@@ -15,10 +15,10 @@ const Button = ({
     onClick,
     children,
 }: ButtonProps) => {
-    const baseStyle = "flex flex-row justify-center items-center px-4 py-2 rounded font-semibold";
+    const baseStyle = "flex justify-center gap-2 items-center px-4 py-2 rounded font-semibold";
     const variantStyle = {
-        text: "bg-transparent",
-        icon: "bg-transparent flex items-center justify-center",
+        text: "",
+        icon: "bg-transparent",
         outlined: "border border-gray-300",
     }[variant];
     const sizeStyle = {
