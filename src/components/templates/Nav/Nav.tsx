@@ -12,9 +12,7 @@ const Nav = () => {
                 Text Button
             </Button>
             <Button variant="icon" size="small" color="secondary">
-                <span>
-                    <Image src={sample} alt="sample"></Image>
-                </span>
+                <Image priority src={sample} alt="sample"></Image>
             </Button>
             <Button variant="outlined" size="large" color="primary">
                  <span>

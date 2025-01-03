@@ -15,7 +15,7 @@ type ChildrenProps = {
 
 export default function RootLayout({ children }: Readonly<ChildrenProps>) {
   return (
-      <html>
+      <html lang="ko">
           <body className={`h-screen bg-red-200`}>
               <Nav/>
               <div className={`h-full overflow-auto`}>

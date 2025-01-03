@@ -4,6 +4,7 @@ interface ButtonProps {
     variant?: "text" | "icon" | "outlined";
     size?: "small" | "medium" | "large";
     color?: "primary" | "secondary";
+    alt?: string
     onClick?: () => void;
     children: React.ReactNode;
 }
@@ -12,6 +13,7 @@ const Button = ({
     variant = "text",
     size = "medium",
     color = "primary",
+    alt = "버튼",
     onClick,
     children,
 }: ButtonProps) => {
@@ -35,6 +37,7 @@ const Button = ({
         <button
             onClick={onClick}
             className={`${baseStyle} ${variantStyle} ${sizeStyle} ${colorStyle}`}
+            alt={alt}
         >
             {children}
         </button>

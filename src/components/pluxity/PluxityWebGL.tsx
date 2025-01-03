@@ -7,11 +7,7 @@ export default function PluxityWebGL() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if(containerRef.current) {
-            Px.Core.Initialize(containerRef.current);
-        } else {
-            console.error("containerRef.current가 null입니다.");
-        }
+        Px.Core.Initialize(containerRef.current);
     }, []);
 
     return (
