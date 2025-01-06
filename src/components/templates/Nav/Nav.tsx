@@ -6,6 +6,7 @@ import Image from "next/image";
 import Badge from "@/components/atoms/badge";
 import badgeStore from "@/store/badge-store";
 import { useEffect } from "react";
+import LoginButton from "@/components/atoms/buttons/LoginButton";
 
 const Nav = () => {
 
@@ -31,6 +32,7 @@ const Nav = () => {
                     <Image priority src={sample} alt="sample"/> 
                 </span> Launch
             </Button>
+            <LoginButton onClick={(e)=> console.log(e)}> 로그인 </LoginButton>
         </nav>
     )
 }
