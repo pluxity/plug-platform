@@ -5,10 +5,12 @@
   "main": "index.js",
   "packageManager": "pnpm@10.2.1",
   "scripts": {
+    "admin": "pnpm --filter @plug/admin",
     "admin:dev": "pnpm --filter @plug/admin dev",
     "admin:build": "pnpm --filter @plug/admin build",
     "admin:start": "pnpm --filter @plug/admin start",
-    "ui:dev": "pnpm --filter @plug/ui dev"
+    
+    "storybook": "pnpm --filter @plug/ui storybook"
   },
   "keywords": [],
   "author": "",
