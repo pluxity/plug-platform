@@ -1,5 +1,5 @@
 {
-  "name": "@plug/admin",
+  "name": "@plug/sample-nextjs",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@10.2.1",

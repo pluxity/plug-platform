@@ -5,10 +5,8 @@
   "main": "index.js",
   "packageManager": "pnpm@10.2.1",
   "scripts": {
-    "admin": "pnpm --filter @plug/admin",
-    "admin:dev": "pnpm --filter @plug/admin dev",
-    "admin:build": "pnpm --filter @plug/admin build",
-    "admin:start": "pnpm --filter @plug/admin start",
+    "sample-nextjs": "pnpm --filter @plug/sample-nextjs",
+    "sample": "pnpm --filter @plug/sample",
     
     "storybook": "pnpm --filter @plug/ui storybook"
   },
