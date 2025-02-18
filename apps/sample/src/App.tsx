@@ -1,15 +1,12 @@
-import BasicButton from "@plug/ui/src/components/atoms/buttons/BasicButton"
-import './App.css'
+import { Button } from "@plug/ui/src/components/Button";
 
 function App() {
 
   return (
     <>
-      <div>
-        <BasicButton>
-          버튼
-        </BasicButton>
-       </div>
+      <div className="bg-black h-screen w-screen">
+        <Button>버튼</Button>
+      </div>
     </>
   )
 }

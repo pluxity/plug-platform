@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import Header from './Header';
 
 const meta: Meta<typeof Header> = {
-  title: 'Components/Organisms/Header',
+  title: 'Components/Layouts/Header',
   component: Header,
   tags: ['autodocs'],
   argTypes: {
@@ -17,7 +17,7 @@ export default meta;
 
 type Story = StoryObj<typeof Header>;
 
-export const Default: Story = {
+export const DefaultHeader: Story = {
   args: {
     logoSrc: '/logo.svg',
     children: 'Additional Header Content',
