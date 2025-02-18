@@ -16,11 +16,7 @@ const meta: Meta<typeof Time> = {
     },
     format:{
       control: 'select',
-      options:[
-        'HH:mm:ss', 'HH시 mm분 ss초', 'YYYY-MM-DD' , 'YYYY년 MM월 DD일',
-        'YYYY년 MM월 DD일 HH:mm:ss', 'YYYY년 MM월 DD일 HH시 mm분 ss초',
-        'YYYY년 MM월 DD일(요일)', 'HH:mm', 'HH시 mm분'
-      ]
+      options:['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD', 'locale']
     }
   },
 };
