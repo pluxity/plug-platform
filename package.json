@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "admin": "pnpm --filter @plug/admin",
     "sample": "pnpm --filter @plug/sample",
     "sample-nextjs": "pnpm --filter @plug/sample-nextjs",
     "storybook": "pnpm --filter @plug/ui storybook"
