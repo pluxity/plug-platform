@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
-import Dashboard from '../pages/Dashboard';
-import Users from '../pages/User';
-import SystemSettings from '../pages/SystemSetting';
-import Drawing from '../pages/Drawings/Drawing';
-import DrawingCategory from "../pages/Drawings/Category";
-import PlxObject from '../pages/Objects/Object';
-import ObjectCategory from '../pages/Objects/Category';
+import Dashboard from '../pages/dashboard/Dashboard';
+import Users from '../pages/dashboard/User';
+import SystemSettings from '../pages/dashboard/SystemSetting';
+import Drawing from '../pages/dashboard/Drawings/Drawing';
+import DrawingCategory from "../pages/dashboard/Drawings/Category";
+import PlxObject from '../pages/dashboard/Objects/Object';
+import ObjectCategory from '../pages/dashboard/Objects/Category';
 
-const AppRoutes = () => (
+const DashboardRoutes = () => (
   <Routes>
     <Route path="/" element={<Dashboard />} />
     <Route path="/users" element={<Users />} />
@@ -19,4 +19,4 @@ const AppRoutes = () => (
   </Routes>
 );
 
-export default AppRoutes;
+export default DashboardRoutes;

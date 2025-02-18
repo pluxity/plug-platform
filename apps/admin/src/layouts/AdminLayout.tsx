@@ -1,6 +1,5 @@
 import { ReactNode, useState } from 'react';
 import { Layout, Button } from 'antd';
-import { useLocation } from 'react-router-dom';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
 import SiderNav from './SiderNav';
@@ -15,7 +14,6 @@ type AdminLayoutProps = {
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [collapsed, setCollapsed] = useState(true);
-  const location = useLocation(); // 필요하면 location을 사용하세요.
 
   return (
     <Layout style={{ minHeight: '100vh' }}>

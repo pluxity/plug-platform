@@ -35,7 +35,7 @@ const items = [
 
 type SideNavProps = SiderProps;
 
-const SideNav = ({ ...others }: SideNavProps) => {
+const SideNav = ({...others }: SideNavProps) => {
 
     const navigate = useNavigate();
 
