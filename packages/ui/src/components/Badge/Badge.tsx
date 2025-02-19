@@ -1,5 +1,5 @@
 import {HTMLAttributes} from 'react';
-import clsx from 'clsx';
+import cn from 'clsx';
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement>{
     variant?: 'primary' | 'destructive';
@@ -22,8 +22,8 @@ const Badge = ({
     
     // variant 스타일 정의 
     const variantStyle = {
-        primary : 'bg-primary-500',
-        destructive : 'bg-destructive-500',
+        primary : 'bg-primary-500 text-white',
+        destructive : 'bg-destructive-500 text-white',
     }[variant];
 
     // size 스타일 정의
@@ -39,7 +39,7 @@ const Badge = ({
             role="status" 
             aria-live="polite" 
             aria-label={label}
-            className={clsx(
+            className={cn(
                 badgeStyle,
                 variantStyle,
                 sizeStyle,
