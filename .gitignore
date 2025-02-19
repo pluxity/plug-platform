@@ -48,3 +48,8 @@ temp/
 # Docker 관련 (개발용 override 파일 등, 필요에 따라)
 docker-compose.override.yml
 *storybook.log
+
+# 모든 .d.ts 파일을 무시하되, vite-env.d.ts와 vite.config.d.ts는 예외 처리
+*.d.ts
+!vite-env.d.ts
+!vite.config.d.ts
