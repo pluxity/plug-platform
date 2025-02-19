@@ -1,5 +1,5 @@
 import {HTMLAttributes} from 'react';
-import cn from 'clsx';
+import {cn} from '../../utils/classname';
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement>{
     variant?: 'primary' | 'destructive';
