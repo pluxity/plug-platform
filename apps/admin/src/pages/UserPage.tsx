@@ -3,9 +3,11 @@ import { Table, Button, Input, Select, Space, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import RegistrationModal from "../components/molecules/RegistrationModal";
 import UserRegistrationForm from "../components/organisms/UserRegistrationForm";
+import { type User } from "../services/user/types"
+import { getUsers } from  "../variables/sample";
 
 
-const initialUsers: User[] = getUsers();
+const initialUsers: User[] = getUsers;
 
 const UserPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>(initialUsers);

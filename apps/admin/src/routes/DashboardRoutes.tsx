@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Dashboard from '../pages/MainPage';
+import MainPage from '../pages/MainPage';
 import Users from '../pages/UserPage';
 import SystemSettings from '../pages/SystemSettingPage';
 import Drawing from '../pages/Drawings/DrawingPage';
@@ -9,7 +9,7 @@ import ObjectCategory from '../pages/Objects/CategoryPage';
 
 const DashboardRoutes = () => (
   <Routes>
-    <Route path="/" element={<Dashboard />} />
+    <Route path="/" element={<MainPage />} />
     <Route path="/users" element={<Users />} />
     <Route path="/settings" element={<SystemSettings />} />
     <Route path="/drawings/category" element={<DrawingCategory />} />

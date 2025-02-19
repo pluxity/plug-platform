@@ -1,3 +1,5 @@
+import { type User } from "../services/user/types"
+
 const sampleDrawings = Array.from({ length: 100 }, (_, index) => ({
   id: index + 1,
   title: `도면 ${index + 1}`,
@@ -5,16 +7,11 @@ const sampleDrawings = Array.from({ length: 100 }, (_, index) => ({
   thumbnail: `https://picsum.photos/240/160?random=${index + 1}`,
 }));
 
-const sampleUsers: {
-    key: number;
-    name: string;
-    email: string;
-    phone?: string;
-}[] = Array.from({ length: 100 }, (_, i) => ({
+const getUsers: User[] = Array.from({ length: 100 }, (_, i) => ({
   key: i + 1,
   name: `사용자 ${i + 1}`,
   email: `user${i + 1}@example.com`,
   phone: `010-0000-${(i + 1).toString().padStart(4, "0")}`,
 }));
 
-export { sampleDrawings, sampleUsers };
+export { sampleDrawings, getUsers };
