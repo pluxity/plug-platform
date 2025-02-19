@@ -8,7 +8,7 @@ const meta: Meta<typeof Time> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary'],
+      options: ['black', 'white'],
     },
     size: {
       control: 'select',
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof Time>;
 
 export const Primary: Story = {
   args: {
-    variant: 'primary',
+    variant: 'black',
     size:'small',
     format : 'YYYY-MM-DD HH:mm:ss',
   },

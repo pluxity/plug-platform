@@ -2,33 +2,29 @@ import { TimeHTMLAttributes, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 export interface TimeProps extends TimeHTMLAttributes<HTMLTimeElement> {
-  variant?: 'primary';
-  size?: 'small' | 'medium' | 'large';
-  lang?: string;
+  variant: 'black' | 'white';
+  size: 'small' | 'medium' | 'large';
+  lang: string;
   format? :string;
   className?: string;
-  children? : string;
 }
 
 const Time = ({ 
-  variant = 'primary',
+  variant = 'black',
   lang = 'ko',
   size = 'small',
   format = 'YYYY-MM-DD HH:mm:ss',
   className,
-  children,
   ...props 
 }: TimeProps) => {
 
-  // 공통 시간 스타일
   const timeStyle = 'flex gap-2 items-center font-bold';
 
-  // variant 스타일 정의
   const variantStyle = {
-    primary: '#000',
+    black: 'text-black',
+    white: 'text-white'
   }[variant];
 
-  // size 스타일 정의
   const sizeStyle = {
     small: 'text-sm',
     medium: 'text-base',
@@ -40,10 +36,10 @@ const Time = ({
   function formatDate(date:Date, format:string, lang?:string){
 
     const locale = lang;
-    const options = {
-      seconds: 'numeric',
+    const options : Intl.DateTimeFormatOptions = {
+      second: 'numeric',
       hour: 'numeric',
-      minutes: 'numeric',
+      minute: 'numeric',
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -72,7 +68,6 @@ const Time = ({
     }
   }
 
-// 실시간 업데이트 
 const [currentTime, setCurrentTime] = useState('');
 
 useEffect(() => {
@@ -86,17 +81,15 @@ useEffect(() => {
   
   return (
     <time 
-        role="time"
         className={clsx(
             variantStyle,
             timeStyle,
             sizeStyle,
-            format,
             className
         )}
         {...props}
         >
-          {<span>{currentTime}</span>}
+          {currentTime}
     </time>
   );
 };
