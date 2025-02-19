@@ -5,6 +5,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement>{
     variant?: 'primary' | 'destructive';
     size?: 'xsmall' | 'small' | 'medium' | 'large';
     className?: string;   
+    label?: string;
 }
 
 const Badge = ({
@@ -12,6 +13,7 @@ const Badge = ({
     size = 'small',
     className,
     children,
+    label,
     ...props
 } : BadgeProps) => {
 
@@ -34,10 +36,9 @@ const Badge = ({
 
     return(
         <span
-            id="badge"
             role="status" 
             aria-live="polite" 
-            aria-label="새 메시지"
+            aria-label={label}
             className={clsx(
                 badgeStyle,
                 variantStyle,

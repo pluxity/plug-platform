@@ -25,7 +25,8 @@ export const Primary: Story = {
     args: {
       variant: 'primary',
       size:'xsmall',
-      children: 'message'
+      children: 'message',
+      label: 'badge'
     },
   };
 
@@ -34,6 +35,7 @@ export const Primary: Story = {
       variant: 'destructive',
       size:'xsmall',
       children: 'notice',
+      label: 'badge'
     },
   };
   
