@@ -8,9 +8,10 @@ const ThreeDViewer: React.FC = () => {
     if (containerRef.current) {
       new Engine3D(containerRef.current);
     }
+    console.log('WebGL 초기화 호출.');
   }, []);
 
-  return <div ref={containerRef} style={{ width: '800px', height: '600px' }} />;
+  return <div ref={containerRef} style={{ left: '0px', top: '0px', width: '100vw', height: '100vh' }} />;
 };
 
 export default ThreeDViewer;
