@@ -2,9 +2,9 @@ import { TimeHTMLAttributes, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 export interface TimeProps extends TimeHTMLAttributes<HTMLTimeElement> {
-  variant: 'black' | 'white';
-  size: 'small' | 'medium' | 'large';
-  lang: string;
+  variant?: 'black' | 'white';
+  size?: 'small' | 'medium' | 'large';
+  lang?: string;
   format? :string;
   className?: string;
 }
