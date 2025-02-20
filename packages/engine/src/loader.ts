@@ -48,6 +48,11 @@ function LoadGltf(url: string, onLoad: Function) {
             type: 'onGltfLoaded',
             target: gltf.scene,
         });
+        // 그림자맵 업데이트 이벤트 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onShadowMapNeedsUpdate',
+            shadowMapTarget: modelGroup,
+        });
 
         // 로드 완료 콜백 호출
         onLoad?.();

@@ -7,6 +7,26 @@ enum CustomLayer {
     Pickable,
 }
 
+/**
+ * 마우스 버튼 열거형
+ */
+enum MouseButton {
+    Left = 0,
+    Middle = 1,
+    Right = 2,
+}
+
+/**
+ * 조합키 열거형
+ */
+enum ModifyKey {
+    Shift = 'shiftKey',
+    Control = 'ctrlKey',
+    Alt = 'altKey',
+}
+
 export {
-    CustomLayer
+    CustomLayer,
+    MouseButton,
+    ModifyKey,
 }

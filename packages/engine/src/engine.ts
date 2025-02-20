@@ -17,7 +17,6 @@ class Engine3D {
     private hemiLight: THREE.HemisphereLight;
 
     private rootScene: THREE.Scene; // 최상위 루트씬
-    private testObj: THREE.Object3D;
 
     /**
      * 생성자
@@ -83,17 +82,14 @@ class Engine3D {
         // 렌더링 루프 콜백
         this.renderer.setAnimationLoop(this.onRender.bind(this));
 
+        // 그림자맵 이벤트 콜백 등록
+        Event.InternalHandler.addEventListener('onShadowMapNeedsUpdate' as never, this.updateShadowMap.bind(this));
+
         // 초기화 완료 이벤트 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onEngineInitialized',
             engine: this,
         });
-
-        // 테스트
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-        this.testObj = new THREE.Mesh(geometry, material);
-        this.rootScene.add(this.testObj);
 
     }
 
@@ -123,11 +119,6 @@ class Engine3D {
         });
 
         // 업데이트 및 렌더링
-        if( this.testObj ) {
-            this.testObj.rotateX(1.0 * deltaTime);
-            this.testObj.rotateY(2.0 * deltaTime);
-            this.testObj.rotateZ(3.0 * deltaTime);
-        }
         this.composer.render();
 
         // 렌더링 후 이벤트 통지
@@ -138,10 +129,55 @@ class Engine3D {
     }
 
     /**
+     * 그림자맵 업데이트
+     */
+    updateShadowMap(evt: any): void {
+
+        const target = (evt.shadowMapTarget === undefined) ? this.RootScene : evt.shadowMapTarget;
+
+        // 대상 객체 바운딩 계산
+        const bounding = new THREE.Box3().setFromObject(target);
+        const sphere = new THREE.Sphere();
+        bounding.getBoundingSphere(sphere);
+
+        // 광원 위치 조정
+        const lightWorldPos = new THREE.Vector3();
+        this.directionalLight.getWorldPosition(lightWorldPos);
+        lightWorldPos.normalize();
+        this.directionalLight.position.copy(sphere.center.clone().addScaledVector(lightWorldPos, sphere.radius));
+
+        // 광원 그림자 카메라 사이즈 조정
+        this.directionalLight.shadow.camera.left = -sphere.radius;
+        this.directionalLight.shadow.camera.right = sphere.radius;
+        this.directionalLight.shadow.camera.top = sphere.radius;
+        this.directionalLight.shadow.camera.bottom = -sphere.radius;
+
+        // 그림자 카메라 평면 거리 조정
+        this.directionalLight.shadow.camera.near = 0.1;
+        this.directionalLight.shadow.camera.far = sphere.radius * 2.0;
+        this.directionalLight.shadow.camera.updateProjectionMatrix();
+
+    }
+
+    /**
+     * Dom 객체
+     */
+    get Dom() {
+        return this.dom;
+    }
+
+    /**
      * 루트 씬 객체
      */
     get RootScene() {
         return this.rootScene;
+    }
+
+    /**
+     * 카메라 인스턴스(원근투영)
+     */
+    get Camera() {
+        return this.camera;
     }
 }
 
