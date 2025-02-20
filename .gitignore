@@ -48,3 +48,6 @@ temp/
 # Docker 관련 (개발용 override 파일 등, 필요에 따라)
 docker-compose.override.yml
 *storybook.log
+
+# typescript d.ts
+**/*.d.ts
