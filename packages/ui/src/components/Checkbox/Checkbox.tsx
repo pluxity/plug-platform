@@ -2,9 +2,8 @@ import { useState, HTMLAttributes } from 'react';
 import { cn } from '../../utils/classname';
 
 export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
-    variant?: 'primary';
+    variant?: 'primary' | 'secondary';
     size?: 'small' | 'medium' | 'large';
-    boxcolor?: 'primary' | 'secondary',
     className?: string;
     disabled?: boolean;
 }
@@ -12,7 +11,6 @@ export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
 const Checkbox = ({
     variant = 'primary',
     size = 'small',
-    boxcolor = 'primary',
     disabled = false,
     children,
     className,
@@ -30,12 +28,13 @@ const Checkbox = ({
     
     const inputVariantStyle = {
         primary: 'bg-white border-black after:border-black',
+        secondary: 'bg-white border-secondary-500 after:border-black'
     }[variant];
 
     const inputCheckboxStyle = {
         primary: 'bg-primary-500 border-primary-500',
         secondary: 'bg-secondary-500 border-secondary-500',
-    }[boxcolor];
+    }[variant];
 
     const inputDisabledStyle = disabled ? 'bg-gray-200 border-gray-300 cursor-not-allowed' : '';
 
@@ -50,6 +49,7 @@ const Checkbox = ({
     
     const labelVariantStyle = {
         primary: 'text-black',
+        secondary: 'text-secondary-500',
     }[variant];
 
     const labelDisabledStyle = disabled ? 'text-gray-400' : '';
@@ -62,19 +62,11 @@ const Checkbox = ({
         setChecked(e.target.checked);
     }
 
-     const handleClick = (e: React.MouseEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-        if (!disabled) {
-            setChecked(!checked);
-        }
-    };
-
     return (
         <label
             role="checkbox"  
             aria-checked={checked}
             htmlFor="checkbox" 
-            onClick={handleClick}
             className={cn(
                 labelStyle,
                 labelSizeStyle,
