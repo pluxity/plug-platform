@@ -4,7 +4,9 @@ import { cn } from "../../utils/classname";
 export interface RadioProps extends HTMLAttributes<HTMLInputElement> {
   variant?: "primary" | "secondary";
   size?: "small" | "medium" | "large";
+  name?: string;
   value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
   disabled?: boolean;
 }
@@ -13,7 +15,9 @@ const Radio = ({
   variant = "primary",
   size = "small",
   disabled = false,
+  name,
   value,
+  onChange,
   children,
   className,
   ...props
@@ -61,7 +65,11 @@ const Radio = ({
   const [checked, setChecked] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(e.target.checked);
+    if (onChange) {
+      onChange(e); 
+    } else {
+      setChecked(e.target.checked); 
+    }
   };
 
   return (
@@ -80,11 +88,11 @@ const Radio = ({
       <input
         type="radio"
         id={value}
-        name="radiotest"
-        className="absolute opacity-0"
+        name={name}
         disabled={disabled}
         checked={checked}
         onChange={handleChange}
+        className="absolute opacity-0"
         {...props}
       />
       <span
