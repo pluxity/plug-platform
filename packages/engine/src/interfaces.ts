@@ -25,8 +25,19 @@ enum ModifyKey {
     Alt = 'altKey',
 }
 
+/**
+ * 모델 정보
+ */
+interface ModelInfo {
+    objectName: string;
+    displayName: string;
+    sortingOrder: number;
+    floorId: string;
+}
+
 export {
     CustomLayer,
     MouseButton,
     ModifyKey,
+    ModelInfo,
 }
