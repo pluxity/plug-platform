@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Model } from '@plug/engine/src';
 
 /**
  * WebGL 조작 패널
@@ -34,7 +35,8 @@ class WebGLControlPanel extends React.Component<any, any> {
 
         // 스테이트
         this.state = {
-            selectedApiName: 'None'
+            selectedApiName: 'None',
+            floorData: []
         };
     }
 
@@ -43,13 +45,22 @@ class WebGLControlPanel extends React.Component<any, any> {
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if( this.state.selectedApiName === "Loader") {
+        if (this.state.selectedApiName === "Loader") {
             return (
-                <button>로더메뉴</button>
+                <button disabled>LoadGltf</button>
             );
-        } else if( this.state.selectedApiName === "Model") {
+        } else if (this.state.selectedApiName === "Model") {
             return (
-                <button>모델메뉴</button>
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, "Model.GetHierarchy")}>GetModelHierarchy</button>
+                    <br/>
+                    {this.state.floorData.map((data: any) => (
+                        <span key={data.floorId}>
+                            <input type="checkbox" id={data.floorId} value={data.floorId} defaultChecked={true}></input>
+                            <label htmlFor={data.floorId}>{data.displayName}</label><br/>
+                        </span>
+                    ))}
+                </span>
             );
         }
 
@@ -70,7 +81,7 @@ class WebGLControlPanel extends React.Component<any, any> {
                         <option value="Loader">Loader</option>
                         <option value="Model">Model</option>
                     </select>
-                    <br/>
+                    <br />
                     {this.renderMenu()}
                 </fieldset>
             </div>
@@ -83,6 +94,21 @@ class WebGLControlPanel extends React.Component<any, any> {
      */
     onApiSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
         this.setState({ selectedApiName: event.target.value });
+    }
+
+    /**
+     * api 버튼 클릭 이벤트
+     * @param apiName - Api 명
+     */
+    onApiBtnClick(apiName: string) {
+        switch (apiName) {
+            case 'Model.GetHierarchy': {
+                Model.GetModelHierarchy('funeralhall.glb', (data: any) => {
+                    console.log('Model.GetModelHierarchy -> ', data);
+                    this.setState({ floorData: data }); // 얻은 층정보로 state 설정
+                });
+            } break;
+        }
     }
 }
 
