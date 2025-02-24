@@ -22,7 +22,7 @@ const Radio = ({
   className,
   ...props
 }: RadioProps) => {
-  // 체크박스 input 스타일
+  // 라디오버튼 input 스타일
   const inputStyle =
     "inline-block border-1 rounded-full relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:w-1/2 after:h-1/2 after:rounded-full after:bg-white after:border-full after:transform";
 
@@ -46,7 +46,7 @@ const Radio = ({
     ? "bg-gray-200 border-gray-300 cursor-not-allowed"
     : "";
 
-  // 체크박스 label 스타일
+  // 라디오버튼 label 스타일
   const labelStyle = "cursor-pointer inline-flex gap-x-1 items-center";
   const labelSizeStyle = {
     small: "text-sm",
@@ -61,7 +61,7 @@ const Radio = ({
 
   const labelDisabledStyle = disabled ? "text-gray-400" : "";
 
-  // 체크박스 동작
+  // 라디오버튼 동작
   const [checked, setChecked] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
