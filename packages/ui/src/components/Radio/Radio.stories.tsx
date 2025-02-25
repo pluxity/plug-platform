@@ -24,18 +24,12 @@ export const Primary: Story = {
     args: {
         variant: 'primary',
         size: 'small',
-        name: "primary",
+        name: 'primary',
         children: (
         <>
-          <RadioGroupItem value="primary01">
-            Option small 01
-          </RadioGroupItem>
-          <RadioGroupItem value="primary02">
-            Option small 02
-          </RadioGroupItem>
-          <RadioGroupItem value="primary03">
-            Option small 03
-          </RadioGroupItem>
+          <RadioGroupItem value="primary01" label="Option small 01"/>
+          <RadioGroupItem value="primary02" label="Option small 02"/>
+          <RadioGroupItem value="primary03" label="Option small 03"/>
         </>
       ),
     },
@@ -48,15 +42,9 @@ export const Secondary: Story = {
         name: 'secondary',
         children: (
         <>
-          <RadioGroupItem value="secondary01">
-            Option medium 01
-          </RadioGroupItem>
-          <RadioGroupItem value="secondary02">
-            Option medium 02
-          </RadioGroupItem>
-          <RadioGroupItem value="secondary03">
-            Option medium 03
-          </RadioGroupItem>
+          <RadioGroupItem value="secondary01" label="Option medium 01"/>
+          <RadioGroupItem value="secondary02" label="Option medium 02"/>
+          <RadioGroupItem value="secondary03" label="Option medium 03"/>
         </>
       ),
     },
@@ -69,15 +57,9 @@ export const Disabled: Story = {
         name: 'disabled',
         children: (
         <>
-          <RadioGroupItem value="disabled01" disabled>
-            Option large 01
-          </RadioGroupItem>
-          <RadioGroupItem value="disabled02" disabled>
-            Option large 02
-          </RadioGroupItem>
-          <RadioGroupItem value="disabled03" disabled>
-            Option large 03
-          </RadioGroupItem>
+          <RadioGroupItem value="disabled01" label="Option large 01" disabled />
+          <RadioGroupItem value="disabled02" label="Option large 02" disabled />
+          <RadioGroupItem value="disabled03" label="Option large 03" disabled />
         </>
       ),
     },

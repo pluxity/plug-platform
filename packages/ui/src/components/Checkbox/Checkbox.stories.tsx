@@ -29,7 +29,7 @@ export const Default: Story = {
     args:{
         variant: 'primary',
         size: 'small',
-        children: 'checkbox'
+        label: 'checkbox'
     }
 }
 
@@ -37,7 +37,6 @@ export const OnlyInput: Story = {
     args:{
         variant: 'primary',
         size: 'small',
-        children: ''
     }
 }
 
@@ -45,7 +44,7 @@ export const Disabled: Story = {
     args:{
         variant: 'primary',
         size: 'small',
-        children: 'checkbox',
+        label: 'checkbox',
         disabled: true
     }
 }

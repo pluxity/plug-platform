@@ -4,6 +4,7 @@ import { cn } from "../../utils/classname";
 export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
   variant?: "primary" | "secondary";
   size?: "small" | "medium" | "large";
+  label?: string;
   className?: string;
   disabled?: boolean;
 }
@@ -11,8 +12,8 @@ export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
 const Checkbox = ({
   variant = "primary",
   size = "small",
+  label,
   disabled = false,
-  children,
   className,
   ...props
 }: CheckboxProps) => {
@@ -95,8 +96,8 @@ const Checkbox = ({
             : "after:hidden",
           "transition-all duration-300"
         )}
-      ></span>
-      {children}
+        ></span>
+        {label}
     </label>
   );
 };

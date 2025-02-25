@@ -13,82 +13,72 @@ interface RadioGroupContextProps {
 const RadioGroupContext = createContext<RadioGroupContextProps | undefined>(undefined);
 
 interface RadioGroupProps {
-  value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
-  variant?: "primary" | "secondary"; 
-  size?: "small" | "medium" | "large"; 
-  name: string;
+  variant?: "primary" | "secondary";
+  size?: "small" | "medium" | "large";
+  name:string;
+  onChange: (value: string) => void;
   children: ReactNode;
   className?: string;
 }
 
 const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(({
-  value, 
-  defaultValue, 
-  onChange, 
-  variant = "primary", 
-  size = "small", 
+  defaultValue,
+  variant = "primary",
+  size = "small",
+  onChange,
   name,
-  children, 
+  children,
   ...props
 }, ref) => {
-  
-  const [internalValue, setInternalValue] = useState<string | null>(defaultValue || null);
-  const selectedValue = value !== undefined ? value : internalValue;
 
-  const handleChange = (newValue: string) => {
-    if (onChange) {
-      onChange(newValue);
-    }
-    if (value === undefined) {
-      setInternalValue(newValue);
-    }
+  const [internalValue, setInternalValue] = useState<string | null>(defaultValue || null);
+
+  const handleChange = (value: string) => {
+    setInternalValue(value);
+    onChange(value);
   };
 
   return (
-    <RadioGroupContext.Provider value={{ selectedValue, onChange: handleChange, variant, size, name }}>
-      <div
-        role="radiogroup"
-        className={cn("grid gap-2", props.className)}
-        ref={ref}
-        {...props}
-      >
+    <RadioGroupContext.Provider value={{ selectedValue: internalValue, onChange: handleChange, variant, size, name }}>
+      <div 
+          role="radiogroup" 
+          className={cn("grid gap-2", props.className)} 
+          ref={ref} 
+          {...props}
+        >
         {children}
       </div>
     </RadioGroupContext.Provider>
   );
 });
 
-// RadioGroupItem 컴포넌트
 export interface RadioItemProps extends React.HTMLAttributes<HTMLLabelElement> {
-  value?: string;
+  value: string;
   label?: string;
   disabled?: boolean;
   className?: string;
-  onChange?: () => void;
 }
 
 const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
-  label,
   value,
+  label,
   disabled = false,
   children,
   className,
   ...props
 }, ref) => {
 
+  
   const context = useContext(RadioGroupContext);
 
   if (!context) {
-    throw new Error('RadioGroupItem must be used within a RadioGroup');
+    throw new Error("RadioGroupItem은 RadioGroup 내에서 사용되어야 합니다.");
   }
 
   const { selectedValue, onChange, variant, size, name } = context;
 
-  // 라디오버튼 input 스타일
-  const inputStyle =
-    "z-1 inline-block cursor-pointer border-1 rounded-full relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:w-1/2 after:h-1/2 after:rounded-full after:bg-white after:border-full after:transform";
+  const inputStyle = "z-1 inline-block cursor-pointer border-1 rounded-full relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:w-1/2 after:h-1/2 after:rounded-full after:bg-white after:border-full after:transform";
 
   const inputSizeStyle = {
     small: "w-4 h-4",
@@ -106,11 +96,8 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
     secondary: "bg-secondary-500 border-secondary-500",
   }[variant];
 
-  const inputDisabledStyle = disabled
-    ? "bg-gray-200 border-gray-300 cursor-not-allowed"
-    : "";
+  const inputDisabledStyle = disabled ? "bg-gray-200 border-gray-300 cursor-not-allowed" : "";
 
-  // 라디오버튼 label 스타일
   const labelStyle = "cursor-pointer inline-flex gap-x-1 items-center";
   const labelSizeStyle = {
     small: "text-sm",
@@ -126,6 +113,7 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
   const labelDisabledStyle = disabled ? "text-gray-400 cursor-not-allowed" : "";
 
   const handleChange = () => {
+    console.log("RadioGroupItem clicked with value:", value);
     if (onChange && value) {
       onChange(value);
     }
@@ -134,7 +122,6 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
   return (
     <label
       aria-checked={selectedValue === value}
-      htmlFor={value}
       ref={ref}
       className={cn(
         labelStyle,
@@ -147,7 +134,6 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
     >
       <input
         type="radio"
-        id={value}
         className="absolute opacity-0 z-1"
         disabled={disabled}
         checked={selectedValue === value}
@@ -167,7 +153,7 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
           "transition-all duration-300"
         )}
       ></span>
-      {children}
+      {label}
     </label>
   );
 });
