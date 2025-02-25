@@ -18,7 +18,7 @@ const Checkbox = ({
 }: CheckboxProps) => {
   // 체크박스 input 스타일
   const inputStyle =
-    "inline-block border-1 rounded-sm relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:w-1/3 after:h-1/3 after:border-t-2 after:border-r-2 after:transform after:rotate-132";
+    "inline-block cursor-pointer border-1 rounded-sm relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:w-1/3 after:h-1/3 after:border-t-2 after:border-r-2 after:transform after:rotate-132";
 
   const inputSizeStyle = {
     small: "w-4 h-4",
@@ -28,7 +28,7 @@ const Checkbox = ({
 
   const inputVariantStyle = {
     primary: "bg-white border-black after:border-black",
-    secondary: "bg-white border-secondary-500 after:border-black",
+    secondary: "bg-white border-black after:border-black",
   }[variant];
 
   const inputCheckboxStyle = {
@@ -50,10 +50,10 @@ const Checkbox = ({
 
   const labelVariantStyle = {
     primary: "text-black",
-    secondary: "text-secondary-500",
+    secondary: "text-black",
   }[variant];
 
-  const labelDisabledStyle = disabled ? "text-gray-400" : "";
+  const labelDisabledStyle = disabled ? "text-gray-400 cursor-not-allowed" : "";
 
   // 체크박스 동작
   const [checked, setChecked] = useState(false);
