@@ -53,13 +53,20 @@ class WebGLControlPanel extends React.Component<any, any> {
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, "Model.GetHierarchy")}>GetModelHierarchy</button>
-                    <br/>
+                    <br />
                     {this.state.floorData.map((data: any) => (
                         <span key={data.floorId}>
-                            <input type="checkbox" id={data.floorId} value={data.floorId} defaultChecked={true}></input>
-                            <label htmlFor={data.floorId}>{data.displayName}</label><br/>
+                            <input type="checkbox" id={data.floorId} value={data.floorId} defaultChecked={true} onChange={this.onFloorVisibleCheckChanged.bind(this)}></input>
+                            <label htmlFor={data.floorId}>{data.displayName}</label><br />
                         </span>
                     ))}
+                    {
+                        this.state.floorData.length > 0 &&
+                        <span>
+                            <button onClick={() => this.setFloorVisibility(true)}>ShowAll</button>
+                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button>
+                        </span>
+                    }
                 </span>
             );
         }
@@ -105,10 +112,33 @@ class WebGLControlPanel extends React.Component<any, any> {
             case 'Model.GetHierarchy': {
                 Model.GetModelHierarchy('funeralhall.glb', (data: any) => {
                     console.log('Model.GetModelHierarchy -> ', data);
+
                     this.setState({ floorData: data }); // 얻은 층정보로 state 설정
                 });
             } break;
         }
+    }
+
+    /**
+     * 층 객체 체크박스값 변화 이벤트 처리
+     */
+    onFloorVisibleCheckChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        const target: HTMLInputElement = evt.target;
+        if (target.checked)
+            Model.Show(target.id);
+        else
+            Model.Hide(target.id);
+    }
+
+    /**
+     * 층객체 모든 층 보이기/숨기기
+     * @param isVisible - 가시화 여부
+     */
+    setFloorVisibility(isVisible: boolean) {
+        if (isVisible)
+            Model.ShowAll();
+        else
+            Model.HideAll();
     }
 }
 
