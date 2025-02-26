@@ -14,6 +14,10 @@ const meta: Meta<typeof Checkbox> = {
             control: 'select',
             options: ['small', 'medium', 'large']
         },
+        type:{
+            control: 'select',
+            options: ['rectangle', 'circle']
+        },
         disabled:{
             boolean: false,
         }
@@ -29,7 +33,8 @@ export const Default: Story = {
     args:{
         variant: 'primary',
         size: 'small',
-        children: 'checkbox'
+        type: 'circle',
+        label: 'checkbox'
     }
 }
 
@@ -37,7 +42,6 @@ export const OnlyInput: Story = {
     args:{
         variant: 'primary',
         size: 'small',
-        children: ''
     }
 }
 
@@ -45,7 +49,7 @@ export const Disabled: Story = {
     args:{
         variant: 'primary',
         size: 'small',
-        children: 'checkbox',
+        label: 'checkbox',
         disabled: true
     }
 }

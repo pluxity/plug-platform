@@ -4,6 +4,8 @@ import { cn } from "../../utils/classname";
 export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
   variant?: "primary" | "secondary";
   size?: "small" | "medium" | "large";
+  type?: "rectangle" | "circle";
+  label?: string;
   className?: string;
   disabled?: boolean;
 }
@@ -11,14 +13,23 @@ export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
 const Checkbox = ({
   variant = "primary",
   size = "small",
+  type = "rectangle",
+  label,
   disabled = false,
-  children,
   className,
   ...props
 }: CheckboxProps) => {
+
+  // 체크박스 동작
+  const [checked, setChecked] = useState(false);
+
   // 체크박스 input 스타일
-  const inputStyle =
-    "inline-block border-1 rounded-sm relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:w-1/3 after:h-1/3 after:border-t-2 after:border-r-2 after:transform after:rotate-132";
+  const inputStyle = "inline-block cursor-pointer bg-white border-1 border-gray-500 relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-2/3 after:w-1/2 after:h-1/3 after:border-t-1 after:border-r-1 after:border-white after:transform after:rotate-132";
+
+  const inputTypeStyle = {
+    rectangle: "rounded-sm",
+    circle: "rounded-full",
+  }[type];
 
   const inputSizeStyle = {
     small: "w-4 h-4",
@@ -26,19 +37,13 @@ const Checkbox = ({
     large: "w-6 h-6",
   }[size];
 
+
   const inputVariantStyle = {
-    primary: "bg-white border-black after:border-black",
-    secondary: "bg-white border-secondary-500 after:border-black",
+    primary: `${checked ? "bg-primary-500 border-primary-600" : ""}`,
+    secondary: `${checked ? "bg-secondary-500 border-secondary-600" : ""}`,
   }[variant];
 
-  const inputCheckboxStyle = {
-    primary: "bg-primary-500 border-primary-500",
-    secondary: "bg-secondary-500 border-secondary-500",
-  }[variant];
-
-  const inputDisabledStyle = disabled
-    ? "bg-gray-200 border-gray-300 cursor-not-allowed"
-    : "";
+  const inputDisabledStyle = disabled ? "bg-gray-200 border-gray-400 after:border-gray-400 cursor-not-allowed" : "";
 
   // 체크박스 label 스타일
   const labelStyle = "cursor-pointer inline-flex gap-x-1 items-center";
@@ -50,13 +55,10 @@ const Checkbox = ({
 
   const labelVariantStyle = {
     primary: "text-black",
-    secondary: "text-secondary-500",
+    secondary: "text-black",
   }[variant];
 
-  const labelDisabledStyle = disabled ? "text-gray-400" : "";
-
-  // 체크박스 동작
-  const [checked, setChecked] = useState(false);
+  const labelDisabledStyle = disabled ? "text-gray-400 cursor-not-allowed" : "";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(e.target.checked);
@@ -87,16 +89,14 @@ const Checkbox = ({
       <span
         className={cn(
           inputStyle,
+          inputTypeStyle,
           inputSizeStyle,
           inputVariantStyle,
           inputDisabledStyle,
-          checked
-            ? `after:block after:border-white ${inputCheckboxStyle}`
-            : "after:hidden",
-          "transition-all duration-300"
+          checked ? `after:block` : "after:hidden", "transition-all duration-300"
         )}
-      ></span>
-      {children}
+        ></span>
+        {label}
     </label>
   );
 };
