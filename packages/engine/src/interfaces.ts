@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 /**
  * 카메라, 픽킹등에 사용할 레이어 열거형
  */
@@ -35,9 +37,29 @@ interface ModelInfo {
     floorId: string;
 }
 
+/**
+ * poi 생성 옵션
+ */
+interface PoiCreateOption {
+    id: string;
+    iconUrl: string;
+    modelUrl?: string;
+    displayText: string;
+    property: { [key: string]: any };
+}
+
+/**
+ * Poi 데이터
+ */
+interface PoiData extends PoiCreateOption{
+    iconObj?: THREE.Sprite;
+}
+
 export {
     CustomLayer,
     MouseButton,
     ModifyKey,
     ModelInfo,
+    PoiCreateOption,
+    PoiData,
 }
