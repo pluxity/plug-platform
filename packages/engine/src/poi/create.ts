@@ -64,8 +64,9 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
 
     // 텍스트 생성
 
-    // poi 목록에 저장
+    // poi 데이터 속성 설정
     const poiData: Interfaces.PoiData = option;
+    poiData.position = new Interfaces.Vector3Custom();
     poiData.iconObj = iconObj;
 
     // poi 생성 이벤트 내부 통지
