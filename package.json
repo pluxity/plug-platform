@@ -6,7 +6,7 @@
   "scripts": {
     "format": "prettier --write",
     "sample": "pnpm --filter @plug/sample",
-    "sample-nextjs": "pnpm --filter @plug/sample-nextjs",
+    "tancheon": "pnpm --filter @plug/tancheon",
     "storybook": "pnpm --filter @plug/ui storybook"
   },
   "keywords": [],
