@@ -2,13 +2,17 @@ import { Button } from "@plug/ui/src/components/Button";
 import { Time } from "@plug/ui/src/components/Time";
 import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
+import { InputText, InputIcon} from "@plug/ui/src/components/Input";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 
 function App() {
   const [group1, setGroup1] = useState<string>('');
   const [group2, setGroup2] = useState<string>('');
+
+  const input_value= useRef<HTMLInputElement>(null);
+  console.log(input_value.current?.value);
 
   return (
     <>
@@ -25,8 +29,13 @@ function App() {
           <RadioGroupItem value="3" label="option3"/>
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
+        <InputText variant="outline" placeholder="텍스트를 입력하세요." invalid={true} />
+        <InputText variant="outline" placeholder="텍스트를 입력하세요." disabled />
+        <InputIcon position="right" placeholder="텍스트를 입력하세요." invalid={true}/>
+        <InputIcon position="right" placeholder="텍스트를 입력하세요." invalid={true} disabled={true}/>
         <label>{group1}</label>
         <label>{group2}</label>
+        <input ref={input_value}></input>
       </div>
     </>
   )
