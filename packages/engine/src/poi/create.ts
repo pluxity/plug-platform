@@ -3,6 +3,7 @@ import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
 import { Engine3D } from '../engine';
+import { PoiElement } from './element';
 
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
@@ -32,19 +33,6 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  * @param option - poi 생성 옵션
  */
 function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
-    /*
-    interface PoiCreateOption {
-        id: string;
-        iconUrl: string;
-        modelUrl?: string;
-        displayText: string;
-        property: { [key: string]: any };
-    }
-        
-    interface PoiData extends PoiCreateOption{
-        iconObj?: THREE.Sprite;
-    }
-    */
     // 중복 체크
 
     // 아이콘 재질이 로드된 상태가 아니면 로드
@@ -65,14 +53,14 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     // 텍스트 생성
 
     // poi 데이터 속성 설정
-    const poiData: Interfaces.PoiData = option;
-    poiData.position = new Interfaces.Vector3Custom();
-    poiData.iconObj = iconObj;
+    const element = new PoiElement(option);
+    element.position = new Interfaces.Vector3Custom();
+    element.IconObject = iconObj;
 
     // poi 생성 이벤트 내부 통지
     Event.InternalHandler.dispatchEvent({
         type: 'onPoiCreate',
-        target: poiData,
+        target: element,
         onCompleteCallback: onComplete,
     });
 }

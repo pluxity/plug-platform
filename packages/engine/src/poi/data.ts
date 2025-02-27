@@ -1,13 +1,14 @@
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
+import { PoiElement } from './element';
 
-const poiDataList: Record<string, Interfaces.PoiData> = {};
+const poiDataList: Record<string, PoiElement> = {};
 
 /**
  * poi 생성 이벤트
  */
 Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
-    const data: Interfaces.PoiData = evt.target as Interfaces.PoiData;
+    const data: PoiElement = evt.target as PoiElement;
     poiDataList[data.id] = data;
 });
 
@@ -18,14 +19,7 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
 function Export(id: string) {
     if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
-        return {
-            id: poi.id,
-            iconUrl: poi.iconUrl,
-            modelUrl: poi.modelUrl,
-            displayText: poi.displayText,
-            property: poi.property,
-            position: poi.position?.ExportData,
-        };
+        return poi.ExportData;
     }
 }
 

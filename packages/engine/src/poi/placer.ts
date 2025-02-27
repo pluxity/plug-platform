@@ -3,10 +3,12 @@ import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
 import { Engine3D } from '../engine';
+import { PoiElement } from './element';
 
 let engine: Engine3D;
-let target: Interfaces.PoiData | undefined = undefined;
+let target: PoiElement;
 let completeCallback: Function | undefined = undefined;
+let currentPicktarget: THREE.Object3D | undefined;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
@@ -20,7 +22,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  * poi 데이터 추가 이벤트 콜백
  */
 Event.InternalHandler.addEventListener('onPoiCreate' as never, (evt: any) => {
-    target = evt.target as Interfaces.PoiData;
+    target = evt.target as PoiElement;
     completeCallback = evt.onCompleteCallback;
 
     registerPointerEvents();
@@ -71,17 +73,17 @@ function onPointerMove(evt: PointerEvent) {
         rayCast.layers.set(Interfaces.CustomLayer.Pickable);
         rayCast.setFromCamera(mousePos, engine.Camera);
 
+        currentPicktarget = undefined;
         const intersects = rayCast.intersectObjects(engine.RootScene.children, true);
         if (intersects.length > 0) {
-            target?.position?.copy(intersects[0].point);
-            target?.iconObj?.position.copy(intersects[0].point);
+            target.WorldPosition = intersects[0].point.clone();
+            currentPicktarget = intersects[0].object;
         } else {
             // 배경 모델 실패시 평면과 교차 테스트 수행
             const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
             const point = new THREE.Vector3();
             if (rayCast.ray.intersectPlane(plane, point)) {
-                target?.position?.copy(point);
-                target?.iconObj?.position.copy(point);
+                target.WorldPosition = point.clone();
             }
         }
     }
@@ -96,6 +98,10 @@ function onPointerUp(evt: PointerEvent) {
         const currMousePos: THREE.Vector2 = new THREE.Vector2(evt.offsetX, evt.offsetY);
         if (currMousePos.distanceTo(mouseDownPos) < 5.0) {
 
+            // 층 id, 층기준 로컬좌표 값
+            const floorObj = getFloorObject();
+            target.FloorId = floorObj?.userData['floorId'];
+
             // poi 배치 이벤트 내부 통지
             Event.InternalHandler.dispatchEvent({
                 type: 'onPoiPlaced',
@@ -103,9 +109,34 @@ function onPointerUp(evt: PointerEvent) {
             });
 
             // 배치 완료 콜백 호출
-            completeCallback?.(PoiData.Export((target as Interfaces.PoiData).id));
+            completeCallback?.(PoiData.Export(target.id));
 
             unRegisterPointerEvents();
         }
     }
+}
+
+/**
+ * 층 id값 얻기
+ * @returns - 층 id값
+ */
+function getFloorObject(): THREE.Object3D | undefined {
+
+    if (currentPicktarget !== undefined) {
+        let floorObj: THREE.Object3D | undefined = undefined;
+        currentPicktarget.traverseAncestors(parent => {
+            if (floorObj === undefined && parent.userData.hasOwnProperty('type')) {
+                const parentType: string = parent.userData['type'];
+                if (parentType.toLowerCase() === 'floor') {
+                    floorObj = parent;
+                }
+            }
+        });
+
+        if (floorObj !== undefined) {
+            return floorObj;
+        }
+    }
+
+    return undefined;
 }
