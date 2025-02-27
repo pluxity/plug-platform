@@ -4,6 +4,7 @@ import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
 import { useState } from "react";
+import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 
 
 function App() {
@@ -13,7 +14,9 @@ function App() {
   return (
     <>
       <div className="h-screen w-screen">
-        <Button>버튼</Button>
+        <Button variant="outline" color="primary">
+          <MenuIcon />버튼
+        </Button>
         <Time>시간</Time>
         <Badge>뱃지</Badge>
         <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
