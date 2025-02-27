@@ -1,61 +1,98 @@
-import { ButtonHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
+import { cn } from '../../utils/classname';
+
+export type ButtonVariant = 'outline' | 'ghost' | 'default';
+export type ButtonColor = 'primary' | 'secondary' | 'destructive' | 'default';
+export type ButtonSize = 'small' | 'medium' | 'large' | 'icon';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'destructive';
-  size?: 'small' | 'medium' | 'large';
-  className?: string;
+  variant?: ButtonVariant;
+  color?: ButtonColor;
+  size?: ButtonSize;
   isLoading?: boolean;
+  className?: string;
 }
 
-const Button = ({ 
-  variant = 'primary',
-  size = 'medium',
-  className,
-  children,
-  isLoading = false,
-  ...props 
-}: ButtonProps) => {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      variant = 'default',
+      color = 'default',
+      size = 'medium',
+      isLoading = false,
+      disabled,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const buttonBaseStyle =
+      "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0";
 
-  // 공통 버튼 스타일
-  const buttonStyle = 'flex justify-center gap-2 items-center px-4 py-2 rounded font-semibold transition-colors duration-200';
+    const variantStyles = {
+      default: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+      outline:
+        "border border-gray-300 bg-transparent hover:bg-gray-100",
+      ghost: "bg-transparent hover:bg-gray-100",
+    };
 
-  // variant 스타일 정의
-  const variantStyle = {
-    primary: 'bg-primary-500 hover:bg-primary-500/90',
-    secondary: 'bg-secondary-500 hover:bg-secondary-500/80',
-    destructive: 'bg-destructive-500 hover:bg-destructive-700',
-  }[variant];
+    const colorStyles = {
+      default: "",
+      primary:
+        "bg-primary-500 text-primary-foreground shadow hover:bg-primary-600",
+      destructive:
+        "bg-destructive-500 text-destructive-foreground shadow-sm hover:bg-destructive-600",
+      secondary:
+        "bg-secondary-500 text-secondary-foreground shadow-sm hover:bg-secondary-600",
+    };
 
-  // size 스타일 정의
-  const sizeStyle = {
-    small: 'text-sm py-1 px-2',
-    medium: 'text-base py-2 px-4',
-    large: 'text-lg py-3 px-6',
-  }[size];
+    const sizeStyles = {
+      small: "h-8 rounded-md px-3 text-xs",
+      medium: "h-9 px-4 py-2",
+      large: "h-10 rounded-md px-8",
+      icon: "h-9 w-9",
+    };
 
-  return (
-    <button
-      className={clsx(
-        buttonStyle,
-        variantStyle,
-        sizeStyle,
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-        className
-      )}
-      disabled={isLoading}
-      {...props}
-    >
-      {isLoading ? (
-        <>
-          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          {children}
-        </>
-      ) : (
-        children
-      )}
-    </button>
-  );
-};
+    const spinnerStyle =
+      "w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin";
 
-export default Button;
+    const disabledStyle = cn(
+      {
+        'cursor-progress': isLoading,
+        'cursor-not-allowed': disabled && !isLoading,
+        'cursor-pointer': !disabled && !isLoading,
+        'disabled:bg-gray-200 disabled:text-gray-500': disabled || isLoading
+      }
+    );
+
+    return (
+      <button
+        className={cn(
+          buttonBaseStyle,
+          variantStyles[variant],
+          variant !== 'outline' && variant !== 'ghost' && colorStyles[color],
+          sizeStyles[size],
+          disabledStyle,
+          className
+        )}
+        ref={ref}
+        disabled={isLoading || disabled}
+        {...props}
+      >
+         {isLoading ? (
+          <>
+            <span className={spinnerStyle} />
+            {children}
+          </>
+        ) : (
+          children
+        )}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+
+export { Button };

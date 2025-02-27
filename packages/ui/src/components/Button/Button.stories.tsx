@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Button from './Button';
+import { Button } from './Button';
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -8,15 +8,25 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'destructive'],
+      options: ['default', 'outline', 'ghost'],
+    },
+    color: {
+      control: 'select',
+      options: ['defaul', 'primary', 'secondary', 'destructive'],
     },
     size: {
       control: 'select',
-      options: ['small', 'medium', 'large'],
+      options: ['small', 'medium', 'large', 'icon'],
     },
     isLoading: {
       control: 'boolean',
     },
+    disabled: {
+      control: 'boolean',
+    },
+    children: {
+      control: 'text',
+    }
   },
 };
 
@@ -26,30 +36,77 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {
   args: {
-    variant: 'primary',
-    children: 'Primary Button',
+    color: 'primary',
+    children: 'Primary',
   },
 };
 
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
-    children: 'Secondary Button',
+    color: 'secondary',
+    children: 'Secondary',
   },
 };
 
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    children: 'Destructive Button',
+    color: 'destructive',
+    children: 'Destructive',
+  },
+};
+
+export const Outline: Story = {
+  args: {
+    variant: 'outline',
+    children: 'Outline',
+  },
+};
+
+export const Ghost: Story = {
+  args: {
+    variant: 'ghost',
+    children: 'Ghost',
+  },
+};
+
+export const Small: Story = {
+  args: {
+    size: 'small',
+    children: 'Small',
+  },
+};
+
+export const Large: Story = {
+  args: {
+    size: 'large',
+    children: 'Large',
+  },
+};
+
+export const Icon: Story = {
+  args: {
+    size: 'icon',
+    children: '',
   },
 };
 
 export const Loading: Story = {
   args: {
-    variant: 'primary',
-    children: 'Loading...',
     isLoading: true,
+    children: 'Loading...'
   },
 };
 
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+    children: 'Disabled',
+  },
+};
+
+export const Custom: Story = {
+  args: {
+    className: "bg-green-500 text-white hover:bg-green-700",
+    children: 'Custom'
+  },
+};
