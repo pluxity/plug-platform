@@ -7,6 +7,7 @@ import { PoiElement } from './element';
 
 let engine: Engine3D;
 let target: PoiElement;
+let previewLine: THREE.LineSegments;
 let completeCallback: Function | undefined = undefined;
 let currentPicktarget: THREE.Object3D | undefined;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
@@ -16,6 +17,19 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
  */
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
+
+    // 이동시 미리보기용 라인 객체
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 1, 0),
+    ]);
+    const material = new THREE.LineBasicMaterial({ color: 'red' });
+    previewLine = new THREE.LineSegments(geometry, material);
+    previewLine.name = '#PoiPlacerPreviewLine';
+    engine.RootScene.add(previewLine);
+
+    previewLine.visible = false;
+    previewLine.layers.set(Interfaces.CustomLayer.Invisible);
 });
 
 /**
@@ -24,6 +38,8 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 Event.InternalHandler.addEventListener('onPoiCreate' as never, (evt: any) => {
     target = evt.target as PoiElement;
     completeCallback = evt.onCompleteCallback;
+
+    previewLine.scale.y = target.LineHeight;
 
     registerPointerEvents();
 });
@@ -76,14 +92,27 @@ function onPointerMove(evt: PointerEvent) {
         currentPicktarget = undefined;
         const intersects = rayCast.intersectObjects(engine.RootScene.children, true);
         if (intersects.length > 0) {
+            // poi 위치
             target.WorldPosition = intersects[0].point.clone();
+
+            // 미리보기선
+            previewLine.position.copy(target.WorldPosition);
+            previewLine.visible = true;
+            previewLine.layers.set(Interfaces.CustomLayer.Default);
+
             currentPicktarget = intersects[0].object;
         } else {
             // 배경 모델 실패시 평면과 교차 테스트 수행
             const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
             const point = new THREE.Vector3();
             if (rayCast.ray.intersectPlane(plane, point)) {
+                // Poi 위치
                 target.WorldPosition = point.clone();
+
+                // 미리보기선
+                previewLine.position.copy(target.WorldPosition);
+                previewLine.visible = true;
+                previewLine.layers.set(Interfaces.CustomLayer.Default);
             }
         }
     }
@@ -111,7 +140,12 @@ function onPointerUp(evt: PointerEvent) {
             // 배치 완료 콜백 호출
             completeCallback?.(PoiData.Export(target.id));
 
+            // 이벤트 등록 해제
             unRegisterPointerEvents();
+
+            // 미리보기선 숨기기
+            previewLine.visible = false;
+            previewLine.layers.set(Interfaces.CustomLayer.Invisible);
         }
     }
 }

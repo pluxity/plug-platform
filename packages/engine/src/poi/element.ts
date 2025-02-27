@@ -12,7 +12,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
     public displayText: string;
     public property: { [key: string]: any };
 
-    public position?: Interfaces.Vector3Custom;
+    public position: Interfaces.Vector3Custom;
     private iconObj?: THREE.Sprite;
     private lineHeight: number;
 
@@ -29,6 +29,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.displayText = option.displayText;
         this.property = option.property;
 
+        this.position = new Interfaces.Vector3Custom();
         this.lineHeight = 2.0;
     }
 
@@ -51,10 +52,24 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * 월드 위치
+     */
+    get WorldPosition(): THREE.Vector3 {
+        return this.position;
+    }
+
+    /**
      * 층 id값
      */
     set FloorId(value: string) {
         this.floorId = value;
+    }
+
+    /**
+     * 선길이
+     */
+    get LineHeight(): number {
+        return this.lineHeight;
     }
 
     /**
