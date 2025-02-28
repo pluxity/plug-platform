@@ -23,6 +23,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({
 
   return (
     <textarea
+      aria-invalid={invalid} 
       className={cn(
         textareaStyle,
         resizeStyles,
