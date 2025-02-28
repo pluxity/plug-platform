@@ -4,6 +4,12 @@ import { Textarea } from './Textarea';
 const meta: Meta<typeof Textarea> = {
     title: 'Component/Textarea',
     tags: ['autodocs'],
+    argTypes:{
+        resize:{
+            control: 'select',
+            options: ['both', 'horizontal', 'vertical', 'none']
+        }
+    }
 }
 
 export default meta;
@@ -11,12 +17,33 @@ export default meta;
 export const Default: StoryObj<typeof Textarea> = {
     render: (args) => <Textarea {...args} />,
     args: {
-        
+        placeholder: '텍스트를 입력하세요.',
+        resize: 'none'
     }
 }
-export const multi: StoryObj<typeof Textarea> = {
+
+export const Error: StoryObj<typeof Textarea> = {
     render: (args) => <Textarea {...args} />,
     args: {
-        
+        invalid: true,
+        placeholder: '텍스트를 입력하세요.',
+        resize: 'none'
+    }
+}
+
+export const Desabled: StoryObj<typeof Textarea> = {
+    render: (args) => <Textarea {...args} />,
+    args: {
+        placeholder: '텍스트를 입력하세요.',
+        resize: 'none',
+        disabled: true
+    }
+}
+
+export const Resize: StoryObj<typeof Textarea> = {
+    render: (args) => <Textarea {...args} />,
+    args: {
+        placeholder: '사이즈 조절할 수 있습니다.',
+        resize: 'both'
     }
 }

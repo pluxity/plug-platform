@@ -2,16 +2,30 @@ import * as React from "react"
 import { cn } from "../../utils/classname";
 
 interface TextareaProps extends React.ComponentProps<"textarea">{
-    className?:string;
+    resize?: 'both' | 'horizontal' | 'vertical' | 'none';
+    invalid?: boolean;
+    className?: string;
 }
  
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ 
+    resize = 'none',
+    invalid = false,
     className, 
     ...props }, ref) => {
+
+    const textareaStyle = `${invalid === true ? "border-red-600 enabled:placeholder:text-red-600" : " border-gray-400 placeholder:text-gray-300 enabled:hover:placeholder:text-black focus:placeholder:text-black"} outline-none cursor-pointer text-xs text-black placeholder:text-xs disabled:text-gray-300 disabled:border-gray-300 disabled:cursor-not-allowed p-2 border border-1 rounded-xs h-9 disabled:bg-gray-200 min-w-55 min-h-20`;
+    const resizeStyles = {
+      both: "resize",
+      horizontal: "resize-x",
+      vertical: "resize-y",
+      none: "resize-none",
+    }[resize];
+
   return (
     <textarea
       className={cn(
-        "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        textareaStyle,
+        resizeStyles,
         className
       )}
       ref={ref}
