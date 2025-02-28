@@ -3,6 +3,7 @@ import { cn } from "../../utils/classname";
 
 export interface InputTextProps extends React.ComponentProps<'input'>{
     variant? : 'text' | 'outline' ;
+    value? : string;
     type?: string;
     invalid?: boolean;
     className?: string;
@@ -10,6 +11,7 @@ export interface InputTextProps extends React.ComponentProps<'input'>{
 
 const InputText = React.forwardRef<HTMLInputElement, InputTextProps>(({ 
     variant = 'text',
+    value,
     type, 
     invalid = false,
     className, 
@@ -19,19 +21,18 @@ const InputText = React.forwardRef<HTMLInputElement, InputTextProps>(({
 
     const inputVariantStyle = {
         outline : `${invalid === true ? "border-red-600" : "border-gray-400"} p-2 border border-1 rounded-xs h-9 disabled:bg-gray-200`,
-        text : '',
+        text : `${invalid === true ? "text-red-600" : ""}`,
     }[variant];
-    
 
     return (
         <>
             <input
                 type={type}
+                value={value}
                 aria-invalid={invalid} 
                 className={cn(
                     InputTextStyle,
                     inputVariantStyle,
-                    invalid,
                     className
                 )}
                 ref={ref}

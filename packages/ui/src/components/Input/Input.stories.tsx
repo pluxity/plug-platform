@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import {InputText} from './InputText';
 import {InputIcon} from './InputIcon';
+import {InputList, InputListItem} from './InputList';
 
 const meta: Meta = {
     title: 'Components/Input',
@@ -65,3 +66,22 @@ export const IconInputText: StoryObj<typeof InputIcon> = {
     }
 }
 
+export const ListInput: StoryObj<typeof InputList> = {
+    render: (args) => (
+      <InputList {...args} >
+        <InputListItem value="선택 1번"/>
+        <InputListItem value="선택 2번" />
+        <InputListItem value="선택 3번" />
+        <InputListItem value="선택 4번" />
+        <InputListItem value="선택 5번" />
+        <InputListItem value="선택 6번" />
+        <InputListItem value="선택 7번" />
+        <InputListItem value="선택 8번" />
+        <InputListItem value="선택 9번" />
+      </InputList>
+    ),
+    args: {
+        invalid: false,
+        disabled: false,
+    },
+}
