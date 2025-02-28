@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  tancheon-app:
+    build:
+      context: . 
+      dockerfile: apps/tancheon-odor-monitoring/Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    image: tancheon-app:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - JWT_SECRET=plx2025
+      - DATABASE_URL=postgresql://postgres:postgres@tancheon-db:5432/tancheon_db
+    volumes:
+      - ./apps/tancheon-odor-monitoring:/app/apps/tancheon-odor-monitoring:ro
+      - /app/apps/tancheon-odor-monitoring/node_modules
+    depends_on:
+      - tancheon-db
+
+  tancheon-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=tancheon_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - tancheon-db-data:/var/lib/postgresql/data
+      - ./apps/tancheon-odor-monitoring/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+volumes:
+  tancheon-db-data: 
