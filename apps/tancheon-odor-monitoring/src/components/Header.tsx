@@ -1,5 +1,6 @@
 // apps/tancheon-odor-monitoring/src/app/components/Header.tsx
 'use client';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -40,6 +41,11 @@ const Header = () => {
                 <span className="font-bold">
                   {user.user_name}({user.role})님 환영합니다.
                 </span>
+              </li>
+            )}
+            {user?.role === 'ADMIN' && (
+              <li>
+                <Link href="/admin/users">사용자 관리 페이지로 이동</Link>
               </li>
             )}
             <li>
