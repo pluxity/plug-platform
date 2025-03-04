@@ -7,6 +7,7 @@ import { PoiElement } from './element';
 
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
+let lineGroup: THREE.Group;
 const iconStorage: Record<string, THREE.SpriteMaterial> = {};
 
 /**
@@ -26,6 +27,19 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     iconGroup = new THREE.Group();
     iconGroup.name = '#IconGroup';
     poiRootGroup.add(iconGroup);
+
+    // 라인 그룹
+    lineGroup = new THREE.Group();
+    lineGroup.name = '#LineGroup';
+    poiRootGroup.add(lineGroup);
+
+    // poi 관련 씬그룹 생성 이벤트 통지
+    Event.InternalHandler.dispatchEvent({
+        type: 'onPoiSceneGroupCreated',
+        poiRootGroup: poiRootGroup,
+        iconGroup: iconGroup,
+        lineGroup: lineGroup,
+    });
 });
 
 /**
