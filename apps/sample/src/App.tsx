@@ -6,6 +6,7 @@ import { InputText, InputIcon } from "@plug/ui/src/components/Input";
 import { InputList, InputListItem } from "@plug/ui/src/components/Input/InputList";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
 import { useState, useRef } from "react";
+import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 
 
 function App() {
@@ -19,7 +20,9 @@ function App() {
     <>
       <div className="h-screen w-screen">
         <div className="bg-gray-400 text-sm p-2 my-2">버튼 Guide</div>
-        <Button>버튼</Button>
+        <Button variant="outline" color="primary">
+          <MenuIcon />버튼
+        </Button>
         <div className="bg-gray-400 text-sm p-2 my-2">시간 Guide</div>
         <Time>시간</Time>
         <div className="bg-gray-400 text-sm p-2 my-2">뱃지 Guide</div>
