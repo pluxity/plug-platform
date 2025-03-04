@@ -2,12 +2,15 @@ import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
+import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
 let lineGroup: THREE.Group;
+let textGroup: THREE.Group;
+let textGeometry: THREE.PlaneGeometry; // 공용 텍스트 Geometry
 const iconStorage: Record<string, THREE.SpriteMaterial> = {};
 
 /**
@@ -32,6 +35,20 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     lineGroup = new THREE.Group();
     lineGroup.name = '#LineGroup';
     poiRootGroup.add(lineGroup);
+
+    // 텍스트 그룹
+    textGroup = new THREE.Group();
+    textGroup.name = '#TextGroup';
+    poiRootGroup.add(textGroup);
+
+    // 공용 텍스트 geometry
+    textGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
+    textGeometry.translate(0, 2.0, 0);
+
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.8);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.8);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -0.7);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -0.7);
 
     // poi 관련 씬그룹 생성 이벤트 통지
     Event.InternalHandler.dispatchEvent({
@@ -65,11 +82,17 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     iconGroup.add(iconObj);
 
     // 텍스트 생성
+    const textSize = new THREE.Vector2();
+    const textMaterial = Util.createTextMaterial(option.displayText, textSize);
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    //textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
+    textGroup.add(textMesh);
 
     // poi 데이터 속성 설정
     const element = new PoiElement(option);
     element.position = new Interfaces.Vector3Custom();
     element.IconObject = iconObj;
+    element.TextObject = textMesh;
 
     // poi 생성 이벤트 내부 통지
     Event.InternalHandler.dispatchEvent({

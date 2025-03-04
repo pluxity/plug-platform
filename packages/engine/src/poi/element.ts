@@ -14,6 +14,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
     public position: Interfaces.Vector3Custom;
     private iconObj?: THREE.Sprite;
+    private textObj?: THREE.Object3D;
     private lineHeight: number;
 
     private floorId?: string;
@@ -41,6 +42,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * 텍스트 오브젝트
+     */
+    set TextObject(value: THREE.Object3D) {
+        this.textObj = value;
+    }
+
+    /**
      * 월드 위치 설정
      */
     set WorldPosition(value: THREE.Vector3) {
@@ -49,6 +57,9 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
         // 아이콘
         this.iconObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.lineHeight));
+
+        // 텍스트
+        this.textObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.lineHeight));
     }
 
     /**

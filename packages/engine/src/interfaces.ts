@@ -65,16 +65,6 @@ interface PoiCreateOption {
     property: { [key: string]: any };
 }
 
-// /**
-//  * Poi 데이터
-//  */
-// interface PoiData extends PoiCreateOption {
-//     position?: Vector3Custom;
-
-//     iconObj?: THREE.Sprite;
-//     floorId?: string;
-// }
-
 export {
     Vector3Custom,
     CustomLayer,
@@ -82,5 +72,4 @@ export {
     ModifyKey,
     ModelInfo,
     PoiCreateOption,
-    //PoiData,
 }

@@ -179,6 +179,13 @@ class Engine3D {
     get Camera() {
         return this.camera;
     }
+
+    /**
+     * WebGL 렌더러
+     */
+    get Renderer() {
+        return this.renderer;
+    }
 }
 
 export {

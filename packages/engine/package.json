@@ -7,9 +7,11 @@
         "build": "tsc -p tsconfig.json"
     },
     "dependencies": {
+        "pixi.js": "^8.8.1",
         "three": "^0.173.0"
     },
     "devDependencies": {
+        "@types/pixi.js": "^5.0.0",
         "@types/three": "^0.173.0",
         "typescript": "^5.7.3"
     }
