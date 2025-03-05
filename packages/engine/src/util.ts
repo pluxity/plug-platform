@@ -66,11 +66,11 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
     const textStyle = new PIXI.TextStyle({
         stroke: {
             color: 0x000000,
-            width: 8,
+            width: 5,
             join: 'bevel',
         },
         fontFamily: 'Arial',
-        fontSize: 14,
+        fontSize: 12,
         fill: 0xffffff,
         align: 'center',
     });

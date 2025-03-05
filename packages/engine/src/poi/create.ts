@@ -45,10 +45,10 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     textGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
     textGeometry.translate(0, 2.0, 0);
 
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.8);
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.8);
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -0.7);
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -0.7);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
+    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
 
     // poi 관련 씬그룹 생성 이벤트 통지
     Event.InternalHandler.dispatchEvent({
