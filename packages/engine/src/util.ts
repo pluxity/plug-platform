@@ -17,7 +17,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     pixiApp = new PIXI.Application();
     pixiApp.init({
         autoStart: false,
-        //backgroundAlpha: 0,
+        backgroundAlpha: 0,
     });
 });
 
@@ -70,10 +70,9 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
             join: 'bevel',
         },
         fontFamily: 'Arial',
-        fontSize: 16,
+        fontSize: 14,
         fill: 0xffffff,
         align: 'center',
-        textBaseline: 'bottom',
     });
 
     // 사이즈 계산
@@ -89,9 +88,7 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
     pixiApp.stage.addChild(pixiText);
 
     // pixi.js 렌더러의 뷰포트 사이즈를 텍스쳐 크기에 맞춤
-    pixiApp.canvas.width = outSize.x;
-    pixiApp.canvas.height = outSize.y;
-    pixiApp.resize();
+    pixiApp.renderer.resize(outSize.x, outSize.y);
     pixiApp.render();
 
     // three.js 캔버스 텍스쳐 생성
@@ -104,7 +101,7 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
         transparent: true,
         side: THREE.DoubleSide
     });
-    //materialToBillboard(material);
+    materialToBillboard(material);
 
     // pixi.js 텍스트 제거
     pixiApp.stage.removeChild(pixiText);

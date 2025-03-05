@@ -85,7 +85,7 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     const textSize = new THREE.Vector2();
     const textMaterial = Util.createTextMaterial(option.displayText, textSize);
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    //textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
+    textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
     textGroup.add(textMesh);
 
     // poi 데이터 속성 설정
