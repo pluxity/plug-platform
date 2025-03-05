@@ -2,10 +2,10 @@ import { Button } from "@plug/ui/src/components/Button";
 import { Time } from "@plug/ui/src/components/Time";
 import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
-import { InputText, InputIcon } from "@plug/ui/src/components/Input";
-import { InputList, InputListItem } from "@plug/ui/src/components/Input/InputList";
+import { InputText } from "@plug/ui/src/components/Input";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
-import { useState, useRef } from "react";
+import { useState, useCallback } from "react";
+import { debounce } from "lodash";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 
 
@@ -13,8 +13,22 @@ function App() {
   const [group1, setGroup1] = useState<string>('');
   const [group2, setGroup2] = useState<string>('');
 
-  const input_value= useRef<HTMLInputElement>(null);
-  console.log(input_value.current?.value);
+  const [inputTextValue, setInputTextValue] = useState<string>('');
+  const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
+
+  const inputTextDebounce = useCallback(
+    debounce((value: string) => {
+      setInputTextInvalid(value.length <= 10);
+      console.log(value);
+    }, 300),
+    []
+  );
+
+  const inputTextOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputTextValue(value);
+    inputTextDebounce(value);
+  }
 
   return (
     <>
@@ -39,34 +53,9 @@ function App() {
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
-        <InputText placeholder="텍스트를 입력하세요." invalid={true} />
-        <InputText placeholder="텍스트를 입력하세요." disabled />
-        <div className="bg-gray-400 text-sm p-2 my-2">Input List Guide</div>
-        <InputList>
-          <InputListItem value="선택 1번"/>
-          <InputListItem value="선택 2번" />
-          <InputListItem value="선택 3번" />
-          <InputListItem value="선택 4번" />
-          <InputListItem value="선택 5번" />
-          <InputListItem value="선택 6번" />
-        </InputList>
-        <InputList invalid={true}>
-          <InputListItem value="선택 1번"/>
-          <InputListItem value="선택 2번" />
-          <InputListItem value="선택 3번" />
-          <InputListItem value="선택 4번" />
-          <InputListItem value="선택 5번" />
-        </InputList>
-        <InputList disabled={true}>
-          <InputListItem value="선택 1번"/>
-          <InputListItem value="선택 2번" />
-          <InputListItem value="선택 3번" />
-          <InputListItem value="선택 4번" />
-          <InputListItem value="선택 5번" />
-        </InputList>
+        <InputText placeholder="텍스트를 입력하세요." labelControl={true} labelText="라벨명" helperText={inputTextInvalid ? "문구를 확인해주세요" : ""} value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
         <label>{group1}</label>
         <label>{group2}</label>
-        <input ref={input_value}></input>
       </div>
     </>
   )
