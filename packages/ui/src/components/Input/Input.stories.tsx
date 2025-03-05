@@ -22,8 +22,8 @@ export default meta;
 export const TextInput: StoryObj<typeof InputText> = {
     render: (args) => <InputText {...args} />,
     args:{
-        variant: 'outline',
-        placeholder: '텍스트를 입력해주세요'
+        placeholder: '텍스트를 입력해주세요',
+        labelControl: true,
     }
 }
 
@@ -38,7 +38,6 @@ export const TextInputOutline: StoryObj<typeof InputText> = {
 export const TextInputDisabled: StoryObj<typeof InputText> = {
     render: (args) => <InputText {...args} />,
     args:{
-        variant: 'outline',
         placeholder: '텍스트를 입력해주세요',
         disabled : true
     }

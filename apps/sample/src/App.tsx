@@ -39,11 +39,8 @@ function App() {
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
-        <InputText variant="outline" placeholder="텍스트를 입력하세요." invalid={true} />
-        <InputText variant="outline" placeholder="텍스트를 입력하세요." disabled />
-        <div className="bg-gray-400 text-sm p-2 my-2">Input Icon Guide</div>
-        <InputIcon position="right" placeholder="텍스트를 입력하세요." invalid={true}/>
-        <InputIcon position="right" placeholder="텍스트를 입력하세요." invalid={true} disabled={true}/>
+        <InputText placeholder="텍스트를 입력하세요." invalid={true} />
+        <InputText placeholder="텍스트를 입력하세요." disabled />
         <div className="bg-gray-400 text-sm p-2 my-2">Input List Guide</div>
         <InputList>
           <InputListItem value="선택 1번"/>
