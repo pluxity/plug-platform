@@ -3,13 +3,31 @@ import { Time } from "@plug/ui/src/components/Time";
 import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
-import { useState } from "react";
+import { Textarea } from "@plug/ui/src/components/Textarea";
+import { useState, useCallback } from "react";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
+import { debounce } from "lodash";
 
 
 function App() {
   const [group1, setGroup1] = useState<string>('');
   const [group2, setGroup2] = useState<string>('');
+  const [textareaValue, setTextareaValue] = useState<string>('');
+  const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
+  
+  const textareaDebounced = useCallback(
+    debounce((value: string) => {
+      setTextareaInvalid(value.length <= 10);
+      console.log(value);
+    }, 500),
+    []
+  );
+  
+  const textareaOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setTextareaValue(value);
+    textareaDebounced(value);
+  };
 
   return (
     <>
@@ -28,6 +46,8 @@ function App() {
           <RadioGroupItem value="3" label="option3"/>
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
+        <Textarea value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." helperText={textareaInvalid ? "10자 이상 입력해주세요." : ""} invalid={textareaInvalid}
+        />
         <label>{group1}</label>
         <label>{group2}</label>
       </div>
@@ -36,3 +56,4 @@ function App() {
 }
 
 export default App
+
