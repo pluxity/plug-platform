@@ -99,6 +99,16 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 }
 
+/**
+ * poi 위치점 메시 데이터
+ */
+interface PoiPointMeshData {
+    meshRef: THREE.InstancedMesh;
+    rotation: THREE.Euler;
+    scale: THREE.Vector3;
+}
+
 export {
-    PoiElement
+    PoiElement,
+    PoiPointMeshData,
 }

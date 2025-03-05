@@ -11,7 +11,9 @@ let iconGroup: THREE.Group;
 let lineGroup: THREE.Group;
 let textGroup: THREE.Group;
 let textGeometry: THREE.PlaneGeometry; // 공용 텍스트 Geometry
+
 const iconStorage: Record<string, THREE.SpriteMaterial> = {};
+const meshStorage: Record<string, THREE.BufferGeometry> = {};
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -87,6 +89,9 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
     textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
     textGroup.add(textMesh);
+
+    // 위치점 메시
+    
 
     // poi 데이터 속성 설정
     const element = new PoiElement(option);
