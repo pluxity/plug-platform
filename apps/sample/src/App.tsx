@@ -2,12 +2,12 @@ import { Button } from "@plug/ui/src/components/Button";
 import { Time } from "@plug/ui/src/components/Time";
 import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
-import { InputText } from "@plug/ui/src/components/Input";
+import { InputText, InputPassword } from "@plug/ui/src/components/Input";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
-
+import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
 
 function App() {
   const [group1, setGroup1] = useState<string>('');
@@ -53,7 +53,8 @@ function App() {
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
-        <InputText placeholder="텍스트를 입력하세요." labelControl={true} labelText="라벨명" helperText={inputTextInvalid ? "문구를 확인해주세요" : ""} value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
+        <InputText placeholder="텍스트를 입력하세요." labelControl={true} labelText="라벨명" helperText={inputTextInvalid ? "문구를 확인해주세요" : ""} value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
+        <InputPassword placeholder="텍스트를 입력하세요." labelControl={true} labelText="비밀번호" helperText={inputTextInvalid ? "문구를 확인해주세요" : ""} value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
         <label>{group1}</label>
         <label>{group2}</label>
       </div>

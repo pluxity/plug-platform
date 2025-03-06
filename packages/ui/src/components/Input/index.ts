@@ -1,2 +1,2 @@
 export { InputText } from "./InputText";
-export { InputIcon } from "./InputIcon";
+export { InputPassword } from './InputPassword';
