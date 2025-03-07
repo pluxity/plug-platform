@@ -4,6 +4,7 @@ import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
 import Input from "@plug/ui/src/components/Input";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
+import { Textarea } from "@plug/ui/src/components/Textarea";
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
@@ -16,6 +17,9 @@ function App() {
   const [inputTextValue, setInputTextValue] = useState<string>('');
   const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+
+  const [textareaValue, setTextareaValue] = useState<string>('');
+  const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
 
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
@@ -31,6 +35,20 @@ function App() {
     inputTextDebounce(value);
     setError(value.length < 8);
   }
+  
+  const textareaDebounced = useCallback(
+    debounce((value: string) => {
+      setTextareaInvalid(value.length <= 10);
+      console.log(value);
+    }, 500),
+    []
+  );
+  
+  const textareaOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setTextareaValue(value);
+    textareaDebounced(value);
+  };
 
   return (
     <>
@@ -54,6 +72,8 @@ function App() {
           <RadioGroupItem value="3" label="option3"/>
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
+        <div className="bg-gray-400 text-sm p-2 my-2">Textarea Guide</div>
+        <Textarea value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." helperText={textareaInvalid ? "10자 이상 입력해주세요." : ""} invalid={textareaInvalid} />
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
         <Input.Box>
           <Input.Label>라벨</Input.Label>
@@ -74,3 +94,4 @@ function App() {
 }
 
 export default App
+
