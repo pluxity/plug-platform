@@ -49,8 +49,8 @@ const InputPassword = React.forwardRef<HTMLInputElement, InputTextProps>(({
             const HidePasswordIconComponent = HidePasswordIcon as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
     
             return (
-                <button type="button" className="pr-2" onClick={togglePasswordIcon}>
-                    {!passwordState ? <HidePasswordIconComponent fill={iconColor}/> : <PasswordIconComponent fill={iconColor}  />}
+                <button type="button" className="pr-2" onClick={togglePasswordIcon} onMouseDown={(e) => {e.preventDefault();}}>
+                    {!passwordState ? <HidePasswordIconComponent fill={iconColor}/> : <PasswordIconComponent fill={iconColor}/>}
                 </button>
             );
         }
@@ -63,8 +63,6 @@ const InputPassword = React.forwardRef<HTMLInputElement, InputTextProps>(({
                 <>
                     <div
                         className={cn(labelWrapStyle)} 
-                        onFocus={onFocus}  
-                        onBlur={onBlur}    
                     >
                         <label
                             className={labelTextStyle}
@@ -79,6 +77,8 @@ const InputPassword = React.forwardRef<HTMLInputElement, InputTextProps>(({
                                 type={passwordState ? 'text' : 'password'}
                                 value={value}
                                 onChange={PasswordChange}
+                                onFocus={onFocus}
+                                onBlur={onBlur}
                                 aria-describedby={helperTextId}
                                 aria-label={ariaLabel}
                                 aria-invalid={invalid}
@@ -105,15 +105,14 @@ const InputPassword = React.forwardRef<HTMLInputElement, InputTextProps>(({
                 <>
                     <div 
                         className={cn(inputWrapStyle)}
-                        onFocus={onFocus}  
-                        onBlur={onBlur} 
                     >
-                        {iconPosition === "leading" && <span></span>}
                         <input
                             id={inputTextId}
-                            type={type}
+                            type={passwordState ? 'text' : 'password'}
                             value={value}
                             onChange={PasswordChange}
+                            onFocus={onFocus}
+                            onBlur={onBlur}
                             aria-describedby={helperTextId}
                             aria-label={ariaLabel}
                             aria-invalid={invalid}
