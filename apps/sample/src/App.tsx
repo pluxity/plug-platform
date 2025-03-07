@@ -2,7 +2,7 @@ import { Button } from "@plug/ui/src/components/Button";
 import { Time } from "@plug/ui/src/components/Time";
 import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
-import { InputText, InputPassword } from "@plug/ui/src/components/Input";
+import Input from "@plug/ui/src/components/Input";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
@@ -15,6 +15,7 @@ function App() {
 
   const [inputTextValue, setInputTextValue] = useState<string>('');
   const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
 
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
@@ -28,6 +29,7 @@ function App() {
     const value = e.target.value;
     setInputTextValue(value);
     inputTextDebounce(value);
+    setError(value.length < 8);
   }
 
   return (
@@ -53,8 +55,17 @@ function App() {
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
-        <InputText placeholder="텍스트를 입력하세요." labelControl={true} labelText="라벨명" helperText={inputTextInvalid ? "문구를 확인해주세요" : ""} value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
-        <InputPassword placeholder="텍스트를 입력하세요." labelControl={true} labelText="비밀번호" helperText={inputTextInvalid ? "문구를 확인해주세요" : ""} value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
+        <Input.Box>
+          <Input.Label>라벨</Input.Label>
+          <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
+          <Input.HelperText error={error}>
+            {inputTextInvalid ? "비밀번호는 8자 이상이어야 합니다." : "안전한 비밀번호를 입력하세요."}
+          </Input.HelperText>
+        </Input.Box>
+        <Input.Box>
+          <Input.Label>라벨</Input.Label>
+          <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
+        </Input.Box>
         <label>{group1}</label>
         <label>{group2}</label>
       </div>
