@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Addon from 'three/addons';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
@@ -8,6 +9,7 @@ import { PoiElement } from './element';
 let engine: Engine3D;
 let target: PoiElement;
 let previewLine: THREE.LineSegments;
+let previewPointMesh: THREE.Mesh;
 let completeCallback: Function | undefined = undefined;
 let currentPicktarget: THREE.Object3D | undefined;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
@@ -19,17 +21,24 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 
     // 이동시 미리보기용 라인 객체
-    const geometry = new THREE.BufferGeometry().setFromPoints([
+    let geometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(0, 1, 0),
     ]);
-    const material = new THREE.LineBasicMaterial({ color: 'red' });
+    let material: THREE.Material = new THREE.LineBasicMaterial({ color: 'red' });
     previewLine = new THREE.LineSegments(geometry, material);
     previewLine.name = '#PoiPlacerPreviewLine';
     engine.RootScene.add(previewLine);
 
     previewLine.visible = false;
     previewLine.layers.set(Interfaces.CustomLayer.Invisible);
+
+    // 이동시 미리보기용 위치점 객체(구체)
+    geometry = new THREE.SphereGeometry(0.1, 32, 32);
+    material = new THREE.MeshStandardMaterial({ color: 'red' });
+    previewPointMesh = new THREE.Mesh(geometry, material);
+    previewPointMesh.name = '#PoiPlacerPreviewPointMesh';
+    engine.RootScene.add(previewPointMesh);
 });
 
 /**
@@ -40,6 +49,13 @@ Event.InternalHandler.addEventListener('onPoiCreate' as never, (evt: any) => {
     completeCallback = evt.onCompleteCallback;
 
     previewLine.scale.y = target.LineHeight;
+
+    // 미리보기용 위치점 메시
+    if( target.modelUrl !== undefined ) {
+
+    } else {
+
+    }
 
     registerPointerEvents();
 });
@@ -99,6 +115,10 @@ function onPointerMove(evt: PointerEvent) {
             previewLine.position.copy(target.WorldPosition);
             previewLine.visible = true;
             previewLine.layers.set(Interfaces.CustomLayer.Default);
+            // 미리보기 위치점 메시
+            previewPointMesh.position.copy(target.WorldPosition);
+            previewPointMesh.visible = true;
+            previewPointMesh.layers.set(Interfaces.CustomLayer.Default);
 
             currentPicktarget = intersects[0].object;
         } else {
@@ -113,6 +133,10 @@ function onPointerMove(evt: PointerEvent) {
                 previewLine.position.copy(target.WorldPosition);
                 previewLine.visible = true;
                 previewLine.layers.set(Interfaces.CustomLayer.Default);
+                // 미리보기 위치점 메시
+                previewPointMesh.position.copy(target.WorldPosition);
+                previewPointMesh.visible = true;
+                previewPointMesh.layers.set(Interfaces.CustomLayer.Default);
             }
         }
     }
@@ -146,6 +170,9 @@ function onPointerUp(evt: PointerEvent) {
             // 미리보기선 숨기기
             previewLine.visible = false;
             previewLine.layers.set(Interfaces.CustomLayer.Invisible);
+            // 미리보기 위치점 메시 숨기기
+            previewPointMesh.visible = false;
+            previewPointMesh.layers.set(Interfaces.CustomLayer.Invisible);
         }
     }
 }

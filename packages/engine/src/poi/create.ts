@@ -10,6 +10,7 @@ let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
 let lineGroup: THREE.Group;
 let textGroup: THREE.Group;
+let pointMeshGroup: THREE.Group;
 let textGeometry: THREE.PlaneGeometry; // 공용 텍스트 Geometry
 
 const iconStorage: Record<string, THREE.SpriteMaterial> = {};
@@ -43,6 +44,11 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     textGroup.name = '#TextGroup';
     poiRootGroup.add(textGroup);
 
+    // 위치점 메시 그룹
+    pointMeshGroup = new THREE.Group();
+    pointMeshGroup.name = '#PointMeshGroup';
+    poiRootGroup.add(pointMeshGroup);
+
     // 공용 텍스트 geometry
     textGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
     textGeometry.translate(0, 2.0, 0);
@@ -58,6 +64,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
         poiRootGroup: poiRootGroup,
         iconGroup: iconGroup,
         lineGroup: lineGroup,
+        pointMeshGroup: pointMeshGroup,
     });
 });
 
@@ -89,9 +96,6 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
     textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
     textGroup.add(textMesh);
-
-    // 위치점 메시
-    
 
     // poi 데이터 속성 설정
     const element = new PoiElement(option);

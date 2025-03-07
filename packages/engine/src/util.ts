@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Addon from 'three/addons';
 import * as PIXI from 'pixi.js';
 import * as Event from './eventDispatcher';
 import { Engine3D } from './engine';
@@ -110,6 +111,39 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
     return material;
 }
 
+/**
+ * 위치점 메시의 인스턴싱 처리를 위해 주소값에 해당하는 모델링이 다중객체로 구성된 메시면 하나로 합쳐서 반환한다
+ * @param url - 모델파일 주소
+ */
+async function getMergedGeometry(url: string) {
+    const loader = new Addon.GLTFLoader();
+}
+/**
+async function init() {
+
+    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+    camera.position.z = 1;
+
+    scene = new THREE.Scene();
+    	
+        const loader = new THREE.TextureLoader();
+        const texture = await loader.loadAsync( 'https://threejs.org/examples/textures/uv_grid_opengl.jpg' );
+    	
+    const geometry = new THREE.PlaneGeometry();
+    const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+    const mesh = new THREE.Mesh( geometry, material );
+    scene.add( mesh );
+
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+    	
+        animate();
+
+}
+
+*/
 export {
     createTextMaterial,
 }
