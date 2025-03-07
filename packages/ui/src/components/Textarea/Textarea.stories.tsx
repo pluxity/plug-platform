@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Textarea } from './Textarea';
 
+
 const meta: Meta<typeof Textarea> = {
     title: 'Components/Textarea',
     tags: ['autodocs'],
@@ -19,8 +20,6 @@ export const Default: StoryObj<typeof Textarea> = {
     args: {
         placeholder: '텍스트를 입력하세요.',
         resize: 'none',
-        helperControl:true,
-        helperText:'에러 문구가 노출됩니다. 스타일과 위치는 추가 수정이 있을 수 있습니다.'
     }
 }
 
