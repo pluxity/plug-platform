@@ -42,8 +42,6 @@ const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
         ...Object(child.props)
       });
     }
-    
-    return child;
   });
   
   const helperTextsProp = inputHelperTexts.map(child => {
@@ -55,25 +53,13 @@ const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
     });
   });
   
-  if (inputHelperTexts.length === 0) {
-    return (
-      <div 
-        ref={ref}
-        className={cn("inline-flex items-center gap-2", className)} 
-        {...props}
-      >
-        {elementProps}
-      </div>
-    );
-  }
-  
   return (
     <div 
       ref={ref}
       className={cn("inline-flex flex-col gap-1", className)} 
       {...props}
     >
-      <div className="inline-flex items-center gap-2">
+      <div className={cn("inline-flex items-center gap-2")}>
         {elementProps}
       </div>
       {helperTextsProp}

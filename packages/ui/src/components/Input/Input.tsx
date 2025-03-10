@@ -34,7 +34,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   
   const iconColor = invalid ? 'red' : props.disabled ? 'lightgray' : inputFocus ? 'black' : 'lightgray';
 
-  const labelWrapStyle = "inline-flex items-center gap-1";
   const inputWrapStyle = `${invalid === true ? "border-red-600" : props.disabled ? "border-gray-300 bg-gray-200" : "border-gray-400"} inline-flex items-center border border-1 rounded-xs h-9 w-45 `;
   const InputTextStyle = `${invalid === true ? "enabled:placeholder:text-red-600 text-red-600" : "placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs h-full p-2 disabled:text-gray-300 disabled:cursor-not-allowed`;
 
@@ -59,17 +58,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <div
-      className={cn(labelWrapStyle)}
-      onFocus={onFocus}  
-      onBlur={onBlur}    
-    > 
+    <> 
       <div className={cn(inputWrapStyle)}>
         {iconPosition === "leading" && componentIcon('leading')}
         <input
           id={id}
           type={type}
           value={value}
+          onFocus={onFocus}  
+          onBlur={onBlur} 
           onChange={handleChange}
           aria-describedby={id}
           aria-label={ariaLabel}
@@ -83,7 +80,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
         />
         {iconPosition === "trailing" && componentIcon('trailing')}
       </div>
-    </div>
+    </>
   );
 });
 
