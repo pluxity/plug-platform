@@ -1,37 +1,32 @@
 import * as React from 'react';
 import { Model, Poi } from '@plug/engine/src';
 
+// 층 데이터 타입 정의
+interface FloorData {
+  floorId: string;
+  displayName: string;
+  [key: string]: unknown;
+}
+
+// 컴포넌트 상태 타입 정의
+interface WebGLControlPanelState {
+  selectedApiName: string;
+  floorData: FloorData[];
+}
+
+// 컴포넌트 프롭스 타입 정의
+type WebGLControlPanelProps = Record<string, never>;
+
 /**
  * WebGL 조작 패널
  */
-class WebGLControlPanel extends React.Component<any, any> {
-
-    private panelStyle: Record<string, string>;
-    private fieldsetStyle: Record<string, string>;
-
+class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLControlPanelState> {
     /**
      * 생성자
      * @param props - 옵션
      */
-    constructor(props: {}) {
+    constructor(props: WebGLControlPanelProps) {
         super(props);
-
-        // 패널 스타일
-        this.panelStyle = {
-            background: 'rgba(255, 255, 255, 0.7)',
-            // color: 'white',
-            padding: '5px',
-            position: 'absolute',
-            left: '10px',
-            top: '10px',
-            border: '1px solid',
-        };
-        // 필드셋 스타일
-        this.fieldsetStyle = {
-            border: '1px solid',
-            padding: '5px',
-            margin: '5px',
-        };
 
         // 스테이트
         this.state = {
@@ -54,7 +49,7 @@ class WebGLControlPanel extends React.Component<any, any> {
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Model.GetHierarchy')}>GetModelHierarchy</button>
                     <br />
-                    {this.state.floorData.map((data: any) => (
+                    {this.state.floorData.map((data: FloorData) => (
                         <span key={data.floorId}>
                             <input type='checkbox' id={data.floorId} value={data.floorId} defaultChecked={true} onChange={this.onFloorVisibleCheckChanged.bind(this)}></input>
                             <label htmlFor={data.floorId}>{data.displayName}</label><br />
@@ -85,8 +80,8 @@ class WebGLControlPanel extends React.Component<any, any> {
      */
     render(): React.ReactNode {
         return (
-            <div style={this.panelStyle}>
-                <fieldset style={this.fieldsetStyle}>
+            <div className="control-panel">
+                <fieldset className="control-fieldset">
                     <legend>WebGL</legend>
                     <label htmlFor='ApiList'>Api List:</label>
                     <select id='ApiList' defaultValue='None' onChange={this.onApiSelectChange.bind(this)}>
@@ -117,7 +112,7 @@ class WebGLControlPanel extends React.Component<any, any> {
     onApiBtnClick(apiName: string) {
         switch (apiName) {
             case 'Model.GetHierarchy': {
-                Model.GetModelHierarchy('funeralhall.glb', (data: any) => {
+                Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
                     console.log('Model.GetModelHierarchy -> ', data);
 
                     this.setState({ floorData: data }); // 얻은 층정보로 state 설정
@@ -127,7 +122,7 @@ class WebGLControlPanel extends React.Component<any, any> {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
                 const displayText: string = id.substring(0, 8);
-                const property: { [key: string]: any } = {
+                const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
                     testFloat: 2.2
@@ -138,7 +133,7 @@ class WebGLControlPanel extends React.Component<any, any> {
                     iconUrl: iconUrl,
                     displayText: displayText,
                     property: property
-                }, (data: any)=>console.log('Poi.Create Callback', data));
+                }, (data: unknown) => console.log('Poi.Create Callback', data));
             } break;
         }
     }

@@ -12,7 +12,7 @@ const ThreeDViewer: React.FC = () => {
         console.log('WebGL 초기화 호출.');
     }, []);
 
-    return <div ref={containerRef} style={{ left: '0px', top: '0px', width: '100vw', height: '100vh' }} />;
+    return <div ref={containerRef} className="three-d-viewer-container" />;
 };
 
 export default ThreeDViewer;
