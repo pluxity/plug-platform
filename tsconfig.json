@@ -25,14 +25,16 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "declaration": false,
 
     /* Alias */
     "baseUrl": ".",
     "paths": {
-      "@plug/ui/*": ["packages/ui/src"],
-      "@plug/utils/*": ["packages/utils/src"],
+      "@plug/ui/*": ["packages/ui/src"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", "**/*.d.ts"]
 }

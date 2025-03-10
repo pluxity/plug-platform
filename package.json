@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write",
     "sample": "pnpm --filter @plug/sample",
-    "sample-nextjs": "pnpm --filter @plug/sample-nextjs",
+    "tancheon": "pnpm --filter @plug/tancheon",
     "storybook": "pnpm --filter @plug/ui storybook"
   },
   "keywords": [],
@@ -14,12 +15,18 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
     "clsx": "^2.1.1",
+    "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.1"
+    "tailwind-merge": "^3.0.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.16",
+    "@types/uuid": "^10.0.0",
+    "prettier": "^3.5.1",
     "tailwindcss": "^4.0.6",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite-plugin-svgr": "^4.3.0"
   }
 }
