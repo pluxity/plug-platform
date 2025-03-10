@@ -2,7 +2,6 @@ import * as React from "react";
 import { cn } from "../../utils/classname";
 
 export interface TextareaProps extends React.ComponentProps<'textarea'> {
-    id?: string;
     ariaLabel?: string;
     resize?: "none" | "both" | "horizontal" | "vertical";
     invalid?: boolean;
@@ -11,7 +10,6 @@ export interface TextareaProps extends React.ComponentProps<'textarea'> {
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({
-    id,
     ariaLabel,
     resize = "none",
     invalid = false,
@@ -35,7 +33,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({
   return (
     <>
       <textarea
-        aria-describedby={id}
         aria-label={ariaLabel}
         aria-invalid={invalid} 
         className={cn(

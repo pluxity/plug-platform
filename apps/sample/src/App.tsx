@@ -3,8 +3,8 @@ import { Time } from "@plug/ui/src/components/Time";
 import { Badge } from "@plug/ui/src/components/Badge";
 import { Checkbox } from "@plug/ui/src/components/Checkbox";
 import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
+import { Textarea } from "@plug/ui/src/components/Textarea";
 import Input from "@plug/ui/src/components/Input";
-import Textarea from "@plug/ui/src/components/Textarea";
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
@@ -73,15 +73,7 @@ function App() {
           <RadioGroupItem value="4" label="option4" />
         </RadioGroup>
         <div className="bg-gray-400 text-sm p-2 my-2">Textarea Guide</div>
-        <div className="bg-gray-300 text-sm px-1">Textarea 묶음</div>
-        <Textarea.Box>
-          <Textarea value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
-          <Textarea.HelperText error={textareaInvalid}>
-            {textareaInvalid ? "내용은 10자 이상이어야 합니다." : "자유롭게 내용을 입력하세요."}
-          </Textarea.HelperText>
-        </Textarea.Box>
-        <div className="bg-gray-300 text-sm px-1">Textarea 단독사용</div>
-        <Textarea value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
+        <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
         <div className="bg-gray-300 text-sm px-1">Input 묶음</div>
         <Input.Box> 
