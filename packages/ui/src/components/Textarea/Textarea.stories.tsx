@@ -4,11 +4,9 @@ import { Textarea } from './Textarea';
 const meta: Meta<typeof Textarea> = {
     title: 'Components/Textarea',
     tags: ['autodocs'],
-    argTypes:{
-        resize:{
-            control: 'select',
-            options: ['both', 'horizontal', 'vertical', 'none']
-        }
+    args: {
+        placeholder: '텍스트를 입력하세요.',
+        resize: 'none',
     }
 }
 
@@ -18,13 +16,10 @@ export const Default: StoryObj<typeof Textarea> = {
     render: (args) => <Textarea {...args} />,
     args: {
         placeholder: '텍스트를 입력하세요.',
-        resize: 'none',
-        helperControl:true,
-        helperText:'에러 문구가 노출됩니다. 스타일과 위치는 추가 수정이 있을 수 있습니다.'
     }
 }
 
-export const Invalid: StoryObj<typeof Textarea> = {
+export const TextareaInvalid: StoryObj<typeof Textarea> = {
     render: (args) => <Textarea {...args} />,
     args: {
         invalid: true,
@@ -32,7 +27,7 @@ export const Invalid: StoryObj<typeof Textarea> = {
     }
 }
 
-export const Disabled: StoryObj<typeof Textarea> = {
+export const TextareaDisabled: StoryObj<typeof Textarea> = {
     render: (args) => <Textarea {...args} />,
     args: {
         placeholder: '텍스트를 입력하세요.',
@@ -40,10 +35,11 @@ export const Disabled: StoryObj<typeof Textarea> = {
     }
 }
 
-export const Resize: StoryObj<typeof Textarea> = {
+export const TextareaResize: StoryObj<typeof Textarea> = {
     render: (args) => <Textarea {...args} />,
     args: {
-        placeholder: '사이즈 조절할 수 있습니다.',
+        placeholder: '사이즈를 조절할 수 있습니다.',
         resize: 'both'
     }
 }
+
