@@ -19,10 +19,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
     footerClassName,
     ...props 
   }, ref) => {
-    const modalStyles = {
-      width: typeof width === 'number' ? `${width}px` : width,
-      height: typeof height === 'number' ? `${height}px` : height,
-    };
+    const widthClass = typeof width === 'number' ? `w-[${width}px]` : `w-[${width}]`;
+    const heightClass = typeof height === 'number' ? `h-[${height}px]` : `h-[${height}]`;
 
     return (
       <Dialog 
@@ -35,8 +33,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         )}
       >
         <div 
-          className="flex flex-col w-full h-full"
-          style={modalStyles}
+          className={cn(
+            "flex flex-col w-full h-full",
+            widthClass,
+            heightClass
+          )}
         >
           {(title || closable) && (
             <div className={cn(

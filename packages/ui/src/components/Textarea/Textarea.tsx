@@ -34,7 +34,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({
     <>
       <textarea
         aria-label={ariaLabel}
-        aria-invalid={invalid} 
         className={cn(
           textareaStyle,
           resizeStyles,

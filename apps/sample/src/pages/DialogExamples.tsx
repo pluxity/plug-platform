@@ -21,13 +21,13 @@ const DialogExamples: React.FC = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '20px' }}>
+    <div className="container p-5">
       <h1>Dialog, Modal, Popup 예제</h1>
 
       {/* Modal 섹션 */}
-      <section style={{ marginBottom: '40px' }}>
+      <section className="mb-10">
         <h2>Modal 예제</h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="flex gap-2.5">
           <Button onClick={() => setIsModalOpen(true)}>기본 모달 열기</Button>
           <Button onClick={() => setIsLargeModalOpen(true)}>큰 모달 열기</Button>
         </div>
@@ -40,7 +40,7 @@ const DialogExamples: React.FC = () => {
           width={400}
           closable
         >
-          <div style={{ padding: '20px' }}>
+          <div className="p-5">
             <p>이것은 기본 모달 내용입니다.</p>
             <p>모달은 중요한 정보나 작업을 위한 대화상자입니다.</p>
           </div>
@@ -55,13 +55,13 @@ const DialogExamples: React.FC = () => {
           height={400}
           closable
           footer={
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <div className="flex justify-end gap-2.5">
               <Button onClick={() => setIsLargeModalOpen(false)}>취소</Button>
               <Button onClick={() => setIsLargeModalOpen(false)}>확인</Button>
             </div>
           }
         >
-          <div style={{ padding: '20px' }}>
+          <div className="p-5">
             <p>이것은 더 큰 모달 예제입니다.</p>
             <p>푸터에 버튼이 있는 모달입니다.</p>
             <p>모달은 사용자의 주의를 필요로 하는 중요한 작업에 사용됩니다.</p>
@@ -70,9 +70,9 @@ const DialogExamples: React.FC = () => {
       </section>
 
       {/* Popup 섹션 */}
-      <section style={{ marginBottom: '40px' }}>
+      <section className="mb-10">
         <h2>Popup 예제</h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="flex gap-2.5">
           <Button onClick={() => handlePopupPlacementChange('top')}>상단 팝업</Button>
           <Button onClick={() => handlePopupPlacementChange('center')}>중앙 팝업</Button>
           <Button onClick={() => handlePopupPlacementChange('bottom')}>하단 팝업</Button>
@@ -87,7 +87,7 @@ const DialogExamples: React.FC = () => {
           width={300}
           closable
         >
-          <div style={{ padding: '15px' }}>
+          <div className="p-4">
             <p>이것은 팝업 내용입니다.</p>
             <p>현재 위치: {popupPlacement}</p>
             <Button onClick={() => setIsPopupOpen(false)}>닫기</Button>
@@ -107,17 +107,11 @@ const DialogExamples: React.FC = () => {
           closeOnOverlayClick
           closeOnEsc
         >
-          <div style={{ 
-            backgroundColor: 'white', 
-            padding: '20px', 
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            maxWidth: '400px'
-          }}>
+          <div className="bg-white p-5 rounded-lg shadow-md max-w-[400px]">
             <h3>다이얼로그 예제</h3>
             <p>이것은 기본 다이얼로그입니다.</p>
             <p>다이얼로그는 Modal과 Popup의 기본이 되는 컴포넌트입니다.</p>
-            <div style={{ marginTop: '20px', textAlign: 'right' }}>
+            <div className="mt-5 text-right">
               <Button onClick={() => setIsDialogOpen(false)}>닫기</Button>
             </div>
           </div>

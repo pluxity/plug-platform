@@ -70,7 +70,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           onChange={handleChange}
           aria-describedby={id}
           aria-label={ariaLabel}
-          aria-invalid={invalid}
           className={cn(
             InputTextStyle,
             className

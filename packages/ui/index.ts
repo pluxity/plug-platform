@@ -15,16 +15,15 @@ export { Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, 
 
 // 타입 내보내기
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from './src/components/Button/Button';
-// 다른 컴포넌트의 타입도 필요에 따라 내보낼 수 있습니다
-// export type { ModalProps } from './src/components/Modal';
-// export type { PopupProps } from './src/components/Popup';
-// export type { DialogProps } from './src/components/Dialog';
-// export type { TimeProps } from './src/components/Time';
-// export type { CardProps } from './src/components/Card';
-// export type { BadgeProps } from './src/components/Badge';
-// export type { CheckboxProps } from './src/components/Checkbox';
-// export type { RadioGroupProps, RadioGroupItemProps } from './src/components/Radio';
-// export type { TextareaProps } from './src/components/Textarea';
-// export type { InputProps } from './src/components/Input';
+export type { ModalProps } from './src/components/Modal';
+export type { PopupProps } from './src/components/Popup';
+export type { DialogProps } from './src/components/Dialog';
+export type { TimeProps } from './src/components/Time';
+export type { CardProps } from './src/components/Card';
+export type { BadgeProps } from './src/components/Badge';
+export type { CheckboxProps } from './src/components/Checkbox';
+export type { RadioGroupProps, RadioGroupItemProps } from './src/components/Radio';
+export type { TextareaProps } from './src/components/Textarea';
+export type { InputProps } from './src/components/Input';
 
 

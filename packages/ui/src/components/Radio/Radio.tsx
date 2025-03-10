@@ -12,7 +12,7 @@ interface RadioGroupContextProps {
 
 const RadioGroupContext = createContext<RadioGroupContextProps | undefined>(undefined);
 
-interface RadioGroupProps {
+export interface RadioGroupProps {
   defaultValue?: string;
   variant?: "primary" | "secondary";
   size?: "small" | "medium" | "large";
@@ -64,7 +64,6 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
   value,
   label,
   disabled = false,
-  children,
   className,
   ...props
 }, ref) => {
@@ -116,7 +115,6 @@ const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
 
   return (
     <label
-      aria-checked={selectedValue === value}
       ref={ref}
       className={cn(
         labelStyle,
