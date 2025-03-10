@@ -1,101 +1,83 @@
-import { Button } from "@plug/ui/src/components/Button";
-import { Time } from "@plug/ui/src/components/Time";
-import { Badge } from "@plug/ui/src/components/Badge";
-import { Checkbox } from "@plug/ui/src/components/Checkbox";
-import { RadioGroup, RadioGroupItem } from "@plug/ui/src/components/Radio";
-import { Textarea } from "@plug/ui/src/components/Textarea";
-import Input from "@plug/ui/src/components/Input";
-import { useState, useCallback } from "react";
-import { debounce } from "lodash";
-import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
-import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import DesignSystem from './pages/DesignSystem';
+import ThreeDTest from './pages/ThreeDTest';
+import DialogExamples from './pages/DialogExamples';
 
 function App() {
-  const [group1, setGroup1] = useState<string>('');
-  const [group2, setGroup2] = useState<string>('');
-
-  const [inputTextValue, setInputTextValue] = useState<string>('');
-  const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
-
-  const [textareaValue, setTextareaValue] = useState<string>('');
-  const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
-
-  const inputTextDebounce = useCallback(
-    debounce((value: string) => {
-      setInputTextInvalid(value.length <= 10);
-      console.log(value);
-    }, 300),
-    []
-  );
-
-  const inputTextOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputTextValue(value);
-    inputTextDebounce(value);
-    setError(value.length < 8);
-  }
-  
-  const textareaDebounced = useCallback(
-    debounce((value: string) => {
-      setTextareaInvalid(value.length <= 10);
-      console.log(value);
-    }, 500),
-    []
-  );
-  
-  const textareaOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setTextareaValue(value);
-    textareaDebounced(value);
-  };
-
   return (
-    <>
-      <div className="h-screen w-screen">
-        <div className="bg-gray-400 text-sm p-2 my-2">버튼 Guide</div>
-        <Button variant="outline" color="primary">
-          <MenuIcon />버튼
-        </Button>
-        <div className="bg-gray-400 text-sm p-2 my-2">시간 Guide</div>
-        <Time>시간</Time>
-        <div className="bg-gray-400 text-sm p-2 my-2">뱃지 Guide</div>
-        <Badge>뱃지</Badge>
-        <div className="bg-gray-400 text-sm p-2 my-2">체크박스 Guide</div>
-        <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
-        <div className="bg-gray-400 text-sm p-2 my-2">라디오버튼 Guide</div>
-        <RadioGroup variant="primary" defaultValue="1" name="group1" onChange={(value) => { setGroup1(value); }}>
-          <RadioGroupItem value="1" label="option1"/>
-          <RadioGroupItem value="2" label="option2" disabled/>
-        </RadioGroup>
-        <RadioGroup variant="secondary" defaultValue="3" name="group2" onChange={setGroup2}>
-          <RadioGroupItem value="3" label="option3"/>
-          <RadioGroupItem value="4" label="option4" />
-        </RadioGroup>
-        <div className="bg-gray-400 text-sm p-2 my-2">Textarea Guide</div>
-        <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
-        <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
-        <div className="bg-gray-300 text-sm px-1">Input 묶음</div>
-        <Input.Box> 
-          <Input.Label>라벨</Input.Label>
-          <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
-          <Input.HelperText error={error}>
-            {inputTextInvalid ? "비밀번호는 8자 이상이어야 합니다." : "안전한 비밀번호를 입력하세요."}
-          </Input.HelperText>
-        </Input.Box>
-        <Input.Box>
-          <Input.Label>라벨</Input.Label>
-          <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
-        </Input.Box>
-        <div className="bg-gray-300 text-sm px-1">Input 단독사용</div>
-        <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
-        <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
-        <label>{group1}</label>
-        <label>{group2}</label>
+    <Router>
+      <div className="min-h-screen">
+        <nav className="bg-gray-800 text-white p-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <h1 className="text-xl font-bold">Plug Platform</h1>
+            <ul className="flex space-x-4">
+              <li>
+                <Link to="/" className="hover:text-gray-300">홈</Link>
+              </li>
+              <li>
+                <Link to="/design-system" className="hover:text-gray-300">디자인 시스템</Link>
+              </li>
+              <li>
+                <Link to="/3d-test" className="hover:text-gray-300">3D 테스트</Link>
+              </li>
+              <li>
+                <Link to="/dialog-examples" className="hover:text-gray-300">다이얼로그 예제</Link>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        
+        <div className="container mx-auto p-4">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/design-system" element={<DesignSystem />} />
+            <Route path="/3d-test" element={<ThreeDTest />} />
+            <Route path="/dialog-examples" element={<DialogExamples />} />
+          </Routes>
+        </div>
       </div>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+// 홈 페이지 컴포넌트
+function Home() {
+  return (
+    <div className="py-8">
+      <h1 className="text-3xl font-bold mb-6">Plug Platform 샘플 앱</h1>
+      <p className="mb-4">이 앱은 Plug UI 컴포넌트를 테스트하기 위한 샘플 앱입니다.</p>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h2 className="text-xl font-semibold text-blue-800 mb-2">사용 방법</h2>
+        <p className="text-blue-700">
+          상단 네비게이션 바에서 원하는 페이지를 선택하여 이동할 수 있습니다.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="border rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-3">디자인 시스템</h3>
+          <p className="text-gray-600 mb-4">다양한 UI 컴포넌트의 사용 예제를 확인할 수 있습니다.</p>
+          <Link to="/design-system" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            디자인 시스템 보기
+          </Link>
+        </div>
+        <div className="border rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-3">3D 테스트</h3>
+          <p className="text-gray-600 mb-4">3D 렌더링 및 관련 기능을 테스트할 수 있습니다.</p>
+          <Link to="/3d-test" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            3D 테스트 보기
+          </Link>
+        </div>
+        <div className="border rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-3">다이얼로그 예제</h3>
+          <p className="text-gray-600 mb-4">Modal, Popup, Dialog 컴포넌트 사용 예제를 확인할 수 있습니다.</p>
+          <Link to="/dialog-examples" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            다이얼로그 예제 보기
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
 

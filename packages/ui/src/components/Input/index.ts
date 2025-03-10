@@ -12,3 +12,4 @@ Input.HelperText = InputHelperText;
 Input.Box = InputBox;
 
 export default Input;
+export type { InputProps } from './Input';
