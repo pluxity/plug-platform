@@ -66,8 +66,6 @@ const Checkbox = ({
 
   return (
     <label
-      role="checkbox"
-      aria-checked={checked}
       htmlFor="checkbox"
       className={cn(
         labelStyle,

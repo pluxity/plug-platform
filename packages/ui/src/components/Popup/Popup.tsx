@@ -38,9 +38,7 @@ const Popup = forwardRef<HTMLDivElement, PopupProps>(
     overlayClassName,
     ...props 
   }, ref) => {
-    const popupStyles = {
-      width: typeof width === 'number' ? `${width}px` : width,
-    };
+    const widthClass = typeof width === 'number' ? `w-[${width}px]` : `w-[${width}]`;
 
     return (
       <Dialog 
@@ -57,8 +55,10 @@ const Popup = forwardRef<HTMLDivElement, PopupProps>(
         )}
       >
         <div 
-          className="flex flex-col w-full"
-          style={popupStyles}
+          className={cn(
+            "flex flex-col w-full",
+            widthClass
+          )}
         >
           {(title || closable) && (
             <div className={cn(

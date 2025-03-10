@@ -11,8 +11,7 @@ import {
   CardFooterProps 
 } from './Card.types';
 
-// Card Root 컴포넌트
-const CardRoot = forwardRef<HTMLDivElement, CardProps>(
+const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, closable = false, onClose, ...props }, ref) => {    
     const [isVisible, setIsVisible] = useState(true);
 
@@ -52,9 +51,8 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     );
   }
 );
-CardRoot.displayName = "Card.Root";
+Card.displayName = "Card";
 
-// Card Header 컴포넌트
 const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -66,9 +64,8 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
     );
   }
 );
-CardHeader.displayName = "Card.Header";
+CardHeader.displayName = "CardHeader";
 
-// Card Title 컴포넌트
 const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -83,9 +80,8 @@ const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
     );
   }
 );
-CardTitle.displayName = "Card.Title";
+CardTitle.displayName = "CardTitle";
 
-// Card Description 컴포넌트
 const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -97,9 +93,8 @@ const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
     );
   }
 );
-CardDescription.displayName = "Card.Description";
+CardDescription.displayName = "CardDescription";
 
-// Card Content 컴포넌트
 const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -111,9 +106,8 @@ const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
     );
   }
 );
-CardContent.displayName = "Card.Content";
+CardContent.displayName = "CardContent";
 
-// Card Footer 컴포넌트
 const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -125,15 +119,6 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
     );
   }
 );
-CardFooter.displayName = "Card.Footer";
+CardFooter.displayName = "CardFooter";
 
-// 합성 패턴을 위한 Card 객체 생성
-const Card = Object.assign(CardRoot, {
-  Header: CardHeader,
-  Title: CardTitle,
-  Description: CardDescription,
-  Content: CardContent,
-  Footer: CardFooter
-});
-
-export { Card }; 
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }; 
