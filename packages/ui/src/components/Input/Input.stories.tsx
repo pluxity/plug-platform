@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import {InputText} from './InputText';
-import {InputPassword} from './InputPassword';
+import Input from './index'; 
 
 const meta: Meta = {
     title: 'Components/Input',
@@ -12,40 +11,69 @@ const meta: Meta = {
         invalid: {
             control: 'boolean'
         },
+        iconPosition: {
+            control: 'select',
+            options: ['leading', 'trailing']
+        }
     },
 }
 
 export default meta;
 
-export const TextInput: StoryObj<typeof InputText> = {
-    render: (args) => <InputText {...args} />,
-    args:{
-        placeholder: '텍스트를 입력해주세요',
-        iconPosition: 'leading'
-    }
+export const TextInput: StoryObj = {
+    render: (args) => (
+        <Input.Text {...args} 
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
 
-export const TextInputInvalid: StoryObj<typeof InputText> = {
-    render: (args) => <InputText {...args} />,
-    args:{
-        placeholder: '텍스트를 입력해주세요',
-        invalid: true,
-    }
+export const TextInputInvalid: StoryObj = {
+    render: (args) => (
+        <Input.Text {...args} 
+            invalid={true}
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
 
-export const TextInputDisabled: StoryObj<typeof InputText> = {
-    render: (args) => <InputText {...args} />,
-    args:{
-        placeholder: '텍스트를 입력해주세요',
-        disabled: true,
-    }
+export const TextInputDisabled: StoryObj = {
+    render: (args) => (
+        <Input.Text {...args} 
+            disabled={true}
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
 
-export const PasswordInput: StoryObj<typeof InputPassword> = {
-    render: (args) => <InputPassword {...args} />,
-    args: {
-        placeholder: '텍스트를 입력해주세요',
-    }
+export const PasswordInput: StoryObj = {
+    render: (args) => (
+        <Input.Password {...args} 
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
+
+export const InputWithLabel: StoryObj = {
+    render: (args) => (
+        <Input.Box {...args}>
+            <Input.Label>이름</Input.Label>
+            <Input.Text placeholder='이름을 입력해주세요' />
+        </Input.Box>
+    ),
+}
+
+export const InputWithHelperText: StoryObj = {
+    render: (args) => (
+        <Input.Box {...args}>
+            <Input.Label>이름</Input.Label>
+            <Input.Text placeholder='이름을 입력해주세요' />
+            <Input.HelperText>에러 문구 등 안내 문구 영역</Input.HelperText>
+        </Input.Box>
+    ),
+}
+
+
+
 
 

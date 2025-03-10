@@ -1,11 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Textarea } from './Textarea';
+import Textarea from './index';
 
-
-const meta: Meta<typeof Textarea> = {
+const meta: Meta = {
     title: 'Components/Textarea',
     tags: ['autodocs'],
     argTypes:{
+        disabled: {
+            control: 'boolean'
+        },
+        invalid: {
+            control: 'boolean'
+        },
         resize:{
             control: 'select',
             options: ['both', 'horizontal', 'vertical', 'none']
@@ -15,34 +20,46 @@ const meta: Meta<typeof Textarea> = {
 
 export default meta;
 
-export const Default: StoryObj<typeof Textarea> = {
-    render: (args) => <Textarea {...args} />,
-    args: {
-        placeholder: '텍스트를 입력하세요.',
-        resize: 'none',
-    }
+export const Default: StoryObj = {
+    render: (args) => (
+        <Textarea {...args} 
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
 
-export const Invalid: StoryObj<typeof Textarea> = {
-    render: (args) => <Textarea {...args} />,
-    args: {
-        invalid: true,
-        placeholder: '텍스트를 입력하세요.',
-    }
+export const TextareaInvalid: StoryObj = {
+    render: (args) => (
+        <Textarea {...args} 
+            invalid={true}
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
 
-export const Disabled: StoryObj<typeof Textarea> = {
-    render: (args) => <Textarea {...args} />,
-    args: {
-        placeholder: '텍스트를 입력하세요.',
-        disabled: true
-    }
+export const TextareaDisabled: StoryObj = {
+    render: (args) => (
+        <Textarea {...args} 
+            disabled={true}
+            placeholder='텍스트를 입력해주세요'
+        />
+    ),
 }
 
-export const Resize: StoryObj<typeof Textarea> = {
-    render: (args) => <Textarea {...args} />,
-    args: {
-        placeholder: '사이즈 조절할 수 있습니다.',
-        resize: 'both'
-    }
+export const TextareaResize: StoryObj = {
+    render: (args) => (
+        <Textarea {...args} 
+            resize='both'
+            placeholder='사이즈를 조절할 수 있습니다.'
+        />
+    ),
+}
+
+export const TextareaWithHelperText: StoryObj = {
+    render: (args) => (
+        <Textarea.Box {...args}>
+            <Textarea placeholder='텍스트를 입력해주세요' />
+            <Textarea.HelperText>에러 문구 등 안내 문구 영역</Textarea.HelperText>
+        </Textarea.Box>
+    ),
 }
