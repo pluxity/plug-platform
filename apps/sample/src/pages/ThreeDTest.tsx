@@ -1,3 +1,4 @@
+import ThreeDViewer from "./ThreeDViewer";
 
 function ThreeDTest() {
 
@@ -13,6 +14,7 @@ function ThreeDTest() {
           className="w-full h-[500px] bg-black rounded-lg flex items-center justify-center"
         >
           <p className="text-white">3D 컨텐츠가 여기에 렌더링됩니다.</p>
+          <ThreeDViewer />
         </div>
       </div>
     </div>
