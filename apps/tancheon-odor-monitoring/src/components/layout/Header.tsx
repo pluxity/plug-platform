@@ -1,8 +1,8 @@
-// apps/tancheon-odor-monitoring/src/app/components/Header.tsx
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Button } from '@plug/ui';
 
 interface User {
   id: number;
@@ -23,16 +23,14 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    // 쿠키 삭제
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    // localStorage에서 사용자 정보 삭제
     localStorage.removeItem('user');
     router.push('/login');
   };
 
   return (
-    <header className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
+    <header className="bg-gray-800 text-white py-4">
+      <div className="container flex justify-between">
         <h1 className="text-xl font-bold">TanCheon Odor Monitoring</h1>
         <nav>
           <ul className="flex space-x-4">
@@ -49,7 +47,7 @@ const Header = () => {
               </li>
             )}
             <li>
-              <button onClick={handleLogout}>Logout</button>
+              <Button onClick={handleLogout}>Logout</Button>
             </li>
           </ul>
         </nav>

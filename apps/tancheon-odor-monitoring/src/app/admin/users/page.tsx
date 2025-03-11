@@ -1,6 +1,6 @@
 'use client'
 
-import UserTable from "@/components/UserTable";
+import UserTable from "@/components/user/UserTable";
 
 const UserManagementPage = () => {
     return (

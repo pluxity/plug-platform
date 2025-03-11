@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Cesium 스타일 */
+.cesium-widget-credits {
+  display: none !important;
+}
+
+.cesium-viewer-bottom {
+  display: none !important;
+}
+
+/* 기존 스타일 */

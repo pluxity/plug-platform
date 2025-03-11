@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 
   if (token) {
       try {
-        const response = await fetch(new URL('/api/auth', request.url), { // 절대 경로로 수정
+        const response = await fetch(new URL('/api/auth', request.url), {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,5 +40,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/admin/:path*'],
+  matcher: ['/', '/admin/:path*', '/login'],
 };
