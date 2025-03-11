@@ -33,38 +33,209 @@ const TANCHEON_LOCATION = {
   roll : 0.000049202296158235015
 };
 
-// 샘플 오염도 데이터 (위도, 경도, 고도, 오염도 수치)
-const POLLUTION_DATA = [
-  // 탄천 주변 지역 (중심점 기준)
-  { longitude: 127.083264, latitude: 37.496698, height: 10, value: 0.8 }, // 중심점, 높은 오염도
-  { longitude: 127.082264, latitude: 37.495698, height: 20, value: 0.7 },
-  { longitude: 127.084264, latitude: 37.497698, height: 30, value: 0.9 },
-  { longitude: 127.081264, latitude: 37.494698, height: 40, value: 0.6 },
-  { longitude: 127.085264, latitude: 37.498698, height: 50, value: 0.5 },
-  
-  // 주변 지역 (북쪽)
-  { longitude: 127.083264, latitude: 37.499698, height: 60, value: 0.4 },
-  { longitude: 127.082264, latitude: 37.500698, height: 70, value: 0.3 },
-  { longitude: 127.084264, latitude: 37.501698, height: 80, value: 0.2 },
-  
-  // 주변 지역 (남쪽)
-  { longitude: 127.083264, latitude: 37.493698, height: 90, value: 0.7 },
-  { longitude: 127.082264, latitude: 37.492698, height: 100, value: 0.6 },
-  { longitude: 127.084264, latitude: 37.491698, height: 110, value: 0.5 },
-  
-  // 주변 지역 (동쪽)
-  { longitude: 127.086264, latitude: 37.496698, height: 120, value: 0.4 },
-  { longitude: 127.087264, latitude: 37.495698, height: 130, value: 0.3 },
-  { longitude: 127.088264, latitude: 37.497698, height: 140, value: 0.2 },
-  
-  // 주변 지역 (서쪽)
-  { longitude: 127.080264, latitude: 37.496698, height: 150, value: 0.6 },
-  { longitude: 127.079264, latitude: 37.495698, height: 160, value: 0.5 },
-  { longitude: 127.078264, latitude: 37.497698, height: 170, value: 0.4 },
-];
+// 타입 정의
+interface PollutionPoint {
+  longitude: number;
+  latitude: number;
+  value: number;
+}
 
-// Cesium Ion 기본 액세스 토큰 (무료 계정용)
-const CESIUM_ION_DEFAULT_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjY0NjQ5NH0.XcKpgANiY22ejiFfyh4QPSrd5bLG8UXTrHcRKbwfNyo';
+interface HeightHeatmaps {
+  '30m': PollutionPoint[];
+  '60m': PollutionPoint[];
+  '90m': PollutionPoint[];
+}
+
+interface VisibleHeatmaps {
+  '30m': boolean;
+  '60m': boolean;
+  '90m': boolean;
+}
+
+// 샘플 오염도 데이터 (위도, 경도, 오염도 수치)
+const POLLUTION_DATA: HeightHeatmaps = {
+  // 30m 고도 데이터 (주로 서쪽으로 퍼짐)
+  '30m': (() => {
+    const data: PollutionPoint[] = [];
+    const centerLon = TANCHEON_LOCATION.longitude;
+    const centerLat = TANCHEON_LOCATION.latitude;
+    
+    // 중심점 (가장 높은 오염도)
+    data.push({ longitude: centerLon, latitude: centerLat, value: 0.95 });
+    
+    // 서쪽 방향으로 더 많이 퍼지는 패턴 (바람 방향)
+    // 더 자연스러운 분포를 위해 랜덤 요소 추가
+    const pointCount = 40; // 총 포인트 수
+    
+    for (let i = 0; i < pointCount; i++) {
+      // 서쪽 방향으로 치우친 랜덤 각도 생성
+      // 서쪽(180도)을 중심으로 더 많은 포인트가 생성되도록 함
+      let angle;
+      const randomValue = Math.random();
+      
+      if (randomValue < 0.6) {
+        // 60% 확률로 서쪽 방향 (135도~225도)
+        angle = Math.PI * (0.75 + Math.random() * 0.5);
+      } else if (randomValue < 0.85) {
+        // 25% 확률로 남북 방향 (45도~135도, 225도~315도)
+        if (Math.random() < 0.5) {
+          angle = Math.PI * (0.25 + Math.random() * 0.5); // 남쪽 방향
+        } else {
+          angle = Math.PI * (1.25 + Math.random() * 0.5); // 북쪽 방향
+        }
+      } else {
+        // 15% 확률로 동쪽 방향 (315도~45도)
+        angle = Math.PI * (1.75 + Math.random() * 0.5);
+      }
+      
+      // 거리는 중심에서 멀어질수록 확률이 낮아지도록 설정
+      const distanceRandom = Math.pow(Math.random(), 0.5); // 제곱근으로 분포 조정
+      const distance = 0.0005 + distanceRandom * 0.002; // 50m~250m
+      
+      // 오염도는 거리와 방향에 따라 결정
+      // 서쪽 방향이고 가까울수록 높은 오염도
+      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
+      const distanceFactor = 1 - (distance - 0.0005) / 0.002; // 거리가 가까울수록 높은 값
+      
+      const value = 0.3 + 0.65 * directionFactor * distanceFactor;
+      
+      // 약간의 랜덤성 추가
+      const randomFactor = 0.85 + (Math.random() * 0.3);
+      
+      // 좌표 계산
+      const lon = centerLon + (distance * Math.cos(angle));
+      const lat = centerLat + (distance * Math.sin(angle));
+      
+      data.push({
+        longitude: lon,
+        latitude: lat,
+        value: value * randomFactor
+      });
+    }
+    
+    return data;
+  })(),
+  
+  // 60m 고도 데이터 (더 넓게 퍼짐)
+  '60m': (() => {
+    const data: PollutionPoint[] = [];
+    const centerLon = TANCHEON_LOCATION.longitude;
+    const centerLat = TANCHEON_LOCATION.latitude;
+    
+    // 중심점 (60m에서는 중간 정도 오염도)
+    data.push({ longitude: centerLon, latitude: centerLat, value: 0.7 });
+    
+    // 서쪽 방향으로 더 많이 퍼지는 패턴 (바람 방향)
+    // 더 자연스러운 분포를 위해 랜덤 요소 추가
+    const pointCount = 50; // 총 포인트 수
+    
+    for (let i = 0; i < pointCount; i++) {
+      // 서쪽 방향으로 치우친 랜덤 각도 생성
+      let angle;
+      const randomValue = Math.random();
+      
+      if (randomValue < 0.5) {
+        // 50% 확률로 서쪽 방향 (135도~225도)
+        angle = Math.PI * (0.75 + Math.random() * 0.5);
+      } else if (randomValue < 0.8) {
+        // 30% 확률로 남북 방향 (45도~135도, 225도~315도)
+        if (Math.random() < 0.5) {
+          angle = Math.PI * (0.25 + Math.random() * 0.5); // 남쪽 방향
+        } else {
+          angle = Math.PI * (1.25 + Math.random() * 0.5); // 북쪽 방향
+        }
+      } else {
+        // 20% 확률로 동쪽 방향 (315도~45도)
+        angle = Math.PI * (1.75 + Math.random() * 0.5);
+      }
+      
+      // 거리는 중심에서 멀어질수록 확률이 낮아지도록 설정
+      const distanceRandom = Math.pow(Math.random(), 0.6); // 제곱근으로 분포 조정
+      const distance = 0.001 + distanceRandom * 0.004; // 100m~500m
+      
+      // 오염도는 거리와 방향에 따라 결정
+      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
+      const distanceFactor = 1 - (distance - 0.001) / 0.004; // 거리가 가까울수록 높은 값
+      
+      const value = 0.25 + 0.45 * directionFactor * distanceFactor;
+      
+      // 약간의 랜덤성 추가
+      const randomFactor = 0.85 + (Math.random() * 0.3);
+      
+      // 좌표 계산
+      const lon = centerLon + (distance * Math.cos(angle));
+      const lat = centerLat + (distance * Math.sin(angle));
+      
+      data.push({
+        longitude: lon,
+        latitude: lat,
+        value: value * randomFactor
+      });
+    }
+    
+    return data;
+  })(),
+  
+  // 90m 고도 데이터 (가장 넓게 퍼짐, 오염도는 낮음)
+  '90m': (() => {
+    const data: PollutionPoint[] = [];
+    const centerLon = TANCHEON_LOCATION.longitude;
+    const centerLat = TANCHEON_LOCATION.latitude;
+    
+    // 중심점 (90m에서는 낮은 오염도)
+    data.push({ longitude: centerLon, latitude: centerLat, value: 0.5 });
+    
+    // 서쪽 방향으로 더 많이 퍼지는 패턴 (바람 방향)
+    // 더 자연스러운 분포를 위해 랜덤 요소 추가
+    const pointCount = 60; // 총 포인트 수
+    
+    for (let i = 0; i < pointCount; i++) {
+      // 서쪽 방향으로 치우친 랜덤 각도 생성
+      let angle;
+      const randomValue = Math.random();
+      
+      if (randomValue < 0.4) {
+        // 40% 확률로 서쪽 방향 (135도~225도)
+        angle = Math.PI * (0.75 + Math.random() * 0.5);
+      } else if (randomValue < 0.75) {
+        // 35% 확률로 남북 방향 (45도~135도, 225도~315도)
+        if (Math.random() < 0.5) {
+          angle = Math.PI * (0.25 + Math.random() * 0.5); // 남쪽 방향
+        } else {
+          angle = Math.PI * (1.25 + Math.random() * 0.5); // 북쪽 방향
+        }
+      } else {
+        // 25% 확률로 동쪽 방향 (315도~45도)
+        angle = Math.PI * (1.75 + Math.random() * 0.5);
+      }
+      
+      // 거리는 중심에서 멀어질수록 확률이 낮아지도록 설정
+      const distanceRandom = Math.pow(Math.random(), 0.7); // 제곱근으로 분포 조정
+      const distance = 0.002 + distanceRandom * 0.008; // 200m~1km
+      
+      // 오염도는 거리와 방향에 따라 결정
+      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
+      const distanceFactor = 1 - (distance - 0.002) / 0.008; // 거리가 가까울수록 높은 값
+      
+      const value = 0.2 + 0.3 * directionFactor * distanceFactor;
+      
+      // 약간의 랜덤성 추가
+      const randomFactor = 0.85 + (Math.random() * 0.3);
+      
+      // 좌표 계산
+      const lon = centerLon + (distance * Math.cos(angle));
+      const lat = centerLat + (distance * Math.sin(angle));
+      
+      data.push({
+        longitude: lon,
+        latitude: lat,
+        value: value * randomFactor
+      });
+    }
+    
+    return data;
+  })()
+};
 
 const VWorldMap: React.FC<VWorldMapProps> = ({ 
   apiKey, 
@@ -80,7 +251,17 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   const buildingsRef = useRef<any[]>([]);
   const [savedCameraPosition, setSavedCameraPosition] = useState<any>(null);
   const [showHeatmap, setShowHeatmap] = useState(false); // 히트맵 표시 상태
-  const heatmapLayerRef = useRef<any>(null); // 히트맵 레이어 참조
+  const heatmapPrimitiveRef = useRef<{[key in keyof HeightHeatmaps]: any | null}>({
+    '30m': null,
+    '60m': null,
+    '90m': null
+  }); // 고도별 히트맵 프리미티브 참조
+  const [heatmapHeight, setHeatmapHeight] = useState<number>(30); // 히트맵 높이 (기본값 30m)
+  const [visibleHeatmaps, setVisibleHeatmaps] = useState<VisibleHeatmaps>({
+    '30m': true,
+    '60m': false,
+    '90m': false
+  }); // 각 고도별 히트맵 표시 여부
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -128,7 +309,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         });
         buildingsRef.current = [];
         
-        // 장례식장 모델 추가
         const modelPosition = {
           longitude: TANCHEON_LOCATION.longitude,
           latitude: TANCHEON_LOCATION.latitude,
@@ -153,8 +333,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           model: {
             uri: '/models/funeralhall.glb',
             scale: 10.0,
-            //minimumPixelSize: 128,
-            //maximumScale: 20000,
             heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
           }
         });
@@ -263,7 +441,44 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   };
 
-  // 히트맵 토글 함수 (연기/구름 형태)
+  // 타입 안전성을 위한 헬퍼 함수
+  const safeObjectKeys = <T extends object>(obj: T): Array<keyof T> => {
+    return Object.keys(obj) as Array<keyof T>;
+  };
+
+  // 히트맵 높이 변경 함수
+  const changeHeatmapHeight = async (newHeight: number) => {
+    if (!viewerRef.current) return;
+    
+    try {
+      // 높이 변경
+      setHeatmapHeight(newHeight);
+      
+      // 해당 고도의 히트맵 표시
+      const heightKey = `${newHeight}m` as keyof HeightHeatmaps;
+      
+      // 모든 고도의 히트맵 표시 상태 업데이트
+      const newVisibleHeatmaps = {
+        '30m': heightKey === '30m',
+        '60m': heightKey === '60m',
+        '90m': heightKey === '90m'
+      };
+      
+      // 이미 생성된 히트맵이 있다면 표시/숨김 처리
+      safeObjectKeys(heatmapPrimitiveRef.current).forEach(key => {
+        if (heatmapPrimitiveRef.current[key]) {
+          heatmapPrimitiveRef.current[key].show = newVisibleHeatmaps[key as keyof VisibleHeatmaps];
+        }
+      });
+      
+      setVisibleHeatmaps(newVisibleHeatmaps);
+      console.log(`히트맵 높이 변경: ${newHeight}m`);
+    } catch (error) {
+      console.error('히트맵 높이 변경 오류:', error);
+    }
+  };
+
+  // 히트맵 토글 함수
   const toggleHeatmap = async () => {
     if (!viewerRef.current) return;
     
@@ -272,99 +487,158 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       
       if (!showHeatmap) {
         // 히트맵이 표시되지 않은 상태라면 표시
-        if (!heatmapLayerRef.current) {
-          // 연기/구름 형태의 오염도 시각화 생성
-          const pollutionEntities: any[] = [];
-          
-          // 오염도 데이터를 기반으로 연기/구름 효과 생성
-          POLLUTION_DATA.forEach(point => {
-            // 오염도 값에 따라 색상 결정 (0.0-1.0 범위)
-            let color;
-            if (point.value < 0.3) {
-              color = Cesium.Color.BLUE.withAlpha(0.3); // 낮은 오염도: 파란색
-            } else if (point.value < 0.6) {
-              color = Cesium.Color.YELLOW.withAlpha(0.5); // 중간 오염도: 노란색
-            } else {
-              color = Cesium.Color.RED.withAlpha(0.7); // 높은 오염도: 빨간색
-            }
+        const heightKey = `${heatmapHeight}m` as keyof HeightHeatmaps;
+        
+        // 각 고도별 히트맵 생성 또는 표시
+        for (const height of ['30m', '60m', '90m'] as Array<keyof HeightHeatmaps>) {
+          if (!heatmapPrimitiveRef.current[height]) {
+            // 히트맵 데이터 준비
+            console.log(`${height} 오염도 히트맵 생성 시작`);
             
-            // 오염도 값에 따라 크기 결정
-            const size = 100 + point.value * 300; // 오염도가 높을수록 더 큰 구름
+            // 히트맵 영역 경계 계산
+            const data = POLLUTION_DATA[height];
+            const west = Math.min(...data.map(p => p.longitude)) - 0.001;
+            const south = Math.min(...data.map(p => p.latitude)) - 0.001;
+            const east = Math.max(...data.map(p => p.longitude)) + 0.001;
+            const north = Math.max(...data.map(p => p.latitude)) + 0.001;
             
-            // 연기/구름 효과를 위한 원형 반투명 엔티티 생성
-            const entity = viewerRef.current.entities.add({
-              position: Cesium.Cartesian3.fromDegrees(
-                point.longitude,
-                point.latitude,
-                point.height + 50 // 지면에서 약간 위에 표시
-              ),
-              ellipsoid: {
-                radii: new Cesium.Cartesian3(size, size, size * 0.5), // 타원체 크기
-                material: new Cesium.Color(
-                  color.red, 
-                  color.green, 
-                  color.blue, 
-                  color.alpha
-                ).withAlpha(0.7), // 반투명 색상 사용
-                heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-                outline: false
-              },
-              // 오염도 정보 레이블
-              label: {
-                text: `오염도: ${(point.value * 100).toFixed(0)}%`,
-                font: '14px sans-serif',
-                fillColor: Cesium.Color.WHITE,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                outlineWidth: 2,
-                outlineColor: Cesium.Color.BLACK,
-                verticalOrigin: Cesium.VerticalOrigin.CENTER,
-                pixelOffset: new Cesium.Cartesian2(0, -size/2 - 20),
-                heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-                disableDepthTestDistance: Number.POSITIVE_INFINITY // 항상 보이도록 설정
+            // 히트맵 이미지 생성
+            const canvas = document.createElement('canvas');
+            const size = 1024; // 이미지 크기 (더 높은 해상도)
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d')!;
+            
+            // 배경을 투명하게 설정
+            ctx.clearRect(0, 0, size, size);
+            
+            // 컬러맵 캔버스 생성 (그라데이션)
+            const colorMapCanvas = document.createElement('canvas');
+            colorMapCanvas.width = 256;
+            colorMapCanvas.height = 1;
+            const colorMapCtx = colorMapCanvas.getContext('2d')!;
+            const colorGradient = colorMapCtx.createLinearGradient(0, 0, 256, 0);
+            colorGradient.addColorStop(0.0, 'blue');   // 낮은 값
+            colorGradient.addColorStop(0.3, 'cyan');   // 낮은-중간 값
+            colorGradient.addColorStop(0.5, 'lime');   // 중간 값
+            colorGradient.addColorStop(0.7, 'yellow'); // 중간-높은 값
+            colorGradient.addColorStop(1.0, 'red');    // 높은 값
+            colorMapCtx.fillStyle = colorGradient;
+            colorMapCtx.fillRect(0, 0, 256, 1);
+            
+            // 각 데이터 포인트를 캔버스에 그리기
+            data.forEach(point => {
+              // 좌표를 캔버스 좌표로 변환
+              const x = ((point.longitude - west) / (east - west)) * size;
+              const y = size - ((point.latitude - south) / (north - south)) * size; // y축 반전
+              
+              // 그라디언트 생성
+              const radius = 80; // 더 큰 반경
+              const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+              
+              // 컬러맵에서 색상 가져오기
+              const colorIndex = Math.floor(point.value * 255);
+              const pixelData = colorMapCtx.getImageData(colorIndex, 0, 1, 1).data;
+              const color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}`;
+              
+              gradient.addColorStop(0, `${color}, ${point.value * 0.8})`); // 중심
+              gradient.addColorStop(0.7, `${color}, ${point.value * 0.4})`); // 중간
+              gradient.addColorStop(1, `rgba(0, 0, 255, 0)`); // 가장자리 (투명)
+              
+              // 원 그리기
+              ctx.fillStyle = gradient;
+              ctx.beginPath();
+              ctx.arc(x, y, radius, 0, Math.PI * 2);
+              ctx.fill();
+            });
+            
+            // 히트맵 텍스처 생성
+            const heatmapTexture = new Cesium.ImageMaterialProperty({
+              image: canvas,
+              transparent: true
+            });
+            
+            // 히트맵 영역 생성
+            const rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+            
+            // 히트맵 엔티티 생성
+            const heightValue = parseInt(height);
+            const heatmapEntity = viewerRef.current.entities.add({
+              rectangle: {
+                coordinates: rectangle,
+                material: heatmapTexture,
+                height: heightValue, // 고도별 높이 설정
+                heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
               }
             });
             
-            pollutionEntities.push(entity);
-          });
-          
-          // 히트맵 레이어 참조 저장
-          heatmapLayerRef.current = {
-            entities: pollutionEntities
-          };
-          
-          // 카메라를 히트맵 중심으로 이동
-          viewerRef.current.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(
-              TANCHEON_LOCATION.longitude,
-              TANCHEON_LOCATION.latitude,
-              500 // 높이 조정
-            ),
-            orientation: {
-              heading: Cesium.Math.toRadians(0),
-              pitch: Cesium.Math.toRadians(-45),
-              roll: 0
-            }
-          });
-          
-          console.log('오염도 시각화 생성 완료');
-        } else {
-          // 이미 생성된 히트맵이 있다면 표시
-          heatmapLayerRef.current.entities.forEach((entity: any) => {
-            entity.show = true;
-          });
+            // 히트맵 참조 저장
+            heatmapPrimitiveRef.current[height] = heatmapEntity;
+            
+            // 현재 선택된 고도가 아니면 숨김
+            heatmapEntity.show = height === heightKey;
+            
+            console.log(`${height} 오염도 히트맵 생성 완료`);
+          } else {
+            // 이미 생성된 히트맵이 있다면 선택된 고도만 표시
+            heatmapPrimitiveRef.current[height].show = height === heightKey;
+          }
         }
+        
+        // 현재 표시 상태 업데이트
+        setVisibleHeatmaps({
+          '30m': heightKey === '30m',
+          '60m': heightKey === '60m',
+          '90m': heightKey === '90m'
+        });
+        
+        // 카메라를 히트맵 중심으로 이동
+        viewerRef.current.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(
+            TANCHEON_LOCATION.longitude,
+            TANCHEON_LOCATION.latitude,
+            500 // 높이 조정
+          ),
+          orientation: {
+            heading: Cesium.Math.toRadians(0),
+            pitch: Cesium.Math.toRadians(-45),
+            roll: 0
+          }
+        });
       } else {
-        // 히트맵이 표시된 상태라면 숨김
-        if (heatmapLayerRef.current) {
-          heatmapLayerRef.current.entities.forEach((entity: any) => {
-            entity.show = false;
-          });
-        }
+        // 히트맵이 표시된 상태라면 모두 숨김
+        safeObjectKeys(heatmapPrimitiveRef.current).forEach(key => {
+          if (heatmapPrimitiveRef.current[key]) {
+            heatmapPrimitiveRef.current[key].show = false;
+          }
+        });
+        console.log('모든 오염도 히트맵 숨김');
       }
       
       // 상태 업데이트
       setShowHeatmap(!showHeatmap);
       
+    } catch (error) {
+      console.error('히트맵 토글 오류:', error);
+    }
+  };
+
+  // 고도별 히트맵 동시 표시 토글 함수
+  const toggleHeightHeatmap = (height: keyof HeightHeatmaps) => {
+    if (!viewerRef.current || !showHeatmap) return;
+    
+    try {
+      // 해당 고도의 히트맵 표시 상태 토글
+      const newVisibleHeatmaps = { ...visibleHeatmaps };
+      newVisibleHeatmaps[height] = !newVisibleHeatmaps[height];
+      
+      // 히트맵 표시 상태 업데이트
+      if (heatmapPrimitiveRef.current[height]) {
+        heatmapPrimitiveRef.current[height].show = newVisibleHeatmaps[height];
+      }
+      
+      setVisibleHeatmaps(newVisibleHeatmaps);
+      console.log(`${height} 히트맵 표시 상태: ${newVisibleHeatmaps[height]}`);
     } catch (error) {
       console.error('히트맵 토글 오류:', error);
     }
@@ -475,8 +749,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
             initialPosition.height
           ),
           orientation: {
-            heading: Cesium.Math.toRadians(initialPosition.heading || 0),
-            pitch: Cesium.Math.toRadians(initialPosition.pitch || -45),
+            heading: initialPosition.heading || 0,
+            pitch: initialPosition.pitch || -0.5,
             roll: initialPosition.roll || 0
           }
         });
@@ -500,6 +774,126 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           }
         });
 
+        // 정적 나침반 대신 Cesium의 내장 나침반 위젯 활성화
+        viewer.scene.postRender.addEventListener(() => {
+          // 카메라 회전 각도 가져오기
+          const heading = viewer.camera.heading;
+          updateCompass(heading);
+        });
+        
+        // 동적 나침반 생성
+        const compassContainer = document.createElement('div');
+        compassContainer.className = 'compass-container';
+        compassContainer.style.position = 'absolute';
+        compassContainer.style.top = '10px';
+        compassContainer.style.left = '10px';
+        compassContainer.style.width = '100px';
+        compassContainer.style.height = '100px';
+        compassContainer.style.zIndex = '1000';
+        
+        // 나침반 배경 (원)
+        const compassBackground = document.createElement('div');
+        compassBackground.className = 'compass-background';
+        compassBackground.style.position = 'absolute';
+        compassBackground.style.width = '100%';
+        compassBackground.style.height = '100%';
+        compassBackground.style.borderRadius = '50%';
+        compassBackground.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+        compassBackground.style.border = '2px solid #333';
+        compassContainer.appendChild(compassBackground);
+        
+        // 나침반 회전 컨테이너
+        const compassRotate = document.createElement('div');
+        compassRotate.className = 'compass-rotate';
+        compassRotate.style.position = 'absolute';
+        compassRotate.style.width = '100%';
+        compassRotate.style.height = '100%';
+        compassRotate.style.transformOrigin = 'center center';
+        compassBackground.appendChild(compassRotate);
+        
+        // 나침반 방향 표시 (N, E, S, W)
+        const directions = [
+          { label: 'N', angle: 0, top: '5px', left: '50%' },
+          { label: 'E', angle: 90, top: '50%', left: '95px' },
+          { label: 'S', angle: 180, top: '95px', left: '50%' },
+          { label: 'W', angle: 270, top: '50%', left: '5px' }
+        ];
+        
+        directions.forEach(dir => {
+          const dirLabel = document.createElement('div');
+          dirLabel.className = `compass-dir compass-dir-${dir.label}`;
+          dirLabel.style.position = 'absolute';
+          dirLabel.style.top = dir.top;
+          dirLabel.style.left = dir.left;
+          dirLabel.style.transform = 'translate(-50%, -50%)';
+          dirLabel.style.fontWeight = 'bold';
+          dirLabel.style.fontSize = '14px';
+          dirLabel.style.color = '#333';
+          dirLabel.textContent = dir.label;
+          compassRotate.appendChild(dirLabel);
+        });
+        
+        // 나침반 바늘 (고정된 상태로 항상 북쪽 가리킴)
+        const compassNeedle = document.createElement('div');
+        compassNeedle.className = 'compass-needle';
+        compassNeedle.style.position = 'absolute';
+        compassNeedle.style.top = '50%';
+        compassNeedle.style.left = '50%';
+        compassNeedle.style.width = '0';
+        compassNeedle.style.height = '0';
+        compassNeedle.style.borderLeft = '6px solid transparent';
+        compassNeedle.style.borderRight = '6px solid transparent';
+        compassNeedle.style.borderBottom = '40px solid red';
+        compassNeedle.style.transformOrigin = 'center bottom';
+        compassNeedle.style.transform = 'translateX(-50%) translateY(-100%)';
+        compassBackground.appendChild(compassNeedle);
+        
+        // 나침반 남쪽 바늘 (고정된 상태로 항상 남쪽 가리킴)
+        const compassNeedleSouth = document.createElement('div');
+        compassNeedleSouth.className = 'compass-needle-south';
+        compassNeedleSouth.style.position = 'absolute';
+        compassNeedleSouth.style.top = '50%';
+        compassNeedleSouth.style.left = '50%';
+        compassNeedleSouth.style.width = '0';
+        compassNeedleSouth.style.height = '0';
+        compassNeedleSouth.style.borderLeft = '6px solid transparent';
+        compassNeedleSouth.style.borderRight = '6px solid transparent';
+        compassNeedleSouth.style.borderTop = '40px solid blue';
+        compassNeedleSouth.style.transformOrigin = 'center top';
+        compassNeedleSouth.style.transform = 'translateX(-50%)';
+        compassBackground.appendChild(compassNeedleSouth);
+        
+        // 나침반 중심점
+        const compassCenter = document.createElement('div');
+        compassCenter.style.position = 'absolute';
+        compassCenter.style.top = '50%';
+        compassCenter.style.left = '50%';
+        compassCenter.style.width = '10px';
+        compassCenter.style.height = '10px';
+        compassCenter.style.borderRadius = '50%';
+        compassCenter.style.backgroundColor = '#333';
+        compassCenter.style.transform = 'translate(-50%, -50%)';
+        compassBackground.appendChild(compassCenter);
+        
+        // 나침반과 바람 방향 표시를 Cesium 컨테이너에 추가
+        cesiumContainerRef.current.appendChild(compassContainer);
+        
+        // 나침반 업데이트 함수
+        function updateCompass(heading: number) {
+          if (!compassContainer) return;
+          
+          // 나침반 회전 컨테이너 가져오기
+          const compassRotate = compassContainer.querySelector('.compass-rotate');
+          
+          if (compassRotate) {
+            // 라디안을 도(degree)로 변환
+            const headingDegrees = Cesium.Math.toDegrees(heading);
+            
+            // 나침반 회전 (카메라 회전의 반대 방향으로 회전)
+            (compassRotate as HTMLElement).style.transform = `rotate(${-headingDegrees}deg)`;
+          }
+        }
+
         console.log('VWorld 맵 초기화 완료');
         setIsLoading(false);
       } catch (error) {
@@ -515,6 +909,18 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     return () => {
       if (viewer) {
         viewer.destroy();
+      }
+      
+      // 나침반과 바람 방향 표시 제거
+      const compassContainer = cesiumContainerRef.current?.querySelector('.compass-container');
+      const windDirectionContainer = cesiumContainerRef.current?.querySelector('.wind-direction-container');
+      
+      if (compassContainer) {
+        cesiumContainerRef.current?.removeChild(compassContainer);
+      }
+      
+      if (windDirectionContainer) {
+        cesiumContainerRef.current?.removeChild(windDirectionContainer);
       }
     };
   }, [isMounted, apiKey, initialPosition]);
@@ -555,15 +961,55 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           {showBuildings ? '장례식장 모델 숨기기' : '장례식장 모델 표시하기'}
         </button>
         
-        {/* 오염도 시각화 토글 버튼 */}
+        {/* 오염도 히트맵 토글 버튼 */}
         <button
           className={`px-4 py-2 rounded-lg shadow-md font-medium ${
             showHeatmap ? 'bg-green-500 text-white' : 'bg-white text-gray-800'
           }`}
           onClick={toggleHeatmap}
         >
-          {showHeatmap ? '오염도 시각화 숨기기' : '오염도 시각화 표시하기'}
+          {showHeatmap ? '오염도 히트맵 숨기기' : '오염도 히트맵 표시하기'}
         </button>
+        
+        {/* 히트맵 높이 조절 버튼 그룹 (히트맵이 표시된 경우에만 보임) */}
+        {showHeatmap && (
+          <div className="mt-2 bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="px-4 py-2 bg-gray-100 text-gray-800 font-medium text-center border-b border-gray-200">
+              히트맵 고도 선택
+            </div>
+            <div className="flex flex-col">
+              <div className="flex flex-row">
+                <button
+                  className={`flex-1 px-2 py-2 text-sm font-medium ${
+                    visibleHeatmaps['30m'] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
+                  }`}
+                  onClick={() => toggleHeightHeatmap('30m')}
+                >
+                  30m {visibleHeatmaps['30m'] ? '✓' : ''}
+                </button>
+                <button
+                  className={`flex-1 px-2 py-2 text-sm font-medium border-l border-r border-gray-200 ${
+                    visibleHeatmaps['60m'] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
+                  }`}
+                  onClick={() => toggleHeightHeatmap('60m')}
+                >
+                  60m {visibleHeatmaps['60m'] ? '✓' : ''}
+                </button>
+                <button
+                  className={`flex-1 px-2 py-2 text-sm font-medium ${
+                    visibleHeatmaps['90m'] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
+                  }`}
+                  onClick={() => toggleHeightHeatmap('90m')}
+                >
+                  90m {visibleHeatmaps['90m'] ? '✓' : ''}
+                </button>
+              </div>
+              <div className="px-4 py-2 bg-gray-100 text-xs text-center border-t border-gray-200">
+                여러 고도를 동시에 선택할 수 있습니다
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* 카메라 컨트롤 버튼 */}

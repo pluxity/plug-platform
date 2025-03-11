@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-interface CesiumMapProps {
+interface OSMMapProps {
   height?: string;
 }
 
@@ -20,7 +20,7 @@ const TANCHEON_LOCATION = {
   height: 1000
 };
 
-const CesiumMap: React.FC<CesiumMapProps> = ({ height = '500px' }) => {
+const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
   const cesiumContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -185,4 +185,4 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ height = '500px' }) => {
   );
 };
 
-export default CesiumMap; 
+export default OSMMap; 
