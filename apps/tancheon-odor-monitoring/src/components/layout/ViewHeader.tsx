@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import UserIcon from '@plug/ui/src/assets/icons/user.svg';
+import { useRouter } from 'next/navigation';
 
 interface WeatherData {
   temp: number;
@@ -49,11 +50,55 @@ const WindDirectionIcon = ({ deg }: { deg: number }) => {
   );
 };
 
-/**
- * 뷰 헤더 컴포넌트
- */
-const ViewHeader = () => {
+// 클라이언트 사이드에서만 렌더링할 시간 컴포넌트
+const TimeDisplay = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    // 1초마다 현재 시간 업데이트
+    const timeInterval = setInterval(() => {
+      setCurrentDate(new Date());
+    }, 1000);
+    
+    return () => {
+      clearInterval(timeInterval);
+    };
+  }, []);
+
+  /**
+   * 날짜 포맷팅 함수
+   */
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    const weekday = weekdays[date.getDay()];
+    
+    return `${year}년 ${month}월 ${day}일 (${weekday})`;
+  };
+
+  /**
+   * 시간 포맷팅 함수
+   */
+  const formatTime = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  return (
+    <div className="text-center">
+      <div className="text-sm">{formatDate(currentDate)}</div>
+      <div className="text-lg font-semibold">{formatTime(currentDate)}</div>
+    </div>
+  );
+};
+
+// 클라이언트 사이드에서만 렌더링할 날씨 컴포넌트
+const WeatherDisplay = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,49 +145,10 @@ const ViewHeader = () => {
     // 10분마다 날씨 정보 업데이트
     const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000);
     
-    // 1초마다 현재 시간 업데이트
-    const timeInterval = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 1000);
-    
     return () => {
       clearInterval(weatherInterval);
-      clearInterval(timeInterval);
     };
   }, []);
-
-  /**
-   * 날짜 포맷팅 함수
-   */
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-    const weekday = weekdays[date.getDay()];
-    
-    return `${year}년 ${month}월 ${day}일 (${weekday})`;
-  };
-
-  /**
-   * 시간 포맷팅 함수
-   */
-  const formatTime = (date: Date) => {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  /**
-   * 로그아웃 처리 함수
-   */
-  const handleLogout = () => {
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    localStorage.removeItem('user');
-    window.location.href = '/login';
-  };
 
   /**
    * 날씨 정보 수동 새로고침 함수
@@ -150,6 +156,79 @@ const ViewHeader = () => {
   const handleRefreshWeather = () => {
     fetchWeather();
   };
+
+  return (
+    <div className="flex items-center">
+      <div className="bg-gray-700 p-2 rounded-md">
+        {isLoading ? (
+          <div className="text-sm">날씨 정보 로딩 중...</div>
+        ) : error ? (
+          <div className="text-sm text-red-300">{error}</div>
+        ) : weather ? (
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center">
+              <Image 
+                src={`https://openweathermap.org/img/wn/${weather.icon}.png`} 
+                alt={weather.description}
+                width={40}
+                height={40}
+              />
+              <div className="ml-1">
+                <div className="text-sm font-medium">{Math.round(weather.temp)}°C</div>
+                <div className="text-xs">{weather.description}</div>
+              </div>
+            </div>
+            
+            <div className="border-l border-gray-500 pl-3">
+              <div className="text-xs flex items-center">
+                <span className="mr-1">풍속:</span>
+                <span>{weather.windSpeed} m/s</span>
+              </div>
+              <div className="text-xs flex items-center">
+                <span className="mr-1">풍향:</span>
+                <WindDirectionIcon deg={weather.windDeg} />
+                <span className="ml-1">{getWindDirection(weather.windDeg)}</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleRefreshWeather}
+              className="text-gray-300 hover:text-white p-1"
+              title="날씨 정보 새로고침"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * 뷰 헤더 컴포넌트
+ */
+const ViewHeader = () => {
+  const router = useRouter();
+
+  /**
+   * 로그아웃 처리 함수
+   */
+  const handleLogout = () => {
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
+
+  // 클라이언트 사이드에서만 렌더링할 컴포넌트를 위한 상태
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 클라이언트 사이드에서만 실행
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <header className="bg-gray-800 text-white py-3 px-6 shadow-md">
@@ -162,61 +241,16 @@ const ViewHeader = () => {
           <h1 className="text-xl font-bold">탄천 악취 모니터링</h1>
         </div>
         
-        {/* 가운데: 시간과 날씨 */}
+        {/* 가운데: 시간과 날씨 - 클라이언트 사이드에서만 렌더링 */}
         <div className="flex items-center space-x-6">
-          {/* 날짜 및 시간 */}
-          <div className="text-center">
-            <div className="text-sm">{formatDate(currentDate)}</div>
-            <div className="text-lg font-semibold">{formatTime(currentDate)}</div>
-          </div>
-          
-          {/* 날씨 정보 */}
-          <div className="flex items-center">
-            <div className="bg-gray-700 p-2 rounded-md">
-              {isLoading ? (
-                <div className="text-sm">날씨 정보 로딩 중...</div>
-              ) : error ? (
-                <div className="text-sm text-red-300">{error}</div>
-              ) : weather ? (
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center">
-                    <Image 
-                      src={`https://openweathermap.org/img/wn/${weather.icon}.png`} 
-                      alt={weather.description}
-                      width={40}
-                      height={40}
-                    />
-                    <div className="ml-1">
-                      <div className="text-sm font-medium">{Math.round(weather.temp)}°C</div>
-                      <div className="text-xs">{weather.description}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="border-l border-gray-500 pl-3">
-                    <div className="text-xs flex items-center">
-                      <span className="mr-1">풍속:</span>
-                      <span>{weather.windSpeed} m/s</span>
-                    </div>
-                    <div className="text-xs flex items-center">
-                      <span className="mr-1">풍향:</span>
-                      <WindDirectionIcon deg={weather.windDeg} />
-                      <span className="ml-1">{getWindDirection(weather.windDeg)}</span>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={handleRefreshWeather}
-                    className="text-gray-300 hover:text-white p-1"
-                    title="날씨 정보 새로고침"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
+          {isMounted ? (
+            <>
+              <TimeDisplay />
+              <WeatherDisplay />
+            </>
+          ) : (
+            <div className="h-16 w-64 bg-gray-700 rounded-md animate-pulse"></div>
+          )}
         </div>
         
         {/* 오른쪽: 사용자 정보 */}

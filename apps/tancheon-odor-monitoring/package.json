@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "start http://localhost:3000 && next dev --turbopack",
-    "build": "next build",
+    "dev": "pnpm run copy-cesium && start http://localhost:3000 && next dev",
+    "build": "pnpm run copy-cesium && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma": "prisma",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "copy-cesium": "node scripts/copy-cesium-assets.js"
   },
   "dependencies": {
     "@plug/ui": "workspace:^",
@@ -35,6 +36,7 @@
     "copy-webpack-plugin": "^13.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.2.0",
+    "fs-extra": "^11.3.0",
     "typescript": "^5"
   }
 }
