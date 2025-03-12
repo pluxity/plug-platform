@@ -1,17 +1,18 @@
 import * as React from 'react';
 import { Model, Poi } from '@plug/engine/src';
+import { Button, Checkbox } from "@plug/ui";
 
 // 층 데이터 타입 정의
 interface FloorData {
-  floorId: string;
-  displayName: string;
-  [key: string]: unknown;
+    floorId: string;
+    displayName: string;
+    [key: string]: unknown;
 }
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
-  selectedApiName: string;
-  floorData: FloorData[];
+    selectedApiName: string;
+    floorData: FloorData[];
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -42,12 +43,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     renderMenu() {
         if (this.state.selectedApiName === 'Loader') {
             return (
-                <button disabled>LoadGltf</button>
+                <Button disabled>LoadGltf</Button>
             );
         } else if (this.state.selectedApiName === 'Model') {
             return (
                 <span>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Model.GetHierarchy')}>GetModelHierarchy</button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Model.GetHierarchy')}>GetModelHierarchy</Button>
                     <br />
                     {this.state.floorData.map((data: FloorData) => (
                         <span key={data.floorId}>
@@ -58,8 +59,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     {
                         this.state.floorData.length > 0 &&
                         <span>
-                            <button onClick={() => this.setFloorVisibility(true)}>ShowAll</button>
-                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button>
+                            <Button onClick={() => this.setFloorVisibility(true)}>ShowAll</Button>
+                            <Button onClick={() => this.setFloorVisibility(false)}>HideAll</Button>
                         </span>
                     }
                 </span>
@@ -67,7 +68,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         } else if (this.state.selectedApiName === 'Poi') {
             return (
                 <span>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button>
                 </span>
             );
         }
@@ -119,18 +120,24 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 });
             } break;
             case 'Poi.Create': {
+                const sampleModelUrls: (undefined | string)[] = [
+                    undefined,
+                    'monkeyhead.glb',
+                ];
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
                 const displayText: string = id.substring(0, 8);
+                const modelUrl: string | undefined = sampleModelUrls[Math.floor(Math.random() * sampleModelUrls.length)];
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
                     testFloat: 2.2
                 };
-
+                
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
+                    modelUrl: modelUrl,
                     displayText: displayText,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));

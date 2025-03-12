@@ -26,6 +26,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
     constructor(option: Interfaces.PoiCreateOption) {
         // 옵션값
         this.id = option.id;
+        this.modelUrl = option.modelUrl;
         this.iconUrl = option.iconUrl;
         this.displayText = option.displayText;
         this.property = option.property;

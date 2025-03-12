@@ -9,7 +9,7 @@ import { PoiElement } from './element';
 let engine: Engine3D;
 let target: PoiElement;
 let previewLine: THREE.LineSegments;
-let previewPointMesh: THREE.Mesh;
+let previewPointMesh: THREE.Object3D;
 let completeCallback: Function | undefined = undefined;
 let currentPicktarget: THREE.Object3D | undefined;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
@@ -32,29 +32,30 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 
     previewLine.visible = false;
     previewLine.layers.set(Interfaces.CustomLayer.Invisible);
-
-    // 이동시 미리보기용 위치점 객체(구체)
-    geometry = new THREE.SphereGeometry(0.1, 32, 32);
-    material = new THREE.MeshStandardMaterial({ color: 'red' });
-    previewPointMesh = new THREE.Mesh(geometry, material);
-    previewPointMesh.name = '#PoiPlacerPreviewPointMesh';
-    engine.RootScene.add(previewPointMesh);
 });
 
 /**
  * poi 데이터 추가 이벤트 콜백
  */
-Event.InternalHandler.addEventListener('onPoiCreate' as never, (evt: any) => {
+Event.InternalHandler.addEventListener('onPoiCreate' as never, async (evt: any) => {
     target = evt.target as PoiElement;
     completeCallback = evt.onCompleteCallback;
 
     previewLine.scale.y = target.LineHeight;
 
     // 미리보기용 위치점 메시
-    if( target.modelUrl !== undefined ) {
-
+    if (target.modelUrl !== undefined) {
+        const loader = new Addon.GLTFLoader();
+        const gltf = await loader.loadAsync(target.modelUrl);
+        previewPointMesh = gltf.scene;
+        engine.RootScene.add(previewPointMesh);
     } else {
-
+        // modelurl이 유효하지 않으면 구체로 처리
+        const geometry = new THREE.SphereGeometry(0.1, 32, 32);
+        const material = new THREE.MeshStandardMaterial({ color: 'red' });
+        previewPointMesh = new THREE.Mesh(geometry, material);
+        previewPointMesh.name = '#PoiPlacerPreviewPointMesh';
+        engine.RootScene.add(previewPointMesh);
     }
 
     registerPointerEvents();
@@ -170,9 +171,8 @@ function onPointerUp(evt: PointerEvent) {
             // 미리보기선 숨기기
             previewLine.visible = false;
             previewLine.layers.set(Interfaces.CustomLayer.Invisible);
-            // 미리보기 위치점 메시 숨기기
-            previewPointMesh.visible = false;
-            previewPointMesh.layers.set(Interfaces.CustomLayer.Invisible);
+            // 미리보기 위치점 메시 제거
+            releasePreviewPointMesh();
         }
     }
 }
@@ -200,4 +200,26 @@ function getFloorObject(): THREE.Object3D | undefined {
     }
 
     return undefined;
+}
+
+/**
+ * 위치점 메시 메모리 해제
+ */
+function releasePreviewPointMesh() {
+    engine.RootScene.remove(previewPointMesh);
+    previewPointMesh.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+            child.geometry.dispose();
+
+            if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                    mat.dispose();
+                    mat.map?.dispose();
+                });
+            } else {
+                child.material.dispose();
+                child.material.map?.dispose();
+            }
+        }
+    });
 }
