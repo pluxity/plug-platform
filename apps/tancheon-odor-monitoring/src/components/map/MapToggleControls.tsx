@@ -31,17 +31,14 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
   onToggleBuildings,
   buildingLabel = '건물',
   
-  // 히트맵 토글
   showHeatmap,
   onToggleHeatmap,
   heatmapLabel = '히트맵',
   
-  // 단일 고도 선택 (레거시)
   selectedHeight,
   onHeightChange,
   heightOptions = [30, 60, 90],
   
-  // 다중 고도 히트맵 토글
   visibleHeatmaps,
   onToggleHeightHeatmap,
   heightHeatmapOptions = ['30m', '60m', '90m'],
@@ -100,7 +97,6 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
         </div>
       )}
       
-      {/* 다중 고도 히트맵 토글 UI (선택적) */}
       {showHeatmap && onToggleHeightHeatmap && visibleHeatmaps && (
         <div className="mt-2 bg-white rounded-lg shadow-md overflow-hidden">
           <div className="px-4 py-2 bg-gray-100 text-gray-800 font-medium text-center border-b border-gray-200">

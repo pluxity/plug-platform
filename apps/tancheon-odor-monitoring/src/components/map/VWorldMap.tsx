@@ -2,20 +2,17 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import MapControls from './MapControls';
-import CompassWidget from './CompassWidget';
 import MapToggleControls from './MapToggleControls';
+import Cesium from 'cesium';
+
+import { HeightHeatmaps } from '@/types/pollution';
+
+import { TANCHEON_LOCATION } from '@/constants/initialization';
+import { POLLUTION_DATA } from '@/constants/pollutation';
 
 interface VWorldMapProps {
   apiKey: string;
   height?: string;
-  initialPosition?: {
-    longitude: number;
-    latitude: number;
-    height: number;
-    heading?: number;
-    pitch?: number;
-    roll?: number;
-  };
 }
 
 // 타입 확장
@@ -25,236 +22,26 @@ declare global {
     Cesium?: any;
   }
 }
-
-// 탄천 좌표 (대략적인 위치)
-const TANCHEON_LOCATION = {
-  heading : 3.7508082854940867,
-  height : 295.5992540345483,
-  longitude: 127.083264,
-  latitude: 37.496698,
-  pitch : -0.42956590230192493,
-  roll : 0.000049202296158235015
-};
-
-// 타입 정의
-interface PollutionPoint {
-  longitude: number;
-  latitude: number;
-  value: number;
-}
-
-interface HeightHeatmaps {
-  '30m': PollutionPoint[];
-  '60m': PollutionPoint[];
-  '90m': PollutionPoint[];
-}
-
-// Record<string, boolean>로 타입 수정
 interface VisibleHeatmaps extends Record<string, boolean> {
   '30m': boolean;
   '60m': boolean;
   '90m': boolean;
 }
 
-// 샘플 오염도 데이터 (위도, 경도, 오염도 수치)
-const POLLUTION_DATA: HeightHeatmaps = {
-  // 30m 고도 데이터 (주로 서쪽으로 퍼짐)
-  '30m': (() => {
-    const data: PollutionPoint[] = [];
-    const centerLon = TANCHEON_LOCATION.longitude;
-    const centerLat = TANCHEON_LOCATION.latitude;
-    
-    // 중심점 (가장 높은 오염도)
-    data.push({ longitude: centerLon, latitude: centerLat, value: 0.95 });
-    
-    // 서쪽 방향으로 더 많이 퍼지는 패턴 (바람 방향)
-    // 더 자연스러운 분포를 위해 랜덤 요소 추가
-    const pointCount = 40; // 총 포인트 수
-    
-    for (let i = 0; i < pointCount; i++) {
-      // 서쪽 방향으로 치우친 랜덤 각도 생성
-      // 서쪽(180도)을 중심으로 더 많은 포인트가 생성되도록 함
-      let angle;
-      const randomValue = Math.random();
-      
-      if (randomValue < 0.6) {
-        // 60% 확률로 서쪽 방향 (135도~225도)
-        angle = Math.PI * (0.75 + Math.random() * 0.5);
-      } else if (randomValue < 0.85) {
-        // 25% 확률로 남북 방향 (45도~135도, 225도~315도)
-        if (Math.random() < 0.5) {
-          angle = Math.PI * (0.25 + Math.random() * 0.5); // 남쪽 방향
-        } else {
-          angle = Math.PI * (1.25 + Math.random() * 0.5); // 북쪽 방향
-        }
-      } else {
-        // 15% 확률로 동쪽 방향 (315도~45도)
-        angle = Math.PI * (1.75 + Math.random() * 0.5);
-      }
-      
-      // 거리는 중심에서 멀어질수록 확률이 낮아지도록 설정
-      const distanceRandom = Math.pow(Math.random(), 0.5); // 제곱근으로 분포 조정
-      const distance = 0.0005 + distanceRandom * 0.002; // 50m~250m
-      
-      // 오염도는 거리와 방향에 따라 결정
-      // 서쪽 방향이고 가까울수록 높은 오염도
-      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
-      const distanceFactor = 1 - (distance - 0.0005) / 0.002; // 거리가 가까울수록 높은 값
-      
-      const value = 0.3 + 0.65 * directionFactor * distanceFactor;
-      
-      // 약간의 랜덤성 추가
-      const randomFactor = 0.85 + (Math.random() * 0.3);
-      
-      // 좌표 계산
-      const lon = centerLon + (distance * Math.cos(angle));
-      const lat = centerLat + (distance * Math.sin(angle));
-      
-      data.push({
-        longitude: lon,
-        latitude: lat,
-        value: value * randomFactor
-      });
-    }
-    
-    return data;
-  })(),
-  
-  // 60m 고도 데이터 (더 넓게 퍼짐)
-  '60m': (() => {
-    const data: PollutionPoint[] = [];
-    const centerLon = TANCHEON_LOCATION.longitude;
-    const centerLat = TANCHEON_LOCATION.latitude;
-    
-    // 중심점 (60m에서는 중간 정도 오염도)
-    data.push({ longitude: centerLon, latitude: centerLat, value: 0.7 });
-    
-    // 서쪽 방향으로 더 많이 퍼지는 패턴 (바람 방향)
-    // 더 자연스러운 분포를 위해 랜덤 요소 추가
-    const pointCount = 50; // 총 포인트 수
-    
-    for (let i = 0; i < pointCount; i++) {
-      // 서쪽 방향으로 치우친 랜덤 각도 생성
-      let angle;
-      const randomValue = Math.random();
-      
-      if (randomValue < 0.5) {
-        // 50% 확률로 서쪽 방향 (135도~225도)
-        angle = Math.PI * (0.75 + Math.random() * 0.5);
-      } else if (randomValue < 0.8) {
-        // 30% 확률로 남북 방향 (45도~135도, 225도~315도)
-        if (Math.random() < 0.5) {
-          angle = Math.PI * (0.25 + Math.random() * 0.5); // 남쪽 방향
-        } else {
-          angle = Math.PI * (1.25 + Math.random() * 0.5); // 북쪽 방향
-        }
-      } else {
-        // 20% 확률로 동쪽 방향 (315도~45도)
-        angle = Math.PI * (1.75 + Math.random() * 0.5);
-      }
-      
-      // 거리는 중심에서 멀어질수록 확률이 낮아지도록 설정
-      const distanceRandom = Math.pow(Math.random(), 0.6); // 제곱근으로 분포 조정
-      const distance = 0.001 + distanceRandom * 0.004; // 100m~500m
-      
-      // 오염도는 거리와 방향에 따라 결정
-      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
-      const distanceFactor = 1 - (distance - 0.001) / 0.004; // 거리가 가까울수록 높은 값
-      
-      const value = 0.25 + 0.45 * directionFactor * distanceFactor;
-      
-      // 약간의 랜덤성 추가
-      const randomFactor = 0.85 + (Math.random() * 0.3);
-      
-      // 좌표 계산
-      const lon = centerLon + (distance * Math.cos(angle));
-      const lat = centerLat + (distance * Math.sin(angle));
-      
-      data.push({
-        longitude: lon,
-        latitude: lat,
-        value: value * randomFactor
-      });
-    }
-    
-    return data;
-  })(),
-  
-  // 90m 고도 데이터 (가장 넓게 퍼짐, 오염도는 낮음)
-  '90m': (() => {
-    const data: PollutionPoint[] = [];
-    const centerLon = TANCHEON_LOCATION.longitude;
-    const centerLat = TANCHEON_LOCATION.latitude;
-    
-    // 중심점 (90m에서는 낮은 오염도)
-    data.push({ longitude: centerLon, latitude: centerLat, value: 0.5 });
-    
-    // 서쪽 방향으로 더 많이 퍼지는 패턴 (바람 방향)
-    // 더 자연스러운 분포를 위해 랜덤 요소 추가
-    const pointCount = 60; // 총 포인트 수
-    
-    for (let i = 0; i < pointCount; i++) {
-      // 서쪽 방향으로 치우친 랜덤 각도 생성
-      let angle;
-      const randomValue = Math.random();
-      
-      if (randomValue < 0.4) {
-        // 40% 확률로 서쪽 방향 (135도~225도)
-        angle = Math.PI * (0.75 + Math.random() * 0.5);
-      } else if (randomValue < 0.75) {
-        // 35% 확률로 남북 방향 (45도~135도, 225도~315도)
-        if (Math.random() < 0.5) {
-          angle = Math.PI * (0.25 + Math.random() * 0.5); // 남쪽 방향
-        } else {
-          angle = Math.PI * (1.25 + Math.random() * 0.5); // 북쪽 방향
-        }
-      } else {
-        // 25% 확률로 동쪽 방향 (315도~45도)
-        angle = Math.PI * (1.75 + Math.random() * 0.5);
-      }
-      
-      // 거리는 중심에서 멀어질수록 확률이 낮아지도록 설정
-      const distanceRandom = Math.pow(Math.random(), 0.7); // 제곱근으로 분포 조정
-      const distance = 0.002 + distanceRandom * 0.008; // 200m~1km
-      
-      // 오염도는 거리와 방향에 따라 결정
-      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
-      const distanceFactor = 1 - (distance - 0.002) / 0.008; // 거리가 가까울수록 높은 값
-      
-      const value = 0.2 + 0.3 * directionFactor * distanceFactor;
-      
-      // 약간의 랜덤성 추가
-      const randomFactor = 0.85 + (Math.random() * 0.3);
-      
-      // 좌표 계산
-      const lon = centerLon + (distance * Math.cos(angle));
-      const lat = centerLat + (distance * Math.sin(angle));
-      
-      data.push({
-        longitude: lon,
-        latitude: lat,
-        value: value * randomFactor
-      });
-    }
-    
-    return data;
-  })()
-};
-
 const VWorldMap: React.FC<VWorldMapProps> = ({ 
   apiKey, 
-  height = '500px',
-  initialPosition = TANCHEON_LOCATION
+  height = '500px'
 }) => {
   const cesiumContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const viewerRef = useRef<any>(null);
+
   const [showBuildings, setShowBuildings] = useState(false);
   const buildingsRef = useRef<any[]>([]);
   const [savedCameraPosition, setSavedCameraPosition] = useState<any>(null);
-  const [showHeatmap, setShowHeatmap] = useState(false); // 히트맵 표시 상태
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const heatmapPrimitiveRef = useRef<{[key in keyof HeightHeatmaps]: any | null}>({
     '30m': null,
     '60m': null,
@@ -502,7 +289,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
             console.log(`${height} 오염도 히트맵 생성 시작`);
             
             // 히트맵 영역 경계 계산
-            const data = POLLUTION_DATA[height];
+            const data = POLLUTION_DATA;
             const west = Math.min(...data.map(p => p.longitude)) - 0.001;
             const south = Math.min(...data.map(p => p.latitude)) - 0.001;
             const east = Math.max(...data.map(p => p.longitude)) + 0.001;
@@ -510,7 +297,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
             
             // 히트맵 이미지 생성
             const canvas = document.createElement('canvas');
-            const size = 1024; // 이미지 크기 (더 높은 해상도)
+            const size = 1024; 
             canvas.width = size;
             canvas.height = size;
             const ctx = canvas.getContext('2d')!;
@@ -674,13 +461,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           shadows: false,
         });
         
-        // 뷰어 참조 저장
         viewerRef.current = viewer;
         
-        // 기본 이미지 레이어 제거
         viewer.imageryLayers.removeAll();
 
-        // VWorld 위성 지도 레이어 추가
         const vworldSatelliteProvider = new Cesium.WebMapTileServiceImageryProvider({
           url: `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/Satellite/{TileMatrix}/{TileRow}/{TileCol}.jpeg`,
           layer: 'Satellite',
@@ -692,59 +476,33 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         });
         viewer.imageryLayers.addImageryProvider(vworldSatelliteProvider);
         
-        // 한국 지역 지형 데이터 설정 (가능한 경우)
         try {
-          // Cesium World Terrain 데이터 로드 - 한국 지역의 상세 지형도 포함
           const worldTerrain = await Cesium.createWorldTerrainAsync({
-            requestVertexNormals: true, // 지형 조명을 위한 버텍스 노말 요청
-            requestWaterMask: true      // 물 표면 표현을 위한 워터마스크 요청
+            requestVertexNormals: true, 
+            requestWaterMask: true
           });
           viewer.terrainProvider = worldTerrain;
-          console.log('세계 지형 데이터가 로드되었습니다.');
-          
-          // 한국 지역에 대해 더 상세한 지형 적용 시 아래 코드 활성화 가능
-          /*
-          // VWorld 지형 데이터를 활용하려면 적절한 URL과 API 연결 필요
-          // 현재는 VWorld에서 직접적인 지형 데이터 API를 제공하지 않음
-          // 대신 한국 지역에 최적화된 Cesium World Terrain 사용
-          const koreaExtent = Cesium.Rectangle.fromDegrees(
-            124.5, // 서쪽 경도
-            33.0,  // 남쪽 위도
-            132.0, // 동쪽 경도
-            38.9   // 북쪽 위도
-          );
-          
-          // 한국 지역에 대해 카메라 제한 설정 (선택 사항)
-          viewer.camera.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
-          viewer.scene.screenSpaceCameraController.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
-          viewer.scene.screenSpaceCameraController.minimumZoomDistance = 1000; // 최소 1km
-          viewer.scene.screenSpaceCameraController.maximumZoomDistance = 200000; // 최대 200km
-          */
         } catch (error) {
           console.warn('지형 데이터 로드 실패, 기본 타원체 지형을 사용합니다:', error);
-          // 기본 타원체 지형 사용
           const ellipsoidTerrainProvider = new Cesium.EllipsoidTerrainProvider();
           viewer.terrainProvider = ellipsoidTerrainProvider;
         }
 
-        // 3D 지형 활성화
         viewer.scene.globe.enableLighting = true;
         viewer.scene.globe.depthTestAgainstTerrain = true;
 
-        // 초기 카메라 위치로 이동
         viewer.camera.flyTo({
           destination: Cesium.Cartesian3.fromDegrees(
-            initialPosition.longitude,
-            initialPosition.latitude,
-            initialPosition.height
+            TANCHEON_LOCATION.longitude,
+            TANCHEON_LOCATION.latitude,
+            TANCHEON_LOCATION.height
           ),
           orientation: {
-            heading: initialPosition.heading || 0,
-            pitch: initialPosition.pitch || -0.5,
-            roll: initialPosition.roll || 0
+            heading: TANCHEON_LOCATION.heading || 0,
+            pitch: TANCHEON_LOCATION.pitch || -0.5,
+            roll: TANCHEON_LOCATION.roll || 0
           }
         });
-
         
         setIsLoading(false);
       } catch (error) {
@@ -769,7 +527,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         cesiumContainerRef.current?.removeChild(windDirectionContainer);
       }
     };
-  }, [isMounted, apiKey, initialPosition]);
+  }, [isMounted, apiKey, TANCHEON_LOCATION]);
 
   if (!isMounted) {
     return (
@@ -788,41 +546,21 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height }}>
+    <div className={"w-full h-full relative"}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       )}
       
-      {/* 컨트롤 위젯들 - 오른쪽 위에 배치 */}
       <MapControls 
+        viewerRef={viewerRef}
+        initialPosition={TANCHEON_LOCATION}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
-        onFlyToHome={() => {
-          if (viewerRef.current) {
-            const Cesium = (window as any).Cesium;
-            viewerRef.current.camera.flyTo({
-              destination: Cesium.Cartesian3.fromDegrees(
-                TANCHEON_LOCATION.longitude,
-                TANCHEON_LOCATION.latitude,
-                TANCHEON_LOCATION.height
-              ),
-              orientation: {
-                heading: TANCHEON_LOCATION.heading || 0,
-                pitch: TANCHEON_LOCATION.pitch || -0.5,
-                roll: TANCHEON_LOCATION.roll || 0
-              }
-            });
-          }
-        }}
-        onSavePosition={saveCurrentCameraPosition}
-        onFlyToSaved={flyToSavedPosition}
-        hasSavedPosition={!!savedCameraPosition}
         className="right-4 top-4" // 오른쪽 상단에 위치
       />
       
-      {/* 토글 컨트롤 위젯들 - 왼쪽 아래에 배치 */}
       <MapToggleControls
         showBuildings={showBuildings}
         onToggleBuildings={toggleBuildings}
@@ -848,16 +586,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         ref={cesiumContainerRef}
         className="cesium-container w-full h-full"
       />
-      
-      {/* 나침반 위젯 - 왼쪽 위에 배치 */}
-      {viewerRef.current && (
-        <CompassWidget 
-          cesiumContainerRef={cesiumContainerRef} 
-          viewerRef={viewerRef}
-          top="10px"
-          left="10px"
-        />
-      )}
     </div>
   );
 };

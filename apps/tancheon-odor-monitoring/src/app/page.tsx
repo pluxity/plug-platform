@@ -41,19 +41,16 @@ export default function Home() {
         <main className="flex-1 p-6 overflow-auto">
           <div className="space-y-6">
             <h1 className="text-2xl font-bold">탄천 악취 모니터링 대시보드</h1>
-            
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">탄천 지역 3D 지도</h2>
-              
-              {/* 지도 탭 선택 버튼 */}
               <div className="flex mb-4 border-b">
                 <button
+                  type='button'
                   className={`px-4 py-2 font-medium ${activeMapTab === 'vworld' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                   onClick={() => setActiveMapTab('vworld')}
                 >
                   VWorld 지도
                 </button>
                 <button
+                  type='button'
                   className={`px-4 py-2 font-medium ${activeMapTab === 'cesium' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                   onClick={() => setActiveMapTab('cesium')}
                 >
@@ -61,19 +58,18 @@ export default function Home() {
                 </button>
               </div>
               
-              <div className="h-[500px] rounded">
+              <div className="h-[650px] rounded">
                 {activeMapTab === 'cesium' && (
                   <Suspense fallback={<div className="w-full h-full flex items-center justify-center bg-gray-100">지도 로딩 중...</div>}>
-                    <CesiumMap height="500px" />
+                    <CesiumMap height="650px" />
                   </Suspense>
                 )}
                 
                 {activeMapTab === 'vworld' && (
                   <Suspense fallback={<div className="w-full h-full flex items-center justify-center bg-gray-100">지도 로딩 중...</div>}>
-                    <VWorldMap apiKey={vworldApiKey} height="500px" />
+                    <VWorldMap apiKey={vworldApiKey} height="650px" />
                   </Suspense>
                 )}
-              </div>
             </div>
           </div>
         </main>

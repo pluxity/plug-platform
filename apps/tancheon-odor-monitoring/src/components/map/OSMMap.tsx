@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
+import { TANCHEON_LOCATION } from '@/constants/initialization';
+
 interface OSMMapProps {
   height?: string;
 }
@@ -14,12 +16,6 @@ declare global {
 }
 
 // 탄천 좌표 (대략적인 위치)
-const TANCHEON_LOCATION = {
-  longitude: 127.083264,
-  latitude: 37.496698,
-  height: 1000
-};
-
 const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
   const cesiumContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
