@@ -88,23 +88,11 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
           fullscreenButton: false,
           creditContainer: document.createElement('div'), // 크레딧 정보 숨김
           infoBox: false, // InfoBox 비활성화
+          terrainProvider: new Cesium.EllipsoidTerrainProvider(), // 초기 지형 제공자
         });
 
-        setViewer(viewer);
-
-        viewer.imageryLayers.removeAll();
-
-        const osmProvider = new Cesium.OpenStreetMapImageryProvider({
-          url: 'https://a.tile.openstreetmap.org/'
-        });
-        viewer.imageryLayers.addImageryProvider(osmProvider);
-
-        // 기본 지형 제공자 설정
-        const terrainProvider = new Cesium.EllipsoidTerrainProvider();
-        viewer.terrainProvider = terrainProvider;
-
-        // 탄천 지역으로 카메라 이동
-        viewer.camera.flyTo({
+        // 즉시 카메라 위치 설정
+        viewer.camera.setView({
           destination: Cesium.Cartesian3.fromDegrees(
             TANCHEON_LOCATION.longitude,
             TANCHEON_LOCATION.latitude,
@@ -116,6 +104,19 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
             roll: 0.0
           }
         });
+
+        setViewer(viewer);
+
+        viewer.imageryLayers.removeAll();
+
+        const osmProvider = new Cesium.OpenStreetMapImageryProvider({
+          url: 'https://a.tile.openstreetmap.org/'
+        });
+        viewer.imageryLayers.addImageryProvider(osmProvider);
+
+        // 기본 지형 제공자 설정은 이미 초기화할 때 설정했으므로 제거
+        // const terrainProvider = new Cesium.EllipsoidTerrainProvider();
+        // viewer.terrainProvider = terrainProvider;
 
         setIsLoading(false);
       } catch (error) {
@@ -161,7 +162,6 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
 
       <MapControls 
         initialPosition={TANCHEON_LOCATION}
-        className="right-4 top-4" 
       />
       
       <MapToggleControls className="left-4 bottom-4"  />

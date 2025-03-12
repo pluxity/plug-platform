@@ -97,39 +97,12 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           infoBox: false,
           sceneMode: Cesium.SceneMode.SCENE3D,
           shadows: false,
+          // 초기 로딩을 위한 기본 지형 제공자
+          terrainProvider: new Cesium.EllipsoidTerrainProvider(),
         });
         
-        setViewer(viewer);
-        
-        viewer.imageryLayers.removeAll();
-
-        const vworldSatelliteProvider = new Cesium.WebMapTileServiceImageryProvider({
-          url: `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/Satellite/{TileMatrix}/{TileRow}/{TileCol}.jpeg`,
-          layer: 'Satellite',
-          style: 'default',
-          format: 'image/jpeg',
-          tileMatrixSetID: 'EPSG:3857',
-          credit: new Cesium.Credit('VWorld Satellite Imagery'),
-          maximumLevel: 19
-        });
-        viewer.imageryLayers.addImageryProvider(vworldSatelliteProvider);
-        
-        try {
-          const worldTerrain = await Cesium.createWorldTerrainAsync({
-            requestVertexNormals: true, 
-            requestWaterMask: true
-          });
-          viewer.terrainProvider = worldTerrain;
-        } catch (error) {
-          console.warn('지형 데이터 로드 실패, 기본 타원체 지형을 사용합니다:', error);
-          const ellipsoidTerrainProvider = new Cesium.EllipsoidTerrainProvider();
-          viewer.terrainProvider = ellipsoidTerrainProvider;
-        }
-
-        viewer.scene.globe.enableLighting = true;
-        viewer.scene.globe.depthTestAgainstTerrain = true;
-
-        viewer.camera.flyTo({
+        // 뷰어 생성 직후 바로 카메라 위치 설정 (애니메이션 없이 즉시 이동)
+        viewer.camera.setView({
           destination: Cesium.Cartesian3.fromDegrees(
             TANCHEON_LOCATION.longitude,
             TANCHEON_LOCATION.latitude,
@@ -142,8 +115,55 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           }
         });
         
-        setIsLoading(false);
-      } catch (error) {
+        setViewer(viewer);
+        
+        viewer.imageryLayers.removeAll();
+
+        // 이미지 레이어 로드 후 지형 데이터 처리 함수
+        const loadTerrainAfterImagery = async () => {
+          try {
+            const worldTerrain = await Cesium.createWorldTerrainAsync({
+              requestVertexNormals: true, 
+              requestWaterMask: true
+            });
+            
+            if (viewer && !viewer.isDestroyed()) {
+              viewer.terrainProvider = worldTerrain;
+              viewer.scene.globe.enableLighting = true;
+              viewer.scene.globe.depthTestAgainstTerrain = true;
+            }
+          } catch (error: any) {
+            console.warn('지형 데이터 로드 실패, 기본 타원체 지형을 사용합니다:', error);
+            if (viewer && !viewer.isDestroyed()) {
+              const ellipsoidTerrainProvider = new Cesium.EllipsoidTerrainProvider();
+              viewer.terrainProvider = ellipsoidTerrainProvider;
+            }
+          } finally {
+            setIsLoading(false);
+          }
+        };
+
+        // 이미지 레이어 로드
+        try {
+          const vworldSatelliteProvider = new Cesium.WebMapTileServiceImageryProvider({
+            url: `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/Satellite/{TileMatrix}/{TileRow}/{TileCol}.jpeg`,
+            layer: 'Satellite',
+            style: 'default',
+            format: 'image/jpeg',
+            tileMatrixSetID: 'EPSG:3857',
+            credit: new Cesium.Credit('VWorld Satellite Imagery'),
+            maximumLevel: 19
+          });
+          
+          viewer.imageryLayers.addImageryProvider(vworldSatelliteProvider);
+          
+          // 이미지 로드 완료 후 지형 데이터 로드
+          setTimeout(loadTerrainAfterImagery, 500); // 500ms 지연 후 지형 데이터 로드
+        } catch (error: any) {
+          console.warn('VWorld 이미지 레이어 초기화 실패:', error);
+          setIsLoading(false);
+        }
+      } catch (error: any) {
         console.error('Cesium 초기화 오류:', error);
         setError('지도를 로드하는 중 오류가 발생했습니다.');
         setIsLoading(false);
@@ -186,7 +206,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       
       <MapControls 
         initialPosition={TANCHEON_LOCATION}
-        className="right-4 top-4" // 오른쪽 상단에 위치
       />
       
       <MapToggleControls className="left-4 bottom-4"  />

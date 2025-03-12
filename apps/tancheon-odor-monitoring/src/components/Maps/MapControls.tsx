@@ -60,7 +60,7 @@ const MapControls: React.FC<MapControlsProps> = ({
 
   // UI 렌더링
   return (
-    <div className={`absolute top-4 right-4 z-10 flex flex-col space-y-2 ${className}`}>
+    <div className={`absolute bottom-4 right-4 z-10 flex flex-col space-y-2 ${className}`}>
       <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden">
         <button
           type="button"
