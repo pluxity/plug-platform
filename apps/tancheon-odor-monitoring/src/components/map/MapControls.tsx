@@ -1,5 +1,6 @@
+import useCesiumStore from '@/stores/useCesiumStore';
+
 interface MapControlsProps {
-  viewerRef: React.MutableRefObject<any>; // Cesium viewer ref
   initialPosition?: any; // 초기 위치 정보 (필요한 경우)
   onZoomIn: () => void;
   onZoomOut: () => void;
@@ -8,16 +9,18 @@ interface MapControlsProps {
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
-  viewerRef,
   initialPosition,
   onFlyToHome,
   className = ''
 }) => {
+  // Cesium 상태를 스토어에서 직접 가져오기
+  const { viewer } = useCesiumStore();
+
   const zoomIn = () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
-      const camera = viewerRef.current.camera;
+      const camera = viewer.camera;
       const zoomAmount = camera.positionCartographic.height * 0.5;
       camera.zoomIn(zoomAmount);
     } catch (error) {
@@ -26,10 +29,10 @@ const MapControls: React.FC<MapControlsProps> = ({
   };
 
   const zoomOut = () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
-      const camera = viewerRef.current.camera;
+      const camera = viewer.camera;
       const zoomAmount = camera.positionCartographic.height * 0.5;
       camera.zoomOut(zoomAmount);
     } catch (error) {
@@ -38,11 +41,11 @@ const MapControls: React.FC<MapControlsProps> = ({
   };
 
   const flyToHome = async () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
       const Cesium = await import('cesium');
-      viewerRef.current.camera.flyTo({
+      viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(
           initialPosition.longitude,
           initialPosition.latitude,

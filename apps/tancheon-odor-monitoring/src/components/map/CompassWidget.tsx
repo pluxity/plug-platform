@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
+import useCesiumStore from '@/stores/useCesiumStore';
 
 interface CompassWidgetProps {
   cesiumContainerRef: React.RefObject<HTMLDivElement | null>;
-  viewerRef: React.RefObject<any>;
   className?: string;
   top?: string;
   left?: string;
@@ -16,7 +16,6 @@ interface CompassWidgetProps {
  */
 export const CompassWidget: React.FC<CompassWidgetProps> = ({ 
   cesiumContainerRef,
-  viewerRef,
   className = '',
   top = '10px',
   left = '10px',
@@ -25,9 +24,12 @@ export const CompassWidget: React.FC<CompassWidgetProps> = ({
 }) => {
   const compassContainerRef = useRef<HTMLDivElement | null>(null);
   
+  // Cesium 상태를 스토어에서 직접 가져오기
+  const { viewer } = useCesiumStore();
+  
   // 나침반 생성
   useEffect(() => {
-    if (!cesiumContainerRef.current || !viewerRef.current) return;
+    if (!cesiumContainerRef.current || !viewer) return;
     
     // 동적 나침반 생성
     const compassContainer = document.createElement('div');
@@ -134,11 +136,24 @@ export const CompassWidget: React.FC<CompassWidgetProps> = ({
     compassContainerRef.current = compassContainer;
     
     // 나침반 업데이트 이벤트 등록
-    const updateCompassListener = viewerRef.current.scene.postRender.addEventListener(() => {
-      // 카메라 회전 각도 가져오기
-      const heading = viewerRef.current.camera.heading;
-      updateCompass(heading);
-    });
+    let updateCompassListener: (() => void) | undefined;
+    
+    // viewer와 scene이 존재하는지 확인
+    if (viewer && viewer.scene) {
+      try {
+        updateCompassListener = viewer.scene.postRender.addEventListener(() => {
+          // 카메라가 존재하는지 확인
+          if (viewer && viewer.camera) {
+            const heading = viewer.camera.heading;
+            updateCompass(heading);
+          }
+        });
+      } catch (error) {
+        console.warn('나침반 이벤트 등록 실패:', error);
+      }
+    } else {
+      console.warn('Cesium 뷰어의 scene이 초기화되지 않았습니다. 나침반이 작동하지 않을 수 있습니다.');
+    }
     
     // 나침반 업데이트 함수
     function updateCompass(heading: number) {
@@ -173,7 +188,7 @@ export const CompassWidget: React.FC<CompassWidgetProps> = ({
         updateCompassListener();
       }
     };
-  }, [cesiumContainerRef, viewerRef, className, top, left, right, bottom]);
+  }, [cesiumContainerRef, viewer, className, top, left, right, bottom]);
   
   // 이 컴포넌트는 실제 DOM 요소를 렌더링하지 않고 명령형 방식으로 나침반을 생성
   return null;

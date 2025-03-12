@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MapControls from './MapControls';
 import MapToggleControls from './MapToggleControls';
+import CompassWidget from './CompassWidget';
 import Cesium from 'cesium';
 
 import { HeightHeatmaps } from '@/types/pollution';
@@ -10,12 +11,13 @@ import { HeightHeatmaps } from '@/types/pollution';
 import { TANCHEON_LOCATION } from '@/constants/initialization';
 import { POLLUTION_DATA } from '@/constants/pollutation';
 
+import useCesiumStore from '@/stores/useCesiumStore';
+
 interface VWorldMapProps {
   apiKey: string;
   height?: string;
 }
 
-// 타입 확장
 declare global {
   interface Window {
     CESIUM_BASE_URL?: string;
@@ -36,7 +38,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const viewerRef = useRef<any>(null);
+
+  const { viewer, setViewer } = useCesiumStore();
 
   const [showBuildings, setShowBuildings] = useState(false);
   const buildingsRef = useRef<any[]>([]);
@@ -46,13 +49,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     '30m': null,
     '60m': null,
     '90m': null
-  }); // 고도별 히트맵 프리미티브 참조
+  });
   const [heatmapHeight, setHeatmapHeight] = useState<number>(30); // 히트맵 높이 (기본값 30m)
   const [visibleHeatmaps, setVisibleHeatmaps] = useState<VisibleHeatmaps>({
     '30m': true,
     '60m': false,
     '90m': false
-  }); // 각 고도별 히트맵 표시 여부
+  });
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -86,7 +89,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 건물 추가/제거 함수
   const toggleBuildings = async () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
       const Cesium = await import('cesium');
@@ -94,8 +97,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       if (!showBuildings) {
         // 기존 건물 제거
         buildingsRef.current.forEach(entity => {
-          if (entity && viewerRef.current.entities.contains(entity)) {
-            viewerRef.current.entities.remove(entity);
+          if (entity && viewer.entities.contains(entity)) {
+            viewer.entities.remove(entity);
           }
         });
         buildingsRef.current = [];
@@ -117,7 +120,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           new Cesium.HeadingPitchRoll(0, 0, 0)
         );
         
-        const funeralHall = viewerRef.current.entities.add({
+        const funeralHall = viewer.entities.add({
           name: 'FuneralHallModel',
           position: position,
           orientation: orientation,
@@ -133,8 +136,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       } else {
         // 건물 제거
         buildingsRef.current.forEach(entity => {
-          if (entity && viewerRef.current.entities.contains(entity)) {
-            viewerRef.current.entities.remove(entity);
+          if (entity && viewer.entities.contains(entity)) {
+            viewer.entities.remove(entity);
           }
         });
         buildingsRef.current = [];
@@ -151,10 +154,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 현재 카메라 위치 저장
   const saveCurrentCameraPosition = () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
-      const camera = viewerRef.current.camera;
+      const camera = viewer.camera;
       const position = camera.positionCartographic;
       const heading = camera.heading;
       const pitch = camera.pitch;
@@ -181,12 +184,12 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 저장된 카메라 위치로 이동
   const flyToSavedPosition = async () => {
-    if (!viewerRef.current || !savedCameraPosition) return;
+    if (!viewer || !savedCameraPosition) return;
     
     try {
       const Cesium = await import('cesium');
       
-      viewerRef.current.camera.flyTo({
+      viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromRadians(
           savedCameraPosition.longitude,
           savedCameraPosition.latitude,
@@ -208,10 +211,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 확대
   const zoomIn = () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
-      const camera = viewerRef.current.camera;
+      const camera = viewer.camera;
       const zoomAmount = camera.positionCartographic.height * 0.5;
       camera.zoomIn(zoomAmount);
     } catch (error) {
@@ -221,10 +224,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 축소
   const zoomOut = () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
-      const camera = viewerRef.current.camera;
+      const camera = viewer.camera;
       const zoomAmount = camera.positionCartographic.height * 0.5;
       camera.zoomOut(zoomAmount);
     } catch (error) {
@@ -239,7 +242,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 히트맵 높이 변경 함수
   const changeHeatmapHeight = async (newHeight: number) => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
       // 높이 변경
@@ -273,7 +276,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 히트맵 토글 함수
   const toggleHeatmap = async () => {
-    if (!viewerRef.current) return;
+    if (!viewer) return;
     
     try {
       const Cesium = await import('cesium');
@@ -355,8 +358,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
             const rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
             
             // 히트맵 엔티티 생성
-            const heightValue = parseInt(height);
-            const heatmapEntity = viewerRef.current.entities.add({
+            const heightValue = parseInt(height as string);
+            const heatmapEntity = viewer.entities.add({
               rectangle: {
                 coordinates: rectangle,
                 material: heatmapTexture,
@@ -405,7 +408,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 고도별 히트맵 동시 표시 토글 함수 - 원래 코드로 복원
   const toggleHeightHeatmap = (height: keyof HeightHeatmaps) => {
-    if (!viewerRef.current || !showHeatmap) return;
+    if (!viewer || !showHeatmap) return;
     
     try {
       // 해당 고도의 히트맵 표시 상태 토글
@@ -461,7 +464,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           shadows: false,
         });
         
-        viewerRef.current = viewer;
+        setViewer(viewer);
         
         viewer.imageryLayers.removeAll();
 
@@ -554,7 +557,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       )}
       
       <MapControls 
-        viewerRef={viewerRef}
         initialPosition={TANCHEON_LOCATION}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
@@ -580,6 +582,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           }
         }}
         className="left-4 bottom-4" // 왼쪽 하단에 위치
+      />
+      
+      {/* 나침반 위젯 추가 */}
+      <CompassWidget 
+        cesiumContainerRef={cesiumContainerRef}
+        top="20px"
+        left="20px"
       />
       
       <div

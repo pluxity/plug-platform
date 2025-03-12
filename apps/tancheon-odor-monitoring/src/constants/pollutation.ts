@@ -9,16 +9,16 @@ export const POLLUTION_DATA: PollutionPoint[] = (() => {
     
     data.push({ longitude: centerLon, latitude: centerLat, value: 0.95 });
     
-    const pointCount = 40; // 총 포인트 수
+    const pointCount = 40;
     
     for (let i = 0; i < pointCount; i++) {
       let angle = Math.PI * (Math.random() * 0.5);
 
-      const distanceRandom = Math.pow(Math.random(), 0.5); // 제곱근으로 분포 조정
-      const distance = 0.0005 + distanceRandom * 0.002; // 50m~250m
+      const distanceRandom = Math.pow(Math.random(), 0.5);
+      const distance = 0.0005 + distanceRandom * 0.002;
       
-      const directionFactor = (Math.cos(angle) + 1) / 2; // 서쪽(180도)에서 최대, 동쪽(0도)에서 최소
-      const distanceFactor = 1 - (distance - 0.0005) / 0.002; // 거리가 가까울수록 높은 값
+      const directionFactor = (Math.cos(angle) + 1) / 2;
+      const distanceFactor = 1 - (distance - 0.0005) / 0.002;
       
       const value = 0.3 + 0.65 * directionFactor * distanceFactor;      
       
