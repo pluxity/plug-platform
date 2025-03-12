@@ -4,12 +4,16 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@plug/ui/src/components/Button';
+import { useUserStore } from '@/stores/userStore';
 
 const LoginPage = () => {
   const router = useRouter();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  
+  // Zustand 스토어에서 setUser 함수 가져오기
+  const setUser = useUserStore((state) => state.setUser);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -31,8 +35,10 @@ const LoginPage = () => {
         console.log('로그인 성공:', data);
         // 쿠키 설정
         document.cookie = `token=${data.token}; path=/;`;
-        //유저 정보 localStorage에 저장
-        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // localStorage 대신 Zustand 스토어 사용
+        setUser(data.user);
+        
         router.push('/'); // 메인 페이지로 이동
       } else {
         const data = await response.json();

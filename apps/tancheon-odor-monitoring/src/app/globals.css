@@ -9,4 +9,25 @@
   display: none !important;
 }
 
+.cesium-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cesium-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+.cesium-viewer-cesiumWidgetContainer {
+  width: 100%;
+  height: 100%;
+}
+
+.cesium-widget {
+  width: 100%;
+  height: 100%;
+}
+
 /* 기존 스타일 */
