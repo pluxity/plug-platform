@@ -8,6 +8,7 @@ import useCesiumStore from '@/stores/cesiumStore';
 
 import { TANCHEON_LOCATION } from '@/constants/initialization';
 import { POLLUTION_DATA } from '@/constants/pollutation';
+import { createHeatmapAtHeight, HeatmapOptions } from '@/lib/heatmap';
 
 interface VisibleHeatmaps extends Record<string, boolean> {
   '30m': boolean;
@@ -169,8 +170,6 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     if (!viewer) return;
     
     try {
-      const Cesium = await import('cesium');
-      
       if (!showHeatmap) {
         // 히트맵이 표시되지 않은 상태라면 표시
         const heightKey = `${heatmapHeight}m` as keyof HeightHeatmaps;
@@ -181,82 +180,25 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
             // 히트맵 데이터 준비
             console.log(`${height} 오염도 히트맵 생성 시작`);
             
-            // 히트맵 영역 경계 계산
-            const data = POLLUTION_DATA;
-            const west = Math.min(...data.map(p => p.longitude)) - 0.001;
-            const south = Math.min(...data.map(p => p.latitude)) - 0.001;
-            const east = Math.max(...data.map(p => p.longitude)) + 0.001;
-            const north = Math.max(...data.map(p => p.latitude)) + 0.001;
+            // 히트맵 옵션 설정
+            const options: HeatmapOptions = {
+              gridSize: 256,
+              canvasSize: 1024,
+              radius: 15,
+              blurRadius: 8,
+              valueThreshold: 0.05
+            };
             
-            // 히트맵 이미지 생성
-            const canvas = document.createElement('canvas');
-            const size = 1024; 
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d')!;
-            
-            // 배경을 투명하게 설정
-            ctx.clearRect(0, 0, size, size);
-            
-            // 컬러맵 캔버스 생성 (그라데이션)
-            const colorMapCanvas = document.createElement('canvas');
-            colorMapCanvas.width = 256;
-            colorMapCanvas.height = 1;
-            const colorMapCtx = colorMapCanvas.getContext('2d')!;
-            const colorGradient = colorMapCtx.createLinearGradient(0, 0, 256, 0);
-            colorGradient.addColorStop(0.0, 'blue');   // 낮은 값
-            colorGradient.addColorStop(0.3, 'cyan');   // 낮은-중간 값
-            colorGradient.addColorStop(0.5, 'lime');   // 중간 값
-            colorGradient.addColorStop(0.7, 'yellow'); // 중간-높은 값
-            colorGradient.addColorStop(1.0, 'red');    // 높은 값
-            colorMapCtx.fillStyle = colorGradient;
-            colorMapCtx.fillRect(0, 0, 256, 1);
-            
-            // 각 데이터 포인트를 캔버스에 그리기
-            data.forEach(point => {
-              // 좌표를 캔버스 좌표로 변환
-              const x = ((point.longitude - west) / (east - west)) * size;
-              const y = size - ((point.latitude - south) / (north - south)) * size; // y축 반전
-              
-              // 그라디언트 생성
-              const radius = 80; // 더 큰 반경
-              const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-              
-              // 컬러맵에서 색상 가져오기
-              const colorIndex = Math.floor(point.value * 255);
-              const pixelData = colorMapCtx.getImageData(colorIndex, 0, 1, 1).data;
-              const color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}`;
-              
-              gradient.addColorStop(0, `${color}, ${point.value * 0.8})`);
-              gradient.addColorStop(0.7, `${color}, ${point.value * 0.4})`);
-              gradient.addColorStop(1, `rgba(0, 0, 255, 0)`); 
-              
-              // 원 그리기
-              ctx.fillStyle = gradient;
-              ctx.beginPath();
-              ctx.arc(x, y, radius, 0, Math.PI * 2);
-              ctx.fill();
-            });
-            
-            // 히트맵 텍스처 생성
-            const heatmapTexture = new Cesium.ImageMaterialProperty({
-              image: canvas,
-              transparent: true
-            });
-            
-            // 히트맵 영역 생성
-            const rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
-            
-            // 히트맵 엔티티 생성
+            // 히트맵 높이 변환 (문자열에서 숫자로)
             const heightValue = parseInt(height as string);
-            const heatmapEntity = viewer.entities.add({
-              rectangle: {
-                coordinates: rectangle,
-                material: heatmapTexture,
-                height: heightValue, // 고도별 높이 설정
-                heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
-              }
-            });
+            
+            // 히트맵 생성 유틸리티 함수 호출
+            const heatmapEntity = await createHeatmapAtHeight(
+              viewer,
+              POLLUTION_DATA,
+              heightValue,
+              options
+            );
             
             // 히트맵 참조 저장
             heatmapPrimitiveRef.current[height] = heatmapEntity;
