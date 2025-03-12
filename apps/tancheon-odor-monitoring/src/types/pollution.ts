@@ -3,10 +3,7 @@ export interface PollutionPoint {
   longitude: number;
   latitude: number;
   value: number;
-  height: number;
-  altitude?: number;
-  timestamp?: string;
-  source?: string;
+  height?: number;
 }
 export interface HeightHeatmaps {
   '30m': PollutionPoint[];

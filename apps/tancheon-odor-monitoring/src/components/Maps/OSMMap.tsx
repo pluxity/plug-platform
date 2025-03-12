@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import MapControls from './MapControls';
+import MapToggleControls from './MapToggleControls';
 
 import { TANCHEON_LOCATION } from '@/constants/initialization';
+import useCesiumStore from '@/stores/cesiumStore';
 
 interface OSMMapProps {
   height?: string;
@@ -21,6 +24,8 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+
+  const { viewer, setViewer } = useCesiumStore();
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -85,10 +90,10 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
           infoBox: false, // InfoBox 비활성화
         });
 
-        // 기본 이미지 레이어 제거
+        setViewer(viewer);
+
         viewer.imageryLayers.removeAll();
 
-        // OpenStreetMap 이미지 레이어 추가
         const osmProvider = new Cesium.OpenStreetMapImageryProvider({
           url: 'https://a.tile.openstreetmap.org/'
         });
@@ -147,12 +152,19 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height }}>
+    <div className={"w-full h-full relative"}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       )}
+
+      <MapControls 
+        initialPosition={TANCHEON_LOCATION}
+        className="right-4 top-4" 
+      />
+      
+      <MapToggleControls className="left-4 bottom-4"  />
       <div
         ref={cesiumContainerRef}
         className="cesium-container w-full h-full"

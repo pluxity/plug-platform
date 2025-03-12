@@ -1,9 +1,5 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import UserIcon from '@plug/ui/src/assets/icons/user.svg';
-import { useRouter } from 'next/navigation';
 
 interface WeatherData {
   temp: number;
@@ -13,20 +9,13 @@ interface WeatherData {
   windDeg: number;
 }
 
-/**
- * 풍향을 계산하는 함수
- * @param deg 풍향 각도
- * @returns 풍향 문자열
- */
 const getWindDirection = (deg: number): string => {
   const directions = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
   const index = Math.round(deg / 45) % 8;
   return directions[index];
 };
 
-/**
- * 풍향 아이콘 컴포넌트
- */
+
 const WindDirectionIcon = ({ deg }: { deg: number }) => {
   return (
     <div className="relative inline-block">
@@ -50,68 +39,19 @@ const WindDirectionIcon = ({ deg }: { deg: number }) => {
   );
 };
 
-// 클라이언트 사이드에서만 렌더링할 시간 컴포넌트
-const TimeDisplay = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-
-  useEffect(() => {
-    // 1초마다 현재 시간 업데이트
-    const timeInterval = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 1000);
-    
-    return () => {
-      clearInterval(timeInterval);
-    };
-  }, []);
-
-  /**
-   * 날짜 포맷팅 함수
-   */
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-    const weekday = weekdays[date.getDay()];
-    
-    return `${year}년 ${month}월 ${day}일 (${weekday})`;
-  };
-
-  /**
-   * 시간 포맷팅 함수
-   */
-  const formatTime = (date: Date) => {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  return (
-    <div className="text-center">
-      <div className="text-sm">{formatDate(currentDate)}</div>
-      <div className="text-lg font-semibold">{formatTime(currentDate)}</div>
-    </div>
-  );
-};
-
-// 클라이언트 사이드에서만 렌더링할 날씨 컴포넌트
-const WeatherDisplay = () => {
+export const WeatherDisplay = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 날씨 정보 가져오기
   const fetchWeather = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // 서울 좌표 (탄천 인근)
+
       const lat = 37.5139;
       const lon = 127.0599;
-      const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || 'f5d4a5f5e0843e7c44fcca9c1c26c6a2';
+      const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || '6d730b0224c411d1832362c66c083e91';
       
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr`
@@ -130,6 +70,7 @@ const WeatherDisplay = () => {
         windSpeed: data.wind.speed,
         windDeg: data.wind.deg
       });
+
     } catch (err) {
       console.error('날씨 정보 가져오기 오류:', err);
       setError('날씨 정보를 가져오는데 실패했습니다.');
@@ -150,9 +91,6 @@ const WeatherDisplay = () => {
     };
   }, []);
 
-  /**
-   * 날씨 정보 수동 새로고침 함수
-   */
   const handleRefreshWeather = () => {
     fetchWeather();
   };
@@ -206,70 +144,3 @@ const WeatherDisplay = () => {
     </div>
   );
 };
-
-/**
- * 뷰 헤더 컴포넌트
- */
-const ViewHeader = () => {
-  const router = useRouter();
-
-  /**
-   * 로그아웃 처리 함수
-   */
-  const handleLogout = () => {
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    localStorage.removeItem('user');
-    router.push('/login');
-  };
-
-  // 클라이언트 사이드에서만 렌더링할 컴포넌트를 위한 상태
-  const [isMounted, setIsMounted] = useState(false);
-
-  // 클라이언트 사이드에서만 실행
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  return (
-    <header className="bg-gray-800 text-white py-3 px-6 shadow-md">
-      <div className="flex justify-between items-center">
-        {/* 왼쪽: 로고와 타이틀 */}
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-            <span className="text-white font-bold">TM</span>
-          </div>
-          <h1 className="text-xl font-bold">탄천 악취 모니터링</h1>
-        </div>
-        
-        {/* 가운데: 시간과 날씨 - 클라이언트 사이드에서만 렌더링 */}
-        <div className="flex items-center space-x-6">
-          {isMounted ? (
-            <>
-              <TimeDisplay />
-              <WeatherDisplay />
-            </>
-          ) : (
-            <div className="h-16 w-64 bg-gray-700 rounded-md animate-pulse"></div>
-          )}
-        </div>
-        
-        {/* 오른쪽: 사용자 정보 */}
-        <div className="flex items-center">
-          <div className="bg-blue-600 text-xs px-2 py-1 rounded-md mr-2">관리자</div>
-          <div className="flex items-center">
-            <Image src={UserIcon} alt="사용자" width={24} height={24} className="mr-2" />
-            <span className="text-sm">홍길동</span>
-          </div>
-          <button 
-            onClick={handleLogout}
-            className="ml-4 text-sm text-gray-300 hover:text-white"
-          >
-            로그아웃
-          </button>
-        </div>
-      </div>
-    </header>
-  );
-};
-
-export default ViewHeader; 

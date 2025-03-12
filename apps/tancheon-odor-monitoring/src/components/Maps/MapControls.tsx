@@ -1,16 +1,12 @@
-import useCesiumStore from '@/stores/useCesiumStore';
+import useCesiumStore from '@/stores/cesiumStore';
 
 interface MapControlsProps {
   initialPosition?: any; // 초기 위치 정보 (필요한 경우)
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onFlyToHome?: () => void;
   className?: string;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
   initialPosition,
-  onFlyToHome,
   className = ''
 }) => {
   // Cesium 상태를 스토어에서 직접 가져오기

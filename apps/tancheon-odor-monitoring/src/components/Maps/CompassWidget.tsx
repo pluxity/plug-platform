@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import useCesiumStore from '@/stores/useCesiumStore';
+import useCesiumStore from '@/stores/cesiumStore';
 
 interface CompassWidgetProps {
   cesiumContainerRef: React.RefObject<HTMLDivElement | null>;

@@ -1,18 +1,18 @@
 'use client';
 import { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import ViewHeader from '@/components/layout/ViewHeader';
-import Sidebar from '@/components/layout/Sidebar';
+import ViewHeader from '@/components/Layouts/ViewHeader';
+import Sidebar from '@/components/Layouts/Sidebar';
 
 // Cesium 맵 컴포넌트를 클라이언트 사이드에서만 로드하도록 동적 임포트
 const CesiumMap = dynamic(
-  () => import('@/components/map/OSMMap'),
+  () => import('@/components/Maps/OSMMap'),
   { ssr: false } // 서버 사이드 렌더링 비활성화
 );
 
 // VWorld 맵 컴포넌트를 클라이언트 사이드에서만 로드하도록 동적 임포트
 const VWorldMap = dynamic(
-  () => import('@/components/map/VWorldMap'),
+  () => import('@/components/Maps/VWorldMap'),
   { ssr: false } // 서버 사이드 렌더링 비활성화
 );
 

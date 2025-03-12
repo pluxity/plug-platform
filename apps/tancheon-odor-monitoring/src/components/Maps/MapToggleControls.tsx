@@ -1,55 +1,52 @@
-'use client';
+import React from 'react';
 
-import { useEffect, useRef, useState } from 'react';
-import MapControls from './MapControls';
-import MapToggleControls from './MapToggleControls';
-import CompassWidget from './CompassWidget';
-import Cesium from 'cesium';
+import { useRef, useState } from 'react';
 
 import { HeightHeatmaps } from '@/types/pollution';
+
+import useCesiumStore from '@/stores/cesiumStore';
 
 import { TANCHEON_LOCATION } from '@/constants/initialization';
 import { POLLUTION_DATA } from '@/constants/pollutation';
 
-import useCesiumStore from '@/stores/useCesiumStore';
-
-interface VWorldMapProps {
-  apiKey: string;
-  height?: string;
-}
-
-declare global {
-  interface Window {
-    CESIUM_BASE_URL?: string;
-    Cesium?: any;
-  }
-}
 interface VisibleHeatmaps extends Record<string, boolean> {
   '30m': boolean;
   '60m': boolean;
   '90m': boolean;
 }
 
-const VWorldMap: React.FC<VWorldMapProps> = ({ 
-  apiKey, 
-  height = '500px'
+interface MapToggleControlsProps {
+  className?: string;
+}
+
+/**
+ * 맵 토글 컨트롤 컴포넌트 - 건물, 히트맵 등의 표시/숨김 토글 및 고도 선택 기능
+ * VWorldMap과 OSMMap 모두에서 재사용 가능합니다.
+ */
+export const MapToggleControls: React.FC<MapToggleControlsProps> = ({  
+  className = ''
 }) => {
-  const cesiumContainerRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
 
   const { viewer, setViewer } = useCesiumStore();
-
+  
   const [showBuildings, setShowBuildings] = useState(false);
   const buildingsRef = useRef<any[]>([]);
   const [savedCameraPosition, setSavedCameraPosition] = useState<any>(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
+
+  // 고도 선택 옵션
+  const heightOptions = [30, 60, 90];
+  const [selectedHeight, setSelectedHeight] = useState<number>(30);
+  
+  // 히트맵 고도 옵션
+  const heightHeatmapOptions: Array<keyof VisibleHeatmaps> = ['30m', '60m', '90m'];
+
   const heatmapPrimitiveRef = useRef<{[key in keyof HeightHeatmaps]: any | null}>({
     '30m': null,
     '60m': null,
     '90m': null
   });
+
   const [heatmapHeight, setHeatmapHeight] = useState<number>(30); // 히트맵 높이 (기본값 30m)
   const [visibleHeatmaps, setVisibleHeatmaps] = useState<VisibleHeatmaps>({
     '30m': true,
@@ -57,36 +54,12 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     '90m': false
   });
 
-  // 컴포넌트가 마운트되었는지 확인
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
-
-  // Cesium CSS 로드
-  useEffect(() => {
-    if (!isMounted) return;
-
-    // CSS 파일을 동적으로 로드하는 함수
-    const loadCss = (url: string) => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = url;
-      document.head.appendChild(link);
-      return link;
-    };
-
-    // Cesium 위젯 CSS 로드
-    const widgetsCss = loadCss('/static/cesium/Widgets/widgets.css');
-
-    return () => {
-      // 언마운트 시 CSS 제거
-      if (widgetsCss) {
-        document.head.removeChild(widgetsCss);
-      }
-    };
-  }, [isMounted]);
-
+  // 고도 변경 처리 함수
+  const onHeightChange = (height: number) => {
+    setSelectedHeight(height);
+    changeHeatmapHeight(height);
+  };
+  
   // 건물 추가/제거 함수
   const toggleBuildings = async () => {
     if (!viewer) return;
@@ -152,94 +125,11 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   };
 
-  // 현재 카메라 위치 저장
-  const saveCurrentCameraPosition = () => {
-    if (!viewer) return;
-    
-    try {
-      const camera = viewer.camera;
-      const position = camera.positionCartographic;
-      const heading = camera.heading;
-      const pitch = camera.pitch;
-      const roll = camera.roll;
-      
-      const savedPosition = {
-        longitude: position.longitude,
-        latitude: position.latitude,
-        height: position.height,
-        heading: heading,
-        pitch: pitch,
-        roll: roll
-      };
-      
-      setSavedCameraPosition(savedPosition);
-      console.log('카메라 위치 저장 완료:', savedPosition);
-      
-      // 사용자에게 알림
-      alert('현재 카메라 위치가 저장되었습니다.');
-    } catch (error) {
-      console.error('카메라 위치 저장 오류:', error);
-    }
-  };
-
-  // 저장된 카메라 위치로 이동
-  const flyToSavedPosition = async () => {
-    if (!viewer || !savedCameraPosition) return;
-    
-    try {
-      const Cesium = await import('cesium');
-      
-      viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromRadians(
-          savedCameraPosition.longitude,
-          savedCameraPosition.latitude,
-          savedCameraPosition.height
-        ),
-        orientation: {
-          heading: savedCameraPosition.heading,
-          pitch: savedCameraPosition.pitch,
-          roll: savedCameraPosition.roll
-        },
-        duration: 1.5
-      });
-      
-      console.log('저장된 카메라 위치로 이동 완료');
-    } catch (error) {
-      console.error('카메라 이동 오류:', error);
-    }
-  };
-
-  // 확대
-  const zoomIn = () => {
-    if (!viewer) return;
-    
-    try {
-      const camera = viewer.camera;
-      const zoomAmount = camera.positionCartographic.height * 0.5;
-      camera.zoomIn(zoomAmount);
-    } catch (error) {
-      console.error('확대 오류:', error);
-    }
-  };
-
-  // 축소
-  const zoomOut = () => {
-    if (!viewer) return;
-    
-    try {
-      const camera = viewer.camera;
-      const zoomAmount = camera.positionCartographic.height * 0.5;
-      camera.zoomOut(zoomAmount);
-    } catch (error) {
-      console.error('축소 오류:', error);
-    }
-  };
-
   // 타입 안전성을 위한 헬퍼 함수
   const safeObjectKeys = <T extends object>(obj: T): Array<keyof T> => {
     return Object.keys(obj) as Array<keyof T>;
   };
-
+  
   // 히트맵 높이 변경 함수
   const changeHeatmapHeight = async (newHeight: number) => {
     if (!viewer) return;
@@ -406,7 +296,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   };
 
-  // 고도별 히트맵 동시 표시 토글 함수 - 원래 코드로 복원
+  // 고도별 히트맵 동시 표시 토글 함수
   const toggleHeightHeatmap = (height: keyof HeightHeatmaps) => {
     if (!viewer || !showHeatmap) return;
     
@@ -426,177 +316,58 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   };
 
-  // Cesium 초기화
-  useEffect(() => {
-    if (!isMounted || !cesiumContainerRef.current) return;
-
-    let viewer: any = null;
-
-    const initCesium = async () => {
-      try {
-        window.CESIUM_BASE_URL = '/static/cesium/';
-        const Cesium = await import('cesium');
-        
-        // 이미 존재하는 뷰어 제거
-        if (viewer) {
-          viewer.destroy();
-        }
-
-        // cesiumContainerRef.current가 null이 아님을 보장
-        if (!cesiumContainerRef.current) {
-          console.error('Cesium 컨테이너 요소가 없습니다.');
-          return;
-        }
-
-        // Cesium 뷰어 생성 - 타입 안전성 보장
-        viewer = new Cesium.Viewer(cesiumContainerRef.current, {
-          baseLayerPicker: false,
-          timeline: false,
-          animation: false,
-          geocoder: false,
-          homeButton: false,
-          sceneModePicker: false,
-          navigationHelpButton: false,
-          fullscreenButton: false,
-          creditContainer: document.createElement('div'), // 크레딧 정보 숨김
-          infoBox: false,
-          sceneMode: Cesium.SceneMode.SCENE3D,
-          shadows: false,
-        });
-        
-        setViewer(viewer);
-        
-        viewer.imageryLayers.removeAll();
-
-        const vworldSatelliteProvider = new Cesium.WebMapTileServiceImageryProvider({
-          url: `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/Satellite/{TileMatrix}/{TileRow}/{TileCol}.jpeg`,
-          layer: 'Satellite',
-          style: 'default',
-          format: 'image/jpeg',
-          tileMatrixSetID: 'EPSG:3857',
-          credit: new Cesium.Credit('VWorld Satellite Imagery'),
-          maximumLevel: 19
-        });
-        viewer.imageryLayers.addImageryProvider(vworldSatelliteProvider);
-        
-        try {
-          const worldTerrain = await Cesium.createWorldTerrainAsync({
-            requestVertexNormals: true, 
-            requestWaterMask: true
-          });
-          viewer.terrainProvider = worldTerrain;
-        } catch (error) {
-          console.warn('지형 데이터 로드 실패, 기본 타원체 지형을 사용합니다:', error);
-          const ellipsoidTerrainProvider = new Cesium.EllipsoidTerrainProvider();
-          viewer.terrainProvider = ellipsoidTerrainProvider;
-        }
-
-        viewer.scene.globe.enableLighting = true;
-        viewer.scene.globe.depthTestAgainstTerrain = true;
-
-        viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(
-            TANCHEON_LOCATION.longitude,
-            TANCHEON_LOCATION.latitude,
-            TANCHEON_LOCATION.height
-          ),
-          orientation: {
-            heading: TANCHEON_LOCATION.heading || 0,
-            pitch: TANCHEON_LOCATION.pitch || -0.5,
-            roll: TANCHEON_LOCATION.roll || 0
-          }
-        });
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Cesium 초기화 오류:', error);
-        setError('지도를 로드하는 중 오류가 발생했습니다.');
-        setIsLoading(false);
-      }
-    };
-
-    initCesium();
-
-    // 컴포넌트 언마운트 시 정리
-    return () => {
-      if (viewer) {
-        viewer.destroy();
-      }
-      
-      // 바람 방향 표시 제거
-      const windDirectionContainer = cesiumContainerRef.current?.querySelector('.wind-direction-container');
-      
-      if (windDirectionContainer) {
-        cesiumContainerRef.current?.removeChild(windDirectionContainer);
-      }
-    };
-  }, [isMounted, apiKey, TANCHEON_LOCATION]);
-
-  if (!isMounted) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-        <div className="animate-pulse">지도 초기화 중...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className={"w-full h-full relative"}>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div className={`absolute bottom-4 left-4 z-10 flex flex-col space-y-2 ${className}`}>
+
+      <button
+        className={`px-4 py-2 rounded-lg shadow-md font-medium ${
+          showBuildings ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'
+        }`}
+        onClick={toggleBuildings}
+      >
+        {showBuildings ? `건물 숨기기` : `건물 표시하기`}
+      </button>
+      
+      <button
+        className={`px-4 py-2 rounded-lg shadow-md font-medium ${
+          showHeatmap ? 'bg-green-500 text-white' : 'bg-white text-gray-800'
+        }`}
+        onClick={toggleHeatmap}
+      >
+        {showHeatmap ? `히트맵 숨기기` : `히트맵 표시하기`}
+      </button>
+      
+      {showHeatmap && visibleHeatmaps && (
+        <div className="mt-2 bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="px-4 py-2 bg-gray-100 text-gray-800 font-medium text-center border-b border-gray-200">
+            히트맵 고도 선택
+          </div>
+          <div className="flex flex-col">
+            <div className="flex flex-row">
+              {heightHeatmapOptions.map((height, index) => (
+                <button
+                  key={height}
+                  className={`flex-1 px-2 py-2 text-sm font-medium ${
+                    visibleHeatmaps[height] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
+                  } ${
+                    index > 0 && index < heightHeatmapOptions.length - 1 ? 'border-l border-r border-gray-200' : 
+                    index > 0 ? 'border-l border-gray-200' : 
+                    index < heightHeatmapOptions.length - 1 ? 'border-r border-gray-200' : ''
+                  }`}
+                  onClick={() => toggleHeightHeatmap(height)}
+                >
+                  {height} {visibleHeatmaps[height] ? '✓' : ''}
+                </button>
+              ))}
+            </div>
+            <div className="px-4 py-2 bg-gray-100 text-xs text-center border-t border-gray-200">
+              여러 고도를 동시에 선택할 수 있습니다
+            </div>
+          </div>
         </div>
       )}
-      
-      <MapControls 
-        initialPosition={TANCHEON_LOCATION}
-        onZoomIn={zoomIn}
-        onZoomOut={zoomOut}
-        className="right-4 top-4" // 오른쪽 상단에 위치
-      />
-      
-      <MapToggleControls
-        showBuildings={showBuildings}
-        onToggleBuildings={toggleBuildings}
-        buildingLabel="장례식장 모델"
-        
-        showHeatmap={showHeatmap}
-        onToggleHeatmap={toggleHeatmap}
-        heatmapLabel="오염도 히트맵"
-        
-        // 타입 안전성 개선
-        visibleHeatmaps={Object.fromEntries(
-          Object.entries(visibleHeatmaps)
-        ) as Record<string, boolean>}
-        onToggleHeightHeatmap={(height: string) => {
-          if (height === '30m' || height === '60m' || height === '90m') {
-            toggleHeightHeatmap(height);
-          }
-        }}
-        className="left-4 bottom-4" // 왼쪽 하단에 위치
-      />
-      
-      {/* 나침반 위젯 추가 */}
-      <CompassWidget 
-        cesiumContainerRef={cesiumContainerRef}
-        top="20px"
-        left="20px"
-      />
-      
-      <div
-        ref={cesiumContainerRef}
-        className="cesium-container w-full h-full"
-      />
     </div>
   );
 };
 
-export default VWorldMap; 
+export default MapToggleControls; 
