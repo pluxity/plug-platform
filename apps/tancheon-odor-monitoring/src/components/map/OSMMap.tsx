@@ -116,26 +116,6 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
           }
         });
 
-        // 위치 마커 추가
-        viewer.entities.add({
-          position: Cesium.Cartesian3.fromDegrees(
-            TANCHEON_LOCATION.longitude,
-            TANCHEON_LOCATION.latitude
-          ),
-          point: {
-            pixelSize: 10,
-            color: Cesium.Color.RED
-          },
-          label: {
-            text: '탄천 위치',
-            font: '14pt sans-serif',
-            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            pixelOffset: new Cesium.Cartesian2(0, -10)
-          }
-        });
-
-        console.log('Cesium 맵 초기화 완료');
         setIsLoading(false);
       } catch (error) {
         console.error('Cesium 초기화 오류:', error);

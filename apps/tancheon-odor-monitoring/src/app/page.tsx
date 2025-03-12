@@ -6,13 +6,13 @@ import Sidebar from '@/components/layout/Sidebar';
 
 // Cesium 맵 컴포넌트를 클라이언트 사이드에서만 로드하도록 동적 임포트
 const CesiumMap = dynamic(
-  () => import('@/components/OSMMap'),
+  () => import('@/components/map/OSMMap'),
   { ssr: false } // 서버 사이드 렌더링 비활성화
 );
 
 // VWorld 맵 컴포넌트를 클라이언트 사이드에서만 로드하도록 동적 임포트
 const VWorldMap = dynamic(
-  () => import('@/components/VWorldMap'),
+  () => import('@/components/map/VWorldMap'),
   { ssr: false } // 서버 사이드 렌더링 비활성화
 );
 

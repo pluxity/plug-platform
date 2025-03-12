@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import MapControls from './MapControls';
+import CompassWidget from './CompassWidget';
+import MapToggleControls from './MapToggleControls';
 
 interface VWorldMapProps {
   apiKey: string;
@@ -46,7 +49,8 @@ interface HeightHeatmaps {
   '90m': PollutionPoint[];
 }
 
-interface VisibleHeatmaps {
+// Record<string, boolean>로 타입 수정
+interface VisibleHeatmaps extends Record<string, boolean> {
   '30m': boolean;
   '60m': boolean;
   '90m': boolean;
@@ -467,7 +471,9 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       // 이미 생성된 히트맵이 있다면 표시/숨김 처리
       safeObjectKeys(heatmapPrimitiveRef.current).forEach(key => {
         if (heatmapPrimitiveRef.current[key]) {
-          heatmapPrimitiveRef.current[key].show = newVisibleHeatmaps[key as keyof VisibleHeatmaps];
+          // 타입 안전성 보장을 위한 타입 가드
+          const typedKey = key as keyof typeof newVisibleHeatmaps;
+          heatmapPrimitiveRef.current[key].show = newVisibleHeatmaps[typedKey];
         }
       });
       
@@ -541,9 +547,9 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
               const pixelData = colorMapCtx.getImageData(colorIndex, 0, 1, 1).data;
               const color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}`;
               
-              gradient.addColorStop(0, `${color}, ${point.value * 0.8})`); // 중심
-              gradient.addColorStop(0.7, `${color}, ${point.value * 0.4})`); // 중간
-              gradient.addColorStop(1, `rgba(0, 0, 255, 0)`); // 가장자리 (투명)
+              gradient.addColorStop(0, `${color}, ${point.value * 0.8})`);
+              gradient.addColorStop(0.7, `${color}, ${point.value * 0.4})`);
+              gradient.addColorStop(1, `rgba(0, 0, 255, 0)`); 
               
               // 원 그리기
               ctx.fillStyle = gradient;
@@ -592,19 +598,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           '90m': heightKey === '90m'
         });
         
-        // 카메라를 히트맵 중심으로 이동
-        viewerRef.current.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(
-            TANCHEON_LOCATION.longitude,
-            TANCHEON_LOCATION.latitude,
-            500 // 높이 조정
-          ),
-          orientation: {
-            heading: Cesium.Math.toRadians(0),
-            pitch: Cesium.Math.toRadians(-45),
-            roll: 0
-          }
-        });
       } else {
         // 히트맵이 표시된 상태라면 모두 숨김
         safeObjectKeys(heatmapPrimitiveRef.current).forEach(key => {
@@ -623,7 +616,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   };
 
-  // 고도별 히트맵 동시 표시 토글 함수
+  // 고도별 히트맵 동시 표시 토글 함수 - 원래 코드로 복원
   const toggleHeightHeatmap = (height: keyof HeightHeatmaps) => {
     if (!viewerRef.current || !showHeatmap) return;
     
@@ -638,7 +631,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       }
       
       setVisibleHeatmaps(newVisibleHeatmaps);
-      console.log(`${height} 히트맵 표시 상태: ${newVisibleHeatmaps[height]}`);
     } catch (error) {
       console.error('히트맵 토글 오류:', error);
     }
@@ -652,76 +644,39 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
     const initCesium = async () => {
       try {
-        // Cesium 에셋 경로 설정
         window.CESIUM_BASE_URL = '/static/cesium/';
-        console.log('Cesium 에셋 경로 설정:', window.CESIUM_BASE_URL);
-        
-        // Cesium 동적 로드
         const Cesium = await import('cesium');
-        console.log('Cesium 로드 성공');
         
-        // 이미 뷰어가 있으면 제거
+        // 이미 존재하는 뷰어 제거
         if (viewer) {
           viewer.destroy();
         }
 
-        // 컨테이너 요소가 있는지 다시 확인
-        if (!cesiumContainerRef.current) return;
-
-        try {
-          // 세계 지형 데이터 로드 (비동기)
-          const worldTerrain = await Cesium.createWorldTerrainAsync({
-            requestVertexNormals: true
-          });
-
-          // Cesium Viewer 생성
-          viewer = new Cesium.Viewer(cesiumContainerRef.current, {
-            baseLayerPicker: false,
-            timeline: false,
-            animation: false,
-            geocoder: false,
-            homeButton: false, // 홈 버튼 제거
-            sceneModePicker: false, // 지구 버튼(sceneModePicker) 제거
-            navigationHelpButton: false,
-            fullscreenButton: true,
-            creditContainer: document.createElement('div'), // 크레딧 정보 숨김
-            infoBox: false, // InfoBox 비활성화
-            terrainProvider: worldTerrain, // 세계 지형 데이터 사용
-            sceneMode: Cesium.SceneMode.SCENE3D, // 3D 모드로 시작
-            shadows: false, // 그림자 비활성화 (성능 향상)
-          });
-          
-          // 뷰어 참조 저장
-          viewerRef.current = viewer;
-          
-          // 휠 줌 속도 조절 - 기본값보다 낮게 설정하여 줌 속도를 줄임
-          viewer.scene.screenSpaceCameraController.zoomFactor = 2.0; // 기본값은 5.0, 낮을수록 줌 속도가 느려짐
-        } catch (terrainError) {
-          console.warn('지형 데이터 로드 실패, 기본 지형으로 대체:', terrainError);
-          
-          // 지형 로드 실패 시 기본 지형으로 대체
-          viewer = new Cesium.Viewer(cesiumContainerRef.current, {
-            baseLayerPicker: false,
-            timeline: false,
-            animation: false,
-            geocoder: false,
-            homeButton: false, // 홈 버튼 제거
-            sceneModePicker: false, // 지구 버튼(sceneModePicker) 제거
-            navigationHelpButton: false,
-            fullscreenButton: true,
-            creditContainer: document.createElement('div'), // 크레딧 정보 숨김
-            infoBox: false, // InfoBox 비활성화
-            terrainProvider: new Cesium.EllipsoidTerrainProvider(), // 기본 지형 사용
-            sceneMode: Cesium.SceneMode.SCENE3D, // 3D 모드로 시작
-          });
-          
-          // 뷰어 참조 저장
-          viewerRef.current = viewer;
-          
-          // 휠 줌 속도 조절 - 기본값보다 낮게 설정하여 줌 속도를 줄임
-          viewer.scene.screenSpaceCameraController.zoomFactor = 2.0; // 기본값은 5.0, 낮을수록 줌 속도가 느려짐
+        // cesiumContainerRef.current가 null이 아님을 보장
+        if (!cesiumContainerRef.current) {
+          console.error('Cesium 컨테이너 요소가 없습니다.');
+          return;
         }
 
+        // Cesium 뷰어 생성 - 타입 안전성 보장
+        viewer = new Cesium.Viewer(cesiumContainerRef.current, {
+          baseLayerPicker: false,
+          timeline: false,
+          animation: false,
+          geocoder: false,
+          homeButton: false,
+          sceneModePicker: false,
+          navigationHelpButton: false,
+          fullscreenButton: false,
+          creditContainer: document.createElement('div'), // 크레딧 정보 숨김
+          infoBox: false,
+          sceneMode: Cesium.SceneMode.SCENE3D,
+          shadows: false,
+        });
+        
+        // 뷰어 참조 저장
+        viewerRef.current = viewer;
+        
         // 기본 이미지 레이어 제거
         viewer.imageryLayers.removeAll();
 
@@ -736,6 +691,41 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           maximumLevel: 19
         });
         viewer.imageryLayers.addImageryProvider(vworldSatelliteProvider);
+        
+        // 한국 지역 지형 데이터 설정 (가능한 경우)
+        try {
+          // Cesium World Terrain 데이터 로드 - 한국 지역의 상세 지형도 포함
+          const worldTerrain = await Cesium.createWorldTerrainAsync({
+            requestVertexNormals: true, // 지형 조명을 위한 버텍스 노말 요청
+            requestWaterMask: true      // 물 표면 표현을 위한 워터마스크 요청
+          });
+          viewer.terrainProvider = worldTerrain;
+          console.log('세계 지형 데이터가 로드되었습니다.');
+          
+          // 한국 지역에 대해 더 상세한 지형 적용 시 아래 코드 활성화 가능
+          /*
+          // VWorld 지형 데이터를 활용하려면 적절한 URL과 API 연결 필요
+          // 현재는 VWorld에서 직접적인 지형 데이터 API를 제공하지 않음
+          // 대신 한국 지역에 최적화된 Cesium World Terrain 사용
+          const koreaExtent = Cesium.Rectangle.fromDegrees(
+            124.5, // 서쪽 경도
+            33.0,  // 남쪽 위도
+            132.0, // 동쪽 경도
+            38.9   // 북쪽 위도
+          );
+          
+          // 한국 지역에 대해 카메라 제한 설정 (선택 사항)
+          viewer.camera.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
+          viewer.scene.screenSpaceCameraController.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
+          viewer.scene.screenSpaceCameraController.minimumZoomDistance = 1000; // 최소 1km
+          viewer.scene.screenSpaceCameraController.maximumZoomDistance = 200000; // 최대 200km
+          */
+        } catch (error) {
+          console.warn('지형 데이터 로드 실패, 기본 타원체 지형을 사용합니다:', error);
+          // 기본 타원체 지형 사용
+          const ellipsoidTerrainProvider = new Cesium.EllipsoidTerrainProvider();
+          viewer.terrainProvider = ellipsoidTerrainProvider;
+        }
 
         // 3D 지형 활성화
         viewer.scene.globe.enableLighting = true;
@@ -755,146 +745,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           }
         });
 
-        // 위치 마커 추가
-        viewer.entities.add({
-          position: Cesium.Cartesian3.fromDegrees(
-            TANCHEON_LOCATION.longitude,
-            TANCHEON_LOCATION.latitude
-          ),
-          point: {
-            pixelSize: 10,
-            color: Cesium.Color.RED
-          },
-          label: {
-            text: '탄천 위치',
-            font: '14pt sans-serif',
-            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            pixelOffset: new Cesium.Cartesian2(0, -10)
-          }
-        });
-
-        // 정적 나침반 대신 Cesium의 내장 나침반 위젯 활성화
-        viewer.scene.postRender.addEventListener(() => {
-          // 카메라 회전 각도 가져오기
-          const heading = viewer.camera.heading;
-          updateCompass(heading);
-        });
         
-        // 동적 나침반 생성
-        const compassContainer = document.createElement('div');
-        compassContainer.className = 'compass-container';
-        compassContainer.style.position = 'absolute';
-        compassContainer.style.top = '10px';
-        compassContainer.style.left = '10px';
-        compassContainer.style.width = '100px';
-        compassContainer.style.height = '100px';
-        compassContainer.style.zIndex = '1000';
-        
-        // 나침반 배경 (원)
-        const compassBackground = document.createElement('div');
-        compassBackground.className = 'compass-background';
-        compassBackground.style.position = 'absolute';
-        compassBackground.style.width = '100%';
-        compassBackground.style.height = '100%';
-        compassBackground.style.borderRadius = '50%';
-        compassBackground.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
-        compassBackground.style.border = '2px solid #333';
-        compassContainer.appendChild(compassBackground);
-        
-        // 나침반 회전 컨테이너
-        const compassRotate = document.createElement('div');
-        compassRotate.className = 'compass-rotate';
-        compassRotate.style.position = 'absolute';
-        compassRotate.style.width = '100%';
-        compassRotate.style.height = '100%';
-        compassRotate.style.transformOrigin = 'center center';
-        compassBackground.appendChild(compassRotate);
-        
-        // 나침반 방향 표시 (N, E, S, W)
-        const directions = [
-          { label: 'N', angle: 0, top: '5px', left: '50%' },
-          { label: 'E', angle: 90, top: '50%', left: '95px' },
-          { label: 'S', angle: 180, top: '95px', left: '50%' },
-          { label: 'W', angle: 270, top: '50%', left: '5px' }
-        ];
-        
-        directions.forEach(dir => {
-          const dirLabel = document.createElement('div');
-          dirLabel.className = `compass-dir compass-dir-${dir.label}`;
-          dirLabel.style.position = 'absolute';
-          dirLabel.style.top = dir.top;
-          dirLabel.style.left = dir.left;
-          dirLabel.style.transform = 'translate(-50%, -50%)';
-          dirLabel.style.fontWeight = 'bold';
-          dirLabel.style.fontSize = '14px';
-          dirLabel.style.color = '#333';
-          dirLabel.textContent = dir.label;
-          compassRotate.appendChild(dirLabel);
-        });
-        
-        // 나침반 바늘 (고정된 상태로 항상 북쪽 가리킴)
-        const compassNeedle = document.createElement('div');
-        compassNeedle.className = 'compass-needle';
-        compassNeedle.style.position = 'absolute';
-        compassNeedle.style.top = '50%';
-        compassNeedle.style.left = '50%';
-        compassNeedle.style.width = '0';
-        compassNeedle.style.height = '0';
-        compassNeedle.style.borderLeft = '6px solid transparent';
-        compassNeedle.style.borderRight = '6px solid transparent';
-        compassNeedle.style.borderBottom = '40px solid red';
-        compassNeedle.style.transformOrigin = 'center bottom';
-        compassNeedle.style.transform = 'translateX(-50%) translateY(-100%)';
-        compassBackground.appendChild(compassNeedle);
-        
-        // 나침반 남쪽 바늘 (고정된 상태로 항상 남쪽 가리킴)
-        const compassNeedleSouth = document.createElement('div');
-        compassNeedleSouth.className = 'compass-needle-south';
-        compassNeedleSouth.style.position = 'absolute';
-        compassNeedleSouth.style.top = '50%';
-        compassNeedleSouth.style.left = '50%';
-        compassNeedleSouth.style.width = '0';
-        compassNeedleSouth.style.height = '0';
-        compassNeedleSouth.style.borderLeft = '6px solid transparent';
-        compassNeedleSouth.style.borderRight = '6px solid transparent';
-        compassNeedleSouth.style.borderTop = '40px solid blue';
-        compassNeedleSouth.style.transformOrigin = 'center top';
-        compassNeedleSouth.style.transform = 'translateX(-50%)';
-        compassBackground.appendChild(compassNeedleSouth);
-        
-        // 나침반 중심점
-        const compassCenter = document.createElement('div');
-        compassCenter.style.position = 'absolute';
-        compassCenter.style.top = '50%';
-        compassCenter.style.left = '50%';
-        compassCenter.style.width = '10px';
-        compassCenter.style.height = '10px';
-        compassCenter.style.borderRadius = '50%';
-        compassCenter.style.backgroundColor = '#333';
-        compassCenter.style.transform = 'translate(-50%, -50%)';
-        compassBackground.appendChild(compassCenter);
-        
-        // 나침반과 바람 방향 표시를 Cesium 컨테이너에 추가
-        cesiumContainerRef.current.appendChild(compassContainer);
-        
-        // 나침반 업데이트 함수
-        function updateCompass(heading: number) {
-          if (!compassContainer) return;
-          
-          // 나침반 회전 컨테이너 가져오기
-          const compassRotate = compassContainer.querySelector('.compass-rotate');
-          
-          if (compassRotate) {
-            // 라디안을 도(degree)로 변환
-            const headingDegrees = Cesium.Math.toDegrees(heading);
-            
-            // 나침반 회전 (카메라 회전의 반대 방향으로 회전)
-            (compassRotate as HTMLElement).style.transform = `rotate(${-headingDegrees}deg)`;
-          }
-        }
-
-        console.log('VWorld 맵 초기화 완료');
         setIsLoading(false);
       } catch (error) {
         console.error('Cesium 초기화 오류:', error);
@@ -911,13 +762,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         viewer.destroy();
       }
       
-      // 나침반과 바람 방향 표시 제거
-      const compassContainer = cesiumContainerRef.current?.querySelector('.compass-container');
+      // 바람 방향 표시 제거
       const windDirectionContainer = cesiumContainerRef.current?.querySelector('.wind-direction-container');
-      
-      if (compassContainer) {
-        cesiumContainerRef.current?.removeChild(compassContainer);
-      }
       
       if (windDirectionContainer) {
         cesiumContainerRef.current?.removeChild(windDirectionContainer);
@@ -949,117 +795,69 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         </div>
       )}
       
-      {/* 버튼 컨테이너 - 왼쪽 하단 */}
-      <div className="absolute bottom-4 left-4 z-10 flex flex-col space-y-2">
-        {/* 장례식장 모델 토글 버튼 */}
-        <button
-          className={`px-4 py-2 rounded-lg shadow-md font-medium ${
-            showBuildings ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'
-          }`}
-          onClick={toggleBuildings}
-        >
-          {showBuildings ? '장례식장 모델 숨기기' : '장례식장 모델 표시하기'}
-        </button>
-        
-        {/* 오염도 히트맵 토글 버튼 */}
-        <button
-          className={`px-4 py-2 rounded-lg shadow-md font-medium ${
-            showHeatmap ? 'bg-green-500 text-white' : 'bg-white text-gray-800'
-          }`}
-          onClick={toggleHeatmap}
-        >
-          {showHeatmap ? '오염도 히트맵 숨기기' : '오염도 히트맵 표시하기'}
-        </button>
-        
-        {/* 히트맵 높이 조절 버튼 그룹 (히트맵이 표시된 경우에만 보임) */}
-        {showHeatmap && (
-          <div className="mt-2 bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="px-4 py-2 bg-gray-100 text-gray-800 font-medium text-center border-b border-gray-200">
-              히트맵 고도 선택
-            </div>
-            <div className="flex flex-col">
-              <div className="flex flex-row">
-                <button
-                  className={`flex-1 px-2 py-2 text-sm font-medium ${
-                    visibleHeatmaps['30m'] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
-                  }`}
-                  onClick={() => toggleHeightHeatmap('30m')}
-                >
-                  30m {visibleHeatmaps['30m'] ? '✓' : ''}
-                </button>
-                <button
-                  className={`flex-1 px-2 py-2 text-sm font-medium border-l border-r border-gray-200 ${
-                    visibleHeatmaps['60m'] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
-                  }`}
-                  onClick={() => toggleHeightHeatmap('60m')}
-                >
-                  60m {visibleHeatmaps['60m'] ? '✓' : ''}
-                </button>
-                <button
-                  className={`flex-1 px-2 py-2 text-sm font-medium ${
-                    visibleHeatmaps['90m'] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
-                  }`}
-                  onClick={() => toggleHeightHeatmap('90m')}
-                >
-                  90m {visibleHeatmaps['90m'] ? '✓' : ''}
-                </button>
-              </div>
-              <div className="px-4 py-2 bg-gray-100 text-xs text-center border-t border-gray-200">
-                여러 고도를 동시에 선택할 수 있습니다
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* 컨트롤 위젯들 - 오른쪽 위에 배치 */}
+      <MapControls 
+        onZoomIn={zoomIn}
+        onZoomOut={zoomOut}
+        onFlyToHome={() => {
+          if (viewerRef.current) {
+            const Cesium = (window as any).Cesium;
+            viewerRef.current.camera.flyTo({
+              destination: Cesium.Cartesian3.fromDegrees(
+                TANCHEON_LOCATION.longitude,
+                TANCHEON_LOCATION.latitude,
+                TANCHEON_LOCATION.height
+              ),
+              orientation: {
+                heading: TANCHEON_LOCATION.heading || 0,
+                pitch: TANCHEON_LOCATION.pitch || -0.5,
+                roll: TANCHEON_LOCATION.roll || 0
+              }
+            });
+          }
+        }}
+        onSavePosition={saveCurrentCameraPosition}
+        onFlyToSaved={flyToSavedPosition}
+        hasSavedPosition={!!savedCameraPosition}
+        className="right-4 top-4" // 오른쪽 상단에 위치
+      />
       
-      {/* 카메라 컨트롤 버튼 */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col space-y-2">
-        {/* 확대/축소 버튼 */}
-        <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden">
-          <button
-            className="px-4 py-2 hover:bg-gray-100 font-medium text-gray-800 border-b border-gray-200"
-            onClick={zoomIn}
-            title="확대"
-          >
-            확대 (+)
-          </button>
-          <button
-            className="px-4 py-2 hover:bg-gray-100 font-medium text-gray-800"
-            onClick={zoomOut}
-            title="축소"
-          >
-            축소 (-)
-          </button>
-        </div>
+      {/* 토글 컨트롤 위젯들 - 왼쪽 아래에 배치 */}
+      <MapToggleControls
+        showBuildings={showBuildings}
+        onToggleBuildings={toggleBuildings}
+        buildingLabel="장례식장 모델"
         
-        {/* 카메라 위치 저장/이동 버튼 */}
-        <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden">
-          <button
-            className="px-4 py-2 hover:bg-gray-100 font-medium text-gray-800 border-b border-gray-200"
-            onClick={saveCurrentCameraPosition}
-            title="현재 카메라 위치 저장"
-          >
-            현재 위치 저장
-          </button>
-          <button
-            className={`px-4 py-2 font-medium ${
-              savedCameraPosition 
-                ? 'hover:bg-gray-100 text-gray-800' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-            onClick={flyToSavedPosition}
-            disabled={!savedCameraPosition}
-            title="저장된 카메라 위치로 이동"
-          >
-            저장 위치로 이동
-          </button>
-        </div>
-      </div>
+        showHeatmap={showHeatmap}
+        onToggleHeatmap={toggleHeatmap}
+        heatmapLabel="오염도 히트맵"
+        
+        // 타입 안전성 개선
+        visibleHeatmaps={Object.fromEntries(
+          Object.entries(visibleHeatmaps)
+        ) as Record<string, boolean>}
+        onToggleHeightHeatmap={(height: string) => {
+          if (height === '30m' || height === '60m' || height === '90m') {
+            toggleHeightHeatmap(height);
+          }
+        }}
+        className="left-4 bottom-4" // 왼쪽 하단에 위치
+      />
       
       <div
         ref={cesiumContainerRef}
         className="cesium-container w-full h-full"
       />
+      
+      {/* 나침반 위젯 - 왼쪽 위에 배치 */}
+      {viewerRef.current && (
+        <CompassWidget 
+          cesiumContainerRef={cesiumContainerRef} 
+          viewerRef={viewerRef}
+          top="10px"
+          left="10px"
+        />
+      )}
     </div>
   );
 };
