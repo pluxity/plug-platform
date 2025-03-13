@@ -1,9 +1,8 @@
-
 export interface PollutionPoint {
   longitude: number;
   latitude: number;
   value: number;
-  height?: number;
+  height: number;
 }
 export interface HeightHeatmaps {
   '30m': PollutionPoint[];

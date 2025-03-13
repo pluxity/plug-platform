@@ -1,20 +1,13 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
-import { useRef, useState } from 'react';
-
-import { HeightHeatmaps } from '@/types/pollution';
+import { HeightHeatmaps, PollutionPoint } from '@/types/pollution';
 
 import useCesiumStore from '@/stores/cesiumStore';
 
-import { TANCHEON_LOCATION } from '@/constants/initialization';
+import { TANCHEON_LOCATION, HEATMAP_GRID_CONFIG } from '@/constants/initialization';
 import { POLLUTION_DATA } from '@/constants/pollutation';
-import { createHeatmapAtHeight, HeatmapOptions } from '@/lib/heatmap';
-
-interface VisibleHeatmaps extends Record<string, boolean> {
-  '30m': boolean;
-  '60m': boolean;
-  '90m': boolean;
-}
+import { create3DGridHeatmap, Heatmap3DOptions } from '@/lib/heatmap';
+import { create2DHeatmaps, HeatmapOptions } from '@/lib/heatmap_2d';
 
 interface MapToggleControlsProps {
   className?: string;
@@ -30,36 +23,21 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
 
   const { viewer, setViewer } = useCesiumStore();
   
+  const [showTerrain, setShowTerrain] = useState(true);
   const [showBuildings, setShowBuildings] = useState(false);
   const buildingsRef = useRef<any[]>([]);
   const [savedCameraPosition, setSavedCameraPosition] = useState<any>(null);
-  const [showHeatmap, setShowHeatmap] = useState(false);
-
-  // 고도 선택 옵션
-  const heightOptions = [30, 60, 90];
-  const [selectedHeight, setSelectedHeight] = useState<number>(30);
   
-  // 히트맵 고도 옵션
-  const heightHeatmapOptions: Array<keyof VisibleHeatmaps> = ['30m', '60m', '90m'];
-
-  const heatmapPrimitiveRef = useRef<{[key in keyof HeightHeatmaps]: any | null}>({
-    '30m': null,
-    '60m': null,
-    '90m': null
-  });
-
-  const [heatmapHeight, setHeatmapHeight] = useState<number>(30); // 히트맵 높이 (기본값 30m)
-  const [visibleHeatmaps, setVisibleHeatmaps] = useState<VisibleHeatmaps>({
-    '30m': true,
-    '60m': false,
-    '90m': false
-  });
-
-  // 고도 변경 처리 함수
-  const onHeightChange = (height: number) => {
-    setSelectedHeight(height);
-    changeHeatmapHeight(height);
-  };
+  // 히트맵 상태
+  const [show3DHeatmap, setShow3DHeatmap] = useState(false);
+  const [show2DHeatmap, setShow2DHeatmap] = useState(false);
+  const [simulating, setSimulating] = useState(false);
+  const [simulationStep, setSimulationStep] = useState(0);
+  const [currentPollutionData, setCurrentPollutionData] = useState<PollutionPoint[]>(POLLUTION_DATA);
+  
+  // 히트맵 엔티티 관리
+  const [heatmap3DEntities, setHeatmap3DEntities] = useState<any[]>([]);
+  const [heatmap2DEntities, setHeatmap2DEntities] = useState<any[]>([]);
   
   // 건물 추가/제거 함수
   const toggleBuildings = async () => {
@@ -100,7 +78,7 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
           orientation: orientation,
           model: {
             uri: '/models/funeralhall.glb',
-            scale: 10.0,
+            scale: 1.0,
             heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
           }
         });
@@ -125,139 +103,176 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       console.error('모델 토글 오류:', error);
     }
   };
-
-  // 타입 안전성을 위한 헬퍼 함수
-  const safeObjectKeys = <T extends object>(obj: T): Array<keyof T> => {
-    return Object.keys(obj) as Array<keyof T>;
+    
+  // 현재 데이터 반환
+  const getCurrentData = () => {
+    if (simulating) {
+      return currentPollutionData;
+    }
+    
+    return POLLUTION_DATA;
   };
   
-  // 히트맵 높이 변경 함수
-  const changeHeatmapHeight = async (newHeight: number) => {
+  // 3D 히트맵 생성 함수
+  const create3DHeatmap = async () => {
     if (!viewer) return;
     
     try {
-      // 높이 변경
-      setHeatmapHeight(newHeight);
+      // 현재 데이터 가져오기
+      const data = getCurrentData();
       
-      // 해당 고도의 히트맵 표시
-      const heightKey = `${newHeight}m` as keyof HeightHeatmaps;
-      
-      // 모든 고도의 히트맵 표시 상태 업데이트
-      const newVisibleHeatmaps = {
-        '30m': heightKey === '30m',
-        '60m': heightKey === '60m',
-        '90m': heightKey === '90m'
+      // 히트맵 옵션 설정
+      const options: Heatmap3DOptions = {
+        minHeight: 0,
+        maxHeight: 10,
+        opacity: 0.3,
+        segments: HEATMAP_GRID_CONFIG.SEGMENTS,
+        colorScheme: [
+          "rgba(0, 0, 255, 0)",          // 투명한 파란색 (낮은 값)
+          "rgba(0, 0, 255, 0.5)",        // 반투명 파란색
+          "rgba(0, 255, 255, 0.6)",      // 청록색
+          "rgba(0, 255, 0, 0.7)",        // 초록색
+          "rgba(255, 255, 0, 0.8)",      // 노란색
+          "rgba(255, 0, 0, 0.9)"         // 빨간색 (높은 값)
+        ],
+        enhancedSmoothing: true,
+        influenceRadius: 15,             // 2D 히트맵의 radius 값과 일치
+        valueThreshold: HEATMAP_GRID_CONFIG.VALUE_THRESHOLD,
+        colorOffset: 0.1,                
+        colorMultiplier: 1.3,            
+        weightDivisor: 0.7,              
+        lowValueOpacity: 0,              
+        transparencyThreshold: 0.25,
+        baseHeight: 30
       };
       
-      // 이미 생성된 히트맵이 있다면 표시/숨김 처리
-      safeObjectKeys(heatmapPrimitiveRef.current).forEach(key => {
-        if (heatmapPrimitiveRef.current[key]) {
-          // 타입 안전성 보장을 위한 타입 가드
-          const typedKey = key as keyof typeof newVisibleHeatmaps;
-          heatmapPrimitiveRef.current[key].show = newVisibleHeatmaps[typedKey];
+      // 3D 격자 히트맵 생성
+      console.log('부드러운 3D 격자 히트맵 생성');
+      const entities = await create3DGridHeatmap(viewer, data, options);
+      
+      // 생성된 엔티티 저장
+      setHeatmap3DEntities(entities);
+      
+    } catch (error) {
+      console.error('3D 히트맵 생성 오류:', error);
+    }
+  };
+  
+  // 2D 히트맵 생성 함수
+  const create2DHeatmap = async () => {
+    if (!viewer) return;
+    
+    try {
+      // 현재 데이터 가져오기
+      const data = getCurrentData();
+      
+      // 히트맵 옵션 설정
+      const options: HeatmapOptions = {
+        gridSize: 256,
+        canvasSize: 1024,
+        radius: 15,
+        blurRadius: 12, // 더 강한 블러 효과
+        valueThreshold: HEATMAP_GRID_CONFIG.VALUE_THRESHOLD,
+        showBorder: true,
+        borderColor: 'rgba(255, 255, 255, 0.7)',
+        borderWidth: 3,
+        rotation: 0
+      };
+      
+      // 2D 히트맵 생성 (고도별로)
+      console.log('2D 히트맵 생성 (고도별)');
+      const entities = await create2DHeatmaps(viewer, data, options);
+      
+      // 생성된 엔티티 저장
+      setHeatmap2DEntities(entities);
+      
+    } catch (error) {
+      console.error('2D 히트맵 생성 오류:', error);
+    }
+  };
+  
+  // 3D 히트맵 제거 함수
+  const remove3DHeatmap = () => {
+    if (!viewer) return;
+    
+    try {
+      // 모든 3D 히트맵 엔티티 제거
+      heatmap3DEntities.forEach(entity => {
+        if (entity && viewer.entities.contains(entity)) {
+          viewer.entities.remove(entity);
         }
       });
       
-      setVisibleHeatmaps(newVisibleHeatmaps);
-      console.log(`히트맵 높이 변경: ${newHeight}m`);
+      // 엔티티 배열 초기화
+      setHeatmap3DEntities([]);
+      
     } catch (error) {
-      console.error('히트맵 높이 변경 오류:', error);
+      console.error('3D 히트맵 제거 오류:', error);
     }
   };
-
-  // 히트맵 토글 함수
-  const toggleHeatmap = async () => {
+  
+  // 2D 히트맵 제거 함수
+  const remove2DHeatmap = () => {
     if (!viewer) return;
     
     try {
-      if (!showHeatmap) {
-        // 히트맵이 표시되지 않은 상태라면 표시
-        const heightKey = `${heatmapHeight}m` as keyof HeightHeatmaps;
-        
-        // 각 고도별 히트맵 생성 또는 표시
-        for (const height of ['30m', '60m', '90m'] as Array<keyof HeightHeatmaps>) {
-          if (!heatmapPrimitiveRef.current[height]) {
-            // 히트맵 데이터 준비
-            console.log(`${height} 오염도 히트맵 생성 시작`);
-            
-            // 히트맵 옵션 설정
-            const options: HeatmapOptions = {
-              gridSize: 256,
-              canvasSize: 1024,
-              radius: 15,
-              blurRadius: 8,
-              valueThreshold: 0.05
-            };
-            
-            // 히트맵 높이 변환 (문자열에서 숫자로)
-            const heightValue = parseInt(height as string);
-            
-            // 히트맵 생성 유틸리티 함수 호출
-            const heatmapEntity = await createHeatmapAtHeight(
-              viewer,
-              POLLUTION_DATA,
-              heightValue,
-              options
-            );
-            
-            // 히트맵 참조 저장
-            heatmapPrimitiveRef.current[height] = heatmapEntity;
-            
-            // 현재 선택된 고도가 아니면 숨김
-            heatmapEntity.show = height === heightKey;
-            
-            console.log(`${height} 오염도 히트맵 생성 완료`);
-          } else {
-            // 이미 생성된 히트맵이 있다면 선택된 고도만 표시
-            heatmapPrimitiveRef.current[height].show = height === heightKey;
-          }
+      // 모든 2D 히트맵 엔티티 제거
+      heatmap2DEntities.forEach(entity => {
+        if (entity && viewer.entities.contains(entity)) {
+          viewer.entities.remove(entity);
         }
-        
-        // 현재 표시 상태 업데이트
-        setVisibleHeatmaps({
-          '30m': heightKey === '30m',
-          '60m': heightKey === '60m',
-          '90m': heightKey === '90m'
-        });
-        
-      } else {
-        // 히트맵이 표시된 상태라면 모두 숨김
-        safeObjectKeys(heatmapPrimitiveRef.current).forEach(key => {
-          if (heatmapPrimitiveRef.current[key]) {
-            heatmapPrimitiveRef.current[key].show = false;
-          }
-        });
-        console.log('모든 오염도 히트맵 숨김');
-      }
+      });
       
-      // 상태 업데이트
-      setShowHeatmap(!showHeatmap);
+      // 엔티티 배열 초기화
+      setHeatmap2DEntities([]);
       
     } catch (error) {
-      console.error('히트맵 토글 오류:', error);
+      console.error('2D 히트맵 제거 오류:', error);
     }
   };
-
-  // 고도별 히트맵 동시 표시 토글 함수
-  const toggleHeightHeatmap = (height: keyof HeightHeatmaps) => {
-    if (!viewer || !showHeatmap) return;
+  
+  // 3D 히트맵 토글 함수
+  const toggle3DHeatmap = async () => {
+    if (!viewer) return;
     
     try {
-      // 해당 고도의 히트맵 표시 상태 토글
-      const newVisibleHeatmaps = { ...visibleHeatmaps };
-      newVisibleHeatmaps[height] = !newVisibleHeatmaps[height];
-      
-      // 히트맵 표시 상태 업데이트
-      if (heatmapPrimitiveRef.current[height]) {
-        heatmapPrimitiveRef.current[height].show = newVisibleHeatmaps[height];
+      if (!show3DHeatmap) {
+        // 3D 히트맵 생성
+        await create3DHeatmap();
+      } else {
+        // 3D 히트맵 제거
+        remove3DHeatmap();
       }
       
-      setVisibleHeatmaps(newVisibleHeatmaps);
+      // 히트맵 표시 상태 토글
+      setShow3DHeatmap(!show3DHeatmap);
+      
     } catch (error) {
-      console.error('히트맵 토글 오류:', error);
+      console.error('3D 히트맵 토글 오류:', error);
     }
   };
-
+  
+  // 2D 히트맵 토글 함수
+  const toggle2DHeatmap = async () => {
+    if (!viewer) return;
+    
+    try {
+      if (!show2DHeatmap) {
+        // 2D 히트맵 생성
+        await create2DHeatmap();
+      } else {
+        // 2D 히트맵 제거
+        remove2DHeatmap();
+      }
+      
+      // 히트맵 표시 상태 토글
+      setShow2DHeatmap(!show2DHeatmap);
+      
+    } catch (error) {
+      console.error('2D 히트맵 토글 오류:', error);
+    }
+  };
+  
   return (
     <div className={`absolute bottom-4 left-4 z-10 flex flex-col space-y-2 ${className}`}>
 
@@ -272,42 +287,21 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       
       <button
         className={`px-4 py-2 rounded-lg shadow-md font-medium ${
-          showHeatmap ? 'bg-green-500 text-white' : 'bg-white text-gray-800'
+          show3DHeatmap ? 'bg-green-500 text-white' : 'bg-white text-gray-800'
         }`}
-        onClick={toggleHeatmap}
+        onClick={toggle3DHeatmap}
       >
-        {showHeatmap ? `히트맵 숨기기` : `히트맵 표시하기`}
+        {show3DHeatmap ? `3D 히트맵 숨기기` : `3D 히트맵 표시하기`}
       </button>
       
-      {showHeatmap && visibleHeatmaps && (
-        <div className="mt-2 bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-4 py-2 bg-gray-100 text-gray-800 font-medium text-center border-b border-gray-200">
-            히트맵 고도 선택
-          </div>
-          <div className="flex flex-col">
-            <div className="flex flex-row">
-              {heightHeatmapOptions.map((height, index) => (
-                <button
-                  key={height}
-                  className={`flex-1 px-2 py-2 text-sm font-medium ${
-                    visibleHeatmaps[height] ? 'bg-blue-500 text-white' : 'hover:bg-gray-100 text-gray-800'
-                  } ${
-                    index > 0 && index < heightHeatmapOptions.length - 1 ? 'border-l border-r border-gray-200' : 
-                    index > 0 ? 'border-l border-gray-200' : 
-                    index < heightHeatmapOptions.length - 1 ? 'border-r border-gray-200' : ''
-                  }`}
-                  onClick={() => toggleHeightHeatmap(height)}
-                >
-                  {height} {visibleHeatmaps[height] ? '✓' : ''}
-                </button>
-              ))}
-            </div>
-            <div className="px-4 py-2 bg-gray-100 text-xs text-center border-t border-gray-200">
-              여러 고도를 동시에 선택할 수 있습니다
-            </div>
-          </div>
-        </div>
-      )}
+      <button
+        className={`px-4 py-2 rounded-lg shadow-md font-medium ${
+          show2DHeatmap ? 'bg-purple-500 text-white' : 'bg-white text-gray-800'
+        }`}
+        onClick={toggle2DHeatmap}
+      >
+        {show2DHeatmap ? `2D 히트맵 숨기기` : `2D 히트맵 표시하기`}
+      </button>      
     </div>
   );
 };
