@@ -18,6 +18,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
     private lineHeight: number;
 
     private floorId?: string;
+    
+    private pointMeshData: PoiPointMeshData;
 
     /**
      * 생성자
@@ -33,6 +35,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
         this.position = new Interfaces.Vector3Custom();
         this.lineHeight = 2.0;
+
+        this.pointMeshData = {
+            meshRef: undefined,
+            instanceIndex: -1,
+            rotation: new THREE.Euler(),
+            scale: new THREE.Vector3(1, 1, 1),
+        };
     }
 
     /**
@@ -85,6 +94,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * 위치점 메시 데이터
+     */
+    get PointMeshData(): PoiPointMeshData {
+        return this.pointMeshData;
+    }
+
+    /**
      * poi 데이터
      */
     get ExportData() {
@@ -104,7 +120,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
  * poi 위치점 메시 데이터
  */
 interface PoiPointMeshData {
-    meshRef: THREE.InstancedMesh;
+    meshRef: THREE.InstancedMesh | undefined;
+    instanceIndex: number;
     rotation: THREE.Euler;
     scale: THREE.Vector3;
 }
