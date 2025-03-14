@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as Interfaces from '../interfaces';
+import * as Event from '../eventDispatcher';
 
 /**
  * poi 개별요소 클래스
@@ -115,6 +116,25 @@ class PoiElement implements Interfaces.PoiCreateOption {
             rotation: this.pointMeshData.rotation.ExportData,
             scale: this.pointMeshData.scale.ExportData,
         };
+    }
+
+    /**
+     * poi 요소 제거 및 메모리 해제
+     */
+    dispose() {
+        // 아이콘 제거
+        this.iconObj?.parent?.remove(this.iconObj);
+
+        // 텍스트 제거
+        this.textObj?.parent?.remove(this.textObj);
+        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).map?.dispose();
+        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).dispose();
+
+        // 내부 이벤트 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onPoiElementDisposed',
+            id: this.id,
+        });
     }
 }
 

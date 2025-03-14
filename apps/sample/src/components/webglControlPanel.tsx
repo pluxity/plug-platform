@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Model, Poi } from '@plug/engine/src';
-import { Button, Checkbox } from "@plug/ui";
+import * as Px from '@plug/engine/src';
+import { Button, Input } from "@plug/ui";
 
 // 층 데이터 타입 정의
 interface FloorData {
@@ -12,6 +12,7 @@ interface FloorData {
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
     selectedApiName: string;
+    deletePoiId: string;
     floorData: FloorData[];
 }
 
@@ -32,8 +33,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         // 스테이트
         this.state = {
             selectedApiName: 'None',
+            deletePoiId: '',
             floorData: []
         };
+        console.log('px', Px);
     }
 
     /**
@@ -68,7 +71,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         } else if (this.state.selectedApiName === 'Poi') {
             return (
                 <span>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button><br />
+                    <Input.Text value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi id'></Input.Text>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button>
+                    <br />
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
                 </span>
             );
         }
@@ -113,7 +120,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onApiBtnClick(apiName: string) {
         switch (apiName) {
             case 'Model.GetHierarchy': {
-                Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
+                Px.Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
                     console.log('Model.GetModelHierarchy -> ', data);
 
                     this.setState({ floorData: data }); // 얻은 층정보로 state 설정
@@ -133,14 +140,23 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     testInt: 11,
                     testFloat: 2.2
                 };
-                
-                Poi.Create({
+
+                Px.Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
                     modelUrl: modelUrl,
                     displayText: displayText,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
+            } break;
+            case 'Poi.Delete': {
+                if (this.state.deletePoiId !== '') {
+                    Px.Poi.Delete(this.state.deletePoiId);
+                }
+            } break;
+            case 'Poi.ExportAll': {
+                const data = Px.Poi.ExportAll();
+                console.log('Poi.ExportAll', data);
             } break;
         }
     }
@@ -151,9 +167,17 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onFloorVisibleCheckChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         const target: HTMLInputElement = evt.target;
         if (target.checked)
-            Model.Show(target.id);
+            Px.Model.Show(target.id);
         else
-            Model.Hide(target.id);
+            Px.Model.Hide(target.id);
+    }
+
+    /**
+     * poi 제거 텍스트 입력 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onDeletePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ deletePoiId: evt.target.value });
     }
 
     /**
@@ -162,9 +186,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     setFloorVisibility(isVisible: boolean) {
         if (isVisible)
-            Model.ShowAll();
+            Px.Model.ShowAll();
         else
-            Model.HideAll();
+            Px.Model.HideAll();
     }
 }
 

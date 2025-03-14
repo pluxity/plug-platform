@@ -145,6 +145,33 @@ function Export(id: string) {
     }
 }
 
+/**
+ * 모든 poi의 익스포트용 데이터 얻기
+ */
+function ExportAll() {
+    const result: any[] = [];
+    Object.values(poiDataList).forEach(poi => result.push(poi.ExportData));
+    return result;
+}
+
+/**
+ * poi 제거
+ * @param id - 제거할 poi id값
+ */
+function Delete(id: string) {
+    if( poiDataList.hasOwnProperty(id)){
+        const poi = poiDataList[id];
+        poi.dispose();
+
+        delete poiDataList[id];
+
+        updatePoiLine();
+        updatePoiMesh();
+    }
+}
+
 export {
-    Export
+    Export,
+    ExportAll,
+    Delete,
 }

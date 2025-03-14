@@ -1,3 +1,3 @@
 import './placer';
-import './data';
+export * from  './data';
 export * from './create';
