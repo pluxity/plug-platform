@@ -4,7 +4,6 @@ import CopyWebpackPlugin from "copy-webpack-plugin";
 import fs from "fs";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
       {
