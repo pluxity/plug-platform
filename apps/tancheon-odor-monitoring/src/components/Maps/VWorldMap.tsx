@@ -178,7 +178,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         viewer.destroy();
       }
     };
-  }, [isMounted, setViewer, apiKey]);
+  }, [isMounted, setViewer, cesiumContainerRef, apiKey]);
 
   if (!isMounted) {
     return (
@@ -204,9 +204,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         </div>
       )}
       
-      <MapControls 
-        initialPosition={TANCHEON_LOCATION}
-      />
+      <MapControls />
       
       <MapToggleControls className="left-4 bottom-4"  />
       

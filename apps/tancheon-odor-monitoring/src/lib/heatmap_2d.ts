@@ -73,7 +73,7 @@ export function createHeatmapImage(
     }
   }
   
-  const targetMaxValue = DATA_MAX;
+  const targetMaxValue = HEATMAP_GRID_CONFIG.POLLUTION_DATA_MAX;
   
   if (maxGridValue > targetMaxValue) {
     const scaleFactor = targetMaxValue / maxGridValue;

@@ -156,9 +156,7 @@ const OSMMap: React.FC<OSMMapProps> = () => {
         </div>
       )}
 
-      <MapControls 
-        initialPosition={TANCHEON_LOCATION}
-      />
+      <MapControls />
       
       <MapToggleControls className="left-4 bottom-4"  />
       <div

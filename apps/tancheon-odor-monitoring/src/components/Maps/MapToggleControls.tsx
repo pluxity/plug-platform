@@ -8,6 +8,7 @@ import { useHeatmapStore } from '@/stores/heatmapStore';
 import { TANCHEON_LOCATION } from '@/constants/initialization';
 import { getHeightLevels, HeatmapDataPoint, getHeatmapDataPointsByHeight } from '@/lib/heatmap_data';
 import { HeatmapEntityMap, MapToggleControlsProps } from '@/types/heatmap';
+import { updateColorScale } from '@/lib/heatmap_3D';
 
 const SIMULATION_HEIGHTS = [30, 40, 50, 60, 70, 80, 90];
 
@@ -131,12 +132,47 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
   };
 
   const toggle2DHeatmap = async () => {
+    if (!viewer) {
+      console.error('2D 히트맵 토글 실패: viewer가 없습니다.');
+      return;
+    }
+    
+    console.log('2D 히트맵 토글 시작, 현재 상태:', show2DHeatmap ? '표시 중' : '숨김 중');
+    
+    // 데이터 스토어 디버깅
+    console.log('높이별 데이터 상태:', Object.keys(dataByHeight).map(key => {
+      const height = parseInt(key);
+      return `${height}m: ${dataByHeight[height]?.length || 0}개 데이터`;
+    }).join(', '));
+    
     if (show2DHeatmap) {
+      console.log('2D 히트맵 제거 시작');
       await remove2DHeatmap();
+      console.log('2D 히트맵 제거 완료');
     } else {
-      for (const height of selectedHeights) {
-        await create2DHeatmap(height);
+      console.log('2D 히트맵 생성 시작, 선택된 고도:', selectedHeights);
+      
+      // 기본 데이터 생성 - 데이터가 없으면 생성
+      const hasAnyData = selectedHeights.some(height => dataByHeight[height]?.length > 0);
+      if (!hasAnyData) {
+        console.log('데이터가 없어 기본 데이터를 생성합니다.');
+        generateBaseData(selectedHeights);
       }
+      
+      let createdCount = 0;
+      
+      for (const height of selectedHeights) {
+        try {
+          const entity = await create2DHeatmap(height);
+          if (entity) {
+            createdCount++;
+          }
+        } catch (error) {
+          console.error(`고도 ${height}m 2D 히트맵 생성 오류:`, error);
+        }
+      }
+      
+      console.log(`2D 히트맵 생성 완료: ${createdCount}/${selectedHeights.length} 개 생성됨`);
     }
     
     // 상태 업데이트
@@ -207,7 +243,10 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
           console.error(innerError);
 
           try {
-            viewer.entities.remove(entity);
+            // entity가 Entity 타입인지 확인
+            if ('id' in entity) {
+              viewer.entities.remove(entity);
+            }
           } catch (removeError) {
             console.error(removeError);
           }
@@ -225,20 +264,29 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
   
   // 2D 히트맵 생성 함수
   const create2DHeatmap = async (height: number) => {
-    if (!viewer) return;
+    if (!viewer) {
+      console.error('2D 히트맵 생성 실패: viewer가 없습니다.');
+      return null;
+    }
+    
+    console.log(`고도 ${height}m 2D 히트맵 생성 시작`);
     
     try {
-      // 모듈 동적 import
-      const { create2DHeatmap } = await import('@/lib/heatmap_2D');
+      console.log('heatmap_2D.ts 모듈 import 시도');
+      // 모듈 동적 import - 함수명 충돌 방지를 위해 다른 이름으로 가져옴
+      const { create2DHeatmap: create2DHeatmapFn } = await import('@/lib/heatmap_2D');
+      console.log('heatmap_2D.ts 모듈 import 성공');
       
       // 해당 고도의 히트맵이 이미 존재하는지 확인
       if (heatmap2DRef.current[height]) {
+        console.log(`기존 고도 ${height}m 2D 히트맵 제거`);
         // 기존 히트맵 제거
         await remove2DHeatmapAtHeight(height);
       }
       
       // 데이터 스토어에서 최신 데이터 가져오기
       const currentData: HeatmapDataPoint[] = dataByHeight[height] || [];
+      console.log(`고도 ${height}m 데이터 ${currentData.length}개 로드됨`);
       
       // 최저값 필터링 (옵션) - 너무 낮은 값은 아예 데이터에서 제외
       // 히트맵을 더 선명하게 표시하기 위해 낮은 값(20 이하)은 표시하지 않음
@@ -248,14 +296,19 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       
       // 2D 히트맵 생성
       // 값이 낮은 부분은 투명하게 설정 (valueThreshold 값을 높게 설정)
-      const entity = await create2DHeatmap(viewer, height, {
+      console.log(`create2DHeatmap 함수 호출 시작 (고도: ${height}m)`);
+      const entity = await create2DHeatmapFn(viewer, height, {
         valueThreshold: 0.15, // 값 임계값 설정 (0.05 -> 0.15로 증가시켜 낮은 값 제외)
         customData: filteredData, // 필터링된 데이터 사용 (타입 오류 해결)
         blur: 0.8, // 블러 효과 증가 (부드러운 경계를 위해)
       });
+      console.log(`create2DHeatmap 함수 호출 완료, 엔티티:`, entity ? '생성됨' : '실패');
       
       // 참조에 저장
-      heatmap2DRef.current[height] = entity;
+      if (entity) {
+        heatmap2DRef.current[height] = entity;
+        console.log(`고도 ${height}m 2D 히트맵 엔티티 저장 완료`);
+      }
       
       return entity;
     } catch (error) {
@@ -297,6 +350,8 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
   };
   
   const generateBaseData = (heights: number[]) => {
+    console.log('기본 데이터 생성 시작, 고도:', heights);
+    
     heights.forEach(height => {
       generateBaseDataForHeight(height);
     });
@@ -305,10 +360,16 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       longitude: TANCHEON_LOCATION.longitude + (Math.random() * 0.002 - 0.001),
       latitude: TANCHEON_LOCATION.latitude + (Math.random() * 0.002 - 0.001)
     };
+    
+    console.log('기본 데이터 생성 완료, 새 오염 중심:', pollutionCenterRef.current);
   };
   
   const generateBaseDataForHeight = (height: number) => {
+    console.log(`고도 ${height}m 기본 데이터 생성 시작`);
+    
     const baseData = getHeatmapDataPointsByHeight(height);
+    console.log(`고도 ${height}m 원본 데이터 ${baseData.length}개 로드됨`);
+    
     const modifiedData = baseData.map(point => ({
       ...point,
       value: 10 + Math.random() * 20 // 10-30 사이 값
@@ -317,6 +378,7 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     baseDataRef.current[height] = modifiedData;
     
     updateDataPoints(height, modifiedData);
+    console.log(`고도 ${height}m 데이터 업데이트 완료, ${modifiedData.length}개 데이터 포인트`);
   };
   
   // 오염 확산 시뮬레이션 단계별 데이터 생성
@@ -397,7 +459,7 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     
     // 3D 히트맵 색상 스케일 업데이트 (낮은 값은 더 투명하게)
     if (show3DHeatmap) {
-      update3DHeatmapColorScale([]);
+      updateColorScale([]);
     }
     
     // 상태가 업데이트된 후 다음 렌더 사이클에서 시뮬레이션 데이터 생성을 예약
@@ -471,8 +533,12 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
         
         // 2D 히트맵 제거
         Object.values(heatmap2DRef.current).forEach(entity => {
-          if (entity && viewer.entities.contains(entity)) {
-            viewer.entities.remove(entity);
+          // 엔티티 ID가 있는 경우 (Entity 타입인 경우)
+          if (entity && 'id' in entity) {
+            const foundEntity = viewer.entities.getById(entity.id);
+            if (foundEntity) {
+              viewer.entities.remove(foundEntity);
+            }
           }
         });
         
