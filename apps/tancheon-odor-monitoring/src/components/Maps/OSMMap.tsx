@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapControls from './MapControls';
 import MapToggleControls from './MapToggleControls';
+import * as Cesium from 'cesium';
 
 import { TANCHEON_LOCATION } from '@/constants/initialization';
 import useCesiumStore from '@/stores/cesiumStore';
@@ -19,13 +20,13 @@ declare global {
 }
 
 // 탄천 좌표 (대략적인 위치)
-const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
+const OSMMap: React.FC<OSMMapProps> = () => {
   const cesiumContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
-  const { viewer, setViewer } = useCesiumStore();
+  const { setViewer } = useCesiumStore();
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -61,7 +62,7 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
   useEffect(() => {
     if (!isMounted || !cesiumContainerRef.current) return;
 
-    let viewer: any = null;
+    let viewer: Cesium.Viewer | null = null;
 
     const initCesium = async () => {
       try {
@@ -128,7 +129,6 @@ const OSMMap: React.FC<OSMMapProps> = ({ height = '500px' }) => {
 
     initCesium();
 
-    // 컴포넌트 언마운트 시 정리
     return () => {
       if (viewer) {
         viewer.destroy();

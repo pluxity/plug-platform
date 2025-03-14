@@ -1,36 +1,22 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import * as Cesium from 'cesium';
 
 import useCesiumStore from '@/stores/cesiumStore';
 import { usePollutionDataStore } from '@/stores/pollutionDataStore';
 import { useHeatmapStore } from '@/stores/heatmapStore';
 
-import { TANCHEON_LOCATION, HEATMAP_GRID_CONFIG } from '@/constants/initialization';
+import { TANCHEON_LOCATION } from '@/constants/initialization';
 import { getHeightLevels, HeatmapDataPoint, getHeatmapDataPointsByHeight } from '@/lib/heatmap_data';
-import { Viewer } from 'cesium';
+import { HeatmapEntityMap, MapToggleControlsProps } from '@/types/heatmap';
 
-// 히트맵 엔티티 관리를 위한 타입
-type HeatmapEntityMap = {
-  [height: number]: any; // Cesium.Entity 또는 Cesium.PrimitiveCollection
-};
-
-interface MapToggleControlsProps {
-  className?: string;
-}
-
-// 시뮬레이션에 사용할 고도 목록 (10m 간격)
 const SIMULATION_HEIGHTS = [30, 40, 50, 60, 70, 80, 90];
 
-/**
- * 맵 토글 컨트롤 컴포넌트 - 건물, 히트맵 등의 표시/숨김 토글 및 고도 선택 기능
- * VWorldMap과 OSMMap 모두에서 재사용 가능합니다.
- */
 export const MapToggleControls: React.FC<MapToggleControlsProps> = ({  
   className = ''
 }) => {
 
-  const { viewer, setViewer } = useCesiumStore();
+  const { viewer } = useCesiumStore();
   
-  // 상태 관리
   const [showBuildings, setShowBuildings] = useState(false);
   const [show3DHeatmap, setShow3DHeatmap] = useState(false);
   const [show2DHeatmap, setShow2DHeatmap] = useState(false);
@@ -38,26 +24,21 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
   const [simulationActive, setSimulationActive] = useState(false);
   const [simulationStep, setSimulationStep] = useState(0);
   
-  // Zustand 스토어에서 데이터 가져오기
   const {
     dataByHeight,
     lastUpdated,
     isLoading,
-    generateRandomData,
     updateDataPoints
   } = usePollutionDataStore();
   
-  // 히트맵 스토어 사용
   const {
     create3DHeatmap,
     removeHeatmapInstance,
     removeAllHeatmapInstances,
     applyNewDataToHeatmap,
-    updateColorScale
   } = useHeatmapStore();
   
-  // 참조 관리
-  const buildingsRef = useRef<any[]>([]);
+  const buildingsRef = useRef<Cesium.Entity[]>([]);
   const heatmap2DRef = useRef<HeatmapEntityMap>({});
   const simulationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const baseDataRef = useRef<Record<number, HeatmapDataPoint[]>>({});
@@ -66,10 +47,8 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     latitude: TANCHEON_LOCATION.latitude + (Math.random() * 0.002 - 0.001)
   });
   
-  // 고도 레벨 목록
   const heightLevels = getHeightLevels();
 
-  // 건물 토글 함수
   const toggleBuildings = async () => {
     if (!viewer) return;
     
@@ -129,7 +108,7 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       setShowBuildings(!showBuildings);
       
     } catch (error) {
-      // 오류 처리
+      console.error(error);
     }
   };
 
@@ -138,7 +117,6 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     if (!viewer) return;
     
     if (show3DHeatmap) {
-      // 3D 히트맵 제거
       removeAllHeatmapInstances(viewer);
       stopSimulation();
     } else {
@@ -146,21 +124,16 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
         await create3DHeatmap(viewer, height);
       }
       
-      // 전체 데이터를 채운 초기 상태 생성
       generateBaseData(selectedHeights);
     }
     
-    // 상태 업데이트
     setShow3DHeatmap(!show3DHeatmap);
   };
 
-  // 2D 히트맵 토글 함수
   const toggle2DHeatmap = async () => {
     if (show2DHeatmap) {
-      // 2D 히트맵 제거
       await remove2DHeatmap();
     } else {
-      // 2D 히트맵 생성 (선택된 모든 고도에 대해)
       for (const height of selectedHeights) {
         await create2DHeatmap(height);
       }
@@ -231,21 +204,22 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
             viewer.entities.remove(foundEntity);
           }
         } catch (innerError) {
-          // 폴백: 직접 제거 시도
+          console.error(innerError);
+
           try {
             viewer.entities.remove(entity);
           } catch (removeError) {
-            // 오류 처리
+            console.error(removeError);
           }
         }
         
-        // 참조에서 제거
         delete heatmap2DRef.current[height];
+
       } else {
-        // 오류 처리
+
       }
     } catch (error) {
-      // 오류 처리
+      console.error(error);
     }
   };
   
@@ -259,19 +233,34 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       
       // 해당 고도의 히트맵이 이미 존재하는지 확인
       if (heatmap2DRef.current[height]) {
-        return;
+        // 기존 히트맵 제거
+        await remove2DHeatmapAtHeight(height);
       }
       
+      // 데이터 스토어에서 최신 데이터 가져오기
+      const currentData: HeatmapDataPoint[] = dataByHeight[height] || [];
+      
+      // 최저값 필터링 (옵션) - 너무 낮은 값은 아예 데이터에서 제외
+      // 히트맵을 더 선명하게 표시하기 위해 낮은 값(20 이하)은 표시하지 않음
+      const filteredData: HeatmapDataPoint[] = currentData.filter(point => point.value > 20);
+      
+      console.log(`2D 히트맵 생성: ${height}m, 총 데이터 ${currentData.length}개 중 필터링 후 ${filteredData.length}개 데이터 포인트 사용`);
+      
       // 2D 히트맵 생성
-      const entity = create2DHeatmap(viewer, height, {
-        valueThreshold: 0.05, // 값 임계값 설정
+      // 값이 낮은 부분은 투명하게 설정 (valueThreshold 값을 높게 설정)
+      const entity = await create2DHeatmap(viewer, height, {
+        valueThreshold: 0.15, // 값 임계값 설정 (0.05 -> 0.15로 증가시켜 낮은 값 제외)
+        customData: filteredData, // 필터링된 데이터 사용 (타입 오류 해결)
+        blur: 0.8, // 블러 효과 증가 (부드러운 경계를 위해)
       });
       
       // 참조에 저장
       heatmap2DRef.current[height] = entity;
       
+      return entity;
     } catch (error) {
-      // 오류 처리
+      console.error('2D 히트맵 생성 오류:', error);
+      return null;
     }
   };
   
@@ -295,7 +284,7 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
             viewer.entities.remove(foundEntity);
           }
         } catch (innerError) {
-          // 오류 처리
+          console.error(innerError);
         }
       }
       
@@ -303,52 +292,30 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       heatmap2DRef.current = {};
       
     } catch (error) {
-      // 오류 처리
-    }
-  };
-
-  // 3D 히트맵 색상 스케일 업데이트 함수
-  const update3DHeatmapColorScale = async (newColorScale: Array<{ value: number, color: any }>) => {
-    if (!viewer) return;
-    
-    try {
-      // 스토어의 updateColorScale 함수 호출
-      await updateColorScale(newColorScale, viewer, selectedHeights);
-      
-    } catch (error) {
-      // 오류 처리
+      console.error(error);
     }
   };
   
-  // 기본 데이터 생성 함수 (전체 데이터 포인트를 채움)
   const generateBaseData = (heights: number[]) => {
-    // 각 고도별로 기본 데이터 생성
     heights.forEach(height => {
       generateBaseDataForHeight(height);
     });
     
-    // 오염 중심점 설정 (모든 단계에서 공통으로 사용)
     pollutionCenterRef.current = {
       longitude: TANCHEON_LOCATION.longitude + (Math.random() * 0.002 - 0.001),
       latitude: TANCHEON_LOCATION.latitude + (Math.random() * 0.002 - 0.001)
     };
   };
   
-  // 특정 고도의 기본 데이터 생성
   const generateBaseDataForHeight = (height: number) => {
-    // 기존 그리드 데이터 가져오기 (lib/heatmap_data.ts의 데이터 사용)
     const baseData = getHeatmapDataPointsByHeight(height);
-    
-    // 기본값 낮춤 (10-30 사이로 설정)
     const modifiedData = baseData.map(point => ({
       ...point,
       value: 10 + Math.random() * 20 // 10-30 사이 값
     }));
     
-    // 기본 데이터 저장
     baseDataRef.current[height] = modifiedData;
     
-    // 데이터 스토어 업데이트
     updateDataPoints(height, modifiedData);
   };
   
@@ -404,6 +371,12 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
   const startSimulation = () => {
     if (simulationActive) return;
     
+    // 3D 히트맵 또는 2D 히트맵이 활성화되어 있는지 확인
+    if (!show3DHeatmap && !show2DHeatmap) {
+      alert('시뮬레이션을 위해 3D 또는 2D 히트맵을 활성화해야 합니다.');
+      return;
+    }
+    
     // 시뮬레이션 고도가 선택되어 있는지 확인
     const hasSimulationHeight = selectedHeights.some(h => SIMULATION_HEIGHTS.includes(h));
     
@@ -421,6 +394,11 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       longitude: TANCHEON_LOCATION.longitude + (Math.random() * 0.002 - 0.001),
       latitude: TANCHEON_LOCATION.latitude + (Math.random() * 0.002 - 0.001)
     };
+    
+    // 3D 히트맵 색상 스케일 업데이트 (낮은 값은 더 투명하게)
+    if (show3DHeatmap) {
+      update3DHeatmapColorScale([]);
+    }
     
     // 상태가 업데이트된 후 다음 렌더 사이클에서 시뮬레이션 데이터 생성을 예약
     setTimeout(() => {
@@ -507,73 +485,7 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     };
   }, [viewer, removeAllHeatmapInstances]);
 
-  // 고도가 시뮬레이션 고도인지 확인하는 함수
   const isSimulationHeight = (height: number) => SIMULATION_HEIGHTS.includes(height);
-
-  // 모든 시뮬레이션 고도 선택
-  const selectAllSimulationHeights = async () => {
-    if (!viewer) return;
-    
-    // 기존에 없는 고도만 추가
-    const heightsToAdd = SIMULATION_HEIGHTS.filter(h => !selectedHeights.includes(h));
-    
-    if (heightsToAdd.length === 0) return;
-    
-    // 새 고도 목록 설정
-    const newSelectedHeights = [...selectedHeights, ...heightsToAdd];
-    setSelectedHeights(newSelectedHeights);
-    
-    // 다음 렌더 사이클에서 히트맵 생성 및 데이터 업데이트 수행
-    setTimeout(() => {
-      if (show3DHeatmap) {
-        for (const height of heightsToAdd) {
-          create3DHeatmap(viewer, height);
-          
-          if (simulationActive) {
-            generateSimulationDataForHeight(height, simulationStep);
-          } else {
-            generateBaseDataForHeight(height);
-          }
-        }
-      }
-      
-      if (show2DHeatmap) {
-        for (const height of heightsToAdd) {
-          create2DHeatmap(height);
-        }
-      }
-    }, 0);
-  };
-  
-  // 모든 시뮬레이션 고도 선택 해제
-  const deselectAllSimulationHeights = async () => {
-    if (!viewer) return;
-    
-    // 현재 선택된 시뮬레이션 고도만 필터링
-    const heightsToRemove = selectedHeights.filter(h => SIMULATION_HEIGHTS.includes(h));
-    
-    if (heightsToRemove.length === 0) return;
-    
-    // 시뮬레이션 고도를 제외한 새 고도 목록 설정
-    const newSelectedHeights = selectedHeights.filter(h => !SIMULATION_HEIGHTS.includes(h));
-    setSelectedHeights(newSelectedHeights);
-    
-    // 다음 렌더 사이클에서 히트맵 제거 수행
-    setTimeout(() => {
-      // 히트맵 제거
-      if (show3DHeatmap) {
-        for (const height of heightsToRemove) {
-          removeHeatmapInstance(height, viewer);
-        }
-      }
-      
-      if (show2DHeatmap) {
-        for (const height of heightsToRemove) {
-          remove2DHeatmapAtHeight(height);
-        }
-      }
-    }, 0);
-  };
 
   return (
     <div className={`absolute bottom-4 left-4 z-10 flex flex-col ${className}`}>

@@ -1,12 +1,11 @@
 import useCesiumStore from '@/stores/cesiumStore';
+import { TANCHEON_LOCATION } from '@/constants/initialization';
 
 interface MapControlsProps {
-  initialPosition?: any; // 초기 위치 정보 (필요한 경우)
   className?: string;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
-  initialPosition,
   className = ''
 }) => {
   // Cesium 상태를 스토어에서 직접 가져오기
@@ -43,14 +42,15 @@ const MapControls: React.FC<MapControlsProps> = ({
       const Cesium = await import('cesium');
       viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(
-          initialPosition.longitude,
-          initialPosition.latitude,
-          initialPosition.height
+          
+          TANCHEON_LOCATION.longitude,
+          TANCHEON_LOCATION.latitude,
+          TANCHEON_LOCATION.height
         ),
         orientation: {
-          heading: initialPosition.heading || 0,
-          pitch: initialPosition.pitch || -0.5,
-          roll: initialPosition.roll || 0
+          heading: TANCHEON_LOCATION.heading || 0,
+          pitch: TANCHEON_LOCATION.pitch || -0.5,
+          roll: TANCHEON_LOCATION.roll || 0
         }
       });
     } catch (error) {
