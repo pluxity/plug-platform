@@ -73,7 +73,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button><br />
                     <Input.Text value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button> &nbsp;
+                    <Button onClick={Px.Poi.Clear}>Clear</Button>
                     <br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
                 </span>

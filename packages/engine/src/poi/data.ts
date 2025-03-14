@@ -4,7 +4,7 @@ import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import { PoiElement } from './element';
 
-const poiDataList: Record<string, PoiElement> = {};
+let poiDataList: Record<string, PoiElement> = {};
 let poiLine: THREE.LineSegments;
 let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
@@ -159,7 +159,7 @@ function ExportAll() {
  * @param id - 제거할 poi id값
  */
 function Delete(id: string) {
-    if( poiDataList.hasOwnProperty(id)){
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         poi.dispose();
 
@@ -170,8 +170,20 @@ function Delete(id: string) {
     }
 }
 
+/**
+ * poi 모두 제거
+ */
+function Clear() {
+    Object.values(poiDataList).forEach(poi => poi.dispose());
+    poiDataList = {};
+
+    updatePoiLine();
+    updatePoiMesh();
+}
+
 export {
     Export,
     ExportAll,
     Delete,
+    Clear,
 }
