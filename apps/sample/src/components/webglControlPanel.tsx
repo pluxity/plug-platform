@@ -79,6 +79,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
                 </span>
             );
+        } else if (this.state.selectedApiName === 'ETC') {
+            return (
+                <span>
+                    <Button onClick={this.printAllApilist.bind(this, Px, 'Px')}>Print Api List</Button>
+                </span>
+            );
         }
 
         return null;
@@ -98,6 +104,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Loader'>Loader</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
+                        <option value='ETC'>ETC</option>
                     </select>
                     <br />
                     {this.renderMenu()}
@@ -190,6 +197,20 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             Px.Model.ShowAll();
         else
             Px.Model.HideAll();
+    }
+
+    /**
+     * 대상 객체의 키목록 출력
+     * @param target - 대상
+     * @param prefix - 접두사
+     */
+    printAllApilist(target: any, prefix: string) {
+        Object.keys(target).forEach(keyName => {
+            this.printAllApilist(target[keyName], prefix + '.' + keyName);
+
+            if (typeof (target[keyName]) === 'function')
+                console.log(prefix + '.' + keyName,);
+        });
     }
 }
 
