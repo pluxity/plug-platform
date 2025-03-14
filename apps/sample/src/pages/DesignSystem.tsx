@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Textarea, Input, Card } from "@plug/ui";
+import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Textarea, Input, Card } from "@plug/ui";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
 
@@ -117,6 +117,16 @@ function DesignSystem() {
         <RadioGroupItem value="3" label="option3"/>
         <RadioGroupItem value="4" label="option4" />
       </RadioGroup>
+      <h2 className="text-xl font-bold mt-8 mb-4">Skeleton 컴포넌트 예제</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton variant="circle" className="w-[180px] h-[180px]"></Skeleton>
+        <Skeleton variant="rectangle" className="w-[200px] h-[100px]"></Skeleton>
+        <div className="flex flex-col gap-2 w-[200px]">
+          <Skeleton variant="text"></Skeleton>
+          <Skeleton variant="text"></Skeleton>
+          <Skeleton variant="text"></Skeleton>
+        </div>
+      </div>
       <h2 className="text-xl font-bold mt-8 mb-4">Textarea 컴포넌트 예제</h2>
       <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
       <h2 className="text-xl font-bold mt-8 mb-4">Input 컴포넌트 예제</h2>
