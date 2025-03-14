@@ -155,6 +155,14 @@ function ExportAll() {
 }
 
 /**
+ * poi 데이터 임포트
+ * @param data - 임포트 데이터
+ */
+function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[]) {
+
+}
+
+/**
  * poi 제거
  * @param id - 제거할 poi id값
  */
@@ -184,6 +192,7 @@ function Clear() {
 export {
     Export,
     ExportAll,
+    Import,
     Delete,
     Clear,
 }

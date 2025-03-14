@@ -78,6 +78,21 @@ interface PoiCreateOption {
     property: { [key: string]: any };
 }
 
+/**
+ * poi 임포트 옵션
+ */
+interface PoiImportOption {
+    id: string;
+    iconUrl: string;
+    modelUrl?: string;
+    displayText: string;
+    floorId: string;
+    property: { [key: string]: any };
+    position: Vector3Custom;
+    rotation: EulerCustom;
+    scale: Vector3Custom;
+}
+
 export {
     Vector3Custom,
     EulerCustom,
@@ -86,4 +101,5 @@ export {
     ModifyKey,
     ModelInfo,
     PoiCreateOption,
+    PoiImportOption,
 }
