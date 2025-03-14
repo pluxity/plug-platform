@@ -39,8 +39,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.pointMeshData = {
             meshRef: undefined,
             instanceIndex: -1,
-            rotation: new THREE.Euler(),
-            scale: new THREE.Vector3(1, 1, 1),
+            rotation: new Interfaces.EulerCustom,
+            scale: new Interfaces.Vector3Custom(1, 1, 1),
         };
     }
 
@@ -112,6 +112,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
             property: this.property,
             floorId: this.floorId,
             position: this.position?.ExportData,
+            rotation: this.pointMeshData.rotation.ExportData,
+            scale: this.pointMeshData.scale.ExportData,
         };
     }
 }
@@ -122,8 +124,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
 interface PoiPointMeshData {
     meshRef: THREE.InstancedMesh | undefined;
     instanceIndex: number;
-    rotation: THREE.Euler;
-    scale: THREE.Vector3;
+    rotation: Interfaces.EulerCustom;
+    scale: Interfaces.Vector3Custom;
 }
 
 export {

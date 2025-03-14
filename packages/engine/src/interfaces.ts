@@ -18,6 +18,19 @@ class Vector3Custom extends THREE.Vector3 {
 }
 
 /**
+ * 데이터 익스포트를 위한 Euler 클래스
+ */
+class EulerCustom extends THREE.Euler {
+    get ExportData() {
+        return {
+            x: this.x,
+            y: this.y,
+            z: this.z,
+        }
+    }
+}
+
+/**
  * 카메라, 픽킹등에 사용할 레이어 열거형
  */
 enum CustomLayer {
@@ -67,6 +80,7 @@ interface PoiCreateOption {
 
 export {
     Vector3Custom,
+    EulerCustom,
     CustomLayer,
     MouseButton,
     ModifyKey,
