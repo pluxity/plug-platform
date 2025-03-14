@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import MapControls from './MapControls';
 import MapToggleControls from './MapToggleControls';
 
+import * as Cesium from 'cesium';
 import { TANCHEON_LOCATION } from '@/constants/initialization';
 import useCesiumStore from '@/stores/cesiumStore';
 
@@ -15,19 +16,18 @@ interface VWorldMapProps {
 declare global {
   interface Window {
     CESIUM_BASE_URL?: string;
-    Cesium?: any;
+    Cesium?: Cesium.Viewer;
   }
 }
 const VWorldMap: React.FC<VWorldMapProps> = ({ 
-  apiKey, 
-  height = '500px'
+  apiKey
 }) => {
   const cesiumContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
-  const { viewer, setViewer } = useCesiumStore();
+  const { setViewer } = useCesiumStore();
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -57,7 +57,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         document.head.removeChild(widgetsCss);
       }
     };
-  }, [isMounted]);
+  }, [isMounted, setViewer]);
 
 
 
@@ -65,7 +65,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   useEffect(() => {
     if (!isMounted || !cesiumContainerRef.current) return;
 
-    let viewer: any = null;
+    let viewer: Cesium.Viewer | null = null;
 
     const initCesium = async () => {
       try {
@@ -132,7 +132,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
               viewer.scene.globe.enableLighting = true;
               viewer.scene.globe.depthTestAgainstTerrain = true;
             }
-          } catch (error: any) {
+          } catch (error) {
             console.warn('지형 데이터 로드 실패, 기본 타원체 지형을 사용합니다:', error);
             if (viewer && !viewer.isDestroyed()) {
               const ellipsoidTerrainProvider = new Cesium.EllipsoidTerrainProvider();
@@ -159,11 +159,11 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           
           // 이미지 로드 완료 후 지형 데이터 로드
           setTimeout(loadTerrainAfterImagery, 500); // 500ms 지연 후 지형 데이터 로드
-        } catch (error: any) {
+        } catch (error) {
           console.warn('VWorld 이미지 레이어 초기화 실패:', error);
           setIsLoading(false);
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Cesium 초기화 오류:', error);
         setError('지도를 로드하는 중 오류가 발생했습니다.');
         setIsLoading(false);
@@ -178,7 +178,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         viewer.destroy();
       }
     };
-  }, [isMounted, apiKey]);
+  }, [isMounted, setViewer, apiKey]);
 
   if (!isMounted) {
     return (

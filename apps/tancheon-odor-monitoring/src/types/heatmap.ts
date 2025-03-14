@@ -56,7 +56,7 @@ export interface HeatmapState {
 
 // 히트맵 엔티티 관리를 위한 타입
 export type HeatmapEntityMap = {
-  [height: number]: any; // Cesium.Entity 또는 Cesium.PrimitiveCollection
+  [height: number]: Cesium.Entity | Cesium.PrimitiveCollection;
 };
 
 // 맵 토글 컨트롤 컴포넌트 props

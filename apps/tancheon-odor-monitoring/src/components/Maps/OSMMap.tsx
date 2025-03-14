@@ -115,10 +115,6 @@ const OSMMap: React.FC<OSMMapProps> = () => {
         });
         viewer.imageryLayers.addImageryProvider(osmProvider);
 
-        // 기본 지형 제공자 설정은 이미 초기화할 때 설정했으므로 제거
-        // const terrainProvider = new Cesium.EllipsoidTerrainProvider();
-        // viewer.terrainProvider = terrainProvider;
-
         setIsLoading(false);
       } catch (error) {
         console.error('Cesium 초기화 오류:', error);
@@ -134,7 +130,7 @@ const OSMMap: React.FC<OSMMapProps> = () => {
         viewer.destroy();
       }
     };
-  }, [isMounted]);
+  }, [isMounted, setViewer]);
 
   if (!isMounted) {
     return (

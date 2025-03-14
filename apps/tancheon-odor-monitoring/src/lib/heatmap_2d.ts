@@ -16,8 +16,6 @@ const DEFAULT_OPTIONS: HeatmapOptions = {
   useAbsoluteScale: true
 };
 
-const GLOBAL_MIN_VALUE = HEATMAP_GRID_CONFIG.POLLUTION_DATA_MIN || 0;
-const GLOBAL_MAX_VALUE = HEATMAP_GRID_CONFIG.POLLUTION_DATA_MAX || 100;
 
 export function createHeatmapImage(
   data: HeatmapDataPoint[],
@@ -31,9 +29,7 @@ export function createHeatmapImage(
   const showBorder = options.showBorder !== undefined ? options.showBorder : DEFAULT_OPTIONS.showBorder!;
   const borderColor = options.borderColor || DEFAULT_OPTIONS.borderColor!;
   const borderWidth = options.borderWidth || DEFAULT_OPTIONS.borderWidth!;
-  const useAbsoluteScale = options.useAbsoluteScale !== undefined ? options.useAbsoluteScale : DEFAULT_OPTIONS.useAbsoluteScale!;
   
-  const DATA_MAX = GLOBAL_MAX_VALUE;
   
   const west = HEATMAP_GRID_CONFIG.WEST;
   const south = HEATMAP_GRID_CONFIG.SOUTH;
@@ -139,7 +135,7 @@ export function createHeatmapImage(
               imageData.data[pixelPos + 2] = colorMapData[colorIndex + 2];
               
               const alphaBase = colorMapData[colorIndex + 3];
-              let alphaScale = Math.min(1.0, transformedValue * 4);
+              const alphaScale = Math.min(1.0, transformedValue * 4);
               let alphaValue = Math.floor(alphaBase * alphaScale);
               
               if (transformedValue < valueThreshold * 2) {

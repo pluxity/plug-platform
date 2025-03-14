@@ -194,9 +194,9 @@ function createPrimitivesFromInstances(
       asynchronous: false,
     });
     
-    // @ts-ignore
+    // @ts-expect-error: 타입 추론 오류
     primitive._heightLevel = heightLevel;
-    // @ts-ignore
+    // @ts-expect-error: 타입 추론 오류
     primitive._batchIndex = i;
     
     viewer.scene.primitives.add(primitive);
@@ -209,7 +209,6 @@ function removeHeatmapPrimitivesFromScene(viewer: Cesium.Viewer, heightLevel: nu
   for (let i = 0; i < viewer.scene.primitives.length; i++) {
     const primitive = viewer.scene.primitives.get(i);
     if (primitive) {
-      // @ts-ignore
       if (primitive._heightLevel === heightLevel) {
         primitivesToRemove.push(primitive);
       }

@@ -19,7 +19,7 @@ interface PollutionDataState {
   setLoading: (loading: boolean) => void;
 }
 
-export const usePollutionDataStore = create<PollutionDataState>((set, get) => ({
+export const usePollutionDataStore = create<PollutionDataState>((set) => ({
   dataByHeight: {},
   lastUpdated: null,
   isLoading: false,

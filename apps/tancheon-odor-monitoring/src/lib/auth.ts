@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       console.error("JWT_SECRET is not defined");
       return NextResponse.json({ message: 'JWT_SECRET이 없습니다.' }, { status: 500 });
     }
-    const decoded:any = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded: JwtPayload = jwt.verify(token, process.env.JWT_SECRET, { complete: true });
     const user = await prisma.users.findUnique({
         where: { id: decoded.userId },
       });
