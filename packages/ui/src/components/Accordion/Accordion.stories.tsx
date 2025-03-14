@@ -32,7 +32,7 @@ export const Default: Story = {
       <AccordionItem value="item-1">
         <AccordionTrigger>첫 번째 항목</AccordionTrigger>
         <AccordionContent>
-          첫 번째 항목의 내용입니다.
+          첫 번째 항목의 내용입니다. 
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">
@@ -51,7 +51,6 @@ export const Default: Story = {
   ),
   args: {
     type: 'single',
-    collapsible: true,
   }
 }
 
@@ -79,7 +78,7 @@ export const Multiple: Story = {
     </Accordion>
   ),
   args: {
-    type: 'multiple',
+    type: 'multiple'
   }
 }
 

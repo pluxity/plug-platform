@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from '../../utils/classname';
 import AccordionIcon from '../../assets/icons/Accordion.svg';
@@ -56,7 +56,7 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
         if (React.isValidElement(child) && (child.type as any) === AccordionItem) {
             return React.cloneElement(child, {
                 isOpen: accordionState.has((child.props as any).value),
-                onToggle: () => accordionUpdate((child.props as any).value)
+                onToggle: () => accordionUpdate((child.props as any).value),
             } as any);
         }
         return child;
@@ -156,8 +156,10 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
     >
       {children}
       <span className={cn(
-        "transform transition-transform duration-500 will-change-transform",
-        isOpen && "rotate-180"
+        "transform transition-transform will-change-transform",
+        isOpen 
+          ? "rotate-180 duration-400 ease-out" 
+          : "rotate-0 duration-400 ease-in"
       )}>
         <AccordionIcon />
       </span>
@@ -167,33 +169,51 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
 
 AccordionTrigger.displayName = "AccordionTrigger";
 
+
 const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
-({ 
-  isOpen = false,
-  className, 
-  children, 
-  ...props 
-}, ref) => {
-  
-  return (
-    <div
-      ref={ref}
-      role="region"
-      className={cn(
-        "overflow-hidden transition-all bg-white will-change-[height,opacity]",
-        isOpen 
-          ? "max-h-[1000px] duration-[2000ms] ease-in-out" 
-          : "max-h-0 duration-700 ease-in-out", 
-        className
-      )}
-      {...props}
-    >
-      <div className="py-4 px-4">
-        {children}
+  ({ 
+    isOpen = false,
+    className, 
+    children, 
+    ...props 
+  }, ref) => {
+    
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [contentHeight, setContentHeight] = useState<number>(0);
+    
+    useEffect(() => {
+      if (contentRef.current) {
+        const height = contentRef.current.scrollHeight;
+        setContentHeight(height);
+      }
+    }); 
+
+    return (
+      <div
+        ref={ref}
+        role="region"
+        className={cn(
+          "overflow-hidden bg-white",
+          className
+        )}
+        style={{
+          maxHeight: isOpen ? `${contentHeight + 32}px` : '0', 
+          transitionDuration: isOpen ? '600ms' : '300ms',
+          transitionTimingFunction: isOpen ? 'ease-out' : 'ease-in-out',
+          willChange: 'max-height',
+        }}
+
+        {...props}
+      >
+        <div 
+          ref={contentRef}
+          className={cn("py-4 px-4")}
+        >
+          {children}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  });
 
 AccordionContent.displayName = 'AccordionContent';
 

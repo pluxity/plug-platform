@@ -8,12 +8,14 @@ import { Badge } from './src/components/Badge';
 import { Checkbox } from './src/components/Checkbox';
 import { RadioGroup, RadioGroupItem } from './src/components/Radio';
 import { Textarea } from './src/components/Textarea';
+import { Accordion } from './src/components/Accordion';
 import Input from './src/components/Input';
 
 // 컴포넌트 내보내기
-export { Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, RadioGroupItem, Textarea, Input };
+export { Accordion, Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, RadioGroupItem, Textarea, Input };
 
 // 타입 내보내기
+export type { AccordionProps } from './src/components/Accordion';
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from './src/components/Button/Button';
 export type { ModalProps } from './src/components/Modal';
 export type { PopupProps } from './src/components/Popup';

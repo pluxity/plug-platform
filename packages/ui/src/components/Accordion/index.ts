@@ -1,8 +1,8 @@
 import { 
-    Accordion, 
+    Accordion as AccordionComponent, 
     AccordionItem, 
     AccordionTrigger, 
-    AccordionContent 
+    AccordionContent, 
 } from './Accordion';
 
 import type { 
@@ -12,16 +12,17 @@ import type {
   AccordionContentProps 
 } from './Accordion.types'; 
 
-export { 
-    Accordion, 
-    AccordionItem, 
-    AccordionTrigger, 
-    AccordionContent,
-};
+const Accordion = Object.assign(AccordionComponent, {
+    Item: AccordionItem,
+    Trigger: AccordionTrigger,
+    Content: AccordionContent
+});
+
+export { Accordion };
 
 export type{
     AccordionProps, 
     AccordionItemProps,
     AccordionTriggerProps,
     AccordionContentProps,
-}
+};
