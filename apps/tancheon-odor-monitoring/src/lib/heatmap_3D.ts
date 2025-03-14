@@ -24,7 +24,6 @@ const DEFAULT_OPTIONS: Heatmap3DOptions = {
   useAbsoluteScale: true,   // 기본적으로 절대값 스케일 사용
 };
 
-// 색상 그라데이션 정의
 const colorScale = [
   { value: 1, color: Cesium.Color.BLUE.withAlpha(0.1) },
   { value: 25, color: Cesium.Color.CYAN.withAlpha(0.3) },
@@ -33,13 +32,8 @@ const colorScale = [
   { value: 100, color: Cesium.Color.RED.withAlpha(0.9) },
 ];
 
-// 동적 색상 매핑을 위한 내부 상태 변수
 let currentColorScale = [...colorScale];
 
-/**
- * 색상 스케일 업데이트 함수
- * @param newColorScale 새로운 색상 스케일
- */
 export function updateColorScale(newColorScale: Array<{ value: number, color: Cesium.Color }>): void {
   currentColorScale = [...newColorScale];
   console.log('3D 히트맵 색상 스케일이 업데이트되었습니다:', newColorScale);

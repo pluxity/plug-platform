@@ -178,35 +178,41 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     
     if (isChecked) {
       newSelectedHeights = [...selectedHeights, height];
-      
-      if (show3DHeatmap) {
-        if (simulationActive) {
-          generateSimulationDataForHeight(height, simulationStep);
-        } else {
-          generateBaseDataForHeight(height);
-        }
-      }
     } else {
       newSelectedHeights = selectedHeights.filter(h => h !== height);
     }
     
+    // 상태 업데이트
     setSelectedHeights(newSelectedHeights);
     
-    if (show2DHeatmap) {
+    // 다음 렌더 사이클에서 데이터 처리를 수행
+    setTimeout(() => {
       if (isChecked) {
-        await create2DHeatmap(height);
+        // 3D 히트맵 데이터 생성
+        if (show3DHeatmap) {
+          if (simulationActive) {
+            generateSimulationDataForHeight(height, simulationStep);
+          } else {
+            generateBaseDataForHeight(height);
+          }
+          create3DHeatmap(viewer, height);
+        }
+        
+        // 2D 히트맵 생성
+        if (show2DHeatmap) {
+          create2DHeatmap(height);
+        }
       } else {
-        await remove2DHeatmapAtHeight(height);
+        // 히트맵 제거
+        if (show3DHeatmap) {
+          removeHeatmapInstance(height, viewer);
+        }
+        
+        if (show2DHeatmap) {
+          remove2DHeatmapAtHeight(height);
+        }
       }
-    }
-    
-    if (show3DHeatmap && viewer) {
-      if (isChecked) {
-        await create3DHeatmap(viewer, height);
-      } else {
-        removeHeatmapInstance(height, viewer);
-      }
-    }
+    }, 0);
   };
   
   // 특정 고도의 2D 히트맵 제거 함수
@@ -406,9 +412,9 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       return;
     }
     
-    // 초기 단계 설정
-    setSimulationStep(0);
+    // 상태 업데이트를 따로 실행
     setSimulationActive(true);
+    setSimulationStep(0);
     
     // 오염 중심 재설정
     pollutionCenterRef.current = {
@@ -416,32 +422,35 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
       latitude: TANCHEON_LOCATION.latitude + (Math.random() * 0.002 - 0.001)
     };
     
-    // 기본 데이터로 초기화
-    generateBaseData(selectedHeights);
-    
-    // 초기 단계 시뮬레이션 시작
-    selectedHeights.forEach(height => {
-      generateSimulationDataForHeight(height, 0);
-    });
-    
-    // 3초 타이머 설정 (테스트용)
-    simulationTimerRef.current = setInterval(() => {
-      setSimulationStep(prevStep => {
-        const nextStep = prevStep + 1;
-        
-        // 모든 고도에 대해 다음 단계 데이터 생성
-        selectedHeights.forEach(height => {
-          generateSimulationDataForHeight(height, nextStep);
-        });
-        
-        // 10번째 단계 후 시뮬레이션 종료
-        if (nextStep >= 10) {
-          stopSimulation();
-        }
-        
-        return nextStep;
+    // 상태가 업데이트된 후 다음 렌더 사이클에서 시뮬레이션 데이터 생성을 예약
+    setTimeout(() => {
+      // 기본 데이터로 초기화
+      generateBaseData(selectedHeights);
+      
+      // 초기 단계 시뮬레이션 시작
+      selectedHeights.forEach(height => {
+        generateSimulationDataForHeight(height, 0);
       });
-    }, 3000); // 3초 (테스트용)
+      
+      // 3초 타이머 설정 (테스트용)
+      simulationTimerRef.current = setInterval(() => {
+        setSimulationStep(prevStep => {
+          const nextStep = prevStep + 1;
+          
+          // 모든 고도에 대해 다음 단계 데이터 생성
+          selectedHeights.forEach(height => {
+            generateSimulationDataForHeight(height, nextStep);
+          });
+          
+          // 10번째 단계 후 시뮬레이션 종료
+          if (nextStep >= 10) {
+            stopSimulation();
+          }
+          
+          return nextStep;
+        });
+      }, 3000);
+    }, 0);
   };
   
   // 시뮬레이션 중지 함수
@@ -514,24 +523,26 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     const newSelectedHeights = [...selectedHeights, ...heightsToAdd];
     setSelectedHeights(newSelectedHeights);
     
-    // 히트맵 생성 및 데이터 업데이트
-    if (show3DHeatmap) {
-      for (const height of heightsToAdd) {
-        await create3DHeatmap(viewer, height);
-        
-        if (simulationActive) {
-          generateSimulationDataForHeight(height, simulationStep);
-        } else {
-          generateBaseDataForHeight(height);
+    // 다음 렌더 사이클에서 히트맵 생성 및 데이터 업데이트 수행
+    setTimeout(() => {
+      if (show3DHeatmap) {
+        for (const height of heightsToAdd) {
+          create3DHeatmap(viewer, height);
+          
+          if (simulationActive) {
+            generateSimulationDataForHeight(height, simulationStep);
+          } else {
+            generateBaseDataForHeight(height);
+          }
         }
       }
-    }
-    
-    if (show2DHeatmap) {
-      for (const height of heightsToAdd) {
-        await create2DHeatmap(height);
+      
+      if (show2DHeatmap) {
+        for (const height of heightsToAdd) {
+          create2DHeatmap(height);
+        }
       }
-    }
+    }, 0);
   };
   
   // 모든 시뮬레이션 고도 선택 해제
@@ -547,18 +558,21 @@ export const MapToggleControls: React.FC<MapToggleControlsProps> = ({
     const newSelectedHeights = selectedHeights.filter(h => !SIMULATION_HEIGHTS.includes(h));
     setSelectedHeights(newSelectedHeights);
     
-    // 히트맵 제거
-    if (show3DHeatmap) {
-      for (const height of heightsToRemove) {
-        removeHeatmapInstance(height, viewer);
+    // 다음 렌더 사이클에서 히트맵 제거 수행
+    setTimeout(() => {
+      // 히트맵 제거
+      if (show3DHeatmap) {
+        for (const height of heightsToRemove) {
+          removeHeatmapInstance(height, viewer);
+        }
       }
-    }
-    
-    if (show2DHeatmap) {
-      for (const height of heightsToRemove) {
-        await remove2DHeatmapAtHeight(height);
+      
+      if (show2DHeatmap) {
+        for (const height of heightsToRemove) {
+          remove2DHeatmapAtHeight(height);
+        }
       }
-    }
+    }, 0);
   };
 
   return (

@@ -311,7 +311,7 @@ export function create2DHeatmap(
   
   // 히트맵 엔티티 생성 및 반환
   const entity = addHeatmapToViewer(viewer, canvas, heightLevel, heatmapOptions);
-    
+  
   return entity;
 }
 
