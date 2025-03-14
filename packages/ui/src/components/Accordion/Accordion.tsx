@@ -53,11 +53,11 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
     }
 
     const elementProps = React.Children.map(children, child => {
-        if (React.isValidElement(child) && (child.type as any) === AccordionItem) {
+        if (React.isValidElement(child) && child.type === AccordionItem) {
             return React.cloneElement(child, {
-                isOpen: accordionState.has((child.props as any).value),
-                onToggle: () => accordionUpdate((child.props as any).value),
-            } as any);
+                isOpen: accordionState.has((child.props as AccordionItemProps).value),
+                onToggle: () => accordionUpdate((child.props as AccordionItemProps).value),
+            } as AccordionItemProps);
         }
         return child;
     });
@@ -77,7 +77,6 @@ Accordion.displayName = 'Accordion';
 
 const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
 ({ 
-  value,
   disabled = false,
   isOpen = false, 
   onToggle,
@@ -92,22 +91,22 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
 
   const elementProps = React.Children.map(children, child => {
     if(React.isValidElement(child)){
-        if((child.type as any) === AccordionTrigger){
+        if((child.type as AccordionTriggerProps) === AccordionTrigger){
           return React.cloneElement(child, {
             isOpen,
             disabled,
             id: buttonId,
             "aria-controls": contentId,
             onToggle,
-          } as any);
+          } as AccordionTriggerProps);
         }
 
-        if((child.type as any) === AccordionContent){
+        if((child.type as AccordionContentProps) === AccordionContent){
           return React.cloneElement(child,{
             isOpen,
             id: contentId,
             "aria-labelledby": buttonId,
-          } as any);
+          } as AccordionContentProps);
         }
     }
     return child;
@@ -186,7 +185,7 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
         const height = contentRef.current.scrollHeight;
         setContentHeight(height);
       }
-    }); 
+    }, []); 
 
     return (
       <div

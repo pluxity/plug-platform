@@ -7,15 +7,13 @@ import { InputLabel } from "./InputLabel";
 import { InputText } from "./InputText";
 import { InputPassword } from "./InputPassword";
 
-export interface InputBoxProps extends React.PropsWithChildren<{
+export interface InputBoxProps extends React.HTMLAttributes<HTMLDivElement>{
   className?: string;
-  id?: string;
-}> {}
+}
 
 const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
   children,
   className,
-  id,
   ...props
 }, ref) => {
 
@@ -31,12 +29,12 @@ const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
     if (!React.isValidElement(child)) return child;
     
     if (child.type === InputLabel) {
-      return React.cloneElement(child as React.ReactElement<any>, { 
+      return React.cloneElement(child as React.ReactElement<HTMLLabelElement>, { 
         htmlFor: inputId,
         ...Object(child.props)
       });
     } else if (child.type === InputText || child.type === InputPassword) {
-      return React.cloneElement(child as React.ReactElement<any>, { 
+      return React.cloneElement(child as React.ReactElement<HTMLInputElement>, { 
         id: inputId,
         "aria-describedby": inputHelperTexts.length > 0 ? helperId : '',
         ...Object(child.props)
@@ -47,7 +45,7 @@ const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
   const helperTextsProp = inputHelperTexts.map(child => {
     if (!React.isValidElement(child)) return child;
     
-    return React.cloneElement(child as React.ReactElement<any>, { 
+    return React.cloneElement(child as React.ReactElement<HTMLParagraphElement>, { 
       id: helperId,
       ...Object(child.props)
     });
