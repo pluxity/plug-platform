@@ -12,7 +12,7 @@ import { Skeleton } from './src/components/Skeleton';
 import { Switch } from './src/components/Switch';
 import { Textarea } from './src/components/Textarea';
 import { Label } from './src/components/Label';
-import Input from './src/components/Input';
+import { Input } from './src/components/Input';
 
 // 컴포넌트 내보내기
 export { Accordion, Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea, Label, Input };
