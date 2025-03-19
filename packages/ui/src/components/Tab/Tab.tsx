@@ -14,15 +14,51 @@ const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
     children,
     ...props
 }, ref) => {
+    const [tabActive, setTabActive] = useState(0);
+    const handleTabClick = (index: number) => {
+        setTabActive(index);
+    };
+    const uniqueIdRef = useRef(uuidv4());
+
+    const tabTriggers = React.Children.toArray(children).filter(
+        (child) => React.isValidElement(child) && child.type === TabTrigger
+    );
+    const tabTriggerElement = tabTriggers.map((child, index) => {
+        if (React.isValidElement(child) && child.type === TabTrigger) {
+            return React.cloneElement(child, {
+                id: `trigger-${uniqueIdRef.current}-${index}`,
+                "aria-controls": `panel-${uniqueIdRef.current}-${index}`,
+                isActive: tabActive === index,
+                onClick: () => handleTabClick(index),
+            } as TabTriggerProps);
+        }
+        return child;
+    });
+
+    const tabContents = React.Children.toArray(children).filter(
+        (child) => React.isValidElement(child) && child.type === TabContent
+    );
+    const tabContentElement = tabContents.map((child, index) => {
+        if (React.isValidElement(child) && child.type === TabContent) {
+            return React.cloneElement(child, {
+                id: `panel-${uniqueIdRef.current}-${index}`,
+                "aria-labelledby": `trigger-${uniqueIdRef.current}-${index}`,
+                isActive: tabActive === index, 
+            } as TabContentProps);
+        }
+        return child;
+    });
+
     return(
         <div
-            className={cn("w-full" , className)}
+            className={cn("w-full", className)}
             ref={ref}
             {...props}
-        >
-            {children}
+        >   
+            {tabTriggerElement}
+            {tabContentElement}
         </div>
-    )
+    );
 });
 
 Tab.displayName = "Tab";
@@ -36,33 +72,6 @@ const TabList = React.forwardRef<HTMLDivElement, TabListProps>(({
 
     const tabListStyle = "flex item-center gap-1 w-full";
 
-    const uniqueIdRef = useRef(uuidv4());
-    const triggerId = `button-${uniqueIdRef.current}`;
-    const contentId = `content-${uniqueIdRef.current}`;
-
-    const [tabActive, setTabActive] = useState(0);
-    const handleTabClick = (index: number) => {
-        setTabActive(index);
-    }
-    const ElementProps = React.Children.map(children, (child, index) => {
-        if (React.isValidElement(child) && child.type === TabTrigger) {
-          return React.cloneElement(child, {
-            id: triggerId,
-            "aria-controls": contentId,
-            isActive: tabActive === index,
-            onClick: () => handleTabClick(index),
-          } as TabTriggerProps );
-        }
-        if (React.isValidElement(child) && child.type === TabContent) {
-            return React.cloneElement(child,{
-                id: contentId,
-                "aria-labelledby": triggerId,
-                isActive: tabActive === index,
-            } as TabContentProps );
-        }
-        return child;
-      });
-
 return(
     <div
         ref={ref}
@@ -75,7 +84,7 @@ return(
         )}
         {...props}
         >
-            {ElementProps}
+            {children}
         </div>
     )
 });
@@ -103,7 +112,6 @@ const TabTrigger = React.forwardRef<HTMLButtonElement, TabTriggerProps>(({
             className={cn(
                 tabTriggerStyle, 
                 tabTriggerAnimate,
-                
                 className
             )}
             ref={ref}

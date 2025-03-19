@@ -15,11 +15,11 @@ export const Default: Story = {
     render: (args: TabProps) => (
         <Tab {...args} className="w-100">
             <Tab.List>
-                <Tab.Trigger>첫번째 버튼</Tab.Trigger>
-                <Tab.Trigger>두번째 버튼</Tab.Trigger>
+                <Tab.Trigger>첫번째 탭</Tab.Trigger>
+                <Tab.Trigger>두번째 탭</Tab.Trigger>
             </Tab.List>
-            <Tab.Content>첫번째 내용</Tab.Content>
-            <Tab.Content>두번째 내용</Tab.Content>
+            <Tab.Content>첫번째 콘텐츠 영역</Tab.Content>
+            <Tab.Content>두번째 콘텐츠 영역</Tab.Content>
         </Tab>
     ),
     args:{
