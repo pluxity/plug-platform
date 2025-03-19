@@ -1,9 +1,7 @@
 
 import { LabelHTMLAttributes } from "react";
 export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
-    error?: boolean;
-    disabled?: boolean;
-    focused?: boolean;
+    color?: "primary" | "secondary" | "destructive";
     required?: boolean;
     size?: "small" | "medium" | "large";
     className?: string;

@@ -4,9 +4,7 @@ import type { LabelProps } from "./Label.types";
 
 const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
 ({
-    error,
-    disabled,
-    focused,
+    color = "primary",
     required,
     size = "medium",
     className,
@@ -14,11 +12,12 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
     ...props
 }, ref) => {
 
-    const labelColor = `text-black 
-    ${error && "text-red-600"} 
-    ${disabled && "text-gray-400 cursor-not-allowed"}
-    ${focused && "text-blue-600"}
-    ${required && "before:align-middle before:content-['*'] before:mr-[3px] before:text-red-600"}`;
+    const labelColor = {
+        primary: "text-primary-500",
+        secondary: "text-secondary-500",
+        destructive: "text-destructive-500"
+    }[color];
+    
 
     const labelSize = {
         small: "text-sm ", 
@@ -33,6 +32,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
             className={cn(
                 labelSize,
                 labelColor,
+                `${required && "before:align-middle before:content-['*'] before:mr-[3px] before:text-red-600 font-bold"}`,
                 className
             )}
             {...props}
