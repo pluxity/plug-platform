@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect, memo } from "react";
+import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea , Label ,Input, Card } from "@plug/ui";
+import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
 
@@ -33,30 +33,6 @@ const products = [
   }
 ];
 
-// 월간 판매량 차트 컴포넌트 (memo로 감싸서 불필요한 리렌더링 방지)
-const MonthlyBarChart = memo(({ data, options }: { data: ChartData, options: ChartOptions }) => {
-  return (
-    <Card className="h-full">
-      <Card.Header>
-        <Card.Title>월간 판매량 (막대 차트)</Card.Title>
-        <Card.Description>
-          월별 판매량을 보여주는 막대 차트입니다.
-        </Card.Description>
-      </Card.Header>
-      <Card.Content className="h-80">
-        <Chart
-          type="bar"
-          data={data}
-          options={options}
-          width="100%"
-          height="100%"
-          updateMode="default"
-        />
-      </Card.Content>
-    </Card>
-  );
-});
-
 function DesignSystem() {
   const [group1, setGroup1] = useState<string>('');
   const [group2, setGroup2] = useState<string>('');
@@ -69,6 +45,8 @@ function DesignSystem() {
   const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
 
   const [isSwitchChecked, setIsSwitchChecked] = useState<boolean>(false);
+
+  const [activeTab, setActiveTab] = useState<string>('tab1');
 
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
@@ -103,6 +81,10 @@ function DesignSystem() {
     setIsSwitchChecked(checked);
     console.log(checked);
   };
+
+  const tabOnChange = (value: string) => {
+    setActiveTab(value);
+};
 
   return (
     <>
@@ -161,6 +143,15 @@ function DesignSystem() {
       <Switch label="라벨이 노출됩니다."/>
       <h2 className="text-xl font-bold mt-8 mb-4">Textarea 컴포넌트 예제</h2>
       <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
+      <h2 className="text-xl font-bold mt-8 mb-4">Tab 컴포넌트 예제</h2>
+      <Tab className="w-100" value={activeTab} onValueChange={tabOnChange}>
+          <Tab.List>
+              <Tab.Trigger value="tab1">첫번째 탭</Tab.Trigger>
+              <Tab.Trigger value="tab2">두번째 탭</Tab.Trigger>
+          </Tab.List>
+          <Tab.Content value="tab1">첫번째 콘텐츠 영역</Tab.Content>
+          <Tab.Content value="tab2">두번째 콘텐츠 영역</Tab.Content>
+      </Tab>
       <h2 className="text-xl font-bold mt-8 mb-4">Label 컴포넌트 예제</h2>
       <div className="flex gap-1 items-center">
         <Label htmlFor="label-id" required>라벨명</Label>
@@ -356,28 +347,6 @@ function DesignSystem() {
             </Card.Footer>
           </Card>
         </div>
-        
-        {/* 차트 섹션 추가 */}
-        <h2 className="text-2xl font-bold mb-6 mt-10">차트 컴포넌트 샘플</h2>
-        
-        <div className="mb-6 text-center">
-          <Button 
-            variant="default" 
-            color="primary" 
-            onClick={toggleData}
-            className="px-4 py-2"
-          >
-            {isFirstHalf ? '7-12월 데이터 보기' : '1-6월 데이터 보기'}
-          </Button>
-          <p className="mt-2 text-gray-500">
-            현재 보는 데이터: {isFirstHalf ? '1-6월' : '7-12월'}
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <MonthlyBarChart data={barChartData} options={chartOptions} />
-        </div>
-      </div>
     </>
   )
 }

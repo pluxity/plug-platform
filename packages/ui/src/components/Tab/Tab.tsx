@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useState, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useState, useContext, createContext } from "react";
 import { cn } from "../../utils/classname";
 import type {
     TabProps,
@@ -9,94 +8,86 @@ import type {
     TabContentProps,
 } from "./Tab.types";
 
+interface TabContextProps {
+    currentValue?: string;
+    tabClick: (value: string) => void;
+}
+const TabContext = createContext<TabContextProps | undefined>(undefined);
+
 const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
+    defaultValue,
+    value,
+    onValueChange,
     className,
     children,
     ...props
 }, ref) => {
-    const [tabActive, setTabActive] = useState(0);
-    const handleTabClick = (index: number) => {
-        setTabActive(index);
+
+    const [isTabValue, setIsTabValue] = useState(defaultValue);
+    const isControlled = value !== undefined;
+    const currentValue = isControlled ? value : isTabValue;
+
+    const handleTab = (value: string) => {
+        if (!isControlled) {
+            setIsTabValue(value);
+        }
+        onValueChange?.(value);
     };
-    const uniqueIdRef = useRef(uuidv4());
-
-    const tabTriggers = React.Children.toArray(children).filter(
-        (child) => React.isValidElement(child) && child.type === TabTrigger
-    );
-    const tabTriggerElement = tabTriggers.map((child, index) => {
-        if (React.isValidElement(child) && child.type === TabTrigger) {
-            return React.cloneElement(child, {
-                id: `trigger-${uniqueIdRef.current}-${index}`,
-                "aria-controls": `panel-${uniqueIdRef.current}-${index}`,
-                isActive: tabActive === index,
-                onClick: () => handleTabClick(index),
-            } as TabTriggerProps);
-        }
-        return child;
-    });
-
-    const tabContents = React.Children.toArray(children).filter(
-        (child) => React.isValidElement(child) && child.type === TabContent
-    );
-    const tabContentElement = tabContents.map((child, index) => {
-        if (React.isValidElement(child) && child.type === TabContent) {
-            return React.cloneElement(child, {
-                id: `panel-${uniqueIdRef.current}-${index}`,
-                "aria-labelledby": `trigger-${uniqueIdRef.current}-${index}`,
-                isActive: tabActive === index, 
-            } as TabContentProps);
-        }
-        return child;
-    });
 
     return(
-        <div
-            className={cn("w-full", className)}
-            ref={ref}
-            {...props}
-        >   
-            {tabTriggerElement}
-            {tabContentElement}
-        </div>
+        <TabContext.Provider value={{ currentValue, tabClick: handleTab }}>
+            <div
+                className={cn("w-full", className)}
+                ref={ref}
+                {...props}
+            >   
+                {children}
+            </div>
+        </TabContext.Provider>
     );
 });
 
 Tab.displayName = "Tab";
 
-const TabList = React.forwardRef<HTMLDivElement, TabListProps>(({
+const TabList = ({
     ariaLabel,
     className,
     children,
     ...props
-}, ref) => {
-
+}: TabListProps) => {
     const tabListStyle = "flex item-center gap-1 w-full";
 
-return(
-    <div
-        ref={ref}
-        aria-orientation="horizontal"
-        aria-label={ariaLabel}
-        role="tablist"
-        className={cn(
-            tabListStyle,
-            className 
-        )}
-        {...props}
+    return(
+        <div
+            aria-orientation="horizontal"
+            aria-label={ariaLabel}
+            role="tablist"
+            className={cn(
+                tabListStyle,
+                className 
+            )}
+            {...props}
         >
             {children}
         </div>
     )
-});
+};
 
 TabList.displayName = "TabList";
 
-const TabTrigger = React.forwardRef<HTMLButtonElement, TabTriggerProps>(({
-    isActive,
+const TabTrigger = ({
     className,
     children,
+    value,
     ...props
-}, ref) => {
+}: TabTriggerProps) => {
+    const context = useContext(TabContext);
+    
+    if (!context) {
+      throw new Error("TabTrigger는 Tab 내부에서만 사용할 수 있습니다.");
+    }
+    const { currentValue , tabClick } = context;
+    const isActive = currentValue === value;
     
     const tabTriggerStyle = `
         inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2 border-transparent
@@ -109,32 +100,38 @@ const TabTrigger = React.forwardRef<HTMLButtonElement, TabTriggerProps>(({
             aria-selected={isActive}
             role="tab"
             type="button"
+            onClick={() => tabClick(value)}
             className={cn(
                 tabTriggerStyle, 
                 tabTriggerAnimate,
                 className
             )}
-            ref={ref}
             {...props}
         >
             {children}
         </button>
     )
-});
+};
 
 TabTrigger.displayName = "TabTrigger";
 
-const TabContent = React.forwardRef<HTMLDivElement, TabContentProps>(({
-    isActive,
+const TabContent = ({
     className,
     children,
+    value,
     ...props
-}, ref) => {
+}: TabContentProps) => {
+    const context = useContext(TabContext);
+    
+    if (!context) {
+      throw new Error("TabContent는 Tab 내부에서만 사용할 수 있습니다.");
+    }
+    const { currentValue } = context;
+    const isActive = currentValue === value;
     
     const tabContentStyle = `
         mt-3 transition-all ease-in-out duration-300,
         ${isActive ? "block" : "hidden"}`;
-
     
     return(
         <div
@@ -144,13 +141,12 @@ const TabContent = React.forwardRef<HTMLDivElement, TabContentProps>(({
                 tabContentStyle, 
                 className
             )}
-            ref={ref}
             {...props}
         >
             {children}
         </div>
     )
-});
+};
 
 TabContent.displayName = "TabContent";
 
