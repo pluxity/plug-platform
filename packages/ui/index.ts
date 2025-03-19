@@ -33,5 +33,7 @@ export type { SwitchProps } from './src/components/Switch';
 export type { TextareaProps } from './src/components/Textarea';
 export type { LabelProps } from './src/components/Label';
 export type { InputProps } from './src/components/Input';
+export type { ChartProps } from './src/components/Chart';
 
-
+// chart.js 타입 내보내기
+export type { ChartData, ChartOptions } from 'chart.js';
