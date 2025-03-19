@@ -11,18 +11,23 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
     disabled = false,
     defaultChecked = false,
     onChange,
+    checked,
     className,
     ...props
 }, ref) => {
 
     const [switchChecked, setSwitchChecked] = useState(defaultChecked);
-    const switchHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const switchState = e.target.checked;
-        setSwitchChecked(switchState);
-        // console.log(switchState);
 
-        onChange?.(switchState);
-    }
+    const isControlled = checked !== undefined;
+    const currentChecked = isControlled ? checked : switchChecked;
+  
+    const switchHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newChecked = e.target.checked;
+      if (!isControlled) {
+        setSwitchChecked(newChecked);
+      }
+      onChange && onChange(newChecked);
+    };
 
     const switchLabelStyle = "inline-flex items-center cursor-pointer gap-1";
     const switchLabelText = {
@@ -43,7 +48,7 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
     }[color];
 
     const switchButtonStyle = "before:content-[''] before:absolute before:rounded-full before:left-[1px] before:top-[50%] before:transform before:-translate-y-1/2 before:bg-gray-600 before:transition-transform before:duration-300 before:ease-in-out"
-    const switchStateStyle = `${switchChecked 
+    const switchStateStyle = `${currentChecked 
         ? "checked:before:bg-white disabled:border-gray-400 disabled:bg-gray-300 transition-all duration-300 ease-in-out before:transition-transform before:duration-300 before:ease-in-out" 
         : "disabled:opacity-50 transition-all duration-300 ease-in-out before:transition-transform before:duration-300 before:ease-in-out"} disabled:cursor-not-allowed checked:before:translate-x-full`;
 
@@ -58,8 +63,8 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
                 onChange={switchHandle}
                 role="switch" 
                 type="checkbox"
-                checked={switchChecked}
-                aria-checked={switchChecked}
+                checked={currentChecked}
+                aria-checked={currentChecked}
                 disabled={disabled}
                 aria-disabled={disabled}
                 className={cn(
@@ -74,7 +79,6 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
             />
             {label && (
                 <span 
-                
                     className={cn(switchLabelText, `${disabled ? "text-gray-400 cursor-not-allowed" : "text-black"}`)}
                 >{label}</span>
             )}

@@ -46,6 +46,8 @@ function DesignSystem() {
   const [textareaValue, setTextareaValue] = useState<string>('');
   const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
 
+  const [isSwitchChecked, setIsSwitchChecked] = useState<boolean>(false);
+
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
       setInputTextInvalid(value.length <= 10);
@@ -73,6 +75,11 @@ function DesignSystem() {
     const value = e.target.value;
     setTextareaValue(value);
     textareaDebounced(value);
+  };
+
+  const SwitchOnChange = (checked: boolean) => {
+    setIsSwitchChecked(checked);
+    console.log(checked);
   };
 
   return (
@@ -128,8 +135,8 @@ function DesignSystem() {
         </div>
       </div>
       <h2 className="text-xl font-bold mt-8 mb-4">Switch 컴포넌트 예제</h2>
-      <Switch size="medium" color="secondary"/>
-      <Switch disabled label="라벨이 노출됩니다."/>
+      <Switch checked={isSwitchChecked} onChange={SwitchOnChange} size="medium" color="secondary"/>
+      <Switch label="라벨이 노출됩니다."/>
       <h2 className="text-xl font-bold mt-8 mb-4">Textarea 컴포넌트 예제</h2>
       <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
       <h2 className="text-xl font-bold mt-8 mb-4">Label 컴포넌트 예제</h2>

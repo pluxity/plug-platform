@@ -5,5 +5,6 @@ export interface SwitchProps {
     disabled?: boolean;
     defaultChecked?: boolean;
     onChange?: (checked: boolean) => void;
+    checked?: boolean;
     className?: string;
 }
