@@ -1,3 +1,4 @@
+import { Accordion } from './src/components/Accordion';
 import { Button } from './src/components/Button/Button';
 import { Modal } from './src/components/Modal';
 import { Popup } from './src/components/Popup';
@@ -7,13 +8,13 @@ import { Card } from './src/components/Card';
 import { Badge } from './src/components/Badge';
 import { Checkbox } from './src/components/Checkbox';
 import { RadioGroup, RadioGroupItem } from './src/components/Radio';
-import { Textarea } from './src/components/Textarea';
-import { Accordion } from './src/components/Accordion';
 import { Skeleton } from './src/components/Skeleton';
+import { Textarea } from './src/components/Textarea';
+import { Label } from './src/components/Label';
 import Input from './src/components/Input';
 
 // 컴포넌트 내보내기
-export { Accordion, Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Textarea, Input };
+export { Accordion, Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Textarea, Label, Input };
 
 // 타입 내보내기
 export type { AccordionProps } from './src/components/Accordion';
@@ -28,6 +29,7 @@ export type { CheckboxProps } from './src/components/Checkbox';
 export type { RadioGroupProps, RadioGroupItemProps } from './src/components/Radio';
 export type { SkeletonProps } from './src/components/Skeleton';
 export type { TextareaProps } from './src/components/Textarea';
+export type { LabelProps } from './src/components/Label';
 export type { InputProps } from './src/components/Input';
 
 
