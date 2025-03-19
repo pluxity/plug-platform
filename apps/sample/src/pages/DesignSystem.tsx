@@ -1,8 +1,12 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { debounce } from "lodash";
 
+<<<<<<< HEAD
 import { Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Textarea, Input, Card, Chart, ChartOptions, ChartData } from "@plug/ui";
 
+=======
+import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Textarea, Label, Input, Card } from "@plug/ui";
+>>>>>>> 10be572df16fbd6825815034ca011ba2ff8d1413
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
 
@@ -165,6 +169,7 @@ function DesignSystem() {
 
   return (
     <>
+<<<<<<< HEAD
       <div className="h-[calc(100%-60px)] w-screen p-12  overflow-y-auto">
         <div className="bg-gray-400 text-sm p-2 my-2">버튼 Guide</div>
         <Button variant="outline" color="primary">
@@ -189,6 +194,71 @@ function DesignSystem() {
         <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
         <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
         <div className="bg-gray-300 text-sm px-1">Input 묶음</div>
+=======
+      <h2 className="text-xl font-bold mt-8 mb-4">Accordion 컴포넌트 예제</h2>
+      <Accordion collapsible={false}>
+        <Accordion.Item value="item-1">
+          <Accordion.Trigger>첫 번째 항목</Accordion.Trigger>
+          <Accordion.Content>
+            첫 번째 항목의 내용입니다. 
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="item-2">
+          <Accordion.Trigger>두 번째 항목</Accordion.Trigger>
+          <Accordion.Content>
+            두 번째 항목의 내용입니다.
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="item-3">
+          <Accordion.Trigger>세 번째 항목</Accordion.Trigger>
+          <Accordion.Content>
+            세 번째 항목의 내용입니다.
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
+      <h2 className="text-xl font-bold mt-8 mb-4">Button 컴포넌트 예제</h2>
+      <Button variant="outline" color="primary">
+        <MenuIcon />버튼
+      </Button>
+      <h2 className="text-xl font-bold mt-8 mb-4">Time 컴포넌트 예제</h2>
+      <p className="flex gap-2 items-center font-bold text-sm">시간</p>
+      <h2 className="text-xl font-bold mt-8 mb-4">Badge 컴포넌트 예제</h2>
+      <Badge>뱃지</Badge>
+      <h2 className="text-xl font-bold mt-8 mb-4">Checkbox 컴포넌트 예제</h2>
+      <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
+      <h2 className="text-xl font-bold mt-8 mb-4">RadioButton 컴포넌트 예제</h2>
+      <RadioGroup variant="primary" defaultValue="1" name="group1" onChange={(value) => { setGroup1(value); }}>
+        <RadioGroupItem value="1" label="option1"/>
+        <RadioGroupItem value="2" label="option2" disabled/>
+      </RadioGroup>
+      <RadioGroup variant="secondary" defaultValue="3" name="group2" onChange={setGroup2}>
+        <RadioGroupItem value="3" label="option3"/>
+        <RadioGroupItem value="4" label="option4" />
+      </RadioGroup>
+      <h2 className="text-xl font-bold mt-8 mb-4">Skeleton 컴포넌트 예제</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton variant="circle" className="w-[180px] h-[180px]"></Skeleton>
+        <Skeleton variant="rectangle" className="w-[200px] h-[100px]"></Skeleton>
+        <div className="flex flex-col gap-2 w-[200px]">
+          <Skeleton variant="text"></Skeleton>
+          <Skeleton variant="text"></Skeleton>
+          <Skeleton variant="text"></Skeleton>
+        </div>
+      </div>
+      <h2 className="text-xl font-bold mt-8 mb-4">Textarea 컴포넌트 예제</h2>
+      <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
+      <h2 className="text-xl font-bold mt-8 mb-4">Label 컴포넌트 예제</h2>
+      <div className="flex gap-1 items-center">
+        <Label htmlFor="label-id" required>라벨명</Label>
+        <Input.Text id="label-id" placeholder="텍스트를 입력하세요" />
+      </div>
+      <h2 className="text-xl font-bold mt-8 mb-4">Input 컴포넌트 예제</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Input 단독 사용 예제 */}
+        <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
+        <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
+        {/* Input 묶음 사용 Input Box 예제 */}
+>>>>>>> 10be572df16fbd6825815034ca011ba2ff8d1413
         <Input.Box> 
           <Input.Label>라벨</Input.Label>
           <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
@@ -200,12 +270,25 @@ function DesignSystem() {
           <Input.Label>라벨</Input.Label>
           <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
         </Input.Box>
-        <div className="bg-gray-300 text-sm px-1">Input 단독사용</div>
-        <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
-        <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
-        <label>{group1}</label>
-        <label>{group2}</label>
+      </div>
+      <h2 className="text-xl font-bold mt-8 mb-4">Card 컴포넌트 예제 (합성 패턴)</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 기본 카드 예제 */}
+        <Card>
+          <Card.Header>
+            <Card.Title>기본 카드</Card.Title>
+            <Card.Description>카드 설명이 여기에 들어갑니다.</Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <p>카드 내용이 여기에 들어갑니다. 다양한 컨텐츠를 포함할 수 있습니다.</p>
+          </Card.Content>
+          <Card.Footer>
+            <Button variant="default" color="primary" className="mr-2">확인</Button>
+            <Button variant="outline">취소</Button>
+          </Card.Footer>
+        </Card>
         
+<<<<<<< HEAD
         <h2 className="text-xl font-bold mt-8 mb-4">Card 컴포넌트 예제 (합성 패턴)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 기본 카드 예제 */}
@@ -266,6 +349,50 @@ function DesignSystem() {
           </Card>
         </div>
         
+=======
+        {/* 닫기 버튼이 있는 카드 */}
+        <Card closable onClose={() => alert('카드가 닫혔습니다.')}>
+          <Card.Header>
+            <Card.Title>닫기 버튼이 있는 카드</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <p>오른쪽 상단의 X 버튼을 클릭하여 이 카드를 닫을 수 있습니다.</p>
+          </Card.Content>
+        </Card>
+        
+        {/* 제품 정보 카드 */}
+        <Card className="bg-gray-50">
+          <Card.Header>
+            <Card.Title>제품 정보</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            {products.length > 0 && (
+              <div>
+                <h4 className="font-medium">{products[0].name}</h4>
+                <p className="text-gray-600 mt-1">가격: {products[0].price.toLocaleString()}원</p>
+                <Badge color="primary" className="mt-2">{products[0].category}</Badge>
+              </div>
+            )}
+          </Card.Content>
+          <Card.Footer>
+            <Button variant="default" color="primary">구매하기</Button>
+          </Card.Footer>
+        </Card>
+        
+        {/* 커스텀 스타일 카드 */}
+        <Card className="bg-blue-50 border-blue-200">
+          <Card.Header className="border-b border-blue-100">
+            <Card.Title className="text-blue-800">커스텀 스타일 카드</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <p>각 컴포넌트에 className을 전달하여 스타일을 커스터마이징할 수 있습니다.</p>
+          </Card.Content>
+          <Card.Footer className="justify-end">
+            <Button variant="outline" color="primary">자세히 보기</Button>
+          </Card.Footer>
+        </Card>
+      </div>
+>>>>>>> 10be572df16fbd6825815034ca011ba2ff8d1413
       
         <h2 className="text-2xl font-bold mb-6">카드 컴포넌트 샘플</h2>
         
