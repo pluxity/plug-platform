@@ -50,12 +50,22 @@ const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
 Tab.displayName = "Tab";
 
 const TabList = ({
+    color = "primary",
     ariaLabel,
     className,
     children,
     ...props
 }: TabListProps) => {
     const tabListStyle = "flex item-center gap-1 w-full";
+
+    const elementProps = React.Children.map(children, child => {
+        if (React.isValidElement(child) && child.type === TabTrigger) {
+            return React.cloneElement(child, {
+                color,
+            } as TabTriggerProps);
+        }
+        return child;
+    });
 
     return(
         <div
@@ -68,7 +78,7 @@ const TabList = ({
             )}
             {...props}
         >
-            {children}
+            {elementProps}
         </div>
     )
 };
@@ -76,6 +86,7 @@ const TabList = ({
 TabList.displayName = "TabList";
 
 const TabTrigger = ({
+    color = "primary",
     className,
     children,
     value,
@@ -91,9 +102,14 @@ const TabTrigger = ({
     
     const tabTriggerStyle = `
         inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2 border-transparent
-        ${isActive && "text-primary-500 border-b-2 border-primary-500"}
+        ${isActive && "border-b-2"}
     `;
     const tabTriggerAnimate = "transition-all ease-in-out duration-300";
+
+    const tabTriggerColor = {
+        primary:  isActive && "text-primary-500 border-primary-500",
+        secondary:  isActive && "text-secondary-500 border-secondary-500",
+    }[color];
    
     return(
         <button
@@ -104,6 +120,7 @@ const TabTrigger = ({
             className={cn(
                 tabTriggerStyle, 
                 tabTriggerAnimate,
+                tabTriggerColor,
                 className
             )}
             {...props}
