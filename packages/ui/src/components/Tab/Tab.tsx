@@ -93,14 +93,14 @@ const TabTrigger = ({
     const context = useContext(TabContext);
     
     if (!context) {
-      throw new Error("TabTrigger는 Tab 내부에서만 사용할 수 있습니다.");
+      throw new Error("TabTrigger must be used within a Tab component.  Ensure that <Tab.Trigger> is nested inside of a <Tab> component.");
     }
     const { currentValue , setCurrentValue } = context;
     const isActive = currentValue === value;
     
     const tabTriggerStyle = `
-        inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2 border-transparent
-        ${isActive && "border-b-2"}
+        inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2
+        ${isActive ? "border-b-2" : "border-transparent"}
     `;
     const tabTriggerAnimate = "transition-all ease-in-out duration-300";
 
@@ -139,7 +139,7 @@ const TabContent = ({
     const context = useContext(TabContext);
     
     if (!context) {
-      throw new Error("TabContent는 Tab 내부에서만 사용할 수 있습니다.");
+      throw new Error("TabContent must be used within a Tab component. Ensure that <Tab.Content> is nested inside of a <Tab> component.");
     }
     const { currentValue } = context;
     const isActive = currentValue === value;
