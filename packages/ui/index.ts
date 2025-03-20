@@ -4,7 +4,9 @@ import { Modal } from './src/components/Modal';
 import { Popup } from './src/components/Popup';
 import { Dialog } from './src/components/Dialog';
 import { Time } from './src/components/Time';
+import { Tab } from './src/components/Tab';
 import { Card } from './src/components/Card';
+import { Chart } from './src/components/Chart';
 import { Badge } from './src/components/Badge';
 import { Checkbox } from './src/components/Checkbox';
 import { RadioGroup, RadioGroupItem } from './src/components/Radio';
@@ -15,7 +17,7 @@ import { Label } from './src/components/Label';
 import { Input } from './src/components/Input';
 
 // 컴포넌트 내보내기
-export { Accordion, Button, Modal, Popup, Dialog, Time, Card, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea, Label, Input };
+export { Accordion, Button, Modal, Popup, Dialog, Time, Tab, Card, Chart, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea, Label, Input };
 
 // 타입 내보내기
 export type { AccordionProps } from './src/components/Accordion';
@@ -24,6 +26,7 @@ export type { ModalProps } from './src/components/Modal';
 export type { PopupProps } from './src/components/Popup';
 export type { DialogProps } from './src/components/Dialog';
 export type { TimeProps } from './src/components/Time';
+export type { TabProps } from './src/components/Tab';
 export type { CardProps } from './src/components/Card';
 export type { BadgeProps } from './src/components/Badge';
 export type { CheckboxProps } from './src/components/Checkbox';
