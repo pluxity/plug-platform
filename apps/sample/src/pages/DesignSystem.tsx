@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
+import { Accordion, Button, Badge, Checkbox, Skeleton, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
 
@@ -34,8 +34,6 @@ const products = [
 ];
 
 function DesignSystem() {
-  const [group1, setGroup1] = useState<string>('');
-  const [group2, setGroup2] = useState<string>('');
 
   const [inputTextValue, setInputTextValue] = useState<string>('');
   const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
@@ -119,15 +117,6 @@ function DesignSystem() {
       <Badge>뱃지</Badge>
       <h2 className="text-xl font-bold mt-8 mb-4">Checkbox 컴포넌트 예제</h2>
       <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
-      <h2 className="text-xl font-bold mt-8 mb-4">RadioButton 컴포넌트 예제</h2>
-      <RadioGroup variant="primary" defaultValue="1" name="group1" onChange={(value) => { setGroup1(value); }}>
-        <RadioGroupItem value="1" label="option1"/>
-        <RadioGroupItem value="2" label="option2" disabled/>
-      </RadioGroup>
-      <RadioGroup variant="secondary" defaultValue="3" name="group2" onChange={setGroup2}>
-        <RadioGroupItem value="3" label="option3"/>
-        <RadioGroupItem value="4" label="option4" />
-      </RadioGroup>
       <h2 className="text-xl font-bold mt-8 mb-4">Skeleton 컴포넌트 예제</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Skeleton variant="circle" className="w-[180px] h-[180px]"></Skeleton>

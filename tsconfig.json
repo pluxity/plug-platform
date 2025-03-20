@@ -39,5 +39,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "**/*.d.ts", "**/packages/engine/**"]
+  "exclude": ["node_modules", "dist", "**/*.d.ts"]
 }

@@ -26,7 +26,10 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
       if (!isControlled) {
         setSwitchChecked(newChecked);
       }
-      onChange && onChange(newChecked);
+
+      if(onChange) {
+        onChange(newChecked);
+      }
     };
 
     const switchLabelStyle = "inline-flex items-center cursor-pointer gap-1";
@@ -64,9 +67,7 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
                 role="switch" 
                 type="checkbox"
                 checked={currentChecked}
-                aria-checked={currentChecked}
                 disabled={disabled}
-                aria-disabled={disabled}
                 className={cn(
                     switchInputWrap,
                     switchInputSize,
