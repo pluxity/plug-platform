@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Tab } from '../Tab';
-import type { TabProps } from './Tab.types';
 import { useState } from "react";
 
 const meta: Meta<typeof Tab> = {
@@ -19,7 +18,7 @@ export default meta;
 type Story = StoryObj<typeof Tab>;
 
 export const Default: Story = {
-    render: (args: TabProps) => (
+    render: (args) => (
         <Tab {...args} className="w-100" defaultValue="tab1">
             <Tab.List>
                 <Tab.Trigger value="tab1">첫번째 탭</Tab.Trigger>

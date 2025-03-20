@@ -11,13 +11,14 @@ import { Badge } from './src/components/Badge';
 import { Checkbox } from './src/components/Checkbox';
 import { RadioGroup, RadioGroupItem } from './src/components/Radio';
 import { Skeleton } from './src/components/Skeleton';
+import { Slider } from './src/components/Slider';
 import { Switch } from './src/components/Switch';
 import { Textarea } from './src/components/Textarea';
 import { Label } from './src/components/Label';
 import { Input } from './src/components/Input';
 
 // 컴포넌트 내보내기
-export { Accordion, Button, Modal, Popup, Dialog, Time, Tab, Card, Chart, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Switch, Textarea, Label, Input };
+export { Accordion, Button, Modal, Popup, Dialog, Time, Tab, Card, Chart, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Slider, Switch, Textarea, Label, Input };
 
 // 타입 내보내기
 export type { AccordionProps } from './src/components/Accordion';
@@ -32,6 +33,7 @@ export type { BadgeProps } from './src/components/Badge';
 export type { CheckboxProps } from './src/components/Checkbox';
 export type { RadioGroupProps, RadioGroupItemProps } from './src/components/Radio';
 export type { SkeletonProps } from './src/components/Skeleton';
+export type { SliderProps } from './src/components/Slider';
 export type { SwitchProps } from './src/components/Switch';
 export type { TextareaProps } from './src/components/Textarea';
 export type { LabelProps } from './src/components/Label';

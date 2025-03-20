@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { Accordion, Button, Badge, Checkbox, Skeleton, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
+import { Accordion, Button, Badge, Checkbox, Skeleton, Slider, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
 
@@ -46,6 +46,8 @@ function DesignSystem() {
 
   const [activeTab, setActiveTab] = useState<string>('tab1');
 
+  const [sliderValue, setSliderValue] = useState<number>(20);
+
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
       setInputTextInvalid(value.length <= 10);
@@ -82,7 +84,11 @@ function DesignSystem() {
 
   const tabOnChange = (value: string) => {
     setActiveTab(value);
-};
+  };
+
+  const SliderChangeValue = (value: number) => {
+      setSliderValue(value);
+  };
 
   return (
     <>
@@ -127,6 +133,13 @@ function DesignSystem() {
           <Skeleton variant="text"></Skeleton>
         </div>
       </div>
+      <h2 className="text-xl font-bold mt-8 mb-4">Slider 컴포넌트 예제</h2>
+      <Slider className="w-[200px]" color="secondary" size="medium" value={sliderValue} onValueChange={SliderChangeValue}>
+          <Slider.Track>
+              <Slider.Thumb />
+          </Slider.Track>
+          <Slider.Range />
+      </Slider>
       <h2 className="text-xl font-bold mt-8 mb-4">Switch 컴포넌트 예제</h2>
       <Switch checked={isSwitchChecked} onChange={SwitchOnChange} size="medium" color="secondary"/>
       <Switch label="라벨이 노출됩니다."/>
