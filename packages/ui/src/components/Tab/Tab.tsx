@@ -10,7 +10,7 @@ import type {
 
 interface TabContextProps {
     currentValue?: string;
-    tabClick: (value: string) => void;
+    setCurrentValue: (value: string) => void;
 }
 const TabContext = createContext<TabContextProps | undefined>(undefined);
 
@@ -27,7 +27,7 @@ const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : isTabValue;
 
-    const handleTab = (value: string) => {
+    const setCurrentValue = (value: string) => {
         if (!isControlled) {
             setIsTabValue(value);
         }
@@ -35,7 +35,7 @@ const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
     };
 
     return(
-        <TabContext.Provider value={{ currentValue, tabClick: handleTab }}>
+        <TabContext.Provider value={{ currentValue, setCurrentValue }}>
             <div
                 className={cn("w-full", className)}
                 ref={ref}
@@ -51,7 +51,6 @@ Tab.displayName = "Tab";
 
 const TabList = ({
     color = "primary",
-    ariaLabel,
     className,
     children,
     ...props
@@ -70,7 +69,6 @@ const TabList = ({
     return(
         <div
             aria-orientation="horizontal"
-            aria-label={ariaLabel}
             role="tablist"
             className={cn(
                 tabListStyle,
@@ -97,7 +95,7 @@ const TabTrigger = ({
     if (!context) {
       throw new Error("TabTrigger는 Tab 내부에서만 사용할 수 있습니다.");
     }
-    const { currentValue , tabClick } = context;
+    const { currentValue , setCurrentValue } = context;
     const isActive = currentValue === value;
     
     const tabTriggerStyle = `
@@ -116,7 +114,7 @@ const TabTrigger = ({
             aria-selected={isActive}
             role="tab"
             type="button"
-            onClick={() => tabClick(value)}
+            onClick={() => setCurrentValue(value)}
             className={cn(
                 tabTriggerStyle, 
                 tabTriggerAnimate,

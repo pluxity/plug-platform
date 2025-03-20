@@ -9,7 +9,6 @@ export interface TabProps extends HTMLAttributes<HTMLDivElement>{
 
 export interface TabListProps extends HTMLAttributes<HTMLDivElement>{
     color?: "primary" | "secondary";
-    ariaLabel?: string;
     className?: string;
 }
 
