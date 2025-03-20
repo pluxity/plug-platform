@@ -1,11 +1,9 @@
-
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { Accordion, Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Skeleton, Textarea, Input, Card } from "@plug/ui";
+import { Accordion, Button, Badge, Checkbox, Skeleton, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
-
 
 // 제품 데이터 샘플
 const products = [
@@ -36,8 +34,6 @@ const products = [
 ];
 
 function DesignSystem() {
-  const [group1, setGroup1] = useState<string>('');
-  const [group2, setGroup2] = useState<string>('');
 
   const [inputTextValue, setInputTextValue] = useState<string>('');
   const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
@@ -45,6 +41,10 @@ function DesignSystem() {
 
   const [textareaValue, setTextareaValue] = useState<string>('');
   const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
+
+  const [isSwitchChecked, setIsSwitchChecked] = useState<boolean>(false);
+
+  const [activeTab, setActiveTab] = useState<string>('tab1');
 
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
@@ -74,6 +74,15 @@ function DesignSystem() {
     setTextareaValue(value);
     textareaDebounced(value);
   };
+
+  const SwitchOnChange = (checked: boolean) => {
+    setIsSwitchChecked(checked);
+    console.log(checked);
+  };
+
+  const tabOnChange = (value: string) => {
+    setActiveTab(value);
+};
 
   return (
     <>
@@ -108,15 +117,6 @@ function DesignSystem() {
       <Badge>뱃지</Badge>
       <h2 className="text-xl font-bold mt-8 mb-4">Checkbox 컴포넌트 예제</h2>
       <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
-      <h2 className="text-xl font-bold mt-8 mb-4">RadioButton 컴포넌트 예제</h2>
-      <RadioGroup variant="primary" defaultValue="1" name="group1" onChange={(value) => { setGroup1(value); }}>
-        <RadioGroupItem value="1" label="option1"/>
-        <RadioGroupItem value="2" label="option2" disabled/>
-      </RadioGroup>
-      <RadioGroup variant="secondary" defaultValue="3" name="group2" onChange={setGroup2}>
-        <RadioGroupItem value="3" label="option3"/>
-        <RadioGroupItem value="4" label="option4" />
-      </RadioGroup>
       <h2 className="text-xl font-bold mt-8 mb-4">Skeleton 컴포넌트 예제</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Skeleton variant="circle" className="w-[180px] h-[180px]"></Skeleton>
@@ -127,8 +127,25 @@ function DesignSystem() {
           <Skeleton variant="text"></Skeleton>
         </div>
       </div>
+      <h2 className="text-xl font-bold mt-8 mb-4">Switch 컴포넌트 예제</h2>
+      <Switch checked={isSwitchChecked} onChange={SwitchOnChange} size="medium" color="secondary"/>
+      <Switch label="라벨이 노출됩니다."/>
       <h2 className="text-xl font-bold mt-8 mb-4">Textarea 컴포넌트 예제</h2>
       <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
+      <h2 className="text-xl font-bold mt-8 mb-4">Tab 컴포넌트 예제</h2>
+      <Tab className="w-100" value={activeTab} onValueChange={tabOnChange}>
+          <Tab.List>
+              <Tab.Trigger value="tab1">첫번째 탭</Tab.Trigger>
+              <Tab.Trigger value="tab2">두번째 탭</Tab.Trigger>
+          </Tab.List>
+          <Tab.Content value="tab1">첫번째 콘텐츠 영역</Tab.Content>
+          <Tab.Content value="tab2">두번째 콘텐츠 영역</Tab.Content>
+      </Tab>
+      <h2 className="text-xl font-bold mt-8 mb-4">Label 컴포넌트 예제</h2>
+      <div className="flex gap-1 items-center">
+        <Label htmlFor="label-id" required>라벨명</Label>
+        <Input.Text id="label-id" placeholder="텍스트를 입력하세요" />
+      </div>
       <h2 className="text-xl font-bold mt-8 mb-4">Input 컴포넌트 예제</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input 단독 사용 예제 */}
@@ -207,7 +224,6 @@ function DesignSystem() {
         </Card>
       </div>
       
-      <div className="container mx-auto py-8 px-4">
         <h2 className="text-2xl font-bold mb-6">카드 컴포넌트 샘플</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -254,7 +270,6 @@ function DesignSystem() {
             </Card.Footer>
           </Card>
           
-          {/* 통계 카드 */}
           <Card className="bg-gray-50">
             <Card.Header>
               <Card.Title>월간 통계</Card.Title>
@@ -321,7 +336,6 @@ function DesignSystem() {
             </Card.Footer>
           </Card>
         </div>
-      </div>
     </>
   )
 }
