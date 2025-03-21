@@ -14,8 +14,8 @@ interface SliderContextProps {
     min: number;
     max: number;
     step?: number;
-    size?: 'small' | 'medium' | 'large';
-    color?: 'primary' | 'secondary';
+    size: 'small' | 'medium' | 'large';
+    color: 'primary' | 'secondary';
 }
 
 const SliderContext = React.createContext<SliderContextProps | undefined>(undefined);
@@ -88,10 +88,10 @@ const SliderTrack = React.forwardRef<HTMLDivElement, SliderTrackProps>(({
         throw new Error('SliderTrack은 Slider 구성 요소 내에서 사용해야 합니다. <Slider.Track>가 <Slider> 구성 요소 내부에 중첩되어 있는지 확인하세요.');
     }
 
-    const { currentValue, min, max, color = 'primary', disabled } = context;
+    const { currentValue, min, max, color, disabled } = context;
     const sliderTrackWidth = ((currentValue - min) / (max - min)) * 100;
 
-    const sliderTrackStyle = `absolute h-full rounded-full ${disabled && 'bg-gray-300'}`;
+    const sliderTrackStyle = `absolute h-full rounded-full ${disabled ? 'bg-gray-300' : ''}`;
     const sliderTrackColor = {
         primary: 'bg-primary-500',
         secondary: 'bg-secondary-500',
@@ -107,7 +107,8 @@ const SliderTrack = React.forwardRef<HTMLDivElement, SliderTrackProps>(({
             )}
             style={{ width: `${sliderTrackWidth}%` }}
             {...props}
-        />
+        >
+        </div>
     );
 });
 
@@ -123,10 +124,10 @@ const SliderThumb = ({
         throw new Error('SliderThumb은 Slider 구성 요소 내에서 사용해야 합니다. <Slider.Thumb>이 <Slider> 구성 요소 내부에 중첩되어 있는지 확인하세요.');
     }
 
-    const { size = 'small', disabled } = context;
+    const { size, disabled } = context;
 
     const sliderThumbStyle = `absolute bg-white shadow-[0_2px_3px_3px_rgba(0,0,0,0.2)] rounded-full -translate-y-1/2 -translate-x-1/2 top-1/2 left-full 
-    ${disabled && `cursor-not-allowed`}`;
+    ${disabled ? `cursor-not-allowed` : ''}`;
     
     const sliderThumbSize = {
         small: 'w-3 h-3',
@@ -135,14 +136,15 @@ const SliderThumb = ({
     }[size];
     
     return (
-        <div 
+        <span 
             className={cn(
                 sliderThumbSize,
                 sliderThumbStyle,
                 className
             )}
             {...props}
-        />
+        >
+        </span>
     );
 };
 
@@ -159,9 +161,9 @@ const SliderRange = React.forwardRef<HTMLInputElement, SliderRangeProps>(({
         throw new Error('SliderRange는 Slider 구성 요소 내에서 사용해야 합니다. <Slider.Range>가 <Slider> 구성 요소 내부에 중첩되어 있는지 확인하세요.');
     }
 
-    const { disabled, currentValue, setCurrentValue, min, max, step = 1 } = context; 
+    const { disabled, currentValue, setCurrentValue, min, max, step} = context; 
 
-    const sliderRangeStyle = `absolute w-full h-full opacity-0 cursor-pointer ${disabled && 'cursor-not-allowed'}`;
+    const sliderRangeStyle = `absolute w-full h-full opacity-0 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer' }`;
 
     return (
       <input

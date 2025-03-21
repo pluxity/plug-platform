@@ -38,15 +38,34 @@ export const ControlledSlider: Story = {
             };
             
             return (
-                <Slider className="w-[200px]" color="secondary" size="medium" value={sliderValue} onValueChange={SliderChangeValue}>
-                    <Slider.Track>
-                        <Slider.Thumb />
-                    </Slider.Track>
-                    <Slider.Range />
-                </Slider>
+                <>
+                    <span>value: {sliderValue}</span>
+                    <Slider className="w-[200px]" color="secondary" size="medium" value={sliderValue} onValueChange={SliderChangeValue}>
+                        <Slider.Track className="bg-red-500">
+                            <Slider.Thumb />
+                        </Slider.Track>
+                        <Slider.Range />
+                    </Slider>
+                </>
             );
         };
         
         return <ControlledSliderDemo />;
     }
 }
+
+export const Disabled: Story = {
+    render: (args) => (
+        <Slider 
+            disabled
+            defaultValue={80}
+            className="w-[200px]"
+            {...args}
+        >
+            <Slider.Track>
+                <Slider.Thumb />
+            </Slider.Track>
+            <Slider.Range />
+        </Slider>
+    )
+};

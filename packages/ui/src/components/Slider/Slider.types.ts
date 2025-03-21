@@ -1,4 +1,4 @@
-export interface SliderProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface SliderProps extends React.HTMLAttributes<HTMLDivElement> {
     defaultValue?: number;
     value?: number;
     onValueChange?: (value: number) => void;
@@ -11,14 +11,14 @@ export interface SliderProps extends React.HTMLAttributes<HTMLSpanElement> {
     className?: string;
 }
 
-export interface SliderTrackProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface SliderTrackProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
 }
 
-export interface SliderRangeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface SliderThumbProps extends React.HTMLAttributes<HTMLSpanElement> {
     className?: string;
 }
 
-export interface SliderThumbProps extends React.HTMLAttributes<HTMLInputElement> {
+export interface SliderRangeProps extends React.HTMLAttributes<HTMLInputElement> {
     className?: string;
 }
