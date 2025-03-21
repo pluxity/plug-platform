@@ -174,6 +174,11 @@ const SliderRange = React.forwardRef<HTMLInputElement, SliderRangeProps>(({
             step={step}
             value={currentValue}
             disabled={disabled}
+            aria-label ="slider"
+            aria-valuemin={min}
+            aria-valuemax={max}
+            aria-valuenow={currentValue}
+            aria-disabled={disabled}
             onChange={(e) => setCurrentValue(Number(e.target.value))}
             className={cn(
                 sliderRangeStyle,
