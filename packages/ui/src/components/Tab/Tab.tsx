@@ -93,7 +93,7 @@ const TabTrigger = ({
     const context = useContext(TabContext);
     
     if (!context) {
-      throw new Error("TabTrigger must be used within a Tab component.  Ensure that <Tab.Trigger> is nested inside of a <Tab> component.");
+      throw new Error("TabTrigger는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.Trigger>가 <Tab> 구성 요소 내부에 중첩되어 있는지 확인하세요.");
     }
     const { currentValue , setCurrentValue } = context;
     const isActive = currentValue === value;
@@ -139,7 +139,7 @@ const TabContent = ({
     const context = useContext(TabContext);
     
     if (!context) {
-      throw new Error("TabContent must be used within a Tab component. Ensure that <Tab.Content> is nested inside of a <Tab> component.");
+      throw new Error("TabContent는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.Content>가 <Tab> 구성 요소 내에 중첩되어 있는지 확인하세요.");
     }
     const { currentValue } = context;
     const isActive = currentValue === value;
