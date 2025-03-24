@@ -4,48 +4,33 @@ import type {
     SliderProps,
     SliderTrackProps,
     SliderThumbProps,
-    SliderRangeProps
+    SliderRangeProps,
+    SliderInternalProps,
+    SliderSize,
+    SliderColor
 } from "./Slider.types";
 
-// 스타일 관련 타입 정의 (내부용)
-export type SliderSize = 'small' | 'medium' | 'large';
-export type SliderColor = 'primary' | 'secondary';
-
-interface SizeClassMap {
-    readonly small: string;
-    readonly medium: string;
-    readonly large: string;
-}
-
-interface ColorClassMap {
-    readonly primary: string;
-    readonly secondary: string;
-}
-
-// 스타일 매핑 상수
-const sizeToClass: SizeClassMap = {
+const sizeToClass: Record<SliderSize, string> = {
     small: 'h-2',
     medium: 'h-3',
     large: 'h-4'
 };
 
-const thumbSizeToClass: SizeClassMap = {
+const thumbSizeToClass: Record<SliderSize, string> = {
     small: 'w-3 h-3',
     medium: 'w-4 h-4',
     large: 'w-5 h-5'
 };
 
-const colorToClass: ColorClassMap = {
+const colorToClass: Record<SliderColor, string> = {
     primary: 'bg-primary-500',
     secondary: 'bg-secondary-500'
 };
 
-// 리액트 컴포넌트 타입 정의
 interface ReactComponentWithDisplayName {
     displayName?: string;
 }
 
-// 서브 컴포넌트 구현 (React 19 스타일로 ref는 props로 받음)
 const SliderTrack = ({
     className,
     currentValue = 0,
@@ -60,6 +45,23 @@ const SliderTrack = ({
     const sliderTrackWidth = ((currentValue - min) / (max - min)) * 100;
     const sliderTrackStyle = `absolute h-full rounded-full ${disabled ? 'bg-gray-300' : ''}`;
 
+    // 자식 컴포넌트에 size 속성 전달
+    const childrenWithProps = React.Children.map(children, (child) => {
+        if (!React.isValidElement(child)) return child;
+        
+        if (isThumbComponent(child)) {
+            const thumbElement = child as React.ReactElement<SliderThumbProps>;
+            return React.cloneElement(thumbElement, { 
+                currentValue,
+                min,
+                max,
+                disabled
+            });
+        }
+        
+        return child;
+    });
+
     return (
         <div 
             ref={ref}
@@ -71,7 +73,7 @@ const SliderTrack = ({
             style={{ width: `${sliderTrackWidth}%` }}
             {...props}
         >
-            {children}
+            {childrenWithProps}
         </div>
     );
 };
@@ -186,37 +188,43 @@ function Slider({
         onValueChange?.(newValue);
     };
 
-    // React.Children을 사용하여 props 전달
-    const childrenWithProps = React.Children.map(children, (child) => {
-        if (!React.isValidElement(child)) return child;
-        
-        // 각 컴포넌트 타입에 따라 필요한 props만 전달
-        const commonProps = {
-            currentValue,
-            onValueChange: handleValueChange,
-            min,
-            max, 
-            step,
-            disabled
-        };
+    const internalProps: SliderInternalProps = {
+        currentValue,
+        onValueChange: handleValueChange,
+        min,
+        max, 
+        step,
+        disabled
+    };
 
-        // 타입에 따라 추가 속성 전달
-        if (isTrackComponent(child)) {
-            return React.cloneElement(child as React.ReactElement<SliderTrackProps>, { 
-                ...commonProps, 
-                color 
-            });
-        } else if (isThumbComponent(child)) {
-            return React.cloneElement(child as React.ReactElement<SliderThumbProps>, { 
-                ...commonProps, 
-                size 
-            });
-        } else if (isRangeComponent(child)) {
-            return React.cloneElement(child as React.ReactElement<SliderRangeProps>, commonProps);
-        }
-        
-        return child;
-    });
+    const hasChildren = React.Children.count(children) > 0;
+    
+    let childContent;
+    if (hasChildren) {
+        childContent = React.Children.map(children, (child) => {
+            if (!React.isValidElement(child)) return child;
+
+            if (isTrackComponent(child)) {
+                return React.cloneElement(child as React.ReactElement<SliderTrackProps>, { 
+                    ...internalProps, 
+                    color,
+                });
+            } else if (isRangeComponent(child)) {
+                return React.cloneElement(child as React.ReactElement<SliderRangeProps>, internalProps);
+            }
+            
+            return child;
+        });
+    } else {
+        childContent = (
+            <>
+                <SliderTrack color={color} {...internalProps}>
+                    <SliderThumb size={size} />
+                </SliderTrack>
+                <SliderRange {...internalProps} />
+            </>
+        );
+    }
 
     return (
         <div 
@@ -228,16 +236,15 @@ function Slider({
             )}
             {...props}
         >
-            {childrenWithProps}
+            {childContent}
         </div>
     );
 }
 
 Slider.displayName = "Slider";
 
-// 서브컴포넌트를 Slider에 직접 추가
 Slider.Track = SliderTrack;
 Slider.Thumb = SliderThumb;
 Slider.Range = SliderRange;
 
-export { Slider, SliderTrack, SliderThumb, SliderRange };
+export { Slider };

@@ -1,18 +1,15 @@
-import { Slider, SliderTrack, SliderThumb, SliderRange, SliderSize, SliderColor } from './Slider';
+import { Slider } from './Slider';
 
 import type { 
     SliderProps,
     SliderTrackProps,
     SliderThumbProps,
-    SliderRangeProps
+    SliderRangeProps,
+    SliderColor,
+    SliderSize
 } from './Slider.types';
 
-export { 
-    Slider, 
-    SliderTrack, 
-    SliderThumb, 
-    SliderRange
-};
+export { Slider };
 
 export type {
     SliderProps,

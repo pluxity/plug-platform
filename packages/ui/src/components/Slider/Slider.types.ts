@@ -1,10 +1,9 @@
 import * as React from 'react';
 
-// 스타일 관련 타입 (내부용)
-type SliderSize = 'small' | 'medium' | 'large';
-type SliderColor = 'primary' | 'secondary';
+export type SliderSize = 'small' | 'medium' | 'large';
+export type SliderColor = 'primary' | 'secondary';
 
-export interface SliderBaseProps {
+export interface SliderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'color'> {
     size?: SliderSize;
     color?: SliderColor;
     defaultValue?: number;
@@ -14,9 +13,6 @@ export interface SliderBaseProps {
     min?: number;
     max?: number;
     step?: number;
-}
-
-export interface SliderProps extends SliderBaseProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'color'> {
     children?: React.ReactNode;
 }
 

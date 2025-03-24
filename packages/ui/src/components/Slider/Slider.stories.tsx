@@ -24,12 +24,7 @@ export const Default: Story = {
     render: (args) => (
         <div className="p-4 w-96 relative">
             <h3 className="mb-4 text-lg font-medium">기본 슬라이더</h3>
-            <Slider {...args} className="my-6">
-                <Slider.Track>
-                    <Slider.Thumb />
-                </Slider.Track>
-                <Slider.Range />
-            </Slider>
+            <Slider {...args} className="my-6" />
         </div>
     ),
     args: {
@@ -47,32 +42,17 @@ export const Sizes: Story = {
             
             <div className="mb-6">
                 <p className="text-sm mb-2">Small</p>
-                <Slider size="small" defaultValue={30} className="my-2">
-                    <Slider.Track>
-                        <Slider.Thumb />
-                    </Slider.Track>
-                    <Slider.Range />
-                </Slider>
+                <Slider size="small" defaultValue={30} className="my-2"/>
             </div>
             
             <div className="mb-6">
                 <p className="text-sm mb-2">Medium</p>
-                <Slider size="medium" defaultValue={50} className="my-2">
-                    <Slider.Track>
-                        <Slider.Thumb />
-                    </Slider.Track>
-                    <Slider.Range />
-                </Slider>
+                <Slider size="medium" defaultValue={50} className="my-2"/>
             </div>
             
             <div className="mb-6">
                 <p className="text-sm mb-2">Large</p>
-                <Slider size="large" defaultValue={70} className="my-2">
-                    <Slider.Track>
-                        <Slider.Thumb />
-                    </Slider.Track>
-                    <Slider.Range />
-                </Slider>
+                <Slider size="large" defaultValue={70} className="my-2"/>
             </div>
         </div>
     ),
@@ -85,19 +65,38 @@ export const Colors: Story = {
             
             <div className="mb-6">
                 <p className="text-sm mb-2">Primary</p>
-                <Slider color="primary" defaultValue={40} className="my-2">
+                <Slider color="primary" defaultValue={40} className="my-2" />
+            </div>
+            
+            <div className="mb-6">
+                <p className="text-sm mb-2">Secondary</p>
+                <Slider color="secondary" defaultValue={60} className="my-2"/>
+            </div>
+        </div>
+    ),
+};
+
+
+export const Customize: Story = {
+    render: () => (
+        <div className="p-4 w-96 relative">
+            <h3 className="mb-4 text-lg font-medium">커스터 마이징</h3>
+            
+            <div className="mb-6">
+                <p className="text-sm mb-2">Thumb 사이즈 변경</p>
+                <Slider color="primary" defaultValue={40}>
                     <Slider.Track>
-                        <Slider.Thumb />
+                        <Slider.Thumb size="large" />
                     </Slider.Track>
                     <Slider.Range />
                 </Slider>
             </div>
             
             <div className="mb-6">
-                <p className="text-sm mb-2">Secondary</p>
-                <Slider color="secondary" defaultValue={60} className="my-2">
-                    <Slider.Track>
-                        <Slider.Thumb />
+                <p className="text-sm mb-2">Thumb 와 Track 색상 변경</p>
+                <Slider defaultValue={60}>
+                    <Slider.Track className="bg-secondary-500">
+                        <Slider.Thumb size="medium" className="bg-secondary-500"  />
                     </Slider.Track>
                     <Slider.Range />
                 </Slider>
