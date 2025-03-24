@@ -1,32 +1,24 @@
-
-import {
-    Slider as SliderComponent,
-    SliderTrack,
-    SliderRange,
-    SliderThumb,
-} from './Slider';
+import { Slider, SliderTrack, SliderThumb, SliderRange, SliderSize, SliderColor } from './Slider';
 
 import type { 
     SliderProps,
     SliderTrackProps,
-    SliderRangeProps,
-    SliderThumbProps
- } from './Slider.types'; 
+    SliderThumbProps,
+    SliderRangeProps
+} from './Slider.types';
 
+export { 
+    Slider, 
+    SliderTrack, 
+    SliderThumb, 
+    SliderRange
+};
 
-
-const Slider = Object.assign(SliderComponent, {
-    Track: SliderTrack,
-    Range: SliderRange,
-    Thumb: SliderThumb,
-});
-
-
-export { Slider };
-
-export type{
+export type {
     SliderProps,
     SliderTrackProps,
+    SliderThumbProps,
     SliderRangeProps,
-    SliderThumbProps
+    SliderSize,
+    SliderColor
 };
