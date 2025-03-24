@@ -161,8 +161,7 @@ const isRangeComponent = (child: React.ReactElement): boolean =>
     child.type === SliderRange || 
     (typeof child.type === 'object' && (child.type as ReactComponentWithDisplayName).displayName === 'SliderRange');
 
-// 메인 컴포넌트 구현
-function Slider({
+const Slider =({
     size = 'small',
     color = 'primary',
     defaultValue = 0,
@@ -176,7 +175,7 @@ function Slider({
     children,
     ref,
     ...props
-}: SliderProps & { ref?: React.Ref<HTMLDivElement> }) {
+}: SliderProps & { ref?: React.Ref<HTMLDivElement> }) => {
     const [internalValue, setInternalValue] = React.useState(defaultValue);
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
