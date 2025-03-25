@@ -48,58 +48,40 @@ export const Size: Story = {
     render: (args) => {
         return (
             <>
-                <strong>small : </strong>
+                <div>small : </div>
                 <BreadCrumb {...args} size='small'>
-                    <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Home'>
-                            <HomeIcon /> Home
-                        </BreadCrumb.Link>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='BreadCrumb'>
-                            <HomeIcon /> BreadCrumb
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Component'>
-                            Component
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
-                <strong>medium : </strong>
+                <div>medium : </div>
                 <BreadCrumb {...args} size='medium'>
-                <BreadCrumb.Item>
-                    <BreadCrumb.Link href='Home'>
-                        <HomeIcon /> Home
-                    </BreadCrumb.Link>
-                </BreadCrumb.Item>
-                <BreadCrumb.Item>
-                    <BreadCrumb.Link href='BreadCrumb'>
-                        <HomeIcon /> BreadCrumb
-                    </BreadCrumb.Link>
-                </BreadCrumb.Item>
-                <BreadCrumb.Item>
-                    <BreadCrumb.Link href='Component'>
-                        Component
-                    </BreadCrumb.Link>
-                </BreadCrumb.Item>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
+                    </BreadCrumb.Item>
+                    <BreadCrumb.Item>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
+                    </BreadCrumb.Item>
+                    <BreadCrumb.Item>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
+                    </BreadCrumb.Item>  
                 </BreadCrumb>
-                <strong>large : </strong>
+                <div>large : </div>
                 <BreadCrumb {...args} size='large'>
-                    <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Home'>
-                            <HomeIcon /> Home
-                        </BreadCrumb.Link>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='BreadCrumb'>
-                            <HomeIcon /> BreadCrumb
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Component'>
-                            Component
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
             </> 
@@ -111,40 +93,28 @@ export const color: Story = {
     render: (args) => {
         return (
             <>
-                <strong>primary : </strong>
+                <div>primary : </div>
                 <BreadCrumb {...args} color='primary'>
-                    <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Home'>
-                            <HomeIcon /> Home
-                        </BreadCrumb.Link>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='BreadCrumb'>
-                            <HomeIcon /> BreadCrumb
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Component'>
-                            Component
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
-                <strong>secondary : </strong>
+                <div>secondary : </div>
                 <BreadCrumb {...args} color='secondary'>
-                    <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Home'>
-                            <HomeIcon /> Home
-                        </BreadCrumb.Link>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='BreadCrumb'>
-                            <HomeIcon /> BreadCrumb
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Component'>
-                            Component
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
             </>
@@ -156,40 +126,28 @@ export const separator: Story = {
     render: (args) => {
         return (
             <>
-                <strong>line : </strong>
+                <div>line : </div>
                 <BreadCrumb {...args} separator='line'>
-                    <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Home'>
-                            <HomeIcon /> Home
-                        </BreadCrumb.Link>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='BreadCrumb'>
-                            <HomeIcon /> BreadCrumb
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Component'>
-                            Component
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
-                <strong>arrow : </strong>
+                <div>arrow : </div>
                 <BreadCrumb {...args} separator='arrow'>
-                    <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Home'>
-                            <HomeIcon /> Home
-                        </BreadCrumb.Link>
+                    <BreadCrumb.Item >
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='BreadCrumb'>
-                            <HomeIcon /> BreadCrumb
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
-                        <BreadCrumb.Link href='Component'>
-                            Component
-                        </BreadCrumb.Link>
+                        <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
             </>
