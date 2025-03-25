@@ -12,6 +12,7 @@ export interface BreadCrumbItemProps extends LiHTMLAttributes<HTMLLIElement> {
     className?: string;
 }
 
-export interface BreadCrumbLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface BreadCrumbLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+    href: string;
     className?: string;
 }

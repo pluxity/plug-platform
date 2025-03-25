@@ -142,6 +142,7 @@ const BreadCrumbLink = forwardRef<HTMLAnchorElement, BreadCrumbLinkProps>(({
     return (
         <a
             ref={ref}
+            href={href}
             className={cn(
                 BreadCrumbLinkStyle,
                 BreadcrumbLinkColor,

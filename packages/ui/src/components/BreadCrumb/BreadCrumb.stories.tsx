@@ -165,7 +165,7 @@ export const WithIcon: Story = {
                     </BreadCrumb.Link>
                 </BreadCrumb.Item>
                 <BreadCrumb.Item>
-                    <BreadCrumb.Link href='BreadCrumb'>
+                    <BreadCrumb.Link href='/?path=/docs/components-breadcrumb--docs'>
                         <HomeIcon /> BreadCrumb
                     </BreadCrumb.Link>
                 </BreadCrumb.Item>
