@@ -1,4 +1,4 @@
-import { forwardRef, useState, createContext, useContext } from 'react';
+import { forwardRef, createContext, useContext } from 'react';
 import React from 'react';
 import { cn } from '../../utils/classname';
 import type{
@@ -8,9 +8,6 @@ import type{
 } from './BreadCrumb.types';
 
 interface BreadCrumbContextProps {
-    currentPage?: string,
-    setCurrentPage?: (page: string) => void;
-    onPageChange?: (page: string) => void;
     color: 'primary' | 'secondary';
     size: 'small' | 'medium' | 'large';
     separator: 'line' | 'arrow';
@@ -20,9 +17,6 @@ const BreadCrumbContext = createContext<BreadCrumbContextProps | undefined>(unde
 
 const BreadCrumb = forwardRef<HTMLElement, BreadCrumbProps>(
 ({
-    defaultPage,
-    page,
-    onPageChange,
     color = 'primary',
     size = 'small',
     separator = 'line',
@@ -30,17 +24,6 @@ const BreadCrumb = forwardRef<HTMLElement, BreadCrumbProps>(
     children,
     ...props
 }, ref) => {
-
-    const [activePage, setActivePage] = useState(defaultPage);
-    const isControlled = page !== undefined;
-    const currentPage = isControlled ? page : activePage;
-
-    const setCurrentPage = (page: string) => {
-        if(!isControlled){
-            setActivePage(page);
-        }
-        onPageChange?.(page);
-    }
     
     const BreadCrumbListStyle = 'flex flex-wrap items-center break-words';
     const BreadCrumbListSize = {
@@ -59,7 +42,7 @@ const BreadCrumb = forwardRef<HTMLElement, BreadCrumbProps>(
     })
     
     return (
-        <BreadCrumbContext.Provider value={{currentPage , setCurrentPage, color, size, separator}}>
+        <BreadCrumbContext.Provider value={{color, size, separator}}>
             <nav
                 ref={ref}
                 aria-label='breadcrumb'
@@ -120,7 +103,7 @@ const BreadCrumbItem = forwardRef<HTMLLIElement, BreadCrumbItemProps>(({
                     role="presentation"
                     aria-hidden="true"
                     className={cn(`transform mx-1 mt-1 border-gray-300 mr-1.5
-                        ${separator === 'line'? 'border-r-1 h-4 rotate-25' : 'rotate-45 border-t-1 border-r-1 w-2 h-2'}
+                        ${separator === 'line'? 'border-r-1 h-3 rotate-25' : 'rotate-45 border-t-1 border-r-1 w-2 h-2'}
                     `)}
                 >
                 </li>
@@ -143,21 +126,12 @@ const BreadCrumbLink = forwardRef<HTMLAnchorElement, BreadCrumbLinkProps>(({
         throw new Error("BreadCrumbLink는 BreadCrumb 구성 요소 내에서 사용해야 합니다. <BreadCrumb.Link>가 <BreadCrumb> 구성 요소 내부에 중첩되어 있는지 확인하세요.");
       }
 
-    const { size, color, setCurrentPage, currentPage } = context;
+    const { size, color } = context;
 
-    const isActive = currentPage === href;
-
-    const handleClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-            if (href && setCurrentPage) {
-                setCurrentPage(href); 
-            }
-      };
-   
-    const BreadCrumbLinkStyle = 'inline-flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap';
+    const BreadCrumbLinkStyle = 'inline-flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap text-gray-400';
     const BreadcrumbLinkColor = {
-        primary: `${isActive ? 'text-primary-500' : 'text-gray-400'} hover:text-primary-500`,
-        secondary: `${isActive ? 'text-secondary-500' : 'text-gray-400'} hover:text-secondary-500`,
+        primary: 'hover:text-primary-500',
+        secondary: 'hover:text-secondary-500',
     }[color];
     const BreadcrumbLinkSize = {
         small: 'max-w-40',
@@ -167,8 +141,6 @@ const BreadCrumbLink = forwardRef<HTMLAnchorElement, BreadCrumbLinkProps>(({
 
     return (
         <a
-            onClick={handleClick}
-            href={href}
             ref={ref}
             className={cn(
                 BreadCrumbLinkStyle,
