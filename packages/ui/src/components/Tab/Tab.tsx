@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useContext, createContext } from "react";
+import { useState, useContext, createContext, useCallback, useId } from "react";
 import { cn } from "../../utils/classname";
 import type {
     TabProps,
@@ -11,31 +11,33 @@ import type {
 interface TabContextProps {
     currentValue?: string;
     setCurrentValue: (value: string) => void;
+    baseId: string;
 }
 const TabContext = createContext<TabContextProps | undefined>(undefined);
 
-const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
+const Tab = ({
     defaultValue,
     value,
     onValueChange,
     className,
+    ref,
     children,
     ...props
-}, ref) => {
-
+}: TabProps) => {
     const [isTabValue, setIsTabValue] = useState(defaultValue);
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : isTabValue;
+    const baseId = useId();
 
-    const setCurrentValue = (value: string) => {
+    const setCurrentValue = useCallback((value: string) => {
         if (!isControlled) {
             setIsTabValue(value);
         }
         onValueChange?.(value);
-    };
+    }, [isControlled, onValueChange]);
 
     return(
-        <TabContext.Provider value={{ currentValue, setCurrentValue }}>
+        <TabContext.Provider value={{ currentValue, setCurrentValue, baseId }}>
             <div
                 className={cn("w-full", className)}
                 ref={ref}
@@ -45,11 +47,11 @@ const Tab = React.forwardRef<HTMLDivElement, TabProps>(({
             </div>
         </TabContext.Provider>
     );
-});
+};
 
 Tab.displayName = "Tab";
 
-const TabList = ({
+const TabList = React.memo(({
     color = "primary",
     className,
     children,
@@ -79,11 +81,11 @@ const TabList = ({
             {elementProps}
         </div>
     )
-};
+});
 
 TabList.displayName = "TabList";
 
-const TabTrigger = ({
+const TabTrigger = React.memo(({
     color = "primary",
     className,
     children,
@@ -95,8 +97,11 @@ const TabTrigger = ({
     if (!context) {
       throw new Error("TabTrigger는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.Trigger>가 <Tab> 구성 요소 내부에 중첩되어 있는지 확인하세요.");
     }
-    const { currentValue , setCurrentValue } = context;
+    const { currentValue, setCurrentValue, baseId } = context;
     const isActive = currentValue === value;
+    
+    const triggerId = `${baseId}-trigger-${value}`;
+    const contentId = `${baseId}-content-${value}`;
     
     const tabTriggerStyle = `
         inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2
@@ -109,12 +114,18 @@ const TabTrigger = ({
         secondary:  isActive && "text-secondary-500 border-secondary-500",
     }[color];
    
+    function handleClick() {
+        setCurrentValue(value);
+    }
+   
     return(
         <button
+            id={triggerId}
             aria-selected={isActive}
+            aria-controls={contentId}
             role="tab"
             type="button"
-            onClick={() => setCurrentValue(value)}
+            onClick={handleClick}
             className={cn(
                 tabTriggerStyle, 
                 tabTriggerAnimate,
@@ -126,11 +137,11 @@ const TabTrigger = ({
             {children}
         </button>
     )
-};
+});
 
 TabTrigger.displayName = "TabTrigger";
 
-const TabContent = ({
+const TabContent = React.memo(({
     className,
     children,
     value,
@@ -141,8 +152,11 @@ const TabContent = ({
     if (!context) {
       throw new Error("TabContent는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.Content>가 <Tab> 구성 요소 내에 중첩되어 있는지 확인하세요.");
     }
-    const { currentValue } = context;
+    const { currentValue, baseId } = context;
     const isActive = currentValue === value;
+    
+    const contentId = `${baseId}-content-${value}`;
+    const triggerId = `${baseId}-trigger-${value}`;
     
     const tabContentStyle = `
         mt-3 transition-all ease-in-out duration-300,
@@ -150,7 +164,9 @@ const TabContent = ({
     
     return(
         <div
+            id={contentId}
             aria-hidden={!isActive}
+            aria-labelledby={triggerId}
             role="tabpanel"
             className={cn(
                 tabContentStyle, 
@@ -161,7 +177,7 @@ const TabContent = ({
             {children}
         </div>
     )
-};
+});
 
 TabContent.displayName = "TabContent";
 
