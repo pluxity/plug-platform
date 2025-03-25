@@ -1,24 +1,13 @@
 import * as React from 'react';
-import { useCallback, useId } from 'react';
+import { useCallback, useId, useState, useEffect, useRef } from 'react';
 import { cn } from '../../utils/classname';
 import type {
     SliderProps,
     SliderTrackProps,
     SliderThumbProps,
-    SliderRangeProps
+    SliderRangeProps,
+    SliderContextProps
 } from "./Slider.types";
-
-interface SliderContextProps {
-    disabled?: boolean;
-    currentValue: number;
-    setCurrentValue: (value: number) => void;
-    min: number;
-    max: number;
-    step?: number;
-    size: 'small' | 'medium' | 'large';
-    color: 'primary' | 'secondary';
-    sliderId: string;
-}
 
 const SliderContext = React.createContext<SliderContextProps | undefined>(undefined);
 
@@ -33,27 +22,59 @@ const Slider = ({
     max = 100,
     step = 1,
     className,
-    ref,
     children,
     ...props
 }: SliderProps) => {
-    const [internalValue, setInternalValue] = React.useState(defaultValue);
+    const [internalValue, setInternalValue] = useState<number>(
+        defaultValue < min ? min : defaultValue > max ? max : defaultValue
+    );
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
     const sliderId = useId();
+    const sliderRef = useRef<HTMLDivElement>(null);
 
-    const setCurrentValue = useCallback((value: number) => {
-        if (!isControlled) {
-            setInternalValue(value);
+    useEffect(() => {
+        if (isControlled && value !== undefined) {
+            const clampedValue = Math.min(Math.max(value, min), max);
+            if (clampedValue !== value) {
+                onValueChange?.(clampedValue);
+            }
         }
-        onValueChange?.(value);
-    }, [isControlled, onValueChange]);
+    }, [value, min, max, isControlled, onValueChange]);
+
+    const setCurrentValue = useCallback((newValue: number) => {
+        const clampedValue = Math.min(Math.max(newValue, min), max);
+        
+        if (!isControlled) {
+            setInternalValue(clampedValue);
+        }
+        
+        if (clampedValue !== currentValue) {
+            onValueChange?.(clampedValue);
+        }
+    }, [isControlled, onValueChange, min, max, currentValue]);
 
     const sliderSize = {
         small: 'h-2',
         medium: 'h-3',
         large: 'h-4'
     }[size];
+
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (disabled) return;
+        
+        const slider = sliderRef.current;
+        if (!slider) return;
+        
+        const rect = slider.getBoundingClientRect();
+        const position = (e.clientX - rect.left) / rect.width;
+        const newValue = min + position * (max - min);
+        
+        const steppedValue = Math.round(newValue / step) * step;
+        setCurrentValue(steppedValue);
+    };
+
+    const hasCustomChildren = React.Children.count(children) > 0;
 
     return (
         <SliderContext.Provider value={{ 
@@ -65,21 +86,33 @@ const Slider = ({
             step,
             size,
             color,
-            sliderId
+            sliderId,
+            sliderRef: { current: sliderRef.current }
         }}>
             <div 
-                ref={ref}
+                ref={sliderRef}
                 role="group"
                 aria-labelledby={`${sliderId}-label`}
                 aria-disabled={disabled}
                 className={cn(
                     "relative rounded-full bg-gray-200",
                     sliderSize,
+                    disabled ? "opacity-50" : "opacity-100",
                     className
                 )}
+                onClick={handleClick}
                 {...props}
             >
-                {children}
+                {hasCustomChildren ? (
+                    children
+                ) : (
+                    <>
+                        <SliderTrack>
+                            <SliderThumb />
+                        </SliderTrack>
+                        <SliderRange />
+                    </>
+                )}
             </div>
         </SliderContext.Provider>
     );
@@ -90,7 +123,7 @@ Slider.displayName = "Slider";
 const SliderTrack = React.memo(
     ({
         className,
-        ref,
+        children,
         ...props
     }: SliderTrackProps) => {
         const context = React.useContext(SliderContext);
@@ -101,24 +134,21 @@ const SliderTrack = React.memo(
         const { currentValue, min, max, color, disabled } = context;
         const sliderTrackWidth = ((currentValue - min) / (max - min)) * 100;
 
-        const sliderTrackStyle = `absolute h-full rounded-full ${disabled ? 'bg-gray-300' : ''}`;
-        const sliderTrackColor = {
-            primary: 'bg-primary-500',
-            secondary: 'bg-secondary-500',
-        }[color];
-
         return (
             <div 
-                ref={ref}
                 role="presentation"
                 className={cn(
-                    sliderTrackColor,
-                    sliderTrackStyle,
+                    "absolute h-full rounded-full",
+                    disabled ? 'bg-gray-300' : {
+                        primary: 'bg-primary-500',
+                        secondary: 'bg-secondary-500',
+                    }[color],
                     className
                 )}
                 style={{ width: `${sliderTrackWidth}%` }}
                 {...props}
             >
+                {children}
             </div>
         );
     }
@@ -128,27 +158,98 @@ SliderTrack.displayName = "SliderTrack";
 
 const SliderThumb = React.memo(({
     className,
+    size: propSize,
     ...props
 }: SliderThumbProps) => {
     const context = React.useContext(SliderContext);
+    const thumbRef = useRef<HTMLSpanElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     if (!context) {
         throw new Error('SliderThumb은 Slider 구성 요소 내에서 사용해야 합니다. <Slider.Thumb>이 <Slider> 구성 요소 내부에 중첩되어 있는지 확인하세요.');
     }
 
-    const { size, disabled, currentValue, min, max, sliderId } = context;
-
-    const sliderThumbStyle = `absolute bg-white shadow-[0_2px_3px_3px_rgba(0,0,0,0.2)] rounded-full -translate-y-1/2 -translate-x-1/2 top-1/2 left-full 
-    ${disabled ? `cursor-not-allowed` : ''}`;
+    const { 
+        size: contextSize, 
+        disabled, 
+        currentValue, 
+        setCurrentValue, 
+        min, 
+        max, 
+        step,
+        sliderId,
+        sliderRef
+    } = context;
     
+    const size = propSize || contextSize;
+
     const sliderThumbSize = {
         small: 'w-3 h-3',
         medium: 'w-4 h-4',
         large: 'w-5 h-5'
     }[size];
     
+    const handleMouseDown = (e: React.MouseEvent) => {
+        if (disabled) return;
+        
+        e.preventDefault();
+        setIsDragging(true);
+        
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            if (!sliderRef.current) return;
+            
+            const rect = sliderRef.current.getBoundingClientRect();
+            const position = (moveEvent.clientX - rect.left) / rect.width;
+            const newValue = min + position * (max - min);
+            
+            const steppedValue = Math.round(newValue / step) * step;
+            const clampedValue = Math.min(Math.max(steppedValue, min), max);
+            
+            setCurrentValue(clampedValue);
+        };
+        
+        const handleMouseUp = () => {
+            setIsDragging(false);
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+    
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (disabled) return;
+        
+        const step = context.step || 1;
+        let newValue = currentValue;
+        
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                newValue = Math.min(currentValue + step, max);
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                newValue = Math.max(currentValue - step, min);
+                break;
+            case 'Home':
+                newValue = min;
+                break;
+            case 'End':
+                newValue = max;
+                break;
+            default:
+                return;
+        }
+        
+        e.preventDefault();
+        setCurrentValue(newValue);
+    };
+    
     return (
         <span 
+            ref={thumbRef}
             role="slider"
             tabIndex={disabled ? -1 : 0}
             aria-valuemin={min}
@@ -158,22 +259,25 @@ const SliderThumb = React.memo(({
             id={`${sliderId}-thumb`}
             className={cn(
                 sliderThumbSize,
-                sliderThumbStyle,
+                "absolute bg-white rounded-full -translate-y-1/2 -translate-x-1/2 top-1/2 left-full",
+                "shadow-[0_2px_3px_rgba(0,0,0,0.2)]",
+                isDragging && "ring-2 ring-offset-2 ring-primary-500",
+                disabled ? "cursor-not-allowed" : "cursor-grab",
+                isDragging && !disabled && "cursor-grabbing",
                 className
             )}
+            onMouseDown={handleMouseDown}
+            onKeyDown={handleKeyDown}
             {...props}
-        >
-        </span>
+        />
     );
 });
 
 SliderThumb.displayName = "SliderThumb";
 
-
 const SliderRange = React.memo(
     ({
         className,
-        ref,
         ...props
     }: SliderRangeProps) => {
         const context = React.useContext(SliderContext);
@@ -184,16 +288,13 @@ const SliderRange = React.memo(
 
         const { disabled, currentValue, setCurrentValue, min, max, step, sliderId } = context; 
 
-        const sliderRangeStyle = `absolute w-full h-full opacity-0 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer' }`;
-
-        function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setCurrentValue(Number(e.target.value));
-        }
+        };
 
         return (
           <input
                 type="range"
-                ref={ref}
                 min={min}
                 max={max}
                 step={step}
@@ -207,7 +308,8 @@ const SliderRange = React.memo(
                 id={`${sliderId}-input`}
                 onChange={handleChange}
                 className={cn(
-                    sliderRangeStyle,
+                    "absolute w-full h-full opacity-0",
+                    disabled ? "cursor-not-allowed" : "cursor-pointer",
                     className
                 )}
                 {...props}
@@ -217,6 +319,5 @@ const SliderRange = React.memo(
 );
 
 SliderRange.displayName = "SliderRange";
-
 
 export { Slider, SliderTrack, SliderThumb, SliderRange };

@@ -6,13 +6,9 @@ import type {
     TabListProps,
     TabTriggerProps,
     TabContentProps,
+    TabContextProps
 } from "./Tab.types";
 
-interface TabContextProps {
-    currentValue?: string;
-    setCurrentValue: (value: string) => void;
-    baseId: string;
-}
 const TabContext = createContext<TabContextProps | undefined>(undefined);
 
 const Tab = ({
@@ -20,8 +16,8 @@ const Tab = ({
     value,
     onValueChange,
     className,
-    ref,
     children,
+    color = "primary",
     ...props
 }: TabProps) => {
     const [isTabValue, setIsTabValue] = useState(defaultValue);
@@ -37,10 +33,9 @@ const Tab = ({
     }, [isControlled, onValueChange]);
 
     return(
-        <TabContext.Provider value={{ currentValue, setCurrentValue, baseId }}>
+        <TabContext.Provider value={{ currentValue, setCurrentValue, baseId, color }}>
             <div
                 className={cn("w-full", className)}
-                ref={ref}
                 {...props}
             >   
                 {children}
@@ -52,12 +47,18 @@ const Tab = ({
 Tab.displayName = "Tab";
 
 const TabList = React.memo(({
-    color = "primary",
+    color: propColor,
     className,
     children,
     ...props
 }: TabListProps) => {
-    const tabListStyle = "flex item-center gap-1 w-full";
+    const context = useContext(TabContext);
+    
+    if (!context) {
+      throw new Error("TabList는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.List>가 <Tab> 구성 요소 내부에 중첩되어 있는지 확인하세요.");
+    }
+    
+    const color = propColor || context.color || "primary";
 
     const elementProps = React.Children.map(children, child => {
         if (React.isValidElement(child) && child.type === TabTrigger) {
@@ -73,14 +74,14 @@ const TabList = React.memo(({
             aria-orientation="horizontal"
             role="tablist"
             className={cn(
-                tabListStyle,
+                "flex item-center gap-1 w-full",
                 className 
             )}
             {...props}
         >
             {elementProps}
         </div>
-    )
+    );
 });
 
 TabList.displayName = "TabList";
@@ -103,20 +104,9 @@ const TabTrigger = React.memo(({
     const triggerId = `${baseId}-trigger-${value}`;
     const contentId = `${baseId}-content-${value}`;
     
-    const tabTriggerStyle = `
-        inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2
-        ${isActive ? "border-b-2" : "border-transparent"}
-    `;
-    const tabTriggerAnimate = "transition-all ease-in-out duration-300";
-
-    const tabTriggerColor = {
-        primary:  isActive && "text-primary-500 border-primary-500",
-        secondary:  isActive && "text-secondary-500 border-secondary-500",
-    }[color];
-   
-    function handleClick() {
+    const handleClick = () => {
         setCurrentValue(value);
-    }
+    };
    
     return(
         <button
@@ -127,16 +117,18 @@ const TabTrigger = React.memo(({
             type="button"
             onClick={handleClick}
             className={cn(
-                tabTriggerStyle, 
-                tabTriggerAnimate,
-                tabTriggerColor,
+                "inline-flex item-center justify-center w-full px-3 py-2 cursor-pointer font-semibold text-gray-600 border-b-2",
+                isActive ? "border-b-2" : "border-transparent",
+                "transition-all ease-in-out duration-300",
+                isActive && color === "primary" && "text-primary-500 border-primary-500",
+                isActive && color === "secondary" && "text-secondary-500 border-secondary-500",
                 className
             )}
             {...props}
         >
             {children}
         </button>
-    )
+    );
 });
 
 TabTrigger.displayName = "TabTrigger";
@@ -150,17 +142,13 @@ const TabContent = React.memo(({
     const context = useContext(TabContext);
     
     if (!context) {
-      throw new Error("TabContent는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.Content>가 <Tab> 구성 요소 내에 중첩되어 있는지 확인하세요.");
+      throw new Error("TabContent는 Tab 구성 요소 내에서 사용해야 합니다. <Tab.Content>가 <Tab> 구성 요소 내부에 중첩되어 있는지 확인하세요.");
     }
     const { currentValue, baseId } = context;
     const isActive = currentValue === value;
     
     const contentId = `${baseId}-content-${value}`;
     const triggerId = `${baseId}-trigger-${value}`;
-    
-    const tabContentStyle = `
-        mt-3 transition-all ease-in-out duration-300,
-        ${isActive ? "block" : "hidden"}`;
     
     return(
         <div
@@ -169,14 +157,15 @@ const TabContent = React.memo(({
             aria-labelledby={triggerId}
             role="tabpanel"
             className={cn(
-                tabContentStyle, 
+                "mt-3 transition-all ease-in-out duration-300",
+                isActive ? "block" : "hidden",
                 className
             )}
             {...props}
         >
             {children}
         </div>
-    )
+    );
 });
 
 TabContent.displayName = "TabContent";
