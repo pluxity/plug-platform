@@ -144,6 +144,13 @@ async function getMergedGeometry(url: string) {
             }
         });
 
+        // 머터리얼 환경맵 설정
+        mergedMaterial.forEach(mat => {
+            (mat as any).envMap = engine.GeneratedCubeRenderTarget.texture;
+            (mat as any).envMapIntensity = 0.1;
+            mat.needsUpdate = true;
+        });
+
         // 수집된 리소스 병합
         mergedGeometry = Addon.BufferGeometryUtils.mergeGeometries(collectGeometries, true);
         // 병합완료후 수집데이터 메모리 해제

@@ -37,6 +37,20 @@ function LoadGltf(url: string, onLoad: Function) {
             if( child instanceof THREE.Mesh ) {
                 child.receiveShadow = true;
                 child.castShadow = true;
+                
+                // 재질 환경맵
+                if(Array.isArray(child.material)){
+                    child.material.forEach(mat=>{
+                        mat.envMap = engine.GeneratedCubeRenderTarget.texture;
+                        mat.envMapIntensity = 0.1;
+                        mat.needsUpdate = true;
+                    });
+                } else {
+                    child.material.envMap = engine.GeneratedCubeRenderTarget.texture;
+                    child.material.envMapIntensity = 0.1;
+                    child.material.needsUpdate = true;
+                }
+
             }
         });
 

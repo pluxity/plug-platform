@@ -18,6 +18,10 @@ class Engine3D {
 
     private rootScene: THREE.Scene; // 최상위 루트씬
 
+    private envScene: Addon.DebugEnvironment;
+    private pmremGenerator: THREE.PMREMGenerator;
+    private generatedCubeRenderTarget: THREE.WebGLRenderTarget;
+
     /**
      * 생성자
      * @param container - WebGL이 붙을 dom 객체
@@ -71,6 +75,13 @@ class Engine3D {
         this.directionalLight.castShadow = true;
         this.directionalLight.shadow.mapSize.width = 4096;
         this.directionalLight.shadow.mapSize.height = 4096;
+
+        // 환경맵 테스트
+        this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+        this.pmremGenerator.compileCubemapShader();
+
+        this.envScene = new Addon.DebugEnvironment();
+        this.generatedCubeRenderTarget = this.pmremGenerator.fromScene(this.envScene);
 
         // 이펙트 컴포저
         this.composer = new Addon.EffectComposer(this.renderer);
@@ -185,6 +196,10 @@ class Engine3D {
      */
     get Renderer() {
         return this.renderer;
+    }
+
+    get GeneratedCubeRenderTarget() {
+        return this.generatedCubeRenderTarget;
     }
 }
 

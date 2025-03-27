@@ -95,7 +95,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     render(): React.ReactNode {
         return (
-            <div className="control-panel">
+            <div className="control-panel" style={{position: 'absolute', background: 'rgba(0, 0, 0, 0.5)', color: 'white'}}>
                 <fieldset className="control-fieldset">
                     <legend>WebGL</legend>
                     <label htmlFor='ApiList'>Api List:</label>

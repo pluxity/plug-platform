@@ -3,12 +3,21 @@ import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import { PoiElement } from './element';
+import { Engine3D } from '../engine';
 
+let engine: Engine3D;
 let poiDataList: Record<string, PoiElement> = {};
 let poiLine: THREE.LineSegments;
 let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
+
+/**
+ * Engine3D 초기화 이벤트 콜백
+ */
+Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any)=>{
+    engine = evt.engine as Engine3D;
+});
 
 /**
  * Poi 씬그룹 초기화 이벤트 처리
@@ -98,7 +107,7 @@ async function updatePoiMesh() {
             // 모델url이 undefined이거나 빈문자열일 경우는 구체사용
             mergedGeometry = new THREE.SphereGeometry(0.1, 32, 32);
             mergedGeometry.addGroup(0, Infinity, 0);
-            mergedMaterial.push(new THREE.MeshStandardMaterial({ color: 'red' }));
+            mergedMaterial.push(new THREE.MeshStandardMaterial({ color: 'red', envMap: engine.GeneratedCubeRenderTarget.texture, envMapIntensity: 0.1 }));
         } else {
             await Util.getMergedGeometry(url).then(data => {
                 mergedGeometry = data.geometry;
