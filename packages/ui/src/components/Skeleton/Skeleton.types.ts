@@ -1,4 +1,3 @@
-export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SkeletonProps extends React.ComponentProps<'div'> {
     variant?: "circle" | "rectangle" | "text";
-    className?: string;
 }

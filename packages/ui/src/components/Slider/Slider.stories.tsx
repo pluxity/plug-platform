@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Slider } from './';
+import { Slider } from '../Slider';
 
 const meta: Meta<typeof Slider> = {
     title: 'Components/Slider',
@@ -76,7 +76,6 @@ export const Colors: Story = {
     ),
 };
 
-
 export const Customize: Story = {
     render: () => (
         <div className="p-4 w-96 relative">
@@ -101,6 +100,19 @@ export const Customize: Story = {
                     <Slider.Range />
                 </Slider>
             </div>
+        </div>
+    ),
+};
+
+export const Disabled: Story = {
+    render: () => (
+        <div className="p-4 w-96 relative">
+            <Slider disabled={true} defaultValue={40}>
+                <Slider.Track>
+                    <Slider.Thumb size="large" />
+                </Slider.Track>
+                <Slider.Range />
+            </Slider>
         </div>
     ),
 };

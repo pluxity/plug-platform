@@ -1,18 +1,13 @@
-import { HTMLAttributes, LiHTMLAttributes, AnchorHTMLAttributes } from 'react';
+import type { Color, Size } from '../types';
 
-export interface BreadCrumbProps extends HTMLAttributes<HTMLElement> {
-    color?: 'primary' | 'secondary';
-    size?: 'small' | 'medium' | 'large';
+type BreadCrumbColor = Exclude<Color, 'destructive'>;
+
+export interface BreadCrumbProps extends React.ComponentProps<'nav'> {
+    color?: BreadCrumbColor;
+    size?: Size;
     separator?: 'line' | 'arrow';
-    className?: string;
 }
 
-export interface BreadCrumbItemProps extends LiHTMLAttributes<HTMLLIElement> {
+export interface BreadCrumbItemProps extends React.ComponentProps<'li'> {
     isLastItem?: boolean;
-    className?: string;
-}
-
-export interface BreadCrumbLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
-    href: string;
-    className?: string;
 }

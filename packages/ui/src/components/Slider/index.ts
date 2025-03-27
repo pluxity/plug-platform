@@ -1,4 +1,3 @@
-
 import {
     Slider as SliderComponent,
     SliderTrack,
@@ -13,14 +12,11 @@ import type {
     SliderThumbProps
  } from './Slider.types'; 
 
-
-
 const Slider = Object.assign(SliderComponent, {
     Track: SliderTrack,
     Range: SliderRange,
     Thumb: SliderThumb,
 });
-
 
 export { Slider };
 

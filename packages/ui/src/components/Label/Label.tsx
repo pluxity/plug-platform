@@ -1,16 +1,15 @@
-import * as React from "react";
 import { cn } from "../../utils/classname";
 import type { LabelProps } from "./Label.types";
 
-const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
-({
+const Label = ({
     color = "primary",
     required,
     size = "medium",
     className,
     children,
+    ref,
     ...props
-}, ref) => {
+}: LabelProps) => {
 
     const labelColor = {
         primary: "text-primary-500",
@@ -40,7 +39,8 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
          {children}   
         </label>
     )
-})
+};
 
 Label.displayName = "Label";
+
 export { Label };

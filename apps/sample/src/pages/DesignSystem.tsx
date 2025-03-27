@@ -122,7 +122,7 @@ function DesignSystem() {
       <h2 className="text-xl font-bold mt-8 mb-4">Badge 컴포넌트 예제</h2>
       <Badge>뱃지</Badge>
       <h2 className="text-xl font-bold mt-8 mb-4">Checkbox 컴포넌트 예제</h2>
-      <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
+      <Checkbox label="체크박스" color="primary" type="circle" disabled/>
       <h2 className="text-xl font-bold mt-8 mb-4">Skeleton 컴포넌트 예제</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Skeleton variant="circle" className="w-[180px] h-[180px]"></Skeleton>

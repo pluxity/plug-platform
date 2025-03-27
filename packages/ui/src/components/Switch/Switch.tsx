@@ -1,10 +1,8 @@
-import * as React from "react";
 import { useState } from "react";
 import { cn } from "../../utils/classname";
 import type { SwitchProps } from "./Switch.types";
 
-const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
-({
+const Switch = ({
     size = 'small',
     color = 'primary',
     label,
@@ -13,8 +11,9 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
     onChange,
     checked,
     className,
+    ref,
     ...props
-}, ref) => {
+}: SwitchProps) => {
 
     const [switchChecked, setSwitchChecked] = useState(defaultChecked);
 
@@ -57,10 +56,7 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
 
     return(
         <label
-            ref={ref}
-            className={cn(
-                switchLabelStyle,
-            )}
+            className={cn(switchLabelStyle, className)}
         >
             <input 
                 onChange={switchHandle}
@@ -68,6 +64,7 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
                 type="checkbox"
                 checked={currentChecked}
                 disabled={disabled}
+                ref={ref}
                 className={cn(
                     switchInputWrap,
                     switchInputSize,
@@ -86,7 +83,8 @@ const Switch = React.forwardRef<HTMLLabelElement, SwitchProps>(
             
         </label>
     )
-})
+};
 
 Switch.displayName = "Switch";
+
 export { Switch };

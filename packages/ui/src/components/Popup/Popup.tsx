@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import React from 'react';
 import { Dialog } from '../Dialog/Dialog';
 import { Button } from '../Button/Button';
 import { cn } from '../../utils/classname';
@@ -25,8 +25,7 @@ const getPlacementClasses = (placement: PopupPlacement): string => {
   }
 };
 
-const Popup = forwardRef<HTMLDivElement, PopupProps>(
-  ({ 
+const Popup = React.memo(({ 
     children, 
     title, 
     placement = 'center', 
@@ -36,8 +35,9 @@ const Popup = forwardRef<HTMLDivElement, PopupProps>(
     headerClassName,
     bodyClassName,
     overlayClassName,
+    ref,
     ...props 
-  }, ref) => {
+  }: PopupProps) => {
     const widthClass = typeof width === 'number' ? `w-[${width}px]` : `w-[${width}]`;
 
     return (
@@ -93,8 +93,7 @@ const Popup = forwardRef<HTMLDivElement, PopupProps>(
         </div>
       </Dialog>
     );
-  }
-);
+  });
 
 Popup.displayName = 'Popup';
 

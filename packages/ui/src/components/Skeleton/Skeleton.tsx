@@ -1,17 +1,14 @@
-import * as React from 'react';
 import { cn } from '../../utils/classname';
 import type { SkeletonProps } from './Skeleton.types';
 
-const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-({
+const Skeleton = ({
     variant = "rectangle",
     className,
     ...props
-}, ref) => {
+}: SkeletonProps ) => {
     return(
         <div 
             aria-busy="true"
-            ref={ref}
             className={cn(
                 "animate-pulse rounded-md bg-muted bg-gray-200",
                 variant === "circle" && "rounded-full",
@@ -19,12 +16,11 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
                 variant === "text" && "h-4 w-full rounded",
                 className
             )}
-            
             {...props}
         >
         </div>
     )
-});
+};
 
 Skeleton.displayName = "Skeleton";
 

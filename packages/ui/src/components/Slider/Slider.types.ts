@@ -1,4 +1,6 @@
-import React from 'react';
+import type { Color, Size } from '../types';
+
+type SliderColor = Exclude<Color, 'destructive'>;
 
 export interface SliderContextProps {
     disabled?: boolean;
@@ -7,13 +9,13 @@ export interface SliderContextProps {
     min: number;
     max: number;
     step: number;
-    size: 'small' | 'medium' | 'large';
-    color: 'primary' | 'secondary';
+    size: Size;
+    color: SliderColor;
     sliderId: string;
     sliderRef: { current: HTMLDivElement | null };
 }
 
-export interface SliderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SliderProps extends React.ComponentProps<'div'> {
     defaultValue?: number;
     value?: number;
     onValueChange?: (value: number) => void;
@@ -21,25 +23,21 @@ export interface SliderProps extends React.HTMLAttributes<HTMLDivElement> {
     max?: number;
     step?: number;
     disabled?: boolean;
-    size?: 'small' | 'medium' | 'large';
-    color?: 'primary' | 'secondary';
-    className?: string;
+    size?: Size;
+    color?: SliderColor;
     'aria-label'?: string;
     'aria-labelledby'?: string;
 }
 
-export interface SliderTrackProps extends React.HTMLAttributes<HTMLDivElement> {
-    className?: string;
+export interface SliderTrackProps extends React.ComponentProps<'div'> {
     children?: React.ReactNode;
 }
 
-export interface SliderThumbProps extends React.HTMLAttributes<HTMLSpanElement> {
-    className?: string;
+export interface SliderThumbProps extends React.ComponentProps<'span'> {
     tabIndex?: number;
-    size?: 'small' | 'medium' | 'large';
+    size?: Size;
 }
 
-export interface SliderRangeProps extends React.HTMLAttributes<HTMLInputElement> {
-    className?: string;
+export interface SliderRangeProps extends React.ComponentProps<'input'> {
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }

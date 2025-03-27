@@ -1,19 +1,14 @@
-import * as React from "react";
 import { cn } from "../../utils/classname";
+import { InputHelperTextProps } from "./Input.types";
 
-export interface InputHelperTextProps extends React.ComponentProps<'p'> {
-  id?: string;
-  error?: boolean;
-  className?: string;
-}
-
-const InputHelperText = React.forwardRef<HTMLParagraphElement, InputHelperTextProps>(({
+const InputHelperText = ({
   children,
   id,
   error = false,
   className,
+  ref,
   ...props
-}, ref) => {
+}: InputHelperTextProps) => {
 
   const helperTextStyle = "text-xs my-1";
   const helperTextError = error ? "text-red-600" : "text-gray-500";
@@ -32,7 +27,7 @@ const InputHelperText = React.forwardRef<HTMLParagraphElement, InputHelperTextPr
       {children}
     </p>
   );
-});
+};
 
 InputHelperText.displayName = 'InputHelperText';
 

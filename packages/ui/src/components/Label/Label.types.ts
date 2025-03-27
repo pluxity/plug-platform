@@ -1,8 +1,8 @@
 
-import { LabelHTMLAttributes } from "react";
-export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
-    color?: "primary" | "secondary" | "destructive";
+import type { Color, Size } from '../types'
+
+export interface LabelProps extends React.ComponentProps<'label'> {
+    color?: Color;
     required?: boolean;
-    size?: "small" | "medium" | "large";
-    className?: string;
+    size?: Size;
 }

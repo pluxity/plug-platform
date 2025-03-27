@@ -1,5 +1,5 @@
 import React from 'react';
-import { DialogProps } from '../Dialog/Dialog.types';
+import type { DialogProps } from '../Dialog/Dialog.types';
 
 export type PopupPlacement = 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'center';
 
@@ -11,4 +11,5 @@ export interface PopupProps extends Omit<DialogProps, 'contentClassName'> {
   contentClassName?: string;
   headerClassName?: string;
   bodyClassName?: string;
+  ref?: React.Ref<HTMLDivElement>;
 } 

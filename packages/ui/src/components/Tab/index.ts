@@ -19,7 +19,6 @@ const Tab = Object.assign(TabComponent, {
     Content: TabContent
 });
 
-
 export { Tab };
 
 export type{

@@ -7,7 +7,6 @@ import {
 import type {
     BreadCrumbProps,
     BreadCrumbItemProps,
-    BreadCrumbLinkProps,
 } from './BreadCrumb.types';
 
 
@@ -16,11 +15,9 @@ const BreadCrumb = Object.assign(BreadCrumbComponent, {
     Link: BreadCrumbLink,
 });
 
-
 export { BreadCrumb };
 
 export type{
     BreadCrumbProps,
     BreadCrumbItemProps,
-    BreadCrumbLinkProps,
 };

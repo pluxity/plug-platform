@@ -1,10 +1,9 @@
-import { forwardRef, createContext, useContext } from 'react';
+import { createContext, useContext } from 'react';
 import React from 'react';
 import { cn } from '../../utils/classname';
 import type{
     BreadCrumbProps,
     BreadCrumbItemProps,
-    BreadCrumbLinkProps,
 } from './BreadCrumb.types';
 
 interface BreadCrumbContextProps {
@@ -15,15 +14,15 @@ interface BreadCrumbContextProps {
 
 const BreadCrumbContext = createContext<BreadCrumbContextProps | undefined>(undefined);
 
-const BreadCrumb = forwardRef<HTMLElement, BreadCrumbProps>(
-({
+const BreadCrumb = ({
     color = 'primary',
     size = 'small',
     separator = 'line',
     className,
     children,
+    ref,
     ...props
-}, ref) => {
+}: BreadCrumbProps) => {
     
     const BreadCrumbListStyle = 'flex flex-wrap items-center break-words';
     const BreadCrumbListSize = {
@@ -59,17 +58,16 @@ const BreadCrumb = forwardRef<HTMLElement, BreadCrumbProps>(
                 </ol>
             </nav>
         </BreadCrumbContext.Provider>
-    )
-});
+    )};
 
 BreadCrumb.displayName = 'BreadCrumb';
 
-const BreadCrumbItem = forwardRef<HTMLLIElement, BreadCrumbItemProps>(({
+const BreadCrumbItem = React.memo(({
     className,
     children,
     isLastItem,
     ...props
-}, ref) => {
+}: BreadCrumbItemProps) => {
     const context = useContext(BreadCrumbContext);
 
     if (!context) {
@@ -87,7 +85,6 @@ const BreadCrumbItem = forwardRef<HTMLLIElement, BreadCrumbItemProps>(({
     return (
         <>
             <li 
-                ref={ref} 
                 className={cn(
                     BreadCrumbItemStyle,
                     BreadcrumbListColor,
@@ -109,17 +106,18 @@ const BreadCrumbItem = forwardRef<HTMLLIElement, BreadCrumbItemProps>(({
                 </li>
             )}
         </>
-    );
+    )
 });
 
 BreadCrumbItem.displayName = 'BreadCrumbItem';
 
-const BreadCrumbLink = forwardRef<HTMLAnchorElement, BreadCrumbLinkProps>(({
+const BreadCrumbLink = ({
     href,
     className,
     children,
+    ref,
     ...props
-}, ref) => {
+}: React.ComponentProps<'a'>) => {
     const context = useContext(BreadCrumbContext);
 
     if (!context) {
@@ -154,7 +152,7 @@ const BreadCrumbLink = forwardRef<HTMLAnchorElement, BreadCrumbLinkProps>(({
             {children}
         </a>
     )
-})
+};
 
 BreadCrumbLink.displayName = 'BreadCrumbLink';
     
