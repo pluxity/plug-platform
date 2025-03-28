@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useState, useRef, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useState, useRef, useEffect, useId } from "react";
 import { cn } from '../../utils/classname';
 import AccordionIcon from '../../assets/icons/Accordion.svg';
 import type { 
@@ -11,15 +10,14 @@ import type {
 } from './Accordion.types';
 
 
-const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
-({ 
+const Accordion = React.memo(({ 
   type = "single",
   collapsible = false,
   onChange,
   className, 
   children,
   ...props 
-}, ref) => {
+}: AccordionProps) => {
   
     const [accordionState, setAccordionState] = useState<Set<string>>(new Set());
 
@@ -64,49 +62,46 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
 
     return (
         <div
-        ref={ref}
-        className={cn("flex flex-col bg-gray-100", className)}
-        {...props}
-        >
-        {elementProps}
+          className={cn("flex flex-col bg-gray-100", className)}
+          {...props}
+          >
+          {elementProps}
         </div>
     );
 });
 
 Accordion.displayName = 'Accordion';
 
-const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
-({ 
+const AccordionItem = React.memo(({ 
   disabled = false,
   isOpen = false, 
   onToggle,
   className,  
   children,
   ...props 
-}, ref) => {
-
-  const uniqueIdRef = useRef(uuidv4());
-  const buttonId = `button-${uniqueIdRef.current}`;
-  const contentId = `content-${uniqueIdRef.current}`;
+}: AccordionItemProps) => {
+  const uniqueId = useId();
+  const buttonId = `button-${uniqueId}`;
+  const contentId = `content-${uniqueId}`;
 
   const elementProps = React.Children.map(children, child => {
     if(React.isValidElement(child)){
-        if((child.type as AccordionTriggerProps) === AccordionTrigger){
-          return React.cloneElement(child, {
-            isOpen,
-            disabled,
-            id: buttonId,
-            "aria-controls": contentId,
-            onToggle,
-          } as AccordionTriggerProps);
+        if(child.type === AccordionTrigger){
+            return React.cloneElement(child, {
+                isOpen,
+                disabled,
+                id: buttonId,
+                "aria-controls": contentId,
+                onToggle,
+            } as AccordionTriggerProps);
         }
 
-        if((child.type as AccordionContentProps) === AccordionContent){
-          return React.cloneElement(child,{
-            isOpen,
-            id: contentId,
-            "aria-labelledby": buttonId,
-          } as AccordionContentProps);
+        if(child.type === AccordionContent){
+            return React.cloneElement(child, {
+                isOpen,
+                id: contentId,
+                "aria-labelledby": buttonId,
+            } as AccordionContentProps);
         }
     }
     return child;
@@ -114,7 +109,6 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
 
   return (
     <div
-      ref={ref}
       className={cn(
         "border-b border-gray-300", 
         disabled && "opacity-50 cursor-not-allowed",
@@ -129,15 +123,15 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
 
 AccordionItem.displayName = 'AccordionItem';
 
-const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-({ 
+const AccordionTrigger = React.memo(({ 
   isOpen = false,
   disabled = false,
   onToggle,
   className, 
   children, 
+  ref,
   ...props 
-}, ref) => {
+}: AccordionTriggerProps) => {
  
   return (
     <button
@@ -169,13 +163,13 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
 AccordionTrigger.displayName = "AccordionTrigger";
 
 
-const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
-  ({ 
+const AccordionContent = React.memo(({ 
     isOpen = false,
     className, 
     children, 
+    ref,
     ...props 
-  }, ref) => {
+  }: AccordionContentProps) => {
     
     const contentRef = useRef<HTMLDivElement>(null);
     const [contentHeight, setContentHeight] = useState<number>(0);

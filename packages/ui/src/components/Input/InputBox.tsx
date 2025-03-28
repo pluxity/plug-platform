@@ -1,25 +1,21 @@
 import * as React from "react";
-import { useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useId } from "react";
 import { cn } from "../../utils/classname";
 import { InputHelperText } from "./InputHelperText";
 import { InputLabel } from "./InputLabel";
 import { InputText } from "./InputText";
 import { InputPassword } from "./InputPassword";
 
-export interface InputBoxProps extends React.HTMLAttributes<HTMLDivElement>{
-  className?: string;
-}
-
-const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
+const InputBox = ({
   children,
   className,
+  ref,
   ...props
-}, ref) => {
+}: React.ComponentProps<'div'>) => {
 
-  const uniqueIdRef = useRef(uuidv4());
-  const inputId = `input-${uniqueIdRef.current}`;
-  const helperId = `helper-${uniqueIdRef.current}`;
+  const uniqueId = useId();
+  const inputId = `input-${uniqueId}`;
+  const helperId = `helper-${uniqueId}`;
   
   const inputChildren = React.Children.toArray(children);
   const inputHelperTexts = inputChildren.filter(child => React.isValidElement(child) && child.type === InputHelperText);
@@ -63,7 +59,7 @@ const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
       {helperTextsProp}
     </div>
   );
-});
+};
 
 InputBox.displayName = 'InputBox';
 

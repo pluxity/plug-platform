@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Accordion } from '../Accordion';
 
-Accordion.Item.displayName = 'Accordion.Item';
-Accordion.Trigger.displayName = 'Accordion.Trigger';
-Accordion.Content.displayName = 'Accordion.Content';
-
 const meta: Meta<typeof Accordion> = {
   title: 'Components/Accordion',
   component: Accordion,

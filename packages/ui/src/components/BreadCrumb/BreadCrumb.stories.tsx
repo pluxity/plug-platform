@@ -48,7 +48,7 @@ export const Size: Story = {
     render: (args) => {
         return (
             <>
-                <div>small : </div>
+                <div className="mt-4">small : </div>
                 <BreadCrumb {...args} size='small'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
@@ -60,7 +60,7 @@ export const Size: Story = {
                         <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
-                <div>medium : </div>
+                <div className="mt-4">medium : </div>
                 <BreadCrumb {...args} size='medium'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
@@ -72,7 +72,7 @@ export const Size: Story = {
                         <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>  
                 </BreadCrumb>
-                <div>large : </div>
+                <div className="mt-4">large : </div>
                 <BreadCrumb {...args} size='large'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
@@ -93,7 +93,7 @@ export const color: Story = {
     render: (args) => {
         return (
             <>
-                <div>primary : </div>
+                <div className="mt-4">primary : </div>
                 <BreadCrumb {...args} color='primary'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
@@ -105,7 +105,7 @@ export const color: Story = {
                         <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
-                <div>secondary : </div>
+                <div className="mt-4">secondary : </div>
                 <BreadCrumb {...args} color='secondary'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
@@ -126,7 +126,7 @@ export const separator: Story = {
     render: (args) => {
         return (
             <>
-                <div>line : </div>
+                <div className="mt-4">line : </div>
                 <BreadCrumb {...args} separator='line'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
@@ -138,7 +138,7 @@ export const separator: Story = {
                         <BreadCrumb.Link href="Component">Component</BreadCrumb.Link>
                     </BreadCrumb.Item>
                 </BreadCrumb>
-                <div>arrow : </div>
+                <div className="mt-4">arrow : </div>
                 <BreadCrumb {...args} separator='arrow'>
                     <BreadCrumb.Item >
                         <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>

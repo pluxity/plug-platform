@@ -30,7 +30,7 @@ type Story = StoryObj<typeof Tab>;
 
 export const Primary: Story = {
     render: () => (
-        <Tab >
+        <Tab>
             <Tab.List color='primary'>
                 <Tab.Trigger value="tab1">첫번째 탭</Tab.Trigger>
                 <Tab.Trigger value="tab2">두번째 탭</Tab.Trigger>

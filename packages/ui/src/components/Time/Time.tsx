@@ -1,17 +1,10 @@
-import { TimeHTMLAttributes, useEffect, useState } from 'react';
-import clsx from 'clsx';
-
-export interface TimeProps extends TimeHTMLAttributes<HTMLTimeElement> {
-  variant?: 'black' | 'white';
-  size?: 'small' | 'medium' | 'large';
-  lang?: string;
-  format? :string;
-  className?: string;
-}
+import { useEffect, useState } from 'react';
+import { cn } from '../../utils/classname';
+import type { TimeProps } from './Time.types';
 
 const Time = ({ 
-  variant = 'black',
-  lang = 'ko',
+  color = 'primary',
+  lang = 'ko-KR',
   size = 'small',
   format = 'YYYY-MM-DD HH:mm:ss',
   className,
@@ -21,9 +14,9 @@ const Time = ({
   const timeStyle = 'flex gap-2 items-center font-bold';
 
   const variantStyle = {
-    black: 'text-black',
-    white: 'text-white'
-  }[variant];
+    primary: 'text-black',
+    secondary: 'text-white'
+  }[color];
 
   const sizeStyle = {
     small: 'text-sm',
@@ -81,7 +74,7 @@ useEffect(() => {
   
   return (
     <time 
-        className={clsx(
+        className={cn(
             variantStyle,
             timeStyle,
             sizeStyle,
@@ -94,5 +87,7 @@ useEffect(() => {
   );
 };
 
-export default Time;
+Time.displayName = "Time";
+
+export { Time };
 

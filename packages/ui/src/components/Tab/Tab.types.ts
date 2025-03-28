@@ -1,35 +1,30 @@
-import { HTMLAttributes } from 'react';
+import type { Color } from '../types';
 
 export interface TabContextProps {
     currentValue?: string;
     setCurrentValue: (value: string) => void;
     baseId: string;
-    color?: "primary" | "secondary";
+    color?: Color;
 }
 
-export interface TabProps extends HTMLAttributes<HTMLDivElement>{
+export interface TabProps extends React.ComponentProps<'div'>{
     defaultValue?: string;
     value?: string;
     onValueChange?: (value: string) => void;
-    className?: string;
-    ref?: React.RefObject<HTMLDivElement>;
-    color?: "primary" | "secondary";
+    color?: Color;
 }
 
-export interface TabListProps extends HTMLAttributes<HTMLDivElement>{
-    color?: "primary" | "secondary";
-    className?: string;
+export interface TabListProps extends React.ComponentProps<'div'>{
+    color?: Color;
 }
 
-export interface TabTriggerProps extends HTMLAttributes<HTMLButtonElement>{
+export interface TabTriggerProps extends React.ComponentProps<'button'>{
     isActive?: boolean;
     value: string;
-    className?: string;
-    color?: "primary" | "secondary";
+    color?: Color;
 }
 
-export interface TabContentProps extends HTMLAttributes<HTMLDivElement> {
+export interface TabContentProps extends React.ComponentProps<'div'>{
     isActive?: boolean;
     value: string;
-    className?: string;
 } 

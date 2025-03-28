@@ -1,7 +1,8 @@
+import * as React from 'react';
 import { useEffect, useRef, useMemo } from 'react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'chart.js/auto';
-import { ChartProps } from './Chart.types';
+import type { ChartProps } from './Chart.types';
 
 ChartJS.register(...registerables);
 
@@ -10,14 +11,14 @@ const emptyChartData = {
   datasets: []
 };
 
-const ChartComponent: React.FC<ChartProps> = ({ 
+const ChartComponent = React.memo(({ 
   type, 
   data, 
   options = {}, 
   width = '100%', 
   height = '300px',
   updateMode = 'default'
-}) => {
+}: ChartProps) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<Chart | null>(null);
 
@@ -66,6 +67,6 @@ const ChartComponent: React.FC<ChartProps> = ({
   return (
     <canvas ref={chartRef} width={width} height={height} />
   );
-};
+});
 
 export { ChartComponent };

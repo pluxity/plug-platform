@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useCallback, useId, useState, useEffect, useRef } from 'react';
 import { cn } from '../../utils/classname';
 import type {
