@@ -7,7 +7,8 @@
     "format": "prettier --write",
     "sample": "pnpm --filter @plug/sample",
     "tancheon": "pnpm --filter @plug/tancheon",
-    "storybook": "pnpm --filter @plug/ui storybook"
+    "storybook": "pnpm --filter @plug/ui storybook",
+    "api-hooks": "pnpm --filter @plug/api-hooks"
   },
   "keywords": [],
   "author": "",
