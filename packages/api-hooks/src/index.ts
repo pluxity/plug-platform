@@ -36,4 +36,6 @@ export type {
   CreatedResponseBody,
   ErrorResponseBody,
   ResponseTypes
-} from './types'; 
+} from './types';
+
+export { TokenProvider } from './auth'; 

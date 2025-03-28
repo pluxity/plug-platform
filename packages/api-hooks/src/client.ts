@@ -1,4 +1,19 @@
-export const API_BASE_URL = 'http://192.168.4.56:8080';
+import { TokenProvider } from './auth';
+
+declare global {
+  interface Window {
+    env?: Record<string, string>;
+  }
+}
+
+// 기본 API URL 설정
+export const API_BASE_URL = 
+  // @ts-ignore - 환경변수 접근 (빌드 시 주입됨)
+  (typeof window !== 'undefined' && window.env?.API_BASE_URL) ||
+  (typeof window !== 'undefined' && (window as any).VITE_API_BASE_URL) ||
+  (typeof window !== 'undefined' && (window as any).REACT_APP_API_BASE_URL) ||
+  (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_BASE_URL) ||
+  'http://192.168.4.56:8080';
 
 export type ResponseHandler<T> = (response: Response) => Promise<T>;
 
@@ -52,7 +67,7 @@ export async function fetchClient<T>(
   options?: RequestInit,
   responseHandler: ResponseHandler<T> = defaultResponseHandler
 ): Promise<T> {
-  const token = localStorage.getItem('accessToken');
+  const token = TokenProvider.getToken();
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -72,6 +87,16 @@ export async function fetchClient<T>(
 
     return await responseHandler(response);
   } catch (error) {
+    if (TokenProvider.shouldRefreshToken(error)) {
+      try {
+        await TokenProvider.refreshToken();
+        return fetchClient(url, options, responseHandler);
+      } catch (refreshError) {
+        console.error('토큰 갱신 실패:', refreshError);
+        throw refreshError;
+      }
+    }
+    
     console.error('API 요청 중 오류 발생:', error);
     throw error;
   }
