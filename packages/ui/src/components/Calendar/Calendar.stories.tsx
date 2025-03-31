@@ -7,9 +7,23 @@ const meta: Meta<typeof Calendar> = {
     component: Calendar,
     tags: ['autodocs'],  
     argTypes: {
-        className: {
-            control: 'text',
-        }
+        className: { 
+            control: 'text' 
+        },
+        showOutsideDays: { 
+            control: 'boolean' 
+        },
+        locale: { 
+            control: 'select', 
+            options: [ko] 
+        },
+        captionLayout: { 
+            control: 'select', 
+            options: ['default', 'dropdown'] 
+        },
+        disabled: { 
+            control: 'object' 
+        },
     }
 };
 
