@@ -1,9 +1,12 @@
 {
   "name": "@plug/api-hooks",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "API 통신을 위한 React 훅 라이브러리",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"

@@ -1,11 +1,13 @@
 {
   "name": "@plug/ui",
   "private": true,
+  "description": "플럭시티 디자인시스템 라이브러리",
   "version": "1.0.0",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",

@@ -12,6 +12,7 @@
   "dependencies": {
     "@plug/ui": "workspace:*",
     "@plug/engine": "workspace:*",
+    "@plug/api-hooks": "workspace:*",
     "react-router-dom": "^7.3.0",
     "zustand": "^5.0.3",
     "tailwindcss": "^4.0.6"
