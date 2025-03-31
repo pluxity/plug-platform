@@ -5,6 +5,7 @@ import * as Event from '../eventDispatcher';
 import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
+import * as PoiData from './data';
 
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
@@ -12,9 +13,6 @@ let lineGroup: THREE.Group;
 let textGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let textGeometry: THREE.PlaneGeometry; // 공용 텍스트 Geometry
-
-const iconStorage: Record<string, THREE.SpriteMaterial> = {};
-const meshStorage: Record<string, THREE.BufferGeometry> = {};
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -76,16 +74,10 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     // 중복 체크
 
     // 아이콘 재질이 로드된 상태가 아니면 로드
-    if (iconStorage.hasOwnProperty(option.iconUrl) === false) {
-        iconStorage[option.iconUrl] = new THREE.SpriteMaterial({
-            map: new THREE.TextureLoader().load(option.iconUrl),
-            sizeAttenuation: false,
-            toneMapped: false,
-        });
-    }
+    const iconMaterial = PoiData.getIcon(option.iconUrl);
 
     // poi용 아이콘 스프라이트 생성
-    const iconObj = new THREE.Sprite(iconStorage[option.iconUrl]);
+    const iconObj = new THREE.Sprite(iconMaterial);
     iconObj.center.set(0.5, 0.0);
     iconObj.scale.setScalar(0.05);
     iconGroup.add(iconObj);

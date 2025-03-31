@@ -11,6 +11,7 @@ let poiLine: THREE.LineSegments;
 let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
+let iconStorage: Record<string, THREE.SpriteMaterial> = {};
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -37,6 +38,23 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
     updatePoiLine();
     updatePoiMesh();
 });
+
+/**
+ * url주소로 아이콘 재질 얻기
+ * @param url - 아이콘 url 주소
+ */
+function getIcon(url: string): THREE.SpriteMaterial {
+
+    if( iconStorage.hasOwnProperty(url) === false ) {
+        iconStorage[url] = new THREE.SpriteMaterial({
+            map: new THREE.TextureLoader().load(url),
+            sizeAttenuation: false,
+            toneMapped: false,
+        });
+    }
+
+    return iconStorage[url];
+}
 
 /**
  * poi 선 업데이트
@@ -199,6 +217,8 @@ function Clear() {
 }
 
 export {
+    getIcon, 
+    
     Export,
     ExportAll,
     Import,
