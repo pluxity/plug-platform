@@ -33,9 +33,8 @@
     "baseUrl": ".",
     "paths": {
       "@plug/ui": ["packages/ui/src"],
-      "@plug/ui/*": ["packages/ui/src/*"],
       "@plug/engine": ["packages/engine/src"],
-      "@plug/engine/*": ["packages/engine/src/*"]
+      "@plug/api-hooks": ["packages/api-hooks/src"],
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
