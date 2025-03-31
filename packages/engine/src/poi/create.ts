@@ -51,6 +51,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
         type: 'onPoiSceneGroupCreated',
         poiRootGroup: poiRootGroup,
         iconGroup: iconGroup,
+        textGroup: textGroup,
         lineGroup: lineGroup,
         pointMeshGroup: pointMeshGroup,
     });

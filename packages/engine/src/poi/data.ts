@@ -8,6 +8,8 @@ import { Engine3D } from '../engine';
 let engine: Engine3D;
 let poiDataList: Record<string, PoiElement> = {};
 let poiLine: THREE.LineSegments;
+let poiIconGroup: THREE.Group;
+let poiTextGroup: THREE.Group;
 let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
@@ -34,6 +36,8 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  * Poi 씬그룹 초기화 이벤트 처리
  */
 Event.InternalHandler.addEventListener('onPoiSceneGroupCreated' as never, (evt: any) => {
+    poiIconGroup = evt.iconGroup as THREE.Group;
+    poiTextGroup = evt.textGroup as THREE.Group;
     poiLineGroup = evt.lineGroup as THREE.Group;
     pointMeshGroup = evt.pointMeshGroup as THREE.Group;
 });
@@ -210,6 +214,41 @@ function ExportAll() {
  */
 function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[]) {
     console.log('data.ts Import Called.', data);
+
+    if (Array.isArray(data) === false) {
+        data = [data];
+    }
+
+    data.forEach(item => {
+        const iconMaterial = getIcon(item.iconUrl);
+        const iconObj = new THREE.Sprite(iconMaterial);
+        iconObj.center.set(0.5, 0.0);
+        iconObj.scale.setScalar(0.05);
+        poiIconGroup.add(iconObj);
+
+        const textMesh = createTextMesh(item.displayText);
+        poiTextGroup.add(textMesh);
+
+        const element = new PoiElement({
+            id: item.id,
+            iconUrl: item.iconUrl,
+            modelUrl: item.modelUrl,
+            displayText: item.displayText,
+            property: item.property,
+        });
+        element.position = new Interfaces.Vector3Custom();
+        element.IconObject = iconObj;
+        element.TextObject = textMesh;
+        element.FloorId = item.floorId;
+        element.WorldPosition = new THREE.Vector3(item.position.x, item.position.y, item.position.z);
+        element.PointMeshData.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
+        element.PointMeshData.scale.copy(item.scale);
+
+        poiDataList[item.id] = element;
+    });
+
+    updatePoiLine();
+    updatePoiMesh();
 }
 
 /**
