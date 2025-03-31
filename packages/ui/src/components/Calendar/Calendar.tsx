@@ -10,8 +10,8 @@ const Calendar = ({
 }: CalendarProps) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
 
-    const handleSelect = (selectedDate: Date | undefined) => {
-        setDate(selectedDate);
+    const handleSelect = (date: Date | undefined) => {
+        setDate(date);
     };
       
     const CalenderStyle = "inline-flex p-3 rounded-md shadow-[0_1px_30px_2px_rgba(0,0,0,0.1)]";

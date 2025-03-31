@@ -43,6 +43,6 @@ export const captionLayout: Story = {
 
 export const Disabled: Story = {
     render: () => (
-        <Calendar className="w-80"  />
+        <Calendar className="w-80" disabled={{ dayOfWeek: [0, 6] }} />
     )
 }
