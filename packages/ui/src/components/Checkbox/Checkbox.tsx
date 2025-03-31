@@ -1,17 +1,9 @@
-import { useState, HTMLAttributes } from "react";
+import { useState } from "react";
 import { cn } from "../../utils/classname";
-
-export interface CheckboxProps extends HTMLAttributes<HTMLInputElement> {
-  variant?: "primary" | "secondary";
-  size?: "small" | "medium" | "large";
-  type?: "rectangle" | "circle";
-  label?: string;
-  className?: string;
-  disabled?: boolean;
-}
+import type { CheckboxProps } from "./Checkbox.types";
 
 const Checkbox = ({
-  variant = "primary",
+  color = "primary",
   size = "small",
   type = "rectangle",
   label,
@@ -41,7 +33,7 @@ const Checkbox = ({
   const inputVariantStyle = {
     primary: `${checked ? "bg-primary-500 border-primary-600" : ""}`,
     secondary: `${checked ? "bg-secondary-500 border-secondary-600" : ""}`,
-  }[variant];
+  }[color];
 
   const inputDisabledStyle = disabled ? "bg-gray-200 border-gray-400 after:border-gray-400 cursor-not-allowed" : "";
 
@@ -56,7 +48,7 @@ const Checkbox = ({
   const labelVariantStyle = {
     primary: "text-black",
     secondary: "text-black",
-  }[variant];
+  }[color];
 
   const labelDisabledStyle = disabled ? "text-gray-400 cursor-not-allowed" : "";
 
@@ -98,5 +90,7 @@ const Checkbox = ({
     </label>
   );
 };
+
+Checkbox.displayname = 'Checkbox';
 
 export default Checkbox;
