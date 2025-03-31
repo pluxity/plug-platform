@@ -1,22 +1,17 @@
 import * as React from "react";
 import { cn } from "../../utils/classname";
+import type { TextareaProps } from "./Textarea.types";
 
-export interface TextareaProps extends React.ComponentProps<'textarea'> {
-    ariaLabel?: string;
-    resize?: "none" | "both" | "horizontal" | "vertical";
-    invalid?: boolean;
-    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    className?: string;
-}
-
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({
+const Textarea = ({
     ariaLabel,
     resize = "none",
     invalid = false,
     value,
     onChange,
     className, 
-    ...props }, ref) => {
+    ref,
+    ...props 
+  }: TextareaProps ) => {
       
     const textareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange?.(e);
@@ -45,9 +40,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({
         {...props}
       />
     </>
-  )
-})
+  )};
 
 Textarea.displayName = 'Textarea';
 
-export { Textarea }
+export { Textarea };

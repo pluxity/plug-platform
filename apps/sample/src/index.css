@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "../../../packages/ui/src/index.css";
+@source "../../../packages/ui";
 
 @theme {
   /* Primary Palette - 보라(Violet) 계열 */

@@ -1,17 +1,12 @@
-import * as React from "react";
 import { cn } from "../../utils/classname";
 
-export interface InputLabelProps extends React.ComponentProps<'label'> {
-  id?: string;
-  className?: string;
-}
-
-const InputLabel = React.forwardRef<HTMLLabelElement, InputLabelProps>(({
+const InputLabel = ({
   children,
   id,
   className,
+  ref,
   ...props
-}, ref) => {
+}: React.ComponentProps<'label'>) => {
   return (
     <label
       ref={ref}
@@ -25,7 +20,7 @@ const InputLabel = React.forwardRef<HTMLLabelElement, InputLabelProps>(({
       {children}
     </label>
   );
-});
+};
 
 InputLabel.displayName = 'InputLabel';
 

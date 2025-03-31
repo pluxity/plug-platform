@@ -13,7 +13,7 @@ const meta: Meta<typeof Button> = {
     },
     color: {
       control: 'select',
-      options: ['defaul', 'primary', 'secondary', 'destructive'],
+      options: ['default', 'primary', 'secondary', 'destructive'],
     },
     size: {
       control: 'select',

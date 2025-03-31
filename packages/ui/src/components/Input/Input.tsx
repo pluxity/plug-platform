@@ -1,19 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
 import { cn } from "../../utils/classname";
+import { InputProps } from "./Input.types"
 
-export interface InputProps extends React.ComponentProps<'input'> {
-    id?: string;
-    ariaLabel?: string;
-    invalid?: boolean;
-    iconPosition?: 'leading' | 'trailing';
-    iconSvg?: string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
-    renderIcon?: (props: {iconColor: string, isFocused: boolean}) => React.ReactNode;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    className?: string;
-}
-
-const Input = React.forwardRef<HTMLInputElement, InputProps>(({
+const Input = ({
     id,
     ariaLabel,
     type = 'text',
@@ -24,8 +14,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
     value,
     onChange,
     className,
+    ref,
     ...props
-}, ref) => {
+}: InputProps) => {
   const [inputFocus, setInputFocus] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {onChange?.(e);};
@@ -81,7 +72,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
       </div>
     </>
   );
-});
+};
 
 Input.displayName = 'Input';
 

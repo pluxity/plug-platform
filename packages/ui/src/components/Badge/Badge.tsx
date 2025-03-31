@@ -1,15 +1,8 @@
-import {HTMLAttributes} from 'react';
 import {cn} from '../../utils/classname';
-
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement>{
-    variant?: 'primary' | 'destructive';
-    size?: 'xsmall' | 'small' | 'medium' | 'large';
-    className?: string;   
-    label?: string;
-}
+import type { BadgeProps } from './Badge.types';
 
 const Badge = ({
-    variant = 'primary',
+    color = 'primary',
     size = 'small',
     className,
     children,
@@ -19,10 +12,11 @@ const Badge = ({
 
     const badgeStyle = 'inline-flex justify-center items-center font-extrabold box-border rounded-full';
     
-    const variantStyle = {
+    const colorStyle = {
         primary : 'bg-primary-500 text-white',
+        secondary : 'bg-secondary-500 text-white',
         destructive : 'bg-destructive-500 text-white',
-    }[variant];
+    }[color];
 
     const sizeStyle = {
         xsmall : 'text-xs px-2 py-1',
@@ -38,7 +32,7 @@ const Badge = ({
             aria-label={label}
             className={cn(
                 badgeStyle,
-                variantStyle,
+                colorStyle,
                 sizeStyle,
                 className
             )}
@@ -49,4 +43,4 @@ const Badge = ({
     );
 };
 
-export default Badge;
+export {Badge};
