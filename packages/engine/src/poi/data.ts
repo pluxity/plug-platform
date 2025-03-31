@@ -54,6 +54,14 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
 });
 
 /**
+ * id에 해당하는 poi가 생성되어 있는지 체크
+ * @param id - poi id
+ */
+function exists(id: string): boolean {
+    return poiDataList.hasOwnProperty(id);
+}
+
+/**
  * url주소로 아이콘 재질 얻기
  * @param url - 아이콘 url 주소
  */
@@ -220,6 +228,11 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[])
     }
 
     data.forEach(item => {
+        if (exists(item.id)) {
+            console.warn(`${item.id} has already exists.`);
+            return;
+        }
+
         const iconMaterial = getIcon(item.iconUrl);
         const iconObj = new THREE.Sprite(iconMaterial);
         iconObj.center.set(0.5, 0.0);
@@ -281,6 +294,7 @@ function Clear() {
 export {
     getIcon,
     createTextMesh,
+    exists,
 
     Export,
     ExportAll,

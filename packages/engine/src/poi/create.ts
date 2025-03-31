@@ -63,6 +63,10 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  */
 function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     // 중복 체크
+    if( PoiData.exists(option.id)) {
+        console.warn(`${option.id} has already exists.`);
+        return;
+    }
 
     // 아이콘 재질이 로드된 상태가 아니면 로드
     const iconMaterial = PoiData.getIcon(option.iconUrl);
