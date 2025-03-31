@@ -1,0 +1,135 @@
+[
+    {
+        "id": "52532e5a-52bb-4112-8229-1372f8057194",
+        "iconUrl": "SamplePoiIcon.png",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "52532e5a",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "1",
+        "position": {
+            "x": 3.1431111985620266,
+            "y": -0.5008831024169922,
+            "z": 32.73114109600026
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "5d688aa0-17e1-4a22-929c-e26bc8fc0080",
+        "iconUrl": "SamplePoiIcon.png",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "5d688aa0",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "3",
+        "position": {
+            "x": -4.039739584271005,
+            "y": 8.750820055603981,
+            "z": 19.262183154791163
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "3d23c870-7a9d-4d14-861d-4237aba30ba8",
+        "iconUrl": "SamplePoiIcon.png",
+        "displayText": "3d23c870",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "3",
+        "position": {
+            "x": 0.46782833452123596,
+            "y": 8.750820055603981,
+            "z": 20.68372035001766
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "f1424365-a827-439b-b249-52e3b4a5b857",
+        "iconUrl": "SamplePoiIcon.png",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "f1424365",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "4",
+        "position": {
+            "x": 4.889417327756163,
+            "y": 12.748811841011051,
+            "z": -4.207401725994695
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "762fd688-2901-43d2-8cae-b7e50672ed18",
+        "iconUrl": "SamplePoiIcon.png",
+        "displayText": "762fd688",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "4",
+        "position": {
+            "x": -2.1995445717988793,
+            "y": 12.748811841011047,
+            "z": -25.840658525629316
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    }
+]

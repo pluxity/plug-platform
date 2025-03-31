@@ -77,6 +77,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button onClick={Px.Poi.Clear}>Clear</Button>
                     <br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'ETC') {
@@ -95,7 +96,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     render(): React.ReactNode {
         return (
-            <div className="control-panel" style={{position: 'absolute', background: 'rgba(0, 0, 0, 0.5)', color: 'white'}}>
+            <div className="control-panel" style={{ position: 'absolute', background: 'rgba(0, 0, 0, 0.5)', color: 'white' }}>
                 <fieldset className="control-fieldset">
                     <legend>WebGL</legend>
                     <label htmlFor='ApiList'>Api List:</label>
@@ -165,6 +166,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.ExportAll': {
                 const data = Px.Poi.ExportAll();
                 console.log('Poi.ExportAll', data);
+            } break;
+            case 'Poi.Import': {
+                fetch('poiSampleData.json').then(res => res.json()).then(data => {
+                    console.log('Poi.Import', data);
+                    Px.Poi.Import(data);
+                });
             } break;
         }
     }

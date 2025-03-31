@@ -168,7 +168,7 @@ function ExportAll() {
  * @param data - 임포트 데이터
  */
 function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[]) {
-
+    console.log('data.ts Import Called.', data);
 }
 
 /**
