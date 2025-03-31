@@ -131,5 +131,112 @@
             "y": 1,
             "z": 1
         }
+    },
+    {
+        "id": "38d5af1e-f691-44dc-a177-629113a9f74a",
+        "iconUrl": "SamplePoiIcon.png",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "38d5af1e",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "3",
+        "position": {
+            "x": 4.159452351938749,
+            "y": 8.750820055603981,
+            "z": 17.05535663926353
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "291d7831-8c47-48a6-9196-67d58d41f421",
+        "iconUrl": "SamplePoiIcon.png",
+        "displayText": "291d7831",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "4",
+        "position": {
+            "x": -5.768850968139247,
+            "y": 12.748811841011047,
+            "z": -23.299381162412804
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "4c1a3aea-2405-4a68-a47f-4d300d135c4f",
+        "iconUrl": "SamplePoiIcon.png",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "4c1a3aea",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "4",
+        "position": {
+            "x": 5.5670444446455525,
+            "y": 12.748811841011047,
+            "z": -27.085616887722605
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    },
+    {
+        "id": "e3d2eefb-d925-486a-8a62-f8156d4b981b",
+        "iconUrl": "SamplePoiIcon.png",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "e3d2eefb",
+        "property": {
+            "testText": "테스트 속성",
+            "testInt": 11,
+            "testFloat": 2.2
+        },
+        "floorId": "1",
+        "position": {
+            "x": 3.1895999151681886,
+            "y": -0.5008831024169886,
+            "z": 31.895450720805332
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
     }
 ]
