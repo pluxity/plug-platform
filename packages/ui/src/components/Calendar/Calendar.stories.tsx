@@ -7,22 +7,24 @@ const meta: Meta<typeof Calendar> = {
     component: Calendar,
     tags: ['autodocs'],  
     argTypes: {
+        mode: {
+            control: 'select',
+            options: ['single' , 'multiple', 'range']
+        },
         className: { 
             control: 'text' 
         },
         showOutsideDays: { 
-            control: 'boolean' 
+            cdescription: '외부요일 노출'
         },
         locale: { 
-            control: 'select', 
-            options: [ko] 
+            description: 'ko 한글 호환 locale={ko}'
         },
         captionLayout: { 
-            control: 'select', 
-            options: ['default', 'dropdown'] 
+            description: '월이나 연도 사이를 탐색할 수 있는 드롭다운'
         },
         disabled: { 
-            control: 'object' 
+            action: 'disabled',
         },
     }
 };
@@ -33,7 +35,20 @@ type Story = StoryObj<typeof Calendar>
 
 export const Default: Story = {
     render: () => (
-        <Calendar className="w-80" />
+        <Calendar className="w-80" mode="single" />
+    )
+}
+
+export const Mode: Story = {
+    render: () => (
+        <>
+            <div className="my-4">Mode: Single</div>
+            <Calendar className="w-80" mode="single" />
+            <div className="my-4">Mode: range</div>
+            <Calendar className="w-80" mode="range" />
+            <div className="my-4">Mode: multiple</div>
+            <Calendar className="w-80" mode="multiple" />
+        </>
     )
 }
 
