@@ -12,12 +12,22 @@ let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
+let sharedTextGeometry: THREE.PlaneGeometry;
 
 /**
  * Engine3D 초기화 이벤트 콜백
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any)=>{
+Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
+
+    // 공용 텍스트 geometry
+    sharedTextGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
+    sharedTextGeometry.translate(0, 2.0, 0);
+
+    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
+    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
+    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
+    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
 });
 
 /**
@@ -45,7 +55,7 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
  */
 function getIcon(url: string): THREE.SpriteMaterial {
 
-    if( iconStorage.hasOwnProperty(url) === false ) {
+    if (iconStorage.hasOwnProperty(url) === false) {
         iconStorage[url] = new THREE.SpriteMaterial({
             map: new THREE.TextureLoader().load(url),
             sizeAttenuation: false,
@@ -54,6 +64,19 @@ function getIcon(url: string): THREE.SpriteMaterial {
     }
 
     return iconStorage[url];
+}
+
+/**
+ * 텍스트 문자열을 three.js 메시로 생성
+ * @param displayText - 표시명 텍스트 문자열
+ */
+function createTextMesh(displayText: string): THREE.Mesh {
+    const textSize = new THREE.Vector2();
+    const textMaterial = Util.createTextMaterial(displayText, textSize);
+    const textMesh = new THREE.Mesh(sharedTextGeometry, textMaterial);
+    textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
+
+    return textMesh;
 }
 
 /**
@@ -217,8 +240,9 @@ function Clear() {
 }
 
 export {
-    getIcon, 
-    
+    getIcon,
+    createTextMesh,
+
     Export,
     ExportAll,
     Import,
