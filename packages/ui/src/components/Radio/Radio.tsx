@@ -92,7 +92,6 @@ const RadioGroupItem = ({
   const labelDisabledStyle = disabled ? "text-gray-400 cursor-not-allowed" : "";
 
   const handleChange = () => {
-    console.log("RadioGroupItem clicked with value:", value);
     if (onChange && value) {
       onChange(value);
     }
