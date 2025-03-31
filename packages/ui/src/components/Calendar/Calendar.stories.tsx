@@ -54,24 +54,24 @@ export const Mode: Story = {
 
 export const showOutsideDays: Story = {
     render: () => (
-        <Calendar className="w-80" showOutsideDays={true}/>
+        <Calendar mode="single" className="w-80" showOutsideDays={true}/>
     )
 }
 
 export const locale: Story = {
     render: () => (
-        <Calendar className="w-80" locale={ko}/>
+        <Calendar mode="single" className="w-80" locale={ko}/>
     )
 }
 
 export const captionLayout: Story = {
     render: () => (
-        <Calendar className="w-80" captionLayout="dropdown" />
+        <Calendar mode="single" className="w-80" captionLayout="dropdown" />
     )
 }
 
 export const Disabled: Story = {
     render: () => (
-        <Calendar className="w-80" disabled={{ dayOfWeek: [0, 6] }} />
+        <Calendar mode="single" className="w-80" disabled={{ dayOfWeek: [0, 6] }} />
     )
 }
