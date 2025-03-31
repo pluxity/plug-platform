@@ -1,15 +1,11 @@
-import { Input } from './Input';
-import { InputProps } from "./Input.types";
+import * as React from "react";
 
-const InputText = ({
-  ref,
-  ...props
-}: InputProps) => {
-  return (
-    <Input type="text" ref={ref} {...props} />
-  )
-}
-  
+import { Input, InputProps } from './Input';
+
+const InputText = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return <Input type="text" ref={ref} {...props} />;
+});
+
 InputText.displayName = 'InputText';
 
 export { InputText };

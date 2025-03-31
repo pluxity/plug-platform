@@ -1,18 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../utils/classname';
 import { DialogProps } from './Dialog.types';
 
-const Dialog = React.memo(({ 
+const Dialog = forwardRef<HTMLDivElement, DialogProps>(
+  ({ 
     isOpen, 
     onClose, 
     children, 
     overlayClassName,
     contentClassName,
     closeOnOverlayClick = true,
-    closeOnEsc = true,
-    ref,
-  }: DialogProps) => {
+    closeOnEsc = true
+  }, ref) => {
     const dialogRef = useRef<HTMLDivElement>(null);
     const mergedRef = (node: HTMLDivElement) => {
       dialogRef.current = node;

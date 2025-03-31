@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Input } from './Input';
-import { InputProps } from "./Input.types";
+import { Input, InputProps } from './Input';
 import PasswordIcon from "../../assets/icons/password.svg";
 import HidePasswordIcon from "../../assets/icons/password_hide.svg";
 

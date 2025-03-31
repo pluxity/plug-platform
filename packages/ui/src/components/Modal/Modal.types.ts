@@ -11,5 +11,4 @@ export interface ModalProps extends Omit<DialogProps, 'contentClassName'> {
   headerClassName?: string;
   bodyClassName?: string;
   footerClassName?: string;
-  ref?: React.Ref<HTMLDivElement>;
 } 

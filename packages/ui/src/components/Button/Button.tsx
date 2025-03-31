@@ -1,8 +1,21 @@
-import * as React from 'react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { cn } from '../../utils/classname';
-import type { ButtonProps } from './Button.types';
 
-const Button = React.memo(({
+export type ButtonVariant = 'outline' | 'ghost' | 'default';
+export type ButtonColor = 'primary' | 'secondary' | 'destructive' | 'default';
+export type ButtonSize = 'small' | 'medium' | 'large' | 'icon';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  color?: ButtonColor;
+  size?: ButtonSize;
+  isLoading?: boolean;
+  className?: string;
+}
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
       className,
       variant = 'default',
       color = 'default',
@@ -10,9 +23,10 @@ const Button = React.memo(({
       isLoading = false,
       disabled,
       children,
-      ref,
       ...props
-    }: ButtonProps) => {
+    },
+    ref
+  ) => {
     const buttonBaseStyle =
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0";
 

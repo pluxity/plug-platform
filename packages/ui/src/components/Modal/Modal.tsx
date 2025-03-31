@@ -1,11 +1,12 @@
-import React from 'react';
+import { forwardRef } from 'react';
 import { Dialog } from '../Dialog/Dialog';
 import { Button } from '../Button/Button';
 import { cn } from '../../utils/classname';
 import CloseIcon from '../../assets/icons/close.svg';
 import { ModalProps } from './Modal.types';
 
-const Modal = React.memo(({ 
+const Modal = forwardRef<HTMLDivElement, ModalProps>(
+  ({ 
     children, 
     title, 
     footer, 
@@ -16,9 +17,8 @@ const Modal = React.memo(({
     headerClassName,
     bodyClassName,
     footerClassName,
-    ref,
     ...props 
-  }: ModalProps) => {
+  }, ref) => {
     const widthClass = typeof width === 'number' ? `w-[${width}px]` : `w-[${width}]`;
     const heightClass = typeof height === 'number' ? `h-[${height}px]` : `h-[${height}]`;
 

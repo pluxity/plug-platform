@@ -1,17 +1,18 @@
-import * as React from "react";
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { cn } from '../../utils/classname';
 import { Button } from '../Button/Button';
 import CloseIcon from '../../assets/icons/close.svg';
-import type { CardProps } from './Card.types';
+import { 
+  CardProps, 
+  CardHeaderProps, 
+  CardTitleProps, 
+  CardDescriptionProps, 
+  CardContentProps, 
+  CardFooterProps 
+} from './Card.types';
 
-const Card = ({ 
-  className, 
-  closable = false, 
-  onClose, 
-  ref,
-  ...props 
-}: CardProps) => {    
+const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, closable = false, onClose, ...props }, ref) => {    
     const [isVisible, setIsVisible] = useState(true);
 
     const handleClose = () => {
@@ -48,14 +49,12 @@ const Card = ({
         {props.children}
       </div>
     );
-  };
+  }
+);
 Card.displayName = "Card";
 
-const CardHeader = React.memo(({ 
-  className, 
-  ref,
-  ...props 
-}: React.ComponentProps<'div'>) => {
+const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
+  ({ className, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -67,11 +66,8 @@ const CardHeader = React.memo(({
 );
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = React.memo(({ 
-  className, 
-  ref,
-  ...props 
-}: React.ComponentProps<'h3'>) => {
+const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
+  ({ className, ...props }, ref) => {
     return (
       <h3
         ref={ref}
@@ -86,11 +82,8 @@ const CardTitle = React.memo(({
 );
 CardTitle.displayName = "CardTitle";
 
-const CardDescription = React.memo(({ 
-  className, 
-  ref,
-  ...props 
-}: React.ComponentProps<'p'>) => {
+const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
+  ({ className, ...props }, ref) => {
     return (
       <p
         ref={ref}
@@ -102,11 +95,8 @@ const CardDescription = React.memo(({
 );
 CardDescription.displayName = "CardDescription";
 
-const CardContent = React.memo(({ 
-  className,
-  ref, 
-  ...props 
-}: React.ComponentProps<'div'>) => {
+const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -118,11 +108,8 @@ const CardContent = React.memo(({
 );
 CardContent.displayName = "CardContent";
 
-const CardFooter = React.memo(({ 
-  className, 
-  ref,
-  ...props 
-}: React.ComponentProps<'div'>) => {
+const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
+  ({ className, ...props }, ref) => {
     return (
       <div
         ref={ref}

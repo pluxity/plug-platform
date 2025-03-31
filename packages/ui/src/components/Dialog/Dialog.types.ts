@@ -8,5 +8,4 @@ export interface DialogProps {
   contentClassName?: string;
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
-  ref?: React.Ref<HTMLDivElement>;
 } 

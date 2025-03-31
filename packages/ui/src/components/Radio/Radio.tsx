@@ -1,26 +1,36 @@
-import { useState, createContext, useContext } from "react";
+import * as React from "react";
+import { useState, createContext, useContext, ReactNode } from "react";
 import { cn } from "../../utils/classname";
-import type { RadioGroupProps, RadioItemProps } from "./Radio.types";
 
 interface RadioGroupContextProps {
   selectedValue: string | null;
   onChange: (value: string) => void;
-  color: string;
-  size: string;
+  variant: "primary" | "secondary";
+  size: "small" | "medium" | "large";
   name: string;
 }
+
 const RadioGroupContext = createContext<RadioGroupContextProps | undefined>(undefined);
 
-const RadioGroup = ({
+export interface RadioGroupProps {
+  defaultValue?: string;
+  variant?: "primary" | "secondary";
+  size?: "small" | "medium" | "large";
+  name:string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+  className?: string;
+}
+
+const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(({
   defaultValue,
-  color = "primary",
+  variant = "primary",
   size = "small",
   onChange,
   name,
   children,
-  ref,
   ...props
-}: RadioGroupProps) => {
+}, ref) => {
 
   const [internalValue, setInternalValue] = useState<string | null>(defaultValue || null);
 
@@ -30,7 +40,7 @@ const RadioGroup = ({
   };
 
   return (
-    <RadioGroupContext.Provider value={{ selectedValue: internalValue, onChange: handleChange, color, size, name }}>
+    <RadioGroupContext.Provider value={{ selectedValue: internalValue, onChange: handleChange, variant, size, name }}>
       <div 
           role="radiogroup" 
           className={cn("grid gap-2", props.className)} 
@@ -41,26 +51,31 @@ const RadioGroup = ({
       </div>
     </RadioGroupContext.Provider>
   );
-}; 
+});
 
-RadioGroup.displayName = "RadioGroup";
+export interface RadioItemProps extends React.HTMLAttributes<HTMLLabelElement> {
+  value: string;
+  label?: string;
+  disabled?: boolean;
+  className?: string;
+}
 
-const RadioGroupItem = ({
+const RadioGroupItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(({
   value,
   label,
   disabled = false,
   className,
-  ref,
   ...props
-}: RadioItemProps) => {
+}, ref) => {
 
+  
   const context = useContext(RadioGroupContext);
 
   if (!context) {
     throw new Error("RadioGroupItem은 RadioGroup 내에서 사용되어야 합니다.");
   }
 
-  const { selectedValue, onChange, color, size, name } = context;
+  const { selectedValue, onChange, variant, size, name } = context;
 
   const inputStyle = "z-1 inline-block cursor-pointer border-1 bg-white border-gray-500 rounded-full relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:border-full after:transform";
 
@@ -73,7 +88,7 @@ const RadioGroupItem = ({
   const inputVariantStyle = {
       primary: `${selectedValue === value ? "border-primary-500 after:bg-primary-500" : ""}`,
       secondary: `${selectedValue === value ? "border-secondary-500 after:bg-secondary-500" : ""}`,
-  }[color];
+  }[variant];
 
   const inputDisabledStyle = disabled ? `bg-gray-200 border-gray-400 cursor-not-allowed ${selectedValue === value ? "after:bg-gray-400" : ""}` : "";
 
@@ -87,11 +102,12 @@ const RadioGroupItem = ({
   const labelVariantStyle = {
     primary: "text-black",
     secondary: "text-black",
-  }[color];
+  }[variant];
 
   const labelDisabledStyle = disabled ? "text-gray-400 cursor-not-allowed" : "";
 
   const handleChange = () => {
+    console.log("RadioGroupItem clicked with value:", value);
     if (onChange && value) {
       onChange(value);
     }
@@ -99,6 +115,7 @@ const RadioGroupItem = ({
 
   return (
     <label
+      ref={ref}
       className={cn(
         labelStyle,
         labelSizeStyle,
@@ -109,7 +126,6 @@ const RadioGroupItem = ({
       {...props}
     >
       <input
-        ref={ref}
         type="radio"
         className="absolute opacity-0 z-1"
         disabled={disabled}
@@ -130,8 +146,9 @@ const RadioGroupItem = ({
       {label}
     </label>
   );
-};
+});
 
 RadioGroupItem.displayName = "RadioGroupItem";
+RadioGroup.displayName = "RadioGroup";
 
 export { RadioGroup, RadioGroupItem };

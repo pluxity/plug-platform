@@ -7,7 +7,14 @@ import {
   CardFooter 
 } from "./Card";
 
-import type { CardProps } from "./Card.types";
+import type { 
+  CardProps, 
+  CardHeaderProps, 
+  CardTitleProps, 
+  CardDescriptionProps, 
+  CardContentProps, 
+  CardFooterProps 
+} from "./Card.types";
 
 // Card 컴포넌트에 하위 컴포넌트를 속성으로 추가
 const Card = Object.assign(CardComponent, {
@@ -20,4 +27,11 @@ const Card = Object.assign(CardComponent, {
 
 export { Card };
 
-export type { CardProps }; 
+export type {
+  CardProps,
+  CardHeaderProps,
+  CardTitleProps,
+  CardDescriptionProps,
+  CardContentProps,
+  CardFooterProps
+}; 

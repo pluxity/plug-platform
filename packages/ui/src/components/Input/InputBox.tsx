@@ -1,21 +1,27 @@
 import * as React from "react";
-import { useId } from "react";
+import { useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { cn } from "../../utils/classname";
 import { InputHelperText } from "./InputHelperText";
 import { InputLabel } from "./InputLabel";
 import { InputText } from "./InputText";
 import { InputPassword } from "./InputPassword";
 
-const InputBox = ({
+export interface InputBoxProps extends React.PropsWithChildren<{
+  className?: string;
+  id?: string;
+}> {}
+
+const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(({
   children,
   className,
-  ref,
+  id,
   ...props
-}: React.ComponentProps<'div'>) => {
+}, ref) => {
 
-  const uniqueId = useId();
-  const inputId = `input-${uniqueId}`;
-  const helperId = `helper-${uniqueId}`;
+  const uniqueIdRef = useRef(uuidv4());
+  const inputId = `input-${uniqueIdRef.current}`;
+  const helperId = `helper-${uniqueIdRef.current}`;
   
   const inputChildren = React.Children.toArray(children);
   const inputHelperTexts = inputChildren.filter(child => React.isValidElement(child) && child.type === InputHelperText);
@@ -25,12 +31,12 @@ const InputBox = ({
     if (!React.isValidElement(child)) return child;
     
     if (child.type === InputLabel) {
-      return React.cloneElement(child as React.ReactElement<HTMLLabelElement>, { 
+      return React.cloneElement(child as React.ReactElement<any>, { 
         htmlFor: inputId,
         ...Object(child.props)
       });
     } else if (child.type === InputText || child.type === InputPassword) {
-      return React.cloneElement(child as React.ReactElement<HTMLInputElement>, { 
+      return React.cloneElement(child as React.ReactElement<any>, { 
         id: inputId,
         "aria-describedby": inputHelperTexts.length > 0 ? helperId : '',
         ...Object(child.props)
@@ -41,7 +47,7 @@ const InputBox = ({
   const helperTextsProp = inputHelperTexts.map(child => {
     if (!React.isValidElement(child)) return child;
     
-    return React.cloneElement(child as React.ReactElement<HTMLParagraphElement>, { 
+    return React.cloneElement(child as React.ReactElement<any>, { 
       id: helperId,
       ...Object(child.props)
     });
@@ -59,7 +65,7 @@ const InputBox = ({
       {helperTextsProp}
     </div>
   );
-};
+});
 
 InputBox.displayName = 'InputBox';
 
