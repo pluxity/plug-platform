@@ -220,16 +220,19 @@ function ExportAll() {
  * poi 데이터 임포트
  * @param data - 임포트 데이터
  */
-function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[]) {
+function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] | string) {
     console.log('data.ts Import Called.', data);
 
     // 비주얼 리소스 업데이트 없이 이전의 생성 요소 제거
     Clear(false);
 
+    // 파라미터가 문자열이면 object로 전환
+    if (typeof data === 'string')
+        data = JSON.parse(data);
+
     // 배열로 전환
-    if (Array.isArray(data) === false) {
-        data = [data];
-    }
+    if (Array.isArray(data) === false)
+        data = [data as Interfaces.PoiImportOption];
 
     // 데이터 배열 순회하며 poi 생성
     data.forEach(item => {

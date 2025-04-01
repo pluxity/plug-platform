@@ -84,7 +84,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</Button>
                     <br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'ETC') {
@@ -180,6 +181,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     console.log('Poi.Import', data);
                     Px.Poi.Import(data);
                 });
+            } break;
+            case 'Poi.ImportSingle': {
+                Px.Poi.Import('{ "id": "38d5af1e-f691-44dc-a177-629113a9f74a", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "38d5af1e", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "3", "position": { "x": 4.159452351938749, "y": 8.750820055603981, "z": 17.05535663926353 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
             } break;
             case 'Poi.Clear': {
                 Px.Poi.Clear();
