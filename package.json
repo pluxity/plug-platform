@@ -8,7 +8,6 @@
     "sample": "pnpm --filter @plug/sample",
     "storybook": "pnpm --filter @plug/ui storybook",
     "api-hooks": "pnpm --filter @plug/api-hooks",
-    "project:tancheon": "pnpm --filter @plug/tancheon",
     "project:busan": "pnpm --filter @plug/busan-subway"
   },
   "keywords": [],
