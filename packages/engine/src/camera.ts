@@ -3,6 +3,7 @@ import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
 import { Engine3D } from './engine';
 import * as TWEEN from '@tweenjs/tween.js';
+import * as PxPoi from './poi';
 
 let engine: Engine3D;
 let cursor: THREE.Object3D;
@@ -484,9 +485,19 @@ function SetState(state: Record<string, any>, transitionTime: number) {
     engine.TweenUpdateGroups.add(rotTween);
 }
 
+/**
+ * poi로 카메라 이동
+ * @param id - poi id
+ */
+function MoveToPoi(id: string) {
+    const poiData = PxPoi.Export(id);
+    console.log('camera.ts MoveToPoi', poiData);
+}
+
 export {
     SetEnabled,
     ExtendView,
     GetState,
     SetState,
+    MoveToPoi,
 }

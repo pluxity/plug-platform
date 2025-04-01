@@ -13,6 +13,7 @@ interface FloorData {
 interface WebGLControlPanelState {
     selectedApiName: string;
     deletePoiId: string;
+    moveToPoiIdValue: string;
     floorData: FloorData[];
 }
 
@@ -34,6 +35,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         this.state = {
             selectedApiName: 'None',
             deletePoiId: '',
+            moveToPoiIdValue: '',
             floorData: []
         };
         console.log('px', Px);
@@ -50,7 +52,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button disabled>SetEnabled</Button>
                     <Button onClick={() => Px.Camera.ExtendView()}>ExtendView</Button><br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button><br/>
+                    <Input.Text style={{color:'white'}} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></Input.Text>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Loader') {
@@ -81,7 +85,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button><br />
-                    <Input.Text style={{ color: 'white' }} value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi id'></Input.Text>
+                    <Input.Text style={{ color: 'white' }} value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></Input.Text>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button> &nbsp;
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</Button>
                     <br />
@@ -151,6 +155,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     Px.Camera.SetState(JSON.parse(state), 1.0);
                 }
             } break;
+            case 'Camera.MoveToPoi': {
+                if( this.state.moveToPoiIdValue !== '' ) {
+                    Px.Camera.MoveToPoi(this.state.moveToPoiIdValue);
+                }
+            } break;
             case 'Model.GetHierarchy': {
                 Px.Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
                     console.log('Model.GetModelHierarchy -> ', data);
@@ -217,11 +226,19 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     }
 
     /**
-     * poi 제거 텍스트 입력 값변경 처리
+     * poi 제거 텍스트 입력창 값변경 처리
      * @param evt - 이벤트 정보
      */
     onDeletePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ deletePoiId: evt.target.value });
+    }
+    
+    /**
+     * poi로 카메라 이동 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onMoveToPoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ moveToPoiIdValue: evt.target.value });
     }
 
     /**
