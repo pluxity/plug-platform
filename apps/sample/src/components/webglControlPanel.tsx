@@ -74,7 +74,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button><br />
                     <Input.Text value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi id'></Input.Text>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button> &nbsp;
-                    <Button onClick={Px.Poi.Clear}>Clear</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</Button>
                     <br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import</Button>
@@ -172,6 +172,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     console.log('Poi.Import', data);
                     Px.Poi.Import(data);
                 });
+            } break;
+            case 'Poi.Clear': {
+                Px.Poi.Clear();
             } break;
         }
     }

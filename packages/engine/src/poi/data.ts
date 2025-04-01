@@ -223,10 +223,15 @@ function ExportAll() {
 function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[]) {
     console.log('data.ts Import Called.', data);
 
+    // 비주얼 리소스 업데이트 없이 이전의 생성 요소 제거
+    Clear(false);
+
+    // 배열로 전환
     if (Array.isArray(data) === false) {
         data = [data];
     }
 
+    // 데이터 배열 순회하며 poi 생성
     data.forEach(item => {
         if (exists(item.id)) {
             console.warn(`${item.id} has already exists.`);
@@ -260,6 +265,7 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[])
         poiDataList[item.id] = element;
     });
 
+    // 업데이트
     updatePoiLine();
     updatePoiMesh();
 }
@@ -283,12 +289,14 @@ function Delete(id: string) {
 /**
  * poi 모두 제거
  */
-function Clear() {
+function Clear(bUpdateVisuals: boolean = true) {
     Object.values(poiDataList).forEach(poi => poi.dispose());
     poiDataList = {};
 
-    updatePoiLine();
-    updatePoiMesh();
+    if (bUpdateVisuals) {
+        updatePoiLine();
+        updatePoiMesh();
+    }
 }
 
 export {
