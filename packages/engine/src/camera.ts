@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
 import { Engine3D } from './engine';
+import * as TWEEN from '@tweenjs/tween.js';
 
 let engine: Engine3D;
 let cursor: THREE.Object3D;
@@ -11,6 +12,7 @@ let pickPoint: THREE.Vector3 | undefined = new THREE.Vector3();
 let rotateSmoothingFactor: number = 0.6;
 let panSmoothingFactor: number = 0.7;
 let zoomIntervalFactor: number = 1.0;
+let posTween: TWEEN.Tween | undefined = undefined;
 const rotateDelta: THREE.Vector2 = new THREE.Vector2();
 const panDelta: THREE.Vector3 = new THREE.Vector3();
 const groundPlane: THREE.Plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -384,6 +386,50 @@ function onContextMenu(evt: MouseEvent) {
     evt.stopPropagation();
 }
 
+/**
+ * 전체보기
+ * @param transitionTime - 이동시간
+ */
+function ExtendView(transitionTime?: number) {
+    // 기본값 처리
+    if (transitionTime === undefined || transitionTime === null) {
+        transitionTime = 1.0;
+    }
+
+    // 배경모델 바운딩 계산
+    const target = engine.RootScene.getObjectByName('#ModelGroup');
+    const bounding = new THREE.Box3().setFromObject(target as THREE.Object3D);
+    const sphere = new THREE.Sphere();
+    bounding.getBoundingSphere(sphere);
+
+    // 카메라 방향 얻기
+    const direction = new THREE.Vector3();
+    engine.Camera.getWorldDirection(direction);
+
+    // 카메라 이동 대상 위치점 처리
+    const camPos = sphere.center.clone().addScaledVector(direction, -sphere.radius);
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+
+    // 트윈 생성 및 시작
+    posTween = new TWEEN.Tween(engine.Camera.position)
+    .to({
+        x: camPos.x,
+        y: camPos.y,
+        z: camPos.z,
+    }, transitionTime * 1000)
+    .easing(TWEEN.Easing.Quartic.InOut)
+    .start();
+
+    // 트윈 업데이트 그룹에 추가
+    engine.TweenUpdateGroups.add(posTween);
+}
+
 export {
     SetEnabled,
+    ExtendView,
 }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as Interfaces from './interfaces';
 import * as Event from './eventDispatcher';
+import * as TWEEN from '@tweenjs/tween.js';
 
 class Engine3D {
 
@@ -21,6 +22,8 @@ class Engine3D {
     private envScene: Addon.DebugEnvironment;
     private pmremGenerator: THREE.PMREMGenerator;
     private generatedCubeRenderTarget: THREE.WebGLRenderTarget;
+    
+    private tweenUpdateGroups: TWEEN.Group;
 
     /**
      * 생성자
@@ -96,6 +99,9 @@ class Engine3D {
         // 그림자맵 이벤트 콜백 등록
         Event.InternalHandler.addEventListener('onShadowMapNeedsUpdate' as never, this.updateShadowMap.bind(this));
 
+        // 트윈 그룹 생성
+        this.tweenUpdateGroups = new TWEEN.Group();
+
         // 초기화 완료 이벤트 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onEngineInitialized',
@@ -122,6 +128,9 @@ class Engine3D {
     onRender(): void {
         
         const deltaTime = this.clock.getDelta();
+
+        // 트윈업데이트
+        this.tweenUpdateGroups.update();
 
         // 렌더링 전 이벤트 통지
         Event.InternalHandler.dispatchEvent({
@@ -198,8 +207,18 @@ class Engine3D {
         return this.renderer;
     }
 
+    /**
+     * 환경맵 렌더타겟
+     */
     get GeneratedCubeRenderTarget() {
         return this.generatedCubeRenderTarget;
+    }
+
+    /**
+     * 트윈 업데이트 그룹
+     */
+    get TweenUpdateGroups() {
+        return this.tweenUpdateGroups;
     }
 }
 

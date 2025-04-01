@@ -44,7 +44,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if (this.state.selectedApiName === 'Loader') {
+        if (this.state.selectedApiName === 'Camera') {
+            return (
+                <span>
+                    <Button disabled>SetEnabled</Button>
+                    <Button onClick={() => Px.Camera.ExtendView()}>ExtendView</Button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Loader') {
             return (
                 <Button disabled>LoadGltf</Button>
             );
@@ -72,7 +79,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button><br />
-                    <Input.Text value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi id'></Input.Text>
+                    <Input.Text style={{ color: 'white' }} value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi id'></Input.Text>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button> &nbsp;
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</Button>
                     <br />
@@ -102,6 +109,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <label htmlFor='ApiList'>Api List:</label>
                     <select id='ApiList' defaultValue='None' onChange={this.onApiSelectChange.bind(this)}>
                         <option value='None' disabled>Api 선택</option>
+                        <option value='Camera'>Camera</option>
                         <option value='Loader'>Loader</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
