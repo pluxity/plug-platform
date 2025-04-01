@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@plug/ui';
-import { fetchClient } from '@plug/api-hooks';
-
-interface SignUpRequest {
-  username: string;
-  password: string;
-  name: string;
-  code: string;
-}
+import { signUp, SignUpRequest } from '@plug/api-hooks';
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -32,11 +25,7 @@ const SignupPage = () => {
     setIsLoading(true);
 
     try {
-      await fetchClient('/api/auth/signup', {
-        method: 'POST',
-        body: JSON.stringify(formData),
-        credentials: 'include', // 쿠키 지원 설정
-      });
+      await signUp(formData);
 
       // 회원가입 성공 시 로그인 페이지로 리다이렉트
       navigate('/login', { state: { message: '회원가입에 성공했습니다. 로그인해주세요.' } });
@@ -55,7 +44,7 @@ const SignupPage = () => {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           이미 계정이 있으신가요?{' '}
-          <Button>로그인</Button>
+          <Button onClick={() => navigate('/login')}>로그인</Button>
         </p>
       </div>
 

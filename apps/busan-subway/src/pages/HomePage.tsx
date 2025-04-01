@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Button } from '@plug/ui'
+import React from 'react';
 
 // 임시 타입 정의
 interface SubwayStation {
@@ -12,22 +11,13 @@ interface SubwayStation {
   };
 }
 
-function HomePage() {
-  const [popularStations] = useState<SubwayStation[]>([
+const HomePage: React.FC = () => {
+  const [popularStations] = React.useState<SubwayStation[]>([
     { id: '1', name: '서면역', line: '1호선', location: { lat: 35.157, lng: 129.059 } },
     { id: '2', name: '해운대역', line: '2호선', location: { lat: 35.163, lng: 129.159 } },
     { id: '3', name: '부산역', line: '1호선', location: { lat: 35.115, lng: 129.042 } },
     { id: '4', name: '동래역', line: '1호선', location: { lat: 35.204, lng: 129.078 } },
   ]);
-
-  // API 훅 사용 예시 (실제 API가 구현되면 사용)
-  // const { data, isLoading, error } = useApiGet<SubwayStation[]>('/stations/popular');
-  
-  // useEffect(() => {
-  //   if (data) {
-  //     setPopularStations(data);
-  //   }
-  // }, [data]);
 
   return (
     <div className="space-y-8">
@@ -37,7 +27,6 @@ function HomePage() {
           부산 지하철은 총 5개 노선으로 운영되며, 도시의 주요 지역을 연결하고 있습니다.
           실시간 열차 정보와 역 주변 정보를 확인하실 수 있습니다.
         </p>
-        <Button>로그인</Button>
       </section>
 
       <section className="bg-white p-6 rounded-lg shadow-md">
@@ -59,8 +48,15 @@ function HomePage() {
           <p className="text-gray-700">주말 및 공휴일: 오전 5:30 - 오후 11:30</p>
         </div>
       </section>
-    </div>
-  )
-}
 
-export default HomePage 
+      <section className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-4">지하철 노선도</h2>
+        <div className="w-full h-[calc(100vh-400px)] bg-gray-100 rounded-lg flex items-center justify-center">
+          <p className="text-gray-500">지하철 노선도가 여기에 표시됩니다.</p>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default HomePage; 

@@ -10,15 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@plug/ui": "workspace:^",
     "@plug/api-hooks": "workspace:^",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@plug/engine": "workspace:^",
+    "@plug/ui": "workspace:^",
+    "js-cookie": "^3.0.5",
+    "react-cookie": "^8.0.1",
     "react-router-dom": "^7.3.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
@@ -31,4 +33,4 @@
     "vite": "^6.1.2",
     "vite-plugin-svgr": "^4.2.0"
   }
-} 
+}
