@@ -48,7 +48,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <Button disabled>SetEnabled</Button>
-                    <Button onClick={() => Px.Camera.ExtendView()}>ExtendView</Button>
+                    <Button onClick={() => Px.Camera.ExtendView()}>ExtendView</Button><br />
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Loader') {
@@ -137,6 +139,18 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onApiBtnClick(apiName: string) {
         switch (apiName) {
+            case 'Camera.GetState': {
+                const state = Px.Camera.GetState();
+                localStorage.setItem('CameraState', JSON.stringify(state));
+            } break;
+            case 'Camera.SetState': {
+                const state = localStorage.getItem('CameraState');
+                if (state === undefined || state === null) {
+                    console.warn('no such data of camera state.');
+                } else {
+                    Px.Camera.SetState(JSON.parse(state), 1.0);
+                }
+            } break;
             case 'Model.GetHierarchy': {
                 Px.Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
                     console.log('Model.GetModelHierarchy -> ', data);
