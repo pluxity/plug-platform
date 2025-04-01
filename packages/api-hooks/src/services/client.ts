@@ -6,9 +6,7 @@ declare global {
   }
 }
 
-// 기본 API URL 설정
 export const API_BASE_URL = 
-  // @ts-ignore - 환경변수 접근 (빌드 시 주입됨)
   (typeof window !== 'undefined' && window.env?.API_BASE_URL) ||
   (typeof window !== 'undefined' && (window as any).VITE_API_BASE_URL) ||
   (typeof window !== 'undefined' && (window as any).REACT_APP_API_BASE_URL) ||
