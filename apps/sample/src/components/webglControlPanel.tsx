@@ -52,8 +52,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button disabled>SetEnabled</Button>
                     <Button onClick={() => Px.Camera.ExtendView()}>ExtendView</Button><br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button><br/>
-                    <Input.Text style={{color:'white'}} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></Input.Text>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button><br />
+                    <Input.Text style={{ color: 'white' }} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></Input.Text>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</Button>
                 </span>
             );
@@ -79,6 +79,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                             <Button onClick={() => this.setFloorVisibility(false)}>HideAll</Button>
                         </span>
                     }
+                    <br />
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Model.Expand')}>Expand</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Model.Collapse')}>Collapse</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Poi') {
@@ -156,7 +159,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 }
             } break;
             case 'Camera.MoveToPoi': {
-                if( this.state.moveToPoiIdValue !== '' ) {
+                if (this.state.moveToPoiIdValue !== '') {
                     Px.Camera.MoveToPoi(this.state.moveToPoiIdValue);
                 }
             } break;
@@ -166,6 +169,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
 
                     this.setState({ floorData: data }); // 얻은 층정보로 state 설정
                 });
+            } break;
+            case 'Model.Expand': {
+                Px.Model.Expand(1.0, 10.0, () => console.log('펼치기 완료'));
+            } break;
+            case 'Model.Collapse': {
+                Px.Model.Collapse(1.0, () => console.log('접기 완료'));
             } break;
             case 'Poi.Create': {
                 const sampleModelUrls: (undefined | string)[] = [
@@ -232,7 +241,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onDeletePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ deletePoiId: evt.target.value });
     }
-    
+
     /**
      * poi로 카메라 이동 입력창 값변경 처리
      * @param evt - 이벤트 정보
