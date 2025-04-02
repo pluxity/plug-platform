@@ -110,7 +110,7 @@ Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) =
         dummy.parent?.remove(dummy);
     });
     poiDummies = [];
-    
+
     // poi선, 위치점메시 업데이트
     updatePoiLine();
     updatePoiMesh();
@@ -182,10 +182,12 @@ function updatePoiLine() {
     // 라인 버텍스 수집
     const linePoints: THREE.Vector3[] = [];
     Object.values(poiDataList).forEach(element => {
-        const p0 = element.WorldPosition.clone();
-        const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
+        if (element.Visible) {
+            const p0 = element.WorldPosition.clone();
+            const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
 
-        linePoints.push(p0, p1);
+            linePoints.push(p0, p1);
+        }
     });
 
     // 라인 메시
@@ -254,7 +256,7 @@ async function updatePoiMesh() {
         currPoiArray.forEach((poi, index) => {
             dummy.position.copy(poi.WorldPosition);
             dummy.rotation.copy(poi.PointMeshData.rotation);
-            dummy.scale.copy(poi.PointMeshData.scale);
+            dummy.scale.copy(poi.Visible ? poi.PointMeshData.scale : new THREE.Vector3(0, 0, 0));
             dummy.updateMatrix();
 
             mesh.setMatrixAt(index, dummy.matrix);
@@ -378,6 +380,56 @@ function Clear(bUpdateVisuals: boolean = true) {
     }
 }
 
+/**
+ * poi 보기
+ * @param id - poi id값
+ */
+function Show(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].Visible = true;
+
+        updatePoiLine();
+        updatePoiMesh();
+    }
+}
+
+/**
+ * poi 숨기기
+ * @param id - poi id값
+ */
+function Hide(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].Visible = false;
+
+        updatePoiLine();
+        updatePoiMesh();
+    }
+}
+
+/**
+ * 모든 poi 보기
+ */
+function ShowAll() {
+    Object.values(poiDataList).forEach(poi => {
+        poi.Visible = true;
+    });
+
+    updatePoiLine();
+    updatePoiMesh();
+}
+
+/**
+ * 모든 poi 숨기기
+ */
+function HideAll() {
+    Object.values(poiDataList).forEach(poi => {
+        poi.Visible = false;
+    });
+
+    updatePoiLine();
+    updatePoiMesh();
+}
+
 export {
     getIcon,
     createTextMesh,
@@ -388,4 +440,8 @@ export {
     Import,
     Delete,
     Clear,
+    Show,
+    Hide,
+    ShowAll,
+    HideAll,
 }

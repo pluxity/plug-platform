@@ -89,6 +89,12 @@ function Show(id: string) {
     if (floorObjects.hasOwnProperty(id)) {
         floorObjects[id].visible = true;
         setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
+
+        // 층가시화 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onModelShow',
+            floorId: id,
+        });
     }
 }
 
@@ -100,6 +106,12 @@ function Hide(id: string) {
     if (floorObjects.hasOwnProperty(id)) {
         floorObjects[id].visible = false;
         setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Invisible);
+
+        // 층 숨기기 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onModelHide',
+            floorId: id,
+        });
     }
 }
 
@@ -110,6 +122,12 @@ function ShowAll() {
     Object.values(floorObjects).forEach(floor => {
         floor.visible = true;
         setObjectLayer(floor, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
+        
+        // 층가시화 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onModelShow',
+            floorId: floor.userData['floorId'],
+        });
     });
 }
 
@@ -120,6 +138,12 @@ function HideAll() {
     Object.values(floorObjects).forEach(floor => {
         floor.visible = false;
         setObjectLayer(floor, Interfaces.CustomLayer.Invisible);
+        
+        // 층 숨기기 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onModelHide',
+            floorId: floor.userData['floorId'],
+        });
     });
 }
 

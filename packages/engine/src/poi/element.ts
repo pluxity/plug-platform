@@ -22,6 +22,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
     
     private pointMeshData: PoiPointMeshData;
 
+    private visibleState: boolean;
+
     /**
      * 생성자
      * @param option - poi 생성 옵션
@@ -43,6 +45,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
             rotation: new Interfaces.EulerCustom,
             scale: new Interfaces.Vector3Custom(1, 1, 1),
         };
+
+        this.visibleState = true;
     }
 
     /**
@@ -123,6 +127,34 @@ class PoiElement implements Interfaces.PoiCreateOption {
             rotation: this.pointMeshData.rotation.ExportData,
             scale: this.pointMeshData.scale.ExportData,
         };
+    }
+
+    /**
+     * 가시화 상태
+     */
+    get Visible(): boolean {
+        return this.visibleState;
+    }
+
+    /**
+     * 가시화 상태
+     */
+    set Visible(value: boolean) {
+        this.visibleState = value;
+
+        if( this.visibleState ) {
+            (this.iconObj as THREE.Sprite).visible = true;
+            this.iconObj?.layers.set(Interfaces.CustomLayer.Default);
+
+            (this.textObj as THREE.Object3D).visible = true;
+            this.textObj?.layers.set(Interfaces.CustomLayer.Default);
+        } else {
+            (this.iconObj as THREE.Sprite).visible = false;
+            this.iconObj?.layers.set(Interfaces.CustomLayer.Invisible);
+
+            (this.textObj as THREE.Object3D).visible = false;
+            this.textObj?.layers.set(Interfaces.CustomLayer.Invisible);
+        }
     }
 
     /**

@@ -13,6 +13,7 @@ interface FloorData {
 interface WebGLControlPanelState {
     selectedApiName: string;
     deletePoiId: string;
+    setVisiblePoiId: string;
     moveToPoiIdValue: string;
     floorData: FloorData[];
 }
@@ -35,6 +36,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         this.state = {
             selectedApiName: 'None',
             deletePoiId: '',
+            setVisiblePoiId: '',
             moveToPoiIdValue: '',
             floorData: []
         };
@@ -94,7 +96,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</Button><br />
+                    <Input.Text style={{ color: 'white' }} value={this.state.setVisiblePoiId} onChange={this.onSetVisiblePoiTextInputValueChanged.bind(this)} placeholder='Show/Hide Poi Id'></Input.Text>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'ETC') {
@@ -220,6 +227,18 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Clear': {
                 Px.Poi.Clear();
             } break;
+            case 'Poi.Show': {
+                Px.Poi.Show(this.state.setVisiblePoiId);
+            } break;
+            case 'Poi.Hide': {
+                Px.Poi.Hide(this.state.setVisiblePoiId);
+            } break;
+            case 'Poi.ShowAll': {
+                Px.Poi.ShowAll();
+            } break;
+            case 'Poi.HideAll': {
+                Px.Poi.HideAll();
+            } break;
         }
     }
 
@@ -240,6 +259,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onDeletePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ deletePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 기사화 설정 텍스트 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSetVisiblePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ setVisiblePoiId: evt.target.value });
     }
 
     /**
