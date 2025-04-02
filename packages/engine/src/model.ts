@@ -133,6 +133,13 @@ function Expand(transitionTime: number, interval: number, onComplete: Function) 
 
     // 트윈이 진행중이면 수행하지 않음
     if (posTween === undefined || posTween === null) {
+
+        // 이동시작전 이벤트 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onModelBeforeMove',
+            floorObjects: floorObjects,
+        });
+
         // 층 배열 얻어서 sortingorder 기준 정렬
         const floorArray = Array.from(Object.values(floorObjects));
         floorArray.sort((a, b) => {
@@ -175,6 +182,12 @@ function Expand(transitionTime: number, interval: number, onComplete: Function) 
                 engine.TweenUpdateGroups.remove(posTween as TWEEN.Tween);
                 posTween = null;
 
+                // 이동 완료 후 이벤트 통지
+                Event.InternalHandler.dispatchEvent({
+                    type: 'onModelAfterMove',
+                    floorObjects: floorObjects,
+                });
+
                 // 완료 콜백 호출
                 onComplete?.();
             })
@@ -194,6 +207,13 @@ function Expand(transitionTime: number, interval: number, onComplete: Function) 
 function Collapse(transitionTime: number, onComplete: Function) {
     // 트윈이 진행중일땐 수행하지 않음
     if (posTween === undefined || posTween === null) {
+
+        // 이동시작전 이벤트 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onModelBeforeMove',
+            floorObjects: floorObjects,
+        });
+
         // 접기 트윈 데이터 생성
         const collapseData = {
             ratio: 0.0,
@@ -209,25 +229,31 @@ function Collapse(transitionTime: number, onComplete: Function) {
 
         // 트윈 생성
         posTween = new TWEEN.Tween(collapseData)
-        .to({
-            ratio: 1.0,
-        }, transitionTime * 1000)
-        .easing(TWEEN.Easing.Quartic.InOut)
-        .onUpdate(()=>{
-            collapseData.floors.forEach((item: any) => {
-                const startPoint = item.startPosition;
-                const endPoint = item.targetPosition;
-                item.target.position.copy(new THREE.Vector3().lerpVectors(startPoint, endPoint, collapseData.ratio));
-            });
-        }).onComplete(()=>{
-            posTween?.stop();
-            engine.TweenUpdateGroups.remove(posTween as TWEEN.Tween);
-            posTween = null;
-            
-            // 완료 콜백 호출
-            onComplete?.();
-        })
-        .start();
+            .to({
+                ratio: 1.0,
+            }, transitionTime * 1000)
+            .easing(TWEEN.Easing.Quartic.InOut)
+            .onUpdate(() => {
+                collapseData.floors.forEach((item: any) => {
+                    const startPoint = item.startPosition;
+                    const endPoint = item.targetPosition;
+                    item.target.position.copy(new THREE.Vector3().lerpVectors(startPoint, endPoint, collapseData.ratio));
+                });
+            }).onComplete(() => {
+                posTween?.stop();
+                engine.TweenUpdateGroups.remove(posTween as TWEEN.Tween);
+                posTween = null;
+
+                // 이동 완료 후 이벤트 통지
+                Event.InternalHandler.dispatchEvent({
+                    type: 'onModelAfterMove',
+                    floorObjects: floorObjects,
+                });
+
+                // 완료 콜백 호출
+                onComplete?.();
+            })
+            .start();
 
         // 트윈 업데이트 그룹에 추가
         engine.TweenUpdateGroups.add(posTween);

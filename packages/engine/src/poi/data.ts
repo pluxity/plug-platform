@@ -15,6 +15,7 @@ let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
 let sharedTextGeometry: THREE.PlaneGeometry;
+let poiDummies: THREE.Object3D[] = [];
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -51,6 +52,81 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
 
     updatePoiLine();
     updatePoiMesh();
+});
+
+/**
+ * 층 이동 전 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onModelBeforeMove' as never, (evt: any) => {
+    const floorObjects: Record<string, THREE.Object3D> = evt.floorObjects;
+
+    // 가시화 요소 숨기기
+    poiIconGroup.visible = false;
+    poiIconGroup.layers.set(Interfaces.CustomLayer.Invisible);
+
+    poiTextGroup.visible = false;
+    poiTextGroup.layers.set(Interfaces.CustomLayer.Invisible);
+
+    poiLineGroup.visible = false;
+    poiLineGroup.layers.set(Interfaces.CustomLayer.Invisible);
+
+    pointMeshGroup.visible = false;
+    pointMeshGroup.layers.set(Interfaces.CustomLayer.Invisible);
+
+    // Poi<=>층별 더미객체 생성
+    Object.values(poiDataList).forEach(poi => {
+
+        // 층 객체 찾아 더미 생성 후 부착
+        if (floorObjects.hasOwnProperty(poi.FloorId)) {
+
+            const dummy = new THREE.Object3D();
+            dummy.name = `${poi.id}.Dummy`;
+            dummy.userData['targetPoiElement'] = poi;
+            dummy.position.copy(poi.WorldPosition);
+
+            const targetFloor = floorObjects[poi.FloorId];
+            targetFloor.attach(dummy);
+
+            poiDummies.push(dummy);
+        }
+    });
+});
+
+/**
+ * 층 이동 후 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) => {
+    const floorObjects: Record<string, THREE.Object3D> = evt.floorObjects;
+
+    // 이동된 더미객체의 위치값을 poi에 적용시킨다.
+    poiDummies.forEach(dummy => {
+        const worldPos = new THREE.Vector3();
+        dummy.getWorldPosition(worldPos);
+
+        const targetPoi = dummy.userData['targetPoiElement'];
+        targetPoi.WorldPosition = worldPos;
+
+        // 원래 층객체로부터 분리
+        dummy.parent?.remove(dummy);
+    });
+    poiDummies = [];
+    
+    // poi선, 위치점메시 업데이트
+    updatePoiLine();
+    updatePoiMesh();
+
+    // 가시화 요소 보이기
+    poiIconGroup.visible = true;
+    poiIconGroup.layers.set(Interfaces.CustomLayer.Default);
+
+    poiTextGroup.visible = true;
+    poiTextGroup.layers.set(Interfaces.CustomLayer.Default);
+
+    poiLineGroup.visible = true;
+    poiLineGroup.layers.set(Interfaces.CustomLayer.Default);
+
+    pointMeshGroup.visible = true;
+    pointMeshGroup.layers.set(Interfaces.CustomLayer.Default);
 });
 
 /**

@@ -88,6 +88,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * 층 id값
+     */
+    get FloorId(): string {
+        return this.floorId as string;
+    }
+
+    /**
      * 선길이
      */
     get LineHeight(): number {
