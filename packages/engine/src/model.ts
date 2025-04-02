@@ -122,12 +122,12 @@ function ShowAll() {
     Object.values(floorObjects).forEach(floor => {
         floor.visible = true;
         setObjectLayer(floor, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
-        
-        // 층가시화 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
-            type: 'onModelShow',
-            floorId: floor.userData['floorId'],
-        });
+
+    });
+
+    // 층가시화 이벤트 내부 통지
+    Event.InternalHandler.dispatchEvent({
+        type: 'onModelShowAll',
     });
 }
 
@@ -138,12 +138,12 @@ function HideAll() {
     Object.values(floorObjects).forEach(floor => {
         floor.visible = false;
         setObjectLayer(floor, Interfaces.CustomLayer.Invisible);
-        
-        // 층 숨기기 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
-            type: 'onModelHide',
-            floorId: floor.userData['floorId'],
-        });
+
+    });
+
+    // 층 숨기기 이벤트 내부 통지
+    Event.InternalHandler.dispatchEvent({
+        type: 'onModelHideAll',
     });
 }
 

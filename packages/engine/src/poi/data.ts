@@ -130,6 +130,54 @@ Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) =
 });
 
 /**
+ * 특정층 가시화 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
+    const floorId: string = evt.floorId;
+    Object.values(poiDataList).forEach(poi => {
+        if (poi.FloorId === floorId) {
+            poi.Visible = true;
+        }
+    });
+    updatePoiLine();
+    updatePoiMesh();
+});
+
+/**
+ * 특정층 숨기기 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
+    const floorId: string = evt.floorId;
+    Object.values(poiDataList).forEach(poi => {
+        if (poi.FloorId === floorId) {
+            poi.Visible = false;
+        }
+    });
+    updatePoiLine();
+    updatePoiMesh();
+});
+
+/**
+ * 모든층 가시화 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => {
+
+    Object.values(poiDataList).forEach(poi => poi.Visible = true);
+    updatePoiLine();
+    updatePoiMesh();
+});
+
+/**
+ * 모든층 숨기기 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
+
+    Object.values(poiDataList).forEach(poi => poi.Visible = false);
+    updatePoiLine();
+    updatePoiMesh();
+});
+
+/**
  * id에 해당하는 poi가 생성되어 있는지 체크
  * @param id - poi id
  */
