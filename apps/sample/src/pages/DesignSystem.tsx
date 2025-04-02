@@ -1,9 +1,23 @@
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { Accordion, Button, Badge, Checkbox, Skeleton, Slider, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
-import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
-import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
+import { 
+  Accordion, 
+  Button, 
+  Badge, 
+  Checkbox, 
+  Skeleton, 
+  Slider, 
+  Switch, 
+  Textarea, 
+  Tab, 
+  Label,
+  Input, 
+  Card 
+} from "@plug/ui";
+import type { ButtonProps } from "@plug/ui";
+import { MenuIcon, NoticeIcon } from "@plug/ui/icons";
+
 
 // 제품 데이터 샘플
 const products = [
@@ -89,6 +103,19 @@ function DesignSystem() {
   const SliderChangeValue = (value: number) => {
       setSliderValue(value);
   };
+
+  const buttonProps: ButtonProps = {
+    variant: "default",
+    color: "primary",
+    size: "medium",
+    isLoading: false,
+    children: "버튼",
+    onClick: () => {
+      console.log("버튼 클릭");
+    }
+
+  }
+
 
   return (
     <>
@@ -189,7 +216,7 @@ function DesignSystem() {
             <p>카드 내용이 여기에 들어갑니다. 다양한 컨텐츠를 포함할 수 있습니다.</p>
           </Card.Content>
           <Card.Footer>
-            <Button variant="default" color="primary" className="mr-2">확인</Button>
+            <Button {...buttonProps}>확인</Button>
             <Button variant="outline">취소</Button>
           </Card.Footer>
         </Card>
