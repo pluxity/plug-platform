@@ -26,7 +26,6 @@ const AlertController: React.FC<{
     
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => {
-        console.log(isOpen);
         setIsOpen(false);
     }
     
