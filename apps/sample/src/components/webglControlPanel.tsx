@@ -222,7 +222,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 });
             } break;
             case 'Poi.ImportSingle': {
-                Px.Poi.Import('{ "id": "38d5af1e-f691-44dc-a177-629113a9f74a", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "38d5af1e", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "3", "position": { "x": 4.159452351938749, "y": 8.750820055603981, "z": 17.05535663926353 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
+                Px.Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
             } break;
             case 'Poi.Clear': {
                 Px.Poi.Clear();

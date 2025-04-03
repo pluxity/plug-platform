@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
+import * as ModelLocal from '../model/model';
 
 /**
  * poi 개별요소 클래스
@@ -123,7 +124,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
             displayText: this.displayText,
             property: this.property,
             floorId: this.floorId,
-            position: this.position?.ExportData,
+            position: ModelLocal.getFloorLocalPosition(this.position.clone(), this.floorId as string), //this.position?.ExportData,
             rotation: this.pointMeshData.rotation.ExportData,
             scale: this.pointMeshData.scale.ExportData,
         };

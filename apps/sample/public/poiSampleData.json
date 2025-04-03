@@ -1,9 +1,9 @@
 [
     {
-        "id": "52532e5a-52bb-4112-8229-1372f8057194",
+        "id": "ae7a0318-da06-40d3-9dd3-67b8ee5b3e38",
         "iconUrl": "SamplePoiIcon.png",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "52532e5a",
+        "displayText": "ae7a0318",
         "property": {
             "testText": "테스트 속성",
             "testInt": 11,
@@ -11,9 +11,9 @@
         },
         "floorId": "1",
         "position": {
-            "x": 3.1431111985620266,
-            "y": -0.5008831024169922,
-            "z": 32.73114109600026
+            "x": -67.2294123183231,
+            "y": -0.4895453653444175,
+            "z": -0.1937201511709974
         },
         "rotation": {
             "x": 0,
@@ -27,10 +27,9 @@
         }
     },
     {
-        "id": "5d688aa0-17e1-4a22-929c-e26bc8fc0080",
+        "id": "864bd443-e4d5-4677-8bb9-c659ca78d293",
         "iconUrl": "SamplePoiIcon.png",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "5d688aa0",
+        "displayText": "864bd443",
         "property": {
             "testText": "테스트 속성",
             "testInt": 11,
@@ -38,9 +37,9 @@
         },
         "floorId": "3",
         "position": {
-            "x": -4.039739584271005,
-            "y": 8.750820055603981,
-            "z": 19.262183154791163
+            "x": -48.68341481830466,
+            "y": 0.20081795752049203,
+            "z": -10.679191657940647
         },
         "rotation": {
             "x": 0,
@@ -54,9 +53,10 @@
         }
     },
     {
-        "id": "3d23c870-7a9d-4d14-861d-4237aba30ba8",
+        "id": "79d0aaab-553f-46f4-8780-73e8a24f7795",
         "iconUrl": "SamplePoiIcon.png",
-        "displayText": "3d23c870",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "79d0aaab",
         "property": {
             "testText": "테스트 속성",
             "testInt": 11,
@@ -64,9 +64,9 @@
         },
         "floorId": "3",
         "position": {
-            "x": 0.46782833452123596,
-            "y": 8.750820055603981,
-            "z": 20.68372035001766
+            "x": -48.38004915874858,
+            "y": 0.20081795752049203,
+            "z": -5.068345703003401
         },
         "rotation": {
             "x": 0,
@@ -80,10 +80,10 @@
         }
     },
     {
-        "id": "f1424365-a827-439b-b249-52e3b4a5b857",
+        "id": "56ac826c-41b6-425b-ad6c-ab33103aa232",
         "iconUrl": "SamplePoiIcon.png",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "f1424365",
+        "displayText": "56ac826c",
         "property": {
             "testText": "테스트 속성",
             "testInt": 11,
@@ -91,9 +91,9 @@
         },
         "floorId": "4",
         "position": {
-            "x": 4.889417327756163,
-            "y": 12.748811841011051,
-            "z": -4.207401725994695
+            "x": -25.77466288586562,
+            "y": 0.19880974292755127,
+            "z": 3.166141018416512
         },
         "rotation": {
             "x": 0,
@@ -107,9 +107,10 @@
         }
     },
     {
-        "id": "762fd688-2901-43d2-8cae-b7e50672ed18",
+        "id": "ab5b3bcd-e10b-4125-a9ea-edf63b6c290a",
         "iconUrl": "SamplePoiIcon.png",
-        "displayText": "762fd688",
+        "modelUrl": "monkeyhead.glb",
+        "displayText": "ab5b3bcd",
         "property": {
             "testText": "테스트 속성",
             "testInt": 11,
@@ -117,9 +118,9 @@
         },
         "floorId": "4",
         "position": {
-            "x": -2.1995445717988793,
-            "y": 12.748811841011047,
-            "z": -25.840658525629316
+            "x": -25.787916402613725,
+            "y": 0.19880974292755127,
+            "z": -2.5328656470393973
         },
         "rotation": {
             "x": 0,
@@ -133,36 +134,10 @@
         }
     },
     {
-        "id": "38d5af1e-f691-44dc-a177-629113a9f74a",
+        "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e",
         "iconUrl": "SamplePoiIcon.png",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "38d5af1e",
-        "property": {
-            "testText": "테스트 속성",
-            "testInt": 11,
-            "testFloat": 2.2
-        },
-        "floorId": "3",
-        "position": {
-            "x": 4.159452351938749,
-            "y": 8.750820055603981,
-            "z": 17.05535663926353
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "291d7831-8c47-48a6-9196-67d58d41f421",
-        "iconUrl": "SamplePoiIcon.png",
-        "displayText": "291d7831",
+        "displayText": "ff8419ab",
         "property": {
             "testText": "테스트 속성",
             "testInt": 11,
@@ -170,63 +145,9 @@
         },
         "floorId": "4",
         "position": {
-            "x": -5.768850968139247,
-            "y": 12.748811841011047,
-            "z": -23.299381162412804
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "4c1a3aea-2405-4a68-a47f-4d300d135c4f",
-        "iconUrl": "SamplePoiIcon.png",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "4c1a3aea",
-        "property": {
-            "testText": "테스트 속성",
-            "testInt": 11,
-            "testFloat": 2.2
-        },
-        "floorId": "4",
-        "position": {
-            "x": 5.5670444446455525,
-            "y": 12.748811841011047,
-            "z": -27.085616887722605
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "e3d2eefb-d925-486a-8a62-f8156d4b981b",
-        "iconUrl": "SamplePoiIcon.png",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "e3d2eefb",
-        "property": {
-            "testText": "테스트 속성",
-            "testInt": 11,
-            "testFloat": 2.2
-        },
-        "floorId": "1",
-        "position": {
-            "x": 3.1895999151681886,
-            "y": -0.5008831024169886,
-            "z": 31.895450720805332
+            "x": -11.168609758648447,
+            "y": 0.19880974292755127,
+            "z": -2.6205250759845735
         },
         "rotation": {
             "x": 0,

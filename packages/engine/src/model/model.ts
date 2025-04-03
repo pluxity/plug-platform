@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Interfaces from './interfaces';
-import * as Event from './eventDispatcher';
+import * as Interfaces from '../interfaces';
+import * as Event from '../eventDispatcher';
 import * as TWEEN from '@tweenjs/tween.js';
-import { Engine3D } from './engine';
+import { Engine3D } from '../engine';
 
 const floorObjects: Record<string, THREE.Object3D> = {};
 let posTween: TWEEN.Tween | undefined | null = undefined;
@@ -44,6 +44,28 @@ function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
         child.layers.disableAll();
         child.layers.set(layer);
     });
+}
+
+/**
+ * 월드좌표를 지정한 층기준 로컬 좌표로 변환한다.
+ * @param worldPos - 변환할 좌표값
+ * @param floorId - 층id값
+ * @returns - 변환된 좌표값
+ */
+function getFloorLocalPosition(worldPos: THREE.Vector3, floorId: string): THREE.Vector3 {
+    const targetFloor = floorObjects[floorId];
+    return targetFloor.worldToLocal(worldPos);
+}
+
+/**
+ * 층기준 로컬좌표를 월드좌표로 변환한다.
+ * @param localPos - 변환할 좌표값
+ * @param floorId - 층id값
+ * @returns - 변환된 좌표값
+ */
+function getFloorWorldPosition(localPos: THREE.Vector3, floorId: string): THREE.Vector3 {
+    const targetFloor = floorObjects[floorId];
+    return targetFloor.localToWorld(localPos);
 }
 
 /**
@@ -285,6 +307,9 @@ function Collapse(transitionTime: number, onComplete: Function) {
 }
 
 export {
+    getFloorLocalPosition,
+    getFloorWorldPosition,
+    
     GetModelHierarchy,
     Show,
     Hide,

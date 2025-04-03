@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
+import * as ModelInternal from '../model/model';
 import { PoiElement } from './element';
 import { Engine3D } from '../engine';
 
@@ -376,6 +377,9 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
         const textMesh = createTextMesh(item.displayText);
         poiTextGroup.add(textMesh);
 
+        // poi element 익스포트시 내보내지는 위치값은 층기준 로컬좌표이므로, 초기 생성을 위해 월드좌표로 변환한다.
+        const convertedPosition = ModelInternal.getFloorWorldPosition(new THREE.Vector3(item.position.x, item.position.y, item.position.z), item.floorId);
+
         const element = new PoiElement({
             id: item.id,
             iconUrl: item.iconUrl,
@@ -387,7 +391,7 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
         element.IconObject = iconObj;
         element.TextObject = textMesh;
         element.FloorId = item.floorId;
-        element.WorldPosition = new THREE.Vector3(item.position.x, item.position.y, item.position.z);
+        element.WorldPosition = convertedPosition;//new THREE.Vector3(item.position.x, item.position.y, item.position.z);
         element.PointMeshData.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
         element.PointMeshData.scale.copy(item.scale);
 
