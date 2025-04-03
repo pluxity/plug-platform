@@ -1,4 +1,5 @@
 export { Accordion } from './components/Accordion';
+export { Alert } from './components/Alert';
 export { Button } from './components/Button';
 export { Modal } from './components/Modal';
 export { Popup } from './components/Popup';
