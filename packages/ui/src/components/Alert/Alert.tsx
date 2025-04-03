@@ -1,6 +1,5 @@
 import { cn } from '../../utils/classname';
 import * as React from 'react';
-import { useState } from 'react';
 import { Button } from '../Button/Button';
 import CloseIcon from '../../assets/icons/close.svg';
 import ErrorIcon from '../../assets/icons/alert_error.svg';
@@ -16,20 +15,9 @@ const Alert = ({
     ref,
     className,
     children,
+    isOpen,
     ...props
 }: AlertProps) => {
-
-    const [isVisible, setIsVisible] = useState(true);
-
-    const handleClose = () => {
-        setIsVisible(false);
-        if (onClose) {
-            onClose();
-        }
-    };
-    if (!isVisible) {
-        return null;
-    }
 
     const alertStyle = 'flex gap-3 rounded-lg border border-gray-200 bg-white shadow-sm relative px-4 py-6 w-100';
     
@@ -52,7 +40,10 @@ const Alert = ({
     return (
         <Dialog
             ref={ref}
-            onClose={handleClose}
+            closeOnOverlayClick={false}
+            closeOnEsc={false}
+            isOpen={isOpen}
+            onClose={onClose}
             contentClassName={cn(
                 alertStyle, 
                 alertVariant, 
@@ -64,7 +55,7 @@ const Alert = ({
                 variant='ghost'
                 size='icon'
                 className='absolute top-2 right-2 h-6 w-6 p-0 hover:bg-transparent'
-                onClick={handleClose}
+                onClick={onClose}
                 aria-label='닫기'
             >
                 <CloseIcon />
