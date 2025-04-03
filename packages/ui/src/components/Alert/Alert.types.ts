@@ -1,5 +1,6 @@
-export interface AlertProps extends React.ComponentProps<'div'>{
+import type { DialogProps } from '../Dialog/Dialog.types';
+
+export interface AlertProps extends DialogProps {
     variant?: 'default' | 'success' | 'error' | 'notice' | 'info';
-    closable?: boolean;
-    onClose?: () => void;
+    className?: string;
 }

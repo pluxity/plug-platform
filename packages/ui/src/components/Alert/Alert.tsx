@@ -7,17 +7,18 @@ import ErrorIcon from '../../assets/icons/alert_error.svg';
 import SuccessIcon from '../../assets/icons/alert_success.svg';
 import InfoIcon from '../../assets/icons/alert_info.svg';
 import NoticeIcon from '../../assets/icons/alert_notice.svg';
+import { Dialog } from '../Dialog/Dialog';
 import type { AlertProps } from './Alert.types';
 
 const Alert = ({
     variant = 'default',
-    closable = false,
     onClose,
     ref,
     className,
     children,
     ...props
 }: AlertProps) => {
+
     const [isVisible, setIsVisible] = useState(true);
 
     const handleClose = () => {
@@ -29,9 +30,9 @@ const Alert = ({
     if (!isVisible) {
         return null;
     }
-    
-    const alertStyle = 'flex gap-3 rounded-lg border border-gray-200 bg-white shadow-sm relative px-4 py-6 w-100';
 
+    const alertStyle = 'flex gap-3 rounded-lg border border-gray-200 bg-white shadow-sm relative px-4 py-6 w-100';
+    
     const alertVariant = {
         default: 'bg-white',
         success: 'bg-green-100',
@@ -49,32 +50,28 @@ const Alert = ({
     }[variant];
 
     return (
-        <div
-            role='alert'
+        <Dialog
             ref={ref}
-            className={cn(
+            onClose={handleClose}
+            contentClassName={cn(
                 alertStyle, 
-                alertVariant,
+                alertVariant, 
                 className
             )}
             {...props}
         >
-            {closable && (
-                <Button
-                    variant='ghost'
-                    size='icon'
-                    className='absolute top-2 right-2 h-6 w-6 p-0 hover:bg-0'
-                    onClick={handleClose}
-                    aria-label='닫기'
-                >
-                    <CloseIcon/>
-                </Button>
-            )}
-
+            <Button
+                variant='ghost'
+                size='icon'
+                className='absolute top-2 right-2 h-6 w-6 p-0 hover:bg-transparent'
+                onClick={handleClose}
+                aria-label='닫기'
+            >
+                <CloseIcon />
+            </Button>
             {variant !== 'default' && alertIcon}
-
-            <div className='flex-column'>{children}</div>
-        </div>
+            <div>{children}</div>
+        </Dialog>
     );
 };
 
