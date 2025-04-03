@@ -15,6 +15,7 @@ interface WebGLControlPanelState {
     deletePoiId: string;
     setVisiblePoiId: string;
     moveToPoiIdValue: string;
+    moveToFloorIdValue: string;
     floorData: FloorData[];
 }
 
@@ -38,6 +39,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             deletePoiId: '',
             setVisiblePoiId: '',
             moveToPoiIdValue: '',
+            moveToFloorIdValue: '',
             floorData: []
         };
         console.log('px', Px);
@@ -52,11 +54,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <Button disabled>SetEnabled</Button>
-                    <Button onClick={() => Px.Camera.ExtendView()}>ExtendView</Button><br />
+                    <Button onClick={() => Px.Camera.ExtendView(1.0)}>ExtendView</Button><br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button><br />
                     <Input.Text style={{ color: 'white' }} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</Button><br/>
+                    <Input.Text style={{ color: 'white' }} value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></Input.Text>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Loader') {
@@ -170,6 +174,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     Px.Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0);
                 }
             } break;
+            case 'Camera.MoveToFloor': {
+                if( this.state.moveToFloorIdValue !== '' ) {
+                    Px.Camera.MoveToFloor(this.state.moveToFloorIdValue, 1.0);
+                }
+            } break;
             case 'Model.GetHierarchy': {
                 Px.Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
                     console.log('Model.GetModelHierarchy -> ', data);
@@ -275,6 +284,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onMoveToPoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ moveToPoiIdValue: evt.target.value });
+    }
+
+    /**
+     * 층으로 카메라 이동 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onMoveToFloorTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ moveToFloorIdValue: evt.target.value });
     }
 
     /**

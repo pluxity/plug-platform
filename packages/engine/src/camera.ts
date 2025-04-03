@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
-import { Engine3D } from './engine';
 import * as TWEEN from '@tweenjs/tween.js';
 import * as PoiDataInternal from './poi/data';
+import * as ModelInternal from './model/model';
+import { Engine3D } from './engine';
 
 let engine: Engine3D;
 let cursor: THREE.Object3D;
@@ -521,10 +522,49 @@ function MoveToPoi(id: string, transitionTime: number) {
     engine.TweenUpdateGroups.add(posTween);
 }
 
+/**
+ * 지정한 층으로 카메라 이동
+ * @param floorId - 층 id값
+ * @param transitionTime - 이동시간
+ */
+function MoveToFloor(floorId: string, transitionTime: number) {
+    // 층 바운딩
+    const bounding = ModelInternal.calculateFloorBounding(floorId);
+    const sphere = new THREE.Sphere();
+    bounding.getBoundingSphere(sphere);
+
+    // 카메라 방향
+    const direction = new THREE.Vector3();
+    engine.Camera.getWorldDirection(direction);
+
+    // 카메라 이동 위치점
+    const camPos = sphere.center.clone().addScaledVector(direction, -sphere.radius);
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+
+    // 트윈 생성 및 시작
+    posTween = new TWEEN.Tween(engine.Camera.position)
+        .to({
+            x: camPos.x,
+            y: camPos.y,
+            z: camPos.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    // 트윈 업데이트 그룹에 추가
+    engine.TweenUpdateGroups.add(posTween);
+}
+
 export {
     SetEnabled,
     ExtendView,
     GetState,
     SetState,
     MoveToPoi,
+    MoveToFloor,
 }

@@ -52,7 +52,7 @@ function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
  * @param floorId - 층id값
  * @returns - 변환된 좌표값
  */
-function getFloorLocalPosition(worldPos: THREE.Vector3, floorId: string): THREE.Vector3 {
+function convertWorldToFloorLocal(worldPos: THREE.Vector3, floorId: string): THREE.Vector3 {
     const targetFloor = floorObjects[floorId];
     return targetFloor.worldToLocal(worldPos);
 }
@@ -63,9 +63,19 @@ function getFloorLocalPosition(worldPos: THREE.Vector3, floorId: string): THREE.
  * @param floorId - 층id값
  * @returns - 변환된 좌표값
  */
-function getFloorWorldPosition(localPos: THREE.Vector3, floorId: string): THREE.Vector3 {
+function convertFloorLocalToWorld(localPos: THREE.Vector3, floorId: string): THREE.Vector3 {
     const targetFloor = floorObjects[floorId];
     return targetFloor.localToWorld(localPos);
+}
+
+/**
+ * 지정한 층의 월드 기준 바운딩 정보 계산
+ * @param floorId - 층 id값
+ * @returns - 계산된 바운딩 정보
+ */
+function calculateFloorBounding(floorId: string): THREE.Box3 {
+    const targetFloor = floorObjects[floorId];
+    return new THREE.Box3().setFromObject(targetFloor);
 }
 
 /**
@@ -307,8 +317,9 @@ function Collapse(transitionTime: number, onComplete: Function) {
 }
 
 export {
-    getFloorLocalPosition,
-    getFloorWorldPosition,
+    convertWorldToFloorLocal,
+    convertFloorLocalToWorld,
+    calculateFloorBounding,
     
     GetModelHierarchy,
     Show,

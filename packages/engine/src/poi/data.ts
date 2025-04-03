@@ -387,7 +387,7 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
         poiTextGroup.add(textMesh);
 
         // poi element 익스포트시 내보내지는 위치값은 층기준 로컬좌표이므로, 초기 생성을 위해 월드좌표로 변환한다.
-        const convertedPosition = ModelInternal.getFloorWorldPosition(new THREE.Vector3(item.position.x, item.position.y, item.position.z), item.floorId);
+        const convertedPosition = ModelInternal.convertFloorLocalToWorld(new THREE.Vector3(item.position.x, item.position.y, item.position.z), item.floorId);
 
         const element = new PoiElement({
             id: item.id,

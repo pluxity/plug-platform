@@ -124,7 +124,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
             displayText: this.displayText,
             property: this.property,
             floorId: this.floorId,
-            position: ModelInternal.getFloorLocalPosition(this.position.clone(), this.floorId as string), //this.position?.ExportData,
+            position: ModelInternal.convertWorldToFloorLocal(this.position.clone(), this.floorId as string), //this.position?.ExportData,
             rotation: this.pointMeshData.rotation.ExportData,
             scale: this.pointMeshData.scale.ExportData,
         };
