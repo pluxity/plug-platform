@@ -392,9 +392,7 @@ function onContextMenu(evt: MouseEvent) {
  * 전체보기
  * @param transitionTime - 이동시간
  */
-function ExtendView(transitionTime?: number) {
-    // 기본값 처리
-    transitionTime = transitionTime || 1.0;
+function ExtendView(transitionTime: number) {
 
     // 배경모델 바운딩 계산
     const target = engine.RootScene.getObjectByName('#ModelGroup');
@@ -448,8 +446,6 @@ function GetState() {
  * @param state - 상태 정보
  */
 function SetState(state: Record<string, any>, transitionTime: number) {
-    // 애니메이션 처리 시간 기본값
-    transitionTime = transitionTime || 1.0;
 
     // 이전 트윈 중지
     if (posTween instanceof TWEEN.Tween) {
@@ -491,8 +487,6 @@ function SetState(state: Record<string, any>, transitionTime: number) {
  * @param transitionTime - 이동시간
  */
 function MoveToPoi(id: string, transitionTime: number) {
-    // 애니메이션 처리 시간 기본값
-    transitionTime = transitionTime || 1.0;
 
     // poi데이터
     const poiElement = PoiDataInternal.getPoiElement(id);

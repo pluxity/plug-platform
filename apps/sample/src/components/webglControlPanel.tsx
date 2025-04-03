@@ -167,7 +167,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Camera.MoveToPoi': {
                 if (this.state.moveToPoiIdValue !== '') {
-                    Px.Camera.MoveToPoi(this.state.moveToPoiIdValue);
+                    Px.Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0);
                 }
             } break;
             case 'Model.GetHierarchy': {
