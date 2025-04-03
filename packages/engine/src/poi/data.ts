@@ -187,6 +187,15 @@ function exists(id: string): boolean {
 }
 
 /**
+ * id에 해당하는 poi 데이터 얻기
+ * @param id - poi id
+ * @returns - poi데이터
+ */
+function getPoiElement(id: string): PoiElement {
+    return poiDataList[id];
+}
+
+/**
  * url주소로 아이콘 재질 얻기
  * @param url - 아이콘 url 주소
  */
@@ -486,6 +495,7 @@ export {
     getIcon,
     createTextMesh,
     exists,
+    getPoiElement,
 
     Export,
     ExportAll,

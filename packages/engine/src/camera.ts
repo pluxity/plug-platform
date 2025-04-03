@@ -3,7 +3,7 @@ import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
 import { Engine3D } from './engine';
 import * as TWEEN from '@tweenjs/tween.js';
-import * as PxPoi from './poi';
+import * as PoiDataInternal from './poi/data';
 
 let engine: Engine3D;
 let cursor: THREE.Object3D;
@@ -488,10 +488,43 @@ function SetState(state: Record<string, any>, transitionTime: number) {
 /**
  * poi로 카메라 이동
  * @param id - poi id
+ * @param transitionTime - 이동시간
  */
-function MoveToPoi(id: string) {
-    const poiData = PxPoi.Export(id);
-    console.log('camera.ts MoveToPoi', poiData);
+function MoveToPoi(id: string, transitionTime: number) {
+    // 애니메이션 처리 시간 기본값
+    transitionTime = transitionTime || 1.0;
+
+    // poi데이터
+    const poiElement = PoiDataInternal.getPoiElement(id);
+
+    // 거리값
+    const radius = poiElement.LineHeight * 2.0;
+
+    // 카메라 방향
+    const direction = new THREE.Vector3();
+    engine.Camera.getWorldDirection(direction);
+
+    // 카메라 이동대상 위치점
+    const camPos = poiElement.WorldPosition.clone().addScaledVector(direction, -radius);
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+
+    // 트윈 생성
+    posTween = new TWEEN.Tween(engine.Camera.position)
+        .to({
+            x: camPos.x,
+            y: camPos.y,
+            z: camPos.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    // 트윈 업데이트 그룹에 추가
+    engine.TweenUpdateGroups.add(posTween);
 }
 
 export {
