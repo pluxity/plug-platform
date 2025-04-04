@@ -9,9 +9,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const logout = useAuthStore((state) => state.logout);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow">
+    <div className="h-screen flex flex-col overflow-hidden">
+      {/* Header - 보더를 헤더 자체에 추가 */}
+      <header className="bg-white border-b border-gray-200 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">부산 지하철</h1>
@@ -25,16 +25,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content - shadow 제거 */}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {children}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Footer - 상단에 보더 추가 */}
+      <footer className="bg-gray-800 text-white border-t border-gray-700 shrink-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="text-center">
             <p className="text-sm">© 2024 부산 지하철. All rights reserved.</p>
           </div>
