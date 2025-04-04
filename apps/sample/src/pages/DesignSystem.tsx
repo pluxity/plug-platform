@@ -4,6 +4,7 @@ import { debounce } from "lodash";
 import { Accordion, Button, Badge, Checkbox, Skeleton, Slider, Switch, Textarea, Tab , Label ,Input, Card } from "@plug/ui";
 import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
 import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
+import { fetchClient } from "@plug/api-hooks";
 
 // 제품 데이터 샘플
 const products = [
