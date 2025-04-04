@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { Button } from '../Button/Button';
-import { Alert, AlertTitle, AlertDescription } from './Alert';
+import { Alert } from '../Alert';
 
 const meta: Meta<typeof Alert> = {
     title: 'Components/Alert',
@@ -42,8 +42,8 @@ export const Default : Story = {
         <AlertController>    
             {({ isOpen, onClose }) => (
                 <Alert {...args} isOpen={isOpen} onClose={onClose}>
-                    <AlertTitle>Alert Title</AlertTitle>
-                    <AlertDescription>This is a basic alert.</AlertDescription>
+                    <Alert.Title>Alert Title</Alert.Title>
+                    <Alert.Description>This is a basic alert.</Alert.Description>
                 </Alert>
             )}
         </AlertController>
@@ -57,8 +57,8 @@ export const Variant : Story = {
             <AlertController>    
                 {({ isOpen, onClose }) => (
                     <Alert isOpen={isOpen} onClose={onClose}>
-                        <AlertTitle>Alert Title</AlertTitle>
-                        <AlertDescription>This is a basic alert.</AlertDescription>
+                        <Alert.Title>Alert Title</Alert.Title>
+                        <Alert.Description>This is a basic alert.</Alert.Description>
                     </Alert>
                 )}
             </AlertController>
@@ -66,8 +66,8 @@ export const Variant : Story = {
             <AlertController>    
                 {({ isOpen, onClose }) => (
                     <Alert isOpen={isOpen} onClose={onClose} variant="success">
-                        <AlertTitle>Success</AlertTitle>
-                        <AlertDescription>Your operations was successful!</AlertDescription>
+                        <Alert.Title>Success</Alert.Title>
+                        <Alert.Description>Your operations was successful!</Alert.Description>
                     </Alert>
                 )}
             </AlertController>
@@ -75,8 +75,8 @@ export const Variant : Story = {
             <AlertController>    
                 {({ isOpen, onClose }) => (
                     <Alert isOpen={isOpen} onClose={onClose} variant="error">
-                        <AlertTitle>Error</AlertTitle>
-                        <AlertDescription>Sometion went wrong</AlertDescription>
+                        <Alert.Title>Error</Alert.Title>
+                        <Alert.Description>Sometion went wrong</Alert.Description>
                     </Alert>
                 )}
             </AlertController>
@@ -84,8 +84,8 @@ export const Variant : Story = {
             <AlertController>    
                 {({ isOpen, onClose }) => (
                     <Alert isOpen={isOpen} onClose={onClose} variant="notice">
-                        <AlertTitle>Notice</AlertTitle>
-                        <AlertDescription>This action cannot be undone.</AlertDescription>
+                        <Alert.Title>Notice</Alert.Title>
+                        <Alert.Description>This action cannot be undone.</Alert.Description>
                     </Alert>
                 )}
             </AlertController>
@@ -93,8 +93,8 @@ export const Variant : Story = {
             <AlertController>    
                 {({ isOpen, onClose }) => (
                     <Alert isOpen={isOpen} onClose={onClose} variant="info">
-                        <AlertTitle>Info</AlertTitle>
-                        <AlertDescription>Be Notice!</AlertDescription>
+                        <Alert.Title>Info</Alert.Title>
+                        <Alert.Description>Be Notice!</Alert.Description>
                     </Alert>
                 )}
             </AlertController>
