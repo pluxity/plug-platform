@@ -1,5 +1,5 @@
 import React from 'react';
-import useAuthStore from '../store/authStore';
+import useAuthStore from '../stores/authStore';
 
 interface LayoutProps {
   children: React.ReactNode;

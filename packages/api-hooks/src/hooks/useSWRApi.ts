@@ -1,16 +1,11 @@
 import useSWR, { SWRConfiguration } from 'swr'
 import { api } from '../core/client'
-import type { RequestOptions } from '../core/client'
-import type { DataResponseBody } from '../types/commons'
-
-type AllowedMethod = 'GET' | 'DELETE'
-
-interface UseSWRApiReturn<T> {
-  data: T | null
-  error: Error | undefined
-  isLoading: boolean
-  mutate: () => void
-}
+import type { 
+  AllowedMethod,  
+  UseSWRApiReturn,
+  RequestOptions,
+  DataResponseBody 
+} from '../types'
 
 export function useSWRApi<T>(
   url: string,

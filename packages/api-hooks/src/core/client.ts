@@ -1,8 +1,4 @@
-import { ResponseTypes } from '../types/commons';
-
-export interface RequestOptions extends RequestInit {
-  requireAuth?: boolean;
-}
+import { ResponseTypes, RequestOptions } from '../types';
 
 const BASE_URL = 'http://localhost:8080';
 

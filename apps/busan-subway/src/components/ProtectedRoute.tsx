@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import useAuthStore from '../store/authStore';
+import useAuthStore from '../stores/authStore';
 import { cookieStorage, ACCESS_TOKEN_NAME } from '../utils/cookies';
 
 interface ProtectedRouteProps {
