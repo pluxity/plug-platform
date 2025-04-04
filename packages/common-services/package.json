@@ -1,13 +1,11 @@
 {
-  "name": "@plug/api-hooks",
+  "name": "@plug/common-services",
   "version": "1.0.0",
   "description": "API 통신을 위한 React 훅 라이브러리",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./core": "./src/core/index.ts",
-    "./hooks": "./src/hooks/index.ts",
     "./types": "./src/types/index.ts",
     "./services": "./src/services/index.ts"
   },
@@ -16,10 +14,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@plug/api-hooks": "workspace:*",
     "swr": "^2.2.5"
-  },
-  "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
   }
 } 

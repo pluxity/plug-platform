@@ -1,6 +1,13 @@
-import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
+import {
+  useState,
+  useEffect,
+  type FormEvent,
+  type ChangeEvent,
+} from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { signIn, type SignInRequest } from '@plug/api-hooks';
+import { signIn, type SignInRequest } from '@plug/common-services';
+import type { DataResponseBody } from '@plug/api-hooks';
+import type { SignInResponse } from '@plug/common-services';
 import { Button, Input } from '@plug/ui';
 import useAuthStore from '../stores/authStore';
 
@@ -19,7 +26,8 @@ export default function LoginPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // 회원가입 후 리디렉션된 경우 메시지 표시
+  const from = location.state?.from?.pathname || '/';
+
   useEffect(() => {
     if (location.state?.message) {
       setSuccessMessage(location.state.message);
@@ -38,17 +46,18 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await signIn(formData);
+      const response: DataResponseBody<SignInResponse> = await signIn(formData);
 
-      if (!response?.accessToken) {
+      if (!response?.data?.accessToken) {
         throw new Error('액세스 토큰이 없습니다');
       }
 
-      // zustand 상태에 토큰 + 사용자 정보 저장
-      login(response.accessToken, response.name, response.code);
+      login(response.data.accessToken, response.data.name, response.data.code);
 
-      // 로그인 후 홈으로 이동
-      navigate('/');
+      // 💡 상태가 반영될 때까지 한 틱 늦추기 (안정성 ↑)
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 0);
     } catch (err) {
       console.error('로그인 오류:', err);
       setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');

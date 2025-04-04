@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@plug/ui';
-import { signUp, SignUpRequest } from '@plug/api-hooks';
+import { signUp, type SignUpRequest } from '@plug/common-services';
 
 const SignupPage = () => {
   const navigate = useNavigate();

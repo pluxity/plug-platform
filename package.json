@@ -5,27 +5,28 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write",
-    "sample": "pnpm --filter @plug/sample",
     "storybook": "pnpm --filter @plug/ui storybook",
     "api-hooks": "pnpm --filter @plug/api-hooks",
+    "common-services": "pnpm --filter @plug/common-services",
+    "sample": "pnpm --filter @plug/sample",
     "project:busan": "pnpm --filter @plug/busan-subway"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tailwindcss": "^4",
     "@tailwindcss/vite": "^4",
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.2"
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss": "^4"
   },
   "devDependencies": {
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
     "@types/lodash": "^4.17.16",
+    "@types/react": "^19.0.9",
+    "@types/react-dom": "^19.0.3",
     "prettier": "^3.5.1",
     "typescript": "^5.7.3",
     "vite": "^6",

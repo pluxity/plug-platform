@@ -5,8 +5,8 @@ import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import { setTokenGetter } from '@plug/api-hooks';
 import useAuthStore from './stores/authStore';
+import { setTokenGetter } from '@plug/api-hooks';
 
 const App: React.FC = () => {
 

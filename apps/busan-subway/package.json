@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@plug/api-hooks": "workspace:^",
+    "@plug/common-services": "workspace:^",
     "@plug/engine": "workspace:^",
     "@plug/ui": "workspace:^",
     "js-cookie": "^3.0.5",

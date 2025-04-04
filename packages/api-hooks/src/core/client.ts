@@ -35,7 +35,7 @@ export const api = {
     return handleResponse<ResponseTypes<T>['GET']>(response);
   },
 
-  post: async <T>(endpoint: string, data: unknown, options: RequestOptions = {}): Promise<ResponseTypes<T>['POST']> => {
+  post: async <T>(endpoint: string, data: unknown, options: RequestOptions = {}): Promise<T> => {
     const headers = options.requireAuth ? getAuthHeaders() : { 'Content-Type': 'application/json' };
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'POST',
@@ -43,7 +43,7 @@ export const api = {
       body: JSON.stringify(data),
       ...options
     });
-    return handleResponse<ResponseTypes<T>['POST']>(response);
+    return handleResponse<T>(response);
   },
 
   put: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<ResponseTypes<T>['PUT']> => {

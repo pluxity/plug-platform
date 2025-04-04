@@ -6,11 +6,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { isAuthenticated, logout } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return null; // 인증되지 않은 경우 레이아웃을 렌더링하지 않음
-  }
+  const logout = useAuthStore((state) => state.logout);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -48,4 +44,4 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;
