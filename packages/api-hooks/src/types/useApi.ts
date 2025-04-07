@@ -11,7 +11,7 @@ export interface UseApiResponse<T, P extends any[] = any[]> {
   /** 요청 중 발생한 에러 객체 (실패 시), 초기값 null */
   error: ErrorResponseBody | null;
   /** 요청 진행 중 여부 플래그 */
-  loading: boolean;
+  isLoading: boolean;
   /**
    * API 요청을 실행하는 함수.
    * @param args - API 요청 함수에 전달될 파라미터들
