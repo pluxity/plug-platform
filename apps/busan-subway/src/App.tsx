@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './components/pages/AdminDashboard';
 import useAuthStore from './stores/authStore';
 import { setTokenGetter } from '@plug/api-hooks';
 import { MainLayout } from './components/layouts/MainLayout';
@@ -20,6 +22,16 @@ const App: React.FC = () => {
           {/* 공개 라우트 */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+
+          {/* 관리자 라우트 */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
 
           {/* 보호된 라우트 */}
           <Route

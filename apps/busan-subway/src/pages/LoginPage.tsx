@@ -1,123 +1,127 @@
-import {
-  useState,
-  useEffect,
-  type FormEvent,
-  type ChangeEvent,
-} from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { signIn, type SignInRequest } from '@plug/common-services';
-import type { DataResponseBody } from '@plug/api-hooks';
-import type { SignInResponse } from '@plug/common-services';
-import { Button, Input } from '@plug/ui';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
+import { authService, LoginRequest } from '../services/authService';
 
-export default function LoginPage() {
+const LoginPage: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const { login, setUser } = useAuthStore();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const login = useAuthStore((state) => state.login);
-
-  const [formData, setFormData] = useState<SignInRequest>({
-    username: '',
-    password: '',
-  });
-
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const from = location.state?.from?.pathname || '/';
-
-  useEffect(() => {
-    if (location.state?.message) {
-      setSuccessMessage(location.state.message);
-    }
-  }, [location]);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccessMessage('');
-    setIsLoading(true);
-
+    
+    if (!username || !password) {
+      setError('아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
+    
     try {
-      const response: DataResponseBody<SignInResponse> = await signIn(formData);
-
-      if (!response?.data?.accessToken) {
-        throw new Error('액세스 토큰이 없습니다');
+      setLoading(true);
+      setError(null);
+      
+      // 로그인 요청
+      const loginData: LoginRequest = {
+        username,
+        password
+      };
+      
+      const response = await authService.login(loginData);
+      
+      // 액세스 토큰 저장
+      login(response.accessToken, '', '');
+      
+      // 사용자 정보 가져오기
+      const userInfo = await authService.getCurrentUser(response.accessToken);
+      
+      // 사용자 정보 저장
+      setUser(userInfo);
+      
+      // 역할에 따른 리다이렉션
+      if (userInfo.roles.some(role => role.name === 'ADMIN')) {
+        navigate('/admin');
+      } else {
+        navigate('/');
       }
-
-      login(response.data.accessToken, response.data.name, response.data.code);
-
-      // 💡 상태가 반영될 때까지 한 틱 늦추기 (안정성 ↑)
-      setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 0);
+      
     } catch (err) {
-      console.error('로그인 오류:', err);
-      setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
+      console.error('로그인 실패:', err);
+      setError('로그인에 실패했습니다. 다시 시도해주세요.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
-
+  
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <div className="w-full max-w-md space-y-6 rounded-lg border bg-card p-6 shadow-lg">
-        <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold">로그인</h1>
-          <p className="text-sm text-muted-foreground">
-            또는{' '}
-            <Button variant="ghost" onClick={() => navigate('/signup')}>
-              회원가입
-            </Button>
-          </p>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md">
+        <div className="rounded-lg bg-white px-6 py-8 shadow-md">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-6">부산 지하철</h1>
+            <h2 className="text-xl font-semibold mb-6">로그인</h2>
+          </div>
+          
+          {error && (
+            <div className="mb-4 rounded-md bg-red-50 p-4">
+              <div className="text-sm text-red-700">{error}</div>
+            </div>
+          )}
+          
+          <form onSubmit={handleLogin}>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="username">
+                아이디
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full rounded-md border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="아이디 입력"
+              />
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
+                비밀번호
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="비밀번호 입력"
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full rounded-md bg-primary-600 py-2 px-4 text-white font-medium ${
+                loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-700'
+              }`}
+            >
+              {loading ? '로그인 중...' : '로그인'}
+            </button>
+          </form>
+          
+          <div className="mt-6 text-center">
+            <a href="/signup" className="text-sm text-primary-600 hover:text-primary-700">
+              계정이 없으신가요? 회원가입
+            </a>
+          </div>
         </div>
-
-        {successMessage && (
-          <div className="rounded-md bg-green-50 p-4">
-            <p className="text-sm text-green-700">{successMessage}</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            id="username"
-            name="username"
-            type="text"
-            placeholder="사용자 ID"
-            required
-            maxLength={20}
-            value={formData.username}
-            onChange={handleChange}
-          />
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="비밀번호"
-            required
-            minLength={6}
-            maxLength={20}
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? '로그인 중...' : '로그인'}
-          </Button>
-        </form>
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
