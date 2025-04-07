@@ -25,7 +25,7 @@ const meta: Meta<typeof Popup> = {
     },
     placement: {
       control: 'select',
-      options: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'center'],
+      options: ['top', 'topLeft', 'topRight', 'bottom', 'bottomLeft', 'bottomRight', 'center'],
       description: '팝업 위치',
       defaultValue: 'center'
     },
@@ -73,12 +73,12 @@ const PopupController: React.FC<{
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => handleOpen('top')}>상단</Button>
-        <Button onClick={() => handleOpen('top-start')}>상단-좌측</Button>
-        <Button onClick={() => handleOpen('top-end')}>상단-우측</Button>
+        <Button onClick={() => handleOpen('topLeft')}>상단-좌측</Button>
+        <Button onClick={() => handleOpen('topRight')}>상단-우측</Button>
         <Button onClick={() => handleOpen('center')}>중앙</Button>
         <Button onClick={() => handleOpen('bottom')}>하단</Button>
-        <Button onClick={() => handleOpen('bottom-start')}>하단-좌측</Button>
-        <Button onClick={() => handleOpen('bottom-end')}>하단-우측</Button>
+        <Button onClick={() => handleOpen('bottomLeft')}>하단-좌측</Button>
+        <Button onClick={() => handleOpen('bottomRight')}>하단-우측</Button>
       </div>
       {children({ isOpen, onClose: handleClose, placement })}
     </div>

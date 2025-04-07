@@ -4,7 +4,7 @@ import {
     ToastDescription,
 } from './Toast';
 
-import type { ToastProps } from './Toast.types';
+import type { ToastContainerProps, ToastContextProps, ToastProps } from './Toast.types';
 
 const Toast = Object.assign(ToastComponent, {
     Title: ToastTitle,

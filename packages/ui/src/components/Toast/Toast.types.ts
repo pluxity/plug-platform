@@ -1,6 +1,8 @@
+import type { Placement } from '../types';
+
 export interface ToastProps extends React.ComponentProps<'div'>{
     variant?: 'default' | 'normal' | 'warning' | 'critical';
-    placement?: 'top' | 'topStart' | 'topEnd' | 'bottom' | 'bottomStart' | 'bottomEnd' | 'center';
+    placement?: Placement;
     closable?: boolean;
     duration?: number;
     autoClose?: boolean;

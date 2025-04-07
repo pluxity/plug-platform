@@ -14,9 +14,9 @@ const meta: Meta<typeof Toast> = {
         },
         placement: {
             control: 'select',
-            options: ['top', 'topStart', 'topEnd', 'bottom', 'bottomStart', 'bottomEnd', 'center'],
+            options: ['top', 'topLeft', 'topRight', 'bottom', 'bottomLeft', 'bottomRight', 'center'],
             description: 'Toast 위치',
-            defaultValue: 'bottomEnd',
+            defaultValue: 'bottomRight',
         },
         closable: {
             control: 'boolean',
@@ -127,19 +127,19 @@ export const Placement : Story = {
                     </Toast>
                 )}
             </ToastController>
-            <div className="mt-4 mb-2">Placement: topStart</div>
+            <div className="mt-4 mb-2">Placement: topLeft</div>
             <ToastController>
                 {({ isOpen, onClose }) => (
-                    <Toast isOpen={isOpen} onClose={onClose} placement="topStart">
+                    <Toast isOpen={isOpen} onClose={onClose} placement="topLeft">
                         <Toast.Title>상단 좌측 토스트</Toast.Title>
                         <Toast.Description>화면 상단 좌측에 표시되는 토스트입니다.</Toast.Description>
                     </Toast>
                 )}
             </ToastController>
-            <div className="mt-4 mb-2">Placement: topEnd</div>
+            <div className="mt-4 mb-2">Placement: topRight</div>
             <ToastController>
                 {({ isOpen, onClose }) => (
-                    <Toast isOpen={isOpen} onClose={onClose} placement="topEnd">
+                    <Toast isOpen={isOpen} onClose={onClose} placement="topRight">
                         <Toast.Title>상단 우측 토스트</Toast.Title>
                         <Toast.Description>화면 상단 우측에 표시되는 토스트입니다.</Toast.Description>
                     </Toast>
@@ -154,19 +154,19 @@ export const Placement : Story = {
                     </Toast>
                 )}
             </ToastController>
-            <div className="mt-4 mb-2">Placement: bottomStart</div>
+            <div className="mt-4 mb-2">Placement: bottomLeft</div>
             <ToastController>
                 {({ isOpen, onClose }) => (
-                    <Toast isOpen={isOpen} onClose={onClose} placement="bottomStart">
+                    <Toast isOpen={isOpen} onClose={onClose} placement="bottomLeft">
                         <Toast.Title>하단 좌측 토스트</Toast.Title>
                         <Toast.Description>화면 하단 좌측에 표시되는 토스트입니다.</Toast.Description>
                     </Toast>
                 )}
             </ToastController>
-            <div className="mt-4 mb-2">Placement: bottomEnd</div>
+            <div className="mt-4 mb-2">Placement: bottomRight</div>
             <ToastController>
                 {({ isOpen, onClose }) => (
-                    <Toast isOpen={isOpen} onClose={onClose} placement="bottomEnd">
+                    <Toast isOpen={isOpen} onClose={onClose} placement="bottomRight">
                         <Toast.Title>하단 우측 토스트</Toast.Title>
                         <Toast.Description>화면 하단 우측에 표시되는 토스트입니다.</Toast.Description>
                     </Toast>

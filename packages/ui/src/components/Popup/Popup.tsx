@@ -9,15 +9,15 @@ const getPlacementClasses = (placement: PopupPlacement): string => {
   switch (placement) {
     case 'top':
       return 'items-start justify-center pt-4';
-    case 'top-start':
+    case 'topLeft':
       return 'items-start justify-start p-4';
-    case 'top-end':
+    case 'topRight':
       return 'items-start justify-end p-4';
     case 'bottom':
       return 'items-end justify-center pb-4';
-    case 'bottom-start':
+    case 'bottomLeft':
       return 'items-end justify-start p-4';
-    case 'bottom-end':
+    case 'bottomRight':
       return 'items-end justify-end p-4';
     case 'center':
     default:
