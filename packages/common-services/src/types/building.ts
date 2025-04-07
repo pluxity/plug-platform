@@ -1,20 +1,26 @@
-export interface FileMeta {
-    id: number;
-    url: string;
-    originalFileName: string;
-    fileType: string;
-    contentType: string;
-    fileStatus: string;
-    createdAt: string;
-    updatedAt: string;
-  }
+import { FileResponse } from "./file";
   
-  export interface Building {
-    id: number;
-    name: string;
-    description: string;
-    file: FileMeta;
-    thumbnail: FileMeta;
-    createdAt: string;
-    updatedAt: string;
-  }  
+export interface BuildingResponse {
+  id: number;
+  name: string;
+  description?: string;
+  file: FileResponse;
+  thumbnail: FileResponse;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBuildingRequest {
+  name: string;
+  description?: string;
+  fileId?: File;
+  thumbnailId?: File;
+}
+
+// 건물 수정 요청 타입
+export interface UpdateBuildingRequest {
+  name: string;
+  description?: string;
+  fileId?: File;
+  thumbnailId?: File;
+}
