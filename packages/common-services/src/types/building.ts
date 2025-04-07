@@ -10,7 +10,7 @@ export interface BuildingResponse {
   updatedAt: string;
 }
 
-export interface CreateBuildingRequest {
+export interface BuildingCreateRequest {
   name: string;
   description?: string;
   fileId?: File;
@@ -18,7 +18,7 @@ export interface CreateBuildingRequest {
 }
 
 // 건물 수정 요청 타입
-export interface UpdateBuildingRequest {
+export interface BuildingUpdateRequest {
   name: string;
   description?: string;
   fileId?: File;

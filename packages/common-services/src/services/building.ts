@@ -1,6 +1,6 @@
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
-import type { BuildingResponse, CreateBuildingRequest, UpdateBuildingRequest } from '@plug/common-services';
+import type { BuildingResponse, BuildingCreateRequest, BuildingUpdateRequest } from '@plug/common-services';
 
 const BUILDINGS_API = `/buildings`;
 
@@ -13,11 +13,11 @@ export const useBuildingDetail = (buildingId: number) => {
 };
 
 export const useCreateBuilding = () => {
-  return usePost<CreatedResponseBody, CreateBuildingRequest>(BUILDINGS_API);
+  return usePost<CreatedResponseBody, BuildingCreateRequest>(BUILDINGS_API);
 };
 
 export const useUpdateBuilding = (buildingId: number) => {
-  return usePut<BaseResponseBody, UpdateBuildingRequest>(`${BUILDINGS_API}/${buildingId}`);
+  return usePut<BaseResponseBody, BuildingUpdateRequest>(`${BUILDINGS_API}/${buildingId}`);
 };
 
 export const useDeleteBuilding = (buildingId: number) => {
