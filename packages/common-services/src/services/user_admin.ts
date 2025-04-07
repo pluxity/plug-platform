@@ -5,30 +5,30 @@ import type { UserResponse, UserCreateRequest, UserUpdateRequest } from '@plug/c
 const USER_API = `/admin/users`;
 
 export const useUsers = () => {
-  return useGet<UserResponse[]>(USER_API);
+  return useGet<UserResponse[]>(USER_API, { requireAuth: true });
 };
 
 export const useUserDetail = (userId: number) => {
-  return useGet<UserResponse>(`${USER_API}/${userId}`);
+  return useGet<UserResponse>(`${USER_API}/${userId}`, { requireAuth: true });
 };
 
 export const useCreateUser = () => {
-  return usePost<CreatedResponseBody, UserCreateRequest>(USER_API);
+  return usePost<CreatedResponseBody, UserCreateRequest>(USER_API, { requireAuth: true });
 };
 
 export const useUpdateUser = (userId: number) => {
-  return usePut<BaseResponseBody, UserUpdateRequest>(`${USER_API}/${userId}`);
+  return usePut<BaseResponseBody, UserUpdateRequest>(`${USER_API}/${userId}`, { requireAuth: true });
 };
 
 export const useDeleteUser = (userId: number) => {
-  return useDelete(`${USER_API}/${userId}`);
+  return useDelete(`${USER_API}/${userId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅
 export const useUsersSWR = () => {
-  return useSWRApi<UserResponse[]>(USER_API);
+  return useSWRApi<UserResponse[]>(USER_API, 'GET', { requireAuth: true });
 };
 
 export const useUserDetailSWR = (buildingId: number) => {
-  return useSWRApi<UserResponse>(`${USER_API}/${buildingId}`);
+  return useSWRApi<UserResponse>(`${USER_API}/${buildingId}`, 'GET', { requireAuth: true });
 };
