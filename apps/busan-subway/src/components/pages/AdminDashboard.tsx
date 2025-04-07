@@ -1,124 +1,123 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 
 const AdminDashboard: React.FC = () => {
   const { user, logout } = useAuthStore();
-
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+  
+  const recentActivities = [
+    { id: 1, activity: '사용자 로그인', user: 'user123', time: '10분 전' },
+    { id: 2, activity: '데이터 업데이트', user: 'admin', time: '30분 전' },
+    { id: 3, activity: '새 사용자 등록', user: 'system', time: '1시간 전' },
+    { id: 4, activity: '설정 변경', user: 'admin', time: '2시간 전' },
+    { id: 5, activity: '백업 완료', user: 'system', time: '3시간 전' },
+  ];
+  
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">관리자 대시보드</h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-500">{user?.name} 님</span>
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow-md">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">관리자 대시보드</h1>
+            <p className="text-gray-600">안녕하세요, {user?.name || '관리자'}님</p>
+          </div>
+          <nav>
             <button
-              onClick={logout}
-              className="px-4 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
+              onClick={handleLogout}
+              className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
             >
               로그아웃
             </button>
-          </div>
+          </nav>
         </div>
       </header>
-
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* 대시보드 카드 1 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-900">사용자 통계</h2>
-              <span className="text-3xl font-bold text-blue-600">157</span>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">총 등록 사용자 수</p>
+      
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        {/* 통계 카드 섹션 */}
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h2 className="text-lg font-semibold text-gray-700">총 사용자</h2>
+            <p className="mt-2 text-3xl font-bold">1,234</p>
+            <p className="mt-2 text-sm text-green-600">+5% 지난 주 대비</p>
           </div>
-
-          {/* 대시보드 카드 2 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-900">일일 방문자</h2>
-              <span className="text-3xl font-bold text-green-600">34</span>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">오늘 방문한 사용자 수</p>
+          
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h2 className="text-lg font-semibold text-gray-700">일일 방문자</h2>
+            <p className="mt-2 text-3xl font-bold">567</p>
+            <p className="mt-2 text-sm text-red-600">-2% 어제 대비</p>
           </div>
-
-          {/* 대시보드 카드 3 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-900">시스템 상태</h2>
-              <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">정상</span>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">모든 서비스가 정상 작동 중입니다</p>
+          
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h2 className="text-lg font-semibold text-gray-700">시스템 상태</h2>
+            <p className="mt-2 text-3xl font-bold text-green-600">정상</p>
+            <p className="mt-2 text-sm text-gray-600">모든 서비스 작동 중</p>
           </div>
-        </div>
-
+          
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h2 className="text-lg font-semibold text-gray-700">시스템 리소스</h2>
+            <p className="mt-2 text-3xl font-bold">65%</p>
+            <p className="mt-2 text-sm text-gray-600">CPU 사용량</p>
+          </div>
+        </section>
+        
         {/* 최근 활동 섹션 */}
-        <div className="mt-8 bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">최근 활동</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    활동
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    사용자
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    시간
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    상태
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    로그인
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    김철수
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    5분 전
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">성공</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    데이터 업데이트
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    이영희
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    30분 전
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">성공</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    로그인 시도
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    unknown_user
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    1시간 전
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">실패</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <section className="mb-8">
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h2 className="mb-4 text-xl font-bold text-gray-900">최근 활동</h2>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      활동
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      사용자
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      시간
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {recentActivities.map((activity) => (
+                    <tr key={activity.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {activity.activity}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {activity.user}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {activity.time}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </section>
+        
+        {/* 빠른 액션 버튼 */}
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+            사용자 관리
+          </button>
+          <button className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+            데이터 백업
+          </button>
+          <button className="rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700">
+            시스템 설정
+          </button>
+        </section>
       </main>
     </div>
   );

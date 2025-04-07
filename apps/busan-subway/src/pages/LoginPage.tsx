@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
-import { authService, LoginRequest } from '../services/authService';
+import { RoleResponse } from '../types/user';
+
+const API_BASE_URL = '/api';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -24,25 +26,44 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // 로그인 요청
-      const loginData: LoginRequest = {
-        username,
-        password
-      };
+      // API 직접 호출로 로그인 처리
+      const response = await fetch(`${API_BASE_URL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
       
-      const response = await authService.login(loginData);
+      if (!response.ok) {
+        throw new Error('로그인에 실패했습니다.');
+      }
+      
+      const data = await response.json();
+      const accessToken = data.accessToken;
       
       // 액세스 토큰 저장
-      login(response.accessToken, '', '');
+      login(accessToken, '', '');
       
-      // 사용자 정보 가져오기
-      const userInfo = await authService.getCurrentUser(response.accessToken);
+      // 사용자 정보 조회를 위한 API 직접 호출
+      const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (!userResponse.ok) {
+        throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+      }
+      
+      const userInfo = await userResponse.json();
       
       // 사용자 정보 저장
       setUser(userInfo);
       
       // 역할에 따른 리다이렉션
-      if (userInfo.roles.some(role => role.name === 'ADMIN')) {
+      if (userInfo.roles.some((role: RoleResponse) => role.name === 'ADMIN')) {
         navigate('/admin');
       } else {
         navigate('/');

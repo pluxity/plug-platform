@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { User, RoleResponse } from '../types/user'
+import { User, RoleResponse } from '@plug/common-services'
 
 type AuthStoreState = {
   accessToken: string | null

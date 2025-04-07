@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
@@ -16,7 +16,7 @@ const App: React.FC = () => {
   setTokenGetter(() => useAuthStore.getState().accessToken);
   
   return (
-    <Router>
+    <BrowserRouter>
       <MainLayout>
         <Routes>
           {/* 공개 라우트 */}
@@ -24,29 +24,17 @@ const App: React.FC = () => {
           <Route path="/signup" element={<SignupPage />} />
 
           {/* 관리자 라우트 */}
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
 
           {/* 보호된 라우트 */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<HomePage />} />
+          </Route>
         </Routes>
       </MainLayout>
-    </Router>
+    </BrowserRouter>
   );
 };
 
