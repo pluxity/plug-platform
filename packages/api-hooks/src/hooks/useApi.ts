@@ -1,33 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { api } from '../core/client';
 import {
+  UseApiResponse,
   DataResponseBody,
   ErrorResponseBody,
   RequestOptions,
 } from '../types';
 
 
-/**
- * API 응답 상태를 나타내는 인터페이스
- * @template T - 성공 시 받을 데이터의 타입
- * @template P - execute 함수가 받을 파라미터 타입 배열 (기본값: any[])
- */
-interface UseApiResponse<T, P extends any[] = any[]> {
-  /** 요청을 통해 받은 데이터 (성공 시), 초기값 null */
-  data: T | null;
-  /** 요청 중 발생한 에러 객체 (실패 시), 초기값 null */
-  error: ErrorResponseBody | null;
-  /** 요청 진행 중 여부 플래그 */
-  loading: boolean;
-  /**
-   * API 요청을 실행하는 함수.
-   * @param args - API 요청 함수에 전달될 파라미터들
-   * @returns Promise<T | null> - 성공 시 데이터 T, 실패 시 null 반환
-   */
-  execute: (...args: P) => Promise<T | null>;
-  /** 요청 상태 초기화 함수 */
-  reset: () => void;
-}
 
 /**
  * API 요청을 처리하는 범용 커스텀 훅
@@ -44,7 +24,7 @@ export function useApi<T, P extends any[] = any[]>(
 ): UseApiResponse<T, P> {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<ErrorResponseBody | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const isMounted = useRef(true);
   useEffect(() => {
@@ -58,7 +38,7 @@ export function useApi<T, P extends any[] = any[]>(
     if (isMounted.current) {
       setData(null);
       setError(null);
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -67,7 +47,7 @@ export function useApi<T, P extends any[] = any[]>(
     async (...args: P): Promise<T | null> => {
       if (!isMounted.current) return null;
 
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
       setData(null); 
 
@@ -125,14 +105,14 @@ export function useApi<T, P extends any[] = any[]>(
         return null;
       } finally {
         if (isMounted.current) {
-          setLoading(false);
+          setIsLoading(false);
         }
       }
     },
     [apiMethod]
   );
 
-  return { data, error, loading, execute, reset };
+  return { data, error, isLoading, execute, reset };
 }
 
 /**
