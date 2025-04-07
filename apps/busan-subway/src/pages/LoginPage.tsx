@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
-import { RoleResponse } from '../types/user';
 
-const API_BASE_URL = '/api';
+import type { DataResponseBody } from '@plug/api-hooks';
+import { signIn, useUserMe } from '@plug/common-services';
+import type { SignInResponse } from '@plug/common-services';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -13,6 +14,8 @@ const LoginPage: React.FC = () => {
   
   const { login, setUser } = useAuthStore();
   const navigate = useNavigate();
+      
+  const { execute } = useUserMe();
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,46 +30,37 @@ const LoginPage: React.FC = () => {
       setError(null);
       
       // API 직접 호출로 로그인 처리
-      const response = await fetch(`${API_BASE_URL}/auth/signin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+      const response: DataResponseBody<SignInResponse> = await signIn({
+        username,
+        password
       });
       
-      if (!response.ok) {
+      if (response.code !== 200) {
         throw new Error('로그인에 실패했습니다.');
       }
       
-      const data = await response.json();
-      const accessToken = data.accessToken;
+      const accessToken = response.data.accessToken;
       
-      // 액세스 토큰 저장
+      // 액세스 토큰 저장 - 이 시점에 tokenGetter에 값이 설정됨
       login(accessToken, '', '');
+
+      // 잠시 지연 추가
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      // 사용자 정보 조회를 위한 API 직접 호출
-      const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
+      // 사용자 정보 조회 및 저장
+      const userData = await execute();
       
-      if (!userResponse.ok) {
-        throw new Error('사용자 정보를 가져오는데 실패했습니다.');
-      }
-      
-      const userInfo = await userResponse.json();
-      
-      // 사용자 정보 저장
-      setUser(userInfo);
-      
-      // 역할에 따른 리다이렉션
-      if (userInfo.roles.some((role: RoleResponse) => role.name === 'ADMIN')) {
-        navigate('/admin');
+      if (userData) {
+        setUser(userData);
+        
+        // 역할에 따른 리다이렉션
+        if (userData.roles.some((role) => role.name === 'ADMIN')) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
-        navigate('/');
+        throw new Error('사용자 정보를 가져오는데 실패했습니다.');
       }
       
     } catch (err) {
