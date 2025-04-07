@@ -1,7 +1,6 @@
 import React from 'react';
 import { Header } from '../molecules/Header';
 import { MapView } from '../organisms/MapView';
-import { Sidebar } from '../organisms/Sidebar';
 
 interface MapTemplateProps {
   title: string;
@@ -21,9 +20,6 @@ export const MapTemplate: React.FC<MapTemplateProps> = ({ title, onLogout }) => 
         {/* 3D 지도 컴포넌트 */}
         <MapView />
       </main>
-
-      {/* 사이드바 컴포넌트 - absolute 포지션 */}
-      <Sidebar defaultOpen={true} />
     </div>
   );
 }; 

@@ -1,42 +1,71 @@
-import React, { useState } from 'react';
-import { Icon } from '../atoms/Icon';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-interface SidebarProps {
-  defaultOpen?: boolean;
-}
+const Sidebar = () => {
+  const [isStationOpen, setIsStationOpen] = useState(false);
+  const location = useLocation();
 
-export const Sidebar: React.FC<SidebarProps> = ({ defaultOpen = true }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+  const handleStationClick = () => {
+    setIsStationOpen(!isStationOpen);
   };
 
   return (
-    <aside 
-      className={`absolute top-12 left-0 h-[calc(100%-48px)] flex transition-all duration-300 ease-in-out z-40 ${
-        isOpen ? 'translate-x-0' : 'translate-x-[-272px]'
-      }`}
-    >
-      {/* 메인 사이드바 컨텐츠 */}
-      <div className="w-[272px] h-full bg-white shadow-lg overflow-y-auto">
-
-        
+    <div className="w-64 h-screen bg-gray-800 text-white fixed left-0 top-0">
+      <div className="p-4">
+        <h1 className="text-xl font-bold mb-6">부산 지하철 관리</h1>
+        <nav>
+          <ul className="space-y-2">
+            <li>
+              <Link 
+                to="/admin/users" 
+                className={`block p-2 rounded hover:bg-gray-700 ${location.pathname === '/admin/users' ? 'bg-gray-700' : ''}`}
+              >
+                사용자 관리
+              </Link>
+            </li>
+            <li>
+              <div>
+                <button
+                  onClick={handleStationClick}
+                  className={`w-full text-left p-2 rounded hover:bg-gray-700 ${location.pathname.includes('/admin/station') ? 'bg-gray-700' : ''}`}
+                >
+                  역사 관리
+                </button>
+                {isStationOpen && (
+                  <ul className="ml-4 mt-2 space-y-2">
+                    <li>
+                      <Link 
+                        to="/admin/station/categories"
+                        className={`block p-2 rounded hover:bg-gray-700 ${location.pathname === '/admin/station/categories' ? 'bg-gray-700' : ''}`}
+                      >
+                        카테고리 관리
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        to="/admin/station/drawings"
+                        className={`block p-2 rounded hover:bg-gray-700 ${location.pathname === '/admin/station/drawings' ? 'bg-gray-700' : ''}`}
+                      >
+                        도면 관리
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </div>
+            </li>
+            <li>
+              <Link 
+                to="/admin/objects"
+                className={`block p-2 rounded hover:bg-gray-700 ${location.pathname === '/admin/objects' ? 'bg-gray-700' : ''}`}
+              >
+                오브젝트 관리
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
-      
-      {/* 토글 탭 */}
-      <div 
-        className="w-12 h-20 bg-white shadow-lg rounded-r-md flex items-center justify-center cursor-pointer self-start mt-4 z-50"
-        onClick={toggleSidebar}
-      >
-        <div className="w-6 h-6 flex items-center justify-center">
-          {isOpen ? (
-            <Icon name="arrow-left" />
-          ) : (
-            <Icon name="arrow-right" />
-          )}
-        </div>
-      </div>
-    </aside>
+    </div>
   );
-}; 
+};
+
+export default Sidebar; 
