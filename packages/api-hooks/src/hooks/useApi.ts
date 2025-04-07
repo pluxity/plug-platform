@@ -24,7 +24,7 @@ export function useApi<T, P extends any[] = any[]>(
 ): UseApiResponse<T, P> {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<ErrorResponseBody | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const isMounted = useRef(true);
   useEffect(() => {
@@ -38,7 +38,7 @@ export function useApi<T, P extends any[] = any[]>(
     if (isMounted.current) {
       setData(null);
       setError(null);
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -47,7 +47,7 @@ export function useApi<T, P extends any[] = any[]>(
     async (...args: P): Promise<T | null> => {
       if (!isMounted.current) return null;
 
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
       setData(null); 
 
@@ -105,14 +105,14 @@ export function useApi<T, P extends any[] = any[]>(
         return null;
       } finally {
         if (isMounted.current) {
-          setLoading(false);
+          setIsLoading(false);
         }
       }
     },
     [apiMethod]
   );
 
-  return { data, error, loading, execute, reset };
+  return { data, error, isLoading, execute, reset };
 }
 
 /**
