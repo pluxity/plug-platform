@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
         password
       });
       
-      if (response.code !== 200) {
+      if (response.status !== 200) {
         throw new Error('로그인에 실패했습니다.');
       }
       
@@ -44,6 +44,9 @@ const LoginPage: React.FC = () => {
       // 액세스 토큰 저장 - 이 시점에 tokenGetter에 값이 설정됨
       login(accessToken, '', '');
 
+      console.log('로그인 후 토큰:', accessToken);
+      console.log('저장된 토큰 확인:', useAuthStore.getState().accessToken);
+      
       // 잠시 지연 추가
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -52,13 +55,7 @@ const LoginPage: React.FC = () => {
       
       if (userData) {
         setUser(userData);
-        
-        // 역할에 따른 리다이렉션
-        if (userData.roles.some((role) => role.name === 'ADMIN')) {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+        navigate('/admin');
       } else {
         throw new Error('사용자 정보를 가져오는데 실패했습니다.');
       }

@@ -5,7 +5,7 @@ import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
-import AdminDashboard from './components/pages/AdminDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import useAuthStore from './stores/authStore';
 import { setTokenGetter } from '@plug/api-hooks';
 import { MainLayout } from './components/layouts/MainLayout';
@@ -13,7 +13,11 @@ import { MainLayout } from './components/layouts/MainLayout';
 const App: React.FC = () => {
 
   // useEffect 안에서 연결하면 타이밍 문제가 있을 수 있음 → 바로 연결
-  setTokenGetter(() => useAuthStore.getState().accessToken);
+  setTokenGetter(() => {
+    const token = useAuthStore.getState().accessToken;
+    console.log('App.tsx에서 토큰 가져오기:', token);
+    return token;
+  });
   
   return (
     <BrowserRouter>
