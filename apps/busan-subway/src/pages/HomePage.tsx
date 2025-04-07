@@ -1,23 +1,6 @@
-import React from 'react';
-
-// 임시 타입 정의
-interface SubwayStation {
-  id: string;
-  name: string;
-  line: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
-}
-
-const HomePage: React.FC = () => {
-  const [popularStations] = React.useState<SubwayStation[]>([
-    { id: '1', name: '서면역', line: '1호선', location: { lat: 35.157, lng: 129.059 } },
-    { id: '2', name: '해운대역', line: '2호선', location: { lat: 35.163, lng: 129.159 } },
-    { id: '3', name: '부산역', line: '1호선', location: { lat: 35.115, lng: 129.042 } },
-    { id: '4', name: '동래역', line: '1호선', location: { lat: 35.204, lng: 129.078 } },
-  ]);
+import { BuildingInfoSection } from "../components/BuildingInfoSection";
+import { BuildingInfoSectionSWR } from "../components/BuildingInfoSectionSWR";
+const HomePage = () => {
 
   return (
     <div className="space-y-8">
@@ -30,14 +13,15 @@ const HomePage: React.FC = () => {
       </section>
 
       <section className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-4">건물 정보</h2>
+        <BuildingInfoSection />
+        <BuildingInfoSectionSWR />
+
+      </section>
+
+      <section className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-4">인기 역</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {popularStations.map(station => (
-            <div key={station.id} className="border border-gray-200 rounded p-4 hover:border-primary-500 transition-colors">
-              <h3 className="font-bold text-lg">{station.name}</h3>
-              <p className="text-sm text-gray-600">{station.line}</p>
-            </div>
-          ))}
         </div>
       </section>
 
