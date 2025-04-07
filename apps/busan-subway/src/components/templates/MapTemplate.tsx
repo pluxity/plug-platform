@@ -10,14 +10,19 @@ interface MapTemplateProps {
 
 export const MapTemplate: React.FC<MapTemplateProps> = ({ title, onLogout }) => {
   return (
-    <div className="w-full h-full relative overflow-hidden">
+    <div className="w-full h-full flex flex-col relative">
       {/* 헤더 컴포넌트 */}
-      <Header title={title} onLogout={onLogout} />
+      <header className="w-full h-12 z-30">
+        <Header title={title} onLogout={onLogout} />
+      </header>
       
-      {/* 3D 지도 컴포넌트 */}
-      <MapView />
-      
-      {/* 사이드바 컴포넌트 - 기본값으로 열려있게 설정 */}
+      {/* 메인 콘텐츠 영역 - 3D 지도 */}
+      <main className="flex-1 overflow-hidden z-10">
+        {/* 3D 지도 컴포넌트 */}
+        <MapView />
+      </main>
+
+      {/* 사이드바 컴포넌트 - absolute 포지션 */}
       <Sidebar defaultOpen={true} />
     </div>
   );
