@@ -3,7 +3,7 @@ import { cn } from "../../utils/classname";
 import type { 
     ToggleGroupProps,
     ToggleProps,
-} from "./Toggle.types";
+} from "./ToggleGroup.types";
 
 
 const ToggleGroup = ({
