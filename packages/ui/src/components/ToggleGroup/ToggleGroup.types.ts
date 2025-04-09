@@ -1,7 +1,10 @@
 import { Size } from '../types';
 
-export interface ToggleProps extends Omit<React.ComponentProps<'button'>, 'onChange'>{
+export interface ToggleGroupProps extends Omit<React.ComponentProps<'div'>, 'onChange'>{
     size?: Size;
-    pressed?: boolean;
-    onChange?: (pressed: boolean) => void;
+    type?: 'single' | 'multiple';
+}
+
+export interface ToggleGroupItemProps extends Omit<React.ComponentProps<'button'>, 'onChange'>{
+    size?: Size;
 }

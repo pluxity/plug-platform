@@ -17,9 +17,9 @@ type Story = StoryObj<typeof ToggleGroup>;
 export const Default: Story = {
     render:(args) => (
         <ToggleGroup {...args}>
-            <ToggleGroupItems>1</ToggleGroupItems>
-            <ToggleGroupItems>2</ToggleGroupItems>
-            <ToggleGroupItems>3</ToggleGroupItems>
+            <ToggleGroup.Item>1</ToggleGroup.Item>
+            <ToggleGroup.Item>2</ToggleGroup.Item>
+            <ToggleGroup.Item>3</ToggleGroup.Item>
         </ToggleGroup>
     )
 }

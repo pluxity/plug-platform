@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { cn } from "../../utils/classname";
 import type { 
     ToggleGroupProps,
-    ToggleProps,
+    ToggleGroupItemProps,
 } from "./ToggleGroup.types";
 
 
@@ -70,5 +70,22 @@ const ToggleGroup = ({
 }
 ToggleGroup.displayName = "ToggleGroup";
 
-export { ToggleGroup, Toggle };
+const ToggleGroupItem = ({
+    className,
+    ref,
+    children,
+    ...props
+}: ToggleGroupItemProps) => {
+
+    return(
+        <button
+            {...props}
+        >
+            {children}
+        </button>
+    )
+}
+ToggleGroupItem.displayName = "ToggleGroupItem";
+
+export { ToggleGroup, ToggleGroupItemProps };
 
