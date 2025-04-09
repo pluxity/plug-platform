@@ -1,6 +1,6 @@
 import { 
     ToggleGroup as ToggleGroupComponent,
-    ToggleItem
+    ToggleGroupItem
  } from './ToggleGroup';
 
 import { 

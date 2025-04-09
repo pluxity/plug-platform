@@ -1,10 +1,18 @@
+import React from "react";
 import { Size } from '../types';
+
+type ToggleGroupType = 'single' | 'multiple';
 
 export interface ToggleGroupProps extends Omit<React.ComponentProps<'div'>, 'onChange'>{
     size?: Size;
-    type?: 'single' | 'multiple';
+    type?: ToggleGroupType;
+    disabled?: boolean;
+    pressed?: string[];
+    defaultPressed?: string[];
+    onChange?: (values: string[]) => void;
+    className?: string;
 }
 
-export interface ToggleGroupItemProps extends Omit<React.ComponentProps<'button'>, 'onChange'>{
-    size?: Size;
+export interface ToggleGroupItemProps extends React.ComponentProps<'button'>{
+    value: string;
 }
