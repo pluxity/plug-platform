@@ -10,7 +10,6 @@ export interface ToggleGroupProps extends Omit<React.ComponentProps<'div'>, 'onC
     pressed?: string[];
     defaultPressed?: string[];
     onChange?: (values: string[]) => void;
-    className?: string;
 }
 
 export interface ToggleGroupItemProps extends React.ComponentProps<'button'>{
