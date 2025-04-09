@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useId } from "react";
+import { useState, createContext, useContext } from "react";
 import { cn } from "../../utils/classname";
 import type { 
     ToggleGroupProps,
@@ -94,13 +94,10 @@ const ToggleGroupItem = ({
     }
     const { size, disabled, pressedValues, toggleValue } = context;
 
-    const id = useId();
-    const propValue = value || id;
-
-    const isPressed = pressedValues.includes(propValue);
+    const isPressed = pressedValues.includes(value);
 
     const onPressChange = () => {
-        toggleValue(propValue); 
+        toggleValue(value); 
     };
 
     const ToggleGroupStyle = `inline-flex items-center justify-center gap-2 rounded-md text-gray-700 font-medium border border-gray-200 bg-transparent shadow-sm hover:bg-gray-100
@@ -117,7 +114,7 @@ const ToggleGroupItem = ({
         <button
             onClick={onPressChange}
             aria-pressed={isPressed}
-            value={propValue}
+            value={value}
             className={cn(
                 ToggleGroupStyle,
                 ToggleGroupSize,
