@@ -46,7 +46,7 @@ const Checkbox = ({
   }[size];
 
 
-  const inputVariantStyle = {
+  const inputColorStyle = {
     primary: `${checked ? "bg-primary-500 border-primary-600" : ""}`,
     secondary: `${checked ? "bg-secondary-500 border-secondary-600" : ""}`,
   }[color];
@@ -61,7 +61,7 @@ const Checkbox = ({
     large: "text-lg",
   }[size];
 
-  const labelVariantStyle = {
+  const labelColorStyle = {
     primary: "text-black",
     secondary: "text-black",
   }[color];
@@ -73,7 +73,7 @@ const Checkbox = ({
       className={cn(
         labelStyle,
         labelSizeStyle,
-        labelVariantStyle,
+        labelColorStyle,
         labelDisabledStyle,
         className
       )}
@@ -92,7 +92,7 @@ const Checkbox = ({
           inputStyle,
           inputTypeStyle,
           inputSizeStyle,
-          inputVariantStyle,
+          inputColorStyle,
           inputDisabledStyle,
           checked ? `after:block` : "after:hidden", "transition-all duration-300",
           inputClassName,
