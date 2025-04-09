@@ -1,7 +1,8 @@
 import React from 'react';
+import type { Placement } from '../types';
 import type { DialogProps } from '../Dialog/Dialog.types';
 
-export type PopupPlacement = 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'center';
+export type PopupPlacement = Placement;
 
 export interface PopupProps extends Omit<DialogProps, 'contentClassName'> {
   title?: React.ReactNode;

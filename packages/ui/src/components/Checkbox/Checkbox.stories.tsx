@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Checkbox from './Checkbox';
+import { useState } from 'react';
+import { Checkbox } from './Checkbox';
 
 const meta: Meta<typeof Checkbox> = {
     title: 'Components/Checkbox',
@@ -20,32 +21,66 @@ const meta: Meta<typeof Checkbox> = {
         },
         disabled:{
             control: 'boolean',
+        },
+        indeterminate:{
+            control: 'boolean',
+            description: '중간 상태 지원'
         }
     }
-
 }
 
 export default meta;
 
 type Story = StoryObj<typeof Checkbox>;
 
+// 체크박스 상태 관리를 위한 컨트롤러 컴포넌트
+const CheckboxController: React.FC<{
+  children: (props: { checked: boolean; onChange: (checked: boolean) => void }) => React.ReactNode;
+  initialChecked?: boolean;
+}> = ({ children, initialChecked = false }) => {
+  const [checked, setChecked] = useState(initialChecked);
+  
+  const handleChange = (newChecked: boolean) => {
+    setChecked(newChecked);
+  };
+  
+  return children({ checked, onChange: handleChange });
+};
+
+
 export const Default: Story = {
-    args: {
-        color: "primary",
-        size: "small",
-        type: "rectangle",
-        label: "checkbox",
-    },
+    render: (args) => (
+        <CheckboxController>
+            {({ checked, onChange }) => (
+                <div>
+                    <Checkbox 
+                        {...args} 
+                        checked={checked} 
+                        onChange={onChange} 
+                        label="Checkbox"
+                    />
+                </div>
+            )}
+        </CheckboxController>
+    ),
 }
 
 export const Colors: Story = {
     render: () => (
         <>
             <div className="mt-4 mb-2">Color: primary</div>
-            <Checkbox color="primary" label="색상 primary"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox color="primary" checked={checked} onChange={onChange} label="색상 primary"/>
+                )}
+            </CheckboxController>
 
             <div className="mt-4 mb-2">Color: Secondary</div>
-            <Checkbox color="secondary" label="색상 secondary"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox color="secondary" checked={checked} onChange={onChange} label="색상 secondary"/>
+                )}
+            </CheckboxController>
         </>
     ),
 }
@@ -54,13 +89,25 @@ export const Sizes: Story = {
     render: () => (
         <>
             <div className="mt-4 mb-2">Size: small</div>
-            <Checkbox size="small" label="small"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox size="small" checked={checked} onChange={onChange} label="small"/>
+                )}
+            </CheckboxController>
 
             <div className="mt-4 mb-2">Size: medium</div>
-            <Checkbox size="medium" label="medium"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox size="medium" checked={checked} onChange={onChange} label="medium"/>
+                )}
+            </CheckboxController>
 
             <div className="mt-4 mb-2">Size: large</div>
-            <Checkbox size="large" label="large"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox size="large" checked={checked} onChange={onChange} label="large"/>
+                )}
+            </CheckboxController>
         </>
     ),
 }
@@ -69,23 +116,83 @@ export const Types: Story = {
     render: () => (
         <>
             <div className="mt-4 mb-2">Type: rectangle</div>
-            <Checkbox type="rectangle" label="checkbox 사각형"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox type="rectangle" checked={checked} onChange={onChange} label="checkbox 사각형"/>
+                )}
+            </CheckboxController>
 
             <div className="mt-4 mb-2">Type: circle</div>
-            <Checkbox type="circle" label="checkbox 원형"/>
+            <CheckboxController>
+                {({ checked, onChange }) => (
+                    <Checkbox type="circle" checked={checked} onChange={onChange} label="checkbox 원형"/>
+                )}
+            </CheckboxController>
         </>
     ),
 }
 
-export const OnlyInput: Story = {
+export const Disabled: Story = {
     render: (args) => (
-        <Checkbox {...args} />
+        <>
+            <div className="mt-4 mb-2">체크 비활성화</div>
+            <CheckboxController initialChecked={true}>
+                {({ checked, onChange }) => (
+                    <Checkbox 
+                        {...args} 
+                        checked={checked} 
+                        onChange={onChange} 
+                        disabled={true} 
+                        label="비활성화"
+                    />
+                )}
+            </CheckboxController>
+
+            <div className="mt-4 mb-2">언체크 비활성화</div>
+            <CheckboxController initialChecked={false}>
+                {({ checked, onChange }) => (
+                    <Checkbox 
+                        {...args} 
+                        checked={checked} 
+                        onChange={onChange} 
+                        disabled={true} 
+                        label="비활성화"
+                    />
+                )}
+            </CheckboxController>
+        </>
     ),
 }
 
-
-export const Disabled: Story = {
+export const Indeterminate: Story = {
     render: (args) => (
-        <Checkbox {...args} disabled={true} label="비활성화"/>
+        <CheckboxController>
+            {({ checked, onChange }) => (
+                <Checkbox 
+                    {...args} 
+                    checked={checked} 
+                    onChange={onChange} 
+                    indeterminate={true} 
+                    label="indeterminate"
+                />
+            )}
+        </CheckboxController>
+    ),
+}
+
+export const CustomInput: Story = {
+    render: (args) => (
+        <CheckboxController>
+            {({ checked, onChange }) => (
+                <Checkbox 
+                    {...args} 
+                    checked={checked} 
+                    onChange={onChange} 
+                    className="text-orange-500" 
+                    inputClassName="bg-orange-500 border-white" 
+                    label="custom Input"
+                />
+            )}
+        </CheckboxController>
     ),
 }
