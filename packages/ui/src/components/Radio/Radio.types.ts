@@ -4,14 +4,13 @@ type RadioColor = Exclude<Color, 'destructive'>;
 
 export interface RadioGroupProps extends Omit<React.ComponentProps<'div'>, 'onChange'> {
     defaultValue?: string;
-    variant?: RadioColor;
+    color?: RadioColor;
     size?: Size;
+    disabled?: boolean;
     name: string;
-    onChange: (value: string) => void;
-    children: React.ReactNode;
 }
 
-export interface RadioItemProps extends Omit<React.ComponentProps<'label'>, 'ref'> {
+export interface RadioGroupItemProps extends Omit<React.ComponentProps<'label'>, 'ref'> {
     value: string;
     label?: React.ReactNode;
     disabled?: boolean;
