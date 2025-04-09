@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from './eventDispatcher';
-import * as Interfaces from './interfaces';
-import { Engine3D } from './engine';
+import * as Event from '../eventDispatcher';
+import * as Interfaces from '../interfaces';
+import { Engine3D } from '../engine';
 
 let engine: Engine3D;
 let modelGroup: THREE.Group;

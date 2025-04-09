@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { Engine3D, Loader } from '@plug/engine/src';
+import * as Px from '@plug/engine/src';
 
 const ThreeDViewer: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (containerRef.current) {
-            new Engine3D(containerRef.current);
-            Loader.LoadGltf('funeralhall.glb', () => console.log('모델 로드 완료.'));
+            new Px.Engine3D(containerRef.current);
+            //Px.Loader.LoadGltf('funeralhall.glb', () => console.log('모델 로드 완료.'));
+            Px.Loader.LoadSbm( window.location.origin + '/SBMSample/', 'Untitled.xml', ()=>console.log('모델 로드 완료'));
         }
         console.log('WebGL 초기화 호출.');
     }, []);
