@@ -58,10 +58,10 @@ const useAuthStore = create<AuthStore>()(
           isAdmin: true,
         }),
         
-      hasRole: () => {
+      hasRole: (roleName: string) => {
         const { user } = get();
-        if (!user) return false;
-        return true;
+        if (!user || !user.roles) return false;
+        return user.roles.includes(roleName);
       },
     }),
     {
