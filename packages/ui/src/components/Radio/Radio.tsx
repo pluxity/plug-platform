@@ -7,6 +7,8 @@ interface RadioGroupContextProps {
   size: string;
   name: string;
   disabled?: boolean;
+  selectedValue: string;
+  toggleValue: (value: string) => void;
 }
 const RadioGroupContext = createContext<RadioGroupContextProps | undefined>(undefined);
 
@@ -14,8 +16,10 @@ const RadioGroup = ({
   defaultValue = "",
   color = "primary",
   size = "small",
+  selected,
   name,
   disabled,
+  onChange,
   children,
   ref,
   ...props
@@ -23,12 +27,20 @@ const RadioGroup = ({
   
   const [selectedValue, setSelectedValue] = useState(defaultValue);
 
-  const handleChange = (value: string) => {
-    setSelectedValue(value);
+  const isSelected = selected !== undefined;
+  const currentSelected = isSelected ? selected : selectedValue;
+
+  const toggleValue = (value: string) => {
+    if(!isSelected) {
+      setSelectedValue(value);
+    }
+    if (onChange) {
+        onChange(value);
+    }
   }
 
   return (
-    <RadioGroupContext.Provider value={{ color, size, name, disabled }}>
+    <RadioGroupContext.Provider value={{ color, size, name, disabled, toggleValue, selectedValue:currentSelected }}>
       <div 
           role="radiogroup" 
           className={cn("grid gap-2", props.className)} 
@@ -47,6 +59,7 @@ const RadioGroupItem = ({
   value,
   label,
   className,
+  inputClassName,
   ref,
   ...props
 }: RadioGroupItemProps) => {
@@ -57,7 +70,12 @@ const RadioGroupItem = ({
     throw new Error("RadioGroupItem은 RadioGroup 내에서 사용되어야 합니다.");
   }
 
-  const { color, size, name, disabled } = context;
+  const { color, size, name, disabled, selectedValue, toggleValue } = context;
+
+  const onSelectedChange = () => {
+    toggleValue(value);
+  };
+  
 
   const inputStyle = "z-1 inline-block cursor-pointer border-1 bg-white border-gray-500 rounded-full relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:border-full after:transform";
 
@@ -67,12 +85,12 @@ const RadioGroupItem = ({
     large: "w-6 h-6 after:w-5 after:h-5",
   }[size];
 
-  // const inputColorStyle = {
-  //     primary: `${selectedValue === value ? "border-primary-500 after:bg-primary-500" : ""}`,
-  //     secondary: `${selectedValue === value ? "border-secondary-500 after:bg-secondary-500" : ""}`,
-  // }[color];
+  const inputColorStyle = {
+      primary: `${selectedValue === value ? "border-primary-500 after:bg-primary-500" : ""}`,
+      secondary: `${selectedValue === value ? "border-secondary-500 after:bg-secondary-500" : ""}`,
+  }[color];
 
-  // const inputDisabledStyle = disabled ? `bg-gray-200 border-gray-400 cursor-not-allowed ${selectedValue === value ? "after:bg-gray-400" : ""}` : "";
+  const inputDisabledStyle = disabled ? `bg-gray-200 border-gray-400 cursor-not-allowed ${selectedValue === value ? "after:bg-gray-400" : ""}` : "";
 
   const labelStyle = "cursor-pointer inline-flex gap-x-1 items-center";
   const labelSizeStyle = {
@@ -97,7 +115,6 @@ const RadioGroupItem = ({
         labelDisabledStyle,
         className
       )}
-      {...props}
     >
       <input
         ref={ref}
@@ -105,14 +122,19 @@ const RadioGroupItem = ({
         className="absolute opacity-0 z-1"
         name={name}
         value={value}
+        checked={selectedValue === value}
+        onChange={onSelectedChange}
+        disabled={disabled}
+        {...props}
       />
       <span
         className={cn(
           inputStyle,
           inputSizeStyle,
-          // inputColorStyle,
-          // inputDisabledStyle,
-          // selectedValue === value ? "after:block" : "after:hidden"
+          inputColorStyle,
+          inputDisabledStyle,
+          selectedValue === value ? "after:block" : "after:hidden",
+          inputClassName,
         )}
       ></span>
       {label}

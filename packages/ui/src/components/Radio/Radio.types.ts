@@ -8,11 +8,14 @@ export interface RadioGroupProps extends Omit<React.ComponentProps<'div'>, 'onCh
     size?: Size;
     disabled?: boolean;
     name: string;
+    selected?: string;
+    onChange?: (value: string) => void;
 }
 
-export interface RadioGroupItemProps extends Omit<React.ComponentProps<'label'>, 'ref'> {
+export interface RadioGroupItemProps extends Omit<React.ComponentProps<'input'>, 'ref'> {
     value: string;
-    label?: React.ReactNode;
+    label?: string;
     disabled?: boolean;
+    inputClassName?: string;
     ref?: React.Ref<HTMLInputElement>;
 }
