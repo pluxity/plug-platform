@@ -47,7 +47,7 @@ class Engine3D {
         this.dom.appendChild(this.renderer.domElement);
 
         // 카메라
-        this.camera = new THREE.PerspectiveCamera(75, this.dom.clientWidth / this.dom.clientHeight, 1.0, 5000);
+        this.camera = new THREE.PerspectiveCamera(75, this.dom.clientWidth / this.dom.clientHeight, 0.1, 5000);
         this.camera.position.set(0, 10, 10);
         this.camera.lookAt(0, 0, 0);
         this.camera.layers.enable(Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);

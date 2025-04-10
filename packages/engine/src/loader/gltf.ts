@@ -3,9 +3,9 @@ import * as Addon from 'three/addons';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import { Engine3D } from '../engine';
+import * as ModelInternal from '../model/model';
 
 let engine: Engine3D;
-let modelGroup: THREE.Group;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -13,11 +13,6 @@ let modelGroup: THREE.Group;
  */
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
-
-    // 배경 모델 그룹 생성
-    modelGroup = new THREE.Group();
-    modelGroup.name = '#ModelGroup';
-    engine.RootScene.add(modelGroup);
 });
 
 /**
@@ -55,7 +50,7 @@ function LoadGltf(url: string, onLoad: Function) {
         });
 
         // 씬에 추가
-        modelGroup.add(gltf.scene);
+        ModelInternal.ModelGroup.add(gltf.scene);
 
         // 로드 완료 내부 이벤트 통지
         Event.InternalHandler.dispatchEvent({
@@ -65,7 +60,7 @@ function LoadGltf(url: string, onLoad: Function) {
         // 그림자맵 업데이트 이벤트 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onShadowMapNeedsUpdate',
-            shadowMapTarget: modelGroup,
+            shadowMapTarget: ModelInternal.ModelGroup,
         });
 
         // 로드 완료 콜백 호출

@@ -8,6 +8,7 @@ import { Engine3D } from '../engine';
 const floorObjects: Record<string, THREE.Object3D> = {};
 let posTween: TWEEN.Tween | undefined | null = undefined;
 let engine: Engine3D;
+let modelGroup: THREE.Group;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -15,6 +16,11 @@ let engine: Engine3D;
  */
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
+
+    // 배경 모델 그룹 생성
+    modelGroup = new THREE.Group();
+    modelGroup.name = '#ModelGroup';
+    engine.RootScene.add(modelGroup);
 });
 
 /**
@@ -83,34 +89,59 @@ function calculateFloorBounding(floorId: string): THREE.Box3 {
  * @param url - 모델링 url 주소
  * @param onComplete - 완료 후 호출될 콜백 함수
  */
-function GetModelHierarchy(url: string, onComplete: Function) {
+// function GetModelHierarchy(url: string, onComplete: Function) {
 
-    new Addon.GLTFLoader().load(url, (gltf) => {
+//     new Addon.GLTFLoader().load(url, (gltf) => {
 
-        const result: Interfaces.ModelInfo[] = [];
+//         const result: Interfaces.ModelInfo[] = [];
 
-        // 구조 분석
-        gltf.scene.traverse(child => {
-            if (child.userData.hasOwnProperty('type')) {
-                const type: string = child.userData['type'];
-                if (type.toLowerCase() === 'floor') {
-                    const info: Interfaces.ModelInfo = {
-                        objectName: child.name,
-                        displayName: child.userData.displayName,
-                        sortingOrder: Number.parseInt(child.userData.sortingorder),
-                        floorId: child.userData.floorId
-                    };
+//         // 구조 분석
+//         gltf.scene.traverse(child => {
+//             if (child.userData.hasOwnProperty('type')) {
+//                 const type: string = child.userData['type'];
+//                 if (type.toLowerCase() === 'floor') {
+//                     const info: Interfaces.ModelInfo = {
+//                         objectName: child.name,
+//                         displayName: child.userData.displayName,
+//                         sortingOrder: Number.parseInt(child.userData.sortingorder),
+//                         floorId: child.userData.floorId
+//                     };
 
-                    // 배열에 저장
-                    result.push(info);
-                }
+//                     // 배열에 저장
+//                     result.push(info);
+//                 }
+//             }
+//         });
+
+//         // 콜백 호출
+//         onComplete?.(result);
+
+//     }, undefined, (err) => console.error(err));
+// }
+
+function GetModelHierarchy(): Interfaces.ModelInfo[] {
+
+    const result: Interfaces.ModelInfo[] = [];
+
+    // 구조 분석
+    modelGroup.traverse(child => {
+        if (child.userData.hasOwnProperty('type')) {
+            const type: string = child.userData['type'];
+            if (type.toLowerCase() === 'floor') {
+                const info: Interfaces.ModelInfo = {
+                    objectName: child.name,
+                    displayName: child.userData.displayName,
+                    sortingOrder: Number.parseInt(child.userData.sortingorder),
+                    floorId: child.userData.floorId
+                };
+
+                // 배열에 저장
+                result.push(info);
             }
-        });
+        }
+    });
 
-        // 콜백 호출
-        onComplete?.(result);
-
-    }, undefined, (err) => console.error(err));
+    return result;
 }
 
 /**
@@ -214,10 +245,11 @@ function Expand(transitionTime: number, interval: number, onComplete: Function) 
             ratio: 0.0,
             floors: []
         };
-        floorArray.forEach((floor, index) => {
+        floorArray.forEach((floor) => {
+            const sortingOrder = floor.userData['sortingorder'];
             expandData.floors.push({
                 target: floor,
-                targetPosition: floor.userData['SourceLocalPosition'].clone().addScaledVector(new THREE.Vector3(0, 1, 0), index * interval)
+                targetPosition: floor.userData['SourceLocalPosition'].clone().addScaledVector(new THREE.Vector3(0, 1, 0), sortingOrder * interval)
             } as never);
         });
 
@@ -317,10 +349,12 @@ function Collapse(transitionTime: number, onComplete: Function) {
 }
 
 export {
+    modelGroup as ModelGroup,
+
     convertWorldToFloorLocal,
     convertFloorLocalToWorld,
     calculateFloorBounding,
-    
+
     GetModelHierarchy,
     Show,
     Hide,

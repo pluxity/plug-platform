@@ -8,7 +8,8 @@ const ThreeDViewer: React.FC = () => {
         if (containerRef.current) {
             new Px.Engine3D(containerRef.current);
             //Px.Loader.LoadGltf('funeralhall.glb', () => console.log('모델 로드 완료.'));
-            Px.Loader.LoadSbm( window.location.origin + '/SBMSample/', 'Untitled.xml', ()=>console.log('모델 로드 완료'));
+            //Px.Loader.LoadSbm( 'SBMSample/Untitled.xml', ()=>console.log('모델 로드 완료'));
+            Px.Loader.LoadSbm( 'sinlim_station/Sillim_2020_12.xml', ()=>console.log('모델 로드 완료'));
         }
         console.log('WebGL 초기화 호출.');
     }, []);

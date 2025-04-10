@@ -100,7 +100,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <br />
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</Button><br />
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</Button>
+                    <br />
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll(LocalStorage)')}>ExportAll(LocalStorage)</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import(LocalStorage)')}>Import(LocalStorage)</Button>
+                    <br/>
                     <Input.Text style={{ color: 'white' }} value={this.state.setVisiblePoiId} onChange={this.onSetVisiblePoiTextInputValueChanged.bind(this)} placeholder='Show/Hide Poi Id'></Input.Text>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</Button>
@@ -180,11 +184,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 }
             } break;
             case 'Model.GetHierarchy': {
-                Px.Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
-                    console.log('Model.GetModelHierarchy -> ', data);
-
-                    this.setState({ floorData: data }); // 얻은 층정보로 state 설정
-                });
+                const floorData = Px.Model.GetModelHierarchy() as any;
+                this.setState({ floorData: floorData });
             } break;
             case 'Model.Expand': {
                 Px.Model.Expand(1.0, 10.0, () => console.log('펼치기 완료'));
@@ -232,6 +233,19 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Poi.ImportSingle': {
                 Px.Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
+            } break;
+            case 'Poi.ExportAll(LocalStorage)': {
+                const data = Px.Poi.ExportAll();
+                console.log('Poi.ExportAll', data);
+                localStorage.setItem('PoiData', JSON.stringify(data));
+            } break;
+            case 'Poi.Import(LocalStorage)': {
+                const data = localStorage.getItem('PoiData');
+                if (data === undefined || data === null) {
+                    console.warn('no such data of PoiData.');
+                } else {
+                    Px.Poi.Import(JSON.parse(data));
+                }
             } break;
             case 'Poi.Clear': {
                 Px.Poi.Clear();

@@ -93,6 +93,43 @@ interface PoiImportOption {
     scale: Vector3Custom;
 }
 
+/**
+ * Sbm 파일 헤더 정보
+ */
+interface SBMHeader {
+    formatName: string;
+    version: number;
+    materialCount: number;
+    meshCount: number;
+}
+
+/**
+ * SBM 재질 정보
+ */
+interface SBMMaterial {
+    id: number;
+    ambient: THREE.Color;
+    diffuse: THREE.Color;
+    opacity: number;
+    specular: THREE.Color;
+    facing: number;
+    textureMapPath: string;
+}
+
+/**
+ * SBM 메시 정보
+ */
+interface SBMMesh {
+    id: number;
+    usedMaterialId: number;
+
+    vertexCount: number;
+    posVertices: number[];
+    normVertices: number[];
+    uvVertices : number[];
+    indices: number[];
+}
+
 export {
     Vector3Custom,
     EulerCustom,
@@ -102,4 +139,7 @@ export {
     ModelInfo,
     PoiCreateOption,
     PoiImportOption,
+    SBMHeader,
+    SBMMaterial,
+    SBMMesh,
 }
