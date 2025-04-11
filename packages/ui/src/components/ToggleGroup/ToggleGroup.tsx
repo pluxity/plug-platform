@@ -81,7 +81,7 @@ const ToggleGroup = ({
 ToggleGroup.displayName = "ToggleGroup";
 
 const ToggleGroupItem = ({
-    value = "",
+    value,
     className,
     children,
     ...props
