@@ -1,23 +1,12 @@
 import { cn } from '../../utils/classname';
-import { DayPicker, DateRange } from 'react-day-picker';
+import { DayPicker } from 'react-day-picker';
 import classNames from "react-day-picker/style.module.css";
-import { useState } from 'react';
 import type { CalendarProps } from './Calendar.types';
 
 const Calendar = ({
-    mode = "single",
-    onChange,
     className,
     ...props
 }: CalendarProps) => {
-    const [selected, setSelected] = useState<Date | Date[] | DateRange | undefined>();
-
-    const handleSelect = (date: Date | Date[] | DateRange | undefined) => {
-        setSelected(date); 
-        if (onChange) {     
-            onChange(date);  
-        }
-    };
       
     const CalenderStyle = "inline-flex p-3 rounded-md shadow-[0_1px_30px_2px_rgba(0,0,0,0.1)]";
     const CalenderDayPicker = {
@@ -52,47 +41,14 @@ const Calendar = ({
     
     return (
         <div className={className}>
-            {mode === 'single' && (
-                <DayPicker
-                    {...props}
-                    mode="single"
-                    selected={selected as Date}
-                    onSelect={(date) => handleSelect(date as Date | undefined)}
-                    className={CalenderStyle}
-                    classNames={{
-                        ...classNames,
-                        ...CalenderDayPicker
-                    }}
-                />
-            )}
-
-            {mode === 'multiple' && (
-                <DayPicker
-                    {...props}
-                    mode="multiple"
-                    selected={selected as Date[]}
-                    onSelect={(dates) => handleSelect(dates as Date[] | undefined)}
-                    className={CalenderStyle}
-                    classNames={{
-                        ...classNames,
-                        ...CalenderDayPicker
-                    }}
-                />
-            )}
-
-            {mode === 'range' && (
-                <DayPicker
-                    {...props}
-                    mode="range"
-                    selected={selected as DateRange}
-                    onSelect={(range) => handleSelect(range as DateRange | undefined)}
-                    className={CalenderStyle}
-                    classNames={{
-                        ...classNames,
-                        ...CalenderDayPicker
-                    }}
-                />
-            )}
+            <DayPicker
+                className={CalenderStyle}
+                classNames={{
+                    ...classNames,
+                    ...CalenderDayPicker
+                }}
+                {...props}
+            />
         </div>
     );
 }

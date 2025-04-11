@@ -1,12 +1,14 @@
+import * as React from 'react';
 import {cn} from '../../utils/classname';
 import type { BadgeProps } from './Badge.types';
 
-const Badge = ({
+const Badge = React.memo(({
     color = 'primary',
     size = 'small',
     className,
-    children,
     label,
+    ref,
+    children,
     ...props
 } : BadgeProps) => {
 
@@ -30,6 +32,7 @@ const Badge = ({
             role="status" 
             aria-live="polite" 
             aria-label={label}
+            ref={ref}
             className={cn(
                 badgeStyle,
                 colorStyle,
@@ -41,6 +44,8 @@ const Badge = ({
             {children}
         </span>
     );
-};
+});
 
-export {Badge};
+Badge.displayName = 'Badge';
+
+export { Badge };
