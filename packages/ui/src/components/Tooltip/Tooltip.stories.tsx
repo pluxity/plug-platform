@@ -110,9 +110,7 @@ export const InteractionTypes: Story = {
                 
                 <Tooltip trigger="focus">
                     <Tooltip.Trigger>
-                        <Button variant="outline" color="primary">
-                            포커스
-                        </Button>
+                        <input type="text" placeholder="포커스시 표시"/>
                     </Tooltip.Trigger>
                     <Tooltip.Content>
                         포커스시 표시 (탭으로 이동하세요)

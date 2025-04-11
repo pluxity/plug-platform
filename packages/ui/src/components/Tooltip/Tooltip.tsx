@@ -92,7 +92,6 @@ const TooltipContent = ({
     if (!isActive) {
         return null;
     }
-    console.log(isActive);
 
     const TooltipContentStyle = `absolute text-white text-sm rounded shadow bg-black py-2 px-3 transition-all duration-300 ease-in-out z-999
         min-w-[120px] text-center whitespace-nowrap after:absolute after:w-2 after:h-2 after:bg-black after:rotate-45 after:content-['']
