@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { DataTableProps } from './DataTable.types'
+import { Pagination } from '../Pagination'
 import TableHeader from './TableHeader'
 import TableBody from './TableBody'
-import Pagination from './Pagination'
 import SearchFilter from './SearchFilter'
 
 const DataTable = <T,>({
