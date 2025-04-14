@@ -117,33 +117,37 @@ export const UnControlled: Story = {
 
 export const Controlled: Story = {
     render: () => {
-        const [singleValue, setSingleValue] = useState<string[]>(["2"]);
-        const [multipleValues, setMultipleValues] = useState<string[]>(["1", "3"]);
+        const ControlledToggleGroup = () => {
+            const [singleValue, setSingleValue] = useState<string[]>(["2"]);
+            const [multipleValues, setMultipleValues] = useState<string[]>(["1", "3"]);
 
-        return (
-            <>
-                <div className="mt-4 mb-2">MultipleType</div>
-                <ToggleGroup 
-                    type="single" 
-                    pressed={singleValue}
-                    onChange={setSingleValue}
-                >
-                    <ToggleGroup.Item value="1">1</ToggleGroup.Item>
-                    <ToggleGroup.Item value="2">2</ToggleGroup.Item>
-                    <ToggleGroup.Item value="3">3</ToggleGroup.Item>
-                </ToggleGroup>
-                
-                <div className="mt-4 mb-2">MultipleType</div>
-                <ToggleGroup 
-                    type="multiple" 
-                    pressed={multipleValues}
-                    onChange={setMultipleValues}
-                >
-                    <ToggleGroup.Item value="1">1</ToggleGroup.Item>
-                    <ToggleGroup.Item value="2">2</ToggleGroup.Item>
-                    <ToggleGroup.Item value="3">3</ToggleGroup.Item>
-                </ToggleGroup>
-            </>
-        );
+            return (
+                <>
+                    <div className="mt-4 mb-2">MultipleType</div>
+                    <ToggleGroup 
+                        type="single" 
+                        pressed={singleValue}
+                        onChange={setSingleValue}
+                    >
+                        <ToggleGroup.Item value="1">1</ToggleGroup.Item>
+                        <ToggleGroup.Item value="2">2</ToggleGroup.Item>
+                        <ToggleGroup.Item value="3">3</ToggleGroup.Item>
+                    </ToggleGroup>
+                    
+                    <div className="mt-4 mb-2">MultipleType</div>
+                    <ToggleGroup 
+                        type="multiple" 
+                        pressed={multipleValues}
+                        onChange={setMultipleValues}
+                    >
+                        <ToggleGroup.Item value="1">1</ToggleGroup.Item>
+                        <ToggleGroup.Item value="2">2</ToggleGroup.Item>
+                        <ToggleGroup.Item value="3">3</ToggleGroup.Item>
+                    </ToggleGroup>
+                </>
+            );
+        };
+            
+        return <ControlledToggleGroup />
     }
 }

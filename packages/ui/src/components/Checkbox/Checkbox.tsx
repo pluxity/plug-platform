@@ -13,7 +13,6 @@ const Checkbox = ({
   indeterminate = false,
   inputClassName,
   className,
-  ref,
   ...props
 }: CheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
