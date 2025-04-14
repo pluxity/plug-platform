@@ -1,14 +1,15 @@
-import { PaginationProps } from './DataTable.types'
+import { PaginationProps } from './Pagination.types';
 import { cn } from '../../utils/classname'
 import { Button } from '../Button'
 import { PrevIcon, NextIcon } from '../../index.icons'
 
-const Pagination = ({ 
-    currentPage = 1, 
-    totalPages = 0, 
-    pageBlock = 10,
-    onPageChange
- }: PaginationProps) => {
+const Pagination = ({
+  currentPage = 1,
+  pageBlock = 10,
+  totalPages,
+  onPageChange,
+  className,
+}: PaginationProps) => {
 
     const selectedPageClassName = 'bg-blue-500 text-white font-semibold'
     const unSelectedPageClassName = 'text-black bg-white hover:bg-blue-200 hover:text-white'
@@ -19,8 +20,8 @@ const Pagination = ({
 
     const renderPageNumbers = () => {
         const pages = [];
-        const startPage = Math.floor((currentPage - 1) / pageBlock) * pageBlock + 1; // Start of the current range
-        const endPage = Math.min(totalPages, startPage + pageBlock - 1); // End of the current range
+        const startPage = Math.floor((currentPage - 1) / pageBlock) * pageBlock + 1;
+        const endPage = Math.min(totalPages, startPage + pageBlock - 1);
 
         if (startPage > 1) {
             pages.push(
@@ -30,7 +31,7 @@ const Pagination = ({
                         'px-3 py-1 rounded-md',
                         unSelectedPageClassName,
                     )}
-                    onClick={() => handlePageChange(currentPage - 1)} // Use updated handler
+                    onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                 >
                     <PrevIcon />
@@ -49,7 +50,7 @@ const Pagination = ({
                             i === currentPage ? selectedPageClassName : unSelectedPageClassName,
                         )
                     }
-                    onClick={() => handlePageChange(i)} // Use updated handler
+                    onClick={() => handlePageChange(i)}
                 >
                     {i}
                 </Button>
@@ -64,7 +65,7 @@ const Pagination = ({
                         'px-3 py-1 rounded-md',
                         unSelectedPageClassName,
                     )}
-                    onClick={() => handlePageChange(currentPage + 1)} // Use updated handler
+                    onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                 >
                     <NextIcon />
@@ -76,7 +77,14 @@ const Pagination = ({
     }
 
     return (
-        <div className="flex justify-center mt-6 space-x-2" role="navigation" aria-label="Pagination">  
+        <div className={
+            cn(  
+                "flex justify-center mt-6 space-x-2",  
+                className  
+            )}
+            role="navigation" 
+            aria-label="Pagination">  
+
             <Button  
                 color="primary"  
                 className={  
@@ -108,6 +116,8 @@ const Pagination = ({
             </Button>  
         </div>  
     )
-}
+};
 
-export default Pagination
+Pagination.displayName = 'Pagination';
+
+export { Pagination }
