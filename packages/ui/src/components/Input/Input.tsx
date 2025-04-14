@@ -25,7 +25,7 @@ const Input = ({
   
   const iconColor = invalid ? 'red' : props.disabled ? 'lightgray' : inputFocus ? 'black' : 'lightgray';
 
-  const inputWrapStyle = `${invalid === true ? "border-red-600" : props.disabled ? "border-gray-300 bg-gray-200" : "border-gray-400"} inline-flex items-center border border-1 rounded-xs h-9 w-45 `;
+  const inputWrapStyle = `${invalid === true ? "border-red-600" : props.disabled ? "border-gray-300 bg-gray-200" : "border-gray-400"} inline-flex items-center border border-1 rounded-xs h-9`;
   const InputTextStyle = `${invalid === true ? "enabled:placeholder:text-red-600 text-red-600" : "placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs h-full p-2 disabled:text-gray-300 disabled:cursor-not-allowed`;
 
   const defaultIcon = (position: 'leading' | 'trailing') => {
