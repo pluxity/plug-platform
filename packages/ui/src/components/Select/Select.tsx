@@ -3,6 +3,7 @@ import { cn } from "../../utils/classname";
 import { SelectCloseIcon } from "../../index.icons"; 
 import type { 
     SelectProps,
+    SelectTriggerProps,
     SelectItemProps,
  } from "./Select.types";
 import React from "react";
@@ -99,9 +100,10 @@ const Select = ({
 Select.displayName = "Select";
 
 const SelectTrigger = ({
+    placeholder = "선택하세요.",
     className,
     ...props
-}: React.ComponentProps<'div'>) => {
+}: SelectTriggerProps) => {
     const context = useContext(SelectContext);
 
     if (!context) {
@@ -170,7 +172,7 @@ const SelectTrigger = ({
                             SelectInputVariant,
                             "flex-1 min-w-[50px]"
                         )}
-                        placeholder={selectedValue.length === 0 ? "선택하세요." : ""}
+                        placeholder={selectedValue.length === 0 ? `${placeholder}` : ""}
                         value={searchValue}
                         onChange={handleInputChange}
         

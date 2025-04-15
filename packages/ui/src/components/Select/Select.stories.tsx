@@ -57,11 +57,10 @@ export const Type: Story = {
           <div className="flex flex-col items-center justify-center h-[400px]">
               <div className="mt-4 mb-2">Type: Multiple</div>
               <Select className="w-60" type="multiple">
-                  <Select.Trigger/>
+                  <Select.Trigger placeholder="입력하세요"/>
                   <Select.Content>
                       <Select.Item value="1번">1번</Select.Item>
                       <Select.Item value="2번">2번</Select.Item>
-  
                       <Select.Item value="3번">3번</Select.Item>
                       <Select.Item value="4번">4번</Select.Item>
                       <Select.Item value="5번">5번</Select.Item>
