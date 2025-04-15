@@ -49,6 +49,9 @@ const ComboBox = ({
     return(
         <ComboBoxContext.Provider value={{ isSelected:isSelectOpen, setIsSelected:setIsSelectOpen, toggleValue, selectedValue:currentSelected, disabled, inputValue, setInputValue }}>
             <div
+                role="combobox"
+                aria-expanded={isSelectOpen}
+                aria-haspopup="listbox"
                 className={cn(
                     "relative inline-block",
                     className
@@ -119,7 +122,7 @@ const ComboBoxContent = ({
     const context = useContext(ComboBoxContext);
 
     if(!context) {
-        throw new Error("SelectContent는 Dropdown 구성 요소 내에서 사용해야 합니다. <Select.Content>가 <Select> 구성 요소 내부에 중첩되어 있는지 확인하세요.")
+        throw new Error("ComboBoxContent는 Dropdown 구성 요소 내에서 사용해야 합니다. <ComboBox.Content>가 <ComboBox> 구성 요소 내부에 중첩되어 있는지 확인하세요.")
     }
 
     const { isSelected, inputValue, setInputValue } = context;
@@ -198,7 +201,7 @@ const ComboBoxItem = ({
     return(
         <li
             role="option"
-            aria-expended={selectedValue}
+            aria-selected={isItemSelected}
             value={value}
             onClick={onItemChange}
             className={cn(

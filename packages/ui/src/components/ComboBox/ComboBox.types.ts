@@ -1,5 +1,5 @@
 export interface ComboBoxProps extends Omit<React.ComponentProps<"div">, 'onChange'>{
-    onChange?: (value: string) => void;
+    onChange?: (value: string | React.ChangeEvent<HTMLInputElement>) => void;
     disabled?: boolean; 
     selected?: string;
 }

@@ -16,6 +16,7 @@ export type { LabelProps } from './components/Label';
 export type { InputProps } from './components/Input';
 export type { ChartProps } from './components/Chart';
 export type { DataTableProps } from './components/DataTable';
+export type { ComboBoxProps } from './components/ComboBox';
 
 // chart.js 타입 내보내기
 export type { ChartData, ChartOptions } from 'chart.js';
