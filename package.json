@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write",
+    "ui": "pnpm --filter @plug/ui",
     "storybook": "pnpm --filter @plug/ui storybook",
     "api-hooks": "pnpm --filter @plug/api-hooks",
     "common-services": "pnpm --filter @plug/common-services",

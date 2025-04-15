@@ -110,21 +110,25 @@ export const Uncontrolled: Story = {
 
 export const Controlled: Story = {
   render: () => {
-    const [selectedValue, setSelectedValue] = useState('option1');
-    
-    return (
-      <>
-        <div className="mt-4 mb-2">현재 선택된 값: {selectedValue}</div>
-        <RadioGroup 
-          name="controlled" 
-          selected={selectedValue} 
-          onChange={(value) => setSelectedValue(value)}
-        >
-            <RadioGroupItem value="option1" label="옵션 1" />
-            <RadioGroupItem value="option2" label="옵션 2" />
-            <RadioGroupItem value="option3" label="옵션 3" />
-        </RadioGroup>    
-      </>
-    );
+    const ControlledRadio = () => {
+      const [selectedValue, setSelectedValue] = useState('option1');
+      
+      return (
+        <>
+          <div className="mt-4 mb-2">현재 선택된 값: {selectedValue}</div>
+          <RadioGroup 
+            name="controlled" 
+            selected={selectedValue} 
+            onChange={(value) => setSelectedValue(value)}
+          >
+              <RadioGroupItem value="option1" label="옵션 1" />
+              <RadioGroupItem value="option2" label="옵션 2" />
+              <RadioGroupItem value="option3" label="옵션 3" />
+          </RadioGroup>    
+        </>
+      );
+    };
+
+    return <ControlledRadio />
   },
 };

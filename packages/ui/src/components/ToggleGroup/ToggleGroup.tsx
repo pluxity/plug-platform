@@ -46,7 +46,11 @@ const ToggleGroup = ({
 
                 const selectedValuesSet = new Set(prev);
                 
-                selectedValuesSet.has(value) ? selectedValuesSet.delete(value) : selectedValuesSet.add(value);
+                if (selectedValuesSet.has(value)) {
+                    selectedValuesSet.delete(value);
+                } else {
+                    selectedValuesSet.add(value);
+                }
                 
                 const newSelectedValues = [...selectedValuesSet]; 
                 if (onChange) {

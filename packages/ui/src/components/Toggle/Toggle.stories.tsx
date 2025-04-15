@@ -49,19 +49,23 @@ export const Disabled: Story = {
 
 export const Controlled: Story = {
     render:() => {
-        const [isToggled, setIsToggled] = useState(false);
-        
-        const handleToggle = () => {
-            setIsToggled(!isToggled);
+        const ControlledToggle = () => {
+            const [isToggled, setIsToggled] = useState(false);
+            
+            const handleToggle = () => {
+                setIsToggled(!isToggled);
+            };
+            
+            return (
+                <Toggle 
+                    pressed={isToggled} 
+                    onChange={handleToggle}
+                >
+                    {isToggled ? 'ON' : 'OFF'}
+                </Toggle>
+            );
         };
-        
-        return (
-            <Toggle 
-                pressed={isToggled} 
-                onChange={handleToggle}
-            >
-                {isToggled ? 'ON' : 'OFF'}
-            </Toggle>
-        );
+
+        return <ControlledToggle />;
     }
 }
