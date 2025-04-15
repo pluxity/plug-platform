@@ -241,7 +241,13 @@ const SelectContent = ({
             )}
             {...props}
         >
-            {filteredChildren}
+            {filteredChildren.length > 0 ? (
+                filteredChildren
+            ) : (
+                <li className="text-gray-400 text-center py-2">
+                    검색 결과가 없습니다.
+                </li>
+            )}
         </ul>
     )
 }
