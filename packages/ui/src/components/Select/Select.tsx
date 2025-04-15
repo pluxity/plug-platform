@@ -51,17 +51,13 @@ const Select = ({
             }
             setIsSelectOpen(false);
         } else if (type === "multiple") {
-
             const selectedValuesSet = new Set(currentSelected);
-
             if (selectedValuesSet.has(value)) {
                 selectedValuesSet.delete(value);
             } else {
                 selectedValuesSet.add(value);
             }
-            
             const newSelectedValues = [...selectedValuesSet];
-            
             if(!isControlled) {
                 setSelectedValue(newSelectedValues);
             }
@@ -85,6 +81,9 @@ const Select = ({
             type
         }}>
             <div
+                role="combobox"
+                aria-expanded={isSelectOpen}
+                aria-haspopup="listbox"
                 className={cn(
                     "relative inline-block",
                     className
@@ -126,7 +125,6 @@ const SelectTrigger = ({
         error: "placeholder:text-destructive-500 text-destructive-500"
     }[variant];
 
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(e.target.value);
         if (!isSelected) {
@@ -137,7 +135,6 @@ const SelectTrigger = ({
     const handleRemoveItem = (value: string) => {
         context.toggleValue(value);
     };
-
 
     return (
         <div
@@ -168,6 +165,9 @@ const SelectTrigger = ({
                     ))}
                     <input 
                         type="text"
+                        aria-expanded={isSelected}
+                        aria-controls="select-listbox"
+                        aria-autocomplete="none"
                         className={cn(
                             "flex-1 min-w-[50px]",
                             SelectInputStyle,
@@ -177,12 +177,14 @@ const SelectTrigger = ({
                         placeholder={selectedValue.length === 0 ? `${placeholder}` : ""}
                         value={searchValue}
                         onChange={handleInputChange}
-        
                     />
                 </>
             ) : (
                 <input 
                     type="text"
+                    aria-expanded={isSelected}
+                    aria-controls="select-listbox"
+                    aria-autocomplete="none"
                     className={cn(
                         "w-full",
                         SelectInputStyle,
@@ -227,7 +229,6 @@ const SelectContent = ({
         error: "border-destructive-500"
     }[variant];
 
-    
     const filteredChildren = React.Children.toArray(children).filter((child) => {
         if (React.isValidElement(child) && searchValue) {
             const childProps = child.props as SelectItemProps;
@@ -239,6 +240,8 @@ const SelectContent = ({
     return(
         <ul
             role="listbox"
+            id="select-listbox"
+            aria-label="선택 목록"
             className={cn(
                 selectContentVariant,
                 selectContentStyle, 
@@ -287,7 +290,7 @@ const SelectItem = ({
     return(
         <li
             role="option"
-            aria-expended={isItemSelected}
+            aria-selected={isItemSelected}
             onClick={onItemChange}
             className={cn(
                 selectItemStyle,
