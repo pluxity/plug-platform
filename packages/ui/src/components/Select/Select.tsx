@@ -101,6 +101,7 @@ Select.displayName = "Select";
 
 const SelectTrigger = ({
     placeholder = "선택하세요.",
+    inputClassName,
     className,
     ...props
 }: SelectTriggerProps) => {
@@ -168,9 +169,10 @@ const SelectTrigger = ({
                     <input 
                         type="text"
                         className={cn(
+                            "flex-1 min-w-[50px]",
                             SelectInputStyle,
                             SelectInputVariant,
-                            "flex-1 min-w-[50px]"
+                            inputClassName
                         )}
                         placeholder={selectedValue.length === 0 ? `${placeholder}` : ""}
                         value={searchValue}
@@ -182,9 +184,10 @@ const SelectTrigger = ({
                 <input 
                     type="text"
                     className={cn(
+                        "w-full",
                         SelectInputStyle,
                         SelectInputVariant,
-                        "w-full"
+                        inputClassName
                     )}
                     placeholder="선택하세요."
                     value={selectedValue}

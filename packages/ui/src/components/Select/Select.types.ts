@@ -11,6 +11,11 @@ export interface SelectProps extends Omit<React.ComponentProps<'div'>, 'onChange
     children? : React.ReactNode;
 }
 
+export interface SelectTriggerProps extends React.ComponentProps<'div'>{
+    inputClassName?: string;
+    placeholder?: string;
+}
+
 export interface SelectItemProps extends React.ComponentProps<'li'>{
     value: string;
 }
