@@ -56,10 +56,10 @@ export const Custom: Story = {
             <ComboBox {...args}>
                 <ComboBox.Trigger placeholder="문구를 입력하세요" inputClassName="text-xs"/>
                 <ComboBoxContent inputClassName="text-xs" className="[&>*]:text-xs">
-                    <ComboBox.Item value="사과">1번</ComboBox.Item>
-                    <ComboBox.Item value="오렌지">2번</ComboBox.Item>
-                    <ComboBox.Item value="바나나">3번</ComboBox.Item>
-                    <ComboBox.Item value="레몬">111번</ComboBox.Item>
+                    <ComboBox.Item value="사과">사과</ComboBox.Item>
+                    <ComboBox.Item value="오렌지">오렌지</ComboBox.Item>
+                    <ComboBox.Item value="바나나">바나나</ComboBox.Item>
+                    <ComboBox.Item value="레몬">레몬</ComboBox.Item>
                 </ComboBoxContent>
             </ComboBox>
         </div>
