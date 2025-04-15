@@ -69,10 +69,10 @@ const Select = ({
     };
 
     return(
-        <SelectContext.Provider value={{
+        <SelectContext value={{
             isSelected: isSelectOpen,
             setIsSelected: setIsSelectOpen,
-            toggleValue,
+            toggleValue: toggleValue,
             selectedValue: currentSelected,
             variant,
             disabled,
@@ -92,7 +92,7 @@ const Select = ({
             >
                 {children}
             </div>
-        </SelectContext.Provider>
+        </SelectContext>
     )
 }
 
@@ -142,7 +142,7 @@ const SelectTrigger = ({
             className={cn(
                 selectTriggerStyle,
                 SelectTriggerVariant,
-                "flex flex-wrap gap-1 cursor-pointer",
+                "flex flex-wrap gap-1",
                 className
             )}
             {...props}
@@ -186,7 +186,7 @@ const SelectTrigger = ({
                     aria-controls="select-listbox"
                     aria-autocomplete="none"
                     className={cn(
-                        "w-full",
+                        "w-full cursor-pointer",
                         SelectInputStyle,
                         SelectInputVariant,
                         inputClassName
