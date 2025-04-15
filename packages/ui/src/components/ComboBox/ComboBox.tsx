@@ -90,7 +90,7 @@ const ComboBoxTrigger = ({
             onClick={() => disabled ? null : setIsSelected(!isSelected)}
             className={cn(
                 comboBoxTriggerStyle,
-                "flex flex-wrap gap-1 cursor-pointer",
+                `flex flex-wrap gap-1 cursor-pointer ${disabled ? "" : "hover:bg-gray-100"}`,
                 className
             )}
             {...props}
@@ -101,7 +101,7 @@ const ComboBoxTrigger = ({
                     aria-controls="listbox"
                     aria-autocomplete="list"
                     className={cn(
-                        "w-full",
+                        "w-full cursor-pointer",
                         comboBoxInputStyle,
                         inputClassName,
                     )}
