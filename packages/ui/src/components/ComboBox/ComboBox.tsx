@@ -97,6 +97,9 @@ const ComboBoxTrigger = ({
         >
             {<input 
                     type="text"
+                    aria-expanded={isSelected}
+                    aria-controls="listbox"
+                    aria-autocomplete="list"
                     className={cn(
                         "w-full",
                         comboBoxInputStyle,
@@ -147,6 +150,8 @@ const ComboBoxContent = ({
     return(
         <ul
             role="listbox"
+            id="listbox"
+            aria-label="선택 목록"
             className={cn(
                 comboBoxContentStyle, 
                 className
