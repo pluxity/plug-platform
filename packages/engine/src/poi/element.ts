@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
 import * as ModelInternal from '../model/model';
+import * as Util from '../util';
 
 /**
  * poi 개별요소 클래스
@@ -20,10 +21,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
     private lineHeight: number;
 
     private floorId?: string;
-    
+
     private pointMeshData: PoiPointMeshData;
 
     private visibleState: boolean;
+
+    private mixer: THREE.AnimationMixer | undefined;
+    private actions: Record<string, THREE.AnimationAction>;
 
     /**
      * 생성자
@@ -38,16 +42,19 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.property = option.property;
 
         this.position = new Interfaces.Vector3Custom();
-        this.lineHeight = 2.0;
+        this.lineHeight = 3.0;
 
         this.pointMeshData = {
-            meshRef: undefined,
+            instanceMeshRef: undefined,
             instanceIndex: -1,
             rotation: new Interfaces.EulerCustom,
             scale: new Interfaces.Vector3Custom(1, 1, 1),
+            animMeshRef: undefined,
         };
 
         this.visibleState = true;
+        this.mixer = undefined;
+        this.actions = {};
     }
 
     /**
@@ -76,6 +83,9 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
         // 텍스트
         this.textObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.lineHeight));
+
+        // 위치점 애니메이션 메시
+        this.pointMeshData.animMeshRef?.position.copy(value);
     }
 
     /**
@@ -124,7 +134,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
             displayText: this.displayText,
             property: this.property,
             floorId: this.floorId,
-            position: ModelInternal.convertWorldToFloorLocal(this.position.clone(), this.floorId as string), //this.position?.ExportData,
+            position: ModelInternal.convertWorldToFloorLocal(this.position.clone(), this.floorId as string),
             rotation: this.pointMeshData.rotation.ExportData,
             scale: this.pointMeshData.scale.ExportData,
         };
@@ -143,25 +153,76 @@ class PoiElement implements Interfaces.PoiCreateOption {
     set Visible(value: boolean) {
         this.visibleState = value;
 
-        if( this.visibleState ) {
+        if (this.visibleState) {
             (this.iconObj as THREE.Sprite).visible = true;
             this.iconObj?.layers.set(Interfaces.CustomLayer.Default);
 
             (this.textObj as THREE.Object3D).visible = true;
             this.textObj?.layers.set(Interfaces.CustomLayer.Default);
+
+            // 위치점 애니메이션 메시
+            if( this.pointMeshData.animMeshRef !== undefined ) {
+                this.pointMeshData.animMeshRef.visible = true;
+                Util.setObjectLayer(this.pointMeshData.animMeshRef, Interfaces.CustomLayer.Default);
+            }
         } else {
             (this.iconObj as THREE.Sprite).visible = false;
             this.iconObj?.layers.set(Interfaces.CustomLayer.Invisible);
 
             (this.textObj as THREE.Object3D).visible = false;
             this.textObj?.layers.set(Interfaces.CustomLayer.Invisible);
+            
+            // 위치점 애니메이션 메시
+            if( this.pointMeshData.animMeshRef !== undefined ) {
+                this.pointMeshData.animMeshRef.visible = false;
+                Util.setObjectLayer(this.pointMeshData.animMeshRef, Interfaces.CustomLayer.Invisible);
+            }
         }
+    }
+
+    /**
+     * 애니메이션 믹서
+     */
+    set Mixer(value: THREE.AnimationMixer | undefined) {
+        this.mixer = value;
+    }
+
+    /**
+     * 애니메이션 믹서
+     */
+    get Mixer(): THREE.AnimationMixer | undefined {
+        return this.mixer;
+    }
+
+    /**
+     * 관리중인 애니메이션 액션 목록
+     */
+    get AnimationActions(): Record<string, THREE.AnimationAction> {
+        return this.actions;
     }
 
     /**
      * poi 요소 제거 및 메모리 해제
      */
     dispose() {
+        // 애니메이션 메시 제거
+        this.pointMeshData.animMeshRef?.parent?.remove(this.pointMeshData.animMeshRef);
+        this.pointMeshData.animMeshRef?.children.forEach((child) => {
+            if (child instanceof THREE.Mesh) {
+                child.geometry.dispose();
+                if( Array.isArray(child.material)) {
+                    child.material.forEach((material) => {
+                        (material as THREE.Material).dispose();
+                        (material as THREE.MeshBasicMaterial).map?.dispose();
+                    });
+                } else {
+                    (child.material as THREE.Material).dispose();
+                    (child.material as THREE.MeshBasicMaterial).map?.dispose();
+                }
+            }
+        });
+        this.pointMeshData.animMeshRef = undefined;
+
         // 아이콘 제거
         this.iconObj?.parent?.remove(this.iconObj);
 
@@ -182,10 +243,12 @@ class PoiElement implements Interfaces.PoiCreateOption {
  * poi 위치점 메시 데이터
  */
 interface PoiPointMeshData {
-    meshRef: THREE.InstancedMesh | undefined;
+    instanceMeshRef: THREE.InstancedMesh | undefined;
     instanceIndex: number;
     rotation: Interfaces.EulerCustom;
     scale: Interfaces.Vector3Custom;
+
+    animMeshRef: THREE.Object3D | undefined;
 }
 
 export {

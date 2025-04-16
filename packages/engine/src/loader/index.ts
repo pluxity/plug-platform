@@ -1,2 +1,2 @@
-export * from './gltf';
+export { LoadGltf } from './gltf';
 export * from './sbm';

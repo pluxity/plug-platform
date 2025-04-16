@@ -3,6 +3,7 @@ import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
 import * as TWEEN from '@tweenjs/tween.js';
+import * as Util from '../util';
 import { Engine3D } from '../engine';
 
 const floorObjects: Record<string, THREE.Object3D> = {};
@@ -40,17 +41,6 @@ Event.InternalHandler.addEventListener('onGltfLoaded' as never, (evt: any) => {
         }
     });
 });
-
-/**
- * 자식을 포함한 대상의 모든 객체에 대해 레이어를 설정
- * @param target - 대상 객체
- */
-function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
-    target.traverse(child => {
-        child.layers.disableAll();
-        child.layers.set(layer);
-    });
-}
 
 /**
  * 월드좌표를 지정한 층기준 로컬 좌표로 변환한다.
@@ -151,7 +141,7 @@ function GetModelHierarchy(): Interfaces.ModelInfo[] {
 function Show(id: string) {
     if (floorObjects.hasOwnProperty(id)) {
         floorObjects[id].visible = true;
-        setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
+        Util.setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
 
         // 층가시화 이벤트 내부 통지
         Event.InternalHandler.dispatchEvent({
@@ -168,7 +158,7 @@ function Show(id: string) {
 function Hide(id: string) {
     if (floorObjects.hasOwnProperty(id)) {
         floorObjects[id].visible = false;
-        setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Invisible);
+        Util.setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Invisible);
 
         // 층 숨기기 이벤트 내부 통지
         Event.InternalHandler.dispatchEvent({
@@ -184,7 +174,7 @@ function Hide(id: string) {
 function ShowAll() {
     Object.values(floorObjects).forEach(floor => {
         floor.visible = true;
-        setObjectLayer(floor, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
+        Util.setObjectLayer(floor, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
 
     });
 
@@ -200,7 +190,7 @@ function ShowAll() {
 function HideAll() {
     Object.values(floorObjects).forEach(floor => {
         floor.visible = false;
-        setObjectLayer(floor, Interfaces.CustomLayer.Invisible);
+        Util.setObjectLayer(floor, Interfaces.CustomLayer.Invisible);
 
     });
 

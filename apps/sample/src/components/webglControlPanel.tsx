@@ -42,7 +42,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             moveToFloorIdValue: '',
             floorData: []
         };
-        console.log('px', Px);
     }
 
     /**
@@ -197,6 +196,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 const sampleModelUrls: (undefined | string)[] = [
                     undefined,
                     'monkeyhead.glb',
+                    'ScreenDoor.glb',
                 ];
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';

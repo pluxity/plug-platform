@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as PIXI from 'pixi.js';
 import * as Event from './eventDispatcher';
+import * as Interfaces from './interfaces';
 import { Engine3D } from './engine';
 
 let pixiApp: PIXI.Application;
@@ -164,7 +165,19 @@ async function getMergedGeometry(url: string) {
     };
 }
 
+/**
+ * 자식을 포함한 대상의 모든 객체에 대해 레이어를 설정
+ * @param target - 대상 객체
+ */
+function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
+    target.traverse(child => {
+        child.layers.disableAll();
+        child.layers.set(layer);
+    });
+}
+
 export {
     createTextMaterial,
     getMergedGeometry,
+    setObjectLayer,
 }

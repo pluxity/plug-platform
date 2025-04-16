@@ -24,18 +24,18 @@ function LoadGltf(url: string, onLoad: Function) {
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         // 객체 그림자 설정
-        gltf.scene.traverse((child)=>{
+        gltf.scene.traverse((child) => {
             // 클릭가능한 객체로
             child.layers.enable(Interfaces.CustomLayer.Pickable);
 
             // 메시 객체면 그림자 설정
-            if( child instanceof THREE.Mesh ) {
+            if (child instanceof THREE.Mesh) {
                 child.receiveShadow = true;
                 child.castShadow = true;
-                
+
                 // 재질 환경맵
-                if(Array.isArray(child.material)){
-                    child.material.forEach(mat=>{
+                if (Array.isArray(child.material)) {
+                    child.material.forEach(mat => {
                         mat.envMap = engine.GeneratedCubeRenderTarget.texture;
                         mat.envMapIntensity = 0.1;
                         mat.needsUpdate = true;
@@ -68,6 +68,59 @@ function LoadGltf(url: string, onLoad: Function) {
     }, undefined, (error: unknown) => console.error(error));
 }
 
+/**
+ * url주소에 해당하는 gltf 모델링을 로드하여 애니메이션과 씬을 반환한다
+ * @param url - gltf 모델링 주소
+ * @returns - gltf 씬 객체와 애니메이션 정보
+ */
+async function getGltfWithAnimation(url: string) {
+
+    if (url === undefined || url === 'undefined') {
+        return {
+            animations: [],
+            scene: undefined,
+        }
+    };
+
+    let animations: THREE.AnimationClip[] = [];
+    let scene: any;
+
+    await new Addon.GLTFLoader().loadAsync(url).then(gltf => {
+
+        // 그림자, 재질 설정
+        gltf.scene.traverse((child) => {
+            if( child instanceof THREE.Mesh ) {
+                child.receiveShadow = true;
+                child.castShadow = true;
+
+                if( Array.isArray(child.material) ) {
+                    child.material.forEach(mat => {
+                        mat.envMap = engine.GeneratedCubeRenderTarget.texture;
+                        mat.envMapIntensity = 0.1;
+                        mat.needsUpdate = true;
+                    });
+                } else {
+                    child.material.envMap = engine.GeneratedCubeRenderTarget.texture;
+                    child.material.envMapIntensity = 0.1;
+                    child.material.needsUpdate = true;
+                }
+            }
+        });
+
+        // 결과값
+        animations = gltf.animations;
+        scene = gltf.scene;
+    });
+
+    return {
+        animations: animations,
+        scene: scene,
+    }
+
+}
+
 export {
+    getGltfWithAnimation,
+
     LoadGltf,
 }

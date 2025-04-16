@@ -3,6 +3,7 @@ import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import * as ModelInternal from '../model/model';
+import * as GltfInternal from '../loader/gltf';
 import { PoiElement } from './element';
 import { Engine3D } from '../engine';
 
@@ -32,6 +33,16 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
     (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
     (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
+});
+
+/**
+ * Engine3D 렌더링 전 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => {
+    const deltaTime = evt.deltaTime as number;
+    // 애니메이션 믹서 업데이트
+    const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined);
+    animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
 });
 
 /**
@@ -288,47 +299,76 @@ async function updatePoiMesh() {
 
     // url 기준으로 수집한 정보로 인스턴스 메시 생성
     for (let url in collect) {
+        // 정적 객체는 인스턴싱 처리
         const currPoiArray = collect[url];
 
-        let mergedGeometry: THREE.BufferGeometry | undefined = undefined;
-        let mergedMaterial: THREE.Material[] = [];
-        if (url === undefined || url === '' || url === 'undefined') {
-            // 모델url이 undefined이거나 빈문자열일 경우는 구체사용
-            mergedGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-            mergedGeometry.addGroup(0, Infinity, 0);
-            mergedMaterial.push(new THREE.MeshStandardMaterial({ color: 'red', envMap: engine.GeneratedCubeRenderTarget.texture, envMapIntensity: 0.1 }));
-        } else {
-            await Util.getMergedGeometry(url).then(data => {
-                mergedGeometry = data.geometry;
-                mergedMaterial = [].concat(data.material as any);
+        const gltfData = await GltfInternal.getGltfWithAnimation(url);
+        if (gltfData.animations.length > 0) {
+            // 애니메이션 객체는 인스턴싱 처리를 하지않고 개별 생성
+            currPoiArray.forEach(poi => {
+                // 위치점 메시 데이터에서 애니메이션 메시가 유효하지 않은 경우만 메시 초기화 및 애니메이션 클립 처리 수행
+                if (poi.PointMeshData.animMeshRef === undefined) {
+                    const clonedScene = gltfData.scene.clone();
+                    pointMeshGroup.add(clonedScene); // 씬에 추가
+                    poi.PointMeshData.animMeshRef = clonedScene; // poi에 복제된 씬 설정
+                    // 애니메이션 믹서
+                    const mixer = new THREE.AnimationMixer(poi.PointMeshData.animMeshRef as THREE.Object3D);
+                    poi.Mixer = mixer; // poi에 믹서 설정
+                    // 애니메이션 클립 처리
+                    gltfData.animations.forEach(clip => {
+                        const animationName = clip.name;
+                        const action = mixer.clipAction(clip);
+                        action.loop = THREE.LoopOnce; // 한번 재생후 종료
+                        action.clampWhenFinished = true; // 애니메이션 종료후 마지막 상태 유지
+                        poi.AnimationActions[animationName] = action; // poi에 처리된 애니메이션 액션 설정
+                    });
+                }
+                // 위치 설정
+                poi.PointMeshData.animMeshRef?.position.copy(poi.WorldPosition);
             });
+
+        } else {
+
+            let mergedGeometry: THREE.BufferGeometry | undefined = undefined;
+            let mergedMaterial: THREE.Material[] = [];
+            if (url === undefined || url === '' || url === 'undefined') {
+                // 모델url이 undefined이거나 빈문자열일 경우는 구체사용
+                mergedGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+                mergedGeometry.addGroup(0, Infinity, 0);
+                mergedMaterial.push(new THREE.MeshStandardMaterial({ color: 'red', envMap: engine.GeneratedCubeRenderTarget.texture, envMapIntensity: 0.1 }));
+            } else {
+                await Util.getMergedGeometry(url).then(data => {
+                    mergedGeometry = data.geometry;
+                    mergedMaterial = [].concat(data.material as any);
+                });
+            }
+
+            // 인스턴스 메시 생성
+            const mesh = new THREE.InstancedMesh(mergedGeometry, mergedMaterial, currPoiArray.length);
+            mesh.receiveShadow = true;
+            mesh.castShadow = true;
+
+            // 인스턴스 메시 각 요소별 트랜스폼 처리
+            const dummy = new THREE.Object3D();
+            currPoiArray.forEach((poi, index) => {
+                dummy.position.copy(poi.WorldPosition);
+                dummy.rotation.copy(poi.PointMeshData.rotation);
+                dummy.scale.copy(poi.Visible ? poi.PointMeshData.scale : new THREE.Vector3(0, 0, 0));
+                dummy.updateMatrix();
+
+                mesh.setMatrixAt(index, dummy.matrix);
+
+                // poi 위치점 메시 데이터에 연결
+                poi.PointMeshData.instanceMeshRef = mesh;
+                poi.PointMeshData.instanceIndex = index;
+            });
+            mesh.instanceMatrix.needsUpdate = true;
+
+            // 씬에 추가
+            pointMeshGroup.add(mesh);
+            // 위치점 메시 리스트에 추가
+            pointMeshStorage[url] = mesh;
         }
-
-        // 인스턴스 메시 생성
-        const mesh = new THREE.InstancedMesh(mergedGeometry, mergedMaterial, currPoiArray.length);
-        mesh.receiveShadow = true;
-        mesh.castShadow = true;
-
-        // 인스턴스 메시 각 요소별 트랜스폼 처리
-        const dummy = new THREE.Object3D();
-        currPoiArray.forEach((poi, index) => {
-            dummy.position.copy(poi.WorldPosition);
-            dummy.rotation.copy(poi.PointMeshData.rotation);
-            dummy.scale.copy(poi.Visible ? poi.PointMeshData.scale : new THREE.Vector3(0, 0, 0));
-            dummy.updateMatrix();
-
-            mesh.setMatrixAt(index, dummy.matrix);
-
-            // poi 위치점 메시 데이터에 연결
-            poi.PointMeshData.meshRef = mesh;
-            poi.PointMeshData.instanceIndex = index;
-        });
-        mesh.instanceMatrix.needsUpdate = true;
-
-        // 씬에 추가
-        pointMeshGroup.add(mesh);
-        // 위치점 메시 리스트에 추가
-        pointMeshStorage[url] = mesh;
     }
 }
 

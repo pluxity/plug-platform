@@ -83,7 +83,6 @@ async function LoadSbm(url: string, onLoad: Function) {
         setEnvMap(floorMesh); // 환경맵 적용
 
         sbmRootGroup.attach(floorMesh);
-        console.log('floorMesh', floorMesh)
     }
 
     // 로드 완료 내부 이벤트 통지
