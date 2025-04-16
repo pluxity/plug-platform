@@ -531,6 +531,17 @@ function HideAll() {
     updatePoiMesh();
 }
 
+/**
+ * id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻음
+ * @param id - poi id값
+ */
+function GetAnimationList(id: string) {
+    if( poiDataList.hasOwnProperty(id) ) {
+        const poi = poiDataList[id];
+        return Object.keys(poi.AnimationActions);
+    }
+}
+
 export {
     getIcon,
     createTextMesh,
@@ -546,4 +557,5 @@ export {
     Hide,
     ShowAll,
     HideAll,
+    GetAnimationList,
 }

@@ -15,6 +15,7 @@ interface WebGLControlPanelState {
     deletePoiId: string;
     setVisiblePoiId: string;
     moveToPoiIdValue: string;
+    getAnimlistPoiIdValue: string;
     moveToFloorIdValue: string;
     floorData: FloorData[];
 }
@@ -40,6 +41,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             setVisiblePoiId: '',
             moveToPoiIdValue: '',
             moveToFloorIdValue: '',
+            getAnimlistPoiIdValue: '',
             floorData: []
         };
     }
@@ -108,7 +110,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</Button>
                     <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</Button>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</Button><br/><br/>
+                    <Input.Text style={{ color: 'white' }} value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></Input.Text>
+                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</Button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'ETC') {
@@ -262,6 +266,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.HideAll': {
                 Px.Poi.HideAll();
             } break;
+            case 'Poi.GetAnimationList': {
+                const data = Px.Poi.GetAnimationList(this.state.getAnimlistPoiIdValue);
+                console.log('Px.Poi.GetAnimationList', data);
+            } break;
         }
     }
 
@@ -290,6 +298,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onSetVisiblePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ setVisiblePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 애니메이션 얻기 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onGetAnimListTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ getAnimlistPoiIdValue: evt.target.value });
     }
 
     /**
