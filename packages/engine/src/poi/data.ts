@@ -542,6 +542,29 @@ function GetAnimationList(id: string) {
     }
 }
 
+/**
+ * poi의 애니메이션을 재생한다.
+ * @param id - poi id값
+ * @param animName - 애니메이션 이름
+ */
+function PlayAnimation(id: string, animName: string) {
+    if( poiDataList.hasOwnProperty(id) ) {
+        const poi = poiDataList[id];
+        poi.playAnimation(animName);
+    }
+}
+
+/**
+ * 재생중인 poi의 애니메이션을 중지한다.
+ * @param id - poi id값
+ */
+function StopAnimation(id: string) {
+    if( poiDataList.hasOwnProperty(id) ) {
+        const poi = poiDataList[id];
+        poi.stopAnimation();
+    }
+}
+
 export {
     getIcon,
     createTextMesh,
@@ -558,4 +581,6 @@ export {
     ShowAll,
     HideAll,
     GetAnimationList,
+    PlayAnimation,
+    StopAnimation
 }

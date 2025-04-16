@@ -237,6 +237,26 @@ class PoiElement implements Interfaces.PoiCreateOption {
             id: this.id,
         });
     }
+
+    /**
+     * 애니메이션 재생
+     * @param name - 애니메이션 이름
+     */
+    playAnimation(name: string) {
+        if (this.mixer && this.actions[name]) {
+            this.mixer.stopAllAction();
+            this.actions[name].play();
+        }
+    }
+
+    /**
+     * 재생중인 애니메이션 중지
+     */
+    stopAnimation() {
+        if (this.mixer) {
+            this.mixer.stopAllAction();
+        }
+    }
 }
 
 /**
