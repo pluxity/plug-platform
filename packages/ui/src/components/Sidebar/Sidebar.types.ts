@@ -6,6 +6,10 @@ export interface SidebarProps extends Omit<React.ComponentProps<'aside'>, 'onCha
     children?: React.ReactNode;
 }
 
+export interface SidebarMenuItemProps extends React.ComponentProps<'li'>{
+    toggleable?: boolean;
+}
+
 export interface SidebarMenuButtonProps extends React.ComponentProps<'button'>{
     isSubMenuOpen?: boolean;
 }

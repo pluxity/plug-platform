@@ -4,6 +4,7 @@ import SidebarArrowIcon from "../../assets/icons/sidebar_arrow.svg";
 import type {
     SidebarProps,
     SidebarMenuButtonProps,
+    SidebarMenuItemProps,
     SidebarSubMenuProps,
 } from "./Sidebar.types";
 
@@ -21,10 +22,8 @@ const Sidebar = ({
     children,
     ...props
 }: SidebarProps) => {
-
     const isControlled = isOpen !== undefined;
     const [sidebarOpen, setSidebarOpen] = useState(true);
-
     const currentState = isControlled ? isOpen : sidebarOpen;
 
     const toggleSidebar = () => {
@@ -98,15 +97,17 @@ const SidebarMenu = ({
 }
 
 const SidebarMenuItem = ({
+    toggleable = true,
     className,
     children,
     ...props
-}: React.ComponentProps<"li">) => {
-
+}: SidebarMenuItemProps) => {
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
     
     const handleClick = () => {
-        setIsSubMenuOpen(prev => !prev);
+        if (toggleable) {
+            setIsSubMenuOpen(prev => !prev);
+        }
     };
 
     const ChildrenElement = React.Children.map(children, child => {
@@ -114,7 +115,11 @@ const SidebarMenuItem = ({
             if (child.type === SidebarMenuButton) {
                 return React.cloneElement(child, {
                     isSubMenuOpen,
-                    onClick: handleClick,
+                    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.stopPropagation();
+                        handleClick();
+                        (child.props as SidebarMenuButtonProps).onClick?.(e);
+                    },
                 } as SidebarMenuButtonProps);
             }
             if (child.type === SidebarSubMenu) {
@@ -143,18 +148,15 @@ const SidebarMenuButton = ({
     onClick,
     ...props
 }: SidebarMenuButtonProps) => {
-
     const { isOpen } = useContext(SidebarContext)!;
-
     const ArrowIcon = SidebarArrowIcon as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
 
     const SubChildrenElement = React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {return child;}
-    
         if (typeof child === 'string') {return isOpen ? child : null;}
-    
         return null;
     });
+
     return(
         <button 
             aria-expanded={isSubMenuOpen}
@@ -202,17 +204,14 @@ const SidebarSubMenuItem = ({
     className,
     children,
     ...props
-}: React.ComponentProps<"button">) => {
+}: React.ComponentProps<"li">) => {
     return (
-        <li>
-            <button
-                role="menuitem"
-                type="button"
-                className={cn("px-2 py-2 rounded text-sm w-full text-left", className)}
-                {...props}
-            >
-                {children}
-            </button>
+        <li
+            role="menuitem"
+            className={cn("px-2 py-2 rounded text-sm w-full text-left", className)}
+            {...props}
+        >
+            {children}
         </li>
     );
 };

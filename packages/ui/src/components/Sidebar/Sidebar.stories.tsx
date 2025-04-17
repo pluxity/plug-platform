@@ -19,25 +19,27 @@ export default meta;
 type Story = StoryObj<typeof Sidebar>;
 
 export const Default: Story = {
-    render: (args) => (
-        <Sidebar {...args}>
+    render: () => (
+        <Sidebar>
             <Sidebar.Header className="rounded-sm bg-gray-100">사이드바 헤더</Sidebar.Header>
             <Sidebar.Menu>
-                <Sidebar.MenuItem>
-                    <Sidebar.MenuButton>
+                <Sidebar.MenuItem toggleable={false}>
+                    <Sidebar.MenuButton onClick={() => location.href = "./?path=/docs/components-sidebar--docs"}>
                         <HomeIcon />
                         메뉴1
                     </Sidebar.MenuButton>
-                    <Sidebar.SubMenu>
-                        <Sidebar.SubMenuItem>서브메뉴1</Sidebar.SubMenuItem>
-                        <Sidebar.SubMenuItem>서브메뉴2</Sidebar.SubMenuItem>
-                    </Sidebar.SubMenu>
                 </Sidebar.MenuItem>
-                <Sidebar.MenuItem>
-                    <Sidebar.MenuButton>메뉴1</Sidebar.MenuButton>
+                <Sidebar.MenuItem toggleable={true}>
+                    <Sidebar.MenuButton>
+                        메뉴2
+                    </Sidebar.MenuButton>
                     <Sidebar.SubMenu>
-                        <Sidebar.SubMenuItem>서브메뉴2-1</Sidebar.SubMenuItem>
-                        <Sidebar.SubMenuItem>서브메뉴2-2</Sidebar.SubMenuItem>
+                        <Sidebar.SubMenuItem>
+                            <a href="./?path=/docs/components-sidebar--docs">서브메뉴2-1</a>
+                        </Sidebar.SubMenuItem>
+                        <Sidebar.SubMenuItem>
+                            <a href="./?path=/docs/components-sidebar--docs">서브메뉴2-2</a>
+                        </Sidebar.SubMenuItem>
                     </Sidebar.SubMenu>
                 </Sidebar.MenuItem>
             </Sidebar.Menu>

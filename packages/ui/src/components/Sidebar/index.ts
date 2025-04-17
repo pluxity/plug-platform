@@ -12,6 +12,7 @@ import {
 import type{
     SidebarProps,
     SidebarMenuButtonProps,
+    SidebarMenuItemProps,
     SidebarSubMenuProps,
 } from './Sidebar.types';
 
@@ -27,4 +28,4 @@ const Sidebar = Object.assign(SidebarComponent, {
 
 export { Sidebar };
 
-export { SidebarProps, SidebarMenuButtonProps, SidebarSubMenuProps }
+export { SidebarProps, SidebarMenuButtonProps, SidebarMenuItemProps, SidebarSubMenuProps }
