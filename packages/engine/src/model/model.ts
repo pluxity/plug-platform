@@ -75,6 +75,26 @@ function calculateFloorBounding(floorId: string): THREE.Box3 {
 }
 
 /**
+ * sortingorder값이 제일 낮은 층객체를 얻는다.
+ * @returns - 층객체
+ */
+function getLowestFloorObject(): THREE.Object3D {
+    const floorArray = Object.values(floorObjects);
+    floorArray.sort((a, b) => {
+        const valueA = Number.parseInt(a.userData['sortingorder']);
+        const valueB = Number.parseInt(b.userData['sortingorder']);
+        if (valueA < valueB)
+            return -1;
+        else if (valueA > valueB)
+            return 1;
+        else
+            return 0;
+    });
+
+    return floorArray[0];
+}
+
+/**
  * 모델구조 얻기
  * @param url - 모델링 url 주소
  * @param onComplete - 완료 후 호출될 콜백 함수
@@ -344,6 +364,7 @@ export {
     convertWorldToFloorLocal,
     convertFloorLocalToWorld,
     calculateFloorBounding,
+    getLowestFloorObject,
 
     GetModelHierarchy,
     Show,

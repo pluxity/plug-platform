@@ -3,6 +3,7 @@ import * as Addon from 'three/addons';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
+import * as ModelInternal from '../model/model';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 
@@ -199,7 +200,7 @@ function getFloorObject(): THREE.Object3D | undefined {
         }
     }
 
-    return undefined;
+    return ModelInternal.getLowestFloorObject();
 }
 
 /**
