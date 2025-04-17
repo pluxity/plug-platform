@@ -364,7 +364,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             this.printAllApilist(target[keyName], prefix + '.' + keyName);
 
             if (typeof (target[keyName]) === 'function')
-                console.log(prefix + '.' + keyName,);
+                console.log(prefix + '.' + keyName);
         });
     }
 }
