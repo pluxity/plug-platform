@@ -18,3 +18,4 @@ export { Textarea } from './components/Textarea';
 export { Label } from './components/Label';
 export { Input } from './components/Input';
 export { DataTable } from './components/DataTable';
+export { Sidebar } from './components/Sidebar';

@@ -2,11 +2,19 @@ import { Meta, StoryObj } from '@storybook/react';
 import { HomeIcon } from '../../index.icons';
 import { Sidebar } from '../Sidebar';
 import { useState } from 'react';
+import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof Sidebar> = {
     title: 'Components/Sidebar',
     component: Sidebar,
     tags: ['autodocs'],
+    decorators: [
+        (Story) => (
+            <MemoryRouter initialEntries={['/']}>
+                <Story />
+            </MemoryRouter>
+        ),
+    ],
     argTypes: {
         isOpen: {
             control: 'boolean',
@@ -22,54 +30,99 @@ export const Default: Story = {
     render: () => (
         <Sidebar>
             <Sidebar.Header className="rounded-sm bg-gray-100">사이드바 헤더</Sidebar.Header>
-            <Sidebar.Menu>
-                <Sidebar.MenuItem toggleable={false}>
-                    <Sidebar.MenuButton onClick={() => location.href = "./?path=/docs/components-sidebar--docs"}>
-                        <HomeIcon />
-                        메뉴1
-                    </Sidebar.MenuButton>
-                </Sidebar.MenuItem>
-                <Sidebar.MenuItem toggleable={true}>
-                    <Sidebar.MenuButton>
-                        메뉴2
-                    </Sidebar.MenuButton>
-                    <Sidebar.SubMenu>
-                        <Sidebar.SubMenuItem>
-                            <a href="./?path=/docs/components-sidebar--docs">서브메뉴2-1</a>
-                        </Sidebar.SubMenuItem>
-                        <Sidebar.SubMenuItem>
-                            <a href="./?path=/docs/components-sidebar--docs">서브메뉴2-2</a>
-                        </Sidebar.SubMenuItem>
-                    </Sidebar.SubMenu>
-                </Sidebar.MenuItem>
-            </Sidebar.Menu>
+            <Sidebar.Menu
+                items={[
+                    {
+                        title: "홈",
+                        link: '/',
+                        icon: <HomeIcon />,
+                        submenu: [
+                            {
+                                title: "프로필",
+                                link: '/',
+                            },
+                            {
+                                title: "알림",
+                                link: '/',
+                            },
+                        ],
+                    },
+                    {
+                        title: "설정",
+                        submenu: [
+                            {
+                                title: "프로필",
+                                link: '/',
+                            },
+                            {
+                                title: "알림",
+                                link: '/',
+                            },
+                        ],
+                    },
+                ]}
+            />
             <Sidebar.Footer className="rounded-sm bg-gray-100">사이드바 푸터</Sidebar.Footer>
         </Sidebar>
     )
 }
 
-export const NoHeaderFooter: Story = {
-    render: (args) => (
-        <Sidebar {...args}>
-            <Sidebar.Menu>
-                <Sidebar.MenuItem>
-                    <Sidebar.MenuButton>
-                        <HomeIcon />
-                        메뉴1
-                    </Sidebar.MenuButton>
-                    <Sidebar.SubMenu>
-                        <Sidebar.SubMenuItem>서브메뉴1</Sidebar.SubMenuItem>
-                        <Sidebar.SubMenuItem>서브메뉴2</Sidebar.SubMenuItem>
-                    </Sidebar.SubMenu>
-                </Sidebar.MenuItem>
-                <Sidebar.MenuItem>
-                    <Sidebar.MenuButton>메뉴1</Sidebar.MenuButton>
-                    <Sidebar.SubMenu>
-                        <Sidebar.SubMenuItem>서브메뉴2-1</Sidebar.SubMenuItem>
-                        <Sidebar.SubMenuItem>서브메뉴2-2</Sidebar.SubMenuItem>
-                    </Sidebar.SubMenu>
-                </Sidebar.MenuItem>
-            </Sidebar.Menu>
+export const Toggleable: Story = {
+    render: () => (
+        <Sidebar>
+            <Sidebar.Header className="rounded-sm bg-gray-100">사이드바 헤더</Sidebar.Header>
+            <Sidebar.Menu
+                items={[
+                    {
+                        title: "Toggleable: false",
+                        link: '/',
+                        toggleable: false,
+                    },
+                    {
+                        title: "Toggleable: true(default)",
+                        submenu: [
+                            {
+                                title: "프로필",
+                                link: '/',
+                            },
+                            {
+                                title: "알림",
+                                link: '/',
+                            },
+                        ],
+                    },
+                ]}
+            />
+            <Sidebar.Footer className="rounded-sm bg-gray-100">사이드바 푸터</Sidebar.Footer>
+        </Sidebar>
+    )
+}
+
+export const OnlyMenu: Story = {
+    render: () => (
+        <Sidebar>
+            <Sidebar.Menu
+                items={[
+                    {
+                        title: "홈",
+                        link: '/',
+                        toggleable: false,
+                    },
+                    {
+                        title: "설정",
+                        submenu: [
+                            {
+                                title: "프로필",
+                                link: '/',
+                            },
+                            {
+                                title: "알림",
+                                link: '/',
+                            },
+                        ],
+                    },
+                ]}
+            />
         </Sidebar>
     )
 }
@@ -83,18 +136,38 @@ export const WithTrigger: Story = {
                 <div className="flex">
                     <Sidebar isOpen={isVisible}>
                         <Sidebar.Header className="rounded-sm bg-gray-100">사이드바 헤더</Sidebar.Header>
-                        <Sidebar.Menu>
-                            <Sidebar.MenuItem>
-                                <Sidebar.MenuButton>
-                                    <HomeIcon />
-                                    메뉴1
-                                </Sidebar.MenuButton>
-                                <Sidebar.SubMenu>
-                                    <Sidebar.SubMenuItem>서브메뉴1</Sidebar.SubMenuItem>
-                                    <Sidebar.SubMenuItem>서브메뉴2</Sidebar.SubMenuItem>
-                                </Sidebar.SubMenu>
-                            </Sidebar.MenuItem>
-                        </Sidebar.Menu>
+                        <Sidebar.Menu
+                            items={[
+                                {
+                                    title: "홈",
+                                    link: '/',
+                                    icon: <HomeIcon />,
+                                    submenu: [
+                                        {
+                                            title: "프로필",
+                                            link: '/',
+                                        },
+                                        {
+                                            title: "알림",
+                                            link: '/',
+                                        },
+                                    ],
+                                },
+                                {
+                                    title: "설정",
+                                    submenu: [
+                                        {
+                                            title: "프로필",
+                                            link: '/',
+                                        },
+                                        {
+                                            title: "알림",
+                                            link: '/',
+                                        },
+                                    ],
+                                },
+                            ]}
+                        />
                         <Sidebar.Footer className="rounded-sm bg-gray-100">사이드바 푸터</Sidebar.Footer>
                     </Sidebar>
                     <div className="p-4">
@@ -116,22 +189,41 @@ export const WithTrigger: Story = {
 }
 
 export const Closed: Story = {
-    render: (args) => (
-        <Sidebar {...args} isOpen={false}>
-            <Sidebar.Header className="rounded-sm bg-gray-100">사이드바 헤더
-            </Sidebar.Header>
-            <Sidebar.Menu>
-                <Sidebar.MenuItem>
-                    <Sidebar.MenuButton>
-                        <HomeIcon />
-                        메뉴1
-                    </Sidebar.MenuButton>
-                    <Sidebar.SubMenu>
-                        <Sidebar.SubMenuItem>서브메뉴1</Sidebar.SubMenuItem>
-                        <Sidebar.SubMenuItem>서브메뉴2</Sidebar.SubMenuItem>
-                    </Sidebar.SubMenu>
-                </Sidebar.MenuItem>
-            </Sidebar.Menu>
+    render: () => (
+        <Sidebar isOpen={false}>
+            <Sidebar.Header className="rounded-sm bg-gray-100">사이드바 헤더</Sidebar.Header>
+            <Sidebar.Menu
+                items={[
+                    {
+                        title: "홈",
+                        link: '/',
+                        icon: <HomeIcon />,
+                        submenu: [
+                            {
+                                title: "프로필",
+                                link: '/',
+                            },
+                            {
+                                title: "알림",
+                                link: '/',
+                            },
+                        ],
+                    },
+                    {
+                        title: "설정",
+                        submenu: [
+                            {
+                                title: "프로필",
+                                link: '/',
+                            },
+                            {
+                                title: "알림",
+                                link: '/',
+                            },
+                        ],
+                    },
+                ]}
+            />
             <Sidebar.Footer className="rounded-sm bg-gray-100">사이드바 푸터</Sidebar.Footer>
         </Sidebar>
     )

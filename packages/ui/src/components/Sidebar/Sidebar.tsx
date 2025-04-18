@@ -1,11 +1,14 @@
 import { cn } from "../../utils/classname";
 import React, { useState, useContext, createContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SidebarArrowIcon from "../../assets/icons/sidebar_arrow.svg";
 import type {
     SidebarProps,
     SidebarMenuButtonProps,
+    SidebarMenuProps,
     SidebarMenuItemProps,
     SidebarSubMenuProps,
+    SidebarSubMenuItemProps,
 } from "./Sidebar.types";
 
 interface SidebarContextType {
@@ -40,8 +43,8 @@ const Sidebar = ({
             <aside
                 aria-hidden={!currentState}
                 className={cn(
-                    'h-screen rounded-md bg-white shadow-[0_0_15px_-3px_rgba(0,_0,_0,_0.2)] flex flex-col',
-                    currentState ? 'w-[200px]' : 'w-[60px]',
+                    'h-screen bg-white shadow-[0_0_15px_-3px_rgba(0,_0,_0,_0.2)] flex flex-col',
+                    currentState ? 'w-60' : 'w-20',
                     'transition-all duration-300 ease-in-out',
                     className
                 )}
@@ -73,11 +76,30 @@ const SidebarHeader = ({
     )
 }
 
-const SidebarMenu = ({
+const SidebarFooter = ({
     className,
     children,
     ...props
-}: React.ComponentProps<"ul">) => {
+}: React.ComponentProps<"div">) => {
+    const { isOpen } = useContext(SidebarContext)!;
+    if (!isOpen) return null;
+    
+    return(
+        <div
+            className={cn("p-3 mt-2", className)}
+            {...props}
+        >
+            {children}
+        </div>
+    )
+}
+
+const SidebarMenu = ({
+    className,
+    children,
+    items = [],
+    ...props
+}: SidebarMenuProps) => {
     return(
         <ul
             className={cn(
@@ -91,7 +113,25 @@ const SidebarMenu = ({
             )}
             {...props}
         >
-            {children}
+            {items.map((item, index) => (
+                <SidebarMenuItem key={index} toggleable={item.toggleable}>
+                    <SidebarMenuButton link={item.link} className={item.className}>
+                        {item.icon}
+                        {item.title}
+                    </SidebarMenuButton>
+                    {item.submenu && (
+                        <SidebarSubMenu>
+                            {item.submenu.map((subItem, subIndex) => (
+                                <li key={subIndex}>
+                                    <SidebarSubMenuItem link={subItem.link} className={subItem.className}>
+                                        {subItem.title}
+                                    </SidebarSubMenuItem>
+                                </li>
+                            ))}
+                        </SidebarSubMenu>
+                    )}
+                </SidebarMenuItem>
+            ))}
         </ul>
     )
 }
@@ -146,10 +186,19 @@ const SidebarMenuButton = ({
     children,
     isSubMenuOpen = false,
     onClick,
+    link,
     ...props
 }: SidebarMenuButtonProps) => {
     const { isOpen } = useContext(SidebarContext)!;
     const ArrowIcon = SidebarArrowIcon as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
+    const navigate = useNavigate(); 
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (link) {
+            navigate(link);
+        }
+        onClick?.(e);
+    };
 
     const SubChildrenElement = React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {return child;}
@@ -161,9 +210,9 @@ const SidebarMenuButton = ({
         <button 
             aria-expanded={isSubMenuOpen}
             type="button"
-            onClick={onClick}
+            onClick={handleClick}
             className={cn(
-                `flex items-center w-full gap-2 ${isOpen ? "" : "justify-center"}`,
+                `flex items-center w-full gap-2  ${isOpen ? "" : "justify-center"}`,
                 className,
             )}
             {...props}
@@ -203,34 +252,31 @@ const SidebarSubMenu = ({
 const SidebarSubMenuItem = ({ 
     className,
     children,
+    onClick,
+    link,
     ...props
-}: React.ComponentProps<"li">) => {
-    return (
-        <li
-            role="menuitem"
-            className={cn("px-2 py-2 rounded text-sm w-full text-left", className)}
-            {...props}
-        >
-            {children}
-        </li>
-    );
-};
-
-const SidebarFooter = ({
-    className,
-    children,
-    ...props
-}: React.ComponentProps<"div">) => {
-    const { isOpen } = useContext(SidebarContext)!;
-    if (!isOpen) return null;
+}: SidebarSubMenuItemProps) => {
+    const navigate = useNavigate(); 
     
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (link) {
+            navigate(link);
+        }
+        onClick?.(e);
+    };
+
     return(
-        <div
-            className={cn("p-3 mt-2", className)}
+        <button
+            type="button"
+            onClick={handleClick}
+            className={cn(
+                "w-full text-left px-2 py-1 text-sm cursor-pointer",
+                className
+            )}
             {...props}
         >
             {children}
-        </div>
+        </button>
     )
 }
 
