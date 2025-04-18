@@ -9,6 +9,7 @@ import PasswordHideIcon from "./assets/icons/password_hide.svg";
 import PasswordIcon from "./assets/icons/password.svg";
 import PrevIcon from "./assets/icons/previous.svg";
 import UserIcon from "./assets/icons/user.svg";
+import SelectCloseIcon from "./assets/icons/select_close.svg";
 import SidebarArrowIcon from "./assets/icons/sidebar_arrow.svg";
 
 export { 
@@ -23,5 +24,5 @@ export {
     PasswordIcon, 
     PrevIcon, 
     UserIcon,
-    SidebarArrowIcon
+    SelectCloseIcon
 };

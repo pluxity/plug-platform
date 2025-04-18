@@ -18,4 +18,7 @@ export { Textarea } from './components/Textarea';
 export { Label } from './components/Label';
 export { Input } from './components/Input';
 export { DataTable } from './components/DataTable';
+export { Dropdown } from './components/Dropdown';
+export { Select } from './components/Select';
+export { ComboBox } from './components/ComboBox';
 export { Sidebar } from './components/Sidebar';
