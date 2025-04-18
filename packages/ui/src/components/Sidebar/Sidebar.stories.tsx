@@ -34,12 +34,17 @@ export const Default: Story = {
                 items={[
                     {
                         title: "홈",
+                        beforeNavigate: () => {
+                            console.log('beforeNavigate 실행')
+                        },
                         link: '/',
                         icon: <HomeIcon />,
+                        className: 'text-red-600',
                         submenu: [
                             {
                                 title: "프로필",
                                 link: '/',
+                                className: 'text-red-600'
                             },
                             {
                                 title: "알림",

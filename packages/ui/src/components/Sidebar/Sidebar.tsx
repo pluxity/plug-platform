@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import SidebarArrowIcon from "../../assets/icons/sidebar_arrow.svg";
 import type {
     SidebarProps,
+    SidebarHeaderProps,
+    SidebarFooterProps,
     SidebarMenuButtonProps,
     SidebarMenuProps,
     SidebarMenuItemProps,
@@ -39,7 +41,7 @@ const Sidebar = ({
     }
     
     return (
-        <SidebarContext.Provider value={{ isOpen:currentState, toggleSidebar }}>
+        <SidebarContext value={{ isOpen:currentState, toggleSidebar }}>
             <aside
                 aria-hidden={!currentState}
                 className={cn(
@@ -54,7 +56,7 @@ const Sidebar = ({
                     {children}
                 </div>
             </aside>
-        </SidebarContext.Provider>
+        </SidebarContext>
     );
 }
 
@@ -62,7 +64,7 @@ const SidebarHeader = ({
     className,
     children,
     ...props
-}: React.ComponentProps<"div">) => {
+}: SidebarHeaderProps) => {
     const { isOpen } = useContext(SidebarContext)!;
     if (!isOpen) return null;
 
@@ -80,7 +82,7 @@ const SidebarFooter = ({
     className,
     children,
     ...props
-}: React.ComponentProps<"div">) => {
+}: SidebarFooterProps) => {
     const { isOpen } = useContext(SidebarContext)!;
     if (!isOpen) return null;
     
@@ -115,7 +117,7 @@ const SidebarMenu = ({
         >
             {items.map((item, index) => (
                 <SidebarMenuItem key={index} toggleable={item.toggleable}>
-                    <SidebarMenuButton link={item.link} className={item.className}>
+                    <SidebarMenuButton link={item.link} className={item.className} beforeNavigate={item.beforeNavigate}>
                         {item.icon}
                         {item.title}
                     </SidebarMenuButton>
@@ -123,7 +125,7 @@ const SidebarMenu = ({
                         <SidebarSubMenu>
                             {item.submenu.map((subItem, subIndex) => (
                                 <li key={subIndex}>
-                                    <SidebarSubMenuItem link={subItem.link} className={subItem.className}>
+                                    <SidebarSubMenuItem link={subItem.link} className={subItem.className} beforeNavigate={subItem.beforeNavigate}>
                                         {subItem.title}
                                     </SidebarSubMenuItem>
                                 </li>
@@ -155,11 +157,7 @@ const SidebarMenuItem = ({
             if (child.type === SidebarMenuButton) {
                 return React.cloneElement(child, {
                     isSubMenuOpen,
-                    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-                        e.stopPropagation();
-                        handleClick();
-                        (child.props as SidebarMenuButtonProps).onClick?.(e);
-                    },
+                    onClick: () => {handleClick();},
                 } as SidebarMenuButtonProps);
             }
             if (child.type === SidebarSubMenu) {
@@ -184,6 +182,7 @@ const SidebarMenuItem = ({
 const SidebarMenuButton = ({
     className,
     children,
+    beforeNavigate,
     isSubMenuOpen = false,
     onClick,
     link,
@@ -194,10 +193,13 @@ const SidebarMenuButton = ({
     const navigate = useNavigate(); 
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        onClick?.(e);
+        if(beforeNavigate){
+            beforeNavigate();
+        }
         if (link) {
             navigate(link);
         }
-        onClick?.(e);
     };
 
     const SubChildrenElement = React.Children.map(children, (child) => {
@@ -253,16 +255,20 @@ const SidebarSubMenuItem = ({
     className,
     children,
     onClick,
+    beforeNavigate,
     link,
     ...props
 }: SidebarSubMenuItemProps) => {
     const navigate = useNavigate(); 
     
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        onClick?.(e);
+        if(beforeNavigate){
+            beforeNavigate();
+        }
         if (link) {
             navigate(link);
         }
-        onClick?.(e);
     };
 
     return(

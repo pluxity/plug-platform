@@ -123,9 +123,13 @@ function DesignSystem() {
             items={[
                 {
                     title: "홈",
+                    beforeNavigate: () => {
+                        console.log('beforeNavigate 실행')
+                    },
                     link: '/3d-test',
                     icon: <HomeIcon />,
                     toggleable: false,
+                    className: 'text-red-600'
                 },
                 {
                     title: "설정",
@@ -133,6 +137,7 @@ function DesignSystem() {
                         {
                             title: "프로필",
                             link: '/3d-test',
+                            className: 'text-red-600'
                         },
                         {
                             title: "알림",

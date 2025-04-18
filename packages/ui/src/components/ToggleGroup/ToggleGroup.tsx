@@ -63,7 +63,7 @@ const ToggleGroup = ({
     };
     
     return (
-        <ToggleGroupContext.Provider value={{ 
+        <ToggleGroupContext value={{ 
             size, 
             disabled, 
             pressedValues: currentPressed, 
@@ -79,7 +79,7 @@ const ToggleGroup = ({
             >
                 {children}
             </div>
-        </ToggleGroupContext.Provider>
+        </ToggleGroupContext>
     );
 };
 ToggleGroup.displayName = "ToggleGroup";
