@@ -1,79 +1,86 @@
 import * as React from "react";
 import { useState } from "react";
 import { cn } from "../../utils/classname";
-import { InputProps } from "./Input.types"
+import { InputProps } from "./Input.types";
 
-const Input = ({
-    id,
-    ariaLabel,
-    type = 'text',
-    invalid = false,
-    iconPosition = 'leading',
-    iconSvg,
-    renderIcon,
-    value,
-    onChange,
-    className,
-    ref,
-    ...props
-}: InputProps) => {
-  const [inputFocus, setInputFocus] = useState(false);
+const Input = React.forwardRef<HTMLInputElement, InputProps<string>>((props, ref) => {
+        const {
+        id,
+        ariaLabel,
+        type = "text",
+        invalid = false,
+        iconPosition = "leading",
+        iconSvg,
+        renderIcon,
+        value,
+        onChange,
+        required,
+        className,
+        disabled,
+        ...rest
+    } = props;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {onChange?.(e);};
-  const onFocus = () => {setInputFocus(true);};
-  const onBlur = () => {setInputFocus(false);};
-  
-  const iconColor = invalid ? 'red' : props.disabled ? 'lightgray' : inputFocus ? 'black' : 'lightgray';
+    const [inputFocus, setInputFocus] = useState(false);
 
-  const inputWrapStyle = `${invalid === true ? "border-red-600" : props.disabled ? "border-gray-300 bg-gray-200" : "border-gray-400"} inline-flex items-center border border-1 rounded-xs h-9`;
-  const InputTextStyle = `${invalid === true ? "enabled:placeholder:text-red-600 text-red-600" : "placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs h-full p-2 disabled:text-gray-300 disabled:cursor-not-allowed`;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        onChange?.(newValue);
+    };
 
-  const defaultIcon = (position: 'leading' | 'trailing') => {
-    if (iconSvg) {
-      const IconSvg = iconSvg as React.FC<React.SVGProps<SVGSVGElement>>;
-      return (
-        <span className={position === 'leading' ? "pl-2" : "pr-2"}>
+    const iconColor = invalid
+        ? "red"
+        : disabled
+            ? "lightgray"
+            : inputFocus
+                ? "black"
+                : "lightgray";
+
+    const inputWrapStyle = `${invalid ? "border-red-600" : disabled ? "border-gray-300 bg-gray-200" : "border-gray-400"} inline-flex items-center border border-1 rounded-xs h-9`;
+
+    const InputTextStyle = `${invalid ? "enabled:placeholder:text-red-600 text-red-600" : "placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs h-full p-2 disabled:text-gray-300 disabled:cursor-not-allowed`;
+
+    const defaultIcon = (position: "leading" | "trailing") => {
+        if (iconSvg) {
+            const IconSvg = iconSvg as React.FC<React.SVGProps<SVGSVGElement>>;
+            return (
+                <span className={position === "leading" ? "pl-2" : "pr-2"}>
           <IconSvg fill={iconColor} />
         </span>
-      );
-    }
-    return null;
-  };
+            );
+        }
+        return null;
+    };
 
-  const componentIcon = (position: 'leading' | 'trailing') => { 
-    if (renderIcon) {
-      return renderIcon({ iconColor, isFocused: inputFocus });
-    }
-    
-    return defaultIcon(position);
-  };
+    const componentIcon = (position: "leading" | "trailing") => {
+        if (renderIcon) {
+            return renderIcon({ iconColor, isFocused: inputFocus });
+        }
+        return defaultIcon(position);
+    };
 
-  return (
-    <> 
-      <div className={cn(inputWrapStyle)}>
-        {iconPosition === "leading" && componentIcon('leading')}
-        <input
-          id={id}
-          type={type}
-          value={value}
-          onFocus={onFocus}  
-          onBlur={onBlur} 
-          onChange={handleChange}
-          aria-describedby={id}
-          aria-label={ariaLabel}
-          className={cn(
-            InputTextStyle,
-            className
-          )}
-          ref={ref}
-          {...props}
-        />
-        {iconPosition === "trailing" && componentIcon('trailing')}
-      </div>
-    </>
-  );
-};
+    return (
+        <div className={cn(inputWrapStyle)}>
+            {iconPosition === "leading" && componentIcon("leading")}
+            <input
+                id={id}
+                ref={ref}
+                type={type}
+                value={value}
+                onFocus={() => setInputFocus(true)}
+                onBlur={() => setInputFocus(false)}
+                onChange={handleChange}
+                aria-describedby={id}
+                aria-label={ariaLabel}
+                required={required}
+                disabled={disabled}
+                className={cn(InputTextStyle, className)}
+                {...rest}
+            />
+            {iconPosition === "trailing" && componentIcon("trailing")}
+        </div>
+    );
+});
 
-Input.displayName = 'Input';
+Input.displayName = "Input";
 
 export { Input };

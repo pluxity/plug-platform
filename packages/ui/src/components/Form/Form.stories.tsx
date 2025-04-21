@@ -1,40 +1,49 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { useState } from 'react'
-import { Form } from './Form'
-import { FormItem } from './Form'
-import { Input } from '../Input'
-import { Button } from '../Button'
-import { Checkbox } from '../Checkbox';
-import { RadioGroup } from '../Radio';
+import type {Meta, StoryObj} from '@storybook/react'
 
-const meta: Meta = {
-  title: 'Components/Form',
-  component: Form,
-  tags: ['autodocs'],
+import {Form} from './Form'
+import {FormItem} from './Form'
+import {Input} from '../Input'
+import {Button} from '../Button'
+import {Checkbox} from '../Checkbox';
+import {RadioGroup} from '../Radio';
+
+interface FormValues {
+    [key: string]: string | number | boolean;
+    username: string;
+    password: string;
+    acceptTerms: boolean;
+    gender: 'male' | 'female' | '';
+}
+
+const meta: Meta<typeof Form> = {
+    title: 'Components/Form',
+    component: Form,
+    tags: ['autodocs'],
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+
+type Story = StoryObj<typeof Form>;
 
 export const Template: Story = {
     render: () => {
-        const handleFinish = (values: Record<string, string>) => {
+        const handleFinish = (values: FormValues) => {
             alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
         };
-    
+
         return (
-            <Form onSubmit={handleFinish}>
+            <Form<FormValues> onSubmit={handleFinish}>
                 <FormItem name="username" label='Username'>
-                    <Input placeholder="Enter your username" />
+                    <Input placeholder="Enter your username"/>
                 </FormItem>
                 <FormItem name="password" label='Password'>
-                    <Input type="password" placeholder="Enter your password" />
+                    <Input type="password" placeholder="Enter your password"/>
                 </FormItem>
                 <Button
                     type="submit"
                     color="primary"
                     disabled={false}
-                    >
+                >
                     Submit
                 </Button>
             </Form>
@@ -44,17 +53,17 @@ export const Template: Story = {
 
 export const Required: Story = {
     render: () => {
-        const handleFinish = (values: Record<string, string>) => {
+        const handleFinish = (values: FormValues) => {
             alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
         };
-    
+
         return (
-            <Form onSubmit={handleFinish}>
+            <Form<FormValues> onSubmit={handleFinish}>
                 <FormItem name="username" label='Username' required>
-                    <Input placeholder="Enter your username" />
+                    <Input placeholder="Enter your username"/>
                 </FormItem>
                 <FormItem name="password" label='Password' required>
-                    <Input type="password" placeholder="Enter your password" />
+                    <Input type="password" placeholder="Enter your password"/>
                 </FormItem>
                 <Button
                     type="submit"
@@ -70,26 +79,19 @@ export const Required: Story = {
 
 export const WithCheckbox: Story = {
     render: () => {
-        const ControlledForm = () => {
-            const [isChecked, setIsChecked] = useState(false);
-
-            const handleSubmit = (values: Record<string, string>) => {
+            const handleSubmit = (values: FormValues) => {
                 alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
             };
 
             return (
-                <Form onSubmit={handleSubmit}>
+                <Form<FormValues> onSubmit={handleSubmit}>
                     <FormItem name="acceptTerms" label="Accept Terms">
                         <Checkbox
                             label="Accept terms and conditions"
                             color="primary"
                             size="medium"
                             type="rectangle"
-                            checked={isChecked}
-                            onChange={(checked) => setIsChecked(checked)}
                         />
-                        <Input />
-
                     </FormItem>
                     <Button
                         type="submit"
@@ -99,25 +101,21 @@ export const WithCheckbox: Story = {
                     </Button>
                 </Form>
             );
-
         }
-
-        return <ControlledForm />;
-    }
 };
 
 export const WithRadio: Story = {
     render: () => {
-        const handleFinish = (values: Record<string, any>) => {
+        const handleFinish = (values: FormValues) => {
             alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
         };
 
         return (
-            <Form onSubmit={handleFinish}>
+            <Form<FormValues> onSubmit={handleFinish}>
                 <FormItem name="gender" label="Gender" required>
-                    <RadioGroup name="primary">
-                        <RadioGroup.Item value="male">Male</RadioGroup.Item>
-                        <RadioGroup.Item value="female">Female</RadioGroup.Item>
+                    <RadioGroup name="gender">
+                        <RadioGroup.Item value="male" label='male'></RadioGroup.Item>
+                        <RadioGroup.Item value="female" label='female'></RadioGroup.Item>
                     </RadioGroup>
                 </FormItem>
                 <Button
@@ -134,15 +132,12 @@ export const WithRadio: Story = {
 
 export const WithCustomValidation: Story = {
     render: () => {
-
-        채ㅜㄴㅅ
-
-        const handleFinish = (values: Record<string, any>) => {
+        const handleFinish = (values: FormValues) => {
             alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
         };
 
-        const validate = (values: Record<string, any>) => {
-            const errors: Record<string, string> = {};
+        const validate = (values: FormValues) => {
+            const errors: Partial<Record<keyof FormValues, string>> = {};
             if (!values.username) {
                 errors.username = 'Username is required';
             } else if (values.username.length < 5) {
@@ -157,12 +152,12 @@ export const WithCustomValidation: Story = {
         };
 
         return (
-            <Form onSubmit={handleFinish} validate={validate}>
+            <Form<FormValues> onSubmit={handleFinish} validate={validate}>
                 <FormItem name="username" label="Username">
-                    <Input placeholder="Enter your username" />
+                    <Input placeholder="Enter your username"/>
                 </FormItem>
                 <FormItem name="password" label="Password">
-                    <Input type="password" placeholder="Enter your password" />
+                    <Input type="password" placeholder="Enter your password"/>
                 </FormItem>
                 <Button
                     type="submit"

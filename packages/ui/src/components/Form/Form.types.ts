@@ -1,19 +1,32 @@
-import { ReactNode } from 'react';
+import { ReactNode, ReactElement } from 'react'
 
-export interface FormProps {
-  children: ReactNode;
-  onSubmit: (values: Record<string, string>) => void;
+export interface FormValues {
+  [key: string]: string | number | boolean
 }
 
-export interface FormContextType {
-  values: Record<string, string>;
-  setFieldValue: (name: string, value: string) => void;
+export interface FormProps<T extends FormValues> {
+  children: ReactNode
+  onSubmit: (values: T) => void
+  initialValues?: T
+  validate?: (values: T) => Partial<Record<keyof T, string>>
 }
 
-export interface FormItemProps {
-  name: string;
-  validate?: (value: string) => boolean;
-  label?: string; 
-  required?: boolean;
-  children: ReactNode;
+export interface FormFieldProps<T> {
+  value: T
+  onChange: (value: T) => void;
+  required?: boolean
+}
+
+export interface FormContextType<T> {
+  values: T
+  setFieldValue: <K extends keyof T>(name: K, value: T[K]) => void
+  validateField?: <K extends keyof T>(name: K, value: T[K]) => void
+  errors?: Partial<Record<keyof T, string>>
+}
+
+export interface FormItemProps<T extends FormValues, K extends keyof T = keyof T> {
+  name: K
+  label?: string
+  required?: boolean
+  children: ReactElement<FormFieldProps<T[K]>>
 }

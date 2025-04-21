@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 
 export type ValidationErrors = Record<string, string>;
-export type FormValues = Record<string, any>;
+export type FormValues = Record<string, string>;
 
 interface UseFormProps {
   initialValues: FormValues;
@@ -17,7 +17,7 @@ export function useForm({ initialValues, validate, onSubmit }: UseFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 단일 필드 값 설정
-  const setFieldValue = useCallback((name: string, value: any) => {
+  const setFieldValue = useCallback((name: string, value: string) => {
     setValues(prev => ({ ...prev, [name]: value }));
     
     // 필드가 수정되었음을 표시
