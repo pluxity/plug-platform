@@ -1,4 +1,4 @@
-import ky from 'ky';
+import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
 const BASE_URL = 'http://localhost:8080';
@@ -9,7 +9,6 @@ export const setTokenGetter = (fn: () => string | null) => {
   getAccessToken = fn;
 };
 
-// 기본 ky 인스턴스
 const baseKy = ky.create({
   prefixUrl: BASE_URL,
   headers: {
@@ -27,27 +26,34 @@ const baseKy = ky.create({
     afterResponse: [
       async (_request, _options, response) => {
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          if (typeof errorData === 'object' && errorData !== null && 'message' in errorData) {
-            throw new Error((errorData as { message?: string }).message || '요청 처리 중 오류');
-          } else {
-            throw new Error('요청 처리 중 오류가 발생했습니다.');
-          }
+          let errorData: any = {};
+          try {
+            errorData = await response.json();
+          } catch (_) {}
+
+          const message = errorData?.message || errorData?.error || `HTTP ${response.status}`;
+          throw new Error(message);
         }
       }
     ]
   }
 });
 
-const buildKy = (options: RequestOptions = {}) => {
-  const requireAuth = options.requireAuth ?? true;
+const buildKy = (
+    options: RequestOptions & Options = {}
+) => {
+  const { requireAuth = true, ...restOptions } = options;
+  const baseOptions: Options = {
+    prefixUrl: BASE_URL,
+    headers: { 'Content-Type': 'application/json' },
+    ...restOptions
+  };
+
   if (!requireAuth) {
-    return ky.create({
-      prefixUrl: BASE_URL,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return ky.create(baseOptions);
   }
-  return baseKy;
+
+  return baseKy.extend({ ...baseOptions });
 };
 
 export const api = {
