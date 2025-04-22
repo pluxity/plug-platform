@@ -6,8 +6,10 @@ import { cn } from '../../utils/classname'
 const FormContext = createContext<FormContextType<any> | undefined>(undefined);
 
 const FormInner = <T extends FormValues>(
-    { children, onSubmit, validate, initialValues }: FormProps<T>,
+    props: FormProps<T>,
+    _ref: React.Ref<{ reset: () => void }> // eslint-disable-line
 ): JSX.Element => {
+    const { children, onSubmit, validate, initialValues } = props;
   const [formValues, setFormValues] = useState<T>(initialValues ?? ({} as T))
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof T, string>>>({})
 
