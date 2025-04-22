@@ -1,11 +1,23 @@
 import { cn } from '../../utils/classname';
-import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../Button/Button';
 import CloseIcon from '../../assets/icons/close.svg';
-import type { ToastProps } from './Toast.types';
 import { createPortal } from 'react-dom';
+import type { 
+    ToastPortalProps,
+    ToastProps,
+    ToastTitleProps,
+    ToastDescriptionProps
+ } from './Toast.types';
 
+const ToastPortal = ({
+    children,
+}: ToastPortalProps) => {
+    return createPortal(
+        <>{children}</>,
+        document.body
+    )
+}
 
 const Toast = ({
     variant = 'default',
@@ -21,6 +33,42 @@ const Toast = ({
     children,
     ...props
 }: ToastProps) => {
+    const [isMounted, setIsMounted] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsMounted(true);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setIsVisible(true);
+                });
+            });
+        } else {
+            setIsVisible(false);
+            const timer = setTimeout(() => {
+                setIsMounted(false);
+            }, duration);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, duration]);
+
+    useEffect(() => {
+        if (isOpen) {
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+            }, autoCloseDuration);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, autoCloseDuration]);
+
+    const handleTransitionEnd = () => {
+        if (!isVisible) {
+            onClose?.();
+        }
+    };
+
+    if (!isMounted) return null;
 
     const getPlacementClasses = (placement: string): string => {
         switch (placement) {
@@ -51,61 +99,51 @@ const Toast = ({
         critical: 'bg-yellow-100',
     }[variant];
 
-    const toastAnimation = `transform transition-all duration-${duration} ${isOpen ? 'opacity-70 ease-in' : 'opacity-0 ease-out'}`;
+    const toastAnimation = `transform transition-all duration-${duration} ${isVisible ? 'opacity-70 ease-in' : 'opacity-0 ease-out'}`;
 
     const toastPlacementAnimation = {
-      top: isOpen ? 'translate-y-0' : 'translate-y-[-10px]',
-      topLeft: isOpen ? 'translate-x-0' : 'translate-x-[-10px]',
-      topRight: isOpen ? 'translate-x-0' : 'translate-x-[10px]',
-      bottom: isOpen ? 'translate-y-0' : 'translate-y-[10px]',
-      bottomLeft: isOpen ? 'translate-x-0' : 'translate-x-[-10px]',
-      bottomRight: isOpen ? 'translate-x-0' : 'translate-x-[10px]',
+      top: isVisible ? 'translate-y-0' : 'translate-y-[-10px]',
+      topLeft: isVisible ? 'translate-x-0' : 'translate-x-[-10px]',
+      topRight: isVisible ? 'translate-x-0' : 'translate-x-[10px]',
+      bottom: isVisible ? 'translate-y-0' : 'translate-y-[10px]',
+      bottomLeft: isVisible ? 'translate-x-0' : 'translate-x-[-10px]',
+      bottomRight: isVisible ? 'translate-x-0' : 'translate-x-[10px]',
       center: '',
     }[placement];
 
-    useEffect(() => {
-        if (isOpen && onClose && autoClose) {
-            const timer = setTimeout(() => {
-                onClose();
-            }, autoCloseDuration);
-            
-            return () => clearTimeout(timer);
-        }
-    }, [isOpen, autoCloseDuration, onClose, autoClose]);
-
-    if (!isOpen) return null;
-
-    return createPortal(
-        <div className={cn(
-            `fixed inset-0 z-50 flex bg-black bg-opacity-50 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`,
-            getPlacementClasses(placement),
-        )}>   
-            <div
-                className={cn(
-                    toastStyle,
-                    toastVariant,
-                    toastAnimation,
-                    toastPlacementAnimation,
-                    className,
-                )}
-                ref={ref}
-                {...props}
-            >
-                {(closable || !autoClose) && (
-                    <Button
-                        variant='ghost'
-                        size='icon'
-                        className='absolute top-[50%] right-2 h-10 w-10 p-0 hover:bg-transparent transform translate-y-[-50%]'
-                        onClick={onClose}
-                        aria-label='닫기'
-                    >
-                        <CloseIcon />
-                    </Button>
-                )}
-                <div>{children}</div>
+    return (
+        <ToastPortal>
+            <div className={cn(
+                `fixed inset-0 z-50 flex bg-black bg-opacity-50 ${isVisible ? 'pointer-events-auto' : 'pointer-events-none'}`,
+                getPlacementClasses(placement),
+            )}>   
+                <div
+                    className={cn(
+                        toastStyle,
+                        toastVariant,
+                        toastAnimation,
+                        toastPlacementAnimation,
+                        className,
+                    )}
+                    ref={ref}
+                    onTransitionEnd={handleTransitionEnd}
+                    {...props}
+                >
+                    {(closable || !autoClose) && (
+                        <Button
+                            variant='ghost'
+                            size='icon'
+                            className='absolute top-[50%] right-2 h-10 w-10 p-0 hover:bg-transparent transform translate-y-[-50%]'
+                            onClick={onClose}
+                            aria-label='닫기'
+                        >
+                            <CloseIcon />
+                        </Button>
+                    )}
+                    <div>{children}</div>
+                </div>
             </div>
-        </div>,
-        document.body
+        </ToastPortal>
     );
 };
 
@@ -116,7 +154,7 @@ const ToastTitle = ({
     className,
     children,
     ...props
-}: React.ComponentProps<'h2'>) => {
+}: ToastTitleProps) => {
 
     const toastTitleStyle = 'mb-2 font-bold leading-none tracking-tight'
     return (
@@ -140,7 +178,7 @@ const ToastDescription = ({
     className,
     children,
     ...props
-}: React.ComponentProps<'p'>) => {
+}: ToastDescriptionProps) => {
     return (
         <p
             ref={ref}
@@ -156,6 +194,5 @@ const ToastDescription = ({
 }
 
 ToastDescription.displayName = 'ToastDescription';
-
 
 export { Toast, ToastTitle, ToastDescription };

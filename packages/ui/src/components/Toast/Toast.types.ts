@@ -1,5 +1,9 @@
 import type { Placement } from '../types';
 
+export interface ToastPortalProps {
+    children: React.ReactNode;
+}
+
 export interface ToastProps extends React.ComponentProps<'div'>{
     variant?: 'default' | 'normal' | 'warning' | 'critical';
     placement?: Placement;
@@ -10,3 +14,7 @@ export interface ToastProps extends React.ComponentProps<'div'>{
     isOpen: boolean;
     onClose?: () => void;
 }
+
+export interface ToastTitleProps extends React.ComponentProps<'h2'>{}
+
+export interface ToastDescriptionProps extends React.ComponentProps<'p'>{}
