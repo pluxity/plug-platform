@@ -50,7 +50,7 @@ const Sheet = ({
             setIsVisible(false);
             const timer = setTimeout(() => {
                 setIsMounted(false);
-            }, 300);
+            }, 300); 
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
@@ -62,6 +62,7 @@ const Sheet = ({
     };
     
     const handleOverlayClick = (e: React.MouseEvent) => {
+        e.preventDefault();
         if (closeOnOverlayClick && e.target === e.currentTarget) {
             onClose?.();
         }
@@ -95,6 +96,7 @@ const Sheet = ({
             <div 
                 className={cn(sheetStyle ,sheetAnimate)} 
                 onTransitionEnd={handleTransitionEnd} 
+                role="dialog"
                 ref={ref}
                 {...props} 
                 >
