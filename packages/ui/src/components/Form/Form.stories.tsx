@@ -139,10 +139,10 @@ export const WithCustomValidation: Story = {
 
         return (
             <Form<FormValues> onSubmit={handleFinish}>
-                <FormItem name="username" label="Username" validate={[required(), email()]}>
+                <FormItem name="username" label="Username" required validate={[required(), email()]}>
                     <Input placeholder="Enter your username"/>
                 </FormItem>
-                <FormItem name="password" label="Password" validate={[required(), minLength(8)]}>
+                <FormItem name="password" label="Password" required validate={[required(), minLength(8)]}>
                     <Input type="password" placeholder="Enter your password"/>
                 </FormItem>
                 <Button
