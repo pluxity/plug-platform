@@ -1,4 +1,5 @@
 import { ReactNode, ReactElement } from 'react'
+import {ValidatorFn} from "./validationUtils";
 
 export interface FormValues {
   [key: string]: string | number | boolean
@@ -18,15 +19,17 @@ export interface FormFieldProps<T> {
 }
 
 export interface FormContextType<T> {
-  values: T
-  setFieldValue: <K extends keyof T>(name: K, value: T[K]) => void
-  validateField?: <K extends keyof T>(name: K, value: T[K]) => void
-  errors?: Partial<Record<keyof T, string>>
+  values: T;
+  setFieldValue: <K extends keyof T>(name: K, value: T[K]) => void;
+  validateField?: <K extends keyof T>(name: K, value: T[K]) => void;
+  setFormErrors: React.Dispatch<React.SetStateAction<Partial<Record<keyof T, string>>>>;
+  errors?: Partial<Record<keyof T, string>>;
 }
 
 export interface FormItemProps<T extends FormValues, K extends keyof T = keyof T> {
-  name: K
-  label?: string
-  required?: boolean
+  name: K;
+  label?: string;
+  required?: boolean;
+  validate?: ValidatorFn[];
   children: ReactElement<FormFieldProps<T[K]>>
 }

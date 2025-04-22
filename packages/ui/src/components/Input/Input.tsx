@@ -37,7 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps<string>>((props, ref
 
     const inputWrapStyle = `${invalid ? "border-red-600" : disabled ? "border-gray-300 bg-gray-200" : "border-gray-400"} inline-flex items-center border border-1 rounded-xs h-9`;
 
-    const InputTextStyle = `${invalid ? "enabled:placeholder:text-red-600 text-red-600" : "placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs h-full p-2 disabled:text-gray-300 disabled:cursor-not-allowed`;
+    const InputTextStyle = `${invalid ? "enabled:placeholder:text-red-600 text-red-600" : "placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs h-full w-full p-2 disabled:text-gray-300 disabled:cursor-not-allowed`;
 
     const defaultIcon = (position: "leading" | "trailing") => {
         if (iconSvg) {

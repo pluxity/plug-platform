@@ -36,7 +36,7 @@ const FormInner = <T extends FormValues>(
   return (
       <form onSubmit={handleSubmit}>
         <FormContext.Provider
-            value={{ values: formValues, setFieldValue, validateField, errors: formErrors } as FormContextType<T>}
+            value={{ values: formValues, setFieldValue, validateField, setFormErrors, errors: formErrors } as FormContextType<T>}
         >
           {children}
         </FormContext.Provider>
@@ -56,15 +56,20 @@ const FormItem = <T extends FormValues>({
                                           children,
                                           label,
                                           required = false,
+    validate,
                                         }: FormItemProps<T>): JSX.Element => {
   const formContext = useContext(FormContext) as FormContextType<T>;
   if (!formContext) throw new Error('Form 컴포넌트 안에서만 사용하세요.')
 
-  const { values, setFieldValue, validateField, errors } = formContext
+  const { values, setFieldValue, setFormErrors, errors } = formContext;
 
     const handleChange = (value: T[typeof name]) => {
         setFieldValue(name, value);
-        validateField?.(name, value);
+        if (validate) {
+            const validators = Array.isArray(validate) ? validate : [validate];
+            const error = validators.map(v => v(value)).find(msg => !!msg);
+            setFormErrors((prev) => ({ ...prev, [name]: error }));
+        }
     };
 
   if (!React.isValidElement(children)) {

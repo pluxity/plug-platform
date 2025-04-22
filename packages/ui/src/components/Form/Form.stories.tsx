@@ -6,6 +6,7 @@ import {Input} from '../Input'
 import {Button} from '../Button'
 import {Checkbox} from '../Checkbox';
 import {RadioGroup} from '../Radio';
+import {email, minLength, required} from "./validationUtils";
 
 interface FormValues {
     [key: string]: string | number | boolean;
@@ -136,27 +137,12 @@ export const WithCustomValidation: Story = {
             alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
         };
 
-        const validate = (values: FormValues) => {
-            const errors: Partial<Record<keyof FormValues, string>> = {};
-            if (!values.username) {
-                errors.username = 'Username is required';
-            } else if (values.username.length < 5) {
-                errors.username = 'Username must be at least 5 characters long';
-            }
-            if (!values.password) {
-                errors.password = 'Password is required';
-            } else if (values.password.length < 8) {
-                errors.password = 'Password must be at least 8 characters long';
-            }
-            return errors;
-        };
-
         return (
-            <Form<FormValues> onSubmit={handleFinish} validate={validate}>
-                <FormItem name="username" label="Username">
+            <Form<FormValues> onSubmit={handleFinish}>
+                <FormItem name="username" label="Username" validate={[required(), email()]}>
                     <Input placeholder="Enter your username"/>
                 </FormItem>
-                <FormItem name="password" label="Password">
+                <FormItem name="password" label="Password" validate={[required(), minLength(8)]}>
                     <Input type="password" placeholder="Enter your password"/>
                 </FormItem>
                 <Button
