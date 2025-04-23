@@ -2,7 +2,7 @@ import React from 'react';
 import type { Placement } from '../types';
 import type { DialogProps } from '../Dialog/Dialog.types';
 
-export type PopupPlacement = Placement;
+export type PopupPlacement = Exclude<Placement, 'left' | 'right'>;
 
 export interface PopupProps extends Omit<DialogProps, 'contentClassName'> {
   title?: React.ReactNode;
