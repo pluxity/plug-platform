@@ -38,6 +38,8 @@ const Sheet = ({
     const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
+    closable = overlay && closeOnOverlayClick ? false : true;
+
     useEffect(() => {
         if (isOpen) {
             setIsMounted(true);
@@ -54,12 +56,6 @@ const Sheet = ({
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
-
-    const handleTransitionEnd = () => {
-        if (!isVisible) {
-            onClose?.();
-        }
-    };
     
     const handleOverlayClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -95,7 +91,6 @@ const Sheet = ({
             }
             <div 
                 className={cn(sheetStyle ,sheetAnimate)} 
-                onTransitionEnd={handleTransitionEnd} 
                 role="dialog"
                 ref={ref}
                 {...props} 

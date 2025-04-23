@@ -1,6 +1,4 @@
-import type { Placement } from '../types';
-
-type SheetPlacement = Exclude<Placement, 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center'> | 'left' | 'right';
+import type { BasePlaceMent } from '../types';
 
 export interface SheetPortalProps {
     children: React.ReactNode;
@@ -12,7 +10,7 @@ export interface SheetProps extends React.ComponentProps<"div"> {
     closable?: boolean;
     overlay?: boolean;
     onClose?: () => void;
-    position?: SheetPlacement;
+    position?: BasePlaceMent;
     children: React.ReactNode;
 }
 

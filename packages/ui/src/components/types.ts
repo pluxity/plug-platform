@@ -1,3 +1,4 @@
 export type Size = 'small' | 'medium' | 'large';
 export type Color = 'primary' | 'secondary' | 'destructive';
-export type Placement = 'top' | 'topLeft' | 'topRight' | 'bottom' | 'bottomLeft' | 'bottomRight' | 'center';
+export type BasePlaceMent = 'top' | 'bottom' | 'left' | 'right';
+export type Placement = BasePlaceMent | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center';

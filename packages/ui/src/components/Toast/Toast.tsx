@@ -62,12 +62,6 @@ const Toast = ({
         }
     }, [isOpen, autoCloseDuration]);
 
-    const handleTransitionEnd = () => {
-        if (!isVisible) {
-            onClose?.();
-        }
-    };
-
     if (!isMounted) return null;
 
     const getPlacementClasses = (placement: string): string => {
@@ -126,7 +120,6 @@ const Toast = ({
                         className,
                     )}
                     ref={ref}
-                    onTransitionEnd={handleTransitionEnd}
                     {...props}
                 >
                     {(closable || !autoClose) && (

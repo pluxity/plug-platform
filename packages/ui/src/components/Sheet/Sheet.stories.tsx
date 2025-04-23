@@ -54,8 +54,12 @@ const SheetController: React.FC<{
   }> = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     
-    const handleOpen = () => setIsOpen(true);
-    const handleClose = () => setIsOpen(false);
+    const handleOpen = () => {
+        setIsOpen(true);
+    }
+    const handleClose = () => {
+        setIsOpen(false);
+    }
     
     return (
       <div>

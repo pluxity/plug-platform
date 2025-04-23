@@ -1,12 +1,14 @@
 import type { Placement } from '../types';
 
+type ToastPlacement = Exclude<Placement, 'left' | 'right'>;
+
 export interface ToastPortalProps {
     children: React.ReactNode;
 }
 
 export interface ToastProps extends React.ComponentProps<'div'>{
     variant?: 'default' | 'normal' | 'warning' | 'critical';
-    placement?: Placement;
+    placement?: ToastPlacement;
     closable?: boolean;
     duration?: number;
     autoClose?: boolean;
