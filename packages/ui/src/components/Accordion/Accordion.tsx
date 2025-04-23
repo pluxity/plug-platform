@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useRef, useEffect, useId } from "react";
 import { cn } from '../../utils/classname';
-import AccordionIcon from '../../assets/icons/Accordion.svg';
+import AccordionIcon from '../../assets/icons/accordion.svg';
 import type { 
   AccordionProps, 
   AccordionItemProps, 
