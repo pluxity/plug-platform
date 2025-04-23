@@ -14,8 +14,14 @@ export interface SheetProps extends React.ComponentProps<"div"> {
     children: React.ReactNode;
 }
 
-export interface SheetHeaderProps extends React.ComponentProps<"div"> {}
+export interface SheetHeaderProps extends React.ComponentProps<"div"> {
+    children: React.ReactNode;
+}
 
-export interface SheetContentProps extends React.ComponentProps<"div"> {}
+export interface SheetContentProps extends React.ComponentProps<"div"> {
+    children: React.ReactNode;
+}
 
-export interface SheetFooterProps extends React.ComponentProps<"div"> {}
+export interface SheetFooterProps extends React.ComponentProps<"div"> {
+    children: React.ReactNode;
+}

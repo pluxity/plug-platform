@@ -17,6 +17,10 @@ export interface ToastProps extends React.ComponentProps<'div'>{
     onClose?: () => void;
 }
 
-export interface ToastTitleProps extends React.ComponentProps<'h2'>{}
+export interface ToastTitleProps extends React.ComponentProps<'h2'>{
+    children: React.ReactNode;
+}
 
-export interface ToastDescriptionProps extends React.ComponentProps<'p'>{}
+export interface ToastDescriptionProps extends React.ComponentProps<'p'>{
+    children: React.ReactNode;
+}
