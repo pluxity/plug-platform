@@ -1,13 +1,18 @@
-import React, { createContext, useContext, useState, forwardRef, JSX, ReactElement} from 'react'
+import React, { createContext, useContext, useState, JSX, ReactElement} from 'react'
 import { FormValues, FormProps, FormContextType, FormItemProps, FormFieldProps,} from './Form.types'
 import { cn } from '../../utils/classname'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FormContext = createContext<FormContextType<any> | undefined>(undefined);
 
+export const useFormContext = <T extends FormValues>() => {
+    const context = useContext(FormContext);
+    if (!context) throw new Error('useFormContext는 Form 내부에서만 사용하세요.');
+    return context as FormContextType<T>;
+};
+
 const FormInner = <T extends FormValues>(
-    props: FormProps<T>,
-    _ref: React.Ref<{ reset: () => void }> // eslint-disable-line
+    props: FormProps<T>
 ): JSX.Element => {
     const { children, onSubmit, validate, initialValues } = props;
   const [formValues, setFormValues] = useState<T>(initialValues ?? ({} as T))
@@ -35,10 +40,12 @@ const FormInner = <T extends FormValues>(
     onSubmit(formValues)
   }
 
-  return (
+    const isValid = Object.values(formErrors).every((e) => !e);
+
+    return (
       <form onSubmit={handleSubmit}>
         <FormContext.Provider
-            value={{ values: formValues, setFieldValue, validateField, setFormErrors, errors: formErrors } as FormContextType<T>}
+            value={{ values: formValues, setFieldValue, validateField, setFormErrors, errors: formErrors, isValid } as FormContextType<T>}
         >
           {children}
         </FormContext.Provider>
@@ -47,8 +54,8 @@ const FormInner = <T extends FormValues>(
 }
 
 const Form = Object.assign(
-    forwardRef(FormInner) as <T extends FormValues>(
-        props: FormProps<T> & { ref?: React.Ref<{ reset: () => void }> }
+    FormInner as <T extends FormValues>(
+        props: FormProps<T>
     ) => JSX.Element,
     { displayName: 'Form' }
 )
@@ -67,9 +74,10 @@ const FormItem = <T extends FormValues>({
 
     const handleChange = (value: T[typeof name]) => {
         setFieldValue(name, value);
+
         if (validate) {
             const validators = Array.isArray(validate) ? validate : [validate];
-            const error = validators.map(v => v(value)).find(msg => !!msg);
+            const error = validators.map((v) => v(value)).find((msg) => !!msg);
             setFormErrors((prev) => ({ ...prev, [name]: error }));
         }
     };

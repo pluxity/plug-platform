@@ -24,6 +24,7 @@ export interface FormContextType<T> {
   validateField?: <K extends keyof T>(name: K, value: T[K]) => void;
   setFormErrors: React.Dispatch<React.SetStateAction<Partial<Record<keyof T, string>>>>;
   errors?: Partial<Record<keyof T, string>>;
+  isValid: boolean;
 }
 
 export interface FormItemProps<T extends FormValues, K extends keyof T = keyof T> {
