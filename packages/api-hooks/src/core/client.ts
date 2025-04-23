@@ -50,7 +50,7 @@ const buildKy = (
   };
 
   if (!requireAuth) {
-    return ky.create(baseOptions);
+    return baseKy.extend({ ...baseOptions, hooks: { beforeRequest: [] } });
   }
 
   return baseKy.extend({ ...baseOptions });
