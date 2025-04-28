@@ -44,7 +44,7 @@
     "packages/*"
   ],
   "lint-staged": {
-    "apps/v1/src/**/*.{ts,tsx}": [
+    "**/*.{ts,tsx}": [
       "pnpm --filter v1 lint:fix"
     ]
   }
