@@ -58,11 +58,16 @@ export const Required: Story = {
 export const WithInput: Story = {
     render: (args) => (
         <div className="flex gap-1 items-center">
-            <Label {...args} htmlFor="label-id9" required></Label>
-            <Input.Text id="label-id9" placeholder="텍스트를 입력하세요" />
+            <Label {...args} htmlFor="label-id9" required />
+            <Input.Text
+                id="label-id9"
+                value=""
+                onChange={() => {}}
+                placeholder="텍스트를 입력하세요"
+            />
         </div>
     ),
-    args:{
-        children: 'Input 등 입력 요소들과 같이 사용 가능합니다.'
-    }
+    args: {
+        children: 'Input 등 입력 요소들과 같이 사용 가능합니다.',
+    },
 }

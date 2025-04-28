@@ -1,4 +1,5 @@
 import type { Color, Size } from '../types';
+import {FormFieldProps} from "../Form/Form.types";
 
 type RadioColor = Exclude<Color, 'destructive'>;
 
@@ -12,7 +13,9 @@ export interface RadioGroupProps extends Omit<React.ComponentProps<'div'>, 'onCh
     onChange?: (value: string) => void;
 }
 
-export interface RadioGroupItemProps extends Omit<React.ComponentProps<'input'>, 'ref'> {
+export interface RadioGroupItemProps extends
+    Omit<React.ComponentProps<'input'>, 'ref' | 'onChange' | 'value'>,
+    Partial<FormFieldProps<string>> {
     value: string;
     label?: string;
     disabled?: boolean;

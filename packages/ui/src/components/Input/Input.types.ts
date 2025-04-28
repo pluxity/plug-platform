@@ -1,12 +1,19 @@
-export interface InputProps extends React.ComponentProps<'input'> {
-    ariaLabel?: string;
-    invalid?: boolean;
-    iconPosition?: 'leading' | 'trailing';
-    iconSvg?: string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
-    renderIcon?: (props: {iconColor: string, isFocused: boolean}) => React.ReactNode;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+import { InputHTMLAttributes } from 'react'
+import { FormFieldProps } from '../Form/Form.types'
+
+export interface InputProps<T = string>
+    extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>,
+        Partial<FormFieldProps<T>> {
+    id?: string
+    type?: 'text' | 'number' | 'password' | 'email' | 'tel'
+    iconPosition?: 'leading' | 'trailing'
+    iconSvg?: React.FC<React.SVGProps<SVGSVGElement>>
+    renderIcon?: (props: { iconColor: string; isFocused: boolean }) => React.ReactNode
+    invalid?: boolean
+    className?: string
+    ariaLabel?: string
 }
 
-  export interface InputHelperTextProps extends React.ComponentProps<'p'> {
+export interface InputHelperTextProps extends React.ComponentProps<'p'> {
     error?: boolean;
-  }
+}

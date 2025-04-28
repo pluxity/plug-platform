@@ -60,6 +60,7 @@ const RadioGroupItem = ({
   label,
   className,
   inputClassName,
+    onChange,
   ref,
   ...props
 }: RadioGroupItemProps) => {
@@ -72,10 +73,13 @@ const RadioGroupItem = ({
 
   const { color, size, name, disabled, selectedValue, toggleValue } = context;
 
-  const onSelectedChange = () => {
-    toggleValue(value);
+  const handleChange = () => {
+    if (onChange) {
+      onChange(value);
+    } else {
+      toggleValue(value);
+    }
   };
-  
 
   const inputStyle = "z-1 inline-block cursor-pointer border-1 bg-white border-gray-500 rounded-full relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:border-full after:transform";
 
@@ -123,7 +127,7 @@ const RadioGroupItem = ({
         name={name}
         value={value}
         checked={selectedValue === value}
-        onChange={onSelectedChange}
+        onChange={handleChange}
         disabled={disabled}
         {...props}
       />

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { cn } from '../../utils/classname';
 import type { ButtonProps } from './Button.types';
+import {useFormContext} from "../Form/Form";
 
 const Button = React.memo(({
       className,
@@ -81,4 +82,25 @@ const Button = React.memo(({
 
 Button.displayName = 'Button';
 
-export { Button };
+const FormSubmitButton = React.memo(({
+                              children,
+                              color = 'primary',
+                              size = 'medium',
+                              isLoading = false,
+                          }: ButtonProps) => {
+    const {isValid} = useFormContext();
+
+    return (
+        <Button
+            type="submit"
+            color={color}
+            size={size}
+            disabled={!isValid}
+            isLoading={isLoading}
+        >
+            {children}
+        </Button>
+    );
+});
+
+export { Button, FormSubmitButton };

@@ -175,7 +175,8 @@ export const ControlledDropdown: Story = {
                         <Dropdown.Trigger>
                             <Input 
                                 readOnly
-                                value={selected.join(', ')} 
+                                value={selected.join(', ')}
+                                onChange={() => {}}
                                 placeholder="선택하세요" 
                             />
                         </Dropdown.Trigger>
