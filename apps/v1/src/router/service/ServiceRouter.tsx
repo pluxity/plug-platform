@@ -1,8 +1,8 @@
 import { RouteObject } from 'react-router-dom';
-import {SERVICE_ROUTE_PATH} from "@plug/v1/router/serviceRoutes";
+import {SERVICE_ROUTE_PATH} from "@plug/v1/router/service/serviceRoutes";
 import Home from "@plug/v1/service/pages/Home";
 
-export const serviceRouter: RouteObject[] = [
+export const ServiceRouter: RouteObject[] = [
     {
         path: '/service',
         children: [

@@ -1,7 +1,7 @@
 module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import', 'prettier'],
+    plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import', 'prettier', 'tailwindcss', 'simple-import-sort'],
     extends: [
         'eslint:recommended',
         'plugin:react/recommended',
@@ -23,6 +23,9 @@ module.exports = {
     },
     rules: {
         'prettier/prettier': 'error',
+        'tailwindcss/classnames-order': 'warn',
+        'simple-import-sort/imports': 'error',
+        'simple-import-sort/exports': 'error',
         'import/order': [
             'error',
             {

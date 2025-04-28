@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
-import {adminRouter} from "@plug/v1/admin/adminRouter";
-import {serviceRouter} from "@plug/v1/service/serviceRouter";
+import {AdminRouter} from "@plug/v1/router/admin/AdminRouter";
+import {ServiceRouter} from "@plug/v1/router/service/ServiceRouter";
 
 export const router = createBrowserRouter([
-    ...adminRouter,
-    ...serviceRouter,
+    ...AdminRouter,
+    ...ServiceRouter,
 ]);
