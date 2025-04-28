@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write",
-    "sample": "pnpm --filter @plug/sample",
-    "tancheon": "pnpm --filter @plug/tancheon",
-    "storybook": "pnpm --filter @plug/ui storybook"
+    "sample": "pnpm --filter @plug/sample"
   },
   "keywords": [],
   "author": "",

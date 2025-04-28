@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Px from '@plug/engine/src';
-import { Button, Input } from "@plug/ui";
 
 // 층 데이터 타입 정의
 interface FloorData {
@@ -56,24 +55,24 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         if (this.state.selectedApiName === 'Camera') {
             return (
                 <span>
-                    <Button disabled>SetEnabled</Button>
-                    <Button onClick={() => Px.Camera.ExtendView(1.0)}>ExtendView</Button><br />
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</Button><br />
-                    <Input.Text style={{ color: 'white' }} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</Button><br/>
-                    <Input.Text style={{ color: 'white' }} value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</Button>
+                    <button disabled>SetEnabled</button>
+                    <button onClick={() => Px.Camera.ExtendView(1.0)}>ExtendView</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</button><br />
+                    <input type='text' style={{ color: 'white' }} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br/>
+                    <input type='text' style={{ color: 'white' }} value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Loader') {
             return (
-                <Button disabled>LoadGltf</Button>
+                <button disabled>LoadGltf</button>
             );
         } else if (this.state.selectedApiName === 'Model') {
             return (
                 <span>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Model.GetHierarchy')}>GetModelHierarchy</Button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Model.GetHierarchy')}>GetModelHierarchy</button>
                     <br />
                     {this.state.floorData.map((data: FloorData) => (
                         <span key={data.floorId}>
@@ -84,46 +83,46 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     {
                         this.state.floorData.length > 0 &&
                         <span>
-                            <Button onClick={() => this.setFloorVisibility(true)}>ShowAll</Button>
-                            <Button onClick={() => this.setFloorVisibility(false)}>HideAll</Button>
+                            <button onClick={() => this.setFloorVisibility(true)}>ShowAll</button>
+                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button>
                         </span>
                     }
                     <br />
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Model.Expand')}>Expand</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Model.Collapse')}>Collapse</Button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Model.Expand')}>Expand</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Model.Collapse')}>Collapse</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Poi') {
             return (
                 <span>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</Button><br />
-                    <Input.Text style={{ color: 'white' }} value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</Button> &nbsp;
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</Button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button><br />
+                    <input type='text' style={{ color: 'white' }} value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</button> &nbsp;
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</button>
                     <br />
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</Button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</button>
                     <br />
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll(LocalStorage)')}>ExportAll(LocalStorage)</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Import(LocalStorage)')}>Import(LocalStorage)</Button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll(LocalStorage)')}>ExportAll(LocalStorage)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Import(LocalStorage)')}>Import(LocalStorage)</button>
                     <br/>
-                    <Input.Text style={{ color: 'white' }} value={this.state.setVisiblePoiId} onChange={this.onSetVisiblePoiTextInputValueChanged.bind(this)} placeholder='Show/Hide Poi Id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</Button><br/><br/>
-                    <Input.Text style={{ color: 'white' }} value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</Button><br/>
-                    <Input.Text style={{ color: 'white' }} value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></Input.Text>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.PlayAnimation')}>PlayAnimation</Button>
-                    <Button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</Button>
+                    <input type='text' style={{ color: 'white' }} value={this.state.setVisiblePoiId} onChange={this.onSetVisiblePoiTextInputValueChanged.bind(this)} placeholder='Show/Hide Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br/><br/>
+                    <input type='text' style={{ color: 'white' }} value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br/>
+                    <input type='text' style={{ color: 'white' }} value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.PlayAnimation')}>PlayAnimation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'ETC') {
             return (
                 <span>
-                    <Button onClick={this.printAllApilist.bind(this, Px, 'Px')}>Print Api List</Button>
+                    <button onClick={this.printAllApilist.bind(this, Px, 'Px')}>Print Api List</button>
                 </span>
             );
         }
@@ -192,6 +191,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 }
             } break;
             case 'Model.GetHierarchy': {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const floorData = Px.Model.GetModelHierarchy() as any;
                 this.setState({ floorData: floorData });
             } break;
@@ -359,6 +359,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @param target - 대상
      * @param prefix - 접두사
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     printAllApilist(target: any, prefix: string) {
         Object.keys(target).forEach(keyName => {
             this.printAllApilist(target[keyName], prefix + '.' + keyName);

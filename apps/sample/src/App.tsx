@@ -1,8 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import DesignSystem from './pages/DesignSystem';
 import ThreeDTest from './pages/ThreeDTest';
-import DialogExamples from './pages/DialogExamples';
-import KyTest from "./pages/KyTest.tsx";
 
 function App() {
   return (
@@ -16,16 +13,7 @@ function App() {
                 <Link to="/" className="hover:text-gray-300">홈</Link>
               </li>
               <li>
-                <Link to="/design-system" className="hover:text-gray-300">디자인 시스템</Link>
-              </li>
-              <li>
                 <Link to="/3d-test" className="hover:text-gray-300">3D 테스트</Link>
-              </li>
-              <li>
-                <Link to="/dialog-examples" className="hover:text-gray-300">다이얼로그 예제</Link>
-              </li>
-              <li>
-                <Link to="/ky-test" className="hover:text-gray-300">ky test</Link>
               </li>
             </ul>
           </div>
@@ -34,10 +22,7 @@ function App() {
         <div className="container mx-auto p-4">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/design-system" element={<DesignSystem />} />
             <Route path="/3d-test" element={<ThreeDTest />} />
-            <Route path="/dialog-examples" element={<DialogExamples />} />
-            <Route path="/ky-test" element={<KyTest />} />
           </Routes>
         </div>
       </div>
@@ -61,9 +46,6 @@ function Home() {
         <div className="border rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold mb-3">디자인 시스템</h3>
           <p className="text-gray-600 mb-4">다양한 UI 컴포넌트의 사용 예제를 확인할 수 있습니다.</p>
-          <Link to="/design-system" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            디자인 시스템 보기
-          </Link>
         </div>
         <div className="border rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold mb-3">3D 테스트</h3>
@@ -75,9 +57,6 @@ function Home() {
         <div className="border rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold mb-3">다이얼로그 예제</h3>
           <p className="text-gray-600 mb-4">Modal, Popup, Dialog 컴포넌트 사용 예제를 확인할 수 있습니다.</p>
-          <Link to="/dialog-examples" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            다이얼로그 예제 보기
-          </Link>
         </div>
       </div>
     </div>
