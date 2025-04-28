@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as Interfaces from './interfaces';
 import * as Event from './eventDispatcher';
+import * as TWEEN from '@tweenjs/tween.js';
 
 class Engine3D {
 
@@ -17,6 +18,12 @@ class Engine3D {
     private hemiLight: THREE.HemisphereLight;
 
     private rootScene: THREE.Scene; // 최상위 루트씬
+
+    private envScene: Addon.DebugEnvironment;
+    private pmremGenerator: THREE.PMREMGenerator;
+    private generatedCubeRenderTarget: THREE.WebGLRenderTarget;
+    
+    private tweenUpdateGroups: TWEEN.Group;
 
     /**
      * 생성자
@@ -40,7 +47,7 @@ class Engine3D {
         this.dom.appendChild(this.renderer.domElement);
 
         // 카메라
-        this.camera = new THREE.PerspectiveCamera(75, this.dom.clientWidth / this.dom.clientHeight, 1.0, 5000);
+        this.camera = new THREE.PerspectiveCamera(75, this.dom.clientWidth / this.dom.clientHeight, 0.1, 5000);
         this.camera.position.set(0, 10, 10);
         this.camera.lookAt(0, 0, 0);
         this.camera.layers.enable(Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
@@ -72,6 +79,13 @@ class Engine3D {
         this.directionalLight.shadow.mapSize.width = 4096;
         this.directionalLight.shadow.mapSize.height = 4096;
 
+        // 환경맵 테스트
+        this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+        this.pmremGenerator.compileCubemapShader();
+
+        this.envScene = new Addon.DebugEnvironment();
+        this.generatedCubeRenderTarget = this.pmremGenerator.fromScene(this.envScene);
+
         // 이펙트 컴포저
         this.composer = new Addon.EffectComposer(this.renderer);
         this.composer.addPass(new Addon.RenderPass(this.rootScene, this.camera));
@@ -84,6 +98,9 @@ class Engine3D {
 
         // 그림자맵 이벤트 콜백 등록
         Event.InternalHandler.addEventListener('onShadowMapNeedsUpdate' as never, this.updateShadowMap.bind(this));
+
+        // 트윈 그룹 생성
+        this.tweenUpdateGroups = new TWEEN.Group();
 
         // 초기화 완료 이벤트 통지
         Event.InternalHandler.dispatchEvent({
@@ -111,6 +128,9 @@ class Engine3D {
     onRender(): void {
         
         const deltaTime = this.clock.getDelta();
+
+        // 트윈업데이트
+        this.tweenUpdateGroups.update();
 
         // 렌더링 전 이벤트 통지
         Event.InternalHandler.dispatchEvent({
@@ -185,6 +205,20 @@ class Engine3D {
      */
     get Renderer() {
         return this.renderer;
+    }
+
+    /**
+     * 환경맵 렌더타겟
+     */
+    get GeneratedCubeRenderTarget() {
+        return this.generatedCubeRenderTarget;
+    }
+
+    /**
+     * 트윈 업데이트 그룹
+     */
+    get TweenUpdateGroups() {
+        return this.tweenUpdateGroups;
     }
 }
 

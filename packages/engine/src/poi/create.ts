@@ -5,16 +5,13 @@ import * as Event from '../eventDispatcher';
 import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
+import * as PoiData from './data';
 
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
 let lineGroup: THREE.Group;
 let textGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
-let textGeometry: THREE.PlaneGeometry; // 공용 텍스트 Geometry
-
-const iconStorage: Record<string, THREE.SpriteMaterial> = {};
-const meshStorage: Record<string, THREE.BufferGeometry> = {};
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -49,20 +46,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     pointMeshGroup.name = '#PointMeshGroup';
     poiRootGroup.add(pointMeshGroup);
 
-    // 공용 텍스트 geometry
-    textGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
-    textGeometry.translate(0, 2.0, 0);
-
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
-    (textGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
-
     // poi 관련 씬그룹 생성 이벤트 통지
     Event.InternalHandler.dispatchEvent({
         type: 'onPoiSceneGroupCreated',
         poiRootGroup: poiRootGroup,
         iconGroup: iconGroup,
+        textGroup: textGroup,
         lineGroup: lineGroup,
         pointMeshGroup: pointMeshGroup,
     });
@@ -74,27 +63,22 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  */
 function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     // 중복 체크
-
-    // 아이콘 재질이 로드된 상태가 아니면 로드
-    if (iconStorage.hasOwnProperty(option.iconUrl) === false) {
-        iconStorage[option.iconUrl] = new THREE.SpriteMaterial({
-            map: new THREE.TextureLoader().load(option.iconUrl),
-            sizeAttenuation: false,
-            toneMapped: false,
-        });
+    if( PoiData.exists(option.id)) {
+        console.warn(`${option.id} has already exists.`);
+        return;
     }
 
+    // 아이콘 재질이 로드된 상태가 아니면 로드
+    const iconMaterial = PoiData.getIcon(option.iconUrl);
+
     // poi용 아이콘 스프라이트 생성
-    const iconObj = new THREE.Sprite(iconStorage[option.iconUrl]);
+    const iconObj = new THREE.Sprite(iconMaterial);
     iconObj.center.set(0.5, 0.0);
     iconObj.scale.setScalar(0.05);
     iconGroup.add(iconObj);
 
     // 텍스트 생성
-    const textSize = new THREE.Vector2();
-    const textMaterial = Util.createTextMaterial(option.displayText, textSize);
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
+    const textMesh = PoiData.createTextMesh(option.displayText);
     textGroup.add(textMesh);
 
     // poi 데이터 속성 설정

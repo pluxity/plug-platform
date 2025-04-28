@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as PIXI from 'pixi.js';
 import * as Event from './eventDispatcher';
+import * as Interfaces from './interfaces';
 import { Engine3D } from './engine';
 
 let pixiApp: PIXI.Application;
@@ -116,34 +117,67 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
  * @param url - 모델파일 주소
  */
 async function getMergedGeometry(url: string) {
+
+    // 인스턴스 메시 생성용 리소스, geometry의 경우 누적하는 형태로 처리
+    let mergedGeometry: THREE.BufferGeometry | undefined = undefined;
+    let mergedMaterial: THREE.Material[] = [];
+
+    // gltf 로더
     const loader = new Addon.GLTFLoader();
+    await loader.loadAsync(url).then(gltfScene => {
+        // 월드 행렬이 적용된 geometry 수집
+        let collectGeometries: THREE.BufferGeometry[] = [];
+        // 로드한 gltf를 순회하며 geometry병합
+        gltfScene.scene.traverse(object => {
+            if (object instanceof THREE.Mesh) {
+                // geometry 수집
+                const currGeometry: THREE.BufferGeometry = object.geometry.clone();
+                object.updateMatrixWorld(true);
+                currGeometry.applyMatrix4(object.matrixWorld);
+
+                collectGeometries.push(currGeometry);
+
+                // material 수집
+                if (Array.isArray(object.material))
+                    mergedMaterial = mergedMaterial.concat(object.material);
+                else
+                    mergedMaterial.push(object.material);
+            }
+        });
+
+        // 머터리얼 환경맵 설정
+        mergedMaterial.forEach(mat => {
+            (mat as any).envMap = engine.GeneratedCubeRenderTarget.texture;
+            (mat as any).envMapIntensity = 0.1;
+            mat.needsUpdate = true;
+        });
+
+        // 수집된 리소스 병합
+        mergedGeometry = Addon.BufferGeometryUtils.mergeGeometries(collectGeometries, true);
+        // 병합완료후 수집데이터 메모리 해제
+        collectGeometries.forEach(geometry => geometry.dispose());
+    });
+
+    // 결과 반환
+    return {
+        geometry: mergedGeometry,
+        material: (mergedMaterial.length > 1) ? mergedMaterial : mergedMaterial[0]
+    };
 }
+
 /**
-async function init() {
-
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-    camera.position.z = 1;
-
-    scene = new THREE.Scene();
-    	
-        const loader = new THREE.TextureLoader();
-        const texture = await loader.loadAsync( 'https://threejs.org/examples/textures/uv_grid_opengl.jpg' );
-    	
-    const geometry = new THREE.PlaneGeometry();
-    const material = new THREE.MeshBasicMaterial( { map: texture } );
-
-    const mesh = new THREE.Mesh( geometry, material );
-    scene.add( mesh );
-
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-    	
-        animate();
-
+ * 자식을 포함한 대상의 모든 객체에 대해 레이어를 설정
+ * @param target - 대상 객체
+ */
+function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
+    target.traverse(child => {
+        child.layers.disableAll();
+        child.layers.set(layer);
+    });
 }
 
-*/
 export {
     createTextMaterial,
+    getMergedGeometry,
+    setObjectLayer,
 }

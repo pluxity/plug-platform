@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
+import * as TWEEN from '@tweenjs/tween.js';
+import * as PoiDataInternal from './poi/data';
+import * as ModelInternal from './model/model';
 import { Engine3D } from './engine';
 
 let engine: Engine3D;
@@ -11,6 +14,8 @@ let pickPoint: THREE.Vector3 | undefined = new THREE.Vector3();
 let rotateSmoothingFactor: number = 0.6;
 let panSmoothingFactor: number = 0.7;
 let zoomIntervalFactor: number = 1.0;
+let posTween: TWEEN.Tween | undefined = undefined;
+let rotTween: TWEEN.Tween | undefined = undefined;
 const rotateDelta: THREE.Vector2 = new THREE.Vector2();
 const panDelta: THREE.Vector3 = new THREE.Vector3();
 const groundPlane: THREE.Plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -384,6 +389,182 @@ function onContextMenu(evt: MouseEvent) {
     evt.stopPropagation();
 }
 
+/**
+ * 전체보기
+ * @param transitionTime - 이동시간
+ */
+function ExtendView(transitionTime: number) {
+
+    // 배경모델 바운딩 계산
+    const target = engine.RootScene.getObjectByName('#ModelGroup');
+    const bounding = new THREE.Box3().setFromObject(target as THREE.Object3D);
+    const sphere = new THREE.Sphere();
+    bounding.getBoundingSphere(sphere);
+
+    // 카메라 방향 얻기
+    const direction = new THREE.Vector3();
+    engine.Camera.getWorldDirection(direction);
+
+    // 카메라 이동 대상 위치점 처리
+    const camPos = sphere.center.clone().addScaledVector(direction, -sphere.radius);
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+
+    // 트윈 생성 및 시작
+    posTween = new TWEEN.Tween(engine.Camera.position)
+        .to({
+            x: camPos.x,
+            y: camPos.y,
+            z: camPos.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    // 트윈 업데이트 그룹에 추가
+    engine.TweenUpdateGroups.add(posTween);
+}
+
+/**
+ * 카메라의 현재 상태(위치, 회전) 얻기
+ * @returns - 현재 상태
+ */
+function GetState() {
+    const camPos = new Interfaces.Vector3Custom().copy(engine.Camera.position);
+    const camRot = new Interfaces.EulerCustom().copy(engine.Camera.rotation);
+
+    return {
+        position: camPos.ExportData,
+        rotation: camRot.ExportData,
+    }
+}
+
+/**
+ * 카메라 상태 설정
+ * @param state - 상태 정보
+ */
+function SetState(state: Record<string, any>, transitionTime: number) {
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+    if (rotTween instanceof TWEEN.Tween) {
+        rotTween.stop();
+        engine.TweenUpdateGroups.remove(rotTween);
+    }
+
+    // 트윈 생성 및 애니메이션 처리
+    posTween = new TWEEN.Tween(engine.Camera.position)
+        .to({
+            x: state.position.x,
+            y: state.position.y,
+            z: state.position.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    rotTween = new TWEEN.Tween(engine.Camera.rotation)
+        .to({
+            x: state.rotation.x,
+            y: state.rotation.y,
+            z: state.rotation.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    // 트윈 업데이트 그룹 추가
+    engine.TweenUpdateGroups.add(posTween);
+    engine.TweenUpdateGroups.add(rotTween);
+}
+
+/**
+ * poi로 카메라 이동
+ * @param id - poi id
+ * @param transitionTime - 이동시간
+ */
+function MoveToPoi(id: string, transitionTime: number) {
+
+    // poi데이터
+    const poiElement = PoiDataInternal.getPoiElement(id);
+
+    // 거리값
+    const radius = poiElement.LineHeight * 2.0;
+
+    // 카메라 방향
+    const direction = new THREE.Vector3();
+    engine.Camera.getWorldDirection(direction);
+
+    // 카메라 이동대상 위치점
+    const camPos = poiElement.WorldPosition.clone().addScaledVector(direction, -radius);
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+
+    // 트윈 생성
+    posTween = new TWEEN.Tween(engine.Camera.position)
+        .to({
+            x: camPos.x,
+            y: camPos.y,
+            z: camPos.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    // 트윈 업데이트 그룹에 추가
+    engine.TweenUpdateGroups.add(posTween);
+}
+
+/**
+ * 지정한 층으로 카메라 이동
+ * @param floorId - 층 id값
+ * @param transitionTime - 이동시간
+ */
+function MoveToFloor(floorId: string, transitionTime: number) {
+    // 층 바운딩
+    const bounding = ModelInternal.calculateFloorBounding(floorId);
+    const sphere = new THREE.Sphere();
+    bounding.getBoundingSphere(sphere);
+
+    // 카메라 방향
+    const direction = new THREE.Vector3();
+    engine.Camera.getWorldDirection(direction);
+
+    // 카메라 이동 위치점
+    const camPos = sphere.center.clone().addScaledVector(direction, -sphere.radius);
+
+    // 이전 트윈 중지
+    if (posTween instanceof TWEEN.Tween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+    }
+
+    // 트윈 생성 및 시작
+    posTween = new TWEEN.Tween(engine.Camera.position)
+        .to({
+            x: camPos.x,
+            y: camPos.y,
+            z: camPos.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.InOut)
+        .start();
+
+    // 트윈 업데이트 그룹에 추가
+    engine.TweenUpdateGroups.add(posTween);
+}
+
 export {
     SetEnabled,
+    ExtendView,
+    GetState,
+    SetState,
+    MoveToPoi,
+    MoveToFloor,
 }

@@ -18,6 +18,19 @@ class Vector3Custom extends THREE.Vector3 {
 }
 
 /**
+ * 데이터 익스포트를 위한 Euler 클래스
+ */
+class EulerCustom extends THREE.Euler {
+    get ExportData() {
+        return {
+            x: this.x,
+            y: this.y,
+            z: this.z,
+        }
+    }
+}
+
+/**
  * 카메라, 픽킹등에 사용할 레이어 열거형
  */
 enum CustomLayer {
@@ -65,11 +78,68 @@ interface PoiCreateOption {
     property: { [key: string]: any };
 }
 
+/**
+ * poi 임포트 옵션
+ */
+interface PoiImportOption {
+    id: string;
+    iconUrl: string;
+    modelUrl?: string;
+    displayText: string;
+    floorId: string;
+    property: { [key: string]: any };
+    position: Vector3Custom;
+    rotation: EulerCustom;
+    scale: Vector3Custom;
+}
+
+/**
+ * Sbm 파일 헤더 정보
+ */
+interface SBMHeader {
+    formatName: string;
+    version: number;
+    materialCount: number;
+    meshCount: number;
+}
+
+/**
+ * SBM 재질 정보
+ */
+interface SBMMaterial {
+    id: number;
+    ambient: THREE.Color;
+    diffuse: THREE.Color;
+    opacity: number;
+    specular: THREE.Color;
+    facing: number;
+    textureMapPath: string;
+}
+
+/**
+ * SBM 메시 정보
+ */
+interface SBMMesh {
+    id: number;
+    usedMaterialId: number;
+
+    vertexCount: number;
+    posVertices: number[];
+    normVertices: number[];
+    uvVertices : number[];
+    indices: number[];
+}
+
 export {
     Vector3Custom,
+    EulerCustom,
     CustomLayer,
     MouseButton,
     ModifyKey,
     ModelInfo,
     PoiCreateOption,
+    PoiImportOption,
+    SBMHeader,
+    SBMMaterial,
+    SBMMesh,
 }
