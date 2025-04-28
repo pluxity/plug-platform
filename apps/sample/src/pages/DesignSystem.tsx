@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { debounce } from "lodash";
 import { 
@@ -17,6 +18,13 @@ import {
 } from "@plug/ui";
 import type { ButtonProps } from "@plug/ui";
 import { MenuIcon, NoticeIcon, HomeIcon } from "@plug/ui/icons";
+
+<<<<<<< HEAD
+=======
+import { Button, Badge, Checkbox, RadioGroup, RadioGroupItem, Textarea, Input, Card } from "@plug/ui";
+import MenuIcon from "@plug/ui/src/assets/icons/menu.svg";
+import NoticeIcon from "@plug/ui/src/assets/icons/notice.svg";
+>>>>>>> 457c776bf103ce7e6363a821b4f32a39ff8ca63a
 
 
 // 제품 데이터 샘플
@@ -48,6 +56,8 @@ const products = [
 ];
 
 function DesignSystem() {
+  const [group1, setGroup1] = useState<string>('');
+  const [group2, setGroup2] = useState<string>('');
 
   const [inputTextValue, setInputTextValue] = useState<string>('');
   const [inputTextInvalid, setInputTextInvalid] = useState<boolean>(false);
@@ -55,12 +65,6 @@ function DesignSystem() {
 
   const [textareaValue, setTextareaValue] = useState<string>('');
   const [textareaInvalid, setTextareaInvalid] = useState<boolean>(false);
-
-  const [isSwitchChecked, setIsSwitchChecked] = useState<boolean>(false);
-
-  const [activeTab, setActiveTab] = useState<string>('tab1');
-
-  const [sliderValue, setSliderValue] = useState<number>(20);
 
   const inputTextDebounce = useCallback(
     debounce((value: string) => {
@@ -91,6 +95,7 @@ function DesignSystem() {
     textareaDebounced(value);
   };
 
+<<<<<<< HEAD
   const SwitchOnChange = (checked: boolean) => {
     setIsSwitchChecked(checked);
     console.log(checked);
@@ -233,7 +238,50 @@ function DesignSystem() {
             <Input.Label>라벨</Input.Label>
             <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
           </Input.Box>
-        </div>
+=======
+  return (
+    <>
+      <div className="h-screen w-screen">
+        <div className="bg-gray-400 text-sm p-2 my-2">버튼 Guide</div>
+        <Button variant="outline" color="primary">
+          <MenuIcon />버튼
+        </Button>
+        <div className="bg-gray-400 text-sm p-2 my-2">시간 Guide</div>
+        <p className="flex gap-2 items-center font-bold text-sm">시간</p>
+        <div className="bg-gray-400 text-sm p-2 my-2">뱃지 Guide</div>
+        <Badge>뱃지</Badge>
+        <div className="bg-gray-400 text-sm p-2 my-2">체크박스 Guide</div>
+        <Checkbox label="체크박스" variant="primary" type="circle" disabled/>
+        <div className="bg-gray-400 text-sm p-2 my-2">라디오버튼 Guide</div>
+        <RadioGroup variant="primary" defaultValue="1" name="group1" onChange={(value) => { setGroup1(value); }}>
+          <RadioGroupItem value="1" label="option1"/>
+          <RadioGroupItem value="2" label="option2" disabled/>
+        </RadioGroup>
+        <RadioGroup variant="secondary" defaultValue="3" name="group2" onChange={setGroup2}>
+          <RadioGroupItem value="3" label="option3"/>
+          <RadioGroupItem value="4" label="option4" />
+        </RadioGroup>
+        <div className="bg-gray-400 text-sm p-2 my-2">Textarea Guide</div>
+        <Textarea aria-label="textarea 입력창" value={textareaValue} onChange={textareaOnChange} resize="both" placeholder="텍스트를 입력하세요." invalid={textareaInvalid} />
+        <div className="bg-gray-400 text-sm p-2 my-2">Input Text Guide</div>
+        <div className="bg-gray-300 text-sm px-1">Input 묶음</div>
+        <Input.Box> 
+          <Input.Label>라벨</Input.Label>
+          <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
+          <Input.HelperText error={error}>
+            {inputTextInvalid ? "비밀번호는 8자 이상이어야 합니다." : "안전한 비밀번호를 입력하세요."}
+          </Input.HelperText>
+        </Input.Box>
+        <Input.Box>
+          <Input.Label>라벨</Input.Label>
+          <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
+        </Input.Box>
+        <div className="bg-gray-300 text-sm px-1">Input 단독사용</div>
+        <Input.Password placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} />
+        <Input.Text placeholder="텍스트를 입력하세요." value={inputTextValue} onChange={inputTextOnChange} invalid={inputTextInvalid} iconPosition="leading" iconSvg={NoticeIcon} />
+        <label>{group1}</label>
+        <label>{group2}</label>
+        
         <h2 className="text-xl font-bold mt-8 mb-4">Card 컴포넌트 예제 (합성 패턴)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 기본 카드 예제 */}
@@ -246,7 +294,7 @@ function DesignSystem() {
               <p>카드 내용이 여기에 들어갑니다. 다양한 컨텐츠를 포함할 수 있습니다.</p>
             </Card.Content>
             <Card.Footer>
-              <Button {...buttonProps}>확인</Button>
+              <Button variant="default" color="primary" className="mr-2">확인</Button>
               <Button variant="outline">취소</Button>
             </Card.Footer>
           </Card>
@@ -293,6 +341,129 @@ function DesignSystem() {
             </Card.Footer>
           </Card>
         </div>
+      </div>
+      
+      <div className="container mx-auto py-8 px-4">
+        <h2 className="text-2xl font-bold mb-6">카드 컴포넌트 샘플</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {/* 제품 카드 목록 */}
+          {products.map((product) => (
+            <Card key={product.id} className="h-full">
+              <Card.Header>
+                <Card.Title>{product.name}</Card.Title>
+                <Card.Description>
+                  <Badge color="primary" className="mt-1">{product.category}</Badge>
+                </Card.Description>
+              </Card.Header>
+              <Card.Content>
+                <p className="text-gray-700 mb-2">{product.description}</p>
+                <p className="text-lg font-semibold text-primary-600">{product.price.toLocaleString()}원</p>
+                <p className="text-sm text-gray-500 mt-1">재고: {product.stock}개</p>
+              </Card.Content>
+              <Card.Footer>
+                <Button variant="default" color="primary" className="w-full">
+                  장바구니에 추가
+                </Button>
+              </Card.Footer>
+            </Card>
+          ))}
+>>>>>>> 457c776bf103ce7e6363a821b4f32a39ff8ca63a
+        </div>
+        <h2 className="text-xl font-bold mt-8 mb-4">Card 컴포넌트 예제 (합성 패턴)</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 기본 카드 예제 */}
+          <Card>
+            <Card.Header>
+              <Card.Title>기본 카드</Card.Title>
+              <Card.Description>카드 설명이 여기에 들어갑니다.</Card.Description>
+            </Card.Header>
+            <Card.Content>
+              <p>카드 내용이 여기에 들어갑니다. 다양한 컨텐츠를 포함할 수 있습니다.</p>
+            </Card.Content>
+            <Card.Footer>
+              <Button {...buttonProps}>확인</Button>
+              <Button variant="outline">취소</Button>
+            </Card.Footer>
+          </Card>
+          
+<<<<<<< HEAD
+=======
+          {/* 통계 카드 */}
+          <Card className="bg-gray-50">
+            <Card.Header>
+              <Card.Title>월간 통계</Card.Title>
+              <Card.Description>2023년 11월</Card.Description>
+            </Card.Header>
+            <Card.Content>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">총 방문자</p>
+                  <p className="text-2xl font-bold">1,234</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">신규 가입자</p>
+                  <p className="text-2xl font-bold">256</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">총 판매액</p>
+                  <p className="text-2xl font-bold">₩8.2M</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">평균 체류시간</p>
+                  <p className="text-2xl font-bold">4.5분</p>
+                </div>
+              </div>
+            </Card.Content>
+          </Card>
+        </div>
+        
+        <h3 className="text-xl font-bold mb-4">인터랙티브 카드</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+>>>>>>> 457c776bf103ce7e6363a821b4f32a39ff8ca63a
+          {/* 닫기 버튼이 있는 카드 */}
+          <Card closable onClose={() => alert('카드가 닫혔습니다.')}>
+            <Card.Header>
+              <Card.Title>닫기 버튼이 있는 카드</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <p>오른쪽 상단의 X 버튼을 클릭하여 이 카드를 닫을 수 있습니다.</p>
+            </Card.Content>
+          </Card>
+          
+          {/* 제품 정보 카드 */}
+          <Card className="bg-gray-50">
+            <Card.Header>
+              <Card.Title>제품 정보</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              {products.length > 0 && (
+                <div>
+                  <h4 className="font-medium">{products[0].name}</h4>
+                  <p className="text-gray-600 mt-1">가격: {products[0].price.toLocaleString()}원</p>
+                  <Badge color="primary" className="mt-2">{products[0].category}</Badge>
+                </div>
+              )}
+            </Card.Content>
+            <Card.Footer>
+              <Button variant="default" color="primary">구매하기</Button>
+            </Card.Footer>
+          </Card>
+          
+          {/* 커스텀 스타일 카드 */}
+          <Card className="bg-blue-50 border-blue-200">
+            <Card.Header className="border-b border-blue-100">
+              <Card.Title className="text-blue-800">커스텀 스타일 카드</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <p>각 컴포넌트에 className을 전달하여 스타일을 커스터마이징할 수 있습니다.</p>
+            </Card.Content>
+            <Card.Footer className="justify-end">
+              <Button variant="outline" color="primary">자세히 보기</Button>
+            </Card.Footer>
+          </Card>
+        </div>
+<<<<<<< HEAD
         
           <h2 className="text-2xl font-bold mb-6">카드 컴포넌트 샘플</h2>
           
@@ -408,6 +579,10 @@ function DesignSystem() {
           </div>
       </div>
     </div>
+=======
+      </div>
+    </>
+>>>>>>> 457c776bf103ce7e6363a821b4f32a39ff8ca63a
   )
 }
 

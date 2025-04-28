@@ -31,7 +31,7 @@ function App() {
           </div>
         </nav>
         
-        <div className="container h-screen">
+        <div className="container mx-auto p-4">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/design-system" element={<DesignSystem />} />
