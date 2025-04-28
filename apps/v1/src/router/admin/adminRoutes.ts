@@ -1,4 +1,4 @@
-export enum ADMIN_ROUTE_PATH {
-    DASHBOARD = 'dashboard',
-    USERS = 'users',
+export enum AdminRoute {
+    Dashboard = 'dashboard',
+    Users = 'users',
 }
