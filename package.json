@@ -42,5 +42,10 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "lint-staged": {
+    "apps/v1/src/**/*.{ts,tsx}": [
+      "pnpm --filter v1 lint:fix"
+    ]
+  }
 }
