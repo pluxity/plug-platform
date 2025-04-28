@@ -7,7 +7,7 @@ export interface InputProps<T = string>
     id?: string
     type?: 'text' | 'number' | 'password' | 'email' | 'tel'
     iconPosition?: 'leading' | 'trailing'
-    iconSvg?: React.FC<React.SVGProps<SVGSVGElement>>
+    iconSvg?: string | React.FC<React.SVGProps<SVGSVGElement>>
     renderIcon?: (props: { iconColor: string; isFocused: boolean }) => React.ReactNode
     invalid?: boolean
     className?: string
