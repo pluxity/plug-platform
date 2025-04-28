@@ -45,7 +45,7 @@
   ],
   "lint-staged": {
     "**/*.{ts,tsx}": [
-      "pnpm --filter v1 lint:fix"
+      "pnpm --filter @plug/v1 lint:fix"
     ]
   }
 }
