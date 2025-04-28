@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DesignSystem from './pages/DesignSystem';
 import ThreeDTest from './pages/ThreeDTest';
 import DialogExamples from './pages/DialogExamples';
+import KyTest from "./pages/KyTest.tsx";
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
               <li>
                 <Link to="/dialog-examples" className="hover:text-gray-300">다이얼로그 예제</Link>
               </li>
+              <li>
+                <Link to="/ky-test" className="hover:text-gray-300">ky test</Link>
+              </li>
             </ul>
           </div>
         </nav>
@@ -33,6 +37,7 @@ function App() {
             <Route path="/design-system" element={<DesignSystem />} />
             <Route path="/3d-test" element={<ThreeDTest />} />
             <Route path="/dialog-examples" element={<DialogExamples />} />
+            <Route path="/ky-test" element={<KyTest />} />
           </Routes>
         </div>
       </div>
