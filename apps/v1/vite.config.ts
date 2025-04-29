@@ -18,4 +18,5 @@ export default defineConfig({
       '@plug/v1': path.resolve(__dirname, './src')
     },
   },
+  assetsInclude: ['**/*.glb'],
 });
