@@ -3,19 +3,13 @@ import * as Px from '@plug/engine/src';
 
 const MapViewer = () => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const engineRef = useRef<Px.Engine3D | undefined>(undefined);
 
     useEffect(() => {
-        if (!containerRef.current || engineRef.current) return;
-
-        const engine = new Px.Engine3D(containerRef.current);
-        engineRef.current = engine;
-
-        Px.Loader.LoadGltf('/models/station.glb', () => {
-            console.log('모델 로드 완료');
-        });
-
-        console.log('WebGL 초기화 완료');
+        if (containerRef.current) {
+            new Px.Engine3D(containerRef.current);
+            Px.Loader.LoadGltf('/models/station.glb', ()=> console.log('sbm->glb 테스트'));
+        }
+        console.log('WebGL 초기화 호출.');
     }, []);
 
     return (
