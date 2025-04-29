@@ -233,7 +233,7 @@ const SliderThumb = React.memo(({
             case 'ArrowDown':
                 newValue = Math.max(currentValue - step, min);
                 break;
-            case 'Home':
+            case 'ViewerPage':
                 newValue = min;
                 break;
             case 'End':
