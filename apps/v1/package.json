@@ -11,14 +11,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@plug/ui": "workspace:*",
-    "@plug/engine": "workspace:*",
     "@plug/api-hooks": "workspace:*",
-    "zustand": "^5.0.3",
-    "tailwindcss": "^4.0.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.4.1"
+    "@plug/engine": "workspace:*",
+    "@plug/ui": "workspace:*",
+    "react-router-dom": "^7.4.1",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
