@@ -1,5 +1,5 @@
 import React from 'react';
-import mockEquipments from "@plug/v1/service/modules/model/mock/facility/mockEquipment";
+import mockEquipments from "@plug/v1/service/modules/model/mock/MockEquipment";
 
 const EquipmentPanel = () => {
     return (

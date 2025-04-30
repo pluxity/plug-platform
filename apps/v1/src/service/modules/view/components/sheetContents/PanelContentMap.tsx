@@ -1,4 +1,4 @@
-import {MenuType} from "@plug/v1/service/modules/model/types/menu";
+import {MenuType} from "@plug/v1/service/modules/model/types/Menu.type";
 import React from "react";
 
 export const PanelComponentMap: Record<MenuType, React.LazyExoticComponent<React.FC>> = {

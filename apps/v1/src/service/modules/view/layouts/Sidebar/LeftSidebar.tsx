@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {Button, Sheet} from "@plug/ui";
-import {MENU_LIST, MenuType} from "@plug/v1/service/modules/model/types/menu";
-import {PanelComponentMap} from "@plug/v1/service/modules/view/components/panel/PanelContentMap";
+import {MENU_LIST, MenuType} from "@plug/v1/service/modules/model/types/Menu.type";
+import {PanelComponentMap} from "@plug/v1/service/modules/view/components/sheetContents/PanelContentMap";
 import {SheetContent, SheetHeader} from "../../../../../../../../packages/ui/src/components/Sheet/Sheet";
 
 
@@ -40,7 +40,7 @@ const LeftSidebar = () => {
                     setSelectedMenu(null);
                 }}
                 position="left"
-                styleOverrides="top-[10%] h-[657px] w-[320px] left-24"
+                styleOverrides="top-[10%] h-[657px] max-w-xl left-24"
             >
                 <SheetHeader className="text-lg font-bold">
                     {MENU_LIST.find(menu => menu.id === selectedMenu)?.label ?? '메뉴'}
