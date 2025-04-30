@@ -7,7 +7,9 @@ const MapViewer = () => {
     useEffect(() => {
         if (containerRef.current) {
             new Px.Engine3D(containerRef.current);
-            Px.Loader.LoadGltf('/models/station.glb', ()=> console.log('sbm->glb 테스트'));
+            Px.Loader.LoadGltf('/models/station.glb', ()=> {
+
+            });
         }
         console.log('WebGL 초기화 호출.');
     }, []);

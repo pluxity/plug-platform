@@ -1,5 +1,5 @@
-import SearchBar from "@plug/v1/service/modules/view/components/layouts/Header/Searchbar";
-import UserProfile from "@plug/v1/service/modules/view/components/layouts/Header/UserProfile";
+import SearchBar from "@plug/v1/service/modules/view/layouts/Header/Searchbar";
+import UserProfile from "@plug/v1/service/modules/view/layouts/Header/UserProfile";
 
 const Header = () => {
     return (

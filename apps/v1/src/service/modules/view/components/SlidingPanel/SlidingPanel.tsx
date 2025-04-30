@@ -1,5 +1,5 @@
 import React from 'react';
-import {cn} from "../../../../../../../../packages/ui/src/utils/classname";
+import {cn} from "@plug/ui";
 
 interface SlidingPanelProps {
     isOpen: boolean;
@@ -18,11 +18,11 @@ const SlidingPanel = ({ isOpen, onClose, children }: SlidingPanelProps) => {
             )}
             <aside
                 className={cn(
-                    'fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out',
-                    isOpen ? 'translate-x-0' : '-translate-x-full'
+                    'fixed top-[10%] left-24 h-[657px] w-[320px] bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out',
+                    isOpen ? 'translate-x-0' : '-translate-x-[calc(100%+6rem)]'
                 )}
             >
-                <div className="p-4 border-b font-bold flex justify-between items-center">
+                <div className="p-4 font-bold flex justify-between items-center">
                     장비목록
                     <button onClick={onClose}>닫기</button>
                 </div>
