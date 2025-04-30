@@ -7,7 +7,9 @@ const MapViewer = () => {
     useEffect(() => {
         if (containerRef.current) {
             new Px.Engine3D(containerRef.current);
+            console.time("loading");
             Px.Loader.LoadGltf('/models/station.glb', ()=> {
+                console.timeEnd("loading");
 
             });
         }
