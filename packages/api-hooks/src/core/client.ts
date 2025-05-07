@@ -1,7 +1,7 @@
 import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
-const BASE_URL = 'http://192.168.4.37:8080';
+// const BASE_URL = 'http://192.168.4.37:8080';
 
 let getAccessToken: () => string | null = () => null;
 
@@ -10,19 +10,11 @@ export const setTokenGetter = (fn: () => string | null) => {
 };
 
 const baseKy = ky.create({
-  prefixUrl: BASE_URL,
+  credentials: 'include',
   headers: {
     'Content-Type': 'application/json'
   },
   hooks: {
-    beforeRequest: [
-      request => {
-        const token = getAccessToken();
-        if (token) {
-          request.headers.set('Authorization', `Bearer ${token}`);
-        }
-      }
-    ],
     afterResponse: [
       async (_request, _options, response) => {
         if (!response.ok) {
@@ -30,7 +22,6 @@ const baseKy = ky.create({
           try {
             errorData = await response.json();
           } catch (_) {}
-
           const message = errorData?.message || errorData?.error || `HTTP ${response.status}`;
           throw new Error(message);
         }
@@ -44,7 +35,6 @@ const buildKy = (
 ) => {
   const { requireAuth = true, ...restOptions } = options;
   const baseOptions: Options = {
-    prefixUrl: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
     ...restOptions
   };

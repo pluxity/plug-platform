@@ -19,4 +19,22 @@ export default defineConfig({
     },
   },
   assetsInclude: ['**/*.glb'],
+  server: {
+    host: '0.0.0.0',
+    port: 5175,
+    proxy: {
+      '/auth': {
+        target: 'http://192.168.4.37:8080',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+      },
+      '/files': {
+        target: 'http://192.168.4.37:8080',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+      }
+    }
+  }
 });
