@@ -4,7 +4,6 @@ import {MENU_LIST, MenuType} from "@plug/v1/service/modules/model/types/Menu.typ
 import {PanelComponentMap} from "@plug/v1/service/modules/view/components/sheetContents/PanelContentMap";
 import {SheetContent, SheetHeader} from "../../../../../../../../packages/ui/src/components/Sheet/Sheet";
 
-
 const LeftSidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState<MenuType | null>(null);

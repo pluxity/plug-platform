@@ -4,7 +4,7 @@ import ViewerPage from "@plug/v1/service/modules/view/pages/ViewerPage";
 
 export const ServiceRouter: RouteObject[] = [
     {
-        path: '/',
+        path: '/service',
         children: [
             { path: SERVICE_ROUTE.VIEWER, element: <ViewerPage/>}
         ],
