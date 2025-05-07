@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write",
-    "sample": "pnpm --filter @plug/sample",
-    "tancheon": "pnpm --filter @plug/tancheon",
-    "storybook": "pnpm --filter @plug/ui storybook"
+    "sample": "pnpm --filter @plug/sample"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +13,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
     "clsx": "^2.1.1",
+    "ky": "^1.8.1",
     "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -28,5 +27,10 @@
     "tailwindcss": "^4.0.6",
     "typescript": "^5.7.3",
     "vite-plugin-svgr": "^4.3.0"
-  }
+  },
+  "packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
