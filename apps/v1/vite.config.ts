@@ -18,4 +18,29 @@ export default defineConfig({
       '@plug/v1': path.resolve(__dirname, './src')
     },
   },
+  assetsInclude: ['**/*.glb'],
+  server: {
+    host: '0.0.0.0',
+    port: 8080,
+    proxy: {
+      '/auth': {
+        target: 'http://192.168.4.37:8080',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+      },
+      '/files': {
+        target: 'http://192.168.4.37:8080',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+      },
+      '/users' : {
+        target: 'http://192.168.4.37:8080',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+      }
+    }
+  }
 });
