@@ -1,4 +1,4 @@
-import { signIn } from '@plug/common-services';
+import { signIn, signOut } from '@plug/common-services';
 import { api, DataResponseBody } from '@plug/api-hooks';
 import { AuthUserProfile } from "@plug/v1/auth/model/types";
 import { useProfileStore } from "@plug/v1/auth/controller/useProfileStore";
@@ -19,6 +19,8 @@ export const logIn = async (data: { username: string; password: string }): Promi
     return user;
 };
 
-export const signOut = async (): Promise<Response> => {
-    return api.post('auth/sign-out', {}, { requireAuth: true });
+export const logOut = async (): Promise<Response> => {
+    const response = await signOut();
+    useProfileStore.getState().clearUser();
+    return response;
 };
