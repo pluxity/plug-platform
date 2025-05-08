@@ -7,6 +7,7 @@ export interface BaseResponseBody {
 }
 
 export interface DataResponseBody<T> extends BaseResponseBody {
+  headers: any;
   data: T;
 }
 

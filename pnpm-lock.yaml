@@ -66,6 +66,9 @@ importers:
       '@plug/api-hooks':
         specifier: workspace:*
         version: link:../../packages/api-hooks
+      '@plug/common-services':
+        specifier: workspace:*
+        version: link:../../packages/common-services
       '@plug/engine':
         specifier: workspace:*
         version: link:../../packages/engine

@@ -1,19 +1,17 @@
-import { api } from '@plug/api-hooks/core';
-import { buildKy } from '@plug/api-hooks';
+import { signIn, UserProfile } from '@plug/common-services';
+import {api, DataResponseBody} from '@plug/api-hooks';
 
-export const authApi = {
-    login: async (data: { username: string; password: string }) => {
-        const response = await buildKy({ requireAuth: false }).post('auth/sign-in', {
-            json: data
-        });
+export const logIn = async (data: { username: string; password: string }): Promise<DataResponseBody<UserProfile>> => {
+    const response = await signIn(data);
 
-        const location = response.headers.get('Location');
-        if (!location) {
-            throw new Error('Location header not found');
-        }
-
-        const path = new URL(location).pathname;
-        const userInfo = await api.get(path);
-        return userInfo;
+    const location = response.headers?.get?.('Location');
+    if (!location) {
+        throw new Error('Location header not found');
     }
+
+    const user = await api.get<UserProfile>(location, {
+        requireAuth: true,
+    });
+
+    return user;
 };
