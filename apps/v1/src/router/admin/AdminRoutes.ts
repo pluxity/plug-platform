@@ -1,4 +1,8 @@
 export enum ADMIN_ROUTE {
-    DASHBOARD = 'dashboard',
-    USERS = 'users',
+    DASHBOARD = '/admin/dashboard/dashboard',
+    USERLIST = '/admin/user/userList',
+    POILIST = '/admin/poi/poiList',
+    POI = '/admin/viewer/poi',
+    TEXT3D = '/admin/viewer/text3d',
+    TOPOLOGY = '/admin/viewer/topology'
 }

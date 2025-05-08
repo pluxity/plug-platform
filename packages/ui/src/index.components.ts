@@ -22,3 +22,5 @@ export { Dropdown } from './components/Dropdown';
 export { Select } from './components/Select';
 export { ComboBox } from './components/ComboBox';
 export { Sidebar } from './components/Sidebar';
+export { Form, FormItem } from './components/Form';
+export { Pagination } from './components/Pagination';
