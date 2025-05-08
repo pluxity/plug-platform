@@ -43,20 +43,19 @@ export const api = {
     return buildKy(options).get(endpoint).json();
   },
 
-  post: async <T>(endpoint: string, data: unknown, options: RequestOptions = {}): Promise<T> => {
-    return buildKy(options).post(endpoint, { json: data }).json();
+  post: (endpoint: string, data: unknown, options: RequestOptions = {}): Promise<Response> => {
+    return buildKy(options).post(endpoint, { json: data });
   },
 
-  put: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<ResponseTypes<T>['PUT']> => {
-    return buildKy(options).put(endpoint, { json: data }).json();
+  put: (endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<Response> => {
+    return buildKy(options).put(endpoint, { json: data });
   },
 
-  patch: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<ResponseTypes<T>['PATCH']> => {
-    return buildKy(options).patch(endpoint, { json: data }).json();
+  patch: (endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<Response> => {
+    return buildKy(options).patch(endpoint, { json: data });
   },
 
-  delete: async <T>(endpoint: string, options: RequestOptions = {}): Promise<ResponseTypes<T>['DELETE']> => {
-    const res = await buildKy(options).delete(endpoint);
-    return res.status === 204 ? undefined as ResponseTypes<T>['DELETE'] : res.json();
+  delete: (endpoint: string, options: RequestOptions = {}): Promise<Response> => {
+    return buildKy(options).delete(endpoint);
   }
 };

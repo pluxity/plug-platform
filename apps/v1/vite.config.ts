@@ -21,7 +21,7 @@ export default defineConfig({
   assetsInclude: ['**/*.glb'],
   server: {
     host: '0.0.0.0',
-    port: 5177,
+    port: 8080,
     proxy: {
       '/auth': {
         target: 'http://192.168.4.37:8080',

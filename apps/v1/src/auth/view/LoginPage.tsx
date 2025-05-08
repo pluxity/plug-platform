@@ -1,5 +1,5 @@
 import { Form, FormItem, Input, Button, required } from '@plug/ui';
-import { authApi } from '../api/auth';
+import { logIn } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -16,7 +16,7 @@ const LoginPage = () => {
     const handleLogin = async (values: LoginFormData) => {
         setError('');
         try {
-            await authApi.login(values);
+            await logIn(values);
             navigate('/service');
         } catch (err: Error | unknown) {
             const error = err instanceof Error ? err.message : '로그인에 실패했습니다.';
