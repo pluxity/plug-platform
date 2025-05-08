@@ -1,14 +1,6 @@
 import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
-// const BASE_URL = 'http://192.168.4.37:8080';
-
-let getAccessToken: () => string | null = () => null;
-
-export const setTokenGetter = (fn: () => string | null) => {
-  getAccessToken = fn;
-};
-
 const baseKy = ky.create({
   credentials: 'include',
   headers: {
@@ -30,7 +22,7 @@ const baseKy = ky.create({
   }
 });
 
-const buildKy = (
+export const buildKy = (
     options: RequestOptions & Options = {}
 ) => {
   const { requireAuth = true, ...restOptions } = options;

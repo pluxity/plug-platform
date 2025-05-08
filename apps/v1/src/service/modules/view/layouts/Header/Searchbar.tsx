@@ -2,7 +2,7 @@ import { api } from '@plug/api-hooks'
 
 const getFiles = async () => {
     try {
-        const response = await api.get<any[]>('files/7');
+        const response = await api.get<unknown>('files/7');
         return response;
     } catch (error) {
         console.error('Failed to fetch files:', error);

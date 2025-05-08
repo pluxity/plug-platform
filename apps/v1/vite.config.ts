@@ -34,6 +34,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         cookieDomainRewrite: 'localhost',
+      },
+      '/users' : {
+        target: 'http://192.168.4.37:8080',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
       }
     }
   }

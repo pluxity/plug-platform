@@ -6,6 +6,7 @@ import { useState } from 'react';
 interface LoginFormData {
     username: string;
     password: string;
+    [key: string]: string;
 }
 
 const LoginPage = () => {
@@ -17,8 +18,9 @@ const LoginPage = () => {
         try {
             await authApi.login(values);
             navigate('/service');
-        } catch (err: any) {
-            setError(err.message || '로그인에 실패했습니다.');
+        } catch (err: Error | unknown) {
+            const error = err instanceof Error ? err.message : '로그인에 실패했습니다.';
+            setError(error);
         }
     };
 
