@@ -1,10 +1,7 @@
 import { api } from '@plug/api-hooks';
 import type { DataResponseBody } from '@plug/api-hooks';
-import type {
-  SignUpRequest,
-  SignInRequest,
-  UserProfile
-} from '../types';
+import {SignInRequest, SignUpRequest, UserProfile} from "@plug/common-services/types";
+
 
 export const signUp = async (data: SignUpRequest) => {
   const response = await api.post('auth/sign-up', data, { requireAuth: false });

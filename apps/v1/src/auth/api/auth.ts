@@ -1,6 +1,6 @@
 import { signIn, signOut } from '@plug/common-services';
 import { api, DataResponseBody } from '@plug/api-hooks';
-import { AuthUserProfile } from "@plug/v1/auth/model/types";
+import { AuthUserProfile } from "@plug/v1/auth/model/profile";
 import { useProfileStore } from "@plug/v1/auth/controller/useProfileStore";
 
 export const logIn = async (data: { username: string; password: string }): Promise<DataResponseBody<AuthUserProfile>> => {
@@ -14,7 +14,8 @@ export const logIn = async (data: { username: string; password: string }): Promi
     const user = await api.get<AuthUserProfile>(location, {
         requireAuth: true,
     });
-    useProfileStore.getState().setUser(user.data);
+    const expirySeconds = parseInt(document.cookie.split('; ').find(row => row.startsWith('expiry='))?.split('=')[1] || '0', 10);
+    useProfileStore.getState().setUser(user.data, expirySeconds);
 
     return user;
 };

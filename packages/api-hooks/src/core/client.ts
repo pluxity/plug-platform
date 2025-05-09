@@ -1,5 +1,6 @@
 import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
+import { useProfileStore } from "@plug/v1/auth/controller/useProfileStore";
 
 const baseKy = ky.create({
   credentials: 'include',
@@ -32,6 +33,10 @@ export const buildKy = (
   };
 
   if (!requireAuth) {
+    const { expiresAt } = useProfileStore.getState();
+    if (expiresAt && Date.now() > expiresAt) {
+      throw new Error('세션이 만료되었습니다. 다시 로그인 해주세요.');
+    }
     return baseKy.extend({ ...baseOptions, hooks: { beforeRequest: [] } });
   }
 
