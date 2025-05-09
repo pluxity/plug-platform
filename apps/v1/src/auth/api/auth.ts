@@ -1,7 +1,8 @@
 import { signIn, signOut } from '@plug/common-services';
 import { api, DataResponseBody } from '@plug/api-hooks';
-import { AuthUserProfile } from "@plug/v1/auth/model/profile";
-import { useProfileStore } from "@plug/v1/auth/controller/useProfileStore";
+import {AuthUserProfile} from "@plug/v1/auth/model/profile";
+import {useProfileStore} from "@plug/v1/auth/controller/useProfileStore";
+
 
 export const logIn = async (data: { username: string; password: string }): Promise<DataResponseBody<AuthUserProfile>> => {
     const response = await signIn(data);
@@ -14,8 +15,12 @@ export const logIn = async (data: { username: string; password: string }): Promi
     const user = await api.get<AuthUserProfile>(location, {
         requireAuth: true,
     });
-    const expirySeconds = parseInt(document.cookie.split('; ').find(row => row.startsWith('expiry='))?.split('=')[1] || '0', 10);
-    useProfileStore.getState().setUser(user.data, expirySeconds);
+
+    const expiresAt = parseInt(
+        document.cookie.split('; ').find(row => row.startsWith('expiry='))?.split('=')[1] || '0',
+        10
+    );
+    useProfileStore.getState().setUser(user.data, expiresAt);
 
     return user;
 };
@@ -24,4 +29,14 @@ export const logOut = async (): Promise<Response> => {
     const response = await signOut();
     useProfileStore.getState().clearUser();
     return response;
+};
+
+export const refreshToken = async () => {
+    try {
+        await api.post('auth/refresh-token', {}, { requireAuth: true });
+        console.log('refreshToken');
+    } catch {
+        await logOut();
+        throw new Error('리프레시 토큰이 만료되어 로그아웃되었습니다.');
+    }
 };

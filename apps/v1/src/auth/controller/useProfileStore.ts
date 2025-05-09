@@ -4,7 +4,7 @@ import {AuthUserProfile} from "@plug/v1/auth/model/profile";
 
 interface AuthStore {
     user: AuthUserProfile | null;
-    setUser: (user: AuthUserProfile, expirySeconds: number) => void;
+    setUser: (user: AuthUserProfile, expiresAt: number) => void;
     expiresAt: number | null;
     clearUser: () => void;
 }
@@ -14,15 +14,14 @@ export const useProfileStore = create<AuthStore>()(
         (set) => ({
             user: null,
             expiresAt: null,
-            setUser: (user, expirySeconds) => {
-                const now = Date.now();
-                const expiresAt = now + expirySeconds * 1000;
+            setUser: (user, expiresAt) => {
                 set({ user, expiresAt });
             },
-            clearUser: () => set({ user: null, expiresAt: null })
+            clearUser: () => set(
+                { user: null, expiresAt: null })
         }),
         {
-            name: 'user-profile'
+            name: 'user-profile',
         }
     )
 );
