@@ -1,7 +1,7 @@
 import { Button, Sidebar, Tab } from '@plug/ui';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { ViewerTabContent } from './components/ViewerTabContent';
-import { LodSetDialog } from '../../components/modals/LodSet';
+import { LodSetModal } from './modals/LodSet';
 import { useState } from 'react';
 
 const Viewer = () => {
@@ -15,7 +15,10 @@ const Viewer = () => {
     };
 
     {/* Lod 설정 모달 show/hide */}
+    const [isLodSetOpen, setIsLodSetOpen] = useState(false);
 
+    const handleOpenLodSet = () => {setIsLodSetOpen(true);};
+    const handleCloseLodSet = () => {setIsLodSetOpen(false);};
 
     return (
         <>
@@ -44,7 +47,7 @@ const Viewer = () => {
                         <Sidebar.Footer className="rounded-sm bg-gray-100 flex gap-2">
                             <Button color='primary'> POI 등록 </Button>
                             <Button color='secondary'> POI 일괄등록 </Button>
-                            <Button className='bg-gray-400 text-white'> LOD 설정 </Button>
+                            <Button className='bg-gray-400 text-white' onClick={(handleOpenLodSet)}> LOD 설정 </Button>
                         </Sidebar.Footer>
                     </Sidebar>
                     <div className='flex-1 flex flex-col'>
@@ -57,7 +60,10 @@ const Viewer = () => {
                     </div>
                 </div>
             </div>
-            <LodSetDialog />
+            <LodSetModal 
+                isOpen={isLodSetOpen}
+                onClose={handleCloseLodSet}
+            />
         </>
     );
 };

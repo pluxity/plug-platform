@@ -1,5 +1,5 @@
 import { Select, Input, Button } from '@plug/ui';
-import { PoiBatRegistDialog } from '../../components/modals/PoiBatRegist';
+import { PoiBatRegistModal } from '../../components/modals/PoiBatRegist';
 import { useState } from 'react';
 
 export default function PoiList() {
@@ -41,7 +41,7 @@ export default function PoiList() {
             </div>
             
             {/* 일괄 등록 모달 */}
-            <PoiBatRegistDialog 
+            <PoiBatRegistModal
                 isOpen={isPoiBatRegistOpen}
                 onClose={handleClosePoiBatRegist}
             />

@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect, useRef } from "react";
 import { cn } from "../../utils/classname";
 import { SelectCloseIcon } from "../../index.icons"; 
 import type { 
@@ -68,6 +68,20 @@ const Select = ({
         }
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+          if (isSelectOpen && !selectRef.current?.contains(event.target as Node)) {
+            setIsSelectOpen(false);
+          }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, [isSelectOpen]);
+      
+      const selectRef = useRef<HTMLDivElement>(null);
+
     return(
         <SelectContext value={{
             isSelected: isSelectOpen,
@@ -81,6 +95,7 @@ const Select = ({
             type
         }}>
             <div
+                ref={selectRef}
                 role="combobox"
                 aria-expanded={isSelectOpen}
                 aria-haspopup="listbox"
@@ -191,7 +206,7 @@ const SelectTrigger = ({
                         SelectInputVariant,
                         inputClassName
                     )}
-                    placeholder="선택하세요."
+                    placeholder={placeholder}
                     value={selectedValue}
                     readOnly
                 />

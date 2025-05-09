@@ -1,28 +1,26 @@
-import { Dialog, Form, Button, Select, Input, FormItem } from '@plug/ui';
-import { CreateFormValues } from '../types/UserDialog.types';
+import { Modal, Form, Button, Select, Input, FormItem } from '@plug/ui';
+import { CreateFormValues } from '../types/UserModal.types';
 
-export interface CreateUserDialogProps {
+export interface CreateUserModalProps {
     isOpen: boolean;
     onClose: () => void;
     mode: 'create' | 'edit';
 }
 
-export const CreateUserDialog = ({ isOpen, onClose, mode }: CreateUserDialogProps) =>{
+export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps) =>{
     const handleFinish = (values: CreateFormValues) => {
         alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
     };
 
     return(
-        <Dialog
-          isOpen={isOpen}
-          onClose={onClose}
-          closeOnOverlayClick={false}
-          overlayClassName="bg-black/50"
+        <Modal
+            title={mode === 'create' ? '사용자 등록' : '사용자 수정'}
+            isOpen={isOpen}
+            onClose={onClose}
+            closeOnOverlayClick={false}
+            overlayClassName="bg-black/50"
+            contentClassName="w-100"
         >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-100">
-            <h2 className="text-lg font-semibold mb-4">
-                {mode === 'create' ? '사용자 등록' : '사용자 수정'}
-            </h2>
             <Form<CreateFormValues> onSubmit={handleFinish}>
                 <FormItem name="role" label='권한'>
                     <Select className="w-full">
@@ -49,7 +47,6 @@ export const CreateUserDialog = ({ isOpen, onClose, mode }: CreateUserDialogProp
                     </Button>
                 </div>
             </Form>
-          </div>
-        </Dialog>
+        </Modal>
     )
 } 

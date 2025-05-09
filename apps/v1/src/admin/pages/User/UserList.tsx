@@ -1,13 +1,13 @@
 import { Select, Input, Button, DataTable } from '@plug/ui';
 import { columns, userData } from './mocks/UserList.mock';
-import { CreateUserDialog } from './components/CreateUserDialog';
+import { CreateUserModal } from './components/CreateUserModal';
 import { useState } from 'react';
 
 export default function UserList() {
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const handleOpenCreateDialog = () => {setIsCreateDialogOpen(true);};
-    const handleCloseCreateDialog = () => {setIsCreateDialogOpen(false);};
+    const handleOpenCreateModal = () => {setIsCreateModalOpen(true);};
+    const handleCloseCreateModal = () => {setIsCreateModalOpen(false);};
 
     return (
         <>
@@ -33,7 +33,7 @@ export default function UserList() {
                     <Button color='primary' className='ml-1'>검색</Button>
                 </div>
                 <div className='ml-auto flex gap-1'>
-                    <Button color='primary' onClick={(handleOpenCreateDialog)}>등록</Button>
+                    <Button color='primary' onClick={(handleOpenCreateModal)}>등록</Button>
                     <Button color='destructive'>삭제</Button>
                 </div>
             </div>
@@ -52,9 +52,9 @@ export default function UserList() {
                     }}
                 />
             </div>
-            <CreateUserDialog 
-                isOpen={isCreateDialogOpen}
-                onClose={handleCloseCreateDialog}
+            <CreateUserModal 
+                isOpen={isCreateModalOpen}
+                onClose={handleCloseCreateModal}
                 mode={'create'}
             />
         </>

@@ -7,7 +7,7 @@ type ContentType = 'poi' | 'text3d' | 'topology';
 
 export const ViewerTabContent = ({ title }: ViewerTabContent) => {
     const renderSearchForm = () => (
-        <div className="flex flex-col gap-2 my-2">
+        <form className="flex flex-col gap-2 my-2">
             <div className="flex items-center gap-2">
                 <Select>
                     <Select.Trigger placeholder="대분류" />
@@ -25,14 +25,14 @@ export const ViewerTabContent = ({ title }: ViewerTabContent) => {
             <Select>
                 <Select.Trigger placeholder="POI명 보기" />
                 <Select.Content>
-                    <Select.Item value="POI명">POI명 보기</Select.Item>
+                    <Select.Item value="POI명">POI명</Select.Item>
                 </Select.Content>
             </Select>
             <div className="flex items-center gap-2">
                 <Input.Text placeholder='POI명을 입력하세요.' className='w-76'/>
                 <Button color='primary'>검색</Button>
             </div>
-        </div>
+        </form>
     );
 
     const renderDataTable = (tabValue: 'alignment' | 'unassigned') => {
