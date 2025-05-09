@@ -21,13 +21,11 @@ export default defineConfig({
   assetsInclude: ['**/*.glb'],
   server: {
     host: '0.0.0.0',
+    allowedHosts: ['app.plug-platform.com'],
     port: 8080,
     proxy: {
       '/auth': {
-        target: 'http://192.168.4.37:8080',
-        changeOrigin: true,
-        secure: false,
-        cookieDomainRewrite: 'localhost',
+        target: 'http://api.plug-platform.com:8080',
       },
       '/files': {
         target: 'http://192.168.4.37:8080',
