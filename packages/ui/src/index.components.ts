@@ -23,4 +23,5 @@ export { Select } from './components/Select';
 export { ComboBox } from './components/ComboBox';
 export { Sidebar } from './components/Sidebar';
 export { Pagination } from './components/Pagination';
+export { Sheet } from './components/Sheet';
 export { Form, FormItem, email, createValidator, composeValidators, maxLength, minLength, required } from './components/Form';
