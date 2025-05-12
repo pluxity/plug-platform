@@ -18,7 +18,7 @@ export const logIn = async (data: { username: string; password: string }): Promi
 
     useProfileStore.getState().setUser(user.data);
 
-    // TODO: 리프레시 토큰 만료 시간 확정 시 주석 제거 예정
+    // TODO: 리프레시 토큰 만료 시간 확정 시 주석 제거 하기
     // const expiresAt = parseInt(
     //     document.cookie.split('; ').find(row => row.startsWith('expiry='))?.split('=')[1] || '0',
     //     10
