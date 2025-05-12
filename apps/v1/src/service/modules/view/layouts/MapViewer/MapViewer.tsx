@@ -15,7 +15,6 @@ const MapViewer = () => {
             });
 
             // Px.Model.GetModelHierarchy("/models/station.glb", (data: any) => { console.log(data) });
-
         }
         console.log('WebGL 초기화 호출.');
     }, []);
