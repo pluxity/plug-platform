@@ -1,3 +1,3 @@
-export enum SERVICE_ROUTE_PATH {
-    HOME = '',
+export enum SERVICE_ROUTE {
+    VIEWER = '',
 }
