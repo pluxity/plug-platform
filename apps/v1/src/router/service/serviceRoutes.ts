@@ -1,4 +1,3 @@
-export enum ServiceRoute {
-    Home = '',
-    About = 'about',
+export enum SERVICE_ROUTE_PATH {
+    HOME = '',
 }
