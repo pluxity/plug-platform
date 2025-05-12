@@ -46,7 +46,7 @@ export function useSWRApi<T>(
     }
 
     if (method === 'DELETE') {
-      await api.delete<void>(url, options)
+      await api.delete(url, options)
       return null as T
     }
 

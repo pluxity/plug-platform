@@ -5,8 +5,8 @@ export interface FloorItem{
     label: string;
 }
 
-export const FLOOR_LIST: FloorTypep[] =[
-    {id: 'B2층 대합실', label: 'B2F 대합실'},
+export const FLOOR_LIST: FloorItem[] =[
+    {id: "B2층 대합실", label: 'B2'},
     {id: 'B1층 대합실', label: 'B1F 대합실'},
     {id: '1층 승강장', label: '1F 승강장'}
 ]

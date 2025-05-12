@@ -20,7 +20,12 @@ export const logIn = async (data: { username: string; password: string }): Promi
         document.cookie.split('; ').find(row => row.startsWith('expiry='))?.split('=')[1] || '0',
         10
     );
-    useProfileStore.getState().setUser(user.data, expiresAt);
+
+    setTimeout(() => {
+        useProfileStore.getState().clearUser();
+    }, expiresAt - 60 * 1000);
+
+    useProfileStore.getState().setUser(user.data);
 
     return user;
 };
@@ -34,7 +39,6 @@ export const logOut = async (): Promise<Response> => {
 export const refreshToken = async () => {
     try {
         await api.post('auth/refresh-token', {}, { requireAuth: true });
-        console.log('refreshToken');
     } catch {
         await logOut();
         throw new Error('리프레시 토큰이 만료되어 로그아웃되었습니다.');
