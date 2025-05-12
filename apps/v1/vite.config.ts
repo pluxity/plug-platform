@@ -1,9 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    svgr({
+      include: "**/*.svg",
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -20,16 +28,10 @@ export default defineConfig({
         target: 'http://api.plug-platform.com:8080',
       },
       '/files': {
-        target: 'http://192.168.4.37:8080',
-        changeOrigin: true,
-        secure: false,
-        cookieDomainRewrite: 'localhost',
+        target: 'http://api.plug-platform.com:8080',
       },
       '/users' : {
-        target: 'http://192.168.4.37:8080',
-        changeOrigin: true,
-        secure: false,
-        cookieDomainRewrite: 'localhost',
+        target: 'http://api.plug-platform.com:8080',
       }
     }
   }

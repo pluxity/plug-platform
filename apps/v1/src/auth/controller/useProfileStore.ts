@@ -12,14 +12,11 @@ export const useProfileStore = create<AuthStore>()(
     persist(
         (set) => ({
             user: null,
-            setUser: (user) => {
-                set({ user });
-            },
-            clearUser: () => set(
-                { user: null }),
+            setUser: (user) => set({ user }),
+            clearUser: () => set({ user: null })
         }),
         {
-            name: 'user-profile',
+            name: 'user-profile'
         }
     )
 );

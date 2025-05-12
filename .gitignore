@@ -53,3 +53,5 @@ docker-compose.override.yml
 *.d.ts
 !vite-env.d.ts
 !vite.config.d.ts
+
+apps/v1/vite.config.ts
