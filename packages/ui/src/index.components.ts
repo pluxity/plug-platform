@@ -11,7 +11,6 @@ export { Chart } from './components/Chart';
 export { Badge } from './components/Badge';
 export { Checkbox } from './components/Checkbox';
 export { RadioGroup } from './components/Radio';
-export { Sheet } from './components/Sheet';
 export { Skeleton } from './components/Skeleton';
 export { Slider } from './components/Slider';
 export { Switch } from './components/Switch';

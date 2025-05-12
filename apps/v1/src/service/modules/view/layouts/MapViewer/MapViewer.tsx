@@ -8,10 +8,14 @@ const MapViewer = () => {
         if (containerRef.current) {
             new Px.Engine3D(containerRef.current);
             console.time("loading");
-            Px.Loader.LoadGltf('/models/station.glb', ()=> {
+            Px.Loader.LoadGltf('/models/konkuk.glb', ()=> {
                 console.timeEnd("loading");
 
+
             });
+
+            // Px.Model.GetModelHierarchy("/models/station.glb", (data: any) => { console.log(data) });
+
         }
         console.log('WebGL 초기화 호출.');
     }, []);
