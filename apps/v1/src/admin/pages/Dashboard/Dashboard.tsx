@@ -1,8 +1,9 @@
 import { Button, Sidebar } from '@plug/ui';
 import { Outlet } from 'react-router-dom';
-import { DASHBOARD_TITLES } from './mocks/DashboardTitle.mock';
+import { DashboardTitle } from './hooks/useDashboardTitle'; 
 
 const Dashboard = () => {
+    const title = DashboardTitle();
 
     return (
         <div className='h-screen flex flex-col overflow-hidden'>
@@ -38,8 +39,8 @@ const Dashboard = () => {
                                         link: '/admin/poi/poilist',
                                     },
                                     {
-                                        title: 'POI 분류',
-                                        link: '/admin/poicategory',
+                                        title: 'POI 아이콘 정보',
+                                        link: '/admin/poi/poiicon',
                                     },
                                 ],
                             },
@@ -53,11 +54,7 @@ const Dashboard = () => {
                 </Sidebar>
                 <div className='flex-1 flex flex-col'>
                     <main className='flex-1 overflow-auto p-6'>
-                        {DASHBOARD_TITLES.map((item) => 
-                            item.path &&(
-                                <h2 key={item.path} className='font-bold text-2xl mb-4'>{item.title}</h2>
-                            )
-                        )}
+                        <h2 className='font-bold text-2xl mb-4'>{title}</h2>
                         <Outlet />
                     </main>
                     <footer className='py-2 px-1 border-t border-gray-200 text-xs text-center'>

@@ -10,7 +10,7 @@ export const columns: Column<User>[] = [
     { key: 'management', label: '관리' },
 ];
 
-export const userData: User[] = [
+export const createUserData = (openModal: (mode: 'create' | 'edit') => void): User[] => [
     { 
         select: <Checkbox />, 
         id: 'ADMIN', 
@@ -18,7 +18,7 @@ export const userData: User[] = [
         code: 'ADMIN', 
         management: 
         <div className='flex flex-wrap gap-1'>
-            <Button color='primary'>수정</Button>
+            <Button color='primary' onClick={() => openModal('edit')}>수정</Button>
             <Button color='destructive'>삭제</Button>
         </div>, 
     },
@@ -29,7 +29,7 @@ export const userData: User[] = [
         code: 'USER', 
         management: 
         <div className='flex flex-wrap gap-1'>
-            <Button color='primary'>수정</Button>
+            <Button color='primary' onClick={() => openModal('edit')}>수정</Button>
             <Button color='destructive'>삭제</Button>
         </div>, 
     },
@@ -40,7 +40,7 @@ export const userData: User[] = [
         code: 'USER', 
         management: 
         <div className='flex flex-wrap gap-1'>
-            <Button color='primary'>수정</Button>
+            <Button color='primary' onClick={() => openModal('edit')}>수정</Button>
             <Button color='destructive'>삭제</Button>
         </div>, 
     },

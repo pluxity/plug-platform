@@ -1,4 +1,5 @@
 import { DASHBOARD_TITLES } from '../mocks/DashboardTitle.mock';
+import { useLocation } from "react-router-dom";
 
 export interface DashboardTitle{
     path: string;
@@ -6,7 +7,8 @@ export interface DashboardTitle{
 }
 
 export const DashboardTitle = () => {
+    const location = useLocation();
     return DASHBOARD_TITLES.find(
-        (title) => title.path
+        (item) => item.path.toLowerCase() === location.pathname.toLowerCase()
     )?.title;
 };

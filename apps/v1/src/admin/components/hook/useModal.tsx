@@ -1,16 +1,16 @@
 import { useState } from 'react';
 
-export interface DialogProps {
+export interface ModalProps {
     mode: 'create' | 'edit';
     isOpen: boolean;
     onClose: () => void;
 }
 
-export const useDialog = () => {
+export const useModal = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [mode, setMode] = useState<'create' | 'edit'>('create');
 
-    const openDialog = (mode: 'create' | 'edit') => {
+    const openModal = (mode: 'create' | 'edit') => {
         setMode(mode);
         setIsOpen(true);
     };
@@ -18,7 +18,7 @@ export const useDialog = () => {
     return {
         isOpen,
         mode,
-        openDialog,
-        closeDialog: () => setIsOpen(false)
+        openModal,
+        closeModal: () => setIsOpen(false)
     };
 };
