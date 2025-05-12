@@ -23,5 +23,6 @@ export { Dropdown } from './components/Dropdown';
 export { Select } from './components/Select';
 export { ComboBox } from './components/ComboBox';
 export { Sidebar } from './components/Sidebar';
+export { Pagination } from './components/Pagination';
 export { Toast } from './components/Toast';
 export { Form, FormItem, email, createValidator, composeValidators, maxLength, minLength, required } from './components/Form';

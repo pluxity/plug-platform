@@ -20,8 +20,9 @@ export default defineConfig({
   },
   assetsInclude: ['**/*.glb'],
   server: {
-    host: 'app.plug-platform.com',
-    port: 5173,
+    host: '0.0.0.0',
+    allowedHosts: ['app.plug-platform.com'],
+    port: 8080,
     proxy: {
       '/auth': {
         target: 'http://api.plug-platform.com:8080',
