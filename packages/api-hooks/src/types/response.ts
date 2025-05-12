@@ -1,4 +1,4 @@
-import { HttpStatus } from '../constants';
+import { HttpStatus } from '../constants/http';
 
 export interface BaseResponseBody {
   timestamp: string;
@@ -7,7 +7,6 @@ export interface BaseResponseBody {
 }
 
 export interface DataResponseBody<T> extends BaseResponseBody {
-  headers: any;
   data: T;
 }
 

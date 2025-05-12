@@ -11,15 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@plug/api-hooks": "workspace:*",
-    "@plug/common-services": "workspace:*",
-    "@plug/engine": "workspace:*",
     "@plug/ui": "workspace:*",
-    "@react-three/drei": "^10.0.7",
-    "@react-three/fiber": "^9.1.2",
-    "react-router-dom": "^7.4.1",
-    "three": "^0.173.0",
-    "zustand": "^5.0.3"
+    "@plug/engine": "workspace:*",
+    "@plug/api-hooks": "workspace:*",
+    "zustand": "^5.0.3",
+    "tailwindcss": "^4.0.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

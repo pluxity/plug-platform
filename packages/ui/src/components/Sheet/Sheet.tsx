@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Button } from '../Button/Button';
 import CloseIcon from '../../assets/icons/close.svg';
 import { useEffect, useState } from 'react';
-import type {
+import type { 
     SheetPortalProps,
     SheetProps,
     SheetHeaderProps,
@@ -32,14 +32,13 @@ const Sheet = ({
     className,
     children,
     ref,
-                   styleOverrides,
     ...props
-}: SheetProps & { styleOverrides?: string}) => {
+}: SheetProps) => {
 
     const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
-    closable = !(overlay && closeOnOverlayClick);
+    closable = overlay && closeOnOverlayClick ? false : true;
 
     useEffect(() => {
         if (isOpen) {
@@ -53,11 +52,11 @@ const Sheet = ({
             setIsVisible(false);
             const timer = setTimeout(() => {
                 setIsMounted(false);
-            }, 300);
+            }, 300); 
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
-
+    
     const handleOverlayClick = (e: React.MouseEvent) => {
         e.preventDefault();
         if (closeOnOverlayClick && e.target === e.currentTarget) {
@@ -66,7 +65,7 @@ const Sheet = ({
     };
 
     if (!isMounted) return null;
-
+    
     const sheetStyle = cn(
         "fixed z-50 w-full bg-white p-4 shadow-lg has-[button]:pr-8",
         position === "right" && "right-0 inset-y-0 max-w-xs",
@@ -85,16 +84,16 @@ const Sheet = ({
 
     return(
         <SheetPortal>
-            {overlay &&
+            {overlay && 
                 <div className="fixed inset-0 z-50 bg-black/50"
                     onClick={handleOverlayClick}
                 />
             }
-            <div
-                className={cn(sheetStyle, sheetAnimate, styleOverrides)}
+            <div 
+                className={cn(sheetStyle ,sheetAnimate)} 
                 role="dialog"
                 ref={ref}
-                {...props}
+                {...props} 
                 >
                 {closable && (
                     <Button
@@ -123,7 +122,7 @@ const SheetHeader = ({
     ref,
 }: SheetHeaderProps) => {
     return(
-        <div
+        <div 
             className={cn(className)}
             ref={ref}
         >
@@ -140,7 +139,7 @@ const SheetContent = ({
     ref,
 }: SheetContentProps) => {
     return(
-        <div
+        <div 
             className={cn(className)}
             ref={ref}
         >
@@ -157,7 +156,7 @@ const SheetFooter = ({
     ref,
 }: SheetFooterProps) => {
     return(
-        <div
+        <div 
             className={cn(className)}
             ref={ref}
         >

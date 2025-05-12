@@ -26,7 +26,7 @@ export const Default: Story = {
         return (
             <BreadCrumb {...args} >
                 <BreadCrumb.Item >
-                    <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                    <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                 </BreadCrumb.Item>
                 <BreadCrumb.Item>
                     <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -51,7 +51,7 @@ export const Size: Story = {
                 <div className="mt-4">small : </div>
                 <BreadCrumb {...args} size='small'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -63,7 +63,7 @@ export const Size: Story = {
                 <div className="mt-4">medium : </div>
                 <BreadCrumb {...args} size='medium'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -75,7 +75,7 @@ export const Size: Story = {
                 <div className="mt-4">large : </div>
                 <BreadCrumb {...args} size='large'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -96,7 +96,7 @@ export const color: Story = {
                 <div className="mt-4">primary : </div>
                 <BreadCrumb {...args} color='primary'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -108,7 +108,7 @@ export const color: Story = {
                 <div className="mt-4">secondary : </div>
                 <BreadCrumb {...args} color='secondary'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -129,7 +129,7 @@ export const separator: Story = {
                 <div className="mt-4">line : </div>
                 <BreadCrumb {...args} separator='line'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -141,7 +141,7 @@ export const separator: Story = {
                 <div className="mt-4">arrow : </div>
                 <BreadCrumb {...args} separator='arrow'>
                     <BreadCrumb.Item >
-                        <BreadCrumb.Link href="ViewerPage">ViewerPage</BreadCrumb.Link>
+                        <BreadCrumb.Link href="Home">Home</BreadCrumb.Link>
                     </BreadCrumb.Item>
                     <BreadCrumb.Item>
                         <BreadCrumb.Link href="BreadCrumb">BreadCrumb</BreadCrumb.Link>
@@ -160,8 +160,8 @@ export const WithIcon: Story = {
         return (
             <BreadCrumb {...args}>
                 <BreadCrumb.Item>
-                    <BreadCrumb.Link href='ViewerPage'>
-                        <HomeIcon /> ViewerPage
+                    <BreadCrumb.Link href='Home'>
+                        <HomeIcon /> Home
                     </BreadCrumb.Link>
                 </BreadCrumb.Item>
                 <BreadCrumb.Item>
