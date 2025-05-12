@@ -1,12 +1,11 @@
-import { Input, Button } from '@plug/ui';
-import { PoiIconRegistModal } from '../../components/modals/PoiIconRegist';
-import { useState } from 'react';
+import { Input, Button, DataTable } from '@plug/ui';
+import { columns ,createIconData } from './mocks/PoiIcon.mock';
+import { PoiIconRegistModal } from '../../components/modals/PoiIconRegist'; 
+import { useModal } from '../../components/hook/useModal';
 
 export default function PoiList() {
-    const [isPoiIconRegistOpen, setIsPoiIconRegistOpen] = useState(false);
-
-    const handleOpenPoiIconRegist = () => {setIsPoiIconRegistOpen(true);};
-    const handleClosePoiIconRegist = () => {setIsPoiIconRegistOpen(false);};
+    const { isOpen, mode, openModal, closeModal } = useModal();
+    const IconData = createIconData(openModal);
 
     return (
         <>
@@ -16,18 +15,29 @@ export default function PoiList() {
                     <Button color='primary' className='ml-1'>검색</Button>
                 </div>
                 <div className='ml-auto flex gap-1'>
-                    <Button color='primary' onClick={(handleOpenPoiIconRegist)}>등록</Button>
+                    <Button color='primary' onClick={() => (openModal('create'))}>등록</Button>
                     <Button color='destructive'>삭제</Button>
                 </div>
             </div>
             <div className='mt-4'>
-                DataTable 영역
+                <DataTable
+                    data={IconData}
+                    columns={columns}
+                    pageSize={10}
+                    filterFunction={(item, search) => {
+                        const lowerSearch = search.toLowerCase();
+                        return (
+                            item.name.toLowerCase().includes(lowerSearch)
+                        );
+                    }}
+                />
             </div>
             
             {/* 등록 모달 */}
             <PoiIconRegistModal
-                isOpen={isPoiIconRegistOpen}
-                onClose={handleClosePoiIconRegist}
+                isOpen={isOpen}
+                onClose={closeModal}
+                mode={mode}
             />
         </>
     );

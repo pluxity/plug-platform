@@ -5,16 +5,17 @@ type PoiIconRegistValue = Record<string, string | number | boolean> & {file?: Fi
 export interface PoiIconRegistProps{
     isOpen: boolean;
     onClose: () => void;
+    mode: 'create' | 'edit';
 }
 
-export const PoiIconRegistModal = ({ isOpen, onClose }: PoiIconRegistProps) =>{
+export const PoiIconRegistModal = ({ isOpen, onClose, mode }: PoiIconRegistProps) =>{
     const handleFinish = (values: PoiIconRegistValue) => {
         alert(`Submitted values: ${JSON.stringify(values)}`);
     };
 
     return(
         <Modal
-            title="아이콘 등록"
+            title={mode === 'create' ? '아이콘 등록' : '아이콘 수정'}
             isOpen={isOpen}
             onClose={onClose}
             closeOnOverlayClick={false}
