@@ -1,23 +1,17 @@
 import * as React from 'react';
-import * as Px from '@plug/engine/src';
+import { Model, Poi } from '@plug/engine/src';
 
 // 층 데이터 타입 정의
 interface FloorData {
-    floorId: string;
-    displayName: string;
-    [key: string]: unknown;
+  floorId: string;
+  displayName: string;
+  [key: string]: unknown;
 }
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
-    selectedApiName: string;
-    deletePoiId: string;
-    setVisiblePoiId: string;
-    moveToPoiIdValue: string;
-    getAnimlistPoiIdValue: string;
-    poiAnimNameValue: string;
-    moveToFloorIdValue: string;
-    floorData: FloorData[];
+  selectedApiName: string;
+  floorData: FloorData[];
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -37,12 +31,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         // 스테이트
         this.state = {
             selectedApiName: 'None',
-            deletePoiId: '',
-            setVisiblePoiId: '',
-            moveToPoiIdValue: '',
-            moveToFloorIdValue: '',
-            getAnimlistPoiIdValue: '',
-            poiAnimNameValue: '',
             floorData: []
         };
     }
@@ -52,20 +40,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if (this.state.selectedApiName === 'Camera') {
-            return (
-                <span>
-                    <button disabled>SetEnabled</button>
-                    <button onClick={() => Px.Camera.ExtendView(1.0)}>ExtendView</button><br />
-                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</button><br />
-                    <input type='text' style={{ color: 'white' }} value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br/>
-                    <input type='text' style={{ color: 'white' }} value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</button>
-                </span>
-            );
-        } else if (this.state.selectedApiName === 'Loader') {
+        if (this.state.selectedApiName === 'Loader') {
             return (
                 <button disabled>LoadGltf</button>
             );
@@ -87,42 +62,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                             <button onClick={() => this.setFloorVisibility(false)}>HideAll</button>
                         </span>
                     }
-                    <br />
-                    <button onClick={this.onApiBtnClick.bind(this, 'Model.Expand')}>Expand</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Model.Collapse')}>Collapse</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Poi') {
             return (
                 <span>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button><br />
-                    <input type='text' style={{ color: 'white' }} value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</button> &nbsp;
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</button>
-                    <br />
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</button>
-                    <br />
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll(LocalStorage)')}>ExportAll(LocalStorage)</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Import(LocalStorage)')}>Import(LocalStorage)</button>
-                    <br/>
-                    <input type='text' style={{ color: 'white' }} value={this.state.setVisiblePoiId} onChange={this.onSetVisiblePoiTextInputValueChanged.bind(this)} placeholder='Show/Hide Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br/><br/>
-                    <input type='text' style={{ color: 'white' }} value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br/>
-                    <input type='text' style={{ color: 'white' }} value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.PlayAnimation')}>PlayAnimation</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</button>
-                </span>
-            );
-        } else if (this.state.selectedApiName === 'ETC') {
-            return (
-                <span>
-                    <button onClick={this.printAllApilist.bind(this, Px, 'Px')}>Print Api List</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
                 </span>
             );
         }
@@ -135,17 +80,15 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     render(): React.ReactNode {
         return (
-            <div className="control-panel" style={{ position: 'absolute', background: 'rgba(0, 0, 0, 0.5)', color: 'white' }}>
+            <div className="control-panel">
                 <fieldset className="control-fieldset">
                     <legend>WebGL</legend>
                     <label htmlFor='ApiList'>Api List:</label>
                     <select id='ApiList' defaultValue='None' onChange={this.onApiSelectChange.bind(this)}>
                         <option value='None' disabled>Api 선택</option>
-                        <option value='Camera'>Camera</option>
                         <option value='Loader'>Loader</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
-                        <option value='ETC'>ETC</option>
                     </select>
                     <br />
                     {this.renderMenu()}
@@ -168,119 +111,30 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onApiBtnClick(apiName: string) {
         switch (apiName) {
-            case 'Camera.GetState': {
-                const state = Px.Camera.GetState();
-                localStorage.setItem('CameraState', JSON.stringify(state));
-            } break;
-            case 'Camera.SetState': {
-                const state = localStorage.getItem('CameraState');
-                if (state === undefined || state === null) {
-                    console.warn('no such data of camera state.');
-                } else {
-                    Px.Camera.SetState(JSON.parse(state), 1.0);
-                }
-            } break;
-            case 'Camera.MoveToPoi': {
-                if (this.state.moveToPoiIdValue !== '') {
-                    Px.Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0);
-                }
-            } break;
-            case 'Camera.MoveToFloor': {
-                if( this.state.moveToFloorIdValue !== '' ) {
-                    Px.Camera.MoveToFloor(this.state.moveToFloorIdValue, 1.0);
-                }
-            } break;
             case 'Model.GetHierarchy': {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const floorData = Px.Model.GetModelHierarchy() as any;
-                this.setState({ floorData: floorData });
-            } break;
-            case 'Model.Expand': {
-                Px.Model.Expand(1.0, 10.0, () => console.log('펼치기 완료'));
-            } break;
-            case 'Model.Collapse': {
-                Px.Model.Collapse(1.0, () => console.log('접기 완료'));
+                Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
+                    console.log('Model.GetModelHierarchy -> ', data);
+
+                    this.setState({ floorData: data }); // 얻은 층정보로 state 설정
+                });
             } break;
             case 'Poi.Create': {
-                const sampleModelUrls: (undefined | string)[] = [
-                    undefined,
-                    'monkeyhead.glb',
-                    'ScreenDoor.glb',
-                ];
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
                 const displayText: string = id.substring(0, 8);
-                const modelUrl: string | undefined = sampleModelUrls[Math.floor(Math.random() * sampleModelUrls.length)];
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
                     testFloat: 2.2
                 };
 
-                Px.Poi.Create({
+                Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    modelUrl: modelUrl,
                     displayText: displayText,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
             } break;
-            case 'Poi.Delete': {
-                if (this.state.deletePoiId !== '') {
-                    Px.Poi.Delete(this.state.deletePoiId);
-                }
-            } break;
-            case 'Poi.ExportAll': {
-                const data = Px.Poi.ExportAll();
-                console.log('Poi.ExportAll', data);
-            } break;
-            case 'Poi.Import': {
-                fetch('poiSampleData.json').then(res => res.json()).then(data => {
-                    console.log('Poi.Import', data);
-                    Px.Poi.Import(data);
-                });
-            } break;
-            case 'Poi.ImportSingle': {
-                Px.Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
-            } break;
-            case 'Poi.ExportAll(LocalStorage)': {
-                const data = Px.Poi.ExportAll();
-                console.log('Poi.ExportAll', data);
-                localStorage.setItem('PoiData', JSON.stringify(data));
-            } break;
-            case 'Poi.Import(LocalStorage)': {
-                const data = localStorage.getItem('PoiData');
-                if (data === undefined || data === null) {
-                    console.warn('no such data of PoiData.');
-                } else {
-                    Px.Poi.Import(JSON.parse(data));
-                }
-            } break;
-            case 'Poi.Clear': {
-                Px.Poi.Clear();
-            } break;
-            case 'Poi.Show': {
-                Px.Poi.Show(this.state.setVisiblePoiId);
-            } break;
-            case 'Poi.Hide': {
-                Px.Poi.Hide(this.state.setVisiblePoiId);
-            } break;
-            case 'Poi.ShowAll': {
-                Px.Poi.ShowAll();
-            } break;
-            case 'Poi.HideAll': {
-                Px.Poi.HideAll();
-            } break;
-            case 'Poi.GetAnimationList': {
-                const data = Px.Poi.GetAnimationList(this.state.getAnimlistPoiIdValue);
-                console.log('Px.Poi.GetAnimationList', data);
-            } break;
-            case 'Poi.PlayAnimation': {
-                Px.Poi.PlayAnimation(this.state.getAnimlistPoiIdValue, this.state.poiAnimNameValue);
-            } break;
-            case 'Poi.StopAnimation': {
-                Px.Poi.StopAnimation(this.state.getAnimlistPoiIdValue);
-            } break
         }
     }
 
@@ -290,57 +144,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onFloorVisibleCheckChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         const target: HTMLInputElement = evt.target;
         if (target.checked)
-            Px.Model.Show(target.id);
+            Model.Show(target.id);
         else
-            Px.Model.Hide(target.id);
-    }
-
-    /**
-     * poi 제거 텍스트 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onDeletePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ deletePoiId: evt.target.value });
-    }
-
-    /**
-     * poi 기사화 설정 텍스트 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onSetVisiblePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ setVisiblePoiId: evt.target.value });
-    }
-
-    /**
-     * poi 애니메이션 얻기 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onGetAnimListTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ getAnimlistPoiIdValue: evt.target.value });
-    }
-
-    /**
-     * poi 애니메이션 이름 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onAnimNameTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ poiAnimNameValue: evt.target.value });
-    }
-
-    /**
-     * poi로 카메라 이동 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onMoveToPoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ moveToPoiIdValue: evt.target.value });
-    }
-
-    /**
-     * 층으로 카메라 이동 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onMoveToFloorTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ moveToFloorIdValue: evt.target.value });
+            Model.Hide(target.id);
     }
 
     /**
@@ -349,24 +155,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     setFloorVisibility(isVisible: boolean) {
         if (isVisible)
-            Px.Model.ShowAll();
+            Model.ShowAll();
         else
-            Px.Model.HideAll();
-    }
-
-    /**
-     * 대상 객체의 키목록 출력
-     * @param target - 대상
-     * @param prefix - 접두사
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    printAllApilist(target: any, prefix: string) {
-        Object.keys(target).forEach(keyName => {
-            this.printAllApilist(target[keyName], prefix + '.' + keyName);
-
-            if (typeof (target[keyName]) === 'function')
-                console.log(prefix + '.' + keyName);
-        });
+            Model.HideAll();
     }
 }
 
