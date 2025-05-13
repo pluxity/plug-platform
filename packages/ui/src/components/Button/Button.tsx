@@ -40,10 +40,11 @@ const Button = React.memo(({
     const spinnerStyle =
         "w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin";
 
-    const cursorStyle = cn({
+    const cursorStyles = cn({
         'cursor-progress': isLoading,
         'cursor-not-allowed': disabled && !isLoading,
         'cursor-pointer': !disabled && !isLoading,
+        'disabled:bg-gray-200 disabled:text-gray-500': disabled || isLoading
     });
 
     return (
@@ -53,7 +54,7 @@ const Button = React.memo(({
                 variantStyles[variant],
                 variant === 'default' && colorStyles[color],
                 sizeStyles[size],
-                cursorStyle,
+                cursorStyles,
                 className
             )}
             ref={ref}
