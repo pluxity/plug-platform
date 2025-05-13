@@ -38,6 +38,7 @@ const Dropdown = ({
         } else {
             setSelectedValue((prev) => {
                 const set = new Set(prev);
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 set.has(value) ? set.delete(value) : set.add(value);
                 const newSelected = [...set];
                 onChange?.(newSelected);

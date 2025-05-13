@@ -1,6 +1,6 @@
 import React from 'react';
-import { Dialog } from '../Dialog/Dialog';
-import { Button } from '../Button/Button';
+import { Dialog } from '../Dialog';
+import { Button } from '../Button';
 import { cn } from '../../utils/classname';
 import CloseIcon from '../../assets/icons/close.svg';
 import { ModalProps } from './Modal.types';

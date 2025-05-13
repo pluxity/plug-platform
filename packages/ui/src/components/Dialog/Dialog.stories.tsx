@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { Dialog } from './Dialog';
-import { Button } from '../Button/Button';
+import { Button } from '@plug/ui';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../Card/Card';
 import { cn } from '../../utils/classname';
 

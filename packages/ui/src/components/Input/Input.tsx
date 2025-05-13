@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { cn } from "../../utils/classname";
-import { InputProps } from "./Input.types";
+import { InputProps } from "@plug/ui";
 
 const Input = React.forwardRef<HTMLInputElement, InputProps<string>>((props, ref) => {
     const {

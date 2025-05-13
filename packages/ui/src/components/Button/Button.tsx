@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cn } from '../../utils/classname';
 import type { ButtonProps } from './Button.types';
-import { useFormContext } from "../Form/Form";
+import { useFormContext } from "../Form";
 
 const Button = React.memo(({
                                className,

@@ -1,6 +1,6 @@
 import { cn } from '../../utils/classname';
 import { createPortal } from 'react-dom';
-import { Button } from '../Button/Button';
+import { Button } from '@plug/ui';
 import CloseIcon from '../../assets/icons/close.svg';
 import { useEffect, useState } from 'react';
 import type {

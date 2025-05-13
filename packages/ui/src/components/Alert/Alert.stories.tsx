@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { Button } from '../Button/Button';
+import { Button } from '@plug/ui';
 import { Alert } from '../Alert';
 
 const meta: Meta<typeof Alert> = {
@@ -76,7 +76,7 @@ export const Variant : Story = {
                 {({ isOpen, onClose }) => (
                     <Alert isOpen={isOpen} onClose={onClose} variant="error">
                         <Alert.Title>Error</Alert.Title>
-                        <Alert.Description>Sometion went wrong</Alert.Description>
+                        <Alert.Description>Something went wrong</Alert.Description>
                     </Alert>
                 )}
             </AlertController>
