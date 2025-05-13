@@ -80,7 +80,7 @@ export const CustomOverlay: Story = {
   args: {
     closeOnOverlayClick: true,
     closeOnEsc: true,
-    overlayClassName: 'bg-blue-500 bg-opacity-30 backdrop-blur-sm',
+    overlayClassName: 'bg-blue-500 bg-opacity-30 backdrop-blur-xs',
   },
   render: (args) => (
       <DialogController>

@@ -6,95 +6,94 @@ import CloseIcon from '../../assets/icons/close.svg';
 import { PopupProps, PopupPlacement } from './Popup.types';
 
 const getPlacementClasses = (placement: PopupPlacement): string => {
-  switch (placement) {
-    case 'top':
-      return 'items-start justify-center pt-4';
-    case 'topLeft':
-      return 'items-start justify-start p-4';
-    case 'topRight':
-      return 'items-start justify-end p-4';
-    case 'bottom':
-      return 'items-end justify-center pb-4';
-    case 'bottomLeft':
-      return 'items-end justify-start p-4';
-    case 'bottomRight':
-      return 'items-end justify-end p-4';
-    case 'center':
-    default:
-      return 'items-center justify-center';
-  }
+    switch (placement) {
+        case 'top':
+            return 'items-start justify-center pt-4';
+        case 'topLeft':
+            return 'items-start justify-start p-4';
+        case 'topRight':
+            return 'items-start justify-end p-4';
+        case 'bottom':
+            return 'items-end justify-center pb-4';
+        case 'bottomLeft':
+            return 'items-end justify-start p-4';
+        case 'bottomRight':
+            return 'items-end justify-end p-4';
+        case 'center':
+        default:
+            return 'items-center justify-center';
+    }
 };
 
-const Popup = React.memo(({ 
-    children, 
-    title, 
-    placement = 'center', 
-    width = '300px', 
-    closable = true, 
-    contentClassName,
-    headerClassName,
-    bodyClassName,
-    overlayClassName,
-    ref,
-    ...props 
-  }: PopupProps) => {
+const Popup = React.memo(({
+                              children,
+                              title,
+                              placement = 'center',
+                              width = '300px',
+                              closable = true,
+                              contentClassName,
+                              headerClassName,
+                              bodyClassName,
+                              overlayClassName,
+                              ref,
+                              ...props
+                          }: PopupProps) => {
     const widthClass = typeof width === 'number' ? `w-[${width}px]` : `w-[${width}]`;
 
     return (
-      <Dialog 
-        {...props} 
-        ref={ref}
-        closeOnOverlayClick={true}
-        overlayClassName={cn(
-          getPlacementClasses(placement),
-          overlayClassName
-        )}
-        contentClassName={cn(
-          "max-w-[90vw] shadow-lg",
-          contentClassName
-        )}
-      >
-        <div 
-          className={cn(
-            "flex flex-col w-full",
-            widthClass
-          )}
+        <Dialog
+            {...props}
+            ref={ref}
+            closeOnOverlayClick={true}
+            overlayClassName={cn(
+                getPlacementClasses(placement),
+                'z-[9999] bg-slate-900/20 backdrop-blur-xs',
+                overlayClassName
+            )}
+            contentClassName={cn(
+                'bg-white rounded-lg shadow-xl',
+                'transition-all duration-300 animate-fade-in',
+                contentClassName
+            )}
         >
-          {(title || closable) && (
-            <div className={cn(
-              "flex items-center justify-between px-4 py-3 border-b border-gray-200",
-              headerClassName
-            )}>
-              {title && (
-                <h3 className="text-base font-medium text-gray-900">
-                  {title}
-                </h3>
-              )}
-              {closable && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-5 p-0 ml-auto"
-                  onClick={props.onClose}
-                  aria-label="닫기"
-                >
-                  <CloseIcon />
-                </Button>
-              )}
+            <div className={cn('flex flex-col', widthClass)}>
+                {(title || closable) && (
+                    <div
+                        className={cn(
+                            'flex items-center justify-between px-4 py-3 border-b border-slate-200',
+                            headerClassName
+                        )}
+                    >
+                        {title && (
+                            <h3 className="text-sm font-semibold text-slate-800">
+                                {title}
+                            </h3>
+                        )}
+                        {closable && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5 p-0 text-slate-500 hover:text-slate-700 transition-colors"
+                                onClick={props.onClose}
+                                aria-label="닫기"
+                            >
+                                <CloseIcon />
+                            </Button>
+                        )}
+                    </div>
+                )}
+
+                <div className={cn(
+                    'p-4 text-sm text-slate-700',
+                    bodyClassName
+                )}>
+                    {children}
+                </div>
             </div>
-          )}
-          
-          <div className={cn(
-            "p-4",
-            bodyClassName
-          )}>
-            {children}
-          </div>
-        </div>
-      </Dialog>
+        </Dialog>
     );
-  });
+});
 
 Popup.displayName = 'Popup';
 
-export { Popup }; 
+export { Popup };
