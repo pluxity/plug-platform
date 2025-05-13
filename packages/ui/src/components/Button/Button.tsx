@@ -1,94 +1,86 @@
 import * as React from 'react';
 import { cn } from '../../utils/classname';
 import type { ButtonProps } from './Button.types';
-import {useFormContext} from "../Form/Form";
+import { useFormContext } from "../Form/Form";
 
 const Button = React.memo(({
-      className,
-      variant = 'default',
-      color = 'default',
-      size = 'medium',
-      isLoading = false,
-      disabled,
-      children,
-      ref,
-      ...props
-    }: ButtonProps) => {
-    const buttonBaseStyle =
-      "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0";
+                               className,
+                               variant = 'default',
+                               color = 'default',
+                               size = 'medium',
+                               isLoading = false,
+                               disabled,
+                               children,
+                               ref,
+                               ...props
+                           }: ButtonProps) => {
+    const baseStyle =
+        "inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none";
 
     const variantStyles = {
-      default: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-      outline:
-        "border border-gray-300 bg-transparent hover:bg-gray-100",
-      ghost: "bg-transparent hover:bg-gray-100",
+        default: "bg-slate-100 text-slate-800 hover:bg-slate-200",
+        outline: "border border-zinc-300 bg-transparent text-zinc-700 hover:bg-zinc-100",
+        ghost: "bg-transparent text-zinc-700 hover:bg-zinc-100",
     };
 
     const colorStyles = {
-      default: "",
-      primary:
-        "bg-primary-500 text-primary-foreground shadow hover:bg-primary-600",
-      destructive:
-        "bg-destructive-500 text-destructive-foreground shadow-sm hover:bg-destructive-600",
-      secondary:
-        "bg-secondary-500 text-secondary-foreground shadow-sm hover:bg-secondary-600",
+        default: "",
+        primary: "bg-blue-600 text-white hover:bg-blue-700",
+        secondary: "bg-slate-600 text-white hover:bg-slate-700",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
     };
 
     const sizeStyles = {
-      small: "h-8 rounded-md px-3 text-xs",
-      medium: "h-9 px-4 py-2",
-      large: "h-10 rounded-md px-8",
-      icon: "h-9 w-9",
+        small: "h-8 px-3 text-xs",
+        medium: "h-9 px-4 text-sm",
+        large: "h-11 px-6 text-base",
+        icon: "h-9 w-9 p-2",
     };
 
     const spinnerStyle =
-      "w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin";
+        "w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin";
 
-    const disabledStyle = cn(
-      {
+    const cursorStyle = cn({
         'cursor-progress': isLoading,
         'cursor-not-allowed': disabled && !isLoading,
         'cursor-pointer': !disabled && !isLoading,
-        'disabled:bg-gray-200 disabled:text-gray-500': disabled || isLoading
-      }
-    );
+    });
 
     return (
-      <button
-        className={cn(
-          buttonBaseStyle,
-          variantStyles[variant],
-          variant !== 'outline' && variant !== 'ghost' && colorStyles[color],
-          sizeStyles[size],
-          disabledStyle,
-          className
-        )}
-        ref={ref}
-        disabled={isLoading || disabled}
-        {...props}
-      >
-         {isLoading ? (
-          <>
-            <span className={spinnerStyle} />
-            {children}
-          </>
-        ) : (
-          children
-        )}
-      </button>
+        <button
+            className={cn(
+                baseStyle,
+                variantStyles[variant],
+                variant === 'default' && colorStyles[color],
+                sizeStyles[size],
+                cursorStyle,
+                className
+            )}
+            ref={ref}
+            disabled={isLoading || disabled}
+            {...props}
+        >
+            {isLoading ? (
+                <>
+                    <span className={cn(spinnerStyle, "me-1")} />
+                    {children}
+                </>
+            ) : (
+                children
+            )}
+        </button>
     );
-  }
-);
+});
 
 Button.displayName = 'Button';
 
 const FormSubmitButton = React.memo(({
-                              children,
-                              color = 'primary',
-                              size = 'medium',
-                              isLoading = false,
-                          }: ButtonProps) => {
-    const {isValid} = useFormContext();
+                                         children,
+                                         color = 'primary',
+                                         size = 'medium',
+                                         isLoading = false,
+                                     }: ButtonProps) => {
+    const { isValid } = useFormContext();
 
     return (
         <Button
