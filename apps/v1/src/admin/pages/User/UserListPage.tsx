@@ -3,7 +3,7 @@ import { columns, createUserData } from './mocks/UserList.mock';
 import { CreateUserModal } from './components/CreateUserModal';
 import { useModal } from '../../components/hook/useModal';
 
-export default function UserList() {
+export default function UserListPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
     const userData = createUserData(openModal);
 
@@ -26,7 +26,7 @@ export default function UserList() {
                         <Select.Item value='code'>도면 코드</Select.Item>
                     </Select.Content>
                 </Select>
-                <div>
+                <div className='flex'>
                     <Input.Text className='w-60' placeholder='검색어를 입력하세요.'/>
                     <Button color='primary' className='ml-1'>검색</Button>
                 </div>
@@ -54,6 +54,7 @@ export default function UserList() {
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}
+
             />
         </>
     );

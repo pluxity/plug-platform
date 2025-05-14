@@ -19,7 +19,6 @@ export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps)
             onClose={onClose}
             closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
-            contentClassName="w-100"
         >
             <Form<CreateFormValues> onSubmit={handleFinish}>
                 <FormItem name="role" label='권한'>
@@ -32,13 +31,16 @@ export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps)
                     </Select>
                 </FormItem>
                 <FormItem name="id" label='아이디'>
-                    <Input.Text placeholder="Enter your id"/>
+                    <Input.Text placeholder="사용자의 아이디를 입력해주세요."/>
                 </FormItem>
                 <FormItem name="password" label='비밀번호'>
-                    <Input.Text type="password" placeholder="Enter your password"/>
+                    <Input.Text type="password" placeholder="사용자의 비밀번호를 입력해주세요."/>
                 </FormItem>
                 <FormItem name="username" label='이름'>
-                    <Input.Text type="text" placeholder="Enter your username"/>
+                    <Input.Text type="text" placeholder="사용자의 이름을 입력해주세요."/>
+                </FormItem>
+                <FormItem name="code" label='코드'>
+                    <Input.Text type="text" placeholder="사용자의 코드를 입력해주세요."/>
                 </FormItem>
                 <div className="mt-6 flex justify-center gap-2">
                     <Button onClick={onClose}>취소</Button>
