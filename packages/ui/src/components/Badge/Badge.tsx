@@ -15,9 +15,9 @@ const Badge = React.memo(({
     const badgeStyle = 'inline-flex justify-center items-center font-extrabold box-border rounded-full';
     
     const colorStyle = {
-        primary : 'bg-primary-500 text-white',
-        secondary : 'bg-secondary-500 text-white',
-        destructive : 'bg-destructive-500 text-white',
+        primary: 'bg-blue-100 text-blue-800',
+        secondary: 'bg-slate-200 text-slate-800',
+        destructive: 'bg-red-100 text-red-800',
     }[color];
 
     const sizeStyle = {

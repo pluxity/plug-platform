@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BreadCrumb } from '../BreadCrumb';
+import { BreadCrumb } from '@plug/ui';
 import HomeIcon from "../../assets/icons/home.svg";
 
 const meta: Meta<typeof BreadCrumb> = {

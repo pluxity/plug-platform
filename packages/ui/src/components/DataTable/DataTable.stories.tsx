@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { DataTable } from './DataTable';
+import { DataTable } from '@plug/ui';
 import { Column } from './DataTable.types';
 
 interface User {
