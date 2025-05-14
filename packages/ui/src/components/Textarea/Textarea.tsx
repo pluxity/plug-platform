@@ -3,45 +3,52 @@ import { cn } from "../../utils/classname";
 import type { TextareaProps } from "./Textarea.types";
 
 const Textarea = ({
-    ariaLabel,
-    resize = "none",
-    invalid = false,
-    value,
-    onChange,
-    className, 
-    ref,
-    ...props 
-  }: TextareaProps ) => {
-      
+                      ariaLabel,
+                      resize = "none",
+                      invalid = false,
+                      value,
+                      onChange,
+                      className,
+                      ref,
+                      ...props
+                  }: TextareaProps) => {
     const textareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange?.(e);
+        onChange?.(e);
     };
 
-    const textareaStyle = `${invalid ? "border-red-600 enabled:placeholder:text-red-600 text-red-600" : " border-gray-400 placeholder:text-gray-300 focus:placeholder:text-black text-black"} outline-none text-xs placeholder:text-xs disabled:text-gray-300 disabled:border-gray-300 disabled:cursor-not-allowed p-2 border border-1 rounded-xs h-9 disabled:bg-gray-200 min-w-55 min-h-20`;
-    const resizeStyles = {
-      both: "resize",
-      horizontal: "resize-x",
-      vertical: "resize-y",
-      none: "resize-none",
+    const baseStyle = "w-full h-32 px-3 py-2 text-sm rounded-md border transition-colors";
+    const textColorStyle = invalid
+        ? "border-red-500 text-red-600 placeholder:text-red-400 focus:ring-red-500 focus:border-red-500"
+        : "border-gray-300 text-slate-800 placeholder:text-slate-400 focus:ring-blue-500 focus:border-blue-500";
+
+    const disabledStyle =
+        "disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:border-gray-200";
+
+    const resizeStyle = {
+        both: "resize",
+        horizontal: "resize-x",
+        vertical: "resize-y",
+        none: "resize-none",
     }[resize];
 
-  return (
-    <>
-      <textarea
-        aria-label={ariaLabel}
-        className={cn(
-          textareaStyle,
-          resizeStyles,
-          className
-        )}
-        value={value}
-        onChange={textareaChange}
-        ref={ref}
-        {...props}
-      />
-    </>
-  )};
+    return (
+        <textarea
+            aria-label={ariaLabel}
+            value={value}
+            onChange={textareaChange}
+            ref={ref}
+            className={cn(
+                baseStyle,
+                textColorStyle,
+                disabledStyle,
+                resizeStyle,
+                className
+            )}
+            {...props}
+        />
+    );
+};
 
-Textarea.displayName = 'Textarea';
+Textarea.displayName = "Textarea";
 
 export { Textarea };

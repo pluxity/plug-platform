@@ -8,7 +8,7 @@ import {
   CardContent, 
   CardFooter 
 } from './Card';
-import { Button } from '../Button';
+import { Button } from '@plug/ui';
 
 const meta: Meta<typeof Card> = {
   title: 'Components/Card',

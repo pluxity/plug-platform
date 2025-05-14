@@ -10,16 +10,13 @@ const InputHelperText = ({
   ...props
 }: InputHelperTextProps) => {
 
-  const helperTextStyle = "text-xs my-1";
-  const helperTextError = error ? "text-red-600" : "text-gray-500";
-
   return (
     <p
       ref={ref}
       id={id}
       className={cn(
-        helperTextStyle,
-        helperTextError,
+          "text-xs mt-1",
+          error ? "text-red-500 font-medium" : "text-slate-500",
         className
       )}
       {...props}

@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState } from 'react';
 import { cn } from '../../utils/classname';
-import { Button } from '../Button/Button';
+import { Button } from '@plug/ui';
 import CloseIcon from '../../assets/icons/close.svg';
-import type { CardProps } from './Card.types';
+import type { CardProps } from '@plug/ui';
 
 const Card = ({ 
   className, 
