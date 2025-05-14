@@ -53,6 +53,3 @@ docker-compose.override.yml
 *.d.ts
 !vite-env.d.ts
 !vite.config.d.ts
-
-# UI/main .gitignore
-packages/!(ui)/**

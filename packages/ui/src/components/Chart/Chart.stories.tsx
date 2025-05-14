@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { ChartComponent } from './Chart';
-import type { ChartProps } from '@plug/ui';
+import type { ChartProps } from './Chart.types';
 
 const meta: Meta<ChartProps> = {
   title: 'Components/Chart',

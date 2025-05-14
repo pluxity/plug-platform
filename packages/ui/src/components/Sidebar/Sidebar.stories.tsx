@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { HomeIcon } from '../../index.icons';
-import { Sidebar } from '@plug/ui';
+import { Sidebar } from '../Sidebar';
 import { useState } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 

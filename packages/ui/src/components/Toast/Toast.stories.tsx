@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { Button } from '@plug/ui';
-import { Toast } from './index';
+import { Button } from '../Button/Button';
+import { Toast } from '../Toast';
 
 const meta: Meta<typeof Toast> = {
     title: 'Components/Toast',

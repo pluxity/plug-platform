@@ -3,28 +3,28 @@ import { cn } from "../../utils/classname";
 import type { CheckboxProps } from "./Checkbox.types";
 
 const Checkbox = ({
-                    color = "primary",
-                    size = "small",
-                    type = "rectangle",
-                    label,
-                    disabled = false,
-                    checked,
-                    onChange,
-                    indeterminate = false,
-                    inputClassName,
-                    className,
+  color = "primary",
+  size = "small",
+  type = "rectangle",
+  label,
+  disabled = false,
+  checked,
+  onChange,
+  indeterminate = false,
+  inputClassName,
+  className,
                     value,
-                    ...props
-                  }: CheckboxProps) => {
+  ...props
+}: CheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (inputRef.current) {
+    if(inputRef.current){
       inputRef.current.indeterminate = indeterminate;
     }
   }, [indeterminate]);
 
-  const isChecked = checked ?? (value as boolean);
+  const isChecked = checked ?? (value as boolean); // 추가됨
 
   const inputStyle = `inline-block cursor-pointer bg-white border-1 border-gray-500 relative after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] 
   ${indeterminate ? "after:w-1/2 after:h-[2px] after:bg-white" : "after:-translate-y-2/3 after:w-1/2 after:h-1/3 after:border-t-1 after:border-r-1 after:border-white after:rotate-132"}`;

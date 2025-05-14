@@ -7,6 +7,7 @@ import type {
     ComboBoxItemProps,
  } from "./ComboBox.types";
 
+
 interface ComboBoxContextProps{
     disabled: boolean;
     isSelected: boolean;
@@ -27,9 +28,11 @@ const ComboBox = ({
     children,
     ...props
 }: ComboBoxProps) => {
+
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState<string>("");
     const [inputValue, setInputValue] = useState("");
+    
     const isControlled = selected !== undefined;
     const currentSelected = isControlled ? selected : selectedValue;
 
@@ -43,23 +46,16 @@ const ComboBox = ({
         setIsSelectOpen(false);
       };
 
-    return (
-        <ComboBoxContext.Provider
-            value={{
-                isSelected: isSelectOpen,
-                setIsSelected: setIsSelectOpen,
-                toggleValue,
-                selectedValue: currentSelected,
-                disabled,
-                inputValue,
-                setInputValue,
-            }}
-        >
+    return(
+        <ComboBoxContext.Provider value={{ isSelected:isSelectOpen, setIsSelected:setIsSelectOpen, toggleValue, selectedValue:currentSelected, disabled, inputValue, setInputValue }}>
             <div
                 role="combobox"
                 aria-expanded={isSelectOpen}
                 aria-haspopup="listbox"
-                className={cn("relative inline-block w-full", className)}
+                className={cn(
+                    "relative inline-block",
+                    className
+                )}
                 {...props}
             >
                 {children}
@@ -84,38 +80,35 @@ const ComboBoxTrigger = ({
   
     const { isSelected, setIsSelected, selectedValue, disabled } = context;
 
+    const comboBoxTriggerStyle = `flex items-center p-1 border border-1 border-gray-400 bg-white text-left relative after:absolute after:content-[''] after:border-t-1 after:border-r-1 after:top-1/2 after:right-3 after:transform after:rotate-135 after:translate-y-[-50%] after:w-2 after:h-2 transition-all duration-300 w-full rounded-xs pr-6
+    ${disabled ? "cursor-not-allowed bg-gray-200" : ""} ${isSelected ? 'after:border-black' : 'after:border-gray-400'}`;
+
+    const comboBoxInputStyle = `outline-none ${disabled ? "cursor-not-allowed" : ""}`;
+
     return (
         <div
-            onClick={() => !disabled && setIsSelected(!isSelected)}
+            onClick={() => disabled ? null : setIsSelected(!isSelected)}
             className={cn(
-                "flex items-center w-full h-10 p-2 rounded-md border border-slate-300 bg-white text-slate-800 shadow-sm hover:bg-slate-50 transition-all duration-200",
-                disabled && "bg-slate-100 cursor-not-allowed text-slate-400",
+                comboBoxTriggerStyle,
+                `flex flex-wrap gap-1 cursor-pointer ${disabled ? "" : "hover:bg-gray-100"}`,
                 className
             )}
             {...props}
         >
-            <input
-                type="text"
-                aria-expanded={isSelected}
-                aria-controls="listbox"
-                aria-autocomplete="list"
-                className={cn(
-                    "w-full outline-none placeholder-slate-400 bg-transparent text-sm cursor-pointer",
-                    disabled && "cursor-not-allowed",
-                    inputClassName
-                )}
-                placeholder={placeholder}
-                value={selectedValue}
-                readOnly
-            />
-            <span
-                className={cn(
-                    "ml-2 inline-block transform transition-transform duration-300",
-                    isSelected ? "rotate-180" : "rotate-0"
-                )}
-            >
-        ▼
-      </span>
+            {<input 
+                    type="text"
+                    aria-expanded={isSelected}
+                    aria-controls="listbox"
+                    aria-autocomplete="list"
+                    className={cn(
+                        "w-full cursor-pointer",
+                        comboBoxInputStyle,
+                        inputClassName,
+                    )}
+                    placeholder={placeholder}
+                    value={selectedValue}
+                    readOnly
+                />}
         </div>
     );
 };
@@ -139,7 +132,14 @@ const ComboBoxContent = ({
 
     if (!isSelected) return null;
 
-    const filteredChildren = React.Children.toArray(children).filter((child) => {
+    const comboBoxContentStyle = `absolute top-full mt-1 flex flex-col gap-2 z-999 bg-white rounded-xs border w-full p-2 overflow-y-auto max-h-42 border-gray-400 
+    [&::-webkit-scrollbar]:w-[6px] 
+    [&::-webkit-scrollbar-track]:bg-transparent 
+    [&::-webkit-scrollbar-thumb]:bg-gray-300 
+    [&::-webkit-scrollbar-thumb]:rounded-full 
+    hover:[&::-webkit-scrollbar-thumb]:bg-gray-300`;
+
+   const filteredChildren = React.Children.toArray(children).filter((child) => {
         if (React.isValidElement(child) && inputValue) {
             const childProps = child.props as ComboBoxItemProps;
             return childProps.children?.toString().toLowerCase().includes(inputValue.toLowerCase());
@@ -153,19 +153,16 @@ const ComboBoxContent = ({
             id="listbox"
             aria-label="선택 목록"
             className={cn(
-                "absolute top-full mt-1 z-50 w-full max-h-48 overflow-y-auto rounded-md border border-slate-200 bg-white shadow-md p-2 text-sm transition",
+                comboBoxContentStyle, 
                 className
             )}
             {...props}
         >
-            <li>
-                <input
+        <li>
+                <input 
                     type="text"
-                    className={cn(
-                        "w-full px-2 py-1 mb-2 rounded-md border border-slate-200 outline-none focus:ring-2 focus:ring-blue-200",
-                        inputClassName
-                    )}
-                    placeholder="검색하세요."
+                    className={cn(inputClassName, "w-full outline-none")}
+                    placeholder="입력하세요."
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                 />
@@ -174,11 +171,13 @@ const ComboBoxContent = ({
             {filteredChildren.length > 0 ? (
                 filteredChildren
             ) : (
-                <li className="text-slate-400 px-2 py-1">검색 결과가 없습니다.</li>
+                <li className="text-gray-400 px-2">
+                    검색 결과가 없습니다.
+                </li>
             )}
         </ul>
-    );
-};
+    )
+}
 
 ComboBoxContent.displayName = "ComboBoxContent";
 
@@ -201,15 +200,17 @@ const ComboBoxItem = ({
         toggleValue(value);          
       };
 
-    return (
+    const comboBoxItemStyle = `text-gray-400 hover:text-black cursor-pointer
+      ${isItemSelected ? "text-primary-500" : "text-gray-400"}`;
+    
+    return(
         <li
             role="option"
             aria-selected={isItemSelected}
             value={value}
             onClick={onItemChange}
             className={cn(
-                "text-slate-600 hover:text-slate-800 hover:bg-slate-100 px-2 py-1 rounded-md transition-colors cursor-pointer",
-                isItemSelected && "text-blue-600 font-medium",
+                comboBoxItemStyle,
                 className
             )}
             {...props}

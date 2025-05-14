@@ -18,37 +18,27 @@ const TableBody = <T,>({ data, columns, search }: TableBodyProps<T> & { search?:
   };
 
   return (
-      <tbody>
-      {data.length === 0 ? (
-          <tr>
-            <td colSpan={columns.length} className="p-4 text-center text-slate-400 text-sm">
-              데이터가 없습니다.
+    <tbody>
+      {data.map((row, rowIndex) => (
+        <tr
+          key={rowIndex}
+          className={cn(
+            `${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`,
+            `hover:bg-gray-100 transition-colors`
+          )}
+        >
+          {columns.map((col) => (
+            <td 
+              role="cell"
+              key={String(col.key)} className="p-3 border border-gray-300">
+              {typeof row[col.key] === 'string' && search
+                ? highlightText(row[col.key] as string, search)
+                : (row[col.key] as React.ReactNode)}
             </td>
-          </tr>
-      ) : (
-          data.map((row, i) => (
-              <tr
-                  key={i}
-                  className={cn(
-                      i % 2 === 0 ? 'bg-white' : 'bg-slate-50',
-                      'hover:bg-slate-100 transition-colors'
-                  )}
-              >
-                {columns.map((col) => (
-                    <td
-                        key={String(col.key)}
-                        role="cell"
-                        className="p-3 border-t border-slate-200 text-sm"
-                    >
-                      {typeof row[col.key] === 'string' && search
-                          ? highlightText(row[col.key] as string, search)
-                          : (row[col.key] as React.ReactNode)}
-                    </td>
-                ))}
-              </tr>
-          ))
-      )}
-      </tbody>
+          ))}
+        </tr>
+      ))}
+    </tbody>
   );
 };
 

@@ -1,33 +1,38 @@
 import { cn } from '../../utils/classname';
 import { useEffect, useState } from 'react';
-import { Button } from '@plug/ui';
+import { Button } from '../Button/Button';
 import CloseIcon from '../../assets/icons/close.svg';
 import { createPortal } from 'react-dom';
-import type {
+import type { 
     ToastPortalProps,
     ToastProps,
     ToastTitleProps,
-    ToastDescriptionProps,
-} from './Toast.types';
+    ToastDescriptionProps
+ } from './Toast.types';
 
-const ToastPortal = ({ children }: ToastPortalProps) => {
-    return createPortal(<>{children}</>, document.body);
-};
+const ToastPortal = ({
+    children,
+}: ToastPortalProps) => {
+    return createPortal(
+        <>{children}</>,
+        document.body
+    )
+}
 
 const Toast = ({
-                   variant = 'default',
-                   placement = 'bottomRight',
-                   duration = 300,
-                   autoClose = true,
-                   autoCloseDuration = 3000,
-                   closable = false,
-                   onClose,
-                   isOpen,
-                   ref,
-                   className,
-                   children,
-                   ...props
-               }: ToastProps) => {
+    variant = 'default',
+    placement = 'bottomRight',
+    duration = 300, 
+    autoClose = true,
+    autoCloseDuration = 3000,
+    closable = false,
+    onClose,
+    isOpen,
+    ref,
+    className,
+    children,
+    ...props
+}: ToastProps) => {
     const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
@@ -49,13 +54,13 @@ const Toast = ({
     }, [isOpen, duration]);
 
     useEffect(() => {
-        if (isOpen && autoClose) {
+        if (isOpen) {
             const timer = setTimeout(() => {
                 setIsVisible(false);
             }, autoCloseDuration);
             return () => clearTimeout(timer);
         }
-    }, [isOpen, autoCloseDuration, autoClose]);
+    }, [isOpen, autoCloseDuration]);
 
     if (!isMounted) return null;
 
@@ -79,51 +84,56 @@ const Toast = ({
         }
     };
 
-    const toastBase = 'relative flex gap-3 px-5 py-4 w-full max-w-sm rounded-lg shadow-md transition-all duration-300 border text-sm';
+    const toastStyle = 'flex gap-3 rounded-lg border border-gray-200 bg-white shadow-sm relative p-5 w-100';
+
     const toastVariant = {
-        default: 'bg-white border-gray-200 text-slate-800',
-        normal: 'bg-green-50 border-green-200 text-green-900',
-        warning: 'bg-yellow-50 border-yellow-200 text-yellow-900',
-        critical: 'bg-rose-50 border-rose-200 text-rose-900',
+        default: 'bg-white',
+        normal: 'bg-green-100 ',
+        warning: 'bg-destructive-100',
+        critical: 'bg-yellow-100',
     }[variant];
 
-    const toastAnimation = cn(
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2',
-        'transform transition-all duration-300 ease-in-out'
-    );
+    const toastAnimation = `transform transition-all duration-${duration} ${isVisible ? 'opacity-70 ease-in' : 'opacity-0 ease-out'}`;
+
+    const toastPlacementAnimation = {
+      top: isVisible ? 'translate-y-0' : 'translate-y-[-10px]',
+      topLeft: isVisible ? 'translate-x-0' : 'translate-x-[-10px]',
+      topRight: isVisible ? 'translate-x-0' : 'translate-x-[10px]',
+      bottom: isVisible ? 'translate-y-0' : 'translate-y-[10px]',
+      bottomLeft: isVisible ? 'translate-x-0' : 'translate-x-[-10px]',
+      bottomRight: isVisible ? 'translate-x-0' : 'translate-x-[10px]',
+      center: '',
+    }[placement];
 
     return (
         <ToastPortal>
-            <div
-                className={cn(
-                    'fixed inset-0 z-[9999] flex pointer-events-none',
-                    getPlacementClasses(placement)
-                )}
-            >
+            <div className={cn(
+                `fixed inset-0 z-50 flex bg-black bg-opacity-50 ${isVisible ? 'pointer-events-auto' : 'pointer-events-none'}`,
+                getPlacementClasses(placement),
+            )}>   
                 <div
                     className={cn(
-                        toastBase,
+                        toastStyle,
                         toastVariant,
                         toastAnimation,
-                        'pointer-events-auto relative',
-                        className
+                        toastPlacementAnimation,
+                        className,
                     )}
                     ref={ref}
                     {...props}
                 >
-                    <div className="flex-1">{children}</div>
-
                     {(closable || !autoClose) && (
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-2.5 right-2.5 h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                            variant='ghost'
+                            size='icon'
+                            className='absolute top-[50%] right-2 h-10 w-10 p-0 hover:bg-transparent transform translate-y-[-50%]'
                             onClick={onClose}
-                            aria-label="닫기"
+                            aria-label='닫기'
                         >
                             <CloseIcon />
                         </Button>
                     )}
+                    <div>{children}</div>
                 </div>
             </div>
         </ToastPortal>
@@ -133,40 +143,48 @@ const Toast = ({
 Toast.displayName = 'Toast';
 
 const ToastTitle = ({
-                        ref,
-                        className,
-                        children,
-                        ...props
-                    }: ToastTitleProps) => {
+    ref,
+    className,
+    children,
+    ...props
+}: ToastTitleProps) => {
+
+    const toastTitleStyle = 'mb-2 font-bold leading-none tracking-tight'
     return (
         <h2
             ref={ref}
-            className={cn('text-sm font-semibold mb-1 leading-tight', className)}
+            className={cn(
+                toastTitleStyle,
+                className
+            )}
             {...props}
         >
             {children}
         </h2>
-    );
-};
+    )
+}
 
 ToastTitle.displayName = 'ToastTitle';
 
 const ToastDescription = ({
-                              ref,
-                              className,
-                              children,
-                              ...props
-                          }: ToastDescriptionProps) => {
+    ref,
+    className,
+    children,
+    ...props
+}: ToastDescriptionProps) => {
     return (
         <p
             ref={ref}
-            className={cn('text-sm text-slate-600', className)}
+            className={cn(
+                'text-sm',
+                className
+            )}
             {...props}
         >
             {children}
         </p>
-    );
-};
+    )
+}
 
 ToastDescription.displayName = 'ToastDescription';
 

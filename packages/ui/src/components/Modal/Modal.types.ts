@@ -1,5 +1,5 @@
 import React from 'react';
-import { DialogProps } from '../Dialog';
+import { DialogProps } from '../Dialog/Dialog.types';
 
 export interface ModalProps extends Omit<DialogProps, 'contentClassName'> {
   title?: React.ReactNode;

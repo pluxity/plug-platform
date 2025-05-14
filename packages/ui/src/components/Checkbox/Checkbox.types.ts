@@ -1,5 +1,5 @@
 import type { Color, Size } from '../types';
-import {FormFieldProps} from "../Form";
+import {FormFieldProps} from "../Form/Form.types";
 
 type CheckboxColor = Exclude<Color, 'destructive'>;
 type CheckboxType = "rectangle" | "circle";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CarouselProps } from './Carousel.types';
-import { Button } from '@plug/ui';
+import { Button } from '../Button/Button';
 import { cn } from '../../utils/classname';
 import Prev from '../../assets/icons/previous.svg';
 import Next from '../../assets/icons/next.svg';
@@ -165,3 +165,5 @@ export const Carousel = ({
     </div>
   );
 };
+
+export default Carousel;

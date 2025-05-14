@@ -1,34 +1,40 @@
 import { cn } from '../../utils/classname';
-import { createPortal } from 'react-dom';
-import { Button } from '@plug/ui';
+import { createPortal } from "react-dom";
+import { Button } from '../Button/Button';
 import CloseIcon from '../../assets/icons/close.svg';
 import { useEffect, useState } from 'react';
-import type {
+import type { 
     SheetPortalProps,
     SheetProps,
     SheetHeaderProps,
     SheetContentProps,
     SheetFooterProps
-} from './Sheet.types';
+} from "./Sheet.types";
 
-const SheetPortal = ({ children }: SheetPortalProps) => {
-    return createPortal(<>{children}</>, document.body);
-};
+const SheetPortal = ({
+    children,
+}: SheetPortalProps) => {
+    return createPortal(
+        <>{children}</>,
+        document.body
+    )
+}
 
-SheetPortal.displayName = 'SheetPortal';
+SheetPortal.displayName = "SheetPortal";
 
 const Sheet = ({
-                   isOpen,
-                   closeOnOverlayClick = true,
-                   closable = true,
-                   overlay = true,
-                   position = 'right',
-                   onClose,
-                   className,
-                   children,
-                   ref,
-                   ...props
-               }: SheetProps) => {
+    isOpen,
+    closeOnOverlayClick = true,
+    closable = true,
+    overlay = true,
+    position = "right",
+    onClose,
+    className,
+    children,
+    ref,
+    ...props
+}: SheetProps) => {
+
     const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
@@ -46,93 +52,119 @@ const Sheet = ({
             setIsVisible(false);
             const timer = setTimeout(() => {
                 setIsMounted(false);
-            }, 300);
+            }, 300); 
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
-
+    
     const handleOverlayClick = (e: React.MouseEvent) => {
+        e.preventDefault();
         if (closeOnOverlayClick && e.target === e.currentTarget) {
             onClose?.();
         }
     };
 
     if (!isMounted) return null;
+    
+    const sheetStyle = cn(
+        "fixed z-50 w-full bg-white p-4 shadow-lg has-[button]:pr-8",
+        position === "right" && "right-0 inset-y-0 max-w-xs",
+        position === "left" && "left-0 inset-y-0 max-w-xs",
+        position === "top" && "inset-x-0 top-0 max-h-xs",
+        position === "bottom" && "inset-x-0 bottom-0 max-h-xs"
+    );
 
-    const basePositionStyle = {
-        right: 'right-0 inset-y-0 max-w-sm',
-        left: 'left-0 inset-y-0 max-w-sm',
-        top: 'inset-x-0 top-0 max-h-[90vh]',
-        bottom: 'inset-x-0 bottom-0 max-h-[90vh]',
-    }[position];
+    const sheetAnimate = cn(
+        "transition-transform duration-300 ease-in-out",
+        position === "right" && (isVisible ? "translate-x-0" : "translate-x-full"),
+        position === "left" && (isVisible ? "translate-x-0" : "-translate-x-full"),
+        position === "top" && (isVisible ? "translate-y-0" : "-translate-y-full"),
+        position === "bottom" && (isVisible ? "translate-y-0" : "translate-y-full")
+    );
 
-    const animationStyle = {
-        right: isVisible ? 'translate-x-0' : 'translate-x-full',
-        left: isVisible ? 'translate-x-0' : '-translate-x-full',
-        top: isVisible ? 'translate-y-0' : '-translate-y-full',
-        bottom: isVisible ? 'translate-y-0' : 'translate-y-full',
-    }[position];
-
-    return (
+    return(
         <SheetPortal>
-            {overlay && (
-                <div
-                    className="fixed inset-0 z-[9998] bg-black/40 transition-opacity"
+            {overlay && 
+                <div className="fixed inset-0 z-50 bg-black/50"
                     onClick={handleOverlayClick}
                 />
-            )}
-            <div
-                ref={ref}
-                className={cn(
-                    'fixed z-[9999] w-full bg-white shadow-xl transition-transform duration-300 ease-in-out',
-                    basePositionStyle,
-                    animationStyle,
-                    className
-                )}
+            }
+            <div 
+                className={cn(sheetStyle ,sheetAnimate)} 
                 role="dialog"
-                {...props}
-            >
+                ref={ref}
+                {...props} 
+                >
                 {closable && (
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute top-4 right-4 h-6 w-6 p-0 text-slate-500 hover:text-slate-700"
-                        onClick={onClose}
+                        className="absolute top-3 right-2 h-6 w-6 p-0 ml-auto right-sm"
                         aria-label="닫기"
+                        onClick={onClose}
                     >
                         <CloseIcon />
                     </Button>
                 )}
-                <div className="flex h-full flex-col divide-y divide-slate-100">
+                <div className={cn("flex h-full flex-col gap-4", className)}>
                     {children}
                 </div>
             </div>
         </SheetPortal>
-    );
-};
+    )
+}
 
-Sheet.displayName = 'Sheet';
+Sheet.displayName = "Sheet";
 
-const SheetHeader = ({ className, children, ref }: SheetHeaderProps) => (
-    <div className={cn('px-5 py-4 flex items-center justify-between', className)} ref={ref}>
-        {children}
-    </div>
-);
+const SheetHeader = ({
+    className,
+    children,
+    ref,
+}: SheetHeaderProps) => {
+    return(
+        <div 
+            className={cn(className)}
+            ref={ref}
+        >
+            {children}
+        </div>
+    )
+}
 
-const SheetContent = ({ className, children, ref }: SheetContentProps) => (
-    <div className={cn('flex-1 overflow-auto px-5 py-4 text-sm text-slate-700', className)} ref={ref}>
-        {children}
-    </div>
-);
+SheetHeader.displayName = "SheetHeader";
 
-const SheetFooter = ({ className, children, ref }: SheetFooterProps) => (
-    <div className={cn('px-5 py-4 flex justify-end gap-2', className)} ref={ref}>
-        {children}
-    </div>
-);
+const SheetContent = ({
+    className,
+    children,
+    ref,
+}: SheetContentProps) => {
+    return(
+        <div 
+            className={cn(className)}
+            ref={ref}
+        >
+            {children}
+        </div>
+    )
+}
 
-SheetHeader.displayName = 'SheetHeader';
-SheetContent.displayName = 'SheetContent';
-SheetFooter.displayName = 'SheetFooter';
+SheetContent.displayName = "SheetContent";
 
-export { SheetPortal, Sheet, SheetHeader, SheetContent, SheetFooter };
+const SheetFooter = ({
+    className,
+    children,
+    ref,
+}: SheetFooterProps) => {
+    return(
+        <div 
+            className={cn(className)}
+            ref={ref}
+        >
+            {children}
+        </div>
+    )
+}
+
+SheetFooter.displayName = "SheetFooter";
+
+export { SheetPortal, Sheet, SheetHeader, SheetContent ,SheetFooter }

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { Popup } from './Popup';
-import { Button } from '@plug/ui';
+import { Button } from '../Button/Button';
 import { PopupPlacement } from './Popup.types';
 import { Card, CardHeader, CardTitle, CardContent } from '../Card/Card';
 

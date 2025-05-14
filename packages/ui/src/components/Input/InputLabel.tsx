@@ -12,7 +12,7 @@ const InputLabel = ({
       ref={ref}
       htmlFor={id}
       className={cn(
-        "block text-sm text-slate-700 font-medium leading-none",
+        "text-sm",
         className
       )}
       {...props}

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Dropdown } from '@plug/ui';
-import { Button } from '@plug/ui';
+import { Dropdown } from '../Dropdown';
+import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { useState } from 'react';
 

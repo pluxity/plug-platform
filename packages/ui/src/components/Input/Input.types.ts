@@ -1,5 +1,5 @@
 import { InputHTMLAttributes } from 'react'
-import { FormFieldProps } from '../Form'
+import { FormFieldProps } from '../Form/Form.types'
 
 export interface InputProps<T = string>
     extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>,

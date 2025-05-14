@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export interface FooterProps {
+interface FooterProps {
   children?: ReactNode;
 }
 

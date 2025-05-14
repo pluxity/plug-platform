@@ -3,10 +3,10 @@ import type {Meta, StoryObj} from '@storybook/react'
 import {Form} from './Form'
 import {FormItem} from './Form'
 import {Input} from '../Input'
-import {Button} from '@plug/ui'
-import {Checkbox} from '@plug/ui';
+import {Button} from '../Button'
+import {Checkbox} from '../Checkbox';
 import {RadioGroup} from '../Radio';
-import {email, maxLength, minLength, required} from "@plug/ui";
+import {email, maxLength, minLength, required} from "./validationUtils";
 import {FormSubmitButton} from "../Button/Button";
 
 interface FormValues {
