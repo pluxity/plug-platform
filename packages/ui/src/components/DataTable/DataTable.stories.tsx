@@ -27,6 +27,10 @@ const meta: Meta<typeof DataTable> = {
     filterFunction: {
       action: 'filterFunction',
     },
+    selectable: {
+      control: 'boolean',
+      defaultValue: false,
+    }
   },
 };
 
@@ -108,6 +112,18 @@ export const CustomPageSizeAndBlock: Story = {
       pageSize={3}
       pageBlock={3} 
       filterFunction={(item, search) => item.name.toLowerCase().includes(search.toLowerCase())}
+    />
+  ),
+};
+
+export const selectTable: Story = {
+  render: () => (
+    <DataTable
+      data={sampleData}
+      columns={columns}
+      pageSize={5}
+      filterFunction={(item, search) => item.name.toLowerCase().includes(search.toLowerCase())}
+      selectable={true}
     />
   ),
 };

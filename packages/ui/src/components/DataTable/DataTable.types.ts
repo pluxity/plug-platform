@@ -12,6 +12,7 @@ export interface Column<T> {
     filterFunction?: (item: T, search: string) => boolean
     showSearch?: boolean
     showPagination?: boolean
+    selectable?: boolean 
   }
   
   export interface PaginationProps {
@@ -31,10 +32,16 @@ export interface Column<T> {
     sortKey: keyof T | null
     sortOrder: 'asc' | 'desc'
     onSort: (key: keyof T) => void
+    selectable?: boolean 
+    selectedAll?: boolean
+    onSelectChange?: (value: boolean) => void
   }
   
   export interface TableBodyProps<T> {
     data: T[]
     columns: Column<T>[]
     search?: string; // 검색어 추가
+    selectable?: boolean
+    selectedRows?: Set<T>
+    onSelectChange?: (row: T) => void
   }

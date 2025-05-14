@@ -6,19 +6,21 @@ import TableBody from './TableBody';
 import SearchFilter from './SearchFilter';
 
 const DataTable = <T,>({
-                         data,
-                         columns,
-                         pageSize = 5,
-                         pageBlock = 10,
-                         onPageChange,
-                         filterFunction,
-                         showSearch = false,
-                         showPagination = true,
-                       }: DataTableProps<T>) => {
+    data,
+    columns,
+    pageSize = 5,
+    pageBlock = 10,
+    onPageChange,
+    filterFunction,
+    showSearch = false,
+    showPagination = true,
+    selectable = false,
+  }: DataTableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [search, setSearch] = useState('');
+  const [selectedRows, setSelectedRows] = useState<Set<T>>(new Set());
 
   const filteredAndSortedData = useMemo(() => {
     let filtered = data;
@@ -57,17 +59,39 @@ const DataTable = <T,>({
     }
   };
 
+  const selectedAll = selectedRows.size === data.length;
+
+  const handleSelectAll = () => {
+    if (selectedAll){
+      setSelectedRows(new Set());
+    } else{
+      setSelectedRows(new Set(data));
+    }
+  }
+  
+  const handleSelectRow = (row: T) => {
+    setSelectedRows((prev) => {
+      const selected = new Set(prev);
+      if(selected.has(row)){
+        selected.delete(row);
+      }else{
+        selected.add(row);
+      }
+      return selected;
+    });
+  };
+
   return (
       <div className="w-full overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm p-4">
         {showSearch && (
             <SearchFilter search={search} onSearchChange={setSearch} />
         )}
         <table className="min-w-full text-sm text-left text-slate-700 border-separate border-spacing-0">
-          <TableHeader columns={columns} sortKey={sortKey} sortOrder={sortOrder} onSort={handleSort} />
-          <TableBody data={paginatedData} columns={columns} search={search} />
+          <TableHeader columns={columns} sortKey={sortKey} sortOrder={sortOrder} onSort={handleSort} selectable={selectable} selectedAll={selectedAll} onSelectChange={handleSelectAll}/>
+          <TableBody data={paginatedData} columns={columns} search={search} selectable={selectable} selectedRows={selectedRows} onSelectChange={handleSelectRow}/>
         </table>
         {showPagination && (
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-center">
               <Pagination
                   currentPage={currentPage}
                   pageBlock={pageBlock}

@@ -25,7 +25,7 @@ const Modal = React.memo(({
             ref={ref}
             closeOnOverlayClick={false}
             contentClassName={cn(
-                'max-w-[90vw] max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden',
+                'max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden',
                 contentClassName
             )}
         >
