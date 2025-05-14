@@ -36,6 +36,7 @@
       "@plug/engine": ["packages/engine/src"],
       "@plug/api-hooks": ["packages/api-hooks/src"],
       "@plug/common-services": ["packages/common-services/src"],
+      "@plug/v1/*": ["apps/v1/src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
