@@ -48,16 +48,14 @@ const InputBox = ({
   });
   
   return (
-    <div 
-      ref={ref}
-      className={cn("inline-flex flex-col gap-1", className)} 
-      {...props}
-    >
-      <div className={cn("inline-flex items-center gap-2")}>
+      <div
+          ref={ref}
+          className={cn("flex flex-col gap-1.5 w-full", className)}
+          {...props}
+      >
         {elementProps}
+        {helperTextsProp}
       </div>
-      {helperTextsProp}
-    </div>
   );
 };
 
