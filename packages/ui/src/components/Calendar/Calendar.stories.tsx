@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Calendar } from './Calendar';
+import { Calendar } from '@plug/ui';
 import { ko } from 'date-fns/locale'
 
 const meta: Meta<typeof Calendar> = {
