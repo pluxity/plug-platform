@@ -30,16 +30,16 @@ export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps)
                         </Select.Content>
                     </Select>
                 </FormItem>
-                <FormItem name="id" label='아이디'>
+                <FormItem name="id" label='아이디' required>
                     <Input.Text placeholder="사용자의 아이디를 입력해주세요."/>
                 </FormItem>
-                <FormItem name="password" label='비밀번호'>
+                <FormItem name="password" label='비밀번호' required>
                     <Input.Text type="password" placeholder="사용자의 비밀번호를 입력해주세요."/>
                 </FormItem>
-                <FormItem name="username" label='이름'>
+                <FormItem name="username" label='이름' required>
                     <Input.Text type="text" placeholder="사용자의 이름을 입력해주세요."/>
                 </FormItem>
-                <FormItem name="code" label='코드'>
+                <FormItem name="code" label='코드' required>
                     <Input.Text type="text" placeholder="사용자의 코드를 입력해주세요."/>
                 </FormItem>
                 <div className="mt-6 flex justify-center gap-2">

@@ -18,10 +18,10 @@ import type {
  * @param method - HTTP 메서드 (기본값: 'GET')
  * @param options - API 요청에 사용할 옵션 객체 (헤더, 인증 여부 등)
  * @param config - SWR의 추가 설정 객체
- * @returns UseSWRApiReturn<T> - SWR이 관리하는 상태(data, error, isLoading, mutate)를 포함한 객체
+ * @returns UseSWRApiReturn<T> - SWR이 관리하는 상태(data, boundary, isLoading, mutate)를 포함한 객체
  *
  * @example
- * const { data, error, isLoading } = useSWRApi<User[]>('/api/users');
+ * const { data, boundary, isLoading } = useSWRApi<User[]>('/api/users');
  *
  * @example
  * const { mutate } = useSWRApi('/api/item/1', 'DELETE');
