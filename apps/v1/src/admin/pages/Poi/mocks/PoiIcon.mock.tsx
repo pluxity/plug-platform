@@ -15,7 +15,7 @@ export const columns: Column<Icon>[] = [
 export const createIconData = (openModal: (mode: 'create' | 'edit') => void): Icon[] => [
     { 
         select: <Checkbox />, 
-        id: '1', 
+        id: 1, 
         name: '자동심장충격기', 
         icon: <img src="" alt="" />,
         code: 'null', 
@@ -28,7 +28,7 @@ export const createIconData = (openModal: (mode: 'create' | 'edit') => void): Ic
     },
     { 
         select: <Checkbox />, 
-        id: '2', 
+        id: 2, 
         name: '키오스크', 
         icon: <img src="" alt="" />,
         code: 'null', 
@@ -41,7 +41,7 @@ export const createIconData = (openModal: (mode: 'create' | 'edit') => void): Ic
     },
     { 
         select: <Checkbox />, 
-        id: '3', 
+        id: 3, 
         name: '비콘', 
         icon: <img src="" alt="" />,
         code: 'ADMIN', 
