@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Sheet } from '../Sheet';
-import { Button } from '../Button';
+import { Button } from '@plug/ui';
 import { useState } from 'react';
 
 const meta: Meta<typeof Sheet> = {

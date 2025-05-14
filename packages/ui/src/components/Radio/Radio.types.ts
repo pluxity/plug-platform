@@ -1,5 +1,5 @@
 import type { Color, Size } from '../types';
-import {FormFieldProps} from "../Form/Form.types";
+import {FormFieldProps} from "@plug/ui";
 
 type RadioColor = Exclude<Color, 'destructive'>;
 

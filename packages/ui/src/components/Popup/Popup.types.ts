@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Placement } from '../types';
-import type { DialogProps } from '../Dialog/Dialog.types';
+import type { DialogProps } from '../Dialog';
 
 export type PopupPlacement = Exclude<Placement, 'left' | 'right'>;
 
