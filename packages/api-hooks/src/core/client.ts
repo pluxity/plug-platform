@@ -10,7 +10,7 @@ export const setTokenGetter = (fn: () => string | null) => {
 };
 
 const baseKy = ky.create({
-  prefixUrl: 'api',
+  prefixUrl: '/api/',
   headers: {
     'Content-Type': 'application/json'
   },
