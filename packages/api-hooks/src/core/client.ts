@@ -1,7 +1,7 @@
 import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
-const BASE_URL = 'http://192.168.4.37:8080';
+// const BASE_URL = 'http://192.168.4.37:8080';
 
 let getAccessToken: () => string | null = () => null;
 
@@ -10,7 +10,7 @@ export const setTokenGetter = (fn: () => string | null) => {
 };
 
 const baseKy = ky.create({
-  prefixUrl: BASE_URL,
+  prefixUrl: '/api',
   headers: {
     'Content-Type': 'application/json'
   },
