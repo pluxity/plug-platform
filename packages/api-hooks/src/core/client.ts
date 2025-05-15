@@ -39,6 +39,13 @@ const baseKy = ky.create({
   }
 });
 
+export const externalApiClient = ky.create({
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 const buildKy = (
     options: RequestOptions & Options = {}
 ) => {
