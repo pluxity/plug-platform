@@ -1,6 +1,6 @@
 import { Modal, Form, Button, Select, Input, FormItem } from '@plug/ui';
 import { CreateFormValues } from '../types/UserModal.types';
-import { useRolesSWR } from "@plug/common-services";
+import {useCreateUser, useRolesSWR} from "@plug/common-services";
 
 export interface CreateUserModalProps {
     isOpen: boolean;
@@ -9,10 +9,18 @@ export interface CreateUserModalProps {
 }
 
 export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps) =>{
-    const { data: roleList, error } = useRolesSWR();
+    const { data: roleList } = useRolesSWR();
+    const { execute: createUser, error } = useCreateUser();
 
-    const handleFinish = (values: CreateFormValues) => {
-        alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
+    const handleFinish = async (values: CreateFormValues) => {
+        const result = await createUser(values);
+
+        if (result) {
+            alert('사용자 등록 완료');
+            onClose();
+        } else {
+            alert(error?.message ?? '등록 실패');
+        }
     };
 
     return(
@@ -24,30 +32,36 @@ export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps)
             overlayClassName="bg-black/50"
         >
             <Form<CreateFormValues> onSubmit={handleFinish}>
-                <FormItem name="role" label='권한 선택' required>
+                <FormItem name="role" label='권한 선택'>
                     <Select className="w-full" type="multiple">
-                        <Select.Trigger placeholder="권한을 선택해주세요"/>
-                        {error &&
-                        <Select.Content>권한 목록을 가져오지 못했습니다.</Select.Content>
-                        }
-                        {!error && !roleList?.length &&
+                        <Select.Trigger placeholder="권한을 선택해주세요" />
                         <Select.Content>
-                            {roleList?.map((role) => (
-                                <Select.Item key={role.id} value={String(role.id)}>
-                                    {role.name} : {role.description}
-                                </Select.Item>
-                            ))}
+                            {error && (
+                                <div className="px-2 py-1 text-sm text-red-500">권한 목록을 가져오지 못했습니다.</div>
+                            )}
+                            {!error && !roleList && (
+                                <div className="px-2 py-1 text-sm text-gray-400">로딩중...</div>
+                            )}
+                            {!error && roleList && roleList.length === 0 && (
+                                <div className="px-2 py-1 text-sm text-gray-400">권한 목록이 없습니다.</div>
+                            )}
+                            {!error && roleList && roleList.length > 0 &&
+                                roleList.map((role) => (
+                                    <Select.Item key={role.id} value={String(role.name)}>
+                                        {role.name}
+                                    </Select.Item>
+                                ))}
                         </Select.Content>
-                        }
                     </Select>
+
                 </FormItem>
-                <FormItem name="id" label='아이디' required>
+                <FormItem name="username" label='아이디' required>
                     <Input.Text placeholder="사용자의 아이디를 입력해주세요."/>
                 </FormItem>
                 <FormItem name="password" label='비밀번호' required>
                     <Input.Text type="password" placeholder="사용자의 비밀번호를 입력해주세요."/>
                 </FormItem>
-                <FormItem name="username" label='이름' required>
+                <FormItem name="name" label='이름' required>
                     <Input.Text type="text" placeholder="사용자의 이름을 입력해주세요."/>
                 </FormItem>
                 <FormItem name="code" label='코드' required>

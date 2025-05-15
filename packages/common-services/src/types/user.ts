@@ -5,6 +5,7 @@ export interface UserCreateRequest {
     password: string;
     name: string;
     code: string;
+    role?: string[];
 }
 
 export interface UserUpdateRequest {

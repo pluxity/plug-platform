@@ -2,7 +2,7 @@ import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
 import type { UserResponse, UserCreateRequest, UserUpdateRequest } from '@plug/common-services';
 
-const USER_API = `/admin/users`;
+const USER_API = `admin/users`;
 
 // 사용자 목록 조회
 export const useUsers = () => {

@@ -14,6 +14,7 @@ export default function UserListPage() {
         select: false,
         management: false
     }));
+    console.log(users);
     const userData = createUserData(openModal);
 
     if (!userData || userData.length === 0) return <div className="text-gray-500">데이터가 없습니다.</div>;

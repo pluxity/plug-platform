@@ -2,7 +2,7 @@ import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
 import type { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@plug/common-services';
 
-const ROLE_API = `/roles`;
+const ROLE_API = `roles`;
 
 // 역할 목록 조회
 export const useRoles = () => {
