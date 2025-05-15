@@ -1,5 +1,6 @@
 import { Modal, Form, Button, Select, Input, FormItem } from '@plug/ui';
 import { CreateFormValues } from '../types/UserModal.types';
+import { useRolesSWR } from "@plug/common-services";
 
 export interface CreateUserModalProps {
     isOpen: boolean;
@@ -8,6 +9,8 @@ export interface CreateUserModalProps {
 }
 
 export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps) =>{
+    const { data: roleList, error } = useRolesSWR();
+
     const handleFinish = (values: CreateFormValues) => {
         alert(`Submitted values: ${JSON.stringify(values, null, 2)}`);
     };
@@ -21,13 +24,21 @@ export const CreateUserModal = ({ isOpen, onClose, mode }: CreateUserModalProps)
             overlayClassName="bg-black/50"
         >
             <Form<CreateFormValues> onSubmit={handleFinish}>
-                <FormItem name="role" label='권한'>
-                    <Select className="w-full">
-                        <Select.Trigger placeholder="권한"/>
+                <FormItem name="role" label='권한 선택' required>
+                    <Select className="w-full" type="multiple">
+                        <Select.Trigger placeholder="권한을 선택해주세요"/>
+                        {error &&
+                        <Select.Content>권한 목록을 가져오지 못했습니다.</Select.Content>
+                        }
+                        {!error && !roleList?.length &&
                         <Select.Content>
-                            <Select.Item value="user">USER</Select.Item>
-                            <Select.Item value="admin">ADMIN</Select.Item>
+                            {roleList?.map((role) => (
+                                <Select.Item key={role.id} value={String(role.id)}>
+                                    {role.name} : {role.description}
+                                </Select.Item>
+                            ))}
                         </Select.Content>
+                        }
                     </Select>
                 </FormItem>
                 <FormItem name="id" label='아이디' required>
