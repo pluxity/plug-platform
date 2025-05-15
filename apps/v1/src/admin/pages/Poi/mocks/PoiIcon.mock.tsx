@@ -1,8 +1,8 @@
-import { Icon } from '../types/PoiIcon.types';
+import { PoiIcon } from '../types/PoiIcon.types';
 import { Checkbox, Button } from '@plug/ui';
 import type { Column } from '@plug/ui';
 
-export const columns: Column<Icon>[] = [
+export const columns: Column<PoiIcon>[] = [
     { key: 'select', label: '선택' },
     { key: 'id', label: '아이디' },
     { key: 'name', label: '이름' },
@@ -12,7 +12,7 @@ export const columns: Column<Icon>[] = [
     { key: 'management', label: '관리' },
 ];
 
-export const createIconData = (openModal: (mode: 'create' | 'edit') => void): Icon[] => [
+export const createIconData = (openModal: (mode: 'create' | 'edit') => void): PoiIcon[] => [
     { 
         select: <Checkbox />, 
         id: 1, 

@@ -1,8 +1,6 @@
 export interface AssetResponse {
     id: number,
     name: string,
-    type: 'TWO_DIMENSION' | string,
-    createdBy: string,
     file: {
       id: number,
       url: string,
@@ -21,13 +19,11 @@ export interface AssetResponse {
 export interface AssetCreateRequest {
     type: string,
     name: string,
-    fileId: number
 }
 
 export interface AssetUpdateRequest {
     type: string,
     name: string,
-    fileId: number
 }
 
 

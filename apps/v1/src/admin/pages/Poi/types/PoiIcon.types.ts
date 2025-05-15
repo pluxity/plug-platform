@@ -1,4 +1,4 @@
-export interface Icon {
+export interface PoiIcon {
     select: React.ReactNode;
     id: number;
     name: string;
@@ -6,10 +6,5 @@ export interface Icon {
     code: string;
     update: string;
     management: React.ReactNode;
-    file?: {
-        url: string;
-        originalFileName: string;
-        contentType: string;
-    }
 }
 

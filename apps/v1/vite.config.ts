@@ -24,15 +24,9 @@ export default defineConfig({
     allowedHosts: ['app.plug-platform.com'],
     port: 8080,
     proxy: {
-      '/auth': {
+      '/api': {
         target: 'http://api.plug-platform.com:8080',
       },
-      '/files': {
-        target: 'http://api.plug-platform.com:8080',
-      },
-      '/users' : {
-        target: 'http://api.plug-platform.com:8080',
-      }
     }
   }
 });
