@@ -83,5 +83,9 @@ export const api = {
   delete: async <T>(endpoint: string, options: RequestOptions = {}): Promise<ResponseTypes<T>['DELETE']> => {
     const res = await buildKy(options).delete(endpoint);
     return res.status === 204 ? undefined as ResponseTypes<T>['DELETE'] : res.json();
-  }
+  },
+
+  getAbsolute: async <T>(absoluteUrl: string): Promise<ResponseTypes<T>['GET']> => {
+    return externalApiClient.get(absoluteUrl).json();
+  },
 };
