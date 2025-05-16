@@ -1,14 +1,29 @@
 import { TableHeaderProps } from './DataTable.types';
+import { Checkbox } from '../Checkbox';
 
 const TableHeader = <T,>({
                              columns,
                              sortKey,
                              sortOrder,
                              onSort,
+                             selectable = false,
+                             selectedAll = false,
+                             onSelectChange,
                          }: TableHeaderProps<T>) => {
     return (
         <thead className="bg-slate-100 text-slate-700 text-xs font-semibold">
         <tr>
+            {selectable && (
+                <th
+                    scope="col"
+                    className="p-3 border-b border-slate-200"
+                >
+                    <Checkbox 
+                        checked={selectedAll}
+                        onChange={onSelectChange}
+                    />
+                </th>
+            )}
             {columns.map((col) => (
                 <th
                     key={String(col.key)}

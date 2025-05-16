@@ -1,8 +1,16 @@
 import React from 'react';
 import { TableBodyProps } from './DataTable.types';
 import { cn } from '../../utils/classname';
+import { Checkbox } from '../Checkbox';
 
-const TableBody = <T,>({ data, columns, search }: TableBodyProps<T> & { search?: string }) => {
+const TableBody = <T,>({ 
+    data, 
+    columns, 
+    search, 
+    selectable = false, 
+    selectedRows,
+    onSelectChange,
+}: TableBodyProps<T> & { search?: string }) => {
   const highlightText = (text: string, search: string) => {
     if (!search) return text;
     const parts = text.split(new RegExp(`(${search})`, 'gi'));
@@ -34,6 +42,17 @@ const TableBody = <T,>({ data, columns, search }: TableBodyProps<T> & { search?:
                       'hover:bg-slate-100 transition-colors'
                   )}
               >
+                {selectable && (
+                  <th
+                        scope="col"
+                        className="p-3 border-t border-slate-200"
+                    >
+                        <Checkbox 
+                              checked={selectedRows?.has(row)}
+                              onChange={() => onSelectChange?.(row)}
+                        />
+                    </th>
+                )}
                 {columns.map((col) => (
                     <td
                         key={String(col.key)}
