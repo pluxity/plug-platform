@@ -15,7 +15,7 @@ const Button = React.memo(({
                                ...props
                            }: ButtonProps) => {
     const baseStyle =
-        "inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none";
+        "inline-flex items-center justify-center gap-2 rounded-lg w-full h-10 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none";
 
     const variantStyles = {
         default: "bg-slate-100 text-slate-800 hover:bg-slate-200",

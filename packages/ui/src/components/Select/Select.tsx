@@ -130,7 +130,7 @@ const SelectTrigger = ({
         <div
             onClick={() => !disabled && setIsSelected(!isSelected)}
             className={cn(
-                "h-10 w-full flex flex-wrap items-start gap-1 rounded-md px-3 py-2 border bg-white shadow-sm transition-all",
+                "h-10 w-full flex flex-wrap items-start gap-1 rounded-md px-3 py-2 border bg-white transition-all",
                 "focus-within:ring-2 focus-within:ring-blue-500",
                 "overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent",
                 disabled && "bg-slate-100 text-slate-400 cursor-not-allowed",
