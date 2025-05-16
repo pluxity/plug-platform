@@ -1,7 +1,7 @@
 import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
-const BASE_URL = 'http://192.168.4.37:8080';
+// const BASE_URL = 'http://192.168.4.37:8080';
 
 let getAccessToken: () => string | null = () => null;
 
@@ -10,7 +10,7 @@ export const setTokenGetter = (fn: () => string | null) => {
 };
 
 const baseKy = ky.create({
-  prefixUrl: BASE_URL,
+  prefixUrl: '/api/',
   headers: {
     'Content-Type': 'application/json'
   },
@@ -37,6 +37,13 @@ const baseKy = ky.create({
       }
     ]
   }
+});
+
+export const externalApiClient = ky.create({
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 const buildKy = (
@@ -76,5 +83,9 @@ export const api = {
   delete: async <T>(endpoint: string, options: RequestOptions = {}): Promise<ResponseTypes<T>['DELETE']> => {
     const res = await buildKy(options).delete(endpoint);
     return res.status === 204 ? undefined as ResponseTypes<T>['DELETE'] : res.json();
-  }
+  },
+
+  getAbsolute: async <T>(absoluteUrl: string): Promise<ResponseTypes<T>['GET']> => {
+    return externalApiClient.get(absoluteUrl).json();
+  },
 };
