@@ -17,13 +17,13 @@ export interface AssetResponse {
 }
 
 export interface AssetCreateRequest {
-    type: string,
     name: string,
+    filedId: number,
 }
 
 export interface AssetUpdateRequest {
-    type: string,
     name: string,
+    filedId: number,
 }
 
 
