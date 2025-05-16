@@ -13,6 +13,8 @@ export interface Column<T> {
     showSearch?: boolean
     showPagination?: boolean
     selectable?: boolean 
+    selectedRows?: Set<T>
+    onSelectChange?: (selectedRows: Set<T>) => void
   }
   
   export interface PaginationProps {
