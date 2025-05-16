@@ -2,7 +2,7 @@ import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
 export const baseKy = ky.create({
-  prefixUrl: 'api',
+  prefixUrl: '/api/',
   credentials: 'include',
   headers: {
     'Content-Type': 'application/json'

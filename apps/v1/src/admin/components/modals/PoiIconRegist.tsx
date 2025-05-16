@@ -23,10 +23,10 @@ export const PoiIconRegistModal = ({ isOpen, onClose, mode }: PoiIconRegistProps
             overlayClassName="bg-black/50"
         >
             <Form<PoiIconRegistValue> onSubmit={handleFinish}>
-                <FormItem name="poiIconRegistName" label='이름'>
+                <FormItem name="poiIconRegistName" label='이름' required>
                     <Input.Text />
                 </FormItem>
-                <FormItem name="poiIconRegistFile" label='일괄 등록 파일'>
+                <FormItem name="poiIconRegistFile" label='일괄 등록 파일' required>
                     <div>
                         <input type='file' name='file' accept=".xlsx, .xls, .csv" 
                             className="w-full text-sm border-1 border-gray-300 rounded-sm py-1 px-1 file:bg-gray-200 file:px-1 file:py-1 file:border-1 file:text-sm file:border-gray-300 file:rounded-sm file:cursor-pointer"
