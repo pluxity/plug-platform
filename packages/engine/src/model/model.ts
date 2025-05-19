@@ -126,7 +126,7 @@ function getLowestFloorObject(): THREE.Object3D {
 //         // 콜백 호출
 //         onComplete?.(result);
 
-//     }, undefined, (err) => console.error(err));
+//     }, undefined, (err) => console.boundary(err));
 // }
 
 function GetModelHierarchy(): Interfaces.ModelInfo[] {

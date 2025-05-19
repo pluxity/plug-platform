@@ -17,7 +17,7 @@ import {
  * @param apiMethod - 실제 API 호출을 수행하는 비동기 함수. (...args: P) => Promise<unknown> 형태여야 함.
  * 이 함수는 성공 시 T 타입의 데이터, { data: T } 형태의 객체, 또는 void/null/undefined를 반환할 수 있음.
  * 실패 시 Error 또는 ErrorResponseBody 형태의 객체를 throw해야 함.
- * @returns UseApiResponse<T, P> - API 상태(data, error, loading)와 실행 함수(execute), 초기화 함수(reset) 포함 객체
+ * @returns UseApiResponse<T, P> - API 상태(data, boundary, loading)와 실행 함수(execute), 초기화 함수(reset) 포함 객체
  */
 export function useApi<T, P extends any[] = any[]>(
   apiMethod: (...args: P) => Promise<unknown>,

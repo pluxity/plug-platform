@@ -12,9 +12,7 @@ export const logIn = async (data: { username: string; password: string }): Promi
         throw new Error('Location header not found');
     }
 
-    const user = await api.getAbsolute<AuthUserProfile>(location, {
-        requireAuth: true,
-    });
+    const user = await api.getAbsolute<AuthUserProfile>(location);
 
     useProfileStore.getState().setUser(user.data);
 

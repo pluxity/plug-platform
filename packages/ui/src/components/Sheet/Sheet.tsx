@@ -32,7 +32,7 @@ const Sheet = ({
     const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
-    closable = !(overlay && closeOnOverlayClick);
+    closable = overlay && closeOnOverlayClick ? false : true;
 
     useEffect(() => {
         if (isOpen) {
