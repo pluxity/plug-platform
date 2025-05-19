@@ -29,7 +29,7 @@ const TableBody = <T,>({
       <tbody>
       {data.length === 0 ? (
           <tr>
-            <td colSpan={columns.length} className="p-4 text-center text-slate-400 text-sm">
+            <td colSpan={selectable ? columns.length + 1 : columns.length} className="p-4 text-center text-slate-400 text-sm">
               데이터가 없습니다.
             </td>
           </tr>
@@ -43,15 +43,12 @@ const TableBody = <T,>({
                   )}
               >
                 {selectable && (
-                  <th
-                        scope="col"
-                        className="p-3 border-t border-slate-200"
-                    >
+                  <td className="p-3 border-t border-slate-200">
                         <Checkbox 
                               checked={selectedRows?.has(row)}
                               onChange={() => onSelectChange?.(row)}
                         />
-                    </th>
+                    </td>
                 )}
                 {columns.map((col) => (
                     <td

@@ -15,7 +15,7 @@ export default function PoiIcon() {
     return (
         <>
             <div className='flex items-center flex-wrap gap-1'>    
-                <div className='flex'>
+                <div className='flex items-center'>
                     <Input.Text className='w-60' placeholder='아이콘명을 입력하세요.'/>
                     <Button color='primary' className='ml-1'>검색</Button>
                 </div>
@@ -34,6 +34,7 @@ export default function PoiIcon() {
                         data={poiIconData}
                         columns={columns}
                         pageSize={10}
+                        selectable={true}
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (

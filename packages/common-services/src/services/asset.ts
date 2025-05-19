@@ -29,6 +29,6 @@ export const useAssetsSWR = () => {
     return useSWRApi<AssetResponse[]>(ASSET_API, 'GET', { requireAuth: true });
 };
 
-export const useRoleDetailSWR = (assetId: number) => {
+export const useAssetsDetailSWR = (assetId: number) => {
     return useSWRApi<AssetResponse>(`${ASSET_API}/${assetId}`, 'GET', { requireAuth: true });
 }

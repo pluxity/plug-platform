@@ -2,7 +2,6 @@ import { PoiIcon } from '../types/PoiIcon.types';
 import type { Column } from '@plug/ui';
 
 export const columns: Column<PoiIcon>[] = [
-    { key: 'select', label: '선택' },
     { key: 'id', label: '아이디' },
     { key: 'name', label: '이름' },
     { key: 'icon', label: '아이콘' },

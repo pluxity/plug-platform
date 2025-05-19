@@ -1,13 +1,12 @@
 import { AssetResponse } from '@plug/common-services';
 import { PoiIcon } from '../types/PoiIcon.types';
-import { Checkbox, Button } from '@plug/ui';
+import { Button } from '@plug/ui';
 
 export function mapAssetsToPoiIcons(
   assets: AssetResponse[],
   openModal: (mode: 'create' | 'edit') => void
 ): PoiIcon[] {
   return assets.map(asset => ({
-    select: <Checkbox />,
     id: asset.id,
     name: asset.name,
     icon: <img src={asset.file?.url} alt={asset.file?.originalFileName} className="w-6 h-6" />,
