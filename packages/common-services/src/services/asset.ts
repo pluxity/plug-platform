@@ -2,7 +2,7 @@ import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
 import { AssetResponse, AssetCreateRequest, AssetUpdateRequest } from '@plug/common-services/types';
 
-const ASSET_API = `asset`;
+const ASSET_API = `assets`;
 
 export const useAssets = () => {
     return useGet<AssetResponse[]>(ASSET_API, { requireAuth: true });

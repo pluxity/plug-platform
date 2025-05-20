@@ -1,9 +1,8 @@
 import { PoiIcon } from '../types/PoiIcon.types';
-import { Checkbox, Button } from '@plug/ui';
+import { Button } from '@plug/ui';
 import type { Column } from '@plug/ui';
 
 export const columns: Column<PoiIcon>[] = [
-    { key: 'select', label: '선택' },
     { key: 'id', label: '아이디' },
     { key: 'name', label: '이름' },
     { key: 'icon', label: '아이콘' },
@@ -14,7 +13,6 @@ export const columns: Column<PoiIcon>[] = [
 
 export const createIconData = (openModal: (mode: 'create' | 'edit') => void): PoiIcon[] => [
     { 
-        select: <Checkbox />, 
         id: 1, 
         name: '자동심장충격기', 
         icon: <img src="" alt="" />,
@@ -27,7 +25,6 @@ export const createIconData = (openModal: (mode: 'create' | 'edit') => void): Po
         </div>, 
     },
     { 
-        select: <Checkbox />, 
         id: 2, 
         name: '키오스크', 
         icon: <img src="" alt="" />,
@@ -40,7 +37,6 @@ export const createIconData = (openModal: (mode: 'create' | 'edit') => void): Po
         </div>, 
     },
     { 
-        select: <Checkbox />, 
         id: 3, 
         name: '비콘', 
         icon: <img src="" alt="" />,

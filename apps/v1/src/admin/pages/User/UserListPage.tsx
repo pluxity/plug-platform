@@ -1,23 +1,33 @@
 import {Select, Input, Button, DataTable, Skeleton} from '@plug/ui';
-import { columns, createUserData } from './mocks/UserList.mock';
+import { columns } from './constants/userListColumns';
 import { CreateUserModal } from './components/CreateUserModal';
 import { useModal } from '../../components/hook/useModal';
-import {useUsersSWR} from "@plug/common-services";
-import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
+import { useUsersSWR, deleteUser } from "@plug/common-services";
+import { useUserList } from './utils/useUserList';
+import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
+import { useState } from 'react';
+import { User } from './types/UserList.types';
 
 export default function UserListPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
-    const { data, error, isLoading } = useUsersSWR();
-    const users = data?.map(user => ({
-        ...user,
-        id: String(user.id),
-        select: false,
-        management: false
-    }));
-    console.log(users);
-    const userData = createUserData(openModal);
+    const { data, error, isLoading, mutate } = useUsersSWR();
+    const [selectState, setSelectState] = useState<Set<User>>(new Set());
 
-    if (!userData || userData.length === 0) return <div className="text-gray-500">데이터가 없습니다.</div>;
+    const handleDelete = async (userId: number) => {
+        deleteUser(userId).then(() => {mutate();})
+      };
+
+    const handleDeleteSelected = () => {
+        Promise.all(
+            Array.from(selectState).map(user => handleDelete(Number(user.id)))
+        )
+        .then(() => {
+            alert(`${selectState.size} 개의 항목이 삭제 되었습니다.`);
+            setSelectState(new Set());
+        });
+    };
+    
+    const userData = useUserList(data || [], openModal, handleDelete);
 
     return (
         <>
@@ -38,26 +48,26 @@ export default function UserListPage() {
                         <Select.Item value='code'>도면 코드</Select.Item>
                     </Select.Content>
                 </Select>
-                <div className='flex'>
+                <div className='flex items-center'>
                     <Input.Text className='w-60' placeholder='검색어를 입력하세요.'/>
                     <Button color='primary' className='ml-1'>검색</Button>
                 </div>
                 <div className='ml-auto flex gap-1'>
                     <Button color='primary' onClick={() => openModal('create')}>등록</Button>
-                    <Button color='destructive'>삭제</Button>
+                    <Button color='destructive' onClick={handleDeleteSelected}>삭제</Button>
                 </div>
             </div>
             <div className='mt-4'>
                 {error && <StateInfoWrapper preset="defaultError" />}
-                {isLoading && <Skeleton />}
-                {!isLoading && !error && (!users || users.length === 0) && (
-                    <StateInfoWrapper preset="emptyTable" />
-                )}
-                {!isLoading && !error && users && (
+                {isLoading && <Skeleton className="w-full h-100"/>}
+                {!isLoading && !error && userData && (
                     <DataTable
-                        data={users || []}
+                        data={userData || []}
                         columns={columns}
                         pageSize={10}
+                        selectable={true}
+                        selectedRows={selectState}
+                        onSelectChange={setSelectState}
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (
@@ -73,7 +83,6 @@ export default function UserListPage() {
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}
-
             />
         </>
     );

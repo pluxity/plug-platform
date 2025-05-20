@@ -5,7 +5,7 @@ import TableHeader from './TableHeader';
 import TableBody from './TableBody';
 import SearchFilter from './SearchFilter';
 
-const DataTable = <T,>({
+const DataTable = <T extends { id: string | number },>({
     data,
     columns,
     pageSize = 5,
@@ -78,11 +78,24 @@ const DataTable = <T,>({
     selectedChange(newSelected);
   }
 
+  const isRowSelected = (row: T) => {
+    for (const selectedRow of currentSelected) {
+      if (selectedRow.id === row.id) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const handleSelectRow = (row: T) => {
     const newSelected = new Set(currentSelected);
-    if(newSelected.has(row)){
-      newSelected.delete(row);
-    }else{
+    if (isRowSelected(row)) {
+      for (const selectedRow of newSelected) {
+        if (selectedRow.id === row.id) {
+          newSelected.delete(selectedRow);
+        }
+      }
+    } else {
       newSelected.add(row);
     }
     selectedChange(newSelected);
@@ -95,7 +108,7 @@ const DataTable = <T,>({
         )}
         <table className="min-w-full text-sm text-left text-slate-700 border-separate border-spacing-0">
           <TableHeader columns={columns} sortKey={sortKey} sortOrder={sortOrder} onSort={handleSort} selectable={selectable} selectedAll={selectedAll} onSelectChange={handleSelectAll}/>
-          <TableBody data={paginatedData} columns={columns} search={search} selectable={selectable} selectedRows={currentSelected} onSelectChange={handleSelectRow}/>
+          <TableBody data={paginatedData} columns={columns} search={search} selectable={selectable} onSelectChange={handleSelectRow} selectedRows={isRowSelected}/>
         </table>
         {showPagination && (
             <div className="mt-4 flex justify-center">

@@ -45,7 +45,7 @@ const TableBody = <T,>({
                 {selectable && (
                   <td className="p-3 border-t border-slate-200">
                         <Checkbox 
-                              checked={selectedRows?.has(row)}
+                              checked={selectedRows?.(row)}
                               onChange={() => onSelectChange?.(row)}
                         />
                     </td>

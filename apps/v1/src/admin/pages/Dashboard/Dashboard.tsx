@@ -10,7 +10,7 @@ const Dashboard = () => {
             <header className='h-12 flex items-center py-2 px-3 bg-blue-400'>
                 <h1>Dashboard Image Area</h1>
                 <div className='flex items-center ml-auto gap-4 text-white'>
-                    <span>Admin 접속 중</span>
+                    <span className="whitespace-nowrap">Admin 접속 중</span>
                     <Button>로그아웃</Button>
                 </div>
             </header>

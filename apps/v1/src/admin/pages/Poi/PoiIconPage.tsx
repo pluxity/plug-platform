@@ -1,16 +1,15 @@
 import { Input, Button, DataTable, Skeleton } from '@plug/ui';
+import { columns } from './constants/poiIconColumns';
 import { PoiIconRegistModal } from '../../components/modals/PoiIconRegist'; 
 import { useModal } from '../../components/hook/useModal';
-import { useSWRApi } from '@plug/api-hooks';
-import { AssetResponse } from '@plug/common-services';
-import { mapAssetsToPoiIcons } from './utils/usePoiIcon';
-import { columns } from './constants/poiIconColumns';
+import { useAssetsSWR } from '@plug/common-services';
+import { usePoiIcon } from './utils/usePoiIcon';
+import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 
 export default function PoiIcon() {
     const { isOpen, mode, openModal, closeModal } = useModal();
-
-    const { data, error, isLoading } = useSWRApi<AssetResponse[]>('/assets');
-    const poiIconData = data ? mapAssetsToPoiIcons(data, openModal) : [];
+    const { data, error, isLoading } = useAssetsSWR();
+    const poiIconData = usePoiIcon(data || [], openModal);
     
     return (
         <>
@@ -25,13 +24,11 @@ export default function PoiIcon() {
                 </div>
             </div>
             <div className='mt-4'>
-                {isLoading ? (
-                    <Skeleton className="w-full h-100"/>
-                ) : error ? (
-                    <p className='text-center py-4 text-destructive-500'>데이터를 불러오는 중 오류가 발생했습니다.</p>
-                ) : (
+                {error && <StateInfoWrapper preset="defaultError" />}
+                {isLoading && <Skeleton className="w-full h-100"/>}
+                {!isLoading && !error && poiIconData && (
                     <DataTable
-                        data={poiIconData}
+                        data={poiIconData || []}
                         columns={columns}
                         pageSize={10}
                         selectable={true}
@@ -42,10 +39,8 @@ export default function PoiIcon() {
                             );
                         }}
                     />
-                )}
+                )} 
             </div>
-            
-            {/* 등록 모달 */}
             <PoiIconRegistModal
                 isOpen={isOpen}
                 onClose={closeModal}

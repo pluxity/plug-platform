@@ -1,9 +1,8 @@
 import { User } from '../types/UserList.types';
-import { Checkbox, Button } from '@plug/ui';
+import { Button } from '@plug/ui';
 import type { Column } from '@plug/ui';
 
 export const columns: Column<User>[] = [
-    { key: 'select', label: '선택' },
     { key: 'id', label: '아이디' },
     { key: 'username', label: '이름' },
     { key: 'code', label: '권한' },
@@ -12,7 +11,6 @@ export const columns: Column<User>[] = [
 
 export const createUserData = (openModal: (mode: 'create' | 'edit') => void): User[] => [
     { 
-        select: <Checkbox />, 
         id: 'ADMIN', 
         username: '관리자', 
         code: 'ADMIN', 
@@ -23,7 +21,6 @@ export const createUserData = (openModal: (mode: 'create' | 'edit') => void): Us
         </div>, 
     },
     { 
-        select: <Checkbox />, 
         id: 'pluxity', 
         username: '플럭시티', 
         code: 'USER', 
@@ -34,7 +31,6 @@ export const createUserData = (openModal: (mode: 'create' | 'edit') => void): Us
         </div>, 
     },
     { 
-        select: <Checkbox />, 
         id: 'dot', 
         username: '닷', 
         code: 'USER', 
