@@ -15,10 +15,11 @@ export type { TextareaProps } from './components/Textarea';
 export type { LabelProps } from './components/Label';
 export type { InputProps } from './components/Input';
 export type { ChartProps } from './components/Chart';
-export type { DataTableProps } from './components/DataTable';
+export type { Column, DataTableProps } from './components/DataTable';
 export type { DropdownProps } from './components/Dropdown';
 export type { SelectProps } from './components/Select';
 export type { ComboBoxProps } from './components/ComboBox';
+export type { FormProps } from './components/Form';
 
 // chart.js 타입 내보내기
 export type { ChartData, ChartOptions } from 'chart.js';
