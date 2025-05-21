@@ -18,12 +18,12 @@ export interface AssetResponse {
 
 export interface AssetCreateRequest {
     name: string,
-    filedId: number,
+    fileId: number,
 }
 
 export interface AssetUpdateRequest {
     name: string,
-    filedId: number,
+    fileId: number,
 }
 
 

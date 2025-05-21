@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { api } from '../core/client';
+import { api, fileApi } from '../core';
 import {
   UseApiResponse,
   DataResponseBody,
@@ -134,9 +134,7 @@ export const useGet = <T>(url: string, options?: RequestOptions) => {
  */
 export const usePost = <T, ReqData = any>(url: string, options?: RequestOptions) => {
   // POST 요청은 execute 호출 시 요청 데이터를 받으므로 P는 [ReqData]
-  return useApi<T, [ReqData]>((requestData) =>
-    api.post<T>(url, requestData, options)
-  );
+  return useApi<T, [ReqData]>((requestData) => api.post(url, requestData, options));
 };
 
 /**
@@ -148,9 +146,7 @@ export const usePost = <T, ReqData = any>(url: string, options?: RequestOptions)
  */
 export const usePut = <T, ReqData = any>(url: string, options?: RequestOptions) => {
   // PUT 요청은 execute 호출 시 요청 데이터를 받으므로 P는 [ReqData]
-  return useApi<T, [ReqData]>((requestData) =>
-    api.put<T>(url, requestData, options)
-  );
+  return useApi<T, [ReqData]>((requestData) => api.put(url, requestData, options));
 };
 
 /**
@@ -162,9 +158,7 @@ export const usePut = <T, ReqData = any>(url: string, options?: RequestOptions) 
  */
 export const usePatch = <T, ReqData = any>(url: string, options?: RequestOptions) => {
   // PATCH 요청은 execute 호출 시 요청 데이터를 받으므로 P는 [ReqData]
-  return useApi<T, [ReqData]>((requestData) =>
-    api.patch<T>(url, requestData, options)
-  );
+  return useApi<T, [ReqData]>((requestData) => api.patch(url, requestData, options));
 };
 
 /**
@@ -175,5 +169,9 @@ export const usePatch = <T, ReqData = any>(url: string, options?: RequestOptions
  * @param options - 요청 옵션 (RequestInit + requireAuth)
  */
 export const useDelete = (url: string, options?: RequestOptions) => {
-  return useApi<null, []>(() => api.delete<void>(url, options));
+  return useApi<null, []>(() => api.delete(url, options));
+};
+
+export const useFileApi = <T = any>(url: string = "/files/upload", options?: RequestOptions) => {
+  return useApi<T, [FormData]>((formData) => fileApi.upload(url, formData, options));
 };
