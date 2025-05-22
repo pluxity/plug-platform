@@ -1,7 +1,6 @@
-export type CreateFormValues = Record<string, string | number | boolean> & {
+export type FormListValues = Record<string, string | number | boolean> & {
     username: string;
     password: string;
     name: string;
     code: string;
-    role?: string[];
 }

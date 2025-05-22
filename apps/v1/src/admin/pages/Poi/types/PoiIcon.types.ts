@@ -1,5 +1,5 @@
 export interface PoiIcon {
-    id: number;
+    id: string;
     name: string;
     icon: React.ReactNode;
     code: string;

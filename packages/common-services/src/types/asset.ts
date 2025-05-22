@@ -11,9 +11,9 @@ export interface AssetResponse {
       updatedAt: string,
     },
     createdAt: string,
-    createBy: string,
+    createdBy: string,
     updatedAt: string,
-    updateBy: string
+    updatedBy: string
 }
 
 export interface AssetCreateRequest {

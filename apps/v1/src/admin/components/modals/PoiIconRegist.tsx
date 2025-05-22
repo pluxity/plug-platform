@@ -8,11 +8,11 @@ import { useFileUpload, createFileFormData } from '@plug/common-services';
 export interface PoiIconRegistProps{
     isOpen: boolean;
     onClose: () => void;
-    mode: 'create' | 'edit';
     onSuccess?: () => void;
+    mode: 'create' | 'edit';
 }
 
-export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess }: PoiIconRegistProps) =>{
+export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode }: PoiIconRegistProps) =>{
   const [name, setName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFileId, setUploadedFileId] = useState<number | null>(null);
@@ -108,7 +108,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess }: PoiIconRegist
   
   return (
     <Modal
-      title="3D 모델 등록"
+      title={mode === 'create' ? '3D 모델 등록' : '3D 모델 수정'}
       isOpen={isOpen}
       onClose={isProcessing ? undefined : onClose}
       closeOnOverlayClick={false}
@@ -161,7 +161,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess }: PoiIconRegist
                   {isUploading ? (
                     <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
                   ) : uploadedFileId ? (
-                    <div className="text-green-500 text-sm">✓ 업로드 완료</div>
+                    <div className="text-green-500 text-xs">업로드 완료</div>
                   ) : (
                     <Button 
                       type="button" 
@@ -185,7 +185,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess }: PoiIconRegist
               disabled={isProcessing || !uploadedFileId || !name}
               isLoading={isAssetCreating}
             >
-              등록
+              {mode === 'create' ? '등록' : '수정'}
             </Button>
           </div>
         </Form>

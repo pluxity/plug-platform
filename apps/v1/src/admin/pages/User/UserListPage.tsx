@@ -1,6 +1,6 @@
 import {Select, Input, Button, DataTable, Skeleton} from '@plug/ui';
 import { columns } from './constants/userListColumns';
-import { CreateUserModal } from './components/CreateUserModal';
+import { UserListModal } from './components/UserListModal';
 import { useModal } from '../../components/hook/useModal';
 import { useUsersSWR, deleteUser } from "@plug/common-services";
 import { useUserList } from './utils/useUserList';
@@ -15,9 +15,14 @@ export default function UserListPage() {
 
     const handleDelete = async (userId: number) => {
         deleteUser(userId).then(() => {mutate();})
-      };
+    };
+    
+    const userData = useUserList(data || [], openModal, handleDelete);
 
     const handleDeleteSelected = () => {
+        if(selectState.size === 0){
+            return alert('삭제할 항목을 선택해주세요.');
+        }
         Promise.all(
             Array.from(selectState).map(user => handleDelete(Number(user.id)))
         )
@@ -27,8 +32,6 @@ export default function UserListPage() {
         });
     };
     
-    const userData = useUserList(data || [], openModal, handleDelete);
-
     return (
         <>
             <div className='flex items-center flex-wrap gap-1'>    
@@ -79,10 +82,11 @@ export default function UserListPage() {
                     />
                 )}
             </div>
-            <CreateUserModal 
+            <UserListModal 
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}
+                onSuccess={mutate}
             />
         </>
     );
