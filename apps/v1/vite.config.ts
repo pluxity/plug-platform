@@ -26,6 +26,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://api.plug-platform.com:8080',
+        rewrite: (path) => path.replace(/^\/api/, ''),      
       },
     }
   }

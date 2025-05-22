@@ -11,24 +11,30 @@ import { PoiIcon } from './types/PoiIcon.types';
 export default function PoiIconPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
     const { data, error, isLoading, mutate } = useAssetsSWR();
-    const [selectState, setSelectState] = useState<Set<PoiIcon>>(new Set());
+    const [ selectedAssets, setSelectedAssets ] = useState<Set<PoiIcon>>(new Set());
+    const [ selectedAssetId, setSelectedAssetId ] = useState<number>();
     
     const handleDelete = async (assetId: number) => {
-        deleteAsset(assetId).then(() => {mutate();})
+        deleteAsset(assetId).then(() => mutate());
     };
-    
-    const poiIconData = usePoiIcon(data || [], openModal, handleDelete);
+
+    const handleEdit = (assetId: number) => {
+        setSelectedAssetId(assetId);
+        openModal('edit');
+    };   
+
+    const poiIconData = usePoiIcon(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = () => {
-        if(selectState.size === 0){
+        if(selectedAssets.size === 0){
             return alert('삭제할 항목을 선택해주세요.');
         }
         Promise.all(
-            Array.from(selectState).map(asset => handleDelete(Number(asset.id)))
+            Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)))
         )
         .then(() => {
-            alert(`${selectState.size} 개의 항목이 삭제 되었습니다.`);
-            setSelectState(new Set());
+            alert(`${selectedAssets.size} 개의 항목이 삭제 되었습니다.`);
+            setSelectedAssets(new Set());
         });
     };
     return (
@@ -52,8 +58,8 @@ export default function PoiIconPage() {
                         columns={columns}
                         pageSize={10}
                         selectable={true}
-                        selectedRows={selectState}
-                        onSelectChange={setSelectState}
+                        selectedRows={selectedAssets}
+                        onSelectChange={setSelectedAssets}
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (
@@ -68,6 +74,7 @@ export default function PoiIconPage() {
                 onClose={closeModal}
                 mode={mode}
                 onSuccess={mutate}
+                selectedAssetId={selectedAssetId}
             />
         </>
     );

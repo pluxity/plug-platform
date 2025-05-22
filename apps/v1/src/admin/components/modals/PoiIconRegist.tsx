@@ -1,30 +1,41 @@
-import React, { useState, useCallback } from 'react';
-
+import React, { useState, useCallback, useEffect } from 'react';
 import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
-import type { AssetCreateRequest } from '@plug/common-services';
-import { usePost } from '@plug/api-hooks';
-import { useFileUpload, createFileFormData } from '@plug/common-services';
+import { useFileUpload, createFileFormData, useAssetCreate, useAssetDetail, useAssetUpdate } from '@plug/common-services';
 
 export interface PoiIconRegistProps{
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
     mode: 'create' | 'edit';
+    selectedAssetId?: number;
 }
 
-export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode }: PoiIconRegistProps) =>{
+export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAssetId }: PoiIconRegistProps) =>{
   const [name, setName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFileId, setUploadedFileId] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   // 파일 업로드 훅
-  const { execute: uploadFile, isLoading: isFileUploading, error: fileError } = 
-    useFileUpload();
+  const { execute: uploadFile, isLoading: isFileUploading, error: fileError } = useFileUpload();
   
   // 에셋 생성 훅
-  const { execute: createAsset, isLoading: isAssetCreating, error: assetError } = 
-    usePost<null, AssetCreateRequest>('assets');
+  const { execute: createAsset, isLoading: isAssetCreating, error: assetError } = useAssetCreate();
+
+  // 에셋 상세 조회 훅
+  const { execute: detailAsset, data: detailAssetData } = useAssetDetail(Number(selectedAssetId));
+  console.log(selectedAssetId);
+
+  //=== 에셋 상세 조회 수정 중==//
+  useEffect(() => {
+    if (selectedAssetId) {
+      detailAsset();
+    }
+  }, [selectedAssetId, detailAsset]);
+
+
+  //에셋 수정 훅 
+  const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError } = useAssetUpdate();
 
   // 파일 선택 핸들러
   const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,27 +74,49 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode }: PoiIcon
 
   // 제출 핸들러
   const handleFinish = useCallback(async (values: Record<string, string>) => {
-    if (!uploadedFileId) {
-      alert('파일을 먼저 업로드해주세요.');
-      return;
-    }
 
-    try {
-      // 에셋 생성 API 호출
-      const asset = await createAsset({
-        name: values.poiIconRegistName || name,
-        fileId: uploadedFileId
-      });
-
-      // 성공 처리
-      if (asset) {
-        alert('아이콘이 성공적으로 등록되었습니다.');
-        resetForm();
-        if (onSuccess) onSuccess();
+    // 수정 모달 제출 
+    if(mode === 'edit' && detailAssetData){  
+      try{
+          const asset = await updateAsset({
+            name: values.poiIconRegistName || name,
+            fileId: uploadedFileId || detailAssetData.file.id  
+          });
+    
+          // 성공 처리
+          if (asset) {
+            alert('아이콘이 성공적으로 수정되었습니다.');
+            resetForm();
+            if (onSuccess) onSuccess();
+          }
+      } catch(error){
+        console.error('아이콘 수정 실패:', error);
       }
-    } catch (error) {
-      console.error('아이콘 등록 실패:', error);
+    // 등록 모달 제출 
+    } else{
+      if (!uploadedFileId) {
+        alert('파일을 먼저 업로드해주세요.');
+        return;
+      }
+  
+      try {
+        // 에셋 생성 API 호출
+        const asset = await createAsset({
+          name: values.poiIconRegistName || name,
+          fileId: uploadedFileId
+        });
+  
+        // 성공 처리
+        if (asset) {
+          alert('아이콘이 성공적으로 등록되었습니다.');
+          resetForm();
+          if (onSuccess) onSuccess();
+        }
+      } catch (error) {
+        console.error('아이콘 등록 실패:', error);
+      }
     }
+
   }, [createAsset, uploadedFileId, name, onSuccess]);
 
   // 폼 초기화
@@ -95,8 +128,8 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode }: PoiIcon
   };
 
   // 에러 메시지 표시
-  const error = fileError || assetError;
-  const isProcessing = isFileUploading || isAssetCreating;
+  const error = fileError || assetError || assetUpdateError;
+  const isProcessing = isFileUploading || isAssetCreating || isAssetUpdating;
 
   // 파일 선택기 열기
   const openFilePicker = () => {

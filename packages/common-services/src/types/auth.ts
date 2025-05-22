@@ -17,7 +17,10 @@ export interface SignInResponse {
 }
 
 export interface UserProfile {
-    name: string;
     code: string;
+    id: number;
+    name: string;
+    username: string;
+    roles: string[];
 }
   

@@ -5,8 +5,8 @@ import  DateFormatter from '@plug/v1/service/utils/dateFormatter';
 
 export const usePoiIcon = (
   data: AssetResponse[],
-  openModal: (mode: 'create' | 'edit') => void,
-  onDelete: (userId: number) => void,
+  onDelete: (assetId: number) => void,
+  onEdit: (assetId: number) => void
 ): PoiIcon[] => {
   return data.map(asset => ({
     id: String(asset.id),
@@ -16,7 +16,7 @@ export const usePoiIcon = (
     update: DateFormatter(asset.createdAt),
     management: (
       <div className="flex flex-wrap gap-1">
-        <Button color="primary" className="w-15" onClick={() => openModal('edit')}>수정</Button>
+        <Button color="primary" className="w-15" onClick={() => onEdit(asset.id)}>수정</Button>
         <Button 
             color="destructive" 
             className="w-15"

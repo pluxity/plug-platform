@@ -1,7 +1,6 @@
 import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
-import { usePost } from '@plug/api-hooks';
+import { useCreateUser } from '@plug/common-services';
 import { useCallback, useState } from 'react';
-import type { UserCreateRequest } from '@plug/common-services';
 
 export interface UserListModalProps {
     isOpen: boolean;
@@ -16,8 +15,7 @@ export const UserListModal = ({ isOpen, onClose, onSuccess, mode }: UserListModa
     const handleChangePassword = (value: string) => {setPassword(value);}
 
     // 사용자 생성 훅
-    const { execute: createUser, isLoading: isCreating, error: createError } = 
-        usePost<null, UserCreateRequest>('admin/users');
+    const { execute: createUser, isLoading: isCreating, error: createError } = useCreateUser()
 
     // 제출 핸들러
     const handleFinish = useCallback(async (values: Record<string, string>) => {
