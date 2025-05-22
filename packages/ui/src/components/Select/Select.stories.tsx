@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Select } from '../Select';
+import { Select } from '@plug/ui';
 import { useState } from 'react';
 
 const meta: Meta<typeof Select> = {
@@ -17,7 +17,19 @@ const meta: Meta<typeof Select> = {
   export const Default: Story = {
       render(args)  {
           return (
-            <div className="flex items-center justify-center h-[400px]">
+            <div className="flex flex-col items-center justify-center h-[400px]">
+                <Select className="w-60" {...args}>
+                    <Select.Trigger />
+                    <Select.Content>
+                        <Select.Item value="1번">1번</Select.Item>
+                        <Select.Item value="2번">2번</Select.Item>
+                        <Select.Item value="3번">3번</Select.Item>
+                        <Select.Item value="4번">4번</Select.Item>
+                        <Select.Item value="5번">5번</Select.Item>
+                        <Select.Item value="6번">6번</Select.Item>
+                        <Select.Item value="7번">7번</Select.Item>
+                    </Select.Content>
+                </Select>
                 <Select className="w-60" {...args}>
                     <Select.Trigger />
                     <Select.Content>

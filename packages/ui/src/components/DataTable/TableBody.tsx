@@ -1,8 +1,16 @@
 import React from 'react';
 import { TableBodyProps } from './DataTable.types';
 import { cn } from '../../utils/classname';
+import { Checkbox } from '../Checkbox';
 
-const TableBody = <T,>({ data, columns, search }: TableBodyProps<T> & { search?: string }) => {
+const TableBody = <T,>({ 
+    data, 
+    columns, 
+    search, 
+    selectable = false, 
+    selectedRows,
+    onSelectChange,
+}: TableBodyProps<T> & { search?: string }) => {
   const highlightText = (text: string, search: string) => {
     if (!search) return text;
     const parts = text.split(new RegExp(`(${search})`, 'gi'));
@@ -18,27 +26,48 @@ const TableBody = <T,>({ data, columns, search }: TableBodyProps<T> & { search?:
   };
 
   return (
-    <tbody>
-      {data.map((row, rowIndex) => (
-        <tr
-          key={rowIndex}
-          className={cn(
-            `${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`,
-            `hover:bg-gray-100 transition-colors`
-          )}
-        >
-          {columns.map((col) => (
-            <td 
-              role="cell"
-              key={String(col.key)} className="p-3 border border-gray-300">
-              {typeof row[col.key] === 'string' && search
-                ? highlightText(row[col.key] as string, search)
-                : (row[col.key] as React.ReactNode)}
+      <tbody>
+      {data.length === 0 ? (
+          <tr>
+            <td colSpan={columns.length} className="p-4 text-center text-slate-400 text-sm">
+              데이터가 없습니다.
             </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
+          </tr>
+      ) : (
+          data.map((row, i) => (
+              <tr
+                  key={i}
+                  className={cn(
+                      i % 2 === 0 ? 'bg-white' : 'bg-slate-50',
+                      'hover:bg-slate-100 transition-colors'
+                  )}
+              >
+                {selectable && (
+                  <th
+                        scope="col"
+                        className="p-3 border-t border-slate-200"
+                    >
+                        <Checkbox 
+                              checked={selectedRows?.has(row)}
+                              onChange={() => onSelectChange?.(row)}
+                        />
+                    </th>
+                )}
+                {columns.map((col) => (
+                    <td
+                        key={String(col.key)}
+                        role="cell"
+                        className="p-3 border-t border-slate-200 text-sm"
+                    >
+                      {typeof row[col.key] === 'string' && search
+                          ? highlightText(row[col.key] as string, search)
+                          : (row[col.key] as React.ReactNode)}
+                    </td>
+                ))}
+              </tr>
+          ))
+      )}
+      </tbody>
   );
 };
 

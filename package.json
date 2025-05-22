@@ -10,9 +10,8 @@
     "storybook": "pnpm --filter @plug/ui storybook",
     "api-hooks": "pnpm --filter @plug/api-hooks",
     "common-services": "pnpm --filter @plug/common-services",
-    "sample": "pnpm --filter @plug/sample",
-    "project:busan": "pnpm --filter @plug/busan-subway",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "project:busan": "pnpm --filter @plug/busan-subway"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { DataTable } from './DataTable';
+import { DataTable } from '@plug/ui';
 import { Column } from './DataTable.types';
+import { useState } from 'react';
 
 interface User {
   id: number;
@@ -27,6 +28,10 @@ const meta: Meta<typeof DataTable> = {
     filterFunction: {
       action: 'filterFunction',
     },
+    selectable: {
+      control: 'boolean',
+      defaultValue: false,
+    }
   },
 };
 
@@ -111,3 +116,40 @@ export const CustomPageSizeAndBlock: Story = {
     />
   ),
 };
+
+export const SelectTable: Story = {
+  render: () => (
+    <DataTable
+      data={sampleData}
+      columns={columns}
+      pageSize={5}
+      filterFunction={(item, search) => item.name.toLowerCase().includes(search.toLowerCase())}
+      selectable={true}
+    />
+  ),
+};
+
+export const ControlledSelectTable: Story = {
+  render:() => {
+    const ControlledSelectTable = () => {
+      const [selectState, setSelectState] = useState<Set<User>>(new Set());
+      
+      return(
+        <>
+            <div className="mt-4 mb-2">선택된 사용자: {selectState.size}</div>
+            <div className="mt-4 mb-2">선택된 사용자 ID: {Array.from(selectState).map(user => user.id).join(',')}</div>
+            <DataTable
+              data={sampleData}
+              columns={columns}
+              pageSize={5}
+              filterFunction={(item, search) => item.name.toLowerCase().includes(search.toLowerCase())}
+              selectable={true}
+              selectedRows={selectState}
+              onSelectChange={setSelectState}
+            />
+        </>
+      )
+    }
+    return <ControlledSelectTable />;
+  }
+}

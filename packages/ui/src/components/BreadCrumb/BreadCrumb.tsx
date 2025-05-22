@@ -75,7 +75,7 @@ const BreadCrumbItem = React.memo(({
     }
     const { color, separator } = context;
 
-    const BreadCrumbItemStyle = 'inline-flex items-center cursor-pointer';
+    const BreadCrumbItemStyle = 'inline-flex items-center font-medium text-gray-500 hover:text-gray-700 transition-colors';
 
     const BreadcrumbListColor = {
         primary: 'text-primary-500',
@@ -95,15 +95,22 @@ const BreadCrumbItem = React.memo(({
                 {children}
 
             </li>
-            {!isLastItem && separator && (
+            {!isLastItem && separator === 'arrow' && (
                 <li
                     role="presentation"
                     aria-hidden="true"
-                    className={cn(`transform mx-1 mt-1 border-gray-300 mr-1.5
-                        ${separator === 'line'? 'border-r-1 h-3 rotate-25' : 'rotate-45 border-t-1 border-r-1 w-2 h-2'}
-                    `)}
+                    className="mx-1 text-gray-400 font-semibold select-none"
                 >
+                    &rsaquo;
                 </li>
+            )}
+
+            {!isLastItem && separator === 'line' && (
+                <li
+                    role="presentation"
+                    aria-hidden="true"
+                    className="mx-2 w-px h-4 bg-gray-300"
+                />
             )}
         </>
     )
@@ -126,7 +133,7 @@ const BreadCrumbLink = ({
 
     const { size, color } = context;
 
-    const BreadCrumbLinkStyle = 'inline-flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap text-gray-400';
+    const BreadCrumbLinkStyle = 'inline-flex items-center gap-1 text-sm font-normal text-gray-500 hover:text-gray-700 transition-colors overflow-hidden text-ellipsis whitespace-nowrap';
     const BreadcrumbLinkColor = {
         primary: 'hover:text-primary-500',
         secondary: 'hover:text-secondary-500',
