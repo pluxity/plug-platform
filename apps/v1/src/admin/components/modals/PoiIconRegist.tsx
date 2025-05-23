@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
-import { useFileUpload, createFileFormData, useAssetCreate, useAssetDetail, useAssetUpdate } from '@plug/common-services';
+import { useFileUpload, createFileFormData, useAssetCreate, useAssetsDetailSWR, useAssetUpdate } from '@plug/common-services';
 
 export interface PoiIconRegistProps{
     isOpen: boolean;
@@ -23,19 +23,10 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
   const { execute: createAsset, isLoading: isAssetCreating, error: assetError } = useAssetCreate();
 
   // 에셋 상세 조회 훅
-  const { execute: detailAsset, data: detailAssetData } = useAssetDetail(Number(selectedAssetId));
-  console.log(selectedAssetId);
-
-  //=== 에셋 상세 조회 수정 중==//
-  useEffect(() => {
-    if (selectedAssetId) {
-      detailAsset();
-    }
-  }, [selectedAssetId, detailAsset]);
-
+  const { data: detailAssetData } = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
 
   //에셋 수정 훅 
-  const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError } = useAssetUpdate();
+  const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError } = useAssetUpdate(Number(selectedAssetId));
 
   // 파일 선택 핸들러
   const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,9 +63,17 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
       });
   }, [uploadFile, name]);
 
+
+  useEffect(() => {
+    if (mode === 'edit' && detailAssetData && isOpen) {
+      setName(detailAssetData.name);
+      setUploadedFileId(detailAssetData.file.id);
+    } 
+  }, [mode, detailAssetData, isOpen]);
+
+
   // 제출 핸들러
   const handleFinish = useCallback(async (values: Record<string, string>) => {
-
     // 수정 모달 제출 
     if(mode === 'edit' && detailAssetData){  
       try{
@@ -109,16 +108,19 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
         // 성공 처리
         if (asset) {
           alert('아이콘이 성공적으로 등록되었습니다.');
-          resetForm();
           if (onSuccess) onSuccess();
+          resetForm();
         }
       } catch (error) {
         console.error('아이콘 등록 실패:', error);
       }
     }
-
-  }, [createAsset, uploadedFileId, name, onSuccess]);
-
+    console.log('업데이트 요청:', {
+      name: values.poiIconRegistName || name,
+      fileId: uploadedFileId || detailAssetData?.file?.id
+    });
+  }, [createAsset, uploadedFileId, name, onSuccess, detailAssetData, updateAsset]);
+  
   // 폼 초기화
   const resetForm = () => {
     setName('');
@@ -154,12 +156,24 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
           </div>
         )}
 
-        <Form onSubmit={handleFinish}>
+        <Form 
+            initialValues={
+              mode === 'edit' && detailAssetData
+                ? {
+                    poiIconRegistName: detailAssetData?.name,
+                    poiIconFileId: String(detailAssetData?.file?.id),
+                  }
+                : {
+                  poiIconRegistName: '',
+                  poiIconFileId: '',
+                }
+            }
+            onSubmit={handleFinish}>
           <FormItem name="poiIconRegistName" label='이름' required>
             <Input.Text 
+              placeholder="모델 이름을 입력하세요"
               value={name}
               onChange={value => setName(value)}
-              placeholder="모델 이름을 입력하세요"
             />
           </FormItem>
           
@@ -170,19 +184,22 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
                 id="icon-file"
                 className="hidden"
                 onChange={handleFileChange}
-                accept=".glb,.gltf"
+                accept=".glb,.gltf,.png"
               />
               
               {!selectedFile ? (
                 <div className="flex items-center">
-                  <p className="flex-1 text-sm text-gray-500">GLB, GLTF 파일만 가능합니다.</p>
+                    {mode === 'edit' && detailAssetData 
+                      ? <p className="flex-1 text-sm">{detailAssetData.file.originalFileName}</p>     
+                      : <p className="flex-1 text-sm text-gray-500">GLB, GLTF 파일만 가능합니다.</p>
+                      }
                   <Button 
                     type="button" 
                     color="secondary"
                     className="w-30"
                     onClick={openFilePicker}
                   >
-                    파일 선택
+                    {mode === 'edit' ? '변경' : '파일 선택'}
                   </Button>
                 </div>
               ) : (
@@ -211,7 +228,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
           </FormItem>
           
           <div className="mt-6 flex justify-center gap-2">
-            <Button onClick={resetForm} disabled={isProcessing}>취소</Button>
+            <Button type="button" onClick={resetForm} disabled={isProcessing}>취소</Button>
             <Button 
               type="submit" 
               color="primary" 

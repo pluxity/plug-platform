@@ -26,8 +26,8 @@ export const useAssetCreate = () => {
 };
 
 // 에셋 수정
-export const useAssetUpdate = () => {
-    return usePut<BaseResponseBody, AssetUpdateRequest>(`${ASSET_API}`, { requireAuth: true });
+export const useAssetUpdate = (assetId: number) => {
+    return usePut<BaseResponseBody, AssetUpdateRequest>(`${ASSET_API}/${assetId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅
@@ -36,5 +36,6 @@ export const useAssetsSWR = () => {
 };
 
 export const useAssetsDetailSWR = (assetId: number) => {
-    return useSWRApi<AssetResponse>(`${ASSET_API}/${assetId}`, 'GET', { requireAuth: true });
-}
+    const key = assetId ? `${ASSET_API}/${assetId}` : '';
+    return useSWRApi<AssetResponse>(key, 'GET', { requireAuth: true });
+};
