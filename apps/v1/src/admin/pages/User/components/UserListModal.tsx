@@ -86,7 +86,7 @@ export const UserListModal = ({ isOpen, onClose, onSuccess, mode }: UserListModa
                     </FormItem>
                     
                     <div className="mt-6 flex justify-center gap-2">
-                        <Button onClick={onClose} disabled={isCreating}>취소</Button>
+                        <Button type="button" onClick={onClose} disabled={isCreating}>취소</Button>
                         <Button 
                             type="submit" 
                             color="primary" 

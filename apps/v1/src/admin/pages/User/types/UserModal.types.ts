@@ -3,4 +3,5 @@ export type FormListValues = Record<string, string | number | boolean> & {
     password: string;
     name: string;
     code: string;
+    role?: string[];
 }
