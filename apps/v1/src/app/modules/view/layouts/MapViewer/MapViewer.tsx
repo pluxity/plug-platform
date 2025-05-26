@@ -7,28 +7,43 @@ const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) =>
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const engineRef = useRef<any>(null);
+    const isModelLoadedRef = useRef<boolean>(false);
 
+    // 엔진 초기화
     useEffect(() => {
         if (containerRef.current && !engineRef.current) {
             engineRef.current = new Px.Engine3D(containerRef.current);
-            console.log('WebGL 엔진 초기화 완료');
         }
+        
+        // 컴포넌트 언마운트 시 정리
+        return () => {
+            if (engineRef.current) {
+                // 엔진 정리 로직이 있다면 여기서 실행
+                engineRef.current = null;
+                isModelLoadedRef.current = false;
+            }
+        };
     }, []);
 
+    // 모델 로드
     useEffect(() => {
-        if (engineRef.current && modelPath) {
+        if (engineRef.current && modelPath && !isModelLoadedRef.current) {
             try {
+                console.log('3D 모델 로드 시작:', modelPath);
                 Px.Loader.LoadGltf(modelPath, () => {
+                    console.log('3D 모델 로드 완료');
+                    isModelLoadedRef.current = true;
                     onModelLoaded?.();
                 });
             } catch (error) {
+                console.error('3D 모델 로드 중 오류 발생:', error);
                 onLoadError?.(error as Error);
             }
         }
     }, [modelPath, onModelLoaded, onLoadError]);
 
     return (
-        <div className="engine absolute inset-0 bg-green-500 z-0">
+        <div className="engine absolute inset-0 z-0">
             <div
                 ref={containerRef}
                 className="three-d-viewer-container"

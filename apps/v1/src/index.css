@@ -1,3 +1,16 @@
 @import 'tailwindcss';
 @import "../../../packages/ui/src/index.css";
 @source "../../../packages/ui";
+
+@theme {
+    --color-primary-100: #feeae2;
+    --color-primary-200: #fdd5c6;
+    --color-primary-300: #fbbfaa;
+    --color-primary-400: #fa9e87;
+    --color-primary-500: #f87e5f;
+    --color-primary-600: #f76642;
+    --color-primary-700: #f65531;
+    --color-primary-800: #f54c25;
+    --color-primary-900: #f44415;
+    --color-primary-foreground: #ffffff;
+}

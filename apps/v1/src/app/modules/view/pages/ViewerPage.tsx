@@ -1,16 +1,42 @@
 
 import { useParams } from 'react-router-dom';
-import MapViewer from "@plug/v1/app/modules/view/layouts/MapViewer/MapViewer";
-import Header from "@plug/v1/app/modules/view/layouts/Header/Header";
-import { useStationDetailSWR } from '@plug/common-services/services';
+import { useState, useEffect } from 'react';
+import { MapViewer, Header, SideMenu, BottomBar, FloorSelector } from "@plug/v1/app/modules/view/layouts";
+import { api } from '@plug/api-hooks/core';
+import type { StationData, Floor } from '@plug/common-services/types';
 
 const ViewerPage = () => {
     const { stationId } = useParams<{ stationId: string }>();
     const parsedStationId = stationId ? parseInt(stationId, 10) : 1; // 기본값 1
     
-    const { data: stationData, isLoading: stationLoading, error } = useStationDetailSWR(parsedStationId);
+    // 상태 관리를 위한 useState
+    const [stationData, setStationData] = useState<StationData | null>(null);
+    const [stationLoading, setStationLoading] = useState<boolean>(true);
+    const [error, setError] = useState<Error | null>(null);
+    const [currentFloor, setCurrentFloor] = useState<string>('ALL');
+    
+    // useEffect를 사용하여 컴포넌트 마운트 시 또는 stationId 변경 시에만 API 호출
+    useEffect(() => {
+        // 비동기 함수 정의
+        const fetchStationData = async () => {
+            try {
+                setStationLoading(true);
+                const response = await api.get<StationData>(`stations/${parsedStationId}`);
+                setStationData(response.data);
+                setError(null);
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setStationLoading(false);
+            }
+        };
+        
+        // 유효한 ID인 경우에만 API 호출
+        if (!isNaN(parsedStationId) && parsedStationId > 0) {
+            fetchStationData();
+        }
+    }, [parsedStationId]); // parsedStationId가 변경될 때만 다시 실행
 
-    // stationId가 유효하지 않은 경우
     const isInvalidStationId = isNaN(parsedStationId) || parsedStationId <= 0;
     
     if (isInvalidStationId) {
@@ -23,7 +49,6 @@ const ViewerPage = () => {
         );
     }
 
-    // API 에러가 있는 경우
     if (error && !stationLoading) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -34,27 +59,44 @@ const ViewerPage = () => {
         );
     }
 
-    const modelPath: string = stationData?.facility?.drawing?.url || '';    const handleModelLoaded = () => {
-        console.log(`스테이션 ${parsedStationId}의 3D 모델 로딩 완료`);
+    const modelPath: string = stationData?.facility?.drawing?.url || '';
+    
+    const handleModelLoaded = () => {
+        console.log('3D 모델 로드 완료');
     };
-
+    
     const handleLoadError = (error: Error) => {
-        console.error(`스테이션 ${parsedStationId}의 3D 모델 로딩 실패:`, error);
+        console.error('3D 모델 로드 실패:', error);
+        setError(error);
+    };
+    
+    const handleFloorChange = (floorId: string) => {
+        setCurrentFloor(floorId);
     };
 
-    // 디버그용 로그
-    console.log('ViewerPage - Station ID:', parsedStationId, 'Data:', stationData);
+    // 층 정보 생성
+    const floorItems = stationData?.floors 
+        ? [...stationData.floors]
+            .reverse()
+            .map((floor: Floor) => ({
+                id: floor.groupId,
+                name: `${floor.name}`
+            }))
+        : [];
+    
+    // 전체층 옵션 추가
+    const floorsWithAll = [...floorItems, { id: 'ALL', name: '전체층' }];
 
     return (        
-        <div className="relative w-screen h-screen overflow-hidden">
-            {!stationLoading && (
+        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
+            {!stationLoading && stationData && (
                 <MapViewer 
                     modelPath={modelPath}
                     onModelLoaded={handleModelLoaded}
                     onLoadError={handleLoadError}
                 />
             )}
-              {stationLoading && (
+            {stationLoading && (
                 <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
                     <div className="text-white text-xl">
                         스테이션 {parsedStationId} 정보 로딩 중...
@@ -63,6 +105,15 @@ const ViewerPage = () => {
             )}
             
             <Header />
+            <SideMenu />
+            {!stationLoading && stationData && (
+                <FloorSelector 
+                    floors={floorsWithAll} 
+                    currentFloor={currentFloor}
+                    onFloorChange={handleFloorChange}
+                />
+            )}
+            <BottomBar currentStation={stationData?.facility?.name || ''} />
         </div>
     );
 };

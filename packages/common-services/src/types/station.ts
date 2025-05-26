@@ -23,7 +23,7 @@ export interface Facility {
 
 export interface Floor {
   name: string;
-  groupId: number;
+  groupId: string;
 }
 
 export interface StationData {

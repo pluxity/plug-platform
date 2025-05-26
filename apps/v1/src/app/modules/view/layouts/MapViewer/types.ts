@@ -1,8 +1,6 @@
-// MapViewer 관련 타입 정의
-
 export interface MapViewerProps {
   modelPath: string;
-  onModelLoaded: () => void;
+  onModelLoaded?: () => void;
   onLoadError?: (error: Error) => void;
 }
 
