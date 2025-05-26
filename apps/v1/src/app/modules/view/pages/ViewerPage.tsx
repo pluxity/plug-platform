@@ -1,7 +1,7 @@
 
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { MapViewer, Header, SideMenu, BottomBar, FloorSelector } from "@plug/v1/app/modules/view/layouts";
+import { MapViewer, Header, SideMenu, BottomBar, FloorSelector, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { api } from '@plug/api-hooks/core';
 import type { StationData, Floor } from '@plug/common-services/types';
 
@@ -87,8 +87,7 @@ const ViewerPage = () => {
     // 전체층 옵션 추가
     const floorsWithAll = [...floorItems, { id: 'ALL', name: '전체층' }];
 
-    return (        
-        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
+    return (          <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
             {!stationLoading && stationData && (
                 <MapViewer 
                     modelPath={modelPath}
@@ -106,6 +105,7 @@ const ViewerPage = () => {
             
             <Header />
             <SideMenu />
+            <EventCounter criticalCount={6} majorCount={4} minorCount={2} />
             {!stationLoading && stationData && (
                 <FloorSelector 
                     floors={floorsWithAll} 

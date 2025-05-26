@@ -43,10 +43,8 @@ const FloorSelector: React.FC<FloorSelectorProps> = ({
     if (onFloorChange) {
       onFloorChange(floorId);
     }
-  };
-
-  return (
-    <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 rounded-l-md shadow-[-1px_0px_4px_2px_var(--color-primary-900)] bg-[var(--color-primary-900)]/20 backdrop-blur-md">
+  };  return (
+    <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 rounded-l-md shadow-[-1px_0px_4px_2px_rgba(0,76,151,0.5)] bg-primary-900/20 backdrop-blur-md">
       <div className="flex items-center">
         <div className="w-9 flex flex-col justify-around items-center gap-6 py-2">
           {floors.map((floor) => (
@@ -55,7 +53,7 @@ const FloorSelector: React.FC<FloorSelectorProps> = ({
                 <div className="absolute right-full mr-8 -mt-3 p-2 bg-white/90 backdrop-blur-sm rounded-md shadow-lg z-20 whitespace-nowrap border-primary-900 border">
                   <div className="text-xs font-bold text-primary-900 px-1">{floor.name}</div>
                   <div className="absolute right-[-4px] top-1/2 transform -translate-y-1/2 w-0 h-0 
-                    border-t-[4px] border-b-[4px] border-l-[4px] border-transparent border-l-primary-900 "></div>
+                    border-t-[4px] border-b-[4px] border-l-[4px] border-transparent border-l-primary-900"></div>
                 </div>
               )}
               
