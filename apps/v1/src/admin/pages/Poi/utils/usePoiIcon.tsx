@@ -11,7 +11,8 @@ export const usePoiIcon = (
   return data.map(asset => ({
     id: String(asset.id),
     name: asset.name,
-    icon: <img src={asset.file?.url} alt={asset.file?.originalFileName} className="w-6 h-6" />,
+    file: asset.file?.originalFileName,
+    thumbnailFile: asset.thumbnailFile?.originalFileName,
     code: asset.createdBy,
     update: DateFormatter(asset.createdAt),
     management: (

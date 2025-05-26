@@ -12,10 +12,19 @@ export interface PoiIconRegistProps{
 
 export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAssetId }: PoiIconRegistProps) =>{
   const [name, setName] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadedFileId, setUploadedFileId] = useState<number | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
 
+  // 3d 모델 파일 상태 관리 
+  const [modelFile, setModelFile] = useState<File | null>(null);
+  const [uploadedModelId, setUploadedModelId] = useState<number | null>(null);
+  
+  // thumbnail파일 상태 관리 
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [uploadThumbnailId, setUploadThumbnailId] = useState<number | null>(null);
+
+  
+  // 파일 공통 로딩 상태 관리 
+  const [isUploading, setIsUploading] = useState(false);
+  
   // 파일 업로드 훅
   const { execute: uploadFile, isLoading: isFileUploading, error: fileError } = useFileUpload();
   
@@ -28,12 +37,12 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
   //에셋 수정 훅 
   const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError } = useAssetUpdate(Number(selectedAssetId));
 
-  // 파일 선택 핸들러
-  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  // 3D 모델 파일 선택 핸들러
+  const handleModelChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setSelectedFile(file);
+    setModelFile(file);
     
     // 파일명을 기본 이름 값으로 설정
     if (!name) {
@@ -52,22 +61,53 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
     uploadFile(formData)
       .then(response => {
         if (response && response.fileId) {
-          setUploadedFileId(response.fileId);
+          setUploadedModelId(response.fileId);
         }
       })
       .catch(err => {
-        console.error('파일 업로드 실패:', err);
+        console.error('3D 파일 업로드 실패:', err);
       })
       .finally(() => {
         setIsUploading(false);
       });
   }, [uploadFile, name]);
 
+  // Thumbnail 파일 선택 핸들러
+  const handleThumbnailChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // PNG 파일 체크 추가
+    if (!file.type.includes('image/png')) {
+      alert('PNG 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    setThumbnailFile(file);
+
+    // 파일이 선택되면 자동으로 업로드 시작
+    setIsUploading(true);
+
+    // 올바른 MIME 타입으로 FormData 생성
+    const formData = createFileFormData(file, 'image/png');
+    uploadFile(formData)
+      .then(response => {
+        if (response && response.fileId) {
+          setUploadThumbnailId(response.fileId);
+        }
+      })
+      .catch(err => {
+        console.error('썸네일 파일 업로드 실패:', err);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  }, [uploadFile]);
+
 
   useEffect(() => {
     if (mode === 'edit' && detailAssetData && isOpen) {
       setName(detailAssetData.name);
-      setUploadedFileId(detailAssetData.file.id);
     } 
   }, [mode, detailAssetData, isOpen]);
 
@@ -79,7 +119,8 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
       try{
           const asset = await updateAsset({
             name: values.poiIconRegistName || name,
-            fileId: uploadedFileId || detailAssetData.file.id  
+            fileId: uploadedModelId || undefined,
+            thumbnailFileId: uploadThumbnailId || undefined
           });
     
           // 성공 처리
@@ -93,7 +134,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
       }
     // 등록 모달 제출 
     } else{
-      if (!uploadedFileId) {
+      if (!uploadedModelId || !uploadThumbnailId) {
         alert('파일을 먼저 업로드해주세요.');
         return;
       }
@@ -102,7 +143,8 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
         // 에셋 생성 API 호출
         const asset = await createAsset({
           name: values.poiIconRegistName || name,
-          fileId: uploadedFileId
+          fileId: uploadedModelId,
+          thumbnailFileId: uploadThumbnailId,
         });
   
         // 성공 처리
@@ -115,17 +157,14 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
         console.error('아이콘 등록 실패:', error);
       }
     }
-    console.log('업데이트 요청:', {
-      name: values.poiIconRegistName || name,
-      fileId: uploadedFileId || detailAssetData?.file?.id
-    });
-  }, [createAsset, uploadedFileId, name, onSuccess, detailAssetData, updateAsset]);
+  }, [createAsset, uploadedModelId, name, onSuccess, detailAssetData, updateAsset, uploadThumbnailId]);
   
   // 폼 초기화
   const resetForm = () => {
     setName('');
-    setSelectedFile(null);
-    setUploadedFileId(null);
+    setModelFile(null);
+    setUploadedModelId(null);
+    setUploadThumbnailId(null);
     onClose();
   };
 
@@ -134,8 +173,8 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
   const isProcessing = isFileUploading || isAssetCreating || isAssetUpdating;
 
   // 파일 선택기 열기
-  const openFilePicker = () => {
-    const fileInput = document.getElementById('icon-file');
+  const openFilePicker = (type: 'model' | 'thumbnail') => {
+    const fileInput = document.getElementById(type === 'model' ? 'icon-file' : 'thumbnail-file');
     if (fileInput) {
       fileInput.click();
     }
@@ -157,6 +196,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
         )}
 
         <Form 
+            key={mode + (detailAssetData?.id ?? '')}
             initialValues={
               mode === 'edit' && detailAssetData
                 ? {
@@ -176,6 +216,56 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
               onChange={value => setName(value)}
             />
           </FormItem>
+
+          <FormItem name="poiIconRegistThumbnail" label='Thumbnail 파일' required>
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+              <input
+                type="file"
+                id="thumbnail-file"
+                className="hidden"
+                onChange={handleThumbnailChange}
+                accept=".png"
+              />
+              
+              {!thumbnailFile ? (
+                <div className="flex items-center">
+                    {mode === 'edit' && detailAssetData 
+                      ? <p className="flex-1 text-sm">{detailAssetData.thumbnailFile.originalFileName}</p>     
+                      : <p className="flex-1 text-sm text-gray-500">PNG 파일만 가능합니다.</p>
+                      }
+                  <Button 
+                    type="button" 
+                    color="secondary"
+                    className="w-30"
+                    onClick={() => openFilePicker('thumbnail')}
+                  >
+                    {mode === 'edit' ? '변경' : '파일 선택'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-sm truncate max-w-xs">
+                    {thumbnailFile.name} ({Math.round(thumbnailFile.size / 1024)} KB)
+                  </span>
+                  
+                  {isUploading ? (
+                    <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
+                  ) : uploadThumbnailId ? (
+                    <div className="text-green-500 text-xs">업로드 완료</div>
+                  ) : (
+                    <Button 
+                      type="button" 
+                      color="secondary"
+                      className="w-30"
+                      onClick={() => openFilePicker('thumbnail')}
+                    >
+                      변경
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </FormItem>
           
           <FormItem name="poiIconRegistFile" label='3D 모델 파일' required>
             <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
@@ -183,11 +273,11 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
                 type="file"
                 id="icon-file"
                 className="hidden"
-                onChange={handleFileChange}
-                accept=".glb,.gltf,.png"
+                onChange={handleModelChange}
+                accept=".glb,.gltf"
               />
               
-              {!selectedFile ? (
+              {!modelFile ? (
                 <div className="flex items-center">
                     {mode === 'edit' && detailAssetData 
                       ? <p className="flex-1 text-sm">{detailAssetData.file.originalFileName}</p>     
@@ -197,7 +287,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
                     type="button" 
                     color="secondary"
                     className="w-30"
-                    onClick={openFilePicker}
+                    onClick={() => openFilePicker('model')}
                   >
                     {mode === 'edit' ? '변경' : '파일 선택'}
                   </Button>
@@ -205,19 +295,19 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
               ) : (
                 <div className="flex items-center justify-between w-full">
                   <span className="text-sm truncate max-w-xs">
-                    {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
+                    {modelFile.name} ({Math.round(modelFile.size / 1024)} KB)
                   </span>
                   
                   {isUploading ? (
                     <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
-                  ) : uploadedFileId ? (
+                  ) : uploadedModelId ? (
                     <div className="text-green-500 text-xs">업로드 완료</div>
                   ) : (
                     <Button 
                       type="button" 
                       color="secondary"
                       className="w-30"
-                      onClick={openFilePicker}
+                      onClick={() => openFilePicker('model')}
                     >
                       변경
                     </Button>
@@ -232,7 +322,11 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
             <Button 
               type="submit" 
               color="primary" 
-              disabled={isProcessing || !uploadedFileId || !name}
+              disabled={
+                isProcessing || !name ||
+                (mode === 'create' && (!uploadedModelId || !uploadThumbnailId)) ||
+                (mode === 'edit' && !name)
+              }
               isLoading={isAssetCreating}
             >
               {mode === 'create' ? '등록' : '수정'}
