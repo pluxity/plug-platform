@@ -4,6 +4,7 @@ import FloorSelector from './FloorSelector/FloorSelector';
 import Header from './Header/Header';
 import MapViewer from './MapViewer/MapViewer';
 import EventCounter from './EventCounter/EventCounter';
+import EnvInfoPanel from './EnvInfoPanel/EnvInfoPanel';
 
 export {
   BottomBar,
@@ -11,5 +12,6 @@ export {
   FloorSelector,
   Header,
   MapViewer,
-  EventCounter
+  EventCounter,
+  EnvInfoPanel
 };

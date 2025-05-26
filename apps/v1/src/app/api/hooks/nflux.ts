@@ -6,6 +6,7 @@ import type {
   CCTV,
   WindGauge,
   StationEnv,
+  StationEvents,
   Light,
   LightGroup,
   Shutter,
@@ -133,6 +134,37 @@ export const useStationEnv = (stationId: string): UseApiResult<StationEnv & { st
     fetchData();
     // 1분마다 업데이트
     const interval = setInterval(fetchData, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [stationId]);
+
+  return { data, loading, error, refetch: fetchData };
+};
+
+// === 역사 이벤트 정보 ===
+export const useStationEvents = (stationId: string): UseApiResult<StationEvents> => {
+  const [data, setData] = useState<StationEvents | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    if (!stationId) return;
+    
+    try {
+      setLoading(true);
+      const result = await nfluxService.getStationEvents(stationId);
+      setData(result.events);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // 10초마다 업데이트
+    const interval = setInterval(fetchData, 10 * 1000);
     return () => clearInterval(interval);
   }, [stationId]);
 

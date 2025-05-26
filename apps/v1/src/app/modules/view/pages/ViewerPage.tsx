@@ -1,7 +1,7 @@
 
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { MapViewer, Header, SideMenu, BottomBar, FloorSelector, EventCounter } from "@plug/v1/app/modules/view/layouts";
+import { MapViewer, Header, FloorSelector, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { api } from '@plug/api-hooks/core';
 import type { StationData, Floor } from '@plug/common-services/types';
 
@@ -14,8 +14,7 @@ const ViewerPage = () => {
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
     const [currentFloor, setCurrentFloor] = useState<string>('ALL');
-    
-    // useEffect를 사용하여 컴포넌트 마운트 시 또는 stationId 변경 시에만 API 호출
+
     useEffect(() => {
         // 비동기 함수 정의
         const fetchStationData = async () => {
@@ -102,10 +101,9 @@ const ViewerPage = () => {
                     </div>
                 </div>
             )}
-            
             <Header />
-            <SideMenu />
-            <EventCounter criticalCount={6} majorCount={4} minorCount={2} />
+            <EventCounter stationId={parsedStationId.toString()} />
+            {/* <StationInfo stationId={parsedStationId.toString()} /> */}
             {!stationLoading && stationData && (
                 <FloorSelector 
                     floors={floorsWithAll} 
@@ -113,7 +111,6 @@ const ViewerPage = () => {
                     onFloorChange={handleFloorChange}
                 />
             )}
-            <BottomBar currentStation={stationData?.facility?.name || ''} />
         </div>
     );
 };
