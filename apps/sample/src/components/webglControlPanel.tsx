@@ -1,17 +1,18 @@
 import * as React from 'react';
-import { Model, Poi } from '@plug/engine/src';
+import { Model, Poi, Path3D } from '@plug/engine/src';
+import {Button} from '@plug/ui';
 
 // 층 데이터 타입 정의
 interface FloorData {
-  floorId: string;
-  displayName: string;
-  [key: string]: unknown;
+    floorId: string;
+    displayName: string;
+    [key: string]: unknown;
 }
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
-  selectedApiName: string;
-  floorData: FloorData[];
+    selectedApiName: string;
+    floorData: FloorData[];
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -33,6 +34,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             selectedApiName: 'None',
             floorData: []
         };
+
+        console.warn('Path3D', Path3D);
     }
 
     /**
@@ -70,6 +73,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
                 </span>
             );
+        } else if (this.state.selectedApiName === 'Path') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
+                    <button onClick={()=>Path3D.Cancel()}>Cancel</button>
+                    <button>Finish</button>
+                    <button>Undo</button>
+                    <button>Redo</button>
+                </span>
+            );
         }
 
         return null;
@@ -89,6 +102,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Loader'>Loader</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
+                        <option value='Path'>Path</option>
                     </select>
                     <br />
                     {this.renderMenu()}
@@ -134,6 +148,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     displayText: displayText,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
+            } break;
+            case 'Path.CreatePath': {
+                const pathId = window.crypto.randomUUID();
+                Path3D.CreatePath(pathId);
             } break;
         }
     }

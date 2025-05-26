@@ -130,6 +130,24 @@ interface SBMMesh {
     indices: number[];
 }
 
+/**
+ * Path3D 세그먼트 데이터 인터페이스
+ */
+interface Path3DSegmentData {
+    start: Vector3Custom;
+    control: Vector3Custom;
+    end: Vector3Custom;
+}
+
+/**
+ * Path3D 데이터 인터페이스
+ */
+interface Path3DData {
+    id: string;
+    color: THREE.ColorRepresentation;
+    segments: Path3DSegmentData[];
+}
+
 export {
     Vector3Custom,
     EulerCustom,
@@ -142,4 +160,6 @@ export {
     SBMHeader,
     SBMMaterial,
     SBMMesh,
+    Path3DSegmentData,
+    Path3DData,
 }
