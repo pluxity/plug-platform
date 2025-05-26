@@ -1,23 +1,31 @@
 import { useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
+import type { MapViewerProps } from './types';
 
-const MapViewer = () => {
+const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const engineRef = useRef<any>(null);
 
     useEffect(() => {
-        if (containerRef.current) {
-            new Px.Engine3D(containerRef.current);
-            console.time("loading");
-            Px.Loader.LoadGltf('/models/konkuk.glb', ()=> {
-                console.timeEnd("loading");
-
-
-            });
-
-            // Px.Model.GetModelHierarchy("/models/station.glb", (data: any) => { console.log(data) });
+        if (containerRef.current && !engineRef.current) {
+            engineRef.current = new Px.Engine3D(containerRef.current);
+            console.log('WebGL 엔진 초기화 완료');
         }
-        console.log('WebGL 초기화 호출.');
     }, []);
+
+    useEffect(() => {
+        if (engineRef.current && modelPath) {
+            try {
+                Px.Loader.LoadGltf(modelPath, () => {
+                    onModelLoaded?.();
+                });
+            } catch (error) {
+                onLoadError?.(error as Error);
+            }
+        }
+    }, [modelPath, onModelLoaded, onLoadError]);
 
     return (
         <div className="engine absolute inset-0 bg-green-500 z-0">
