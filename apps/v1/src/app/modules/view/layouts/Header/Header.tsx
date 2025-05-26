@@ -20,13 +20,14 @@ const Header = () => {
             </div>
             
             <div className="absolute left-1/2 transform -translate-x-1/2">
-                <HeaderEnvInfo stationId={parsedStationId} />
+                <TimeDisplay />
             </div>
             
             <div className="flex items-center gap-4">
-                <TimeDisplay />
+                <HeaderEnvInfo stationId={parsedStationId} />
                 <UserProfile />
-            </div>        </header>
+            </div>        
+        </header>
     );
 };
 

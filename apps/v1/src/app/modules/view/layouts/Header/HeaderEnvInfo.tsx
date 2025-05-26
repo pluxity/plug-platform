@@ -1,30 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStationEnv } from '../../../../api/hooks/nflux';
 
 interface HeaderEnvInfoProps {
   stationId: string;
 }
 
+// 타입 정의
+interface EnvDisplayData {
+  temperature: {
+    watingRoom: number | string;
+    platform: number | string;
+    external: number | string;
+  };
+  airQuality: {
+    ultrafineDust: number | string;
+  };
+}
+
 const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
-  const { data, loading, error } = useStationEnv(stationId);
+  const { data, loading, error, refetch } = useStationEnv(stationId);
+  
+  // 기본 데이터 설정
+  const defaultData: EnvDisplayData = {
+    temperature: {
+      watingRoom: '-',
+      platform: '-',
+      external: '-'
+    },
+    airQuality: {
+      ultrafineDust: '-'
+    }
+  };
+    // 이전 상태를 유지하기 위한 상태 관리
+  const [displayData, setDisplayData] = useState<EnvDisplayData>(defaultData);
 
-  if (loading) {
-    return (
-      <div className="bg-primary-500/30 rounded-[5px] px-3 py-1 flex items-center justify-center">
-        <div className="text-white text-sm">로딩 중...</div>
-      </div>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <div className="bg-primary-500/30 rounded-[5px] px-3 py-1 flex items-center justify-center">
-        <div className="text-red-300 text-sm">데이터 로드 오류</div>
-      </div>
-    );
-  }
+  // 데이터가 변경될 때만 상태 업데이트
+  useEffect(() => {
+    if (data && !loading) {
+      // 서버 데이터를 displayData 형식에 맞게 변환
+      const formattedData: EnvDisplayData = {
+        temperature: {
+          watingRoom: data.temperature.watingRoom,
+          platform: data.temperature.platform,
+          external: data.temperature.external
+        },
+        airQuality: {
+          ultrafineDust: data.airQuality.ultrafineDust
+        }
+      };
+      setDisplayData(formattedData);
+    }
+  }, [data, loading]);
+  
+  // 10초마다 데이터 새로고침
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 10 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [refetch]);
   return (
-    <div className="bg-primary-500/30 rounded-[5px] px-3 py-1 flex items-center gap-4">
+    <div className="flex items-center gap-4">
       <div className="flex items-center gap-1">
         <span className="text-white text-xs">대합실:</span>
         <div className="flex items-center">
@@ -35,7 +72,9 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
             height={18} 
             className="mr-1"
           />
-          <span className="text-white text-sm font-bold">{data.temperature.watingRoom}°C</span>
+          <span className="text-white text-sm font-bold">
+            {`${displayData.temperature.watingRoom}${typeof displayData.temperature.watingRoom === 'number' ? '°C' : ''}`}
+          </span>
         </div>
       </div>
       <div className="flex items-center gap-1">
@@ -48,7 +87,9 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
             height={18} 
             className="mr-1"
           />
-          <span className="text-white text-sm font-bold">{data.temperature.platform}°C</span>
+          <span className="text-white text-sm font-bold">
+            {`${displayData.temperature.platform}${typeof displayData.temperature.platform === 'number' ? '°C' : ''}`}
+          </span>
         </div>
       </div>
       <div className="flex items-center gap-1">
@@ -61,15 +102,23 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
             height={18} 
             className="mr-1"
           />
-          <span className="text-white text-sm font-bold">{data.temperature.external}°C</span>
+          <span className="text-white text-sm font-bold">
+            {`${displayData.temperature.external}${typeof displayData.temperature.external === 'number' ? '°C' : ''}`}
+          </span>
         </div>
-      </div>
-      <div className="flex items-center gap-1">
+      </div>      <div className="flex items-center gap-1">
         <span className="text-white text-xs">초미세먼지:</span>
-        <span className="text-white text-sm font-bold">{data.airQuality.ultrafineDust} ㎍/㎥</span>
-        <span className="text-xs text-white">
-          ({getAirQualityStatus(data.airQuality.ultrafineDust)})
+        <span className="text-white text-sm font-bold">
+          {`${displayData.airQuality.ultrafineDust}${typeof displayData.airQuality.ultrafineDust === 'number' ? ' ㎍/㎥' : ''}`}
         </span>
+        {typeof displayData.airQuality.ultrafineDust === 'number' && (
+          <span className="text-xs text-white">
+            ({getAirQualityStatus(displayData.airQuality.ultrafineDust)})
+          </span>
+        )}
+        {error && !loading && (
+          <span className="text-xs text-red-300 ml-1">(오류)</span>
+        )}
       </div>
     </div>
   );
