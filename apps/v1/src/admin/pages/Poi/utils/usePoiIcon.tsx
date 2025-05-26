@@ -1,7 +1,7 @@
 import { AssetResponse } from '@plug/common-services';
 import { PoiIcon } from '../types/PoiIcon.types';
 import { Button } from '@plug/ui';
-import  DateFormatter from '@plug/v1/service/utils/dateFormatter';
+import  DateFormatter from '@plug/v1/app/utils/dateFormatter';
 
 export const usePoiIcon = (
   data: AssetResponse[],
