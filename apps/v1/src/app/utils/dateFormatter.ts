@@ -42,6 +42,7 @@
  */
 export default function DateFormatter(dateStr: string, options?:Intl.DateTimeFormatOptions) {
     const date = new Date(dateStr);
+    const koreanTime = new Date(date.getTime() + (9 * 60 * 60 * 1000));
 
     return new Intl.DateTimeFormat('ko-KR', {
         year: 'numeric',
@@ -50,6 +51,8 @@ export default function DateFormatter(dateStr: string, options?:Intl.DateTimeFor
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Seoul',
         ...options
-    }).format(date);
+    }).format(koreanTime);
 }

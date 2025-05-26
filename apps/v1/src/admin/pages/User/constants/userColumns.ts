@@ -1,4 +1,4 @@
-import { User } from '../types/UserList.types';
+import { User } from '../types/user.types';
 import type { Column } from '@plug/ui';
 
 export const columns: Column<User>[] = [

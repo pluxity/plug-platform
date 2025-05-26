@@ -1,14 +1,14 @@
-import {Select, Input, Button, DataTable, Skeleton} from '@plug/ui';
-import { columns } from './constants/userListColumns';
-import { UserListModal } from './components/UserListModal';
+import {Button, DataTable, Skeleton} from '@plug/ui';
+import { columns } from './constants/userColumns';
+import { UserModal } from './components/UserModal';
 import { useModal } from '../../components/hook/useModal';
 import { useUsersSWR, deleteUser } from "@plug/common-services";
-import { useUserList } from './utils/useUserList';
+import { useUser } from './utils/useUser';
 import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import { useState } from 'react';
-import { User } from './types/UserList.types';
+import { User } from './types/user.types';
 
-export default function UserListPage() {
+export default function UserPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
     const { data, error, isLoading, mutate } = useUsersSWR();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
@@ -17,7 +17,7 @@ export default function UserListPage() {
         deleteUser(userId).then(() => {mutate();})
     };
     
-    const userData = useUserList(data || [], openModal, handleDelete);
+    const userData = useUser(data || [], openModal, handleDelete);
 
     const handleDeleteSelected = () => {
         if(selectState.size === 0){
@@ -34,27 +34,7 @@ export default function UserListPage() {
     
     return (
         <>
-            <div className='flex items-center flex-wrap gap-1'>    
-                <Select className='w-40'>
-                    <Select.Trigger placeholder='도면분류선택' />
-                    <Select.Content>
-                        <Select.Item value='1호선'>1호선</Select.Item>
-                        <Select.Item value='2호선'>2호선</Select.Item>
-                        <Select.Item value='3호선'>3호선</Select.Item>
-                        <Select.Item value='4호선'>4호선</Select.Item>
-                    </Select.Content>
-                </Select>
-                <Select className='w-40'>
-                    <Select.Trigger placeholder='도면 이름' />
-                    <Select.Content>
-                        <Select.Item value='name'>도면 이름</Select.Item>
-                        <Select.Item value='code'>도면 코드</Select.Item>
-                    </Select.Content>
-                </Select>
-                <div className='flex items-center'>
-                    <Input.Text className='w-60' placeholder='검색어를 입력하세요.'/>
-                    <Button color='primary' className='ml-1'>검색</Button>
-                </div>
+            <div className='flex'>    
                 <div className='ml-auto flex gap-1'>
                     <Button color='primary' onClick={() => openModal('create')}>등록</Button>
                     <Button color='destructive' onClick={handleDeleteSelected}>삭제</Button>
@@ -71,6 +51,7 @@ export default function UserListPage() {
                         selectable={true}
                         selectedRows={selectState}
                         onSelectChange={setSelectState}
+                        showSearch={true}
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (
@@ -82,7 +63,7 @@ export default function UserListPage() {
                     />
                 )}
             </div>
-            <UserListModal 
+            <UserModal 
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}
