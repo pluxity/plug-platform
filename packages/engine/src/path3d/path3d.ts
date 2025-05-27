@@ -23,13 +23,19 @@ class Path3D extends THREE.Group {
     /**
      * 경로 너비
      */
-    private pathWidth: number = 1.0;
+    private pathWidth: number = 0.5;
+    /**
+     * 경로 색상
+     */
+    private pathColor: THREE.ColorRepresentation = 'red';
 
     /**
      * 생성자
      */
-    constructor() {
+    constructor(color: THREE.ColorRepresentation = 'red') {
         super();
+
+        this.pathColor = color;
 
         // geometry구성시 사용할 도형 형태
         const halfLength = this.pathWidth * 0.5;
@@ -41,6 +47,10 @@ class Path3D extends THREE.Group {
         this.extrudeShape.lineTo(-halfLength, -halfLength);
     }
 
+    get PathColor(): THREE.ColorRepresentation {
+        return this.pathColor;
+    }
+
     get ExtrudeShape(): THREE.Shape {
         return this.extrudeShape!;
     }
@@ -49,7 +59,8 @@ class Path3D extends THREE.Group {
      * 내보내기 데이터
      */
     get ExportData(): Object {
-        return {};
+        return {
+        };
     }
 
     /**
@@ -58,12 +69,14 @@ class Path3D extends THREE.Group {
     dispose() {
         // 구간
         this.segments.forEach(segment => {
+            this.remove(segment);
             segment.dispose();
         });
         this.segments = [];
 
         // 위치점
         this.pointObjects.forEach(point => {
+            this.remove(point);
             point.dispose();
         });
         this.pointObjects = [];
@@ -78,7 +91,7 @@ class Path3D extends THREE.Group {
         this.attach(segment); // 월드 트랜스폼을 유지하며 현재 그룹 객체에 부착
 
         // 구간 추가시 각 구간의 이음부가 비어보이므로 실린더를 생성하여 각 시작/끝지점에 위치시킨다.
-        const pointObj = new PathPoint3D(this.pathWidth * 0.5, this.pathWidth, 'red');
+        const pointObj = new PathPoint3D(this.pathWidth * 0.5, this.pathWidth, this.pathColor);
         this.add(pointObj);
         pointObj.position.copy(segment.EndPoint);
         this.pointObjects.push(pointObj);

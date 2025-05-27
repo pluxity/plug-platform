@@ -78,7 +78,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
                     <button onClick={()=>Path3D.Cancel()}>Cancel</button>
-                    <button>Finish</button>
+                    <button onClick={()=>Path3D.Finish()}>Finish</button>
                     <button>Undo</button>
                     <button>Redo</button>
                 </span>
@@ -126,7 +126,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onApiBtnClick(apiName: string) {
         switch (apiName) {
             case 'Model.GetHierarchy': {
-                Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
+                Model.GetModelHierarchy('subway.glb', (data: FloorData[]) => {
                     console.log('Model.GetModelHierarchy -> ', data);
 
                     this.setState({ floorData: data }); // 얻은 층정보로 state 설정
@@ -151,7 +151,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Path.CreatePath': {
                 const pathId = window.crypto.randomUUID();
-                Path3D.CreatePath(pathId);
+                const color = 0xffffff * Math.random();
+                Path3D.CreatePath(pathId, color);
             } break;
         }
     }

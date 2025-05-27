@@ -39,7 +39,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 
     // 포인터 클릭시 표시할 커서 객체
-    const geometry = new THREE.SphereGeometry(0.1, 32, 23);
+    const geometry = new THREE.SphereGeometry(0.1, 32, 32);
     const material = new THREE.MeshStandardMaterial({ color: 'red' });
     cursor = new THREE.Mesh(geometry, material);
     cursor.name = '#CameraPivot';

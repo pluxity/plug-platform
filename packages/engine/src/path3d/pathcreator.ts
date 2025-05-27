@@ -2,11 +2,13 @@ import * as THREE from 'three';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
 import * as Camera from '../camera';
+import * as PathData from './data';
 import { PathSegment3D } from './pathsegment';
 import { Path3D } from './path3d';
 import { Engine3D } from '../engine';
 
 let engine: Engine3D;
+let cursor: THREE.Mesh;
 let pathGroup: THREE.Group;
 let currentPath: Path3D;
 let workingSegment: PathSegment3D;
@@ -22,10 +24,20 @@ enum MouseState { None = 0, SetStartPoint, SetEndPoint };
  */
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
-
+    
+    // 경로 객체 그룹
     pathGroup = new THREE.Group();
     pathGroup.name = '#PathGroup';
     engine.RootScene.add(pathGroup);
+    
+    // 커서
+    cursor = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 'red' })
+    );
+    cursor.name = '#Cursor';
+    cursor.layers.set(Interfaces.CustomLayer.Invisible);
+    pathGroup.add(cursor);    
 
     rayCast.layers.set(Interfaces.CustomLayer.Pickable);
 });
@@ -63,6 +75,31 @@ function getPickPoint(mousePos: THREE.Vector2): THREE.Vector3 | undefined {
 }
 
 /**
+ * 마우스 좌표에 대해 공간상의 평면 픽킹 좌표 계산
+ * @param mousePos - 마우스 좌표
+ * @param planeBasePoint - 평면의 기준점 (기본값: 원점)
+ * @returns - 평면과 교차하는 픽킹 위치
+ */
+function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Vector3): THREE.Vector3 {
+    // 마우스 좌표를 뷰포트 공간으로
+    mousePos.x = (mousePos.x / engine.Dom.clientWidth) * 2 - 1;
+    mousePos.y = -(mousePos.y / engine.Dom.clientHeight) * 2 + 1;
+
+    // 마우스 위치를 기준으로 레이캐스트 생성
+    rayCast.setFromCamera(mousePos, engine.Camera);
+
+    // 평면과 교차 테스트
+    const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), planeBasePoint);
+    const point = new THREE.Vector3();
+    if (rayCast.ray.intersectPlane(plane, point)) {
+        return point;
+    }
+
+    return point;
+}
+
+
+/**
  * 포인터 다운 이벤트 처리
  * @param event - 포인터 다운 이벤트 정보
  */
@@ -87,16 +124,20 @@ function onPointerDown(event: MouseEvent) {
 function onPointerMove(event: MouseEvent) {
 
     if (mouseState === Interfaces.PathCreatorMouseState.SetEndPoint) {
-        const mouseUpPos = new THREE.Vector2(event.offsetX, event.offsetY);
-        let pickPoint = getPickPoint(mouseUpPos) as THREE.Vector3;
+        const currMousePos = new THREE.Vector2(event.offsetX, event.offsetY);
+        let pickPoint = getPickPoint(currMousePos) as THREE.Vector3;
+        cursor.position.copy(pickPoint);
         
         if (bLeftBtnDown) {
             // 곡선
+            // 곡선의 경우 픽킹점을 평면에 대해 처리한다.
+            pickPoint = getPickPointFromPlane(new THREE.Vector2(event.offsetX, event.offsetY), workingSegment.EndPoint.clone());
             const distance = workingSegment.EndPoint.distanceTo(pickPoint);
             const direction = new THREE.Vector3().subVectors(workingSegment.EndPoint, pickPoint).normalize();
             const controlPoint = workingSegment.EndPoint.clone().addScaledVector(direction, distance);
             workingSegment.ControlPoint = controlPoint;
             workingSegment.updateGeometry(currentPath.ExtrudeShape);
+            cursor.position.copy(pickPoint);
         } else {
             // 직선
             const controlPoint = new THREE.Vector3().lerpVectors(workingSegment.StartPoint, pickPoint, 0.5);
@@ -129,7 +170,7 @@ function onPointerUp(event: MouseEvent) {
                 const lastPoint = workingSegment.EndPoint.clone();
 
                 // 새 구간 생성후 시작점 설정
-                workingSegment = new PathSegment3D();
+                workingSegment = new PathSegment3D(currentPath.PathColor);
                 pathGroup.add(workingSegment);
                 workingSegment.StartPoint = lastPoint;
             } break;
@@ -179,24 +220,26 @@ function unregisterEventListeners() {
  * 경로 생성 작업 시작
  * @param id - 경로 ID
  */
-function CreatePath(id: string) {
+function CreatePath(id: string, color: THREE.ColorRepresentation = 'red') {
 
     // 카메라 회전을 휠버튼으로 설정
     Camera.SetRotateButton(Interfaces.MouseButton.Middle);
 
     // 새 경로 객체 생성후
-    currentPath = new Path3D();
+    currentPath = new Path3D(color);
     currentPath.name = id;
     pathGroup.add(currentPath);
 
     // 현재 작업중인 경로 구간 생성
-    workingSegment = new PathSegment3D();
+    workingSegment = new PathSegment3D(currentPath.PathColor);
     pathGroup.add(workingSegment); // 그리는 도중에는 전체 path그룹에 넣어놓고 나중에 path3d 자식객체로 부착 처리
 
     registerEventListeners();
 
     // 마우스 상태
     mouseState = Interfaces.PathCreatorMouseState.SetStartPoint;
+    // 커서 가시화 상태
+    cursor.layers.set(Interfaces.CustomLayer.Default);
 }
 
 /**
@@ -213,10 +256,13 @@ function Cancel() {
     currentPath.dispose();
 
     // 작업중 구간
-    workingSegment.dispose();
     pathGroup.remove(workingSegment as THREE.Object3D);
+    workingSegment.dispose();
 
     unregisterEventListeners();
+    
+    // 커서 가시화 상태
+    cursor.layers.set(Interfaces.CustomLayer.Invisible);
 }
 
 /**
@@ -227,14 +273,19 @@ function Finish(): Object {
     // 카메라 회전 버튼값 복구
     Camera.SetRotateButton(Interfaces.MouseButton.Left);
 
-    // // 반환값
-    // const pathData = currentPath?.ExportData;
+    // 작업중 구간 메모리 해제
+    pathGroup.remove(workingSegment as THREE.Object3D);
+    workingSegment.dispose();
 
-    // // 메모리 해제 및 이벤트 리스너 등록 해제
-    // currentPath.dispose();
+    // 생성 객체 추가
+    PathData.addPathObject(currentPath);
+
+    // 이벤트 등록 해제
     unregisterEventListeners();
+    // 커서 가시화 상태
+    cursor.layers.set(Interfaces.CustomLayer.Invisible);
 
-    return {};
+    return currentPath.ExportData;
 }
 
 /**

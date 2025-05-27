@@ -6,20 +6,19 @@ import * as THREE from 'three';
 class PathSegment3D extends THREE.Mesh {
 
     private curvePath: THREE.QuadraticBezierCurve3= new THREE.QuadraticBezierCurve3();
-    // private extrudeBaseShape?: THREE.Shape; // 스플라인을 따라 생성되는 도형의 기본 형태
-
-    // // 3d 리소스들
-    // private extrudeGeometry?: THREE.ExtrudeGeometry;
-    // private extrudeMaterial?: THREE.MeshBasicMaterial;
-    // private extrudeMesh?: THREE.Mesh;
+    
+    /**
+     * 경로 구간 색상
+     */
+    private segmentColor: THREE.ColorRepresentation = 'red';
 
     /**
      * PathSegment 생성자
      */
-    constructor() {
+    constructor(color: THREE.ColorRepresentation = 'red') {
         super();
 
-        //this.defineExtrudeBaseShape(1.0); // 기본 사각형 형태 정의
+        this.segmentColor = color;
     }
 
     get StartPoint(): THREE.Vector3 {
@@ -62,7 +61,7 @@ class PathSegment3D extends THREE.Mesh {
         this.geometry.translate(-center.x, -center.y, -center.z);
 
         // 재질
-        this.material = new THREE.MeshBasicMaterial({ color: 'red' });
+        this.material = new THREE.MeshBasicMaterial({ color: this.segmentColor });
 
         // 중심위치로 이동
         this.position.copy(center);
@@ -72,71 +71,6 @@ class PathSegment3D extends THREE.Mesh {
         (this.material as THREE.Material).dispose();
         this.geometry.dispose();
     }
-
-    // /**
-    //  * 스플라인을 따라 생성되는 도형의 기본 형태 정의(사각형태)
-    //  * @param length - 도형의 길이
-    //  */
-    // defineExtrudeBaseShape(length: number) {
-        
-    //     const halfLength = length * 0.5;
-
-    //     // 사각형 형태 정의
-    //     this.extrudeBaseShape = new THREE.Shape();
-    //     this.extrudeBaseShape.moveTo(-halfLength, -halfLength);
-    //     this.extrudeBaseShape.lineTo(-halfLength, halfLength);
-    //     this.extrudeBaseShape.lineTo(halfLength,  halfLength);
-    //     this.extrudeBaseShape.lineTo(halfLength, -halfLength);
-    //     this.extrudeBaseShape.lineTo(-halfLength, -halfLength);
-    // }
-
-    // /**
-    //  * 커브객체 위치점 설정
-    //  * @param start - 시작점 좌표
-    //  * @param control - 제어점 좌표
-    //  * @param end - 끝점 좌표
-    //  */
-    // setCurvePoints(start: THREE.Vector3, control: THREE.Vector3, end: THREE.Vector3) {        
-    //     this.curvePath = new THREE.QuadraticBezierCurve3(start, control, end);
-    // }
-
-    // /**
-    //  * geometry 업데이트
-    //  */
-    // updateVisuals() {
-    //     // 이전 생성된 리소스 제거
-    //     this.dispose();
-
-    //     // 재생성
-    //     this.extrudeGeometry = new THREE.ExtrudeGeometry(this.extrudeBaseShape, {
-    //         steps: 20,
-    //         extrudePath: this.curvePath,
-    //     });
-    //     this.extrudeGeometry.computeBoundingSphere(); // 센터점으로 정렬을 위해 바운딩 스피어 계산
-
-    //     // geometry 중심점 정렬 처리
-    //     const center = this.extrudeGeometry.boundingSphere ? this.extrudeGeometry.boundingSphere.center : new THREE.Vector3();
-    //     this.extrudeGeometry.translate(-center.x, -center.y, -center.z);
-
-    //     this.extrudeMaterial = new THREE.MeshBasicMaterial({ color: 'red' });
-    //     this.extrudeMesh = new THREE.Mesh(this.extrudeGeometry, this.extrudeMaterial);
-    //     this.add(this.extrudeMesh);
-
-    //     // 중심위치로 이동
-    //     this.position.copy(center);
-    // }
-
-    // /**
-    //  * 3d 리소스 메모리 해제
-    //  */
-    // dispose() {
-    //     this.parent?.remove(this);
-    //     if (this.extrudeMesh) {
-    //         this.remove(this.extrudeMesh);
-    //         this.extrudeGeometry?.dispose();
-    //         this.extrudeMaterial?.dispose();
-    //     }
-    // }
 }
 
 export {

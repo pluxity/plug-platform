@@ -7,7 +7,7 @@ const ThreeDViewer: React.FC = () => {
     useEffect(() => {
         if (containerRef.current) {
             new Engine3D(containerRef.current);
-            Loader.LoadGltf('funeralhall.glb', () => console.log('모델 로드 완료.'));
+            Loader.LoadGltf('subway.glb', () => console.log('모델 로드 완료.'));
         }
         console.log('WebGL 초기화 호출.');
     }, []);
