@@ -268,7 +268,7 @@ function Cancel() {
 /**
  * 경로 생성 작업 완료
  */
-function Finish(): Object {
+function Finish() {
 
     // 카메라 회전 버튼값 복구
     Camera.SetRotateButton(Interfaces.MouseButton.Left);

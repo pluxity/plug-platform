@@ -58,8 +58,17 @@ class Path3D extends THREE.Group {
     /**
      * 내보내기 데이터
      */
-    get ExportData(): Object {
+    get ExportData() {
+        const segmentsData = this.segments.map(segment => ({
+            start: new Interfaces.Vector3Custom().copy(segment.StartPoint).ExportData,
+            control: new Interfaces.Vector3Custom().copy(segment.StartPoint).ExportData,
+            end: new Interfaces.Vector3Custom().copy(segment.StartPoint).ExportData,
+        }));
+
         return {
+            id: this.name,
+            color: this.pathColor.toString(),
+            segments: segmentsData,
         };
     }
 

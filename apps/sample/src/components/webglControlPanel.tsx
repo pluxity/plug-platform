@@ -78,7 +78,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
                     <button onClick={()=>Path3D.Cancel()}>Cancel</button>
-                    <button onClick={()=>Path3D.Finish()}>Finish</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
                     <button>Undo</button>
                     <button>Redo</button>
                 </span>
@@ -153,6 +153,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 const pathId = window.crypto.randomUUID();
                 const color = 0xffffff * Math.random();
                 Path3D.CreatePath(pathId, color);
+            } break;
+            case 'Path.Finish': {
+                const pathData = Path3D.Finish();
+                console.log('Path3D.Finish -> ', pathData);
             } break;
         }
     }
