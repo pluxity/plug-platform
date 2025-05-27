@@ -42,7 +42,7 @@ class Path3D extends THREE.Group {
         this.extrudeShape = new THREE.Shape();
         this.extrudeShape.moveTo(-halfLength, -halfLength);
         this.extrudeShape.lineTo(-halfLength, halfLength);
-        this.extrudeShape.lineTo(halfLength,  halfLength);
+        this.extrudeShape.lineTo(halfLength, halfLength);
         this.extrudeShape.lineTo(halfLength, -halfLength);
         this.extrudeShape.lineTo(-halfLength, -halfLength);
     }
@@ -60,9 +60,18 @@ class Path3D extends THREE.Group {
      */
     get ExportData() {
         const segmentsData = this.segments.map(segment => ({
-            start: new Interfaces.Vector3Custom().copy(segment.StartPoint).ExportData,
-            control: new Interfaces.Vector3Custom().copy(segment.StartPoint).ExportData,
-            end: new Interfaces.Vector3Custom().copy(segment.StartPoint).ExportData,
+            start: {
+                floorId: segment.StartPointDummy.parent?.userData['floorId'],
+                localPosition: new Interfaces.Vector3Custom().copy(segment.StartPointLocalPosition).ExportData
+            },
+            control: {
+                floorId: segment.ControlPointDummy.parent?.userData['floorId'],
+                localPosition: new Interfaces.Vector3Custom().copy(segment.ControlPointLocalPosition).ExportData
+            },
+            end: {
+                floorId: segment.EndPointDummy.parent?.userData['floorId'],
+                localPosition: new Interfaces.Vector3Custom().copy(segment.EndPointLocalPosition).ExportData
+            },
         }));
 
         return {
@@ -102,7 +111,7 @@ class Path3D extends THREE.Group {
         // 구간 추가시 각 구간의 이음부가 비어보이므로 실린더를 생성하여 각 시작/끝지점에 위치시킨다.
         const pointObj = new PathPoint3D(this.pathWidth * 0.5, this.pathWidth, this.pathColor);
         this.add(pointObj);
-        pointObj.position.copy(segment.EndPoint);
+        pointObj.position.copy(segment.EndPointWorldPosition);
         this.pointObjects.push(pointObj);
     }
 }

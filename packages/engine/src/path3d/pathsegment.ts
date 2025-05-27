@@ -5,8 +5,12 @@ import * as THREE from 'three';
  */
 class PathSegment3D extends THREE.Mesh {
 
-    private curvePath: THREE.QuadraticBezierCurve3= new THREE.QuadraticBezierCurve3();
-    
+    private curvePath: THREE.QuadraticBezierCurve3 = new THREE.QuadraticBezierCurve3();
+
+    private startPointDummy!: THREE.Object3D;
+    private controlPointDummy!: THREE.Object3D;
+    private endPointDummy!: THREE.Object3D;
+
     /**
      * 경로 구간 색상
      */
@@ -21,28 +25,55 @@ class PathSegment3D extends THREE.Mesh {
         this.segmentColor = color;
     }
 
-    get StartPoint(): THREE.Vector3 {
-        return this.curvePath.v0;
+    set StartPointDummy(value: THREE.Object3D) {
+        this.startPointDummy = value;
+
+        this.curvePath.v0 = this.StartPointWorldPosition.clone();
+    }
+    get StartPointDummy(): THREE.Object3D {
+        return this.startPointDummy;
+    }
+    get StartPointLocalPosition(): THREE.Vector3 {
+        return this.startPointDummy.position.clone();
+    }
+    get StartPointWorldPosition(): THREE.Vector3 {
+        const worldPoint = new THREE.Vector3();
+        this.startPointDummy.getWorldPosition(worldPoint);
+        return worldPoint;
     }
 
-    set StartPoint(value: THREE.Vector3) {
-        this.curvePath.v0 = value;
+    set ControlPointDummy(value: THREE.Object3D) {
+        this.controlPointDummy = value;
+
+        this.curvePath.v1 = this.ControlPointWorldPosition.clone();
+    }
+    get ControlPointDummy(): THREE.Object3D {
+        return this.controlPointDummy;
+    }
+    get ControlPointLocalPosition(): THREE.Vector3 {
+        return this.controlPointDummy.position.clone();
+    }
+    get ControlPointWorldPosition(): THREE.Vector3 {
+        const worldPoint = new THREE.Vector3();
+        this.controlPointDummy.getWorldPosition(worldPoint);
+        return worldPoint;
     }
 
-    get ControlPoint(): THREE.Vector3 {
-        return this.curvePath.v1;
-    }
+    set EndPointDummy(value: THREE.Object3D) {
+        this.endPointDummy = value;
 
-    set ControlPoint(value: THREE.Vector3) {
-        this.curvePath.v1 = value;
+        this.curvePath.v2 = this.EndPointWorldPosition.clone();
     }
-
-    get EndPoint(): THREE.Vector3 {
-        return this.curvePath.v2;
+    get EndPointDummy(): THREE.Object3D {
+        return this.endPointDummy;
     }
-
-    set EndPoint(value: THREE.Vector3) {
-        this.curvePath.v2 = value;
+    get EndPointLocalPosition(): THREE.Vector3 {
+        return this.endPointDummy.position.clone();
+    }
+    get EndPointWorldPosition(): THREE.Vector3 {
+        const worldPoint = new THREE.Vector3();
+        this.endPointDummy.getWorldPosition(worldPoint);
+        return worldPoint;
     }
 
     updateGeometry(extrudeShape: THREE.Shape) {

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Model, Poi, Path3D } from '@plug/engine/src';
-import {Button} from '@plug/ui';
 
 // 층 데이터 타입 정의
 interface FloorData {
@@ -62,7 +61,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         this.state.floorData.length > 0 &&
                         <span>
                             <button onClick={() => this.setFloorVisibility(true)}>ShowAll</button>
-                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button>
+                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button><br />
+                            <button onClick={() => Model.Expand(1.0, 15.0)}>Expand</button>
+                            <button onClick={() => Model.Collapse(1.0)}>Collapse</button>
                         </span>
                     }
                 </span>
@@ -77,7 +78,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
-                    <button onClick={()=>Path3D.Cancel()}>Cancel</button>
+                    <button onClick={() => Path3D.Cancel()}>Cancel</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
                     <button>Undo</button>
                     <button>Redo</button>
@@ -126,11 +127,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onApiBtnClick(apiName: string) {
         switch (apiName) {
             case 'Model.GetHierarchy': {
-                Model.GetModelHierarchy('subway.glb', (data: FloorData[]) => {
-                    console.log('Model.GetModelHierarchy -> ', data);
+                const data = Model.GetModelHierarchy();
 
-                    this.setState({ floorData: data }); // 얻은 층정보로 state 설정
-                });
+                console.log('Model.GetModelHierarchy -> ', data);
+
+                this.setState({ floorData: data as any }); // 얻은 층정보로 state 설정
             } break;
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();

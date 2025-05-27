@@ -3,6 +3,7 @@ import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
 import * as Camera from '../camera';
 import * as PathData from './data';
+import * as Util from '../util';
 import { PathSegment3D } from './pathsegment';
 import { Path3D } from './path3d';
 import { Engine3D } from '../engine';
@@ -24,12 +25,12 @@ enum MouseState { None = 0, SetStartPoint, SetEndPoint };
  */
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
-    
+
     // 경로 객체 그룹
     pathGroup = new THREE.Group();
     pathGroup.name = '#PathGroup';
     engine.RootScene.add(pathGroup);
-    
+
     // 커서
     cursor = new THREE.Mesh(
         new THREE.SphereGeometry(0.1, 32, 32),
@@ -37,7 +38,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     );
     cursor.name = '#Cursor';
     cursor.layers.set(Interfaces.CustomLayer.Invisible);
-    pathGroup.add(cursor);    
+    pathGroup.add(cursor);
 
     rayCast.layers.set(Interfaces.CustomLayer.Pickable);
 });
@@ -47,7 +48,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  * @param mousePos - 마우스 좌표
  * @returns - 공간상의 픽킹 위치
  */
-function getPickPoint(mousePos: THREE.Vector2): THREE.Vector3 | undefined {
+function getPickPoint(mousePos: THREE.Vector2) {
 
     // 마우스 좌표를 뷰포트 공간으로
     mousePos.x = (mousePos.x / engine.Dom.clientWidth) * 2 - 1;
@@ -61,13 +62,29 @@ function getPickPoint(mousePos: THREE.Vector2): THREE.Vector3 | undefined {
 
     // 충돌한 객체가 있으면 첫번째 객체의 위치 반환
     if (intersects.length > 0) {
-        return intersects[0].point;
+
+        // 픽킹좌표를 층기준 로컬 좌표로 전환
+        const floorObject = Util.getFloorObject(intersects[0].object);
+        const pickedPointLocal = floorObject.worldToLocal(intersects[0].point.clone());
+
+        return {
+            worldPoint: intersects[0].point,
+            localPoint: pickedPointLocal,
+            pickedFloor: floorObject,
+        };
     } else {
         // 배경 모델과 충돌하지 않는 경우 평면과 교차 테스트
         const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
         const point = new THREE.Vector3();
         if (rayCast.ray.intersectPlane(plane, point)) {
-            return point;
+            const floorObject = Util.getFloorObject();
+            const pickedPointLocal = floorObject.worldToLocal(point.clone());
+
+            return {
+                worldPoint: point,
+                localPoint: pickedPointLocal,
+                pickedFloor: floorObject,
+            };
         }
     }
 
@@ -80,7 +97,7 @@ function getPickPoint(mousePos: THREE.Vector2): THREE.Vector3 | undefined {
  * @param planeBasePoint - 평면의 기준점 (기본값: 원점)
  * @returns - 평면과 교차하는 픽킹 위치
  */
-function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Vector3): THREE.Vector3 {
+function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Vector3) {
     // 마우스 좌표를 뷰포트 공간으로
     mousePos.x = (mousePos.x / engine.Dom.clientWidth) * 2 - 1;
     mousePos.y = -(mousePos.y / engine.Dom.clientHeight) * 2 + 1;
@@ -92,10 +109,17 @@ function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Ve
     const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), planeBasePoint);
     const point = new THREE.Vector3();
     if (rayCast.ray.intersectPlane(plane, point)) {
-        return point;
+        const floorObject = Util.getFloorObject();
+        const pickedPointLocal = floorObject.worldToLocal(point.clone());
+
+        return {
+            worldPoint: point,
+            localPoint: pickedPointLocal,
+            pickedFloor: floorObject,
+        };
     }
 
-    return point;
+    return undefined;
 }
 
 
@@ -111,7 +135,18 @@ function onPointerDown(event: MouseEvent) {
 
         switch (mouseState) {
             case Interfaces.PathCreatorMouseState.SetEndPoint: {
-                workingSegment.EndPoint = getPickPoint(mouseDownPos) as THREE.Vector3;
+                let pickData = getPickPoint(mouseDownPos);
+
+                if (!pickData) {
+                    console.warn('경로 생성 실패: 픽킹 좌표를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const endPointDummy = new THREE.Object3D();
+                endPointDummy.position.copy(pickData.worldPoint);
+                pickData.pickedFloor.attach(endPointDummy);
+
+                workingSegment.EndPointDummy = endPointDummy;
             } break;
         }
     }
@@ -125,24 +160,48 @@ function onPointerMove(event: MouseEvent) {
 
     if (mouseState === Interfaces.PathCreatorMouseState.SetEndPoint) {
         const currMousePos = new THREE.Vector2(event.offsetX, event.offsetY);
-        let pickPoint = getPickPoint(currMousePos) as THREE.Vector3;
-        cursor.position.copy(pickPoint);
-        
+        let pickData = getPickPoint(currMousePos);
+
+        if (!pickData) {
+            console.warn('경로 생성 실패: 픽킹 좌표를 찾을 수 없습니다.');
+            return;
+        }
+
+        cursor.position.copy(pickData.worldPoint);
+
         if (bLeftBtnDown) {
             // 곡선
             // 곡선의 경우 픽킹점을 평면에 대해 처리한다.
-            pickPoint = getPickPointFromPlane(new THREE.Vector2(event.offsetX, event.offsetY), workingSegment.EndPoint.clone());
-            const distance = workingSegment.EndPoint.distanceTo(pickPoint);
-            const direction = new THREE.Vector3().subVectors(workingSegment.EndPoint, pickPoint).normalize();
-            const controlPoint = workingSegment.EndPoint.clone().addScaledVector(direction, distance);
-            workingSegment.ControlPoint = controlPoint;
+            pickData = getPickPointFromPlane(new THREE.Vector2(event.offsetX, event.offsetY), workingSegment.EndPointWorldPosition.clone());
+            const distance = workingSegment.EndPointWorldPosition.distanceTo(pickData?.worldPoint as THREE.Vector3);
+            const direction = new THREE.Vector3().subVectors(workingSegment.EndPointWorldPosition, pickData?.worldPoint as THREE.Vector3).normalize();
+            const controlPoint = workingSegment.EndPointWorldPosition.clone().addScaledVector(direction, distance);
+
+            // 더미 객체 생성
+            const controlPointDummy = new THREE.Object3D();
+            controlPointDummy.position.copy(controlPoint);
+            workingSegment.EndPointDummy.parent?.add(controlPointDummy); // EndPointDummy가 있는 층객체에 더미 객체를 부착
+
+            workingSegment.ControlPointDummy = controlPointDummy;
+
             workingSegment.updateGeometry(currentPath.ExtrudeShape);
-            cursor.position.copy(pickPoint);
+            cursor.position.copy(pickData?.worldPoint as THREE.Vector3);
         } else {
             // 직선
-            const controlPoint = new THREE.Vector3().lerpVectors(workingSegment.StartPoint, pickPoint, 0.5);
-            workingSegment.ControlPoint = controlPoint;
-            workingSegment.EndPoint = pickPoint;
+            const controlPoint = new THREE.Vector3().lerpVectors(workingSegment.StartPointWorldPosition, pickData.worldPoint, 0.5);
+
+            // 더미 객체 생성
+            const endPointDummy = new THREE.Object3D();
+            endPointDummy.position.copy(pickData.worldPoint);
+            pickData.pickedFloor.attach(endPointDummy);
+
+            const controlPointDummy = new THREE.Object3D();
+            controlPointDummy.position.copy(controlPoint);
+            pickData.pickedFloor.attach(controlPointDummy);
+
+            workingSegment.ControlPointDummy = controlPointDummy;
+            workingSegment.EndPointDummy = endPointDummy;
+
             workingSegment.updateGeometry(currentPath.ExtrudeShape);
         }
     }
@@ -156,23 +215,40 @@ function onPointerMove(event: MouseEvent) {
 function onPointerUp(event: MouseEvent) {
     if (event.button === 0) {
         const mouseUpPos = new THREE.Vector2(event.offsetX, event.offsetY);
-        const mouseDistance = mouseUpPos.clone().sub(mouseDownPos);
-        const pickPoint = getPickPoint(mouseUpPos) as THREE.Vector3;
+        const pickData = getPickPoint(mouseUpPos);
+
+        if (!pickData) {
+            console.warn('경로 생성 실패: 픽킹 좌표를 찾을 수 없습니다.');
+            return;
+        }
 
         switch (mouseState) {
             case Interfaces.PathCreatorMouseState.SetStartPoint: {
-                workingSegment.StartPoint = pickPoint;
+
+                // 픽킹 지점에 더미 객체를 생성하여 층객체로 부착시킨다.
+                const dummy = new THREE.Object3D();
+                dummy.position.copy(pickData.worldPoint);
+                pickData.pickedFloor.attach(dummy);
+
+                workingSegment.StartPointDummy = dummy;
+
                 mouseState = Interfaces.PathCreatorMouseState.SetEndPoint;
             } break;
             case Interfaces.PathCreatorMouseState.SetEndPoint: {
                 // 현재 경로 객체에 구간 추가
                 currentPath.addSegment(workingSegment);
-                const lastPoint = workingSegment.EndPoint.clone();
+                const lastWorldPoint = workingSegment.EndPointWorldPosition.clone();
 
                 // 새 구간 생성후 시작점 설정
                 workingSegment = new PathSegment3D(currentPath.PathColor);
                 pathGroup.add(workingSegment);
-                workingSegment.StartPoint = lastPoint;
+
+                // 새 구간의 시작점의 더미
+                const dummy = new THREE.Object3D();
+                dummy.position.copy(lastWorldPoint);
+                pickData.pickedFloor.attach(dummy);
+
+                workingSegment.StartPointDummy = dummy;
             } break;
         }
 
@@ -260,7 +336,7 @@ function Cancel() {
     workingSegment.dispose();
 
     unregisterEventListeners();
-    
+
     // 커서 가시화 상태
     cursor.layers.set(Interfaces.CustomLayer.Invisible);
 }
