@@ -1,24 +1,29 @@
 import * as THREE from 'three';
 import * as Interfaces from '../interfaces';
 import { PathSegment3D } from './pathsegment';
+import { PathPoint3D } from './pathpoint';
 
 /**
  * 경로 객체 클래스
  */
 class Path3D extends THREE.Group {
-    /**
-     * 경로 데이터
-     */
-    private data: Interfaces.Path3DData;
 
+    /**
+     * 경로를 구성하는 각 위치점 객체 배열
+     */
+    private pointObjects: PathPoint3D[] = [];
     /**
      * 각 경로 구간별 객체 배열
      */
     private segments: PathSegment3D[] = [];
     /**
-     * 현재 편집중인 구간
+     * 스플라인을 따라 생성되는 도형의 기본 형태
      */
-    private currentSegment?: PathSegment3D;
+    private extrudeShape?: THREE.Shape;
+    /**
+     * 경로 너비
+     */
+    private pathWidth: number = 1.0;
 
     /**
      * 생성자
@@ -26,61 +31,57 @@ class Path3D extends THREE.Group {
     constructor() {
         super();
 
-        // 경로 데이터 기본값으로 초기화
-        this.data = {
-            id: THREE.MathUtils.generateUUID(),
-            color: 0x00ff00,
-            segments: [],
-        };
+        // geometry구성시 사용할 도형 형태
+        const halfLength = this.pathWidth * 0.5;
+        this.extrudeShape = new THREE.Shape();
+        this.extrudeShape.moveTo(-halfLength, -halfLength);
+        this.extrudeShape.lineTo(-halfLength, halfLength);
+        this.extrudeShape.lineTo(halfLength,  halfLength);
+        this.extrudeShape.lineTo(halfLength, -halfLength);
+        this.extrudeShape.lineTo(-halfLength, -halfLength);
+    }
+
+    get ExtrudeShape(): THREE.Shape {
+        return this.extrudeShape!;
     }
 
     /**
      * 내보내기 데이터
      */
-    get ExportData(): Interfaces.Path3DData {
-        return this.data;
+    get ExportData(): Object {
+        return {};
     }
 
     /**
      * 메모리 해제
      */
     dispose() {
-        throw new Error('Path3D.dispose() is not implemented');
+        // 구간
+        this.segments.forEach(segment => {
+            segment.dispose();
+        });
+        this.segments = [];
+
+        // 위치점
+        this.pointObjects.forEach(point => {
+            point.dispose();
+        });
+        this.pointObjects = [];
     }
 
     /**
-     * 직선 위치점 추가
-     * @param point - 경로 위치점
+     * 새 경로 구간을 전체 경로 객체에 추가
+     * @param segment - 추가할 경로 구간
      */
-    addStraightPoint(point: THREE.Vector3) {
+    addSegment(segment: PathSegment3D) {
+        this.segments.push(segment);
+        this.attach(segment); // 월드 트랜스폼을 유지하며 현재 그룹 객체에 부착
 
-        // 현재 편집중인 구간이 있다면
-        if (this.currentSegment) {
-            // 중심점 계산
-            const lastPoint = this.currentSegment.CurveStartPoint;
-            const centerPoint = new THREE.Vector3().lerpVectors(lastPoint, point, 0.5);
-
-            // 현재 구간에 곡선점 설정
-            this.currentSegment.CurveControlPoint = centerPoint;
-            this.currentSegment.CurveEndPoint = point;
-
-            // 배열에 저장
-            this.segments.push(this.currentSegment);
-        }
-
-        // 없다면 구간 새로 생성후 시작점 설정
-        this.currentSegment = new PathSegment3D();
-        this.currentSegment.CurveStartPoint = point;
-
-    }
-
-    /**
-     * 곡선 위치점 추가
-     * @param point - 경로 위치점
-     * @param control - 곡선 제어점
-     */
-    addCurvedPoint(point: THREE.Vector3, control: THREE.Vector3) {
-
+        // 구간 추가시 각 구간의 이음부가 비어보이므로 실린더를 생성하여 각 시작/끝지점에 위치시킨다.
+        const pointObj = new PathPoint3D(this.pathWidth * 0.5, this.pathWidth, 'red');
+        this.add(pointObj);
+        pointObj.position.copy(segment.EndPoint);
+        this.pointObjects.push(pointObj);
     }
 }
 

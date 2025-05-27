@@ -58,6 +58,15 @@ enum ModifyKey {
 }
 
 /**
+ * 경로 생성기 마우스 상태 열거형
+ */
+enum PathCreatorMouseState {
+    Default = 0,
+    SetStartPoint,
+    SetEndPoint,
+}
+
+/**
  * 모델 정보
  */
 interface ModelInfo {
@@ -154,6 +163,7 @@ export {
     CustomLayer,
     MouseButton,
     ModifyKey,
+    PathCreatorMouseState,
     ModelInfo,
     PoiCreateOption,
     PoiImportOption,
