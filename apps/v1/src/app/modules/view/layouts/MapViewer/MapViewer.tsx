@@ -18,7 +18,6 @@ const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) =>
         // 컴포넌트 언마운트 시 정리
         return () => {
             if (engineRef.current) {
-                // 엔진 정리 로직이 있다면 여기서 실행
                 engineRef.current = null;
                 isModelLoadedRef.current = false;
             }
@@ -31,7 +30,6 @@ const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) =>
             try {
                 console.log('3D 모델 로드 시작:', modelPath);
                 Px.Loader.LoadGltf(modelPath, () => {
-                    console.log('3D 모델 로드 완료');
                     isModelLoadedRef.current = true;
                     onModelLoaded?.();
                 });
