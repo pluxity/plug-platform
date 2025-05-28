@@ -1,4 +1,4 @@
-import { DASHBOARD_TITLES } from '../mocks/DashboardTitle.mock';
+import { DASHBOARD_TITLES } from '../constants/dashboardTitle';
 import { useLocation } from "react-router-dom";
 
 export interface DashboardTitle{

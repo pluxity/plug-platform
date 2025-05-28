@@ -1,8 +1,8 @@
 import { UserResponse } from '@plug/common-services';
-import { User } from '../types/UserList.types';
+import { User } from '../types/user.types';
 import { Button } from '@plug/ui';
 
-export const useUserList = (
+export const useUser = (
     data: UserResponse[],
     openModal: (mode: 'create' | 'edit') => void,
     onDelete: (userId: number) => void,

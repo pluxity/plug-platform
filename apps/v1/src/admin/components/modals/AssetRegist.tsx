@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
 import { useFileUpload, createFileFormData, useAssetCreate, useAssetsDetailSWR, useAssetUpdate } from '@plug/common-services';
 
-export interface PoiIconRegistProps{
+export interface AssetRegistProps{
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
@@ -10,7 +10,7 @@ export interface PoiIconRegistProps{
     selectedAssetId?: number;
 }
 
-export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAssetId }: PoiIconRegistProps) =>{
+export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAssetId }: AssetRegistProps) =>{
   const [name, setName] = useState('');
 
   // 3d 모델 파일 상태 관리 
@@ -34,7 +34,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
   // 에셋 상세 조회 훅
   const { data: detailAssetData } = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
 
-  //에셋 수정 훅 
+  // 에셋 수정 훅 
   const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError } = useAssetUpdate(Number(selectedAssetId));
 
   // 3D 모델 파일 선택 핸들러
@@ -118,7 +118,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
     if(mode === 'edit' && detailAssetData){  
       try{
           const asset = await updateAsset({
-            name: values.poiIconRegistName || name,
+            name: values.assetRegistName || name,
             fileId: uploadedModelId || undefined,
             thumbnailFileId: uploadThumbnailId || undefined
           });
@@ -142,7 +142,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
       try {
         // 에셋 생성 API 호출
         const asset = await createAsset({
-          name: values.poiIconRegistName || name,
+          name: values.assetRegistName || name,
           fileId: uploadedModelId,
           thumbnailFileId: uploadThumbnailId,
         });
@@ -157,7 +157,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
         console.error('아이콘 등록 실패:', error);
       }
     }
-  }, [createAsset, uploadedModelId, name, onSuccess, detailAssetData, updateAsset, uploadThumbnailId]);
+  }, [createAsset, uploadedModelId, name, mode, onSuccess, detailAssetData, updateAsset, uploadThumbnailId]);
   
   // 폼 초기화
   const resetForm = () => {
@@ -182,9 +182,9 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
   
   return (
     <Modal
-      title={mode === 'create' ? '3D 모델 등록' : '3D 모델 수정'}
+      title={mode === 'create' ? 'ASSET 등록' : 'ASSET 수정'}
       isOpen={isOpen}
-      onClose={isProcessing ? undefined : onClose}
+      onClose={isProcessing ? undefined : resetForm}
       closeOnOverlayClick={false}
       overlayClassName="bg-black/50"
     >
@@ -200,16 +200,17 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
             initialValues={
               mode === 'edit' && detailAssetData
                 ? {
-                    poiIconRegistName: detailAssetData?.name,
-                    poiIconFileId: String(detailAssetData?.file?.id),
+                    assetRegistName: detailAssetData?.name,
+                    assetFileId: String(detailAssetData?.file?.id),
                   }
                 : {
-                  poiIconRegistName: '',
-                  poiIconFileId: '',
+                  assetRegistName: '',
+                  assetFileId: '',
                 }
             }
-            onSubmit={handleFinish}>
-          <FormItem name="poiIconRegistName" label='이름' required>
+            onSubmit={handleFinish}
+          >
+          <FormItem name="assetRegistName" label='이름' required>
             <Input.Text 
               placeholder="모델 이름을 입력하세요"
               value={name}
@@ -217,7 +218,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
             />
           </FormItem>
 
-          <FormItem name="poiIconRegistThumbnail" label='Thumbnail 파일' required>
+          <FormItem name="assetRegistThumbnail" label='Thumbnail 파일' required>
             <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
               <input
                 type="file"
@@ -267,7 +268,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
             </div>
           </FormItem>
           
-          <FormItem name="poiIconRegistFile" label='3D 모델 파일' required>
+          <FormItem name="assetRegistFile" label='3D 모델 파일' required>
             <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
               <input
                 type="file"

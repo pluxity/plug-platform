@@ -1,6 +1,6 @@
 import { Button, Sidebar } from '@plug/ui';
 import { Outlet } from 'react-router-dom';
-import { DashboardTitle } from './hooks/useDashboardTitle'; 
+import { DashboardTitle } from './utils/useDashboardTitle'; 
 
 const Dashboard = () => {
     const title = DashboardTitle();
@@ -19,34 +19,18 @@ const Dashboard = () => {
                     <Sidebar.Menu
                         items={[
                             {
-                                title: '역사 관리',
-                                submenu: [
-                                    {
-                                        title: '역사 목록',
-                                        link: '/admin/historylist',
-                                    },
-                                    {
-                                        title: '역사 분류',
-                                        link: '/admin/historycategory',
-                                    },
-                                ],
+                                title: 'ASSET 관리',
+                                link: '/admin/asset/management',
+                                toggleable: false,
                             },
                             {
-                                title: 'POI 관리',
-                                submenu: [
-                                    {
-                                        title: 'POI 목록',
-                                        link: '/admin/poi/poilist',
-                                    },
-                                    {
-                                        title: 'POI 아이콘 정보',
-                                        link: '/admin/poi/poiicon',
-                                    },
-                                ],
+                                title: '호선 관리',
+                                link: '/admin/line/management',
+                                toggleable: false,
                             },
                             {
                                 title: '사용자 관리',
-                                link: '/admin/user/userlist',
+                                link: '/admin/user/management',
                                 toggleable: false,
                             },
                         ]}

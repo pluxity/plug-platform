@@ -1,4 +1,4 @@
-import { User } from '../types/UserList.types';
+import { User } from '../types/user.types';
 import { Button } from '@plug/ui';
 import type { Column } from '@plug/ui';
 

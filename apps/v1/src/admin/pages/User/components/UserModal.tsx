@@ -2,14 +2,14 @@ import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
 import { useCreateUser } from '@plug/common-services';
 import { useCallback, useState } from 'react';
 
-export interface UserListModalProps {
+export interface UserModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
     mode: 'create' | 'edit';
 }
 
-export const UserListModal = ({ isOpen, onClose, onSuccess, mode }: UserListModalProps) => {
+export const UserModal = ({ isOpen, onClose, onSuccess, mode }: UserModalProps) => {
     const [password, setPassword] = useState('');
 
     const handleChangePassword = (value: string) => {setPassword(value);}
