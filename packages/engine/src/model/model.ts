@@ -226,7 +226,7 @@ function HideAll() {
  * @param interval - 간격
  * @param onComplete - 완료 후 호출될 콜백 함수
  */
-function Expand(transitionTime: number, interval: number, onComplete: Function) {
+function Expand(transitionTime: number, interval: number, onComplete?: Function) {
 
     // 트윈이 진행중이면 수행하지 않음
     if (posTween === undefined || posTween === null) {
@@ -302,7 +302,7 @@ function Expand(transitionTime: number, interval: number, onComplete: Function) 
  * @param transitionTime - 애니메이션 진행 시간
  * @param onComplete - 완료 후 호출될 콜백 함수
  */
-function Collapse(transitionTime: number, onComplete: Function) {
+function Collapse(transitionTime: number, onComplete?: Function) {
     // 트윈이 진행중일땐 수행하지 않음
     if (posTween === undefined || posTween === null) {
 
