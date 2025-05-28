@@ -203,9 +203,24 @@ function getFloorObject(target?: THREE.Object3D): THREE.Object3D {
 
 }
 
+/**
+ * 색상이나 이미지로 배경 설정
+ * @param backgroundData - 배경색상 숫자일경우 0xff0000의 형식으로 판단하고, 문자열일 경우 이미지 주소로 판단하여 배경을 설정한다.
+ */
+function SetBackground(backgroundData: number | string) {
+
+    if( typeof(backgroundData) === 'number') {
+        engine.RootScene.background = new THREE.Color(backgroundData);
+    } else if (typeof (backgroundData) === 'string') {
+        engine.RootScene.background = new THREE.TextureLoader().load(backgroundData);
+    }
+}
+
 export {
     createTextMaterial,
     getMergedGeometry,
     setObjectLayer,
     getFloorObject,
+
+    SetBackground,
 }
