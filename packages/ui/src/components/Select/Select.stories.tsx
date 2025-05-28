@@ -28,11 +28,25 @@ const meta: Meta<typeof Select> = {
                         <Select.Item value="5">5번</Select.Item>
                         <Select.Item value="6">6번</Select.Item>
                         <Select.Item value="7">7번</Select.Item>
+                        <Select.Item value="1">1번</Select.Item>
+                        <Select.Item value="2">2번</Select.Item>
+                        <Select.Item value="3">3번</Select.Item>
+                        <Select.Item value="4">4번</Select.Item>
+                        <Select.Item value="5">5번</Select.Item>
+                        <Select.Item value="6">6번</Select.Item>
+                        <Select.Item value="7">7번</Select.Item>
                     </Select.Content>
                 </Select>
                 <Select className="w-60" {...args}>
                     <Select.Trigger />
                     <Select.Content>
+                        <Select.Item value="1">1번</Select.Item>
+                        <Select.Item value="2">2번</Select.Item>
+                        <Select.Item value="3">3번</Select.Item>
+                        <Select.Item value="4">4번</Select.Item>
+                        <Select.Item value="5">5번</Select.Item>
+                        <Select.Item value="6">6번</Select.Item>
+                        <Select.Item value="7">7번</Select.Item>
                         <Select.Item value="1">1번</Select.Item>
                         <Select.Item value="2">2번</Select.Item>
                         <Select.Item value="3">3번</Select.Item>
@@ -63,6 +77,13 @@ export const Type: Story = {
                       <Select.Item value="5">5번</Select.Item>
                       <Select.Item value="6">6번</Select.Item>
                       <Select.Item value="7">7번</Select.Item>
+                      <Select.Item value="1">1번</Select.Item>
+                      <Select.Item value="2">2번</Select.Item>
+                      <Select.Item value="3">3번</Select.Item>
+                      <Select.Item value="4">4번</Select.Item>
+                      <Select.Item value="5">5번</Select.Item>
+                      <Select.Item value="6">6번</Select.Item>
+                      <Select.Item value="7">7번</Select.Item>
                   </Select.Content>
               </Select>
             </div>
@@ -71,6 +92,13 @@ export const Type: Story = {
               <Select className="w-60" type="multiple">
                   <Select.Trigger placeholder="입력하세요" inputClassName="placeholder:text-sm"/>
                   <Select.Content>
+                      <Select.Item value="1">1번</Select.Item>
+                      <Select.Item value="2">2번</Select.Item>
+                      <Select.Item value="3">3번</Select.Item>
+                      <Select.Item value="4">4번</Select.Item>
+                      <Select.Item value="5">5번</Select.Item>
+                      <Select.Item value="6">6번</Select.Item>
+                      <Select.Item value="7">7번</Select.Item>
                       <Select.Item value="1">1번</Select.Item>
                       <Select.Item value="2">2번</Select.Item>
                       <Select.Item value="3">3번</Select.Item>
@@ -102,6 +130,13 @@ export const Variant: Story = {
                       <Select.Item value="5">5번</Select.Item>
                       <Select.Item value="6">6번</Select.Item>
                       <Select.Item value="7">7번</Select.Item>
+                      <Select.Item value="1">1번</Select.Item>
+                      <Select.Item value="2">2번</Select.Item>
+                      <Select.Item value="3">3번</Select.Item>
+                      <Select.Item value="4">4번</Select.Item>
+                      <Select.Item value="5">5번</Select.Item>
+                      <Select.Item value="6">6번</Select.Item>
+                      <Select.Item value="7">7번</Select.Item>
                   </Select.Content>
               </Select>
             </div>
@@ -110,6 +145,13 @@ export const Variant: Story = {
               <Select className="w-60" variant="error">
                   <Select.Trigger/>
                   <Select.Content>
+                      <Select.Item value="1">1번</Select.Item>
+                      <Select.Item value="2">2번</Select.Item>
+                      <Select.Item value="3">3번</Select.Item>
+                      <Select.Item value="4">4번</Select.Item>
+                      <Select.Item value="5">5번</Select.Item>
+                      <Select.Item value="6">6번</Select.Item>
+                      <Select.Item value="7">7번</Select.Item>
                       <Select.Item value="1">1번</Select.Item>
                       <Select.Item value="2">2번</Select.Item>
                       <Select.Item value="3">3번</Select.Item>
@@ -128,7 +170,7 @@ export const Variant: Story = {
 export const Controlled: Story = {
     render() {
         const SelectedController = () => {
-            const [selected, setSelected] = useState<string[]>([]);
+            const [selected, setSelected] = useState<string[]>(['1', '2']);
             
             const handleChange = (newValues: string[]) => {
                 setSelected(newValues);
@@ -147,6 +189,13 @@ export const Controlled: Story = {
                     >
                         <Select.Trigger />
                         <Select.Content>
+                            <Select.Item value="1">1번</Select.Item>
+                            <Select.Item value="2">2번</Select.Item>
+                            <Select.Item value="3">3번</Select.Item>
+                            <Select.Item value="4">4번</Select.Item>
+                            <Select.Item value="5">5번</Select.Item>
+                            <Select.Item value="6">6번</Select.Item>
+                            <Select.Item value="7">7번</Select.Item>
                             <Select.Item value="1">1번</Select.Item>
                             <Select.Item value="2">2번</Select.Item>
                             <Select.Item value="3">3번</Select.Item>

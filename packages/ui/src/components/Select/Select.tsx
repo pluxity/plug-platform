@@ -19,10 +19,8 @@ interface SelectContextProps {
     disabled: boolean;
     isSelected: boolean;
     setIsSelected: (value: boolean) => void;
-    selectedValues: string[];
-    setSelectedValues: (values: string[]) => void;
     selectedItems: Map<string, React.ReactNode>; 
-    setSelectedItems: (items: Map<string, React.ReactNode>) => void;
+    setSelectedItems: React.Dispatch<React.SetStateAction<Map<string, React.ReactNode>>>;
     toggleValue: (value: string, item?: React.ReactNode) => void;
     searchValue: string;
     setSearchValue: (value: string) => void;
@@ -41,14 +39,12 @@ const Select = ({
                     ...props
                 }: SelectProps) => {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
-    const [selectedValues, setSelectedValues] = useState<string[]>([]);
     const [selectedItems, setSelectedItems] = useState<Map<string, React.ReactNode>>(new Map());
 
     const [searchValue, setSearchValue] = useState("");
     const ref = useRef<HTMLDivElement>(null);
 
     const isControlled = selected !== undefined;
-    const currentSelected = isControlled ? selected : selectedValues;
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -58,45 +54,112 @@ const Select = ({
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);    const toggleValue = (value: string, item?: React.ReactNode) => {
+    }, []);
+
+    useEffect(() => {
+        if (isControlled) {
+            const buildNewSelectedItems = (currentInternalSelectedItems: Map<string, React.ReactNode>): Map<string, React.ReactNode> => {
+                const newMap = new Map<string, React.ReactNode>();
+                const propSelectedValues = selected || [];
+                
+                const availableItemNodesFromChildren = new Map<string, React.ReactNode>();
+                React.Children.forEach(children, (childComponent: React.ReactNode) => {
+                    if (React.isValidElement(childComponent) && childComponent.type === SelectContent) {
+                        const contentProps = childComponent.props as { children?: React.ReactNode };
+                        React.Children.forEach(contentProps.children, (itemComponent: React.ReactNode) => {
+                            if (React.isValidElement(itemComponent) && itemComponent.type === SelectItem) {
+                                const itemProps = itemComponent.props as SelectItemProps;
+                                if (itemProps.value && itemProps.children !== undefined) {
+                                    availableItemNodesFromChildren.set(itemProps.value, itemProps.children);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                for (const value of propSelectedValues) {
+                    if (availableItemNodesFromChildren.has(value)) {
+                        newMap.set(value, availableItemNodesFromChildren.get(value)!);
+                    } else {
+                        const existingNode = currentInternalSelectedItems.get(value);
+                        if (existingNode && existingNode !== value) { 
+                            newMap.set(value, existingNode);
+                        } else {
+                            newMap.set(value, value); 
+                        }
+                    }
+                }
+                return newMap;
+            };
+
+            setSelectedItems(prevSelectedItems => {
+                const newCalculatedMap = buildNewSelectedItems(prevSelectedItems);
+
+                let mapsAreEqual = newCalculatedMap.size === prevSelectedItems.size;
+                if (mapsAreEqual && newCalculatedMap.size > 0) { 
+                    for (const [key, val] of newCalculatedMap) {
+                        if (!prevSelectedItems.has(key) || prevSelectedItems.get(key) !== val) {
+                            mapsAreEqual = false;
+                            break;
+                        }
+                    }
+                    if(mapsAreEqual){
+                        for (const key of prevSelectedItems.keys()) {
+                            if (!newCalculatedMap.has(key)) {
+                                mapsAreEqual = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                if (!mapsAreEqual) {
+                    return newCalculatedMap;
+                }
+                return prevSelectedItems;
+            });
+        }
+    }, [selected, children, isControlled, setSelectedItems]);
+
+    const toggleValue = (value: string, itemNode?: React.ReactNode) => {
+        const newItems = new Map(selectedItems); 
+
         if (type === "single") {
-            const newValue = [value];
-            if (!isControlled) setSelectedValues(newValue);
-            
-            // 단일 선택에서는 Map을 비우고 새 항목 추가
-            const newItems = new Map<string, React.ReactNode>();
-            if (item) newItems.set(value, item);
-            setSelectedItems(newItems);
-            
-            onChange?.(newValue);
-            setIsSelectOpen(false);
-        } else {
-            const set = new Set(currentSelected);
-            const hasValue = set.has(value);
-            
-            // 값의 존재 여부에 따라 추가/제거
-            if (hasValue) {
-                set.delete(value);
-                // 아이템도 제거
-                const newItems = new Map(selectedItems);
-                newItems.delete(value);
-                setSelectedItems(newItems);
-            } else {
-                set.add(value);
-                // 아이템 추가
-                if (item) {
-                    const newItems = new Map(selectedItems);
-                    newItems.set(value, item);
-                    setSelectedItems(newItems);
+            const isAlreadySelected = newItems.has(value);
+            newItems.clear(); 
+            if (!isAlreadySelected) { 
+                 if (itemNode !== undefined) {
+                    newItems.set(value, itemNode);
+                } else {
+                    newItems.set(value, value); 
                 }
             }
-            
-            const newValue = Array.from(set);
-            if (!isControlled) setSelectedValues(newValue);
-            onChange?.(newValue);
-            setSearchValue("");
+            const newSelectedValueArray = Array.from(newItems.keys());
+
+            if (!isControlled) {
+                setSelectedItems(newItems);
+            }
+            onChange?.(newSelectedValueArray); 
+            setIsSelectOpen(false);
+        } else { 
+            if (newItems.has(value)) {
+                newItems.delete(value);
+            } else {
+                if (itemNode !== undefined) {
+                    newItems.set(value, itemNode);
+                } else {
+                    newItems.set(value, value); 
+                }
+            }
+            if (!isControlled) {
+                setSelectedItems(newItems);
+            }
+            onChange?.(Array.from(newItems.keys())); 
+            setSearchValue(""); 
         }
-    };    return (
+    };
+    return (
         <SelectContext.Provider
             value={{
                 type,
@@ -104,8 +167,6 @@ const Select = ({
                 disabled,
                 isSelected: isSelectOpen,
                 setIsSelected: setIsSelectOpen,
-                selectedValues: currentSelected,
-                setSelectedValues,
                 selectedItems,
                 setSelectedItems,
                 toggleValue,
@@ -140,7 +201,6 @@ const SelectTrigger = ({
         isSelected,
         setIsSelected,
         selectedItems,
-        selectedValues,
         variant,
         type,
         disabled,
@@ -153,6 +213,8 @@ const SelectTrigger = ({
         variant === "error"
             ? "border-rose-500 text-rose-600"
             : "border-slate-300 text-slate-800";
+
+    const currentSelectedValuesArray = Array.from(selectedItems.keys());
 
     return (
         <div
@@ -169,20 +231,20 @@ const SelectTrigger = ({
         >
             {type === "multiple" ? (
                 <>
-                    {selectedValues.map((value: string) => (
+                    {currentSelectedValuesArray.map((value: string) => (
                         <span
                             key={value}
                             className="flex items-center gap-1 bg-slate-200 text-slate-800 px-2 py-0.5 text-sm rounded"
                         >
-                        {selectedItems.get(value) || value}
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleValue(value);
-                                }}
-                                className="text-slate-500 hover:text-slate-800"
-                            >
+                        {selectedItems.get(value)}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleValue(value);
+                            }}
+                            className="text-slate-500 hover:text-slate-800"
+                        >
                 <SelectCloseIcon />
               </button>
             </span>
@@ -192,7 +254,7 @@ const SelectTrigger = ({
                             "flex-1 min-w-[60px] text-sm bg-transparent outline-none",
                             inputClassName
                         )}
-                        placeholder={selectedValues.length === 0 ? placeholder : ""}
+                        placeholder={currentSelectedValuesArray.length === 0 ? placeholder : ""}
                         value={searchValue}
                         onChange={(e) => {
                             setSearchValue(e.target.value);
@@ -205,8 +267,8 @@ const SelectTrigger = ({
                     <span
                         className="text-slate-800 text-sm block flex flex-row"
                         >
-                        {selectedValues.length > 0
-                            ? (selectedItems.get(selectedValues[0]) || selectedValues[0]) 
+                        {currentSelectedValuesArray.length > 0
+                            ? (selectedItems.get(currentSelectedValuesArray[0]) || currentSelectedValuesArray[0]) 
                             : placeholder}
                         <input
                             className={cn(
@@ -214,7 +276,7 @@ const SelectTrigger = ({
                                 inputClassName
                             )}
                             placeholder={placeholder}
-                            value={selectedValues[0] || ""}
+                            value={currentSelectedValuesArray.length > 0 ? currentSelectedValuesArray[0] : ""}
                             readOnly
                         />
                     </span>
@@ -272,21 +334,39 @@ const SelectItem = ({
     const context = useContext(SelectContext);
     if (!context) throw new Error("SelectItem은 Select 내부에서 사용해야 합니다.");
 
-    const { selectedValues, toggleValue, variant } = context;
-    const isSelected = selectedValues.includes(value);
+    const { selectedItems, setSelectedItems, toggleValue, variant } = context;
+    const isItemSelected = selectedItems.has(value);
+
+    useEffect(() => {
+        setSelectedItems((prevSelectedItems: Map<string, React.ReactNode>): Map<string, React.ReactNode> => {
+            if (prevSelectedItems.has(value)) {
+                const currentStoredNode = prevSelectedItems.get(value);
+                if (currentStoredNode !== children) {
+                    const newMap = new Map(prevSelectedItems);
+                    newMap.set(value, children);
+                    return newMap;
+                }
+            }
+            return prevSelectedItems;
+        });
+    }, [value, children, setSelectedItems]);
+
+    const handleSelect = () => {
+        toggleValue(value, children);
+    };
 
     return (
         <li
             role="option"
-            aria-selected={isSelected}
+            aria-selected={isItemSelected}
             className={cn(
                 "px-3 py-2 cursor-pointer rounded-md transition-colors",
                 "hover:bg-slate-100 text-slate-700 border-white border-[1px]",
-                isSelected && "bg-slate-200 text-blue-600 font-medium border-white border-[1px]",
-                variant === "error" && isSelected && "text-rose-600",
+                isItemSelected && "bg-slate-200 text-blue-600 font-medium border-white border-[1px]",
+                variant === "error" && isItemSelected && "text-rose-600",
                 className
             )}
-            onClick={() => toggleValue(value, children)}
+            onClick={handleSelect}
             {...props}
         >
             {children}
