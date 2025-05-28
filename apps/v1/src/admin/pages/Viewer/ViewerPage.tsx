@@ -21,6 +21,8 @@ const Viewer = () => {
     const [stationData, setStationData] = useState<StationData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [hierachies, setHierachies] = useState<ModelInfo[] | null>(null);
+    
+    const [selectedFloor, setSelectedFloor] = useState<string[]>(['0']);
 
     useEffect(() => {
         const fetchStation = async () => {
@@ -47,7 +49,14 @@ const Viewer = () => {
     
     const handleModelLoaded = () => {
         setHierachies(Px.Model.GetModelHierarchy())
+        handleFloorChange(selectedFloor[0]);
     };
+
+    const handleFloorChange = (floorId: string) => {
+        setSelectedFloor([floorId]);
+        Px.Model.HideAll();
+        Px.Model.Show(floorId);
+    }
 
     // 로딩 중인 경우
     if (isLoading) {
@@ -60,12 +69,8 @@ const Viewer = () => {
 
     return (
         <>
-            <aside className="bg-red-100 w-1/4 p-2 overflow-y-auto">
+            <aside className="bg-red-100 w-1/3 overflow-y-auto">
                 <AssetList />
-                { /* 필터링(AssetCategory) + 검색 기능 */}
-                { /* divider */ }
-                { /* '/assets' Asset  목록 썸네일로 보여주기 */ }
-                { /* Px.Poi 관련 함수 Asset 클릭 시 해당 Asset의 상세 정보 표출 */ }
             </aside>
             <main className="w-full">
                 <div className="flex absolute text-white pl-4 pt-2 items-center"> 
@@ -73,7 +78,11 @@ const Viewer = () => {
                       {stationData?.facility?.name}
                   </h2>
                   { hierachies && 
-                        <Select className="text-sm text-gray-300 ml-2 w-96">
+                        <Select 
+                            className="text-sm text-gray-300 ml-2 w-96" 
+                            selected={selectedFloor} 
+                            onChange={values => handleFloorChange(values[0])}
+                            >
                             <Select.Trigger />
                             <Select.Content>
                               {hierachies.map(floor => (
