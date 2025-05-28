@@ -22,7 +22,10 @@ export const AdminRouter: RouteObject[] = [
                     { path: ADMIN_ROUTE.USER, element: <UserPage /> },
                 ]
             },
-            { path: ADMIN_ROUTE.VIEWER, element: <Viewer /> }, 
+            // 기존의 단일 경로를 변경
+            { path: ADMIN_ROUTE.VIEWER, element: <Viewer /> },
+            // 새로운 동적 경로 추가
+            { path: `${ADMIN_ROUTE.VIEWER}/:stationId`, element: <Viewer /> }, 
         ],
     }
 ];
