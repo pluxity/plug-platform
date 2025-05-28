@@ -165,6 +165,7 @@ export {
     ModifyKey,
     PathCreatorMouseState,
     ModelInfo,
+    ModelInfo as FloorInfo,
     PoiCreateOption,
     PoiImportOption,
     SBMHeader,

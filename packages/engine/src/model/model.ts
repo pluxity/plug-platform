@@ -70,6 +70,12 @@ function convertFloorLocalToWorld(localPos: THREE.Vector3, floorId: string): THR
  * @returns - 계산된 바운딩 정보
  */
 function calculateFloorBounding(floorId: string): THREE.Box3 {
+
+    if (!floorObjects.hasOwnProperty(floorId)) {
+        console.warn('지정한 층객체를 찾을 수 없음: ', floorId);
+        return new THREE.Box3().setFromCenterAndSize(new THREE.Vector3(), new THREE.Vector3(1, 1, 1));
+    }
+
     const targetFloor = floorObjects[floorId];
     return new THREE.Box3().setFromObject(targetFloor);
 }
@@ -99,35 +105,35 @@ function getLowestFloorObject(): THREE.Object3D {
  * @param url - 모델링 url 주소
  * @param onComplete - 완료 후 호출될 콜백 함수
  */
-// function GetModelHierarchy(url: string, onComplete: Function) {
+function GetModelHierarchyFromUrl(url: string, onComplete: Function) {
 
-//     new Addon.GLTFLoader().load(url, (gltf) => {
+    new Addon.GLTFLoader().load(url, (gltf) => {
 
-//         const result: Interfaces.ModelInfo[] = [];
+        const result: Interfaces.ModelInfo[] = [];
 
-//         // 구조 분석
-//         gltf.scene.traverse(child => {
-//             if (child.userData.hasOwnProperty('type')) {
-//                 const type: string = child.userData['type'];
-//                 if (type.toLowerCase() === 'floor') {
-//                     const info: Interfaces.ModelInfo = {
-//                         objectName: child.name,
-//                         displayName: child.userData.displayName,
-//                         sortingOrder: Number.parseInt(child.userData.sortingorder),
-//                         floorId: child.userData.floorId
-//                     };
+        // 구조 분석
+        gltf.scene.traverse(child => {
+            if (child.userData.hasOwnProperty('type')) {
+                const type: string = child.userData['type'];
+                if (type.toLowerCase() === 'floor') {
+                    const info: Interfaces.ModelInfo = {
+                        objectName: child.name,
+                        displayName: child.userData.displayName,
+                        sortingOrder: Number.parseInt(child.userData.sortingorder),
+                        floorId: child.userData.floorId
+                    };
 
-//                     // 배열에 저장
-//                     result.push(info);
-//                 }
-//             }
-//         });
+                    // 배열에 저장
+                    result.push(info);
+                }
+            }
+        });
 
-//         // 콜백 호출
-//         onComplete?.(result);
+        // 콜백 호출
+        onComplete?.(result);
 
-//     }, undefined, (err) => console.error(err));
-// }
+    }, undefined, (err) => console.error(err));
+}
 
 function GetModelHierarchy(): Interfaces.ModelInfo[] {
 
@@ -366,6 +372,7 @@ export {
     calculateFloorBounding,
     getLowestFloorObject,
 
+    GetModelHierarchyFromUrl,
     GetModelHierarchy,
     Show,
     Hide,
