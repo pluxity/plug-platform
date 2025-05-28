@@ -19,8 +19,11 @@ interface SelectContextProps {
     disabled: boolean;
     isSelected: boolean;
     setIsSelected: (value: boolean) => void;
-    selectedValue: string[];
-    toggleValue: (value: string) => void;
+    selectedValues: string[];
+    setSelectedValues: (values: string[]) => void;
+    selectedItems: Map<string, React.ReactNode>; 
+    setSelectedItems: (items: Map<string, React.ReactNode>) => void;
+    toggleValue: (value: string, item?: React.ReactNode) => void;
     searchValue: string;
     setSearchValue: (value: string) => void;
 }
@@ -38,12 +41,14 @@ const Select = ({
                     ...props
                 }: SelectProps) => {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState<string[]>([]);
+    const [selectedValues, setSelectedValues] = useState<string[]>([]);
+    const [selectedItems, setSelectedItems] = useState<Map<string, React.ReactNode>>(new Map());
+
     const [searchValue, setSearchValue] = useState("");
     const ref = useRef<HTMLDivElement>(null);
 
     const isControlled = selected !== undefined;
-    const currentSelected = isControlled ? selected : selectedValue;
+    const currentSelected = isControlled ? selected : selectedValues;
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -53,26 +58,45 @@ const Select = ({
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const toggleValue = (value: string) => {
+    }, []);    const toggleValue = (value: string, item?: React.ReactNode) => {
         if (type === "single") {
             const newValue = [value];
-            if (!isControlled) setSelectedValue(newValue);
+            if (!isControlled) setSelectedValues(newValue);
+            
+            // 단일 선택에서는 Map을 비우고 새 항목 추가
+            const newItems = new Map<string, React.ReactNode>();
+            if (item) newItems.set(value, item);
+            setSelectedItems(newItems);
+            
             onChange?.(newValue);
             setIsSelectOpen(false);
         } else {
             const set = new Set(currentSelected);
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            set.has(value) ? set.delete(value) : set.add(value);
+            const hasValue = set.has(value);
+            
+            // 값의 존재 여부에 따라 추가/제거
+            if (hasValue) {
+                set.delete(value);
+                // 아이템도 제거
+                const newItems = new Map(selectedItems);
+                newItems.delete(value);
+                setSelectedItems(newItems);
+            } else {
+                set.add(value);
+                // 아이템 추가
+                if (item) {
+                    const newItems = new Map(selectedItems);
+                    newItems.set(value, item);
+                    setSelectedItems(newItems);
+                }
+            }
+            
             const newValue = Array.from(set);
-            if (!isControlled) setSelectedValue(newValue);
+            if (!isControlled) setSelectedValues(newValue);
             onChange?.(newValue);
             setSearchValue("");
         }
-    };
-
-    return (
+    };    return (
         <SelectContext.Provider
             value={{
                 type,
@@ -80,7 +104,10 @@ const Select = ({
                 disabled,
                 isSelected: isSelectOpen,
                 setIsSelected: setIsSelectOpen,
-                selectedValue: currentSelected,
+                selectedValues: currentSelected,
+                setSelectedValues,
+                selectedItems,
+                setSelectedItems,
                 toggleValue,
                 searchValue,
                 setSearchValue,
@@ -112,7 +139,8 @@ const SelectTrigger = ({
     const {
         isSelected,
         setIsSelected,
-        selectedValue,
+        selectedItems,
+        selectedValues,
         variant,
         type,
         disabled,
@@ -141,12 +169,12 @@ const SelectTrigger = ({
         >
             {type === "multiple" ? (
                 <>
-                    {selectedValue.map((value) => (
+                    {selectedValues.map((value: string) => (
                         <span
                             key={value}
                             className="flex items-center gap-1 bg-slate-200 text-slate-800 px-2 py-0.5 text-sm rounded"
                         >
-              {value}
+                        {selectedItems.get(value) || value}
                             <button
                                 type="button"
                                 onClick={(e) => {
@@ -164,7 +192,7 @@ const SelectTrigger = ({
                             "flex-1 min-w-[60px] text-sm bg-transparent outline-none",
                             inputClassName
                         )}
-                        placeholder={selectedValue.length === 0 ? placeholder : ""}
+                        placeholder={selectedValues.length === 0 ? placeholder : ""}
                         value={searchValue}
                         onChange={(e) => {
                             setSearchValue(e.target.value);
@@ -173,15 +201,24 @@ const SelectTrigger = ({
                     />
                 </>
             ) : (
-                <input
-                    className={cn(
-                        "w-full text-sm bg-transparent cursor-pointer outline-none",
-                        inputClassName
-                    )}
-                    placeholder={placeholder}
-                    value={selectedValue[0] || ""}
-                    readOnly
-                />
+                <>
+                    <span
+                        className="text-slate-800 text-sm block flex flex-row"
+                        >
+                        {selectedValues.length > 0
+                            ? (selectedItems.get(selectedValues[0]) || selectedValues[0]) 
+                            : placeholder}
+                        <input
+                            className={cn(
+                                "cursor-pointer outline-none opacity-0 w-0",
+                                inputClassName
+                            )}
+                            placeholder={placeholder}
+                            value={selectedValues[0] || ""}
+                            readOnly
+                        />
+                    </span>
+                </>
             )}
         </div>
     );
@@ -235,8 +272,8 @@ const SelectItem = ({
     const context = useContext(SelectContext);
     if (!context) throw new Error("SelectItem은 Select 내부에서 사용해야 합니다.");
 
-    const { selectedValue, toggleValue, variant } = context;
-    const isSelected = selectedValue.includes(value);
+    const { selectedValues, toggleValue, variant } = context;
+    const isSelected = selectedValues.includes(value);
 
     return (
         <li
@@ -249,7 +286,7 @@ const SelectItem = ({
                 variant === "error" && isSelected && "text-rose-600",
                 className
             )}
-            onClick={() => toggleValue(value)}
+            onClick={() => toggleValue(value, children)}
             {...props}
         >
             {children}
