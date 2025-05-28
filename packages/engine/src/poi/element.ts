@@ -95,6 +95,27 @@ class PoiElement implements Interfaces.PoiCreateOption {
         return this.position;
     }
 
+    set Rotation(value: THREE.Euler) {
+        // 회전값
+        this.PointMeshData.rotation.copy(value);
+
+        // 애니메이션 메시
+        this.pointMeshData.animMeshRef?.rotation.copy(value);
+    }    
+    get Rotation(): THREE.Euler {
+        return this.pointMeshData.rotation;
+    }
+
+    set Scale(value: THREE.Vector3) {
+        this.pointMeshData.scale.copy(value);
+
+        this.pointMeshData.animMeshRef?.scale.copy(value);
+    }
+
+    get Scale() {
+        return this.pointMeshData.scale;
+    }
+
     /**
      * 층 id값
      */
