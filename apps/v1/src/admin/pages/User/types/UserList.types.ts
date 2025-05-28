@@ -3,7 +3,8 @@ export interface User {
     username: string;
     phoneNumber: string;
     department: string;
-    contact: React.ReactNode;
+    status: React.ReactNode;
+    role: string;
     management: React.ReactNode;
 }
 

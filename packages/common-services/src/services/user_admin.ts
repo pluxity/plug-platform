@@ -1,5 +1,5 @@
 import { api } from '@plug/api-hooks';
-import { useGet, usePost, usePatch, useSWRApi, useDelete } from '@plug/api-hooks';
+import { useGet, usePost, usePatch, useSWRApi, usePut } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
 import type { UserResponse, UserCreateRequest, UserUpdateRequest, UserUpdatePasswordRequest } from '@plug/common-services';
 
@@ -54,15 +54,6 @@ export const useUserDetailSWR = (userId: number) => {
 // Admin user role 파트
 // 사용자 역할 할당
 export const useAssignUserRoles = (userId: number) => {
-  return usePost<BaseResponseBody, { roleIds: number[] }>(`${USER_API}/${userId}/roles`, { requireAuth: true });
+  return usePut<BaseResponseBody, { roleIds: number[] }>(`${USER_API}/${userId}/roles`, { requireAuth: true });
 };
 
-// 사용자 역할 수정 
-export const useUpdateUserRoles = (userId: number) => {
-  return usePatch<BaseResponseBody, { roleIds: number[] }>(`${USER_API}/${userId}/roles`, { requireAuth: true });
-};
-
-// 사용자 역할 제거 
-export const useRemoveUserRole = (userId: number, roleId: number) => {
-  return useDelete(`${USER_API}/${userId}/roles/${roleId}`, { requireAuth: true });
-};

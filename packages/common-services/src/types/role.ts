@@ -1,11 +1,11 @@
 export interface RoleCreateRequest {
     name: string;
-    department: string;
+    description: string;
 }
 
 export interface RoleUpdateRequest {
     name: string;
-    department: string;
+    description: string;
 }
 
 export interface RoleResponse {

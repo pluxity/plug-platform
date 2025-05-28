@@ -60,7 +60,7 @@ export default function PoiIconPage() {
                     <DataTable
                         data={poiIconData || []}
                         columns={columns}
-                        pageSize={10}
+                        pageSize={7}
                         selectable={true}
                         selectedRows={selectedAssets}
                         onSelectChange={setSelectedAssets}

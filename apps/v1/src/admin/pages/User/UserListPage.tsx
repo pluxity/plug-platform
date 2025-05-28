@@ -2,6 +2,7 @@ import { Button, DataTable, Skeleton } from '@plug/ui';
 import { columns } from './constants/userListColumns';
 import { UserListModal } from './components/UserListModal';
 import { UserPasswordModal } from './components/UserPasswordModal';
+import { UserRoleModal } from './components/UserRoleModal';
 import { useModal } from '../../components/hook/useModal';
 import { useUsersSWR, deleteUser, useUserLoggedIn } from "@plug/common-services";
 import { useUserList } from './utils/useUserList';
@@ -12,10 +13,11 @@ import { User } from './types/UserList.types';
 export default function UserListPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
     const { isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal } = useModal();
+    const { isOpen: isRoleModalOpen, openModal: openRoleModal, closeModal: closeRoleModal } = useModal();
     const { data, error, isLoading, mutate } = useUsersSWR();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
     const [selectedUserId, setSelectedUserId] = useState<number>();
-    const [contactData, setContactData] = useState<Record<number, boolean>>({});
+    const [statusData, setStatusData] = useState<Record<number, boolean>>({});
     const { execute: loggedInUser } = useUserLoggedIn();
     
     // 사용자 정보 수정 모달 
@@ -39,17 +41,28 @@ export default function UserListPage() {
         setSelectedUserId(undefined);
     }, [closePasswordModal]);
 
+    // 권한 설정/수정 모달
+    const handleRoleEdit = useCallback((userId: number) => {
+        setSelectedUserId(userId);
+        openRoleModal('edit');
+    }, [openRoleModal]);
+
+    const handleCloseRoleModal = useCallback(() => {
+        closeRoleModal();
+        setSelectedUserId(undefined);
+    }, [closeRoleModal]);
+
     // 로그인 된 사용자 정보 조회 
     useEffect(() => {
         const fetchLoggedInUsers = async () => {
           try {
             const users = await loggedInUser();
             if (Array.isArray(users)) {
-              const contactMap: Record<number, boolean> = {};
+              const statusMap: Record<number, boolean> = {};
               users.forEach(user => {
-                if (user.isLoggedIn) contactMap[user.id] = true;
+                if (user.isLoggedIn) statusMap[user.id] = true;
               });
-              setContactData(contactMap);
+              setStatusData(statusMap);
             }
           } catch (error) {
             console.log('로그인 사용자 정보 조회 실패', error);
@@ -59,7 +72,7 @@ export default function UserListPage() {
       }, []);
       
     
-    const userData = useUserList(data || [], contactData, handleDelete, handleEdit, handlePasswordEdit);
+    const userData = useUserList(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
 
     const handleDeleteSelected = async() => {
         if(selectState.size === 0){
@@ -78,7 +91,7 @@ export default function UserListPage() {
             console.log('삭제 중 오류가 발생했습니다.', error);
         }
     };
-    
+
     return (
         <>
             <div className='flex'>    
@@ -94,7 +107,7 @@ export default function UserListPage() {
                     <DataTable
                         data={userData || []}
                         columns={columns}
-                        pageSize={10}
+                        pageSize={7}
                         selectable={true}
                         selectedRows={selectState}
                         onSelectChange={setSelectState}
@@ -119,6 +132,12 @@ export default function UserListPage() {
             <UserPasswordModal 
                 isOpen={isPasswordModalOpen}
                 onClose={handleClosePasswordModal}
+                onSuccess={mutate}
+                selectedUserId={selectedUserId}
+            />
+            <UserRoleModal 
+                isOpen={isRoleModalOpen}
+                onClose={handleCloseRoleModal}
                 onSuccess={mutate}
                 selectedUserId={selectedUserId}
             />

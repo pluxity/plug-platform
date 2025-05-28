@@ -13,6 +13,7 @@ export interface UserListModalProps {
 export const UserListModal = ({ isOpen, onClose, onSuccess, mode, selectedUserId }: UserListModalProps) => {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [department, setDepartment] = useState('');
 
@@ -117,15 +118,6 @@ export const UserListModal = ({ isOpen, onClose, onSuccess, mode, selectedUserId
                     }
                     onSubmit={handleFinish}
                 >
-                    {/* <FormItem name="role" label='권한' required>
-                        <Select>
-                            <Select.Trigger placeholder='권한을 선택하세요.' />
-                            <Select.Content>
-                                <Select.Item value='관리자 계정'>관리자 계정</Select.Item>
-                                <Select.Item value='사용자 계정'>사용자 계정</Select.Item>
-                            </Select.Content>
-                        </Select>
-                    </FormItem> */}
 
                     <FormItem name="username" label='아이디' required>
                         <Input.Text 
@@ -142,6 +134,16 @@ export const UserListModal = ({ isOpen, onClose, onSuccess, mode, selectedUserId
                             onChange={value => setName(value)}
                         />
                     </FormItem>
+
+                    {mode === 'create' ? 
+                        <FormItem name="password" label='비밀번호' required>
+                            <Input.Password
+                                placeholder="비밀번호를 입력하세요." 
+                                value={password}
+                                onChange={value => setPassword(value)}
+                            />
+                        </FormItem> : ''
+                    }
 
                     <FormItem name="phoneNumber" label='연락처' required>
                         <Input
