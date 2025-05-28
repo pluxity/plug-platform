@@ -1,7 +1,9 @@
 export interface User {
     id: string;
     username: string;
-    code: string;
+    phoneNumber: string;
+    department: string;
+    contact: React.ReactNode;
     management: React.ReactNode;
 }
 

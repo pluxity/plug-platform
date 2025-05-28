@@ -1,60 +1,87 @@
-import {Select, Input, Button, DataTable, Skeleton} from '@plug/ui';
+import { Button, DataTable, Skeleton } from '@plug/ui';
 import { columns } from './constants/userListColumns';
 import { UserListModal } from './components/UserListModal';
+import { UserPasswordModal } from './components/UserPasswordModal';
 import { useModal } from '../../components/hook/useModal';
-import { useUsersSWR, deleteUser } from "@plug/common-services";
+import { useUsersSWR, deleteUser, useUserLoggedIn } from "@plug/common-services";
 import { useUserList } from './utils/useUserList';
 import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User } from './types/UserList.types';
 
 export default function UserListPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
+    const { isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal } = useModal();
     const { data, error, isLoading, mutate } = useUsersSWR();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
-
+    const [selectedUserId, setSelectedUserId] = useState<number>();
+    const [contactData, setContactData] = useState<Record<number, boolean>>({});
+    const { execute: loggedInUser } = useUserLoggedIn();
+    
+    // 사용자 정보 수정 모달 
     const handleDelete = async (userId: number) => {
         deleteUser(userId).then(() => {mutate();})
     };
     
-    const userData = useUserList(data || [], openModal, handleDelete);
+    const handleEdit = useCallback((userId: number) => {
+        setSelectedUserId(userId);
+        openModal('edit');
+    }, [openModal]);
 
-    const handleDeleteSelected = () => {
+    // 비밀 번호 수정 모달 
+    const handlePasswordEdit = useCallback((userId: number) => {
+        setSelectedUserId(userId);
+        openPasswordModal('edit');
+    }, [openPasswordModal]);
+
+    const handleClosePasswordModal = useCallback(() => {
+        closePasswordModal();
+        setSelectedUserId(undefined);
+    }, [closePasswordModal]);
+
+    // 로그인 된 사용자 정보 조회 
+    useEffect(() => {
+        const fetchLoggedInUsers = async () => {
+          try {
+            const users = await loggedInUser();
+            if (Array.isArray(users)) {
+              const contactMap: Record<number, boolean> = {};
+              users.forEach(user => {
+                if (user.isLoggedIn) contactMap[user.id] = true;
+              });
+              setContactData(contactMap);
+            }
+          } catch (error) {
+            console.log('로그인 사용자 정보 조회 실패', error);
+          }
+        };
+        fetchLoggedInUsers();
+      }, []);
+      
+    
+    const userData = useUserList(data || [], contactData, handleDelete, handleEdit, handlePasswordEdit);
+
+    const handleDeleteSelected = async() => {
         if(selectState.size === 0){
             return alert('삭제할 항목을 선택해주세요.');
         }
-        Promise.all(
-            Array.from(selectState).map(user => handleDelete(Number(user.id)))
-        )
-        .then(() => {
+
+        try{
+            await Promise.all(
+                Array.from(selectState).map(user => handleDelete(Number(user.id)))
+            )
+            
             alert(`${selectState.size} 개의 항목이 삭제 되었습니다.`);
             setSelectState(new Set());
-        });
+
+        } catch (error) {
+            console.log('삭제 중 오류가 발생했습니다.', error);
+        }
     };
     
     return (
         <>
-            <div className='flex items-center flex-wrap gap-1'>    
-                <Select className='w-40'>
-                    <Select.Trigger placeholder='도면분류선택' />
-                    <Select.Content>
-                        <Select.Item value='1호선'>1호선</Select.Item>
-                        <Select.Item value='2호선'>2호선</Select.Item>
-                        <Select.Item value='3호선'>3호선</Select.Item>
-                        <Select.Item value='4호선'>4호선</Select.Item>
-                    </Select.Content>
-                </Select>
-                <Select className='w-40'>
-                    <Select.Trigger placeholder='도면 이름' />
-                    <Select.Content>
-                        <Select.Item value='name'>도면 이름</Select.Item>
-                        <Select.Item value='code'>도면 코드</Select.Item>
-                    </Select.Content>
-                </Select>
-                <div className='flex items-center'>
-                    <Input.Text className='w-60' placeholder='검색어를 입력하세요.'/>
-                    <Button color='primary' className='ml-1'>검색</Button>
-                </div>
+            <div className='flex'>    
                 <div className='ml-auto flex gap-1'>
                     <Button color='primary' onClick={() => openModal('create')}>등록</Button>
                     <Button color='destructive' onClick={handleDeleteSelected}>삭제</Button>
@@ -71,12 +98,12 @@ export default function UserListPage() {
                         selectable={true}
                         selectedRows={selectState}
                         onSelectChange={setSelectState}
+                        showSearch={true}
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (
                                 String(item.id).toLowerCase().includes(lowerSearch) ||
-                                item.username.toLowerCase().includes(lowerSearch) ||
-                                item.code.toLowerCase().includes(lowerSearch)
+                                item.username.toLowerCase().includes(lowerSearch) 
                             );
                         }}
                     />
@@ -87,6 +114,13 @@ export default function UserListPage() {
                 onClose={closeModal}
                 mode={mode}
                 onSuccess={mutate}
+                selectedUserId={selectedUserId}
+            />
+            <UserPasswordModal 
+                isOpen={isPasswordModalOpen}
+                onClose={handleClosePasswordModal}
+                onSuccess={mutate}
+                selectedUserId={selectedUserId}
             />
         </>
     );

@@ -327,7 +327,7 @@ export const PoiIconRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedA
                 (mode === 'create' && (!uploadedModelId || !uploadThumbnailId)) ||
                 (mode === 'edit' && !name)
               }
-              isLoading={isAssetCreating}
+              isLoading={isAssetCreating || isAssetUpdating}
             >
               {mode === 'create' ? '등록' : '수정'}
             </Button>

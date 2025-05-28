@@ -1,5 +1,5 @@
 import { api } from '@plug/api-hooks';
-import { useGet, usePost, usePatch, useSWRApi } from '@plug/api-hooks';
+import { useGet, usePost, usePatch, useSWRApi, useDelete } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
 import type { UserResponse, UserCreateRequest, UserUpdateRequest, UserUpdatePasswordRequest } from '@plug/common-services';
 
@@ -8,6 +8,11 @@ const USER_API = `admin/users`;
 // 사용자 목록 조회
 export const useUsers = () => {
   return useGet<UserResponse[]>(USER_API, { requireAuth: true });
+};
+
+// 로그인된 사용자 정보 조회
+export const useUserLoggedIn = () => {
+  return useGet<UserResponse>(`${USER_API}/with-is-logged-in`, { requireAuth: true });
 };
 
 // 사용자 상세 조회
@@ -42,7 +47,22 @@ export const useUsersSWR = () => {
 
 // SWR 기반 사용자 상세 조회
 export const useUserDetailSWR = (userId: number) => {
-  return useSWRApi<UserResponse>(`${USER_API}/${userId}`, 'GET', { requireAuth: true });
+  const key = userId ? `${USER_API}/${userId}` : '';
+  return useSWRApi<UserResponse>(key, 'GET', { requireAuth: true });
 };
 
-// TODO: Admin user role 파트 추가 필요(역할 할당, 역할 수정, 역할 제거)
+// Admin user role 파트
+// 사용자 역할 할당
+export const useAssignUserRoles = (userId: number) => {
+  return usePost<BaseResponseBody, { roleIds: number[] }>(`${USER_API}/${userId}/roles`, { requireAuth: true });
+};
+
+// 사용자 역할 수정 
+export const useUpdateUserRoles = (userId: number) => {
+  return usePatch<BaseResponseBody, { roleIds: number[] }>(`${USER_API}/${userId}/roles`, { requireAuth: true });
+};
+
+// 사용자 역할 제거 
+export const useRemoveUserRole = (userId: number, roleId: number) => {
+  return useDelete(`${USER_API}/${userId}/roles/${roleId}`, { requireAuth: true });
+};
