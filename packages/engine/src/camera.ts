@@ -16,14 +16,14 @@ let panSmoothingFactor: number = 0.7;
 let zoomIntervalFactor: number = 1.0;
 let posTween: TWEEN.Tween | undefined = undefined;
 let rotTween: TWEEN.Tween | undefined = undefined;
+let rotateBtnId: number = Interfaces.MouseButton.Left;
+let panBtnId: number = Interfaces.MouseButton.Right;
+let dragZoomBtnId: number = Interfaces.MouseButton.Middle;
+let screenPanKey: string = Interfaces.ModifyKey.Shift;
 const rotateDelta: THREE.Vector2 = new THREE.Vector2();
 const panDelta: THREE.Vector3 = new THREE.Vector3();
 const groundPlane: THREE.Plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 const screenPlane: THREE.Plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-const rotateBtnId: number = Interfaces.MouseButton.Left;
-const panBtnId: number = Interfaces.MouseButton.Right;
-const dragZoomBtnId: number = Interfaces.MouseButton.Middle;
-const screenPanKey: string = Interfaces.ModifyKey.Shift;
 const mouseDownPos: Record<string, THREE.Vector2> = {
     'rotate': new THREE.Vector2(),
     'pan': new THREE.Vector2(),
@@ -39,7 +39,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 
     // 포인터 클릭시 표시할 커서 객체
-    const geometry = new THREE.SphereGeometry(0.1, 32, 23);
+    const geometry = new THREE.SphereGeometry(0.1, 32, 32);
     const material = new THREE.MeshStandardMaterial({ color: 'red' });
     cursor = new THREE.Mesh(geometry, material);
     cursor.name = '#CameraPivot';
@@ -131,6 +131,30 @@ function SetEnabled(isEnabled: boolean) {
 
         engine.Dom.removeEventListener('contextmenu', onContextMenu);
     }
+}
+
+/**
+ * 카메라 회전 조작에 대한 마우스 버튼 액션값을 할당한다.
+ * @param newId - 회전 조작에 대한 마우스 버튼 액션값
+ */
+function SetRotateButton(newId: Interfaces.MouseButton) {
+    rotateBtnId = newId;
+}
+
+/**
+ * 카메라 패닝 조작에 대한 마우스 버튼 액션값을 할당한다.
+ * @param newId - 패닝 조작에 대한 마우스 버튼 액션값
+ */
+function SetPanButton(newId: Interfaces.MouseButton) {
+    panBtnId = newId;
+}
+
+/**
+ * 카메라 드래그 줌 조작에 대한 마우스 버튼 액션값을 할당한다.
+ * @param newId - 드래그 줌 조작에 대한 마우스 버튼 액션값
+ */
+function SetDragZoomButton(newId: Interfaces.MouseButton) {
+    dragZoomBtnId = newId;
 }
 
 /**
@@ -562,6 +586,9 @@ function MoveToFloor(floorId: string, transitionTime: number) {
 
 export {
     SetEnabled,
+    SetRotateButton,
+    SetPanButton,
+    SetDragZoomButton,
     ExtendView,
     GetState,
     SetState,

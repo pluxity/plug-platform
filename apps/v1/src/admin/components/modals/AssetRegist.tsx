@@ -1,0 +1,340 @@
+import React, { useState, useCallback, useEffect } from 'react';
+import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
+import { useFileUpload, createFileFormData, useAssetCreate, useAssetsDetailSWR, useAssetUpdate } from '@plug/common-services';
+
+export interface AssetRegistProps{
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess?: () => void;
+    mode: 'create' | 'edit';
+    selectedAssetId?: number;
+}
+
+export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAssetId }: AssetRegistProps) =>{
+  const [name, setName] = useState('');
+
+  // 3d 모델 파일 상태 관리 
+  const [modelFile, setModelFile] = useState<File | null>(null);
+  const [uploadedModelId, setUploadedModelId] = useState<number | null>(null);
+  
+  // thumbnail파일 상태 관리 
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [uploadThumbnailId, setUploadThumbnailId] = useState<number | null>(null);
+
+  
+  // 파일 공통 로딩 상태 관리 
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // 파일 업로드 훅
+  const { execute: uploadFile, isLoading: isFileUploading, error: fileError } = useFileUpload();
+  
+  // 에셋 생성 훅
+  const { execute: createAsset, isLoading: isAssetCreating, error: assetError } = useAssetCreate();
+
+  // 에셋 상세 조회 훅
+  const { data: detailAssetData } = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
+
+  // 에셋 수정 훅 
+  const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError } = useAssetUpdate(Number(selectedAssetId));
+
+  // 3D 모델 파일 선택 핸들러
+  const handleModelChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setModelFile(file);
+    
+    // 파일명을 기본 이름 값으로 설정
+    if (!name) {
+      setName(file.name.replace(/\.[^/.]+$/, "")); // 확장자 제거
+    }
+
+    // GLB 파일인지 확인하고 적절한 MIME 타입 설정
+    const mimeType = file.name.endsWith('.glb') ? 'model/gltf-binary' : 
+                    file.name.endsWith('.gltf') ? 'model/gltf+json' : 
+                    undefined;
+    
+    // 파일이 선택되면 자동으로 업로드 시작
+    setIsUploading(true);
+    // 올바른 MIME 타입으로 FormData 생성
+    const formData = createFileFormData(file, mimeType);
+    uploadFile(formData)
+      .then(response => {
+        if (response && response.fileId) {
+          setUploadedModelId(response.fileId);
+        }
+      })
+      .catch(err => {
+        console.error('3D 파일 업로드 실패:', err);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  }, [uploadFile, name]);
+
+  // Thumbnail 파일 선택 핸들러
+  const handleThumbnailChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // PNG 파일 체크 추가
+    if (!file.type.includes('image/png')) {
+      alert('PNG 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    setThumbnailFile(file);
+
+    // 파일이 선택되면 자동으로 업로드 시작
+    setIsUploading(true);
+
+    // 올바른 MIME 타입으로 FormData 생성
+    const formData = createFileFormData(file, 'image/png');
+    uploadFile(formData)
+      .then(response => {
+        if (response && response.fileId) {
+          setUploadThumbnailId(response.fileId);
+        }
+      })
+      .catch(err => {
+        console.error('썸네일 파일 업로드 실패:', err);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  }, [uploadFile]);
+
+
+  useEffect(() => {
+    if (mode === 'edit' && detailAssetData && isOpen) {
+      setName(detailAssetData.name);
+    } 
+  }, [mode, detailAssetData, isOpen]);
+
+
+  // 제출 핸들러
+  const handleFinish = useCallback(async (values: Record<string, string>) => {
+    // 수정 모달 제출 
+    if(mode === 'edit' && detailAssetData){  
+      try{
+          const asset = await updateAsset({
+            name: values.assetRegistName || name,
+            fileId: uploadedModelId || undefined,
+            thumbnailFileId: uploadThumbnailId || undefined
+          });
+    
+          // 성공 처리
+          if (asset) {
+            alert('아이콘이 성공적으로 수정되었습니다.');
+            resetForm();
+            if (onSuccess) onSuccess();
+          }
+      } catch(error){
+        console.error('아이콘 수정 실패:', error);
+      }
+    // 등록 모달 제출 
+    } else{
+      if (!uploadedModelId || !uploadThumbnailId) {
+        alert('파일을 먼저 업로드해주세요.');
+        return;
+      }
+  
+      try {
+        // 에셋 생성 API 호출
+        const asset = await createAsset({
+          name: values.assetRegistName || name,
+          fileId: uploadedModelId,
+          thumbnailFileId: uploadThumbnailId,
+        });
+  
+        // 성공 처리
+        if (asset) {
+          alert('아이콘이 성공적으로 등록되었습니다.');
+          if (onSuccess) onSuccess();
+          resetForm();
+        }
+      } catch (error) {
+        console.error('아이콘 등록 실패:', error);
+      }
+    }
+  }, [createAsset, uploadedModelId, name, mode, onSuccess, detailAssetData, updateAsset, uploadThumbnailId]);
+  
+  // 폼 초기화
+  const resetForm = () => {
+    setName('');
+    setModelFile(null);
+    setUploadedModelId(null);
+    setUploadThumbnailId(null);
+    onClose();
+  };
+
+  // 에러 메시지 표시
+  const error = fileError || assetError || assetUpdateError;
+  const isProcessing = isFileUploading || isAssetCreating || isAssetUpdating;
+
+  // 파일 선택기 열기
+  const openFilePicker = (type: 'model' | 'thumbnail') => {
+    const fileInput = document.getElementById(type === 'model' ? 'icon-file' : 'thumbnail-file');
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+  
+  return (
+    <Modal
+      title={mode === 'create' ? 'ASSET 등록' : 'ASSET 수정'}
+      isOpen={isOpen}
+      onClose={isProcessing ? undefined : resetForm}
+      closeOnOverlayClick={false}
+      overlayClassName="bg-black/50"
+    >
+      <div className="p-4">
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
+            {error.message}
+          </div>
+        )}
+
+        <Form 
+            key={mode + (detailAssetData?.id ?? '')}
+            initialValues={
+              mode === 'edit' && detailAssetData
+                ? {
+                    assetRegistName: detailAssetData?.name,
+                    assetFileId: String(detailAssetData?.file?.id),
+                  }
+                : {
+                  assetRegistName: '',
+                  assetFileId: '',
+                }
+            }
+            onSubmit={handleFinish}
+          >
+          <FormItem name="assetRegistName" label='이름' required>
+            <Input.Text 
+              placeholder="모델 이름을 입력하세요"
+              value={name}
+              onChange={value => setName(value)}
+            />
+          </FormItem>
+
+          <FormItem name="assetRegistThumbnail" label='Thumbnail 파일' required>
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+              <input
+                type="file"
+                id="thumbnail-file"
+                className="hidden"
+                onChange={handleThumbnailChange}
+                accept=".png"
+              />
+              
+              {!thumbnailFile ? (
+                <div className="flex items-center">
+                    {mode === 'edit' && detailAssetData 
+                      ? <p className="flex-1 text-sm">{detailAssetData.thumbnailFile.originalFileName}</p>     
+                      : <p className="flex-1 text-sm text-gray-500">PNG 파일만 가능합니다.</p>
+                      }
+                  <Button 
+                    type="button" 
+                    color="secondary"
+                    className="w-30"
+                    onClick={() => openFilePicker('thumbnail')}
+                  >
+                    {mode === 'edit' ? '변경' : '파일 선택'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-sm truncate max-w-xs">
+                    {thumbnailFile.name} ({Math.round(thumbnailFile.size / 1024)} KB)
+                  </span>
+                  
+                  {isUploading ? (
+                    <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
+                  ) : uploadThumbnailId ? (
+                    <div className="text-green-500 text-xs">업로드 완료</div>
+                  ) : (
+                    <Button 
+                      type="button" 
+                      color="secondary"
+                      className="w-30"
+                      onClick={() => openFilePicker('thumbnail')}
+                    >
+                      변경
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </FormItem>
+          
+          <FormItem name="assetRegistFile" label='3D 모델 파일' required>
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+              <input
+                type="file"
+                id="icon-file"
+                className="hidden"
+                onChange={handleModelChange}
+                accept=".glb,.gltf"
+              />
+              
+              {!modelFile ? (
+                <div className="flex items-center">
+                    {mode === 'edit' && detailAssetData 
+                      ? <p className="flex-1 text-sm">{detailAssetData.file.originalFileName}</p>     
+                      : <p className="flex-1 text-sm text-gray-500">GLB, GLTF 파일만 가능합니다.</p>
+                      }
+                  <Button 
+                    type="button" 
+                    color="secondary"
+                    className="w-30"
+                    onClick={() => openFilePicker('model')}
+                  >
+                    {mode === 'edit' ? '변경' : '파일 선택'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-sm truncate max-w-xs">
+                    {modelFile.name} ({Math.round(modelFile.size / 1024)} KB)
+                  </span>
+                  
+                  {isUploading ? (
+                    <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
+                  ) : uploadedModelId ? (
+                    <div className="text-green-500 text-xs">업로드 완료</div>
+                  ) : (
+                    <Button 
+                      type="button" 
+                      color="secondary"
+                      className="w-30"
+                      onClick={() => openFilePicker('model')}
+                    >
+                      변경
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </FormItem>
+          
+          <div className="mt-6 flex justify-center gap-2">
+            <Button type="button" onClick={resetForm} disabled={isProcessing}>취소</Button>
+            <Button 
+              type="submit" 
+              color="primary" 
+              disabled={
+                isProcessing || !name ||
+                (mode === 'create' && (!uploadedModelId || !uploadThumbnailId)) ||
+                (mode === 'edit' && !name)
+              }
+              isLoading={isAssetCreating}
+            >
+              {mode === 'create' ? '등록' : '수정'}
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </Modal>
+  );
+} 

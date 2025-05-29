@@ -19,8 +19,9 @@ interface SelectContextProps {
     disabled: boolean;
     isSelected: boolean;
     setIsSelected: (value: boolean) => void;
-    selectedValue: string[];
-    toggleValue: (value: string) => void;
+    selectedItems: Map<string, React.ReactNode>; 
+    setSelectedItems: React.Dispatch<React.SetStateAction<Map<string, React.ReactNode>>>;
+    toggleValue: (value: string, item?: React.ReactNode) => void;
     searchValue: string;
     setSearchValue: (value: string) => void;
 }
@@ -38,12 +39,12 @@ const Select = ({
                     ...props
                 }: SelectProps) => {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState<string[]>([]);
+    const [selectedItems, setSelectedItems] = useState<Map<string, React.ReactNode>>(new Map());
+
     const [searchValue, setSearchValue] = useState("");
     const ref = useRef<HTMLDivElement>(null);
 
     const isControlled = selected !== undefined;
-    const currentSelected = isControlled ? selected : selectedValue;
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -55,23 +56,109 @@ const Select = ({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const toggleValue = (value: string) => {
+    useEffect(() => {
+        if (isControlled) {
+            const buildNewSelectedItems = (currentInternalSelectedItems: Map<string, React.ReactNode>): Map<string, React.ReactNode> => {
+                const newMap = new Map<string, React.ReactNode>();
+                const propSelectedValues = selected || [];
+                
+                const availableItemNodesFromChildren = new Map<string, React.ReactNode>();
+                React.Children.forEach(children, (childComponent: React.ReactNode) => {
+                    if (React.isValidElement(childComponent) && childComponent.type === SelectContent) {
+                        const contentProps = childComponent.props as { children?: React.ReactNode };
+                        React.Children.forEach(contentProps.children, (itemComponent: React.ReactNode) => {
+                            if (React.isValidElement(itemComponent) && itemComponent.type === SelectItem) {
+                                const itemProps = itemComponent.props as SelectItemProps;
+                                if (itemProps.value && itemProps.children !== undefined) {
+                                    availableItemNodesFromChildren.set(itemProps.value, itemProps.children);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                for (const value of propSelectedValues) {
+                    if (availableItemNodesFromChildren.has(value)) {
+                        newMap.set(value, availableItemNodesFromChildren.get(value)!);
+                    } else {
+                        const existingNode = currentInternalSelectedItems.get(value);
+                        if (existingNode && existingNode !== value) { 
+                            newMap.set(value, existingNode);
+                        } else {
+                            newMap.set(value, value); 
+                        }
+                    }
+                }
+                return newMap;
+            };
+
+            setSelectedItems(prevSelectedItems => {
+                const newCalculatedMap = buildNewSelectedItems(prevSelectedItems);
+
+                let mapsAreEqual = newCalculatedMap.size === prevSelectedItems.size;
+                if (mapsAreEqual && newCalculatedMap.size > 0) { 
+                    for (const [key, val] of newCalculatedMap) {
+                        if (!prevSelectedItems.has(key) || prevSelectedItems.get(key) !== val) {
+                            mapsAreEqual = false;
+                            break;
+                        }
+                    }
+                    if(mapsAreEqual){
+                        for (const key of prevSelectedItems.keys()) {
+                            if (!newCalculatedMap.has(key)) {
+                                mapsAreEqual = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                if (!mapsAreEqual) {
+                    return newCalculatedMap;
+                }
+                return prevSelectedItems;
+            });
+        }
+    }, [selected, children, isControlled, setSelectedItems]);
+
+    const toggleValue = (value: string, itemNode?: React.ReactNode) => {
+        const newItems = new Map(selectedItems); 
+
         if (type === "single") {
-            const newValue = [value];
-            if (!isControlled) setSelectedValue(newValue);
-            onChange?.(newValue);
+            const isAlreadySelected = newItems.has(value);
+            newItems.clear(); 
+            if (!isAlreadySelected) { 
+                 if (itemNode !== undefined) {
+                    newItems.set(value, itemNode);
+                } else {
+                    newItems.set(value, value); 
+                }
+            }
+            const newSelectedValueArray = Array.from(newItems.keys());
+
+            if (!isControlled) {
+                setSelectedItems(newItems);
+            }
+            onChange?.(newSelectedValueArray); 
             setIsSelectOpen(false);
-        } else {
-            const set = new Set(currentSelected);
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            set.has(value) ? set.delete(value) : set.add(value);
-            const newValue = Array.from(set);
-            if (!isControlled) setSelectedValue(newValue);
-            onChange?.(newValue);
-            setSearchValue("");
+        } else { 
+            if (newItems.has(value)) {
+                newItems.delete(value);
+            } else {
+                if (itemNode !== undefined) {
+                    newItems.set(value, itemNode);
+                } else {
+                    newItems.set(value, value); 
+                }
+            }
+            if (!isControlled) {
+                setSelectedItems(newItems);
+            }
+            onChange?.(Array.from(newItems.keys())); 
+            setSearchValue(""); 
         }
     };
-
     return (
         <SelectContext.Provider
             value={{
@@ -80,7 +167,8 @@ const Select = ({
                 disabled,
                 isSelected: isSelectOpen,
                 setIsSelected: setIsSelectOpen,
-                selectedValue: currentSelected,
+                selectedItems,
+                setSelectedItems,
                 toggleValue,
                 searchValue,
                 setSearchValue,
@@ -112,7 +200,7 @@ const SelectTrigger = ({
     const {
         isSelected,
         setIsSelected,
-        selectedValue,
+        selectedItems,
         variant,
         type,
         disabled,
@@ -125,6 +213,8 @@ const SelectTrigger = ({
         variant === "error"
             ? "border-rose-500 text-rose-600"
             : "border-slate-300 text-slate-800";
+
+    const currentSelectedValuesArray = Array.from(selectedItems.keys());
 
     return (
         <div
@@ -141,20 +231,20 @@ const SelectTrigger = ({
         >
             {type === "multiple" ? (
                 <>
-                    {selectedValue.map((value) => (
+                    {currentSelectedValuesArray.map((value: string) => (
                         <span
                             key={value}
                             className="flex items-center gap-1 bg-slate-200 text-slate-800 px-2 py-0.5 text-sm rounded"
                         >
-              {value}
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleValue(value);
-                                }}
-                                className="text-slate-500 hover:text-slate-800"
-                            >
+                        {selectedItems.get(value)}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleValue(value);
+                            }}
+                            className="text-slate-500 hover:text-slate-800"
+                        >
                 <SelectCloseIcon />
               </button>
             </span>
@@ -164,7 +254,7 @@ const SelectTrigger = ({
                             "flex-1 min-w-[60px] text-sm bg-transparent outline-none",
                             inputClassName
                         )}
-                        placeholder={selectedValue.length === 0 ? placeholder : ""}
+                        placeholder={currentSelectedValuesArray.length === 0 ? placeholder : ""}
                         value={searchValue}
                         onChange={(e) => {
                             setSearchValue(e.target.value);
@@ -173,15 +263,24 @@ const SelectTrigger = ({
                     />
                 </>
             ) : (
-                <input
-                    className={cn(
-                        "w-full text-sm bg-transparent cursor-pointer outline-none",
-                        inputClassName
-                    )}
-                    placeholder={placeholder}
-                    value={selectedValue[0] || ""}
-                    readOnly
-                />
+                <>
+                    <span
+                        className="text-slate-800 text-sm block flex flex-row"
+                        >
+                        {currentSelectedValuesArray.length > 0
+                            ? (selectedItems.get(currentSelectedValuesArray[0]) || currentSelectedValuesArray[0]) 
+                            : placeholder}
+                        <input
+                            className={cn(
+                                "cursor-pointer outline-none opacity-0 w-0",
+                                inputClassName
+                            )}
+                            placeholder={placeholder}
+                            value={currentSelectedValuesArray.length > 0 ? currentSelectedValuesArray[0] : ""}
+                            readOnly
+                        />
+                    </span>
+                </>
             )}
         </div>
     );
@@ -235,21 +334,39 @@ const SelectItem = ({
     const context = useContext(SelectContext);
     if (!context) throw new Error("SelectItem은 Select 내부에서 사용해야 합니다.");
 
-    const { selectedValue, toggleValue, variant } = context;
-    const isSelected = selectedValue.includes(value);
+    const { selectedItems, setSelectedItems, toggleValue, variant } = context;
+    const isItemSelected = selectedItems.has(value);
+
+    useEffect(() => {
+        setSelectedItems((prevSelectedItems: Map<string, React.ReactNode>): Map<string, React.ReactNode> => {
+            if (prevSelectedItems.has(value)) {
+                const currentStoredNode = prevSelectedItems.get(value);
+                if (currentStoredNode !== children) {
+                    const newMap = new Map(prevSelectedItems);
+                    newMap.set(value, children);
+                    return newMap;
+                }
+            }
+            return prevSelectedItems;
+        });
+    }, [value, children, setSelectedItems]);
+
+    const handleSelect = () => {
+        toggleValue(value, children);
+    };
 
     return (
         <li
             role="option"
-            aria-selected={isSelected}
+            aria-selected={isItemSelected}
             className={cn(
                 "px-3 py-2 cursor-pointer rounded-md transition-colors",
                 "hover:bg-slate-100 text-slate-700 border-white border-[1px]",
-                isSelected && "bg-slate-200 text-blue-600 font-medium border-white border-[1px]",
-                variant === "error" && isSelected && "text-rose-600",
+                isItemSelected && "bg-slate-200 text-blue-600 font-medium border-white border-[1px]",
+                variant === "error" && isItemSelected && "text-rose-600",
                 className
             )}
-            onClick={() => toggleValue(value)}
+            onClick={handleSelect}
             {...props}
         >
             {children}

@@ -7,12 +7,12 @@ const ThreeDViewer: React.FC = () => {
     useEffect(() => {
         if (containerRef.current) {
             new Engine3D(containerRef.current);
-            Loader.LoadGltf('funeralhall.glb', () => console.log('모델 로드 완료.'));
+            Loader.LoadGltf('subway.glb', () => console.log('모델 로드 완료.'));
         }
         console.log('WebGL 초기화 호출.');
     }, []);
 
-    return <div ref={containerRef} className="three-d-viewer-container" style={{ width: '100%', height: '600px' }} />;
+    return <div ref={containerRef} className="three-d-viewer-container" style={{ width: '100%', height: '1000px' }} />;
 };
 
 export default ThreeDViewer;

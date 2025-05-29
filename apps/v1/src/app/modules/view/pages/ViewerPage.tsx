@@ -1,9 +1,10 @@
 
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { MapViewer, Header, FloorSelector, EventCounter, SideMenu } from "@plug/v1/app/modules/view/layouts";
+import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
+import { MapViewer } from '@plug/v1/app/modules/components/map';
 import { api } from '@plug/api-hooks/core';
-import type { StationData, Floor } from '@plug/common-services/types';
+import type { StationData } from '@plug/common-services/types';
 
 const ViewerPage = () => {
     const { stationId } = useParams<{ stationId: string }>();
@@ -13,7 +14,6 @@ const ViewerPage = () => {
     const [stationData, setStationData] = useState<StationData | null>(null);
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
-    const [currentFloor, setCurrentFloor] = useState<string>('ALL');
 
     useEffect(() => {
         // 비동기 함수 정의
@@ -69,24 +69,10 @@ const ViewerPage = () => {
         setError(error);
     };
     
-    const handleFloorChange = (floorId: string) => {
-        setCurrentFloor(floorId);
-    };
 
-    // 층 정보 생성
-    const floorItems = stationData?.floors 
-        ? [...stationData.floors]
-            .reverse()
-            .map((floor: Floor) => ({
-                id: floor.groupId,
-                name: `${floor.name}`
-            }))
-        : [];
-    
-    // 전체층 옵션 추가
-    const floorsWithAll = [...floorItems, { id: 'ALL', name: '전체층' }];
-
-    return (          <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">            {!stationLoading && stationData && (
+    return (         
+        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">            
+            {!stationLoading && stationData && (
                 <MapViewer 
                     modelPath={modelPath}
                     onModelLoaded={handleModelLoaded}
@@ -102,13 +88,6 @@ const ViewerPage = () => {
             <Header />
             <SideMenu />
             <EventCounter stationId={parsedStationId.toString()} />
-            {!stationLoading && stationData && (
-                <FloorSelector 
-                    floors={floorsWithAll} 
-                    currentFloor={currentFloor}
-                    onFloorChange={handleFloorChange}
-                />
-            )}
         </div>
     );
 };

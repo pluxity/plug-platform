@@ -1,17 +1,17 @@
 import * as React from 'react';
-import { Model, Poi } from '@plug/engine/src';
+import { Model, Poi, Path3D } from '@plug/engine/src';
 
 // 층 데이터 타입 정의
 interface FloorData {
-  floorId: string;
-  displayName: string;
-  [key: string]: unknown;
+    floorId: string;
+    displayName: string;
+    [key: string]: unknown;
 }
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
-  selectedApiName: string;
-  floorData: FloorData[];
+    selectedApiName: string;
+    floorData: FloorData[];
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -33,6 +33,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             selectedApiName: 'None',
             floorData: []
         };
+
+        console.warn('Path3D', Path3D);
     }
 
     /**
@@ -59,7 +61,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         this.state.floorData.length > 0 &&
                         <span>
                             <button onClick={() => this.setFloorVisibility(true)}>ShowAll</button>
-                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button>
+                            <button onClick={() => this.setFloorVisibility(false)}>HideAll</button><br />
+                            <button onClick={() => Model.Expand(1.0, 15.0)}>Expand</button>
+                            <button onClick={() => Model.Collapse(1.0)}>Collapse</button>
                         </span>
                     }
                 </span>
@@ -68,6 +72,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Path') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
+                    <button onClick={() => Path3D.Cancel()}>Cancel</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
+                    <button>Undo</button>
+                    <button>Redo</button>
                 </span>
             );
         }
@@ -89,6 +103,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Loader'>Loader</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
+                        <option value='Path'>Path</option>
                     </select>
                     <br />
                     {this.renderMenu()}
@@ -112,11 +127,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onApiBtnClick(apiName: string) {
         switch (apiName) {
             case 'Model.GetHierarchy': {
-                Model.GetModelHierarchy('funeralhall.glb', (data: FloorData[]) => {
-                    console.log('Model.GetModelHierarchy -> ', data);
+                const data = Model.GetModelHierarchy();
 
-                    this.setState({ floorData: data }); // 얻은 층정보로 state 설정
-                });
+                console.log('Model.GetModelHierarchy -> ', data);
+
+                this.setState({ floorData: data as any }); // 얻은 층정보로 state 설정
             } break;
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
@@ -134,6 +149,15 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     displayText: displayText,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
+            } break;
+            case 'Path.CreatePath': {
+                const pathId = window.crypto.randomUUID();
+                const color = 0xffffff * Math.random();
+                Path3D.CreatePath(pathId, color);
+            } break;
+            case 'Path.Finish': {
+                const pathData = Path3D.Finish();
+                console.log('Path3D.Finish -> ', pathData);
             } break;
         }
     }
