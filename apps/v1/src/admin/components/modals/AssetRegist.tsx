@@ -21,7 +21,6 @@ export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAss
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [uploadThumbnailId, setUploadThumbnailId] = useState<number | null>(null);
 
-  
   // 파일 공통 로딩 상태 관리 
   const [isUploading, setIsUploading] = useState(false);
   
@@ -163,6 +162,7 @@ export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAss
   const resetForm = () => {
     setName('');
     setModelFile(null);
+    setThumbnailFile(null);
     setUploadedModelId(null);
     setUploadThumbnailId(null);
     onClose();
@@ -188,153 +188,150 @@ export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAss
       closeOnOverlayClick={false}
       overlayClassName="bg-black/50"
     >
-      <div className="p-4">
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-            {error.message}
-          </div>
-        )}
-
-        <Form 
-            key={mode + (detailAssetData?.id ?? '')}
-            initialValues={
-              mode === 'edit' && detailAssetData
-                ? {
-                    assetRegistName: detailAssetData?.name,
-                    assetFileId: String(detailAssetData?.file?.id),
-                  }
-                : {
-                  assetRegistName: '',
-                  assetFileId: '',
+      <Form 
+          key={mode + (detailAssetData?.id ?? '')}
+          initialValues={
+            mode === 'edit' && detailAssetData
+              ? {
+                  assetRegistName: detailAssetData?.name,
+                  assetFileId: String(detailAssetData?.file?.id),
                 }
-            }
-            onSubmit={handleFinish}
-          >
-          <FormItem name="assetRegistName" label='이름' required>
-            <Input.Text 
-              placeholder="모델 이름을 입력하세요"
-              value={name}
-              onChange={value => setName(value)}
-            />
-          </FormItem>
+              : {
+                assetRegistName: '',
+                assetFileId: '',
+              }
+          }
+          onSubmit={handleFinish}
+        >
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
+              {error.message}
+            </div>
+          )}
+        <FormItem name="assetRegistName" label='이름' required>
+          <Input.Text 
+            placeholder="모델 이름을 입력하세요"
+            value={name}
+            onChange={value => setName(value)}
+          />
+        </FormItem>
 
-          <FormItem name="assetRegistThumbnail" label='Thumbnail 파일' required>
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
-              <input
-                type="file"
-                id="thumbnail-file"
-                className="hidden"
-                onChange={handleThumbnailChange}
-                accept=".png"
-              />
-              
-              {!thumbnailFile ? (
-                <div className="flex items-center">
-                    {mode === 'edit' && detailAssetData 
-                      ? <p className="flex-1 text-sm">{detailAssetData.thumbnailFile.originalFileName}</p>     
-                      : <p className="flex-1 text-sm text-gray-500">PNG 파일만 가능합니다.</p>
-                      }
+        <FormItem name="assetRegistThumbnail" label='Thumbnail 파일' required>
+          <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+            <input
+              type="file"
+              id="thumbnail-file"
+              className="hidden"
+              onChange={handleThumbnailChange}
+              accept=".png"
+            />
+            
+            {!thumbnailFile ? (
+              <div className="flex items-center">
+                  {mode === 'edit' && detailAssetData 
+                    ? <p className="flex-1 text-sm">{detailAssetData.thumbnailFile.originalFileName}</p>     
+                    : <p className="flex-1 text-sm text-gray-500">PNG 파일만 가능합니다.</p>
+                    }
+                <Button 
+                  type="button" 
+                  color="secondary"
+                  className="w-30"
+                  onClick={() => openFilePicker('thumbnail')}
+                >
+                  {mode === 'edit' ? '변경' : '파일 선택'}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between w-full">
+                <span className="text-sm truncate max-w-xs">
+                  {thumbnailFile.name} ({Math.round(thumbnailFile.size / 1024)} KB)
+                </span>
+                
+                {isUploading ? (
+                  <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
+                ) : uploadThumbnailId ? (
+                  <div className="text-green-500 text-xs">업로드 완료</div>
+                ) : (
                   <Button 
                     type="button" 
                     color="secondary"
                     className="w-30"
                     onClick={() => openFilePicker('thumbnail')}
                   >
-                    {mode === 'edit' ? '변경' : '파일 선택'}
+                    변경
                   </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-sm truncate max-w-xs">
-                    {thumbnailFile.name} ({Math.round(thumbnailFile.size / 1024)} KB)
-                  </span>
-                  
-                  {isUploading ? (
-                    <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
-                  ) : uploadThumbnailId ? (
-                    <div className="text-green-500 text-xs">업로드 완료</div>
-                  ) : (
-                    <Button 
-                      type="button" 
-                      color="secondary"
-                      className="w-30"
-                      onClick={() => openFilePicker('thumbnail')}
-                    >
-                      변경
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          </FormItem>
-          
-          <FormItem name="assetRegistFile" label='3D 모델 파일' required>
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
-              <input
-                type="file"
-                id="icon-file"
-                className="hidden"
-                onChange={handleModelChange}
-                accept=".glb,.gltf"
-              />
-              
-              {!modelFile ? (
-                <div className="flex items-center">
-                    {mode === 'edit' && detailAssetData 
-                      ? <p className="flex-1 text-sm">{detailAssetData.file.originalFileName}</p>     
-                      : <p className="flex-1 text-sm text-gray-500">GLB, GLTF 파일만 가능합니다.</p>
-                      }
+                )}
+              </div>
+            )}
+          </div>
+        </FormItem>
+        
+        <FormItem name="assetRegistFile" label='3D 모델 파일' required>
+          <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+            <input
+              type="file"
+              id="icon-file"
+              className="hidden"
+              onChange={handleModelChange}
+              accept=".glb,.gltf"
+            />
+            
+            {!modelFile ? (
+              <div className="flex items-center">
+                  {mode === 'edit' && detailAssetData 
+                    ? <p className="flex-1 text-sm">{detailAssetData.file.originalFileName}</p>     
+                    : <p className="flex-1 text-sm text-gray-500">GLB, GLTF 파일만 가능합니다.</p>
+                    }
+                <Button 
+                  type="button" 
+                  color="secondary"
+                  className="w-30"
+                  onClick={() => openFilePicker('model')}
+                >
+                  {mode === 'edit' ? '변경' : '파일 선택'}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between w-full">
+                <span className="text-sm truncate max-w-xs">
+                  {modelFile.name} ({Math.round(modelFile.size / 1024)} KB)
+                </span>
+                
+                {isUploading ? (
+                  <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
+                ) : uploadedModelId ? (
+                  <div className="text-green-500 text-xs">업로드 완료</div>
+                ) : (
                   <Button 
                     type="button" 
                     color="secondary"
                     className="w-30"
                     onClick={() => openFilePicker('model')}
                   >
-                    {mode === 'edit' ? '변경' : '파일 선택'}
+                    변경
                   </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-sm truncate max-w-xs">
-                    {modelFile.name} ({Math.round(modelFile.size / 1024)} KB)
-                  </span>
-                  
-                  {isUploading ? (
-                    <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
-                  ) : uploadedModelId ? (
-                    <div className="text-green-500 text-xs">업로드 완료</div>
-                  ) : (
-                    <Button 
-                      type="button" 
-                      color="secondary"
-                      className="w-30"
-                      onClick={() => openFilePicker('model')}
-                    >
-                      변경
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          </FormItem>
-          
-          <div className="mt-6 flex justify-center gap-2">
-            <Button type="button" onClick={resetForm} disabled={isProcessing}>취소</Button>
-            <Button 
-              type="submit" 
-              color="primary" 
-              disabled={
-                isProcessing || !name ||
-                (mode === 'create' && (!uploadedModelId || !uploadThumbnailId)) ||
-                (mode === 'edit' && !name)
-              }
-              isLoading={isAssetCreating || isAssetUpdating}
-            >
-              {mode === 'create' ? '등록' : '수정'}
-            </Button>
+                )}
+              </div>
+            )}
           </div>
-        </Form>
-      </div>
+        </FormItem>
+        
+        <div className="mt-6 flex justify-center gap-2">
+          <Button type="button" onClick={resetForm} disabled={isProcessing}>취소</Button>
+          <Button 
+            type="submit" 
+            color="primary" 
+            disabled={
+              isProcessing || !name ||
+              (mode === 'create' && (!uploadedModelId || !uploadThumbnailId)) ||
+              (mode === 'edit' && !name)
+            }
+            isLoading={isAssetCreating || isAssetUpdating}
+          >
+            {mode === 'create' ? '등록' : '수정'}
+          </Button>
+        </div>
+      </Form>
     </Modal>
   );
 } 

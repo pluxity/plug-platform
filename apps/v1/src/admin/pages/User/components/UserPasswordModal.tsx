@@ -49,44 +49,39 @@ export const UserPasswordModal = ({ isOpen, onClose, onSuccess, selectedUserId }
             closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
-            <div className="p-4">
+            <Form onSubmit={handlePasswordFinish}>
                 {passwordUpdateError && (
                     <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
                         {passwordUpdateError.message}
                     </div>
                 )}
+                <FormItem name="currentPassword" label='현재 비밀번호' required>
+                    <Input.Password 
+                        placeholder="현재 비밀번호를 입력하세요." 
+                        value={currentPassword}
+                        onChange={value => setCurrentPassword(value)}
+                    />
+                </FormItem> 
 
-                <Form 
-                    onSubmit={handlePasswordFinish}
-                >
-                    <FormItem name="currentPassword" label='현재 비밀번호' required>
-                        <Input.Password 
-                            placeholder="현재 비밀번호를 입력하세요." 
-                            value={currentPassword}
-                            onChange={value => setCurrentPassword(value)}
-                        />
-                    </FormItem> 
-
-                    <FormItem name="newPassword" label='새 비밀번호' required>
-                        <Input.Password 
-                            placeholder="새 비밀번호를 입력하세요." 
-                            value={newPassword}
-                            onChange={value => setNewPassword(value)}
-                        />
-                    </FormItem>
-                    
-                    <div className="mt-6 flex justify-center gap-2">
-                        <Button type="button" onClick={resetForm} disabled={isPasswordUpdating}>취소</Button>
-                        <Button 
-                            type="submit" 
-                            color="primary" 
-                            isLoading={isPasswordUpdating}
-                        >
-                            변경
-                        </Button>
-                    </div> 
-                </Form>
-            </div>
+                <FormItem name="newPassword" label='새 비밀번호' required>
+                    <Input.Password 
+                        placeholder="새 비밀번호를 입력하세요." 
+                        value={newPassword}
+                        onChange={value => setNewPassword(value)}
+                    />
+                </FormItem>
+                
+                <div className="mt-6 flex justify-center gap-2">
+                    <Button type="button" onClick={resetForm} disabled={isPasswordUpdating}>취소</Button>
+                    <Button 
+                        type="submit" 
+                        color="primary" 
+                        isLoading={isPasswordUpdating}
+                    >
+                        변경
+                    </Button>
+                </div> 
+            </Form>
         </Modal>
     );
 } 

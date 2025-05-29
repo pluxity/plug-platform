@@ -6,6 +6,7 @@ import AssetPage from "../../admin/pages/Asset/Management";
 import LinePage from "../../admin/pages/Line/Management"
 import Viewer from "../../admin/pages/Viewer/ViewerPage";
 import AdminLayout from "../../admin/pages/AdminLayout";
+import DeviceCategory from '../../admin/pages/Device/Category';
 
 export const AdminRouter: RouteObject[] = [
     {
@@ -20,6 +21,7 @@ export const AdminRouter: RouteObject[] = [
                     { path: ADMIN_ROUTE.ASSET, element: <AssetPage /> },
                     { path: ADMIN_ROUTE.LINE, element: <LinePage /> },
                     { path: ADMIN_ROUTE.USER, element: <UserPage /> },
+                    { path: ADMIN_ROUTE.DEVICE_CATEGORY, element: <DeviceCategory /> },
                 ]
             },
             { path: ADMIN_ROUTE.VIEWER, element: <Viewer /> }, 

@@ -65,7 +65,7 @@ export default function UserListPage() {
               setStatusData(statusMap);
             }
           } catch (error) {
-            console.log('로그인 사용자 정보 조회 실패', error);
+            console.error('로그인 사용자 정보 조회 실패', error);
           }
         };
         fetchLoggedInUsers();
@@ -88,7 +88,7 @@ export default function UserListPage() {
             setSelectState(new Set());
 
         } catch (error) {
-            console.log('삭제 중 오류가 발생했습니다.', error);
+            console.error('삭제 중 오류가 발생했습니다.', error);
         }
     };
 

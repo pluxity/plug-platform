@@ -20,17 +20,26 @@ const Dashboard = () => {
                         items={[
                             {
                                 title: 'ASSET 관리',
-                                link: '/admin/asset/management',
+                                link: '/admin/dashboard/asset/management',
                                 toggleable: false,
                             },
                             {
                                 title: '호선 관리',
-                                link: '/admin/line/management',
+                                link: '/admin/dashboard/line/management',
                                 toggleable: false,
                             },
                             {
+                                title: '디바이스 관리',
+                                submenu: [
+                                    {
+                                        title: '디바이스 카테고리 관리',
+                                        link: '/admin/dashboard/device/category'
+                                    }
+                                ]
+                            },
+                            {
                                 title: '사용자 관리',
-                                link: '/admin/user/management',
+                                link: '/admin/dashboard/user/management',
                                 toggleable: false,
                             },
                         ]}
