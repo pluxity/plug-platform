@@ -38,7 +38,7 @@ function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
  * @param url - 모델링 url 주소
  * @param onComplete - 완료 후 호출될 콜백 함수
  */
-function GetModelHierarchy(url: string, onComplete: Function) {
+function GetModelHierarchy(url: string, onComplete: Function, p0: (error: Error) => void) {
 
     new Addon.GLTFLoader().load(url, (gltf) => {
 

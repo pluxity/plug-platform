@@ -43,3 +43,9 @@ export interface CreateStationData {
     lineId: number;
     route: string;
 }
+
+export interface FacilityModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess?: () => void;
+}
