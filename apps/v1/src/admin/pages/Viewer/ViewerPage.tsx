@@ -43,7 +43,7 @@ const Viewer = () => {
         };
 
         fetchStation();
-    }, [stationId]); // stationId가 변경될 때마다 데이터 다시 불러오기
+    }, [stationId]); 
 
     const modelPath: string = stationData?.facility?.drawing?.url || '';
     
@@ -85,7 +85,7 @@ const Viewer = () => {
                             >
                             <Select.Trigger />
                             <Select.Content>
-                              {hierachies.map(floor => (
+                              {hierachies.sort((a, b) => Number(b.floorId) - Number(a.floorId)).map(floor => (
                                   <Select.Item key={floor.floorId} value={floor.floorId}>
                                       {floor.displayName}
                                   </Select.Item>
@@ -100,8 +100,6 @@ const Viewer = () => {
                         onModelLoaded={handleModelLoaded}
                     />
                 )}
-                { /*  */ }
-                { /* 3D 화면 표출 */ }
             </main>
         </>
     );
