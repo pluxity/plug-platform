@@ -20,7 +20,64 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 });
 
-async function StartEdit(id: string, editMode: string) {
+/**
+ * 미리보기 객체 메모리 해제
+ */
+function disposePreviewObject() {
+    if (previewObject) {
+        gizmo.detach();
+        engine.RootScene.remove(previewObject);
+        previewObject.traverse(child => {
+            if (child instanceof THREE.Mesh) {
+                child.geometry.dispose();
+                if (Array.isArray(child.material)) {
+                    child.material.forEach(mat => {
+                        mat.map?.dispose();
+                        mat.dispose();
+                    });
+                } else {
+                    child.material.map?.dispose();
+                    child.material.dispose();
+                }
+            }
+        });
+    }
+}
+
+/**
+ * 대상객체를 편집객체임을 표현하기 위해 재질을 붉은색 반투명 객체로 변경
+ * @param target - 대상 객체
+ */
+function setObjectRedTransparent(target: THREE.Object3D) {
+    const redMaterial = new THREE.MeshBasicMaterial({ color: 'red', transparent: true, opacity: 0.5 });
+    target.renderOrder = 1;
+    target.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+            if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                    mat.map?.dispose();
+                    mat.dispose();
+                });
+            } else {
+                child.material.map?.dispose();
+                child.material.dispose();
+            }
+            child.material = redMaterial;
+            child.renderOrder = 1;
+        }
+    });
+}
+
+/**
+ * poi 편집 시작
+ * @param id - poi id값
+ * @param editMode - 편집모드 ("translate" | "rotate" | "scale")
+ */
+async function StartEdit(id: string, editMode: string = 'translate') {
+
+    // 이전에 생성된 미리보기 객체 메모리 해제
+    disposePreviewObject();
+
     if (!PoiData.exists(id)) {
         console.warn('편집할 poi를 찾지 못함.');
         return;
@@ -50,28 +107,43 @@ async function StartEdit(id: string, editMode: string) {
         previewObject.scale.copy(target.PointMeshData.scale);
     }
 
+    // 재질 변경
+    setObjectRedTransparent(previewObject);
+
     // 기즈모 생성
     gizmo = new Addon.TransformControls(engine.Camera, engine.Renderer.domElement);
+    gizmo.setMode(editMode as Addon.TransformControlsMode); // "translate" | "rotate" | "scale"
     gizmo.addEventListener('dragging-changed', (event) => {
         Camera.SetEnabled(!event.value);
     });
+    gizmo.addEventListener('mouseUp', (event) => {
+        console.log('mouseUp', event);
+        target.WorldPosition = previewObject.position.clone();
+        target.Rotation = previewObject.rotation.clone();
+        target.Scale = previewObject.scale.clone();
 
+        PoiData.updatePoiLine();
+        PoiData.updatePoiMesh();
+    });
     gizmo.attach(previewObject);
 
     const helper = gizmo.getHelper();
     engine.RootScene.add(helper);
 }
 
-function CancelEdit() {
-
-}
-
+/**
+ * poi 편집 종료
+ */
 function FinishEdit() {
 
+    disposePreviewObject();
+
+    const helper = gizmo.getHelper();
+    engine.RootScene.remove(helper);
+    gizmo.dispose();
 }
 
 export {
     StartEdit,
-    CancelEdit,
     FinishEdit,
 }

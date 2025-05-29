@@ -95,7 +95,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(MonkeyHead.glb)')}>Create(MonkeyHead.glb)</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(ScreenDoor.glb)')}>Create(ScreenDoor.glb)</button><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(ScreenDoor.glb)')}>Create(ScreenDoor.glb)</button><br />
                     <input type='text' value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</button> &nbsp;
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</button>
@@ -116,9 +116,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br />
                     <input type='text' value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.PlayAnimation')}>PlayAnimation</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</button><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</button><br />
                     <input type='text' value={this.state.editPoiId} onChange={this.onPoiStartEditValueChanged.bind(this)} placeholder='편집할 Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit')}>StartEdit</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(translate)')}>StartEdit(translate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(rotate)')}>StartEdit(rotate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(scale)')}>StartEdit(scale)</button>&nbsp;
+                    <button onClick={() => Poi.FinishEdit()}>Finish</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Path') {
@@ -344,9 +347,17 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.StopAnimation': {
                 Poi.StopAnimation(this.state.getAnimlistPoiIdValue);
             } break;
-            case 'Poi.StartEdit': {
+            case 'Poi.StartEdit(translate)': {
                 const poiId = this.state.editPoiId;
                 Poi.StartEdit(poiId, 'translate');
+            } break;
+            case 'Poi.StartEdit(rotate)': {
+                const poiId = this.state.editPoiId;
+                Poi.StartEdit(poiId, 'rotate');
+            } break;
+            case 'Poi.StartEdit(scale)': {
+                const poiId = this.state.editPoiId;
+                Poi.StartEdit(poiId, 'scale');
             } break;
 
             /**

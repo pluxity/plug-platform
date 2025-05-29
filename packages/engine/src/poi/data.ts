@@ -325,6 +325,8 @@ async function updatePoiMesh() {
                 }
                 // 위치 설정
                 poi.PointMeshData.animMeshRef?.position.copy(poi.WorldPosition);
+                poi.PointMeshData.animMeshRef?.rotation.copy(poi.Rotation);
+                poi.PointMeshData.animMeshRef?.scale.copy(poi.Scale);
             });
 
         } else {
@@ -570,6 +572,8 @@ export {
     createTextMesh,
     exists,
     getPoiElement,
+    updatePoiLine,
+    updatePoiMesh,
 
     Export,
     ExportAll,
