@@ -1,29 +1,13 @@
-import { api } from "@plug/api-hooks";
-import { useEffect, useState } from "react";
-import type { Asset } from "../types/asset";
+import { useEffect } from "react";
 import AssetCard from "./AssetCard";
+import { useAssetStore } from "../store/assetStore"; // Asset 스토어 import
 
 const AssetList = () => {
-    const [assets, setAssets] = useState<Asset[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { assets, isLoading, fetchAssets, error } = useAssetStore(); // 스토어에서 상태와 액션 가져오기
 
     useEffect(() => {
-        const fetchAssets = async () => {
-            setIsLoading(true);
-            try {
-                const response = await api.get<Asset[]>('assets');
-                if (response && response.data) {
-                    setAssets(response.data);
-                } 
-            } catch (err) {
-                console.error('Error fetching assets:', err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        
-        fetchAssets();
-    }, []);
+        fetchAssets(); // 컴포넌트 마운트 시 Asset 목록 가져오기
+    }, [fetchAssets]);
 
     if (isLoading) {
         return (
@@ -31,6 +15,18 @@ const AssetList = () => {
                 <h2 className="text-lg font-bold mb-4">Asset List</h2>
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-pulse text-gray-500">Loading assets...</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="asset-list p-4">
+                <h2 className="text-lg font-bold mb-4">Asset List</h2>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong className="font-bold">Error:</strong>
+                    <span className="block sm:inline"> Could not fetch assets. Please try again later.</span>
                 </div>
             </div>
         );
