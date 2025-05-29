@@ -327,6 +327,9 @@ async function updatePoiMesh() {
                 poi.PointMeshData.animMeshRef?.position.copy(poi.WorldPosition);
                 poi.PointMeshData.animMeshRef?.rotation.copy(poi.Rotation);
                 poi.PointMeshData.animMeshRef?.scale.copy(poi.Scale);
+
+                // 레이어 설정
+                Util.setObjectLayer(poi.PointMeshData.animMeshRef as THREE.Object3D, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
             });
 
         } else {
@@ -370,6 +373,9 @@ async function updatePoiMesh() {
             pointMeshGroup.add(mesh);
             // 위치점 메시 리스트에 추가
             pointMeshStorage[url] = mesh;
+
+            // 레이어 설정
+            Util.setObjectLayer(mesh as THREE.Object3D, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
         }
     }
 }
@@ -538,7 +544,7 @@ function HideAll() {
  * @param id - poi id값
  */
 function GetAnimationList(id: string) {
-    if( poiDataList.hasOwnProperty(id) ) {
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         return Object.keys(poi.AnimationActions);
     }
@@ -550,7 +556,7 @@ function GetAnimationList(id: string) {
  * @param animName - 애니메이션 이름
  */
 function PlayAnimation(id: string, animName: string) {
-    if( poiDataList.hasOwnProperty(id) ) {
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         poi.playAnimation(animName);
     }
@@ -561,13 +567,15 @@ function PlayAnimation(id: string, animName: string) {
  * @param id - poi id값
  */
 function StopAnimation(id: string) {
-    if( poiDataList.hasOwnProperty(id) ) {
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         poi.stopAnimation();
     }
 }
 
 export {
+    poiDataList as PoiDataList,
+
     getIcon,
     createTextMesh,
     exists,

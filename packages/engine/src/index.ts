@@ -12,3 +12,14 @@ import * as UtilInternal from './util';
 export const Util = {
     SetBackground: UtilInternal.SetBackground
 };
+
+import * as EventInternal from './eventDispatcher';
+export const Event = {
+    AddEventListener: (type: string, callback: Function) => {
+        EventInternal.ExternalHandler.addEventListener(type as never, callback as never);
+
+    },
+    RemoveEventListener: (type: string, callback: Function) => {
+        EventInternal.ExternalHandler.removeEventListener(type as never, callback as never);
+    }
+};

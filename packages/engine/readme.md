@@ -330,6 +330,20 @@ Px.Poi.StartEdit('TestPoi', 'translate');
 Px.Poi.FinishEdit();
 ```
 
+Event
+=============
+## Px.Event.AddEventListener(type: string, callback: Function)
+- type: 처리할 이벤트명
+  - 'onPoiTransformChange': poi 편집시 위치, 회전, 스케일에 값변화가 일어날때 호출
+  - 'onPoiPointerUp': poi에 포인터 업 발생할때 호출
+- callback: 이벤트에 따라 호출될 콜백 함수
+- 형식에 따라 처리할 이벤트를 등록한다.
+
+## Px.Event.RemoveEventListener(type: string, callback: Function)
+- type: 제거할 이벤트명
+- callback: 제거할 콜백함수
+- 형식에 따라 처리하는 이벤트를 제거한다.
+
 Util
 =============
 ## Px.Util.SetBackground(backgroundData: number | string)

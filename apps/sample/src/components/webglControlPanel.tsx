@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Camera, Model, Poi, Path3D, Interfaces, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Model, Path3D, Poi, Util } from '@plug/engine/src';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
@@ -42,6 +42,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             editPoiId: '',
             floorData: []
         };
+
+        this.registerViewerEvents();
 
         console.warn('Path3D', Path3D);
     }
@@ -462,6 +464,20 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onPoiStartEditValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ editPoiId: evt.target.value });
+    }
+
+    /**
+     * 뷰어 이벤트 등록
+     */
+    registerViewerEvents() {
+        // poi 편집 이벤트 등록
+        Event.AddEventListener('onPoiTransformChange' as never, (evt: any) => {
+            console.log(evt);
+        });
+        // poi 객체 포인터업 이벤트 등록
+        Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {
+            console.log(evt);
+        });
     }
 }
 

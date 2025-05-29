@@ -117,13 +117,18 @@ async function StartEdit(id: string, editMode: string = 'translate') {
         Camera.SetEnabled(!event.value);
     });
     gizmo.addEventListener('mouseUp', (event) => {
-        console.log('mouseUp', event);
         target.WorldPosition = previewObject.position.clone();
         target.Rotation = previewObject.rotation.clone();
         target.Scale = previewObject.scale.clone();
 
         PoiData.updatePoiLine();
         PoiData.updatePoiMesh();
+
+        // 외부 이벤트 통지
+        Event.ExternalHandler.dispatchEvent({
+            type: 'onPoiTransformChange',
+            target: target.ExportData
+        });
     });
     gizmo.attach(previewObject);
 
