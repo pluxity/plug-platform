@@ -1,5 +1,5 @@
 import { api } from "@plug/api-hooks";
-import {CreateStationData, Station} from '../types/facility'
+import { Station} from '../types/facility'
 
 const STATIONS_ENDPOINT = 'stations';
 
@@ -16,7 +16,7 @@ export const createStation = (data: {
         name: string;
         thumbnailFileId: number | null
     };
-    floors: { floorId: string; name: string }[];
+    floors: { floorId: number; name: string }[];
     lineId: number;
     route: string
 }): Promise<Response> => {

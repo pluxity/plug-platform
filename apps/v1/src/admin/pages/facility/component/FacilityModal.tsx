@@ -4,7 +4,6 @@ import { useLinesSWR } from '@plug/common-services';
 import { FacilityModalProps } from '../types/facility';
 import {FileUploadField} from "@plug/v1/admin/pages/facility/component/FileUploadField";
 import {useFacility} from "@plug/v1/admin/pages/facility/hook/useFacility";
-import {useFloorInfo} from "@plug/v1/admin/pages/facility/hook/useFloorInfo";
 
 export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps) => {
     const {
@@ -14,10 +13,10 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
         isUploading,
         handleFileUpload,
         handleFinish,
-        resetForm
+        resetForm,
+        modelData,
     } = useFacility({ onClose, onSuccess });
 
-    const { modelData} = useFloorInfo();
     const { data: lines } = useLinesSWR();
 
     const openFilePicker = (type: 'model' | 'thumbnail') => {
@@ -70,15 +69,23 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                         onOpenPicker={openFilePicker}
                     />
 
-                    <FormItem name="floorId" label="층 정보" required>
-                        <Select disabled={isLoading}>
+                    <FormItem name="floors" label="층 정보" required>
+                        <Select disabled={isLoading} type={"multiple"}>
                             <Select.Trigger />
                             <Select.Content>
-                                {modelData.map((item) => (
-                                    <Select.Item key={item.floorId} value={item.floorId}>
+                                {modelData.map((item) => {
+
+                                    const val = JSON.stringify({
+                                        "name": item.displayName,
+                                        "floorId": Number(item.floorId)
+                                    })
+
+                                    return (<Select.Item key={item.floorId} value={val}>
                                         {item.displayName}
                                     </Select.Item>
-                                ))}
+                                    )
+                                    }
+                                )}
                             </Select.Content>
                         </Select>
                     </FormItem>

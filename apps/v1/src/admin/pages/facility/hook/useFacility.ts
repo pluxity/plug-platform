@@ -46,9 +46,19 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
     }, [onClose, resetFiles, resetModelData]);
 
 
-    const handleFinish = useCallback(async (values: Record<string, string>) => {
+    const handleFinish = useCallback(async (values: Record<string, any>) => {
         setIsLoading(true);
         try {
+
+
+            console.log(values);
+            const floors = values.floors.map((item) => {
+                const parsed = JSON.parse(item);
+                return {
+                    floorId: Number(parsed.floorId),
+                    floorName: parsed.name
+                }
+            });
             const result = await createStation({
                 facility: {
                     name: values.name,
@@ -57,11 +67,8 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
                     drawingFileId: files.model.fileId,
                     thumbnailFileId: files.thumbnail.fileId
                 },
-                floors: [{
-                    floorId: values.floorId,
-                    name: values.name
-                }],
-                lineId: Number(values.lineId),
+                floors: floors,
+                lineId: Number(values.lineId[0]),
                 route: ''
             });
 
