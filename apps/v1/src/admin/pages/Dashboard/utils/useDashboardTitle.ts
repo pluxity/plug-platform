@@ -1,5 +1,5 @@
-import { DASHBOARD_TITLES } from '../constants/dashboardTitle';
 import { useLocation } from "react-router-dom";
+import {DASHBOARD_TITLES} from "@plug/v1/admin/pages/Dashboard/constants/DashboardTitle";
 
 export interface DashboardTitle{
     path: string;
@@ -9,6 +9,6 @@ export interface DashboardTitle{
 export const DashboardTitle = () => {
     const location = useLocation();
     return DASHBOARD_TITLES.find(
-        (item) => item.path.toLowerCase() === location.pathname.toLowerCase()
+        (item) => location.pathname.toLowerCase().includes(item.path.toLowerCase())
     )?.title;
 };

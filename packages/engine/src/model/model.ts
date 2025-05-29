@@ -99,35 +99,35 @@ function getLowestFloorObject(): THREE.Object3D {
  * @param url - 모델링 url 주소
  * @param onComplete - 완료 후 호출될 콜백 함수
  */
-// function GetModelHierarchy(url: string, onComplete: Function) {
+function GetModelHierarchyByUrl(url: string, onComplete: Function) {
 
-//     new Addon.GLTFLoader().load(url, (gltf) => {
+    new Addon.GLTFLoader().load(url, (gltf) => {
 
-//         const result: Interfaces.ModelInfo[] = [];
+        const result: Interfaces.ModelInfo[] = [];
 
-//         // 구조 분석
-//         gltf.scene.traverse(child => {
-//             if (child.userData.hasOwnProperty('type')) {
-//                 const type: string = child.userData['type'];
-//                 if (type.toLowerCase() === 'floor') {
-//                     const info: Interfaces.ModelInfo = {
-//                         objectName: child.name,
-//                         displayName: child.userData.displayName,
-//                         sortingOrder: Number.parseInt(child.userData.sortingorder),
-//                         floorId: child.userData.floorId
-//                     };
+        // 구조 분석
+        gltf.scene.traverse(child => {
+            if (child.userData.hasOwnProperty('type')) {
+                const type: string = child.userData['type'];
+                if (type.toLowerCase() === 'floor') {
+                    const info: Interfaces.ModelInfo = {
+                        objectName: child.name,
+                        displayName: child.userData.displayName,
+                        sortingOrder: Number.parseInt(child.userData.sortingorder),
+                        floorId: child.userData.floorId
+                    };
 
-//                     // 배열에 저장
-//                     result.push(info);
-//                 }
-//             }
-//         });
+                    // 배열에 저장
+                    result.push(info);
+                }
+            }
+        });
 
-//         // 콜백 호출
-//         onComplete?.(result);
+        // 콜백 호출
+        onComplete?.(result);
 
-//     }, undefined, (err) => console.boundary(err));
-// }
+    }, undefined, (err) => console.error(err));
+}
 
 function GetModelHierarchy(): Interfaces.ModelInfo[] {
 
@@ -360,12 +360,11 @@ function Collapse(transitionTime: number, onComplete: Function) {
 
 export {
     modelGroup as ModelGroup,
-
     convertWorldToFloorLocal,
     convertFloorLocalToWorld,
     calculateFloorBounding,
     getLowestFloorObject,
-
+    GetModelHierarchyByUrl,
     GetModelHierarchy,
     Show,
     Hide,
