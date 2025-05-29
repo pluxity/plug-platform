@@ -1,19 +1,25 @@
-
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
 import { api } from '@plug/api-hooks/core';
 import type { StationData } from '@plug/common-services/types';
+import useStationStore from '@plug/v1/app/stores/stationStore'; // Corrected import
+import type { StationState } from '@plug/v1/app/stores/stationStore'; // Import StationState for typing
 
 const ViewerPage = () => {
     const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? parseInt(stationId, 10) : 1; // 기본값 1
+    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
+    const setStationId = useStationStore((state: StationState) => state.setStationId);
     
     // 상태 관리를 위한 useState
     const [stationData, setStationData] = useState<StationData | null>(null);
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        setStationId(parsedStationId);
+    }, [parsedStationId, setStationId]);
 
     useEffect(() => {
         // 비동기 함수 정의
