@@ -8,5 +8,4 @@ export enum ADMIN_ROUTE {
     USER = 'user/management',
     ASSET = 'asset/management',
     LINE = 'line/management'
-
 }
