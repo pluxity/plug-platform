@@ -1,20 +1,12 @@
 import { useState, useCallback } from 'react';
 import { createStation } from '../api/station';
 import { useFileUploader } from "@plug/v1/admin/pages/facility/hook/useFileUploader";
-import { useFloorInfo } from "@plug/v1/admin/pages/facility/hook/useFloorInfo";
+import {useFloorInfo} from "@plug/v1/admin/pages/facility/hook/useFloorInfo";
+import {FileType} from "@plug/v1/admin/pages/facility/types/file";
 
 interface FacilityProps {
     onClose: () => void;
     onSuccess?: () => void;
-}
-
-interface StationFormValues {
-    name: string;
-    code: string;
-    description: string;
-    lineId: number;
-    floorId: number;
-    route: string;
 }
 
 const MESSAGES = {
@@ -25,26 +17,34 @@ const MESSAGES = {
 export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [facilityName, setFacilityName] = useState('');
-
-    const {
-        floors,
-        error: floorError,
-        handleFileUploadComplete
-    } = useFloorInfo();
+    const { modelData, getModelInfo, resetModelData } = useFloorInfo();
 
     const {
         files,
         isUploading,
         fileError,
-        handleFileUpload,
+        handleFileUpload: originalHandleFileUpload,
         resetFiles
-    } = useFileUploader(setFacilityName, handleFileUploadComplete);
+    } = useFileUploader(setFacilityName);
+
+    const handleFileUpload = async (
+        event: React.ChangeEvent<HTMLInputElement>,
+        fileType: FileType
+    ) => {
+        const result = await originalHandleFileUpload(event, fileType);
+        if (fileType === 'model' && result?.location) {
+            await getModelInfo(result.location);
+        }
+        return result;
+    };
 
     const resetForm = useCallback(() => {
         setFacilityName('');
         resetFiles();
+        resetModelData();
         onClose();
-    }, [onClose, resetFiles]);
+    }, [onClose, resetFiles, resetModelData]);
+
 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
         setIsLoading(true);
@@ -75,7 +75,7 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
         } finally {
             setIsLoading(false);
         }
-    }, [files, floors, onSuccess, resetForm]);
+    }, [files,  onSuccess, resetForm]);
 
     return {
         isLoading,
@@ -83,9 +83,10 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
         files,
         isUploading,
         fileError,
-        floorError,
         handleFileUpload,
         handleFinish,
-        resetForm
+        resetForm,
+        modelData
     };
+
 };

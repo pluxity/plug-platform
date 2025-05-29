@@ -17,8 +17,8 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
         resetForm
     } = useFacility({ onClose, onSuccess });
 
+    const { modelData} = useFloorInfo();
     const { data: lines } = useLinesSWR();
-    const { floors, error} = useFloorInfo();
 
     const openFilePicker = (type: 'model' | 'thumbnail') => {
         const fileInput = document.getElementById(`${type}-file`);
@@ -74,28 +74,11 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                         <Select disabled={isLoading}>
                             <Select.Trigger />
                             <Select.Content>
-                                {isLoading ? (
-                                    <Select.Item value="">
-                                        로딩 중...
+                                {modelData.map((item) => (
+                                    <Select.Item key={item.floorId} value={item.floorId}>
+                                        {item.displayName}
                                     </Select.Item>
-                                ) : error ? (
-                                    <Select.Item value="">
-                                        층 정보를 불러오는데 실패했습니다
-                                    </Select.Item>
-                                ) : floors && floors.length > 0 ? (
-                                    floors.map((floor) => (
-                                        <Select.Item
-                                            key={floor.floorId}
-                                            value={floor.floorId}
-                                        >
-                                            {floor.displayName}
-                                        </Select.Item>
-                                    ))
-                                ) : (
-                                    <Select.Item value="">
-                                        사용 가능한 층 정보가 없습니다
-                                    </Select.Item>
-                                )}
+                                ))}
                             </Select.Content>
                         </Select>
                     </FormItem>

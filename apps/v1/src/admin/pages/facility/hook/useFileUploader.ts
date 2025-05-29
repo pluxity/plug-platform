@@ -1,9 +1,6 @@
 import { useState } from 'react';
-import {createFileFormData, FileResponse, useFileUpload} from '@plug/common-services';
+import { createFileFormData, useFileUpload } from '@plug/common-services';
 import { FileState, FileType } from '../types/file';
-import { api } from '@plug/api-hooks';
-import * as Px from "@plug/engine/src";
-import {ModelInfo} from "@plug/engine/src/interfaces";
 
 export const useFileUploader = (
     onNameSet?: (name: string) => void,
@@ -40,20 +37,14 @@ export const useFileUploader = (
             const formData = createFileFormData(file, mimeType);
             const response = await uploadFile(formData);
 
-            const locationHeader = response?.location;
-            console.log(locationHeader);
-            if (!locationHeader) throw new Error('업로드 응답에 Location이 없습니다.');
+            setFiles(prev => ({
+                ...prev,
+                [fileType]: {
+                    file
+                }
+            }));
 
-            const fileResponse =  await api.get<FileResponse>(locationHeader.replace(/^\//, ''));
-            const fileurl = fileResponse.data.url;
-            await new Promise<ModelInfo[]>((resolve, reject) => {
-                Px.Model.GetModelHierarchy(fileurl, (data: ModelInfo[]) => {
-                    resolve(data);
-                }, (error: Error) => {
-                    reject(error);
-                });
-            });
-            
+            return response;
         } catch (err) {
             console.error(`${fileType} 파일 업로드 실패:`, err);
         } finally {
@@ -61,12 +52,11 @@ export const useFileUploader = (
         }
     };
 
-
     return {
         files,
         isUploading,
         fileError,
         handleFileUpload,
-        resetFiles: () => setFiles({ model: { file: null, fileId: null }, thumbnail: { file: null, fileId: null } })
+        resetFiles: () => setFiles({ model: { file: null, fileId: null }, thumbnail: { file: null, fileId: null } }),
     };
 };
