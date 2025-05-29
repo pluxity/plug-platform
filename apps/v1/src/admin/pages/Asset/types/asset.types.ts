@@ -1,4 +1,4 @@
-export interface PoiIcon {
+export interface Asset {
     id: string;
     name: string;
     file: React.ReactNode;

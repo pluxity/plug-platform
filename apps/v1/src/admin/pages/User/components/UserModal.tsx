@@ -10,7 +10,7 @@ export interface UserListModalProps {
     selectedUserId?: number; 
 }
 
-export const UserListModal = ({ isOpen, onClose, onSuccess, mode, selectedUserId }: UserListModalProps) => {
+export const UserModal = ({ isOpen, onClose, onSuccess, mode, selectedUserId }: UserListModalProps) => {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');

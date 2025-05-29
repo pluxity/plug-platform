@@ -1,13 +1,13 @@
 import { AssetResponse } from '@plug/common-services';
-import { PoiIcon } from '../types/PoiIcon.types';
+import { Asset } from '../../Asset/types/asset.types';
 import { Button } from '@plug/ui';
 import  DateFormatter from '@plug/v1/app/utils/dateFormatter';
 
-export const usePoiIcon = (
+export const useAsset = (
   data: AssetResponse[],
   onDelete: (assetId: number) => void,
   onEdit: (assetId: number) => void
-): PoiIcon[] => {
+): Asset[] => {
   return data.map(asset => ({
     id: String(asset.id),
     name: asset.name,

@@ -1,17 +1,17 @@
-import { Input, Button, DataTable, Skeleton } from '@plug/ui';
-import { columns } from './constants/poiIconColumns';
-import { PoiIconRegistModal } from '../../components/modals/PoiIconRegist'; 
+import { Button, DataTable, Skeleton } from '@plug/ui';
+import { columns } from './constants/assetColumns';
+import { AssetRegistModal } from '../../components/modals/AssetRegist'; 
 import { useModal } from '../../components/hook/useModal';
 import { useAssetsSWR, deleteAsset } from '@plug/common-services';
-import { usePoiIcon } from './utils/usePoiIcon';
+import { useAsset } from './utils/useAsset';
 import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import { useState } from 'react';
-import { PoiIcon } from './types/PoiIcon.types';
+import { Asset } from './types/asset.types';
 
-export default function PoiIconPage() {
+export default function AssetPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
     const { data, error, isLoading, mutate } = useAssetsSWR();
-    const [ selectedAssets, setSelectedAssets ] = useState<Set<PoiIcon>>(new Set());
+    const [ selectedAssets, setSelectedAssets ] = useState<Set<Asset>>(new Set());
     const [ selectedAssetId, setSelectedAssetId ] = useState<number>();
     
     const handleDelete = async (assetId: number) => {
@@ -23,7 +23,7 @@ export default function PoiIconPage() {
         openModal('edit');
     };   
 
-    const poiIconData = usePoiIcon(data || [], handleDelete, handleEdit);
+    const AssetData = useAsset(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = async () => {
         if(selectedAssets.size === 0){
@@ -43,11 +43,7 @@ export default function PoiIconPage() {
     };
     return (
         <>
-            <div className='flex items-center flex-wrap gap-1'>    
-                <div className='flex items-center'>
-                    <Input.Text className='w-60' placeholder='아이콘명을 입력하세요.'/>
-                    <Button color='primary' className='ml-1'>검색</Button>
-                </div>
+            <div className='flex'>    
                 <div className='ml-auto flex gap-1'>
                     <Button color='primary' onClick={() => (openModal('create'))}>등록</Button>
                     <Button color='destructive' onClick={handleDeleteSelected}>삭제</Button>
@@ -56,14 +52,15 @@ export default function PoiIconPage() {
             <div className='mt-4'>
                 {error && <StateInfoWrapper preset="defaultError" />}
                 {isLoading && <Skeleton className="w-full h-100"/>}
-                {!isLoading && !error && poiIconData && (
+                {!isLoading && !error && AssetData && (
                     <DataTable
-                        data={poiIconData || []}
+                        data={AssetData || []}
                         columns={columns}
                         pageSize={7}
                         selectable={true}
                         selectedRows={selectedAssets}
                         onSelectChange={setSelectedAssets}
+                        showSearch={true}
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (
@@ -73,7 +70,7 @@ export default function PoiIconPage() {
                     />
                 )} 
             </div>
-            <PoiIconRegistModal
+            <AssetRegistModal
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}

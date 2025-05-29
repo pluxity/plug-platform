@@ -1,14 +1,14 @@
 import { Button, DataTable, Skeleton } from '@plug/ui';
-import { columns } from './constants/userListColumns';
-import { UserListModal } from './components/UserListModal';
+import { columns } from './constants/userColumns';
+import { UserModal } from './components/UserModal';
 import { UserPasswordModal } from './components/UserPasswordModal';
 import { UserRoleModal } from './components/UserRoleModal';
 import { useModal } from '../../components/hook/useModal';
 import { useUsersSWR, deleteUser, useUserLoggedIn } from "@plug/common-services";
-import { useUserList } from './utils/useUserList';
+import { useUser } from './utils/useUser';
 import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import { useState, useEffect, useCallback } from 'react';
-import { User } from './types/UserList.types';
+import { User } from './types/user.types';
 
 export default function UserListPage() {
     const { isOpen, mode, openModal, closeModal } = useModal();
@@ -72,7 +72,7 @@ export default function UserListPage() {
       }, []);
       
     
-    const userData = useUserList(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
+    const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
 
     const handleDeleteSelected = async() => {
         if(selectState.size === 0){
@@ -122,7 +122,7 @@ export default function UserListPage() {
                     />
                 )}
             </div>
-            <UserListModal 
+            <UserModal 
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}
