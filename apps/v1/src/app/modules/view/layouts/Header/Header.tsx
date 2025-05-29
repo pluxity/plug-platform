@@ -9,7 +9,7 @@ const Header = () => {
     const parsedStationId = stationId ? stationId : '1'; // 기본값 1
 
     return (
-        <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-primary-400/20 text-white z-10">
+        <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-primary-400/20 backdrop-blur-xs text-white z-10">
             <div className="flex items-center gap-2">
                 <img
                     src="/assets/logo.png"

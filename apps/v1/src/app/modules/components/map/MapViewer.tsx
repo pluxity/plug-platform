@@ -33,7 +33,6 @@ const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) =>
     useEffect(() => {
         if (engineRef.current && modelPath && !isModelLoadedRef.current) {
             try {
-                console.log('3D 모델 로드 시작:', modelPath);
                 Px.Loader.LoadGltf(modelPath, () => {
                     isModelLoadedRef.current = true;
 

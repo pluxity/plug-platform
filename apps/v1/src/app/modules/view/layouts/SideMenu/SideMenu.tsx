@@ -56,7 +56,7 @@ const SideMenu: React.FC = () => {
 
   return (
     <>
-      <div className={`fixed left-0 top-16 bottom-0 w-16 bg-primary-400/20 flex flex-col items-center pt-4 px-2 z-10 shadow-lg`}>
+      <div className={`fixed left-0 top-16 bottom-0 w-16 bg-primary-400/20 backdrop-blur-xs flex flex-col items-center pt-4 px-2 z-10`}>
         <div className="overflow-y-auto flex-1 mt-2">        
           {menuItems.map((item) => (
             <MenuItem
