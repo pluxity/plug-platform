@@ -132,8 +132,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
                     <button onClick={() => Path3D.Cancel()}>Cancel</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
-                    <button>Undo</button>
-                    <button>Redo</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Util') {

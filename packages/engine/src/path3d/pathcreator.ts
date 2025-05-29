@@ -364,24 +364,8 @@ function Finish() {
     return currentPath.ExportData;
 }
 
-/**
- * 경로 생성 작업 되돌리기
- */
-function Undo() {
-
-}
-
-/**
- * 경로 생성 작업 다시실행
- */
-function Redo() {
-
-}
-
 export {
     CreatePath,
     Cancel,
     Finish,
-    Undo,
-    Redo,
 }
