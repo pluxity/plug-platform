@@ -129,6 +129,7 @@ export default function StationDetail() {
                           value={formValues.id}
                           onChange={(value) => handleChange('id', value)}
                           className="w-full"
+                          disabled
                       />
                     </div>
                   </FormItem>
@@ -204,7 +205,6 @@ export default function StationDetail() {
                           value={formValues.externalCode}
                           onChange={(e) => handleChange('code', e)}
                           className="w-full"
-                          disabled
                       />
                     </div>
                   </FormItem>
