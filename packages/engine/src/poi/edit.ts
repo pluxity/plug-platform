@@ -9,6 +9,7 @@ import { PoiElement } from './element';
 
 let engine: Engine3D;
 let target: PoiElement;
+const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 let gizmo: Addon.TransformControls;
 let previewObject: THREE.Object3D;
@@ -19,6 +20,78 @@ let previewObject: THREE.Object3D;
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
 });
+
+/**
+ * 전체 poi 목록에서 마우스 레이캐스트를 위한 객체 수집
+ * @returns - 레이캐스트 객체
+ */
+function collectPickableObjects() {
+    const hasInstanceMeshRefPoiList = Object.values(PoiData.PoiDataList).filter(poi => poi.PointMeshData.instanceMeshRef !== undefined);
+    const hasAnimMeshRefPoiList = Object.values(PoiData.PoiDataList).filter(poi => poi.PointMeshData.animMeshRef !== undefined);
+
+    let resultInstanceMeshList = hasInstanceMeshRefPoiList.map(poi => poi.PointMeshData.instanceMeshRef);
+    let resultAnimMeshList = hasAnimMeshRefPoiList.map(poi => poi.PointMeshData.animMeshRef);
+
+    resultInstanceMeshList = [...new Set(resultInstanceMeshList)];
+    resultAnimMeshList = [...new Set(resultAnimMeshList)];
+
+    return {
+        instanceMeshArray: resultInstanceMeshList,
+        animMeshArray: resultAnimMeshList,
+    }
+}
+
+/**
+ * 포인터 다운 이벤트 처리
+ * @param event - 포인터 다운 이벤트 정보
+ */
+function onPointerDown(evt: MouseEvent) {
+
+    if (evt.button === 0) {
+        mouseDownPos.x = evt.offsetX;
+        mouseDownPos.y = evt.offsetY;
+    }
+}
+
+/**
+ * 포인터 업 이벤트 처리
+ * @param event - 포인터 업 이벤트 정보
+ */
+function onPointerUp(evt: MouseEvent) {
+
+    if (evt.button === 0) {
+        const currMousePos: THREE.Vector2 = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        if (currMousePos.distanceTo(mouseDownPos) < 5.0) {
+
+            const mousePos = new THREE.Vector2(
+                (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
+                -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+            );
+
+            const rayCast = new THREE.Raycaster();
+            rayCast.layers.set(Interfaces.CustomLayer.Pickable);
+            rayCast.setFromCamera(mousePos, engine.Camera);
+
+            const pickObjects = collectPickableObjects();
+        }
+    }
+}
+
+/**
+ * 포인터 이벤트 등록
+ */
+function registerPointerEvents() {
+    engine.Dom.addEventListener('pointerdown', onPointerDown);
+    engine.Dom.addEventListener('pointerup', onPointerUp);
+}
+
+/**
+ * 포인터 이벤트 등록 해제
+ */
+function unregisterPointerEvents() {
+    engine.Dom.removeEventListener('pointerdown', onPointerDown);
+    engine.Dom.removeEventListener('pointerup', onPointerUp);
+}
 
 /**
  * 미리보기 객체 메모리 해제
