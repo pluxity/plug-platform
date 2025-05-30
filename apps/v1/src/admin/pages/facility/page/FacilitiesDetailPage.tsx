@@ -5,6 +5,7 @@ import type { StationDetail } from '../types/facility';
 import { fetchStationDetail, patchStation } from '../api/station';
 import { useLinesSWR } from '@plug/common-services';
 import { FileUploadField } from "@plug/v1/admin/pages/facility/component/FileUploadField";
+import DateFormatter from "@plug/v1/app/utils/dateFormatter";
 
 type FormValues = {
   name: string;
@@ -47,7 +48,7 @@ export default function StationDetail() {
           lineIds: response.data.lineIds.map(String),
           updatedBy: response.data.facility.updatedBy,
           id: response.data.facility.id.toString(),
-          updatedAt: new Date(response.data.facility.updatedAt).toLocaleString(),
+          updatedAt: DateFormatter(response.data.facility.updatedAt),
           floors: response.data.floors.map((floor) => ({name: floor.name, floorId: String(floor.floorId)})),
           externalCode: response.data.externalCode || '',
         });
@@ -232,6 +233,7 @@ export default function StationDetail() {
                           value={formValues.updatedAt}
                           onChange={(e) => handleChange('updatedAt', e)}
                           className="w-full"
+                          disabled
                       />
                     </div>
                   </FormItem>
@@ -244,6 +246,7 @@ export default function StationDetail() {
                           value={formValues.updatedBy}
                           onChange={(e) => handleChange('updatedBy', e)}
                           className="w-full"
+                          disabled
                       />
                     </div>
                   </FormItem>
@@ -299,6 +302,9 @@ export default function StationDetail() {
             <div className="flex justify-center gap-2 mt-6">
               <Button type="submit" color="primary" disabled={isLoading} isLoading={isLoading}>
                 저장
+              </Button>
+              <Button type="button" color="destructive" disabled={isLoading} isLoading={isLoading}>
+                삭제
               </Button>
             </div>
 

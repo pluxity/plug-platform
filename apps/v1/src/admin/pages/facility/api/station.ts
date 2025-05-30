@@ -40,3 +40,7 @@ export const createStation = (data: {
 }): Promise<Response> => {
     return api.post(STATIONS_ENDPOINT, data);
 };
+
+export const deleteStation = (id: number) => {
+    return api.delete(`${STATIONS_ENDPOINT}/${id}`);
+};
