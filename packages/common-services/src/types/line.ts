@@ -3,12 +3,10 @@ export interface LineResponse{
     color: string,
     name: string,
     stationIds: number[];
-    baseResponse:{
-        createdAt: string,
-        createdBy: string,
-        updatedAt: string,
-        updatedBy: string
-    }
+    createdAt: string,
+    createdBy: string,
+    updatedAt: string,
+    updatedBy: string
 }
 
 export interface LineCreateRequest{

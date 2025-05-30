@@ -25,17 +25,21 @@ export default function AssetPage() {
 
     const AssetData = useAsset(data || [], handleDelete, handleEdit);
 
-    const handleDeleteSelected = () => {
+    const handleDeleteSelected = async () => {
         if(selectedAssets.size === 0){
             return alert('삭제할 항목을 선택해주세요.');
         }
-        Promise.all(
-            Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)))
-        )
-        .then(() => {
+        try{
+            await Promise.all(
+                Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)))
+            )
+
             alert(`${selectedAssets.size} 개의 항목이 삭제 되었습니다.`);
             setSelectedAssets(new Set());
-        });
+
+        } catch (error){
+            console.error('삭제 중 오류가 발생했습니다.', error);
+        }
     };
     return (
         <>
@@ -52,7 +56,7 @@ export default function AssetPage() {
                     <DataTable
                         data={AssetData || []}
                         columns={columns}
-                        pageSize={10}
+                        pageSize={7}
                         selectable={true}
                         selectedRows={selectedAssets}
                         onSelectChange={setSelectedAssets}

@@ -14,12 +14,12 @@ export const useRoleDetail = (roleId: number) => {
   return useGet<RoleResponse>(`${ROLE_API}/${roleId}`, { requireAuth: true });
 };
 
-// 역할 생성 조회
+// 역할 생성 
 export const useCreateRole = () => {
   return usePost<CreatedResponseBody, RoleCreateRequest>(ROLE_API, { requireAuth: true });
 };
 
-// 역할 생성
+// 역할 수정
 export const useUpdateRole = (roleId: number) => {
   return usePut<BaseResponseBody, RoleUpdateRequest>(`${ROLE_API}/${roleId}`, { requireAuth: true });
 };

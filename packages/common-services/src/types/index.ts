@@ -6,4 +6,5 @@ export * from './asset';
 export * from './file';
 export * from './line';
 export * from './station';
-
+export * from './device';
+export * from './device_category';
