@@ -4,22 +4,29 @@ export interface UserCreateRequest {
     username: string;
     password: string;
     name: string;
-    code: string;
-    role?: string[];
+    code?: string;
+    phoneNumber: string;
+    department: string;
+    roleIds?: number[];
 }
 
 export interface UserUpdateRequest {
     username: string;
     name: string;
-    code: string;
-    roles: Set<RoleResponse>;
+    code?: string;
+    phoneNumber: string;
+    department: string;
+    roleIds?: number[];
 }
 
 export interface UserResponse {
     id: number;
     username: string;
     name: string;
-    code: string;
+    code?: string;
+    phoneNumber: string;
+    department: string;
+    roles: RoleResponse[];
 }
 
 export interface UserUpdatePasswordRequest {

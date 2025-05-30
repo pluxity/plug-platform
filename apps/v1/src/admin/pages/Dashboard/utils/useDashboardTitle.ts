@@ -1,5 +1,5 @@
+import { DASHBOARD_TITLES } from '../constants/DashboardTitle';
 import { useLocation } from "react-router-dom";
-import {DASHBOARD_TITLES} from "@plug/v1/admin/pages/Dashboard/constants/DashboardTitle";
 
 export interface DashboardTitle{
     path: string;
