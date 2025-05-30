@@ -13,6 +13,7 @@ let previewLine: THREE.LineSegments;
 let previewPointMesh: THREE.Object3D;
 let completeCallback: Function | undefined = undefined;
 let currentPicktarget: THREE.Object3D | undefined;
+let bPlacerEnabled: boolean = false;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
@@ -69,12 +70,16 @@ function registerPointerEvents() {
     engine.Dom.addEventListener('pointerdown', onPointerDown);
     engine.Dom.addEventListener('pointermove', onPointerMove);
     engine.Dom.addEventListener('pointerup', onPointerUp);
+
+    bPlacerEnabled = true;
 }
 
 /**
  * 포인터 이벤트 등록 해제
  */
 function unRegisterPointerEvents() {
+    bPlacerEnabled = false;
+
     engine.Dom.removeEventListener('pointerdown', onPointerDown);
     engine.Dom.removeEventListener('pointermove', onPointerMove);
     engine.Dom.removeEventListener('pointerup', onPointerUp);
@@ -223,4 +228,8 @@ function releasePreviewPointMesh() {
             }
         }
     });
+}
+
+export {
+    bPlacerEnabled as Enabled
 }

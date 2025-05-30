@@ -26,7 +26,8 @@ export const AdminRouter: RouteObject[] = [
                     { path: ADMIN_ROUTE.DEVICE_CATEGORY, element: <DeviceCategory /> },
                 ]
             },
-            { path: ADMIN_ROUTE.VIEWER, element: <Viewer /> }, 
+            { path: ADMIN_ROUTE.VIEWER, element: <Viewer /> },
+            { path: `${ADMIN_ROUTE.VIEWER}/:stationId`, element: <Viewer /> }, 
         ],
     }
 ];

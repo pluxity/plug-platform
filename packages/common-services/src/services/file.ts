@@ -1,18 +1,12 @@
 import { useFileApi } from '@plug/api-hooks';
 import type { RequestOptions } from '@plug/api-hooks';
+import type { FileUploadResponse } from '@plug/common-services/types';
 
 const FILE_API = `files`;
 
 /**
  * 파일 업로드 응답 타입 (Location 헤더 기반)
  */
-export interface FileUploadResponse {
-  fileId?: number;
-  location?: string;
-  fileName?: string;
-  success?: boolean;
-  status?: number;
-}
 
 /**
  * 파일 업로드 전용 API 훅

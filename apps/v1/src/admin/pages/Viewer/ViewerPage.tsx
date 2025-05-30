@@ -1,69 +1,163 @@
-import { Button, Sidebar, Tab } from '@plug/ui';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { ViewerTabContent } from './components/ViewerTabContent';
-import { LodSetModal } from './modals/LodSet';
-import { useState } from 'react';
+import { api } from "@plug/api-hooks";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import type { StationWithFeatures, FeatureResponse } from "./types";
+
+import { AssetList, MapViewer } from "./components";
+import * as Px from '@plug/engine/src';
+import { Select } from "@plug/ui";
+import { useStationStore } from './store/stationStore'; 
+import { useAssetStore } from './store/assetStore';
+
+interface ModelInfo {
+    objectName: string;
+    displayName: string;
+    sortingOrder: number;
+    floorId: string;
+}
 
 const Viewer = () => {
-    {/* Tab Trigger 동작 */}
-    const navigate = useNavigate();
-    const [currentTab, setCurrentTab] = useState('poi');
+    const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
+    const { currentStationId, setStationId } = useStationStore(); 
 
-    const handleTabChange = (value: string) => {
-        setCurrentTab(value);
-        navigate(`/admin/viewer/${value}`);
-    };
+    const [stationData, setStationData] = useState<StationWithFeatures | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [hierachies, setHierachies] = useState<ModelInfo[] | null>(null);
+    const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
 
-    {/* Lod 설정 모달 show/hide */}
-    const [isLodSetOpen, setIsLodSetOpen] = useState(false);
+    useEffect(() => {
+        const idToSet = stationIdFromParams || '2'; 
+        setStationId(idToSet);
+    }, [stationIdFromParams, setStationId]);
 
-    const handleOpenLodSet = () => {setIsLodSetOpen(true);};
-    const handleCloseLodSet = () => {setIsLodSetOpen(false);};
+    useEffect(() => {
+        const fetchStation = async () => {
+            if (!currentStationId) {
+                setIsLoading(false);
+                return;
+            }
+            
+            setIsLoading(true);
+            try {
+                const response = await api.get<StationWithFeatures>(`stations/${currentStationId}/with-features`);
+                setStationData(response.data);
+            } catch (err) {
+                console.error('Error fetching station data:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (currentStationId) {
+            fetchStation();
+        } else {
+            setIsLoading(false);
+        }
+
+    }, [currentStationId]); 
+
+    const modelPath: string = stationData?.facility?.drawing?.url || '';
+
+    const handleFloorChange = useCallback((floorId: string) => {
+        setSelectedFloor(floorId);
+        Px.Model.HideAll();
+        Px.Model.Show(floorId);
+    }, []);
+
+    const handleFeatureData = useCallback(() => {
+        // 스토어에서 최신 assets 값을 직접 가져오기
+        const currentAssets = useAssetStore.getState().assets;
+        
+        if (stationData?.features && currentAssets.length > 0) {
+            const poiData = stationData.features.map((feature: FeatureResponse) => {
+                const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
+                return {
+                    id: feature.id, 
+                    iconUrl: '', 
+                    modelUrl: modelUrl,
+                    displayText: feature.deviceCode || '배치 안됨',
+                    floorId: feature.floorId,
+                    property: {
+                        code: feature.deviceCode || '',
+                    },
+                    position: feature.position,
+                    rotation: feature.rotation,
+                    scale: feature.scale
+                };
+            });
+
+            Px.Poi.Import(JSON.stringify(poiData));
+
+            // Px.Event.AddEventListener('onPoiPointerUp', (event: any) => {
+            //     console.log(event);
+            // });
+        }
+    }, [stationData]);
+
+    const handleModelLoaded = useCallback(async () => {
+        const modelHierarchy = Px.Model.GetModelHierarchy();
+        console.log(':', modelHierarchy);
+        if (modelHierarchy) { 
+            setHierachies(modelHierarchy as ModelInfo[]);
+        } else {
+            setHierachies(null);
+        }
+
+        handleFeatureData();
+        handleFloorChange("0");
+
+    }, [setHierachies, handleFeatureData, handleFloorChange]);
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-pulse text-gray-500">역사 데이터 로딩 중...</div>
+            </div>
+        );
+    }
+
+    if (!currentStationId && !isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-gray-500">Station ID를 찾을 수 없습니다.</div>
+            </div>
+        );
+    }
 
     return (
         <>
-            <div className='h-screen flex flex-col overflow-hidden'>
-                <header className='h-12 flex items-center py-2 px-3 bg-blue-400'>
-                    <h1>Dashboard Image Area</h1>
-                    <div className='flex items-center ml-auto gap-4 text-white'>
-                        <span className="whitespace-nowrap">Admin 접속 중</span>
-                        <Button>로그아웃</Button>
-                    </div>
-                </header>
-                <div className='flex flex-1 overflow-hidden'>
-                    <Sidebar className='h-full w-100'>
-                        <div className='flex-1 flex flex-col relative'>
-                            <Tab value={currentTab} onValueChange={handleTabChange}>
-                                <Tab.List color='primary' className="text-sm whitespace-nowrap">
-                                    <Tab.Trigger value="poi" className="bg-gray-100 rounded-sm">POI</Tab.Trigger>
-                                    <Tab.Trigger value="text3d" className="bg-gray-100 rounded-sm">TEXT 3D</Tab.Trigger>
-                                    <Tab.Trigger value="topology" className="bg-gray-100 rounded-sm">TOPOLOGY</Tab.Trigger>
-                                </Tab.List>
-                                <ViewerTabContent title="poi" />
-                                <ViewerTabContent title="text3d" />
-                                <ViewerTabContent title="topology" />
-                            </Tab>
-                        </div>
-                        <Sidebar.Footer className="rounded-sm bg-gray-100 flex gap-2">
-                            <Button color='primary'> POI 등록 </Button>
-                            <Button color='secondary'> POI 일괄등록 </Button>
-                            <Button className='bg-gray-400 text-white' onClick={(handleOpenLodSet)}> LOD 설정 </Button>
-                        </Sidebar.Footer>
-                    </Sidebar>
-                    <div className='flex-1 flex flex-col'>
-                        <main className='flex-1 overflow-auto'>
-                            <Outlet />
-                        </main>
-                        <footer className='py-2 px-1 border-t border-gray-200 text-xs text-center'>
-                            <p>Copyright © 2025 PLUXITY.co.,Ltd. All rights reserved.</p>
-                        </footer>
-                    </div>
+            <aside className="bg-white w-1/3 overflow-y-auto">
+                <AssetList /> {/* AssetList에서 useStationStore를 통해 currentStationId 접근 가능 */}
+            </aside>
+            <main className="w-full">
+                <div className="flex absolute text-white pl-4 pt-2 items-center"> 
+                  <h2 className="text-xl font-bold">
+                      {stationData?.facility?.name}
+                  </h2>
+                  { hierachies && 
+                        <Select 
+                            className="text-sm text-gray-300 ml-2 w-96" 
+                            selected={selectedFloor ? [selectedFloor] : []}
+                            onChange={values => handleFloorChange(values[0])}
+                            >
+                            <Select.Trigger/>
+                            <Select.Content>
+                              {hierachies.sort((a, b) => Number(b.floorId) - Number(a.floorId)).map(floor => (
+                                  <Select.Item key={floor.floorId} value={floor.floorId}>
+                                      {floor.displayName}
+                                  </Select.Item>
+                              ))}
+                            </Select.Content>
+                        </Select>
+                    }
                 </div>
-            </div>
-            <LodSetModal 
-                isOpen={isLodSetOpen}
-                onClose={handleCloseLodSet}
-            />
+                {stationData && currentStationId && ( // currentStationId도 확인하여 렌더링
+                    <MapViewer 
+                        modelPath={modelPath}
+                        onModelLoaded={handleModelLoaded}
+                    />
+                )}
+            </main>
         </>
     );
 };
