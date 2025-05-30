@@ -41,9 +41,9 @@ interface PoiImportOption {
     displayText: string; // 표시명 텍스트
     floorId: string; // poi가 배치된 층 id값
     property: { [key: string]: any }; // 속성
-    position: Vector3Custom; // 위치 x,y,z
-    rotation: EulerCustom; // 회전 x,y,z
-    scale: Vector3Custom; // 스케일 x,y,z
+    position: Vector3; // 위치 x,y,z
+    rotation: Vector3; // 회전 x,y,z
+    scale: Vector3; // 스케일 x,y,z
 }
 // 사용 예시
 Px.Poi.Import({
@@ -73,4 +73,16 @@ Px.Poi.Import({
         "z": 1
     }
 });
+```
+
+## Vector3
+```javascript
+/**
+ * 임포트용 벡터3 인터페이스
+ */
+interface Vector3 {
+    x: number;
+    y: number;
+    z: number;
+}
 ```
