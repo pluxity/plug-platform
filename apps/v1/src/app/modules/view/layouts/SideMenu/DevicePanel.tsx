@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '@plug/api-hooks/core';
-// import useStationStore from '@plug/v1/app/stores/stationStore';
+import useStationStore from '@plug/v1/app/stores/stationStore';
 
 
 interface Device {
@@ -17,7 +17,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, onClose }) => {
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  // const { stationId } = useStationStore(); 
+  const { stationId } = useStationStore(); 
 
   useEffect(() => {
     if (!categoryId) {
@@ -29,7 +29,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, onClose }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get<Device[]>(`device-categories/${categoryId}/devices`);
+        const response = await api.get<Device[]>(`devices/station/${stationId}/grouped`);
         setDevices(response.data || []);
       } catch (err) {
         console.error('Error fetching devices:', err);

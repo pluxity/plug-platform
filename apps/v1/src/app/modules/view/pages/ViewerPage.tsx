@@ -4,15 +4,13 @@ import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layout
 import { MapViewer } from '@plug/v1/app/modules/components/map';
 import { api } from '@plug/api-hooks/core';
 import type { StationData } from '@plug/common-services/types';
-import useStationStore from '@plug/v1/app/stores/stationStore'; // Corrected import
-import type { StationState } from '@plug/v1/app/stores/stationStore'; // Import StationState for typing
+import useStationStore from '@plug/v1/app/stores/stationStore';
 
 const ViewerPage = () => {
     const { stationId } = useParams<{ stationId: string }>();
     const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
-    const setStationId = useStationStore((state: StationState) => state.setStationId);
+    const { setStationId } = useStationStore();
     
-    // 상태 관리를 위한 useState
     const [stationData, setStationData] = useState<StationData | null>(null);
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
@@ -22,11 +20,10 @@ const ViewerPage = () => {
     }, [parsedStationId, setStationId]);
 
     useEffect(() => {
-        // 비동기 함수 정의
         const fetchStationData = async () => {
             try {
                 setStationLoading(true);
-                const response = await api.get<StationData>(`stations/${parsedStationId}`);
+                const response = await api.get<StationData>(`stations/${parsedStationId}/with-features`);
                 setStationData(response.data);
                 setError(null);
             } catch (err) {
@@ -36,23 +33,10 @@ const ViewerPage = () => {
             }
         };
         
-        // 유효한 ID인 경우에만 API 호출
         if (!isNaN(parsedStationId) && parsedStationId > 0) {
             fetchStationData();
         }
-    }, [parsedStationId]); // parsedStationId가 변경될 때만 다시 실행
-
-    const isInvalidStationId = isNaN(parsedStationId) || parsedStationId <= 0;
-    
-    if (isInvalidStationId) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="text-red-500 text-xl">
-                    유효하지 않은 스테이션 ID입니다: {stationId}
-                </div>
-            </div>
-        );
-    }
+    }, [parsedStationId]);
 
     if (error && !stationLoading) {
         return (
@@ -89,7 +73,8 @@ const ViewerPage = () => {
                 <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
                     <div className="text-white text-xl">
                         스테이션 {parsedStationId} 정보 로딩 중...
-                    </div>                </div>
+                    </div>                
+                </div>
             )}
             <Header />
             <SideMenu />
