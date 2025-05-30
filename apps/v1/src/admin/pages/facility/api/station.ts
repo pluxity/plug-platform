@@ -12,6 +12,10 @@ export const fetchStationDetail = (id: number) => {
     return api.get<StationDetail>(`stations/${id}`);
 }
 
+export const patchStation = (id: number) => {
+    return api.patch(`stations/${id}`);
+}
+
 export const createStation = (data: {
     facility: {
         code: string;
@@ -21,7 +25,7 @@ export const createStation = (data: {
         thumbnailFileId: number | null
     };
     floors: { floorId: number; name: string }[];
-    lineId: number;
+    lineIds: number[];
     route: string;
     externalCode: string;
 }): Promise<Response> => {

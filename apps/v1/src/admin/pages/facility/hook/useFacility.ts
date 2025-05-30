@@ -50,10 +50,14 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
             const floors = values.floors.map((item) => {
                 const parsed = JSON.parse(item);
                 return {
-                    floorId: Number(parsed.floorId),
+                    floorId: parsed.floorId,
                     name: parsed.name
                 }
             });
+
+            const lineIds = Array.isArray(values.linesId)
+                ? values.linesId.map(Number)
+                : [Number(values.linesId)];
 
             const result = await createStation({
                 facility: {
@@ -64,7 +68,7 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
                     thumbnailFileId: files.thumbnail.fileId
                 },
                 floors: floors,
-                lineId: Number(values.lineId),
+                lineIds: lineIds,
                 route: '',
                 externalCode: values.externalCode
             });

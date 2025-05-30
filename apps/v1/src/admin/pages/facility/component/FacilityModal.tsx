@@ -77,7 +77,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
 
                                     const val = JSON.stringify({
                                         "name": item.displayName,
-                                        "floorId": Number(item.floorId)
+                                        "floorId": item.floorId
                                     })
 
                                     return (<Select.Item key={item.floorId} value={val}>
@@ -91,9 +91,9 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                     </FormItem>
 
 
-                    <FormItem name="lineId" label="해당호선" required>
-                        <Select type={"multiple"}>
-                            <Select.Trigger />
+                    <FormItem name="linesId" label="해당호선" required>
+                        <Select type="multiple" defaultValue={[]}>
+                            <Select.Trigger/>
                             <Select.Content>
                                 {lines?.map((line) => (
                                     <Select.Item key={line.id} value={String(line.id)}>
