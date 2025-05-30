@@ -9,6 +9,6 @@ export interface DashboardTitle{
 export const DashboardTitle = () => {
     const location = useLocation();
     return DASHBOARD_TITLES.find(
-        (item) => item.path.toLowerCase() === location.pathname.toLowerCase()
+        (item) => location.pathname.toLowerCase().includes(item.path.toLowerCase())
     )?.title;
 };
