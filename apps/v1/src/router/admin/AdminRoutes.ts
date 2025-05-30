@@ -2,6 +2,7 @@ export enum ADMIN_ROUTE {
     LAYOUT = 'admin',
 
     DASHBOARD = 'dashboard',
+
     USER = 'user/management',
     ASSET = 'asset/management',
     LINE = 'line/management',
@@ -9,4 +10,7 @@ export enum ADMIN_ROUTE {
     FACILITIES_DETAIL= 'facility/:id',
 
     VIEWER = 'viewer',
+
+    DEVICE = 'device/management',
+    DEVICE_CATEGORY = 'device/category'
 }

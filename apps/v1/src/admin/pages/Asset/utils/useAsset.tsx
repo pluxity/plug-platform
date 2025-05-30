@@ -13,7 +13,7 @@ export const useAsset = (
     name: asset.name,
     file: asset.file?.originalFileName,
     thumbnailFile: asset.thumbnailFile?.originalFileName,
-    code: asset.createdBy,
+    creator: asset.createdBy,
     update: DateFormatter(asset.createdAt),
     management: (
       <div className="flex flex-wrap gap-1">

@@ -38,7 +38,7 @@ export default function AssetPage() {
             setSelectedAssets(new Set());
 
         } catch (error){
-            console.log('삭제 중 오류가 발생했습니다.', error);
+            console.error('삭제 중 오류가 발생했습니다.', error);
         }
     };
     return (

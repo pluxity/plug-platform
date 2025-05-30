@@ -17,8 +17,8 @@ export const useLine = (
         style={{ backgroundColor:line.color }}
       />
     ),
-    code: line.baseResponse.createdBy,
-    update: DateFormatter(line.baseResponse.createdAt),
+    creator: line.createdBy,
+    update: DateFormatter(line.createdAt),
     management: (
       <div className="flex flex-wrap gap-1">
         <Button color="primary" className="w-15" onClick={() => onEdit(line.id)}>수정</Button>

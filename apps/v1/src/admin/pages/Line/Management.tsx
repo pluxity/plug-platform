@@ -53,7 +53,7 @@ export default function LinePage() {
                     <DataTable
                         data={lineData || []}
                         columns={columns}
-                        pageSize={10}
+                        pageSize={7}
                         selectable={true}
                         selectedRows={selectedLines}
                         onSelectChange={setSelectedLines}

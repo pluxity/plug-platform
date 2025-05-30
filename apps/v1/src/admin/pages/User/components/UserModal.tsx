@@ -94,87 +94,83 @@ export const UserModal = ({ isOpen, onClose, onSuccess, mode, selectedUserId }: 
             closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
-            <div className="p-4">
+            <Form 
+                key={mode + (detailUserData?.id ?? '')}
+                initialValues={
+                    mode === 'edit' && detailUserData ? {
+                        username: detailUserData.username,
+                        name: detailUserData.name,
+                        phoneNumber: detailUserData.phoneNumber,
+                        department: detailUserData.department,
+                    } : {
+                        username: '',
+                        name: '',
+                        phoneNumber: '',
+                        department: '',
+                    }
+                }
+                onSubmit={handleFinish}
+            >
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
                         {error.message}
                     </div>
                 )}
+                <FormItem name="username" label='아이디' required>
+                    <Input.Text 
+                        placeholder="아이디를 입력하세요."
+                        value={id}
+                        onChange={value => setId(value)}
+                    />
+                </FormItem>
+                
+                <FormItem name="name" label='이름' required>
+                    <Input.Text 
+                        placeholder="이름을 입력하세요." 
+                        value={name}
+                        onChange={value => setName(value)}
+                    />
+                </FormItem>
 
-                <Form 
-                    key={mode + (detailUserData?.id ?? '')}
-                    initialValues={
-                        mode === 'edit' && detailUserData ? {
-                            username: detailUserData.username,
-                            name: detailUserData.name,
-                            phoneNumber: detailUserData.phoneNumber,
-                            department: detailUserData.department,
-                        } : {
-                            username: '',
-                            name: '',
-                            phoneNumber: '',
-                            department: '',
-                        }
-                    }
-                    onSubmit={handleFinish}
-                >
-
-                    <FormItem name="username" label='아이디' required>
-                        <Input.Text 
-                            placeholder="아이디를 입력하세요."
-                            value={id}
-                            onChange={value => setId(value)}
+                {mode === 'create' ? 
+                    <FormItem name="password" label='비밀번호' required>
+                        <Input.Password
+                            placeholder="비밀번호를 입력하세요." 
+                            value={password}
+                            onChange={value => setPassword(value)}
                         />
-                    </FormItem>
+                    </FormItem> : ''
+                }
+
+                <FormItem name="phoneNumber" label='연락처' required>
+                    <Input
+                        type="tel"
+                        placeholder="000-0000-0000 형식으로 입력하세요." 
+                        value={phoneNumber}
+                        onChange={value => setPhoneNumber(value)}
+                    />
+                </FormItem>
+
+                <FormItem name="department" label='부서' required>
+                    <Input.Text 
+                        placeholder="부서를 입력하세요." 
+                        value={department}
+                        onChange={value => {setDepartment(value);}} 
                     
-                    <FormItem name="name" label='이름' required>
-                        <Input.Text 
-                            placeholder="이름을 입력하세요." 
-                            value={name}
-                            onChange={value => setName(value)}
-                        />
-                    </FormItem>
-
-                    {mode === 'create' ? 
-                        <FormItem name="password" label='비밀번호' required>
-                            <Input.Password
-                                placeholder="비밀번호를 입력하세요." 
-                                value={password}
-                                onChange={value => setPassword(value)}
-                            />
-                        </FormItem> : ''
-                    }
-
-                    <FormItem name="phoneNumber" label='연락처' required>
-                        <Input
-                            type="tel"
-                            placeholder="000-0000-0000 형식으로 입력하세요." 
-                            value={phoneNumber}
-                            onChange={value => setPhoneNumber(value)}
-                        />
-                    </FormItem>
-
-                    <FormItem name="department" label='부서' required>
-                        <Input.Text 
-                            placeholder="부서를 입력하세요." 
-                            value={department}
-                            onChange={value => {setDepartment(value);}} 
-                        
-                        />
-                    </FormItem>
-                    
-                    <div className="mt-6 flex justify-center gap-2">
-                        <Button type="button" onClick={resetForm} disabled={isProcessing}>취소</Button>
-                        <Button 
-                            type="submit" 
-                            color="primary" 
-                            isLoading={isCreating || isUserUpdating }
-                        >
-                            {mode === 'create' ? '등록' : '수정'}
-                        </Button>
-                    </div>
-                </Form>
-            </div>
+                    />
+                </FormItem>
+                
+                <div className="mt-6 flex justify-center gap-2">
+                    <Button type="button" onClick={resetForm} disabled={isProcessing}>취소</Button>
+                    <Button 
+                        type="submit" 
+                        color="primary" 
+                        isLoading={isCreating || isUserUpdating }
+                    >
+                        {mode === 'create' ? '등록' : '수정'}
+                    </Button>
+                </div>
+            </Form>
         </Modal>
     );
 } 

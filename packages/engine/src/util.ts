@@ -3,6 +3,7 @@ import * as Addon from 'three/addons';
 import * as PIXI from 'pixi.js';
 import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
+import * as ModelInternal from './model/model';
 import { Engine3D } from './engine';
 
 let pixiApp: PIXI.Application;
@@ -176,8 +177,50 @@ function setObjectLayer(target: THREE.Object3D, layer: Interfaces.CustomLayer) {
     });
 }
 
+/**
+ * 대상 객체로부터 부모객체를 탐색하여 층 객체를 찾는다.
+ * 찾지 못했을경우 가장 낮은 층이 반환됨
+ * @param target - 대상 객체
+ * @returns - 층 객체
+ */
+function getFloorObject(target?: THREE.Object3D): THREE.Object3D {
+
+    let result = ModelInternal.getLowestFloorObject();
+
+    if (!target)
+        return result;
+
+    target.traverseAncestors(parent => {
+        if (parent.userData.hasOwnProperty('type')) {
+            const parentType: string = parent.userData['type'];
+            if (parentType.toLowerCase() === 'floor') {
+                result = parent;
+            }
+        }
+    });
+
+    return result;
+
+}
+
+/**
+ * 색상이나 이미지로 배경 설정
+ * @param backgroundData - 배경색상 숫자일경우 0xff0000의 형식으로 판단하고, 문자열일 경우 이미지 주소로 판단하여 배경을 설정한다.
+ */
+function SetBackground(backgroundData: number | string) {
+
+    if( typeof(backgroundData) === 'number') {
+        engine.RootScene.background = new THREE.Color(backgroundData);
+    } else if (typeof (backgroundData) === 'string') {
+        engine.RootScene.background = new THREE.TextureLoader().load(backgroundData);
+    }
+}
+
 export {
     createTextMaterial,
     getMergedGeometry,
     setObjectLayer,
+    getFloorObject,
+
+    SetBackground,
 }
