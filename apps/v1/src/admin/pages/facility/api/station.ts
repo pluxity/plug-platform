@@ -18,7 +18,8 @@ export const createStation = (data: {
     };
     floors: { floorId: number; name: string }[];
     lineId: number;
-    route: string
+    route: string;
+    externalCode: string;
 }): Promise<Response> => {
     return api.post(STATIONS_ENDPOINT, data);
 };

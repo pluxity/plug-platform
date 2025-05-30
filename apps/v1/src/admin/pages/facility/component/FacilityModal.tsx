@@ -92,7 +92,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
 
 
                     <FormItem name="lineId" label="해당호선" required>
-                        <Select>
+                        <Select type={"multiple"}>
                             <Select.Trigger />
                             <Select.Content>
                                 {lines?.map((line) => (
@@ -102,6 +102,10 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                                 ))}
                             </Select.Content>
                         </Select>
+                    </FormItem>
+
+                    <FormItem name="externalCode" label="외부 코드" required>
+                        <Input.Text placeholder="외부 코드를 입력하세요" />
                     </FormItem>
 
                     <div className="mt-6 flex justify-center gap-2">

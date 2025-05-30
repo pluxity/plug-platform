@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { api } from '@plug/api-hooks';
 import * as Px from "@plug/engine/src";
 import { ModelInfo } from "@plug/engine/src/interfaces";
-import { FileResponse } from '@plug/common-services';
+import {FileResponse, FileUploadResponse} from '@plug/common-services';
 
 export const useFloorInfo = () => {
     const [modelData, setModelData] = useState<ModelInfo[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const getModelInfo = async (locationHeader: string) => {
+    const getModelInfo = async (locationHeader: FileUploadResponse | null) => {
         if (!locationHeader) throw new Error('업로드 응답에 Location이 없습니다.');
 
         setIsLoading(true);

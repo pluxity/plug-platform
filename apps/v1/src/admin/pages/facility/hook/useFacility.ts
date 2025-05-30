@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { createStation } from '../api/station';
 import { useFileUploader } from "@plug/v1/admin/pages/facility/hook/useFileUploader";
-import {useFloorInfo} from "@plug/v1/admin/pages/facility/hook/useFloorInfo";
 import {FileType} from "@plug/v1/admin/pages/facility/types/file";
 
 interface FacilityProps {
@@ -17,10 +16,11 @@ const MESSAGES = {
 export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [facilityName, setFacilityName] = useState('');
-    const { modelData, getModelInfo, resetModelData } = useFloorInfo();
 
     const {
         files,
+        modelData,
+        resetModelData,
         isUploading,
         fileError,
         handleFileUpload: originalHandleFileUpload,
@@ -32,9 +32,6 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
         fileType: FileType
     ) => {
         const result = await originalHandleFileUpload(event, fileType);
-        if (fileType === 'model' && result?.location) {
-            await getModelInfo(result.location);
-        }
         return result;
     };
 
@@ -50,15 +47,14 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
         setIsLoading(true);
         try {
 
-
-            console.log(values);
             const floors = values.floors.map((item) => {
                 const parsed = JSON.parse(item);
                 return {
                     floorId: Number(parsed.floorId),
-                    floorName: parsed.name
+                    name: parsed.name
                 }
             });
+
             const result = await createStation({
                 facility: {
                     name: values.name,
@@ -68,8 +64,9 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
                     thumbnailFileId: files.thumbnail.fileId
                 },
                 floors: floors,
-                lineId: Number(values.lineId[0]),
-                route: ''
+                lineId: Number(values.lineId),
+                route: '',
+                externalCode: values.externalCode
             });
 
             if (result) {
