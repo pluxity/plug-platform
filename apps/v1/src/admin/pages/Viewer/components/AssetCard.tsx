@@ -2,6 +2,7 @@ import { api } from '@plug/api-hooks';
 import { Card } from '@plug/ui';
 import type { Asset } from "../types";
 import { v4 as uuidv4 } from 'uuid';
+import { useStationStore } from '../store/stationStore';
 
 import * as Px from '@plug/engine/src';
 
@@ -15,6 +16,8 @@ interface PoiCreateOption {
 }
 
 const AssetCard = ({asset}: {asset: Asset;}) => {
+
+    const { currentStationId } = useStationStore();
 
     const handleClick = () => {
         console.log('Asset clicked:', asset);
@@ -33,6 +36,8 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
     const createPoiComplete = (poi: any) => {
         console.log('POI created:', poi);
         api.post('features', {
+            facilityId: currentStationId,
+            floorId: poi.floorId,
             id: poi.id,
             code: poi.id,
             assetId: asset.id,

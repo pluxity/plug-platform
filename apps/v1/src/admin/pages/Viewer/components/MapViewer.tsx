@@ -4,9 +4,8 @@ import * as Px from '@plug/engine/src';
 export interface MapViewerProps {
   modelPath: string;
   onModelLoaded?: () => void;
-  onLoadError?: (error: Error) => void;
 }
-const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) => {
+const MapViewer = ({ modelPath, onModelLoaded }: MapViewerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,21 +27,20 @@ const MapViewer = ({ modelPath, onModelLoaded, onLoadError }: MapViewerProps) =>
         };
     }, []);
 
+
     // 모델 로드
     useEffect(() => {
         if (engineRef.current && modelPath && !isModelLoadedRef.current) {
             try {
-                console.log('3D 모델 로드 시작:', modelPath);
                 Px.Loader.LoadGltf(modelPath, () => {
                     isModelLoadedRef.current = true;
                     onModelLoaded?.();
                 });
             } catch (error) {
                 console.error('3D 모델 로드 중 오류 발생:', error);
-                onLoadError?.(error as Error);
             }
         }
-    }, [modelPath, onModelLoaded, onLoadError]);
+    }, [modelPath, onModelLoaded]);
 
     return (
         <div className="engine w-full h-full inset-0 z-0">

@@ -12,13 +12,31 @@ export interface Facility {
   updatedBy: string;
 }
 
+interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+
+export interface FeatureResponse {
+  id: string;
+  assetId: number;
+  deviceCode: string | null;
+  floorId: string;
+  position: Vector3;
+  rotation: Vector3;
+  scale: Vector3;
+}
+
 export interface Floor {
   name: string;
   groupId: string;
 }
 
-export interface StationData {
+export interface StationWithFeatures {
   facility: Facility;
+  features: FeatureResponse[];
   floors: Floor[];
   lineId: number;
   route: string;

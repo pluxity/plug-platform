@@ -1,12 +1,13 @@
 import { api } from "@plug/api-hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import type { StationData } from "./types";
+import type { StationWithFeatures, FeatureResponse } from "./types";
 
 import { AssetList, MapViewer } from "./components";
 import * as Px from '@plug/engine/src';
 import { Select } from "@plug/ui";
-
+import { useStationStore } from './store/stationStore'; 
+import { useAssetStore } from './store/assetStore';
 
 interface ModelInfo {
     objectName: string;
@@ -16,24 +17,29 @@ interface ModelInfo {
 }
 
 const Viewer = () => {
-    // URL 파라미터에서 stationId 가져오기
-    const { stationId } = useParams<{ stationId: string }>();
-    const [stationData, setStationData] = useState<StationData | null>(null);
+    const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
+    const { currentStationId, setStationId } = useStationStore(); 
+
+    const [stationData, setStationData] = useState<StationWithFeatures | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [hierachies, setHierachies] = useState<ModelInfo[] | null>(null);
-    
     const [selectedFloor, setSelectedFloor] = useState<string[]>(['0']);
 
     useEffect(() => {
+        const idToSet = stationIdFromParams || '2'; 
+        setStationId(idToSet);
+    }, [stationIdFromParams, setStationId]);
+
+    useEffect(() => {
         const fetchStation = async () => {
-            // 로딩 상태 설정
-            setIsLoading(true);
+            if (!currentStationId) {
+                setIsLoading(false);
+                return;
+            }
             
+            setIsLoading(true);
             try {
-                // stationId가 없는 경우 기본값 사용 (선택 사항)
-                const parsedStationId = stationId || '2';
-                
-                const response = await api.get<StationData>(`stations/${parsedStationId}`);
+                const response = await api.get<StationWithFeatures>(`stations/${currentStationId}/with-features`);
                 setStationData(response.data);
             } catch (err) {
                 console.error('Error fetching station data:', err);
@@ -42,23 +48,61 @@ const Viewer = () => {
             }
         };
 
-        fetchStation();
-    }, [stationId]); 
+        if (currentStationId) {
+            fetchStation();
+        } else {
+            setIsLoading(false);
+        }
+
+    }, [currentStationId]); 
 
     const modelPath: string = stationData?.facility?.drawing?.url || '';
-    
-    const handleModelLoaded = () => {
-        setHierachies(Px.Model.GetModelHierarchy())
-        handleFloorChange(selectedFloor[0]);
-    };
 
-    const handleFloorChange = (floorId: string) => {
+    const handleFloorChange = useCallback((floorId: string) => {
         setSelectedFloor([floorId]);
         Px.Model.HideAll();
         Px.Model.Show(floorId);
-    }
+    }, []);
 
-    // 로딩 중인 경우
+    const handleFeatureData = useCallback(() => {
+        // 스토어에서 최신 assets 값을 직접 가져오기
+        const currentAssets = useAssetStore.getState().assets;
+        
+        if (stationData?.features && currentAssets.length > 0) {
+            const poiData = stationData.features.map((feature: FeatureResponse) => {
+                const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
+                return {
+                    id: feature.id, 
+                    iconUrl: '', 
+                    modelUrl: modelUrl,
+                    displayText: feature.deviceCode || '테스트',
+                    floorId: feature.floorId,
+                    property: {
+                        code: feature.deviceCode || '',
+                    },
+                    position: feature.position,
+                    rotation: feature.rotation,
+                    scale: feature.scale
+                };
+            });
+
+            Px.Poi.Import(JSON.stringify(poiData));
+        }
+    }, [stationData]);
+
+    const handleModelLoaded = useCallback(async () => {
+        const modelHierarchy = Px.Model.GetModelHierarchy();
+        console.log('Model Hierarchy:', modelHierarchy);
+        if (modelHierarchy) { 
+            setHierachies(modelHierarchy as ModelInfo[]);
+        } else {
+            setHierachies(null);
+        }
+
+        handleFeatureData();
+
+    }, [setHierachies, handleFeatureData]);
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -67,10 +111,18 @@ const Viewer = () => {
         );
     }
 
+    if (!currentStationId && !isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-gray-500">Station ID를 찾을 수 없습니다.</div>
+            </div>
+        );
+    }
+
     return (
         <>
-            <aside className="bg-red-100 w-1/3 overflow-y-auto">
-                <AssetList />
+            <aside className="bg-white w-1/3 overflow-y-auto">
+                <AssetList /> {/* AssetList에서 useStationStore를 통해 currentStationId 접근 가능 */}
             </aside>
             <main className="w-full">
                 <div className="flex absolute text-white pl-4 pt-2 items-center"> 
@@ -94,7 +146,7 @@ const Viewer = () => {
                         </Select>
                     }
                 </div>
-                {stationData && (
+                {stationData && currentStationId && ( // currentStationId도 확인하여 렌더링
                     <MapViewer 
                         modelPath={modelPath}
                         onModelLoaded={handleModelLoaded}
