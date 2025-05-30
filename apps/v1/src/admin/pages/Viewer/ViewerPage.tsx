@@ -1,12 +1,13 @@
 import { api } from "@plug/api-hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import type { StationData } from "./types";
+import type { StationWithFeatures, FeatureResponse } from "./types";
 
 import { AssetList, MapViewer } from "./components";
 import * as Px from '@plug/engine/src';
 import { Select } from "@plug/ui";
 import { useStationStore } from './store/stationStore'; 
+import { useAssetStore } from './store/assetStore';
 
 interface ModelInfo {
     objectName: string;
@@ -19,7 +20,7 @@ const Viewer = () => {
     const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
     const { currentStationId, setStationId } = useStationStore(); 
 
-    const [stationData, setStationData] = useState<StationData | null>(null);
+    const [stationData, setStationData] = useState<StationWithFeatures | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [hierachies, setHierachies] = useState<ModelInfo[] | null>(null);
     const [selectedFloor, setSelectedFloor] = useState<string[]>(['0']);
@@ -33,17 +34,15 @@ const Viewer = () => {
         const fetchStation = async () => {
             if (!currentStationId) {
                 setIsLoading(false);
-                setStationData(null);
                 return;
             }
             
             setIsLoading(true);
             try {
-                const response = await api.get<StationData>(`stations/${currentStationId}`);
+                const response = await api.get<StationWithFeatures>(`stations/${currentStationId}/with-features`);
                 setStationData(response.data);
             } catch (err) {
                 console.error('Error fetching station data:', err);
-                setStationData(null);
             } finally {
                 setIsLoading(false);
             }
@@ -53,29 +52,57 @@ const Viewer = () => {
             fetchStation();
         } else {
             setIsLoading(false);
-            setStationData(null);
         }
+
     }, [currentStationId]); 
 
     const modelPath: string = stationData?.facility?.drawing?.url || '';
-    
-    const handleModelLoaded = () => {
+
+    const handleFloorChange = useCallback((floorId: string) => {
+        setSelectedFloor([floorId]);
+        Px.Model.HideAll();
+        Px.Model.Show(floorId);
+    }, []);
+
+    const handleFeatureData = useCallback(() => {
+        // 스토어에서 최신 assets 값을 직접 가져오기
+        const currentAssets = useAssetStore.getState().assets;
+        
+        if (stationData?.features && currentAssets.length > 0) {
+            const poiData = stationData.features.map((feature: FeatureResponse) => {
+                const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
+                return {
+                    id: feature.id, 
+                    iconUrl: '', 
+                    modelUrl: modelUrl,
+                    displayText: feature.deviceCode || '테스트',
+                    floorId: feature.floorId,
+                    property: {
+                        code: feature.deviceCode || '',
+                    },
+                    position: feature.position,
+                    rotation: feature.rotation,
+                    scale: feature.scale
+                };
+            });
+
+            Px.Poi.Import(JSON.stringify(poiData));
+        }
+    }, [stationData]);
+
+    const handleModelLoaded = useCallback(async () => {
         const modelHierarchy = Px.Model.GetModelHierarchy();
+        console.log('Model Hierarchy:', modelHierarchy);
         if (modelHierarchy) { 
             setHierachies(modelHierarchy as ModelInfo[]);
         } else {
             setHierachies(null);
         }
-        handleFloorChange(selectedFloor[0]);
-    };
 
-    const handleFloorChange = (floorId: string) => {
-        setSelectedFloor([floorId]);
-        Px.Model.HideAll();
-        Px.Model.Show(floorId);
-    }
+        handleFeatureData();
 
-    // 로딩 중인 경우
+    }, [setHierachies, handleFeatureData]);
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -84,7 +111,6 @@ const Viewer = () => {
         );
     }
 
-    // currentStationId가 없고 로딩 중도 아닐 때 (예: 초기화 실패 또는 ID 없음)
     if (!currentStationId && !isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">

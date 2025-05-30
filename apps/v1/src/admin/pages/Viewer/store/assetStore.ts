@@ -8,7 +8,7 @@ interface AssetStoreState {
   isLoading: boolean;
   error: Error | null;
   fetchAssets: () => Promise<void>;
-  fetchAssetById: (id: number) => Promise<void>;
+  fetchAssetById: (id: number) => void;
   clearSelectedAsset: () => void;
 }
 
@@ -27,7 +27,7 @@ export const useAssetStore = create<AssetStoreState>((set, get) => ({
       set({ error: error as Error, isLoading: false, assets: [] });
     }
   },
-  fetchAssetById: async (id: number) => {
+  fetchAssetById: (id: number) => {
     const existingAsset = get().assets.find(asset => asset.id === id);
     if (existingAsset) {
       set({ selectedAsset: existingAsset, isLoading: false, error: null });
@@ -36,6 +36,7 @@ export const useAssetStore = create<AssetStoreState>((set, get) => ({
 
     set({ selectedAsset: null, error: null });
   },
+  
   clearSelectedAsset: () => {
     set({ selectedAsset: null });
   }

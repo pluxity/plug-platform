@@ -1,17 +1,18 @@
 import * as React from 'react';
-import { Model, Poi, Path3D } from '@plug/engine/src';
-
-// 층 데이터 타입 정의
-interface FloorData {
-    floorId: string;
-    displayName: string;
-    [key: string]: unknown;
-}
+import { Camera, Event, Interfaces, Model, Path3D, Poi, Util } from '@plug/engine/src';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
     selectedApiName: string;
-    floorData: FloorData[];
+    deletePoiId: string;
+    setVisiblePoiId: string;
+    moveToPoiIdValue: string;
+    getAnimlistPoiIdValue: string;
+    poiAnimNameValue: string;
+    moveToFloorIdValue: string;
+    backgroundImageUrl: string;
+    editPoiId: string;
+    floorData: Interfaces.FloorInfo[];
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -31,8 +32,18 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         // 스테이트
         this.state = {
             selectedApiName: 'None',
+            deletePoiId: '',
+            setVisiblePoiId: '',
+            moveToPoiIdValue: '',
+            moveToFloorIdValue: '',
+            getAnimlistPoiIdValue: '',
+            poiAnimNameValue: '',
+            backgroundImageUrl: '',
+            editPoiId: '',
             floorData: []
         };
+
+        this.registerViewerEvents();
 
         console.warn('Path3D', Path3D);
     }
@@ -42,7 +53,20 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if (this.state.selectedApiName === 'Loader') {
+        if (this.state.selectedApiName === 'Camera') {
+            return (
+                <span>
+                    <button disabled>SetEnabled</button>
+                    <button onClick={() => Camera.ExtendView(1.0)}>ExtendView</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</button><br />
+                    <input type='text' value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br />
+                    <input type='text' value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Loader') {
             return (
                 <button disabled>LoadGltf</button>
             );
@@ -51,7 +75,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Model.GetHierarchy')}>GetModelHierarchy</button>
                     <br />
-                    {this.state.floorData.map((data: FloorData) => (
+                    {this.state.floorData.map((data: Interfaces.FloorInfo) => (
                         <span key={data.floorId}>
                             <input type='checkbox' id={data.floorId} value={data.floorId} defaultChecked={true} onChange={this.onFloorVisibleCheckChanged.bind(this)}></input>
                             <label htmlFor={data.floorId}>{data.displayName}</label><br />
@@ -72,6 +96,34 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(MonkeyHead.glb)')}>Create(MonkeyHead.glb)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(ScreenDoor.glb)')}>Create(ScreenDoor.glb)</button><br />
+                    <input type='text' value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</button> &nbsp;
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</button>
+                    <br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll')}>ExportAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Import')}>Import(JSON)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ImportSingle')}>Import(Single Object)</button>
+                    <br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ExportAll(LocalStorage)')}>ExportAll(LocalStorage)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Import(LocalStorage)')}>Import(LocalStorage)</button>
+                    <br />
+                    <input type='text' value={this.state.setVisiblePoiId} onChange={this.onSetVisiblePoiTextInputValueChanged.bind(this)} placeholder='Show/Hide Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br /><br />
+                    <input type='text' value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br />
+                    <input type='text' value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.PlayAnimation')}>PlayAnimation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</button><br />
+                    <input type='text' value={this.state.editPoiId} onChange={this.onPoiStartEditValueChanged.bind(this)} placeholder='편집할 Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(translate)')}>StartEdit(translate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(rotate)')}>StartEdit(rotate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(scale)')}>StartEdit(scale)</button>&nbsp;
+                    <button onClick={() => Poi.FinishEdit()}>Finish</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Path') {
@@ -82,6 +134,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
                     <button>Undo</button>
                     <button>Redo</button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Util') {
+            return (
+                <span>
+                    <label htmlFor='bgColor'>색상으로 배경설정:</label><input id='bgColor' type='color' onChange={this.onBackgroundColorChange.bind(this)}></input><br />
+                    <label htmlFor='bgImgUrl'>이미지Url로 배경설정:</label><input id="bgImgUrl" type="text" value={this.state.backgroundImageUrl} onChange={this.onBackgroundImageUrlChange.bind(this)}></input><button onClick={this.onApiBtnClick.bind(this, 'Util.SetBackgroundImage')}>설정</button><br />
                 </span>
             );
         }
@@ -101,9 +160,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <select id='ApiList' defaultValue='None' onChange={this.onApiSelectChange.bind(this)}>
                         <option value='None' disabled>Api 선택</option>
                         <option value='Loader'>Loader</option>
+                        <option value='Camera'>Camera</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
-                        <option value='Path'>Path</option>
+                        <option value='Path'>Path(작업중)</option>
+                        <option value='Util'>Util</option>
                     </select>
                     <br />
                     {this.renderMenu()}
@@ -126,6 +187,35 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onApiBtnClick(apiName: string) {
         switch (apiName) {
+            /**
+             * Camera
+             */
+            case 'Camera.GetState': {
+                const state = Camera.GetState();
+                localStorage.setItem('CameraState', JSON.stringify(state));
+            } break;
+            case 'Camera.SetState': {
+                const state = localStorage.getItem('CameraState');
+                if (state === undefined || state === null) {
+                    console.warn('no such data of camera state.');
+                } else {
+                    Camera.SetState(JSON.parse(state), 1.0);
+                }
+            } break;
+            case 'Camera.MoveToPoi': {
+                if (this.state.moveToPoiIdValue !== '') {
+                    Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0);
+                }
+            } break;
+            case 'Camera.MoveToFloor': {
+                if (this.state.moveToFloorIdValue !== '') {
+                    Camera.MoveToFloor(this.state.moveToFloorIdValue, 1.0);
+                }
+            } break;
+
+            /**
+             * Model
+             */
             case 'Model.GetHierarchy': {
                 const data = Model.GetModelHierarchy();
 
@@ -133,6 +223,23 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
 
                 this.setState({ floorData: data as any }); // 얻은 층정보로 state 설정
             } break;
+
+            /**
+             * Path
+             */
+            case 'Path.CreatePath': {
+                const pathId = window.crypto.randomUUID();
+                const color = 0xffffff * Math.random();
+                Path3D.CreatePath(pathId, color);
+            } break;
+            case 'Path.Finish': {
+                const pathData = Path3D.Finish();
+                console.log('Path3D.Finish -> ', pathData);
+            } break;
+
+            /**
+             * Poi
+             */
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
@@ -150,14 +257,116 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
             } break;
-            case 'Path.CreatePath': {
-                const pathId = window.crypto.randomUUID();
-                const color = 0xffffff * Math.random();
-                Path3D.CreatePath(pathId, color);
+            case 'Poi.Create(MonkeyHead.glb)': {
+                const id: string = window.crypto.randomUUID();
+                const iconUrl: string = 'SamplePoiIcon.png';
+                const displayText: string = id.substring(0, 8);
+                const property: { [key: string]: unknown } = {
+                    testText: '테스트 속성',
+                    testInt: 11,
+                    testFloat: 2.2
+                };
+
+                Poi.Create({
+                    id: id,
+                    iconUrl: iconUrl,
+                    displayText: displayText,
+                    modelUrl: 'monkeyhead.glb',
+                    property: property
+                }, (data: unknown) => console.log('Poi.Create(MonkeyHead.glb) Callback', data));
             } break;
-            case 'Path.Finish': {
-                const pathData = Path3D.Finish();
-                console.log('Path3D.Finish -> ', pathData);
+            case 'Poi.Create(ScreenDoor.glb)': {
+                const id: string = window.crypto.randomUUID();
+                const iconUrl: string = 'SamplePoiIcon.png';
+                const displayText: string = id.substring(0, 8);
+                const property: { [key: string]: unknown } = {
+                    testText: '테스트 속성',
+                    testInt: 11,
+                    testFloat: 2.2
+                };
+
+                Poi.Create({
+                    id: id,
+                    iconUrl: iconUrl,
+                    displayText: displayText,
+                    modelUrl: 'ScreenDoor.glb',
+                    property: property
+                }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
+            } break;
+            case 'Poi.Delete': {
+                if (this.state.deletePoiId !== '') {
+                    Poi.Delete(this.state.deletePoiId);
+                }
+            } break;
+            case 'Poi.ExportAll': {
+                const data = Poi.ExportAll();
+                console.log('Poi.ExportAll', data);
+            } break;
+            case 'Poi.Import': {
+                fetch('poiSampleData.json').then(res => res.json()).then(data => {
+                    console.log('Poi.Import', data);
+                    Poi.Import(data);
+                });
+            } break;
+            case 'Poi.ImportSingle': {
+                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
+            } break;
+            case 'Poi.ExportAll(LocalStorage)': {
+                const data = Poi.ExportAll();
+                console.log('Poi.ExportAll', data);
+                localStorage.setItem('PoiData', JSON.stringify(data));
+            } break;
+            case 'Poi.Import(LocalStorage)': {
+                const data = localStorage.getItem('PoiData');
+                if (data === undefined || data === null) {
+                    console.warn('no such data of PoiData.');
+                } else {
+                    Poi.Import(JSON.parse(data));
+                }
+            } break;
+            case 'Poi.Clear': {
+                Poi.Clear();
+            } break;
+            case 'Poi.Show': {
+                Poi.Show(this.state.setVisiblePoiId);
+            } break;
+            case 'Poi.Hide': {
+                Poi.Hide(this.state.setVisiblePoiId);
+            } break;
+            case 'Poi.ShowAll': {
+                Poi.ShowAll();
+            } break;
+            case 'Poi.HideAll': {
+                Poi.HideAll();
+            } break;
+            case 'Poi.GetAnimationList': {
+                const data = Poi.GetAnimationList(this.state.getAnimlistPoiIdValue);
+                console.log('Poi.GetAnimationList', data);
+            } break;
+            case 'Poi.PlayAnimation': {
+                Poi.PlayAnimation(this.state.getAnimlistPoiIdValue, this.state.poiAnimNameValue);
+            } break;
+            case 'Poi.StopAnimation': {
+                Poi.StopAnimation(this.state.getAnimlistPoiIdValue);
+            } break;
+            case 'Poi.StartEdit(translate)': {
+                const poiId = this.state.editPoiId;
+                Poi.StartEdit(poiId, 'translate');
+            } break;
+            case 'Poi.StartEdit(rotate)': {
+                const poiId = this.state.editPoiId;
+                Poi.StartEdit(poiId, 'rotate');
+            } break;
+            case 'Poi.StartEdit(scale)': {
+                const poiId = this.state.editPoiId;
+                Poi.StartEdit(poiId, 'scale');
+            } break;
+
+            /**
+             * Util
+             */
+            case 'Util.SetBackgroundImage': {
+                Util.SetBackground(this.state.backgroundImageUrl);
             } break;
         }
     }
@@ -182,6 +391,93 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             Model.ShowAll();
         else
             Model.HideAll();
+    }
+
+    /**
+     * poi로 카메라 이동 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onMoveToPoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ moveToPoiIdValue: evt.target.value });
+    }
+
+    /**
+     * 층으로 카메라 이동 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onMoveToFloorTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ moveToFloorIdValue: evt.target.value });
+    }
+
+    /**
+     * poi 제거 텍스트 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onDeletePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ deletePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 기사화 설정 텍스트 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSetVisiblePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ setVisiblePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 애니메이션 얻기 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onGetAnimListTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ getAnimlistPoiIdValue: evt.target.value });
+    }
+
+    /**
+     * poi 애니메이션 이름 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onAnimNameTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ poiAnimNameValue: evt.target.value });
+    }
+
+    /**
+     * util 색상코드로 배경색 설정 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onBackgroundColorChange(evt: React.ChangeEvent<HTMLInputElement>) {
+        const colorNumber = parseInt(evt.target.value.replace('#', ''), 16);
+        Util.SetBackground(colorNumber);
+    }
+
+    /**
+     * util 이미지로 배경설정 input 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onBackgroundImageUrlChange(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ backgroundImageUrl: evt.target.value });
+    }
+
+    /**
+     * 편집할 poi id값 입력 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPoiStartEditValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ editPoiId: evt.target.value });
+    }
+
+    /**
+     * 뷰어 이벤트 등록
+     */
+    registerViewerEvents() {
+        // poi 편집 이벤트 등록
+        Event.AddEventListener('onPoiTransformChange' as never, (evt: any) => {
+            console.log(evt);
+        });
+        // poi 객체 포인터업 이벤트 등록
+        Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {
+            console.log(evt);
+        });
     }
 }
 
