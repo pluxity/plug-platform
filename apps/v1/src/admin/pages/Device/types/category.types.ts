@@ -1,9 +1,8 @@
-export interface Line {
-    id: number;
+export interface Category{
+    id: number,
     name: string;
-    color: React.ReactNode;
+    iconFile: React.ReactNode;
     creator: string;
     update: string;
     management: React.ReactNode;
 }
-

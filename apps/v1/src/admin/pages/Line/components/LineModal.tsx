@@ -88,58 +88,55 @@ export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: 
             closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
-            <div className="p-4">
+            <Form
+                key={mode + (detailLineData?.id ?? '')}
+                initialValues={
+                    mode === 'edit' && detailLineData
+                        ? {
+                            name: detailLineData.name,
+                            color: detailLineData.color
+                        }
+                        : {
+                            name: '',
+                            color: ''
+                        }
+                    }
+                    onSubmit={handleFinish}
+                >
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
                         {error.message}
                     </div>
                 )}
+                <FormItem name="name" label="호선" required>
+                    <Input.Text
+                        placeholder="호선 이름을 입력하세요"
+                        value={name}
+                        onChange={value => setName(value)}
+                    />
+                </FormItem>
 
-                <Form
-                    key={mode + (detailLineData?.id ?? '')}
-                    initialValues={
-                        mode === 'edit' && detailLineData
-                            ? {
-                                name: detailLineData.name,
-                                color: detailLineData.color
-                            }
-                            : {
-                                name: '',
-                                color: ''
-                            }
-                        }
-                        onSubmit={handleFinish}
-                    >
-                    <FormItem name="name" label="호선" required>
-                        <Input.Text
-                            placeholder="호선 이름을 입력하세요"
-                            value={name}
-                            onChange={value => setName(value)}
-                        />
-                    </FormItem>
+                <FormItem name="color" label="색상" required>
+                    <ChromePicker
+                        color={color || (mode === 'edit' && detailLineData ? detailLineData.color : '')}
+                        onChangeComplete={(colorResult) => setColor(colorResult.hex)}
+                    />
+                </FormItem>
 
-                    <FormItem name="color" label="색상" required>
-                        <ChromePicker
-                            color={color || (mode === 'edit' && detailLineData ? detailLineData.color : '')}
-                            onChangeComplete={(colorResult) => setColor(colorResult.hex)}
-                        />
-                    </FormItem>
-
-                    <div className="mt-6 flex justify-center gap-2">
-                        <Button type="button" onClick={resetForm} disabled={isProcessing}>
-                            취소
-                        </Button>
-                        <Button
-                            type="submit"
-                            color="primary"
-                            disabled={!name && !color}
-                            isLoading={isProcessing}
-                            >
-                            {mode === 'create' ? '등록' : '수정'}
-                        </Button>
-                    </div>
-                </Form>
-            </div>
+                <div className="mt-6 flex justify-center gap-2">
+                    <Button type="button" onClick={resetForm} disabled={isProcessing}>
+                        취소
+                    </Button>
+                    <Button
+                        type="submit"
+                        color="primary"
+                        disabled={!name && !color}
+                        isLoading={isProcessing}
+                        >
+                        {mode === 'create' ? '등록' : '수정'}
+                    </Button>
+                </div>
+            </Form>
         </Modal>
     );
 };
