@@ -4,6 +4,7 @@ import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
 import * as Camera from '../camera';
+import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 
@@ -13,6 +14,8 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 let gizmo: Addon.TransformControls;
 let previewObject: THREE.Object3D;
+let _editMode: Addon.TransformControlsMode = 'translate';
+let bPoiEditEnabled: boolean = false;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -20,26 +23,6 @@ let previewObject: THREE.Object3D;
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
 });
-
-/**
- * 전체 poi 목록에서 마우스 레이캐스트를 위한 객체 수집
- * @returns - 레이캐스트 객체
- */
-function collectPickableObjects() {
-    const hasInstanceMeshRefPoiList = Object.values(PoiData.PoiDataList).filter(poi => poi.PointMeshData.instanceMeshRef !== undefined);
-    const hasAnimMeshRefPoiList = Object.values(PoiData.PoiDataList).filter(poi => poi.PointMeshData.animMeshRef !== undefined);
-
-    let resultInstanceMeshList = hasInstanceMeshRefPoiList.map(poi => poi.PointMeshData.instanceMeshRef);
-    let resultAnimMeshList = hasAnimMeshRefPoiList.map(poi => poi.PointMeshData.animMeshRef);
-
-    resultInstanceMeshList = [...new Set(resultInstanceMeshList)];
-    resultAnimMeshList = [...new Set(resultAnimMeshList)];
-
-    return {
-        instanceMeshArray: resultInstanceMeshList,
-        animMeshArray: resultAnimMeshList,
-    }
-}
 
 /**
  * 포인터 다운 이벤트 처리
@@ -72,7 +55,12 @@ function onPointerUp(evt: MouseEvent) {
             rayCast.layers.set(Interfaces.CustomLayer.Pickable);
             rayCast.setFromCamera(mousePos, engine.Camera);
 
-            const pickObjects = collectPickableObjects();
+            const poi = Util.getPoiFromRaycast(rayCast);
+            if (poi !== undefined) {
+                target = poi;
+                createEditPreviewObject();
+                unregisterPointerEvents();
+            }
         }
     }
 }
@@ -146,18 +134,12 @@ function setObjectRedTransparent(target: THREE.Object3D) {
  * @param id - poi id값
  * @param editMode - 편집모드 ("translate" | "rotate" | "scale")
  */
-async function StartEdit(id: string, editMode: string = 'translate') {
+async function createEditPreviewObject() {
 
     // 이전에 생성된 미리보기 객체 메모리 해제
     disposePreviewObject();
 
-    if (!PoiData.exists(id)) {
-        console.warn('편집할 poi를 찾지 못함.');
-        return;
-    }
-
     // 편집 대상 poi의 modelUrl을 기준으로 편집용 임시 객체를 생성한다.
-    target = PoiData.getPoiElement(id);
     if (target.modelUrl !== undefined) {
         const loader = new Addon.GLTFLoader();
         const gltf = await loader.loadAsync(target.modelUrl);
@@ -185,7 +167,7 @@ async function StartEdit(id: string, editMode: string = 'translate') {
 
     // 기즈모 생성
     gizmo = new Addon.TransformControls(engine.Camera, engine.Renderer.domElement);
-    gizmo.setMode(editMode as Addon.TransformControlsMode); // "translate" | "rotate" | "scale"
+    gizmo.setMode(_editMode); // "translate" | "rotate" | "scale"
     gizmo.addEventListener('dragging-changed', (event) => {
         Camera.SetEnabled(!event.value);
     });
@@ -210,18 +192,39 @@ async function StartEdit(id: string, editMode: string = 'translate') {
 }
 
 /**
+ * poi 편집 시작
+ * @param editMode - 편집모드 'translate', 'rotate', 'scale' 택1
+ */
+function StartEdit(editMode: string) {
+    FinishEdit();
+
+    _editMode = editMode as Addon.TransformControlsMode;
+
+    registerPointerEvents();
+
+    bPoiEditEnabled = true;
+}
+
+/**
  * poi 편집 종료
  */
 function FinishEdit() {
 
+    bPoiEditEnabled = false;
+
     disposePreviewObject();
 
-    const helper = gizmo.getHelper();
-    engine.RootScene.remove(helper);
-    gizmo.dispose();
+    if (gizmo) {
+        const helper = gizmo.getHelper();
+        engine.RootScene.remove(helper);
+        gizmo.dispose();
+    }
 }
 
 export {
+
+    bPoiEditEnabled as Enabled,
+
     StartEdit,
     FinishEdit,
 }

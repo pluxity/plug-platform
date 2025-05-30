@@ -11,7 +11,6 @@ interface WebGLControlPanelState {
     poiAnimNameValue: string;
     moveToFloorIdValue: string;
     backgroundImageUrl: string;
-    editPoiId: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -39,7 +38,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             getAnimlistPoiIdValue: '',
             poiAnimNameValue: '',
             backgroundImageUrl: '',
-            editPoiId: '',
             floorData: []
         };
 
@@ -119,7 +117,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <input type='text' value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.PlayAnimation')}>PlayAnimation</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StopAnimation')}>StopAnimation</button><br />
-                    <input type='text' value={this.state.editPoiId} onChange={this.onPoiStartEditValueChanged.bind(this)} placeholder='편집할 Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(translate)')}>StartEdit(translate)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(rotate)')}>StartEdit(rotate)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(scale)')}>StartEdit(scale)</button>&nbsp;
@@ -355,16 +352,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.StopAnimation(this.state.getAnimlistPoiIdValue);
             } break;
             case 'Poi.StartEdit(translate)': {
-                const poiId = this.state.editPoiId;
-                Poi.StartEdit(poiId, 'translate');
+                Poi.StartEdit('translate');
             } break;
             case 'Poi.StartEdit(rotate)': {
-                const poiId = this.state.editPoiId;
-                Poi.StartEdit(poiId, 'rotate');
+                Poi.StartEdit('rotate');
             } break;
             case 'Poi.StartEdit(scale)': {
-                const poiId = this.state.editPoiId;
-                Poi.StartEdit(poiId, 'scale');
+                Poi.StartEdit('scale');
             } break;
 
             /**
@@ -469,14 +463,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onBackgroundImageUrlChange(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ backgroundImageUrl: evt.target.value });
-    }
-
-    /**
-     * 편집할 poi id값 입력 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onPoiStartEditValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ editPoiId: evt.target.value });
     }
 
     /**

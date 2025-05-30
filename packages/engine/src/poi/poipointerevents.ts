@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
-import * as PoiData from './data';
 import * as Placer from './placer';
+import * as PoiEditor from './edit';
 import * as Util from '../util';
-import { PoiElement } from './element';
 import { Engine3D } from '../engine';
 
 let engine: Engine3D;
@@ -22,32 +21,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
- * 전체 poi 목록에서 마우스 레이캐스트를 위한 객체 수집
- * @returns - 레이캐스트 객체
- */
-function collectPickableObjects() {
-    const hasInstanceMeshRefPoiList = Object.values(PoiData.PoiDataList).filter(poi => poi.PointMeshData.instanceMeshRef !== undefined);
-    const hasAnimMeshRefPoiList = Object.values(PoiData.PoiDataList).filter(poi => poi.PointMeshData.animMeshRef !== undefined);
-
-    let resultInstanceMeshList = hasInstanceMeshRefPoiList.map(poi => poi.PointMeshData.instanceMeshRef);
-    let resultAnimMeshList = hasAnimMeshRefPoiList.map(poi => poi.PointMeshData.animMeshRef);
-
-    resultInstanceMeshList = [...new Set(resultInstanceMeshList)];
-    resultAnimMeshList = [...new Set(resultAnimMeshList)];
-
-    return {
-        instanceMeshArray: resultInstanceMeshList,
-        animMeshArray: resultAnimMeshList,
-    }
-}
-
-/**
  * 포인터 다운 이벤트 처리
  * @param evt - 이벤트 정보
  */
 function onPointerDown(evt: PointerEvent) {
 
-    if (Placer.Enabled)
+    if (Placer.Enabled || PoiEditor.Enabled)
         return;
 
     if (evt.button === 0) {
@@ -62,7 +41,7 @@ function onPointerDown(evt: PointerEvent) {
  */
 function onPointerUp(evt: PointerEvent) {
 
-    if (Placer.Enabled)
+    if (Placer.Enabled || PoiEditor.Enabled)
         return;
 
     if (evt.button === 0) {
