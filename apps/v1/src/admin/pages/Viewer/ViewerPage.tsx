@@ -23,7 +23,7 @@ const Viewer = () => {
     const [stationData, setStationData] = useState<StationWithFeatures | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [hierachies, setHierachies] = useState<ModelInfo[] | null>(null);
-    const [selectedFloor, setSelectedFloor] = useState<string[]>(['0']);
+    const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
 
     useEffect(() => {
         const idToSet = stationIdFromParams || '2'; 
@@ -59,7 +59,7 @@ const Viewer = () => {
     const modelPath: string = stationData?.facility?.drawing?.url || '';
 
     const handleFloorChange = useCallback((floorId: string) => {
-        setSelectedFloor([floorId]);
+        setSelectedFloor(floorId);
         Px.Model.HideAll();
         Px.Model.Show(floorId);
     }, []);
@@ -75,7 +75,7 @@ const Viewer = () => {
                     id: feature.id, 
                     iconUrl: '', 
                     modelUrl: modelUrl,
-                    displayText: feature.deviceCode || '테스트',
+                    displayText: feature.deviceCode || '배치 안됨',
                     floorId: feature.floorId,
                     property: {
                         code: feature.deviceCode || '',
@@ -87,12 +87,16 @@ const Viewer = () => {
             });
 
             Px.Poi.Import(JSON.stringify(poiData));
+
+            // Px.Event.AddEventListener('onPoiPointerUp', (event: any) => {
+            //     console.log(event);
+            // });
         }
     }, [stationData]);
 
     const handleModelLoaded = useCallback(async () => {
         const modelHierarchy = Px.Model.GetModelHierarchy();
-        console.log('Model Hierarchy:', modelHierarchy);
+        console.log(':', modelHierarchy);
         if (modelHierarchy) { 
             setHierachies(modelHierarchy as ModelInfo[]);
         } else {
@@ -100,8 +104,9 @@ const Viewer = () => {
         }
 
         handleFeatureData();
+        handleFloorChange("0");
 
-    }, [setHierachies, handleFeatureData]);
+    }, [setHierachies, handleFeatureData, handleFloorChange]);
 
     if (isLoading) {
         return (
@@ -132,10 +137,10 @@ const Viewer = () => {
                   { hierachies && 
                         <Select 
                             className="text-sm text-gray-300 ml-2 w-96" 
-                            selected={selectedFloor} 
+                            selected={selectedFloor ? [selectedFloor] : []}
                             onChange={values => handleFloorChange(values[0])}
                             >
-                            <Select.Trigger />
+                            <Select.Trigger/>
                             <Select.Content>
                               {hierachies.sort((a, b) => Number(b.floorId) - Number(a.floorId)).map(floor => (
                                   <Select.Item key={floor.floorId} value={floor.floorId}>
