@@ -1,9 +1,14 @@
 import { Modal, Form, FormItem, Button, Input, Select } from '@plug/ui';
 import React from 'react';
 import { useLinesSWR } from '@plug/common-services';
-import { FacilityModalProps } from '../types/facility';
 import {FileUploadField} from "@plug/v1/admin/pages/facility/component/FileUploadField";
 import {useFacility} from "@plug/v1/admin/pages/facility/hook/useFacility";
+
+type FacilityModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+};
 
 export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps) => {
     const {

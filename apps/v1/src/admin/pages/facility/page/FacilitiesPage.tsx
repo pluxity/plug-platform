@@ -66,6 +66,7 @@ export default function FacilitiesPage() {
             <FacilityModal
                 isOpen={isOpen}
                 onClose={closeModal}
+                onSuccess={closeModal}
             />
         </div>
     );

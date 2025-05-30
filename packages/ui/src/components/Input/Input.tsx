@@ -20,9 +20,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps<string>>((props, ref
         ...rest
     } = props;
 
-    console.log(value, rest);
-    console.log(className);
-
     const [inputFocus, setInputFocus] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

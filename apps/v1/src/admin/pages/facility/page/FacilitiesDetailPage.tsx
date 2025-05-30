@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, FormItem, Input, Select, Button } from '@plug/ui';
 import type { StationDetail } from '../types/facility';
-import { fetchStationDetail, patchStation } from '../api/station';
+import {deleteStation, fetchStationDetail, patchStation} from '../api/station';
 import { useLinesSWR } from '@plug/common-services';
 import { FileUploadField } from "@plug/v1/admin/pages/facility/component/FileUploadField";
 import DateFormatter from "@plug/v1/app/utils/dateFormatter";
@@ -67,6 +67,11 @@ export default function StationDetail() {
     }));
   };
 
+  const openFilePicker = (type: 'model' | 'thumbnail') => {
+    const fileInput = document.getElementById(`${type}-file`);
+    if (fileInput) fileInput.click();
+  };
+
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
@@ -111,6 +116,23 @@ export default function StationDetail() {
       setIsLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      const confirmed = confirm('정말 삭제하시겠습니까?');
+      if (!confirmed) return;
+
+      setIsLoading(true);
+      await deleteStation(Number(id));
+      alert('성공적으로 삭제되었습니다.');
+      window.location.href = '/admin/dashboard/facility';
+    } catch (error) {
+      console.error('삭제 실패:', error);
+      alert('삭제에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   if (!station) return <div className="p-6">로딩 중...</div>;
 
@@ -251,28 +273,25 @@ export default function StationDetail() {
                     </div>
                   </FormItem>
                 </td>
+
               </tr>
-            </tbody>
-          </table>
-
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="font-medium mb-2">썸네일 이미지</p>
-                {station.facility.thumbnail?.url && (
-                    <div className="w-full h-48 mb-3 rounded-lg overflow-hidden">
-                      <img
-                          src={station.facility.thumbnail.url}
-                          alt="썸네일 이미지"
-                          className="w-full h-full object-cover"
-                      />
-                    </div>
-                )}
-              </div>
-              <div>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
+              <td rowSpan={2}>
+              {station.facility.thumbnail?.url && (
+                  <div className="w-full rounded-lg overflow-hidden" >
+                    <img
+                        src={station.facility.thumbnail.url}
+                        alt="썸네일 이미지"
+                        className="w-full h-full object-cover"
+                    />
+                  </div>
+              )}
+              </td>
+              <th className="border border-gray-300 p-2 bg-gray-50" >썸네일 파일</th>
+              <td className="border border-gray-300 p-2">
                 <FileUploadField
                     type="thumbnail"
-                    label="썸네일 파일"
                     fileState={{
                       file: station.facility.thumbnail as unknown as File,
                       fileId: station.facility.thumbnail.id,
@@ -280,12 +299,16 @@ export default function StationDetail() {
                     }}
                     isUploading={false}
                     onChange={(e) => console.log(e)}
-                    onOpenPicker={() => {
-                    }}
+                    onOpenPicker={() => {openFilePicker('thumbnail')}}
+                    label='썸네일 파일'
                 />
+              </td>
+            </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50">3D 모델 파일</th>
+              <td className='border border-gray-300 p-2'>
                 <FileUploadField
                     type="model"
-                    label="3D 모델 파일"
                     fileState={{
                       file: station.facility.drawing as unknown as File,
                       fileId: station.facility.drawing.id,
@@ -293,17 +316,20 @@ export default function StationDetail() {
                     }}
                     isUploading={false}
                     onChange={(e) => console.log(e)}
-                    onOpenPicker={() => {
-                    }}
+                    onOpenPicker={() => {openFilePicker('model')}}
+                    label='썸네일 파일'
                 />
-              </div>
-          </div>
+              </td>
+
+            </tr>
+            </tbody>
+          </table>
 
             <div className="flex justify-center gap-2 mt-6">
               <Button type="submit" color="primary" disabled={isLoading} isLoading={isLoading}>
                 저장
               </Button>
-              <Button type="button" color="destructive" disabled={isLoading} isLoading={isLoading}>
+              <Button type="button" color="destructive" disabled={isLoading} onClick={handleDelete} isLoading={isLoading}>
                 삭제
               </Button>
             </div>

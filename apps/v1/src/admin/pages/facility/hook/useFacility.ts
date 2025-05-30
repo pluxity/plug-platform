@@ -77,13 +77,15 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
                 alert(MESSAGES.SUCCESS);
                 onSuccess?.();
                 resetForm();
+                onClose();
+                window.location.reload();
             }
         } catch (error) {
             console.error(MESSAGES.ERROR, error);
         } finally {
             setIsLoading(false);
         }
-    }, [files,  onSuccess, resetForm]);
+    }, [files.model.fileId, files.thumbnail.fileId, onClose, onSuccess, resetForm]);
 
     return {
         isLoading,

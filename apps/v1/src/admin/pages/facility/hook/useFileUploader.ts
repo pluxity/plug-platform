@@ -37,6 +37,7 @@ export const useFileUploader = (
             setModelData(data);
             console.log(data)
             return data;
+            
         } catch (error) {
             console.error('모델 정보 로드 실패:', error);
             throw error;

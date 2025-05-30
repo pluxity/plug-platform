@@ -56,7 +56,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
             ) : (
                 <div className="flex items-center justify-between w-full">
                     <span className="text-sm truncate max-w-xs">
-                        {fileState.originalFileName}
+                        {fileState.originalFileName? fileState.originalFileName : fileState.file.name}
                     </span>
                     
                     {isUploading ? (
