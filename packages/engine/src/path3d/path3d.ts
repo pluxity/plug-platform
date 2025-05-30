@@ -19,7 +19,7 @@ class Path3D extends THREE.Group {
     /**
      * 스플라인을 따라 생성되는 도형의 기본 형태
      */
-    private extrudeShape?: THREE.Shape;
+    private extrudeShape!: THREE.Shape;
     /**
      * 경로 너비
      */
@@ -113,6 +113,10 @@ class Path3D extends THREE.Group {
         this.add(pointObj);
         pointObj.position.copy(segment.EndPointWorldPosition);
         this.pointObjects.push(pointObj);
+    }
+
+    updateGeometries() {
+        this.segments.forEach(segment => segment.updateGeometry(this.extrudeShape));
     }
 }
 

@@ -80,6 +80,11 @@ class PathSegment3D extends THREE.Mesh {
         // 이전 생성 리소스 제거
         this.dispose();
 
+        // 커브점 업데이트
+        this.curvePath.v0 = this.StartPointWorldPosition.clone();
+        this.curvePath.v1 = this.ControlPointWorldPosition.clone();
+        this.curvePath.v2 = this.EndPointWorldPosition.clone();
+
         // 재생성
         this.geometry = new THREE.ExtrudeGeometry(extrudeShape, {
             steps: 20,
@@ -101,6 +106,8 @@ class PathSegment3D extends THREE.Mesh {
     dispose() {
         (this.material as THREE.Material).dispose();
         this.geometry.dispose();
+
+        // 더미 제거
     }
 }
 

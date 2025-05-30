@@ -18,6 +18,7 @@ let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
 let sharedTextGeometry: THREE.PlaneGeometry;
 let poiDummies: THREE.Object3D[] = [];
+let bNeedsUpdate: boolean = false;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -43,6 +44,13 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => 
     // 애니메이션 믹서 업데이트
     const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined);
     animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
+
+    // 업데이트가 필요한경우
+    if( bNeedsUpdate ) {
+        updatePoiLine();
+        updatePoiMesh();
+        bNeedsUpdate = false;
+    }
 });
 
 /**
@@ -62,8 +70,7 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
     const data: PoiElement = evt.target as PoiElement;
     poiDataList[data.id] = data;
 
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 });
 
 /**
@@ -124,8 +131,7 @@ Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) =
     poiDummies = [];
 
     // poi선, 위치점메시 업데이트
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 
     // 가시화 요소 보이기
     poiIconGroup.visible = true;
@@ -151,8 +157,8 @@ Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
             poi.Visible = true;
         }
     });
-    updatePoiLine();
-    updatePoiMesh();
+    
+    bNeedsUpdate = true;
 });
 
 /**
@@ -165,8 +171,8 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
             poi.Visible = false;
         }
     });
-    updatePoiLine();
-    updatePoiMesh();
+    
+    bNeedsUpdate = true;
 });
 
 /**
@@ -175,8 +181,8 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
 Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = true);
-    updatePoiLine();
-    updatePoiMesh();
+
+    bNeedsUpdate = true;
 });
 
 /**
@@ -185,8 +191,8 @@ Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => 
 Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = false);
-    updatePoiLine();
-    updatePoiMesh();
+    
+    bNeedsUpdate = true;
 });
 
 /**
@@ -405,7 +411,6 @@ function ExportAll() {
  * @param data - 임포트 데이터
  */
 function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] | string) {
-    console.log('data.ts Import Called.', data);
 
     // 비주얼 리소스 업데이트 없이 이전의 생성 요소 제거
     Clear(false);
@@ -456,8 +461,7 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
     });
 
     // 업데이트
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 }
 
 /**
@@ -470,9 +474,8 @@ function Delete(id: string) {
         poi.dispose();
 
         delete poiDataList[id];
-
-        updatePoiLine();
-        updatePoiMesh();
+        
+        bNeedsUpdate = true;
     }
 }
 
@@ -484,8 +487,7 @@ function Clear(bUpdateVisuals: boolean = true) {
     poiDataList = {};
 
     if (bUpdateVisuals) {
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -497,8 +499,7 @@ function Show(id: string) {
     if (poiDataList.hasOwnProperty(id)) {
         poiDataList[id].Visible = true;
 
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -510,8 +511,7 @@ function Hide(id: string) {
     if (poiDataList.hasOwnProperty(id)) {
         poiDataList[id].Visible = false;
 
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -523,8 +523,7 @@ function ShowAll() {
         poi.Visible = true;
     });
 
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 }
 
 /**
@@ -535,8 +534,7 @@ function HideAll() {
         poi.Visible = false;
     });
 
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 }
 
 /**

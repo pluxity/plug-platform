@@ -167,11 +167,10 @@ Px.Poi.StopAnimation('TestPoi');
 ```
 
 ## Px.Poi.StartEdit(id: string, editMode: string)
-- id: poi id값
 - editMode: 'translate', 'rotate', 'scale' 중 택1
 - poi의 위치, 회전, 스케일 편집을 시작한다.
 ```javascript
-Px.Poi.StartEdit('TestPoi', 'translate');
+Px.Poi.StartEdit('translate');
 ```
 
 ## Px.Poi.FinishEdit()
