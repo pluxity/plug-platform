@@ -32,6 +32,10 @@ const Dashboard = () => {
                                 title: '디바이스 관리',
                                 submenu: [
                                     {
+                                        title: '디바이스 관리',
+                                        link: '/admin/dashboard/device/management'
+                                    },
+                                    {
                                         title: '디바이스 카테고리 관리',
                                         link: '/admin/dashboard/device/category'
                                     }

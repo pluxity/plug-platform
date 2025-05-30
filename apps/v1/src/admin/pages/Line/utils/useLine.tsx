@@ -17,7 +17,7 @@ export const useLine = (
         style={{ backgroundColor:line.color }}
       />
     ),
-    code: line.createdBy,
+    creator: line.createdBy,
     update: DateFormatter(line.createdAt),
     management: (
       <div className="flex flex-wrap gap-1">

@@ -2,7 +2,7 @@ export interface Category{
     id: number,
     name: string;
     iconFile: React.ReactNode;
-    code: string;
+    creator: string;
     update: string;
     management: React.ReactNode;
 }

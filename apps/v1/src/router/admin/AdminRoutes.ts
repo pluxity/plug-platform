@@ -9,5 +9,6 @@ export enum ADMIN_ROUTE {
     ASSET = 'asset/management',
     LINE = 'line/management',
     
+    DEVICE = 'device/management',
     DEVICE_CATEGORY = 'device/category'
 }

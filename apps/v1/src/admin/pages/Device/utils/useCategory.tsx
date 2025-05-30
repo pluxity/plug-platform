@@ -12,7 +12,7 @@ export const useCategory = (
         id: category.id,
         name: category.name,
         iconFile: category.iconFile?.originalFileName,
-        code: category.createdBy,
+        creator: category.createdBy,
         update: DateFormatter(category.createdAt),
         management: (
             <div className="flex flex-wrap gap-1">

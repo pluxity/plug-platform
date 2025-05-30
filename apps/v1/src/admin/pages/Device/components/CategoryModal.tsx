@@ -186,12 +186,12 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
                                     : <p className="flex-1 text-sm text-gray-500">IMAGE 파일 업로드</p>
                                     }
                                 <Button 
-                                type="button" 
-                                color="secondary"
-                                className="w-30"
-                                onClick={() => openFilePicker()}
-                                >
-                                {mode === 'edit' ? '변경' : '파일 선택'}
+                                    type="button" 
+                                    color="secondary"
+                                    className="w-30"
+                                    onClick={() => openFilePicker()}
+                                    >
+                                    {mode === 'edit' ? '변경' : '파일 선택'}
                                 </Button>
                             </div>
                             ) : (
