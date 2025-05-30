@@ -1,5 +1,5 @@
 import { api } from "@plug/api-hooks";
-import { Station} from '../types/facility'
+import {Station, StationDetail} from '../types/facility'
 
 const STATIONS_ENDPOINT = 'stations';
 
@@ -7,6 +7,10 @@ const STATIONS_ENDPOINT = 'stations';
 export const fetchStations = () => {
     return api.get<Station[]>('stations');
 };
+
+export const fetchStationDetail = (id: number) => {
+    return api.get<StationDetail>(`stations/${id}`);
+}
 
 export const createStation = (data: {
     facility: {

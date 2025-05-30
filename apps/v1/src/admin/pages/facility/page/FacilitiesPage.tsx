@@ -38,7 +38,7 @@ export default function FacilitiesPage() {
             </div>
             <div className='mt-4 grid grid-cols-4 gap-4'>
                 {stations?.map((station) => (
-                    <Card key={station.facility?.id} className="w-full" onClick={() => navigate(`/admin/dashboard/facility/${station.facility?.id}`)}>
+                    <Card key={station.facility?.id} className="w-full" onClick={() => navigate(`/admin/dashboard/facility/${station.facility.id}`)}>
                         <div className="w-full h-[200px] bg-gray-200 rounded-t-lg flex items-center justify-center">
                             <img
                                 src={station.facility?.thumbnail?.url ?? ""}
