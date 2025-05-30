@@ -6,10 +6,32 @@ import { fetchStationDetail, patchStation } from '../api/station';
 import { useLinesSWR } from '@plug/common-services';
 import { FileUploadField } from "@plug/v1/admin/pages/facility/component/FileUploadField";
 
+type FormValues = {
+  name: string;
+  description: string;
+  code: string;
+  lineIds: string[];
+  updatedBy: string;
+  id: string;
+  updatedAt: string;
+  floors: Array<{ name: string; floorId: string }>;
+  externalCode: string;
+};
+
 export default function StationDetail() {
   const { id } = useParams<{ id: string }>();
   const [station, setStation] = useState<StationDetail | null>(null);
-  const [formData, setFormData] = useState<any>(null);
+  const [formValues, setFormValues] = useState({
+    name: '',
+    description: '',
+    code: '',
+    lineIds: [] as string[],
+    updatedBy: '',
+    id: '',
+    updatedAt: '',
+    floors: [] as Array<{ name: string; floorId: string }>,
+    externalCode: ''
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { data: lines } = useLinesSWR();
 
@@ -18,18 +40,17 @@ export default function StationDetail() {
       try {
         const response = await fetchStationDetail(Number(id));
         setStation(response.data);
-        setFormData({
-          id: response.data.facility.id,
+        setFormValues({
           name: response.data.facility.name,
           description: response.data.facility.description,
-          code: response.data.facility.code,
+          code: response.data.facility.code || '',
           lineIds: response.data.lineIds.map(String),
-          createdAt: response.data.facility.createdAt,
-          createdBy: response.data.facility.createdBy,
-          thumbnail: response.data.facility.thumbnail,
-          drawing: response.data.facility.drawing
+          updatedBy: response.data.facility.updatedBy,
+          id: response.data.facility.id.toString(),
+          updatedAt: new Date(response.data.facility.updatedAt).toLocaleString(),
+          floors: response.data.floors.map((floor) => ({name: floor.name, floorId: String(floor.floorId)})),
+          externalCode: response.data.externalCode || '',
         });
-        console.log(formData)
       } catch (error) {
         console.error('역사 정보를 불러오는데 실패했습니다:', error);
       }
@@ -38,19 +59,51 @@ export default function StationDetail() {
     loadStationDetail();
   }, [id]);
 
-  const handleInputChange = (name: string, value: any) => {
-    setFormData(prev => ({
+  const handleChange = (name: string, value: string | string[]) => {
+    setFormValues(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
-      await patchStation(Number(id));
+      const updateData = {
+        facility: {
+          name: formValues.name,
+          description: formValues.description,
+          code: formValues.code,
+        },
+        lineIds: formValues.lineIds.map(Number),
+        floors: formValues.floors.map(floor => ({
+          name: floor.name,
+          floorId: Number(floor.floorId)
+        })),
+        externalCode: formValues.externalCode,
+      };
+
+      await patchStation({
+        id: Number(id),
+        ...updateData
+      });
+
       const response = await fetchStationDetail(Number(id));
       setStation(response.data);
+      setFormValues({
+        name: response.data.facility.name,
+        description: response.data.facility.description,
+        code: response.data.facility.code || '',
+        lineIds: response.data.lineIds.map(String),
+        updatedBy: response.data.facility.updatedBy,
+        id: String(response.data.facility.id),
+        updatedAt: response.data.facility.updatedAt,
+        floors: response.data.floors.map((floor) => ({
+          name: floor.name,
+          floorId: String(floor.floorId)
+        })),
+        externalCode: response.data.externalCode || '',
+      });
     } catch (error) {
       console.error('수정 실패:', error);
     } finally {
@@ -58,35 +111,39 @@ export default function StationDetail() {
     }
   };
 
-  if (!station || !formData) return <div className="p-6">로딩 중...</div>;
+  if (!station) return <div className="p-6">로딩 중...</div>;
 
   return (
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-4">기본 정보</h3>
-
-        <Form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            <table className="w-full border-collapse border border-gray-300">
-              <tbody>
+    <div className="p-6">
+      <Form onSubmit={handleSubmit}>
+        <div className="space-y-6">
+          <table className="w-full border-collapse border border-gray-300">
+            <tbody>
               <tr>
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사 ID</th>
                 <td className="border border-gray-300 p-2 w-1/3">
                   <FormItem name="id" >
-                    <Input.Text
-                        placeholder={formData.id}
-                        className="w-full"
-                        disabled
-                    />
+                    <div>
+                      <Input.Text
+                          value={formValues.id}
+                          onChange={(value) => handleChange('id', value)}
+                          className="w-full"
+                      />
+                    </div>
                   </FormItem>
                 </td>
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사명</th>
                 <td className="border border-gray-300 p-2 w-1/3">
                   <FormItem name="name" required >
-                    <Input.Text
-                        placeholder={formData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        className="w-full"
-                    />
+                    <div>
+                      <Input.Text
+                          placeholder={formValues.name}
+                          value={formValues.name}
+                          onChange={(value) => handleChange('name', value)}
+                          className="w-full"
+                      />
+                    </div>
+
                   </FormItem>
                 </td>
               </tr>
@@ -94,68 +151,106 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">설명</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="description" required >
-                    <Input.Text
-                        placeholder={formData.description}
-                        onChange={(e) => handleInputChange('description', e.target.value)}
-                        className="w-full"
-                    />
+                    <div>
+                      <Input.Text
+                          value={formValues.description}
+                          onChange={(e) => handleChange('description', e)}
+                          className="w-full"
+                      />
+                    </div>
                   </FormItem>
                 </td>
                 <th className="border border-gray-300 p-2 bg-gray-50">코드</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="code" >
-                    <Input.Text placeholder={formData.code} className="w-full" disabled/>
+                    <div>
+                      <Input.Text
+                          value={formValues.code}
+                          onChange={(e) => handleChange('code', e)}
+                          className="w-full"
+                          disabled
+                      />
+                    </div>
                   </FormItem>
                 </td>
               </tr>
               <tr>
                 <th className="border border-gray-300 p-2 bg-gray-50">노선</th>
-                <td className="border border-gray-300 p-2" colSpan={3}>
-                  <p>
-                    {formData.lineIds}
-                  </p>
+                <td className="border border-gray-300 p-2">
                   <FormItem name="lineIds" required >
                     <Select
-                        type="multiple"
-                        className="w-full"
-                        onChange={(value) => handleInputChange('lineIds', value)}
+                      type="multiple"
+                      className="w-full"
+                      selected={formValues.lineIds}
+                      onChange={(value) => handleChange('lineIds', value)}
                     >
                       <Select.Trigger />
                       <Select.Content>
                         {lines?.map((line) => (
-                            <Select.Item key={line.id} value={String(line.id)}>
-                              {line.name}
-                            </Select.Item>
+                          <Select.Item key={line.id} value={String(line.id)}>
+                            {line.name}
+                          </Select.Item>
                         ))}
                       </Select.Content>
                     </Select>
                   </FormItem>
                 </td>
+                <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>
+                <td className="border border-gray-300 p-2">
+                  <FormItem name="externalCode" >
+                    <div>
+                      <Input.Text
+                          value={formValues.externalCode}
+                          onChange={(e) => handleChange('code', e)}
+                          className="w-full"
+                          disabled
+                      />
+                    </div>
+                  </FormItem>
+                </td>
               </tr>
               <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50">생성일</th>
-                <td className="border border-gray-300 p-2">
-                  <FormItem name="createdAt" >
-                    <Input.Text
-                        placeholder={formData.createdAt}
-                        className="w-full"
-                        disabled
-                    />
-                  </FormItem>
-                </td>
-                <th className="border border-gray-300 p-2 bg-gray-50">생성자</th>
-                <td className="border border-gray-300 p-2">
-                  <FormItem name="createdBy" >
-                    <Input.Text
-                        placeholder={formData.createdBy}
-                        className="w-full"
-                        disabled
-                    />
+                <th className="border border-gray-300 p-2 bg-gray-50">층 정보</th>
+                <td className="border border-gray-300 p-2" colSpan={3}>
+                  <FormItem name="floors" required>
+                    <div className="space-y-2">
+                      {formValues.floors.map((floor) => (
+                          <div key={floor.floorId} className="flex gap-2">
+                            <p>{floor.name}</p>
+                          </div>
+                      ))}
+                    </div>
                   </FormItem>
                 </td>
               </tr>
-              </tbody>
-            </table>
+              <tr>
+                <th className="border border-gray-300 p-2 bg-gray-50">수정일</th>
+                <td className="border border-gray-300 p-2">
+                  <FormItem name="updatedAt" >
+                    <div>
+                      <Input.Text
+                          value={formValues.updatedAt}
+                          onChange={(e) => handleChange('updatedAt', e)}
+                          className="w-full"
+                      />
+                    </div>
+                  </FormItem>
+                </td>
+                <th className="border border-gray-300 p-2 bg-gray-50">마지막 수정인</th>
+                <td className="border border-gray-300 p-2">
+                  <FormItem name="updatedBy" >
+                    <div>
+                      <Input.Text
+                          value={formValues.updatedBy}
+                          onChange={(e) => handleChange('updatedBy', e)}
+                          className="w-full"
+                      />
+                    </div>
+                  </FormItem>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
 
             <div className="grid grid-cols-2 gap-4">
@@ -177,7 +272,8 @@ export default function StationDetail() {
                     label="썸네일 파일"
                     fileState={{
                       file: station.facility.thumbnail as unknown as File,
-                      fileId: station.facility.thumbnail.id
+                      fileId: station.facility.thumbnail.id,
+                      originalFileName: station.facility.thumbnail.originalFileName
                     }}
                     isUploading={false}
                     onChange={(e) => console.log(e)}
@@ -187,7 +283,11 @@ export default function StationDetail() {
                 <FileUploadField
                     type="model"
                     label="3D 모델 파일"
-                    fileState={{file: station.facility.drawing as unknown as File, fileId: station.facility.drawing.id}}
+                    fileState={{
+                      file: station.facility.drawing as unknown as File,
+                      fileId: station.facility.drawing.id,
+                      originalFileName: station.facility.drawing.originalFileName
+                    }}
                     isUploading={false}
                     onChange={(e) => console.log(e)}
                     onOpenPicker={() => {

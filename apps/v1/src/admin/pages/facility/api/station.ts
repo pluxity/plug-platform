@@ -3,18 +3,27 @@ import {Station, StationDetail} from '../types/facility'
 
 const STATIONS_ENDPOINT = 'stations';
 
-
 export const fetchStations = () => {
-    return api.get<Station[]>('stations');
+    return api.get<Station[]>(STATIONS_ENDPOINT);
 };
 
 export const fetchStationDetail = (id: number) => {
-    return api.get<StationDetail>(`stations/${id}`);
+    return api.get<StationDetail>(`${STATIONS_ENDPOINT}/${id}`);
 }
 
-export const patchStation = (id: number) => {
-    return api.patch(`stations/${id}`);
-}
+export const patchStation = (data: {
+    id: number;
+    facility: {
+        name: string;
+        description: string;
+        code: string;
+    };
+    lineIds: number[];
+    floors: Array<{ name: string; floorId: number }>;
+    externalCode: string;
+}) => {
+    return api.patch(`${STATIONS_ENDPOINT}/${data.id}`, data);
+};
 
 export const createStation = (data: {
     facility: {
