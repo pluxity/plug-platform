@@ -141,6 +141,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <label htmlFor='bgImgUrl'>이미지Url로 배경설정:</label><input id="bgImgUrl" type="text" value={this.state.backgroundImageUrl} onChange={this.onBackgroundImageUrlChange.bind(this)}></input><button onClick={this.onApiBtnClick.bind(this, 'Util.SetBackgroundImage')}>설정</button><br />
                 </span>
             );
+        } else if(this.state.selectedApiName === 'Test' ) {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Test')}>Test</button>
+                </span>
+            );
         }
 
         return null;
@@ -163,6 +169,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Poi'>Poi</option>
                         <option value='Path'>Path(작업중)</option>
                         <option value='Util'>Util</option>
+                        <option value='Test'>Test</option>
                     </select>
                     <br />
                     {this.renderMenu()}
@@ -365,6 +372,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              */
             case 'Util.SetBackgroundImage': {
                 Util.SetBackground(this.state.backgroundImageUrl);
+            } break;
+
+            /**
+             * Test
+             */
+            case 'Test': {
+                Model.HideAll();
+                Model.Show('0');
             } break;
         }
     }

@@ -178,6 +178,7 @@ function onPointerMove(event: MouseEvent) {
             const controlPoint = workingSegment.EndPointWorldPosition.clone().addScaledVector(direction, distance);
 
             // 더미 객체 생성
+            debugger; // 마우스 이동시마다 더미 생성됨 수정요망
             const controlPointDummy = new THREE.Object3D();
             controlPointDummy.position.copy(controlPoint);
             workingSegment.EndPointDummy.parent?.add(controlPointDummy); // EndPointDummy가 있는 층객체에 더미 객체를 부착

@@ -106,6 +106,8 @@ class PathSegment3D extends THREE.Mesh {
     dispose() {
         (this.material as THREE.Material).dispose();
         this.geometry.dispose();
+
+        // 더미 제거
     }
 }
 
