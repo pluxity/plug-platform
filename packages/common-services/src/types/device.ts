@@ -11,12 +11,10 @@ export interface CategoryResponse {
       createdAt: string,
       updatedAt: string,
     }
-    baseResponse:{
-        createdAt: string,
-        createdBy: string,
-        updatedAt: string,
-        updatedBy: string
-    }
+    createdAt: string,
+    createdBy: string,
+    updatedAt: string,
+    updatedBy: string
 }
 
 export interface CategoryCreateRequest {

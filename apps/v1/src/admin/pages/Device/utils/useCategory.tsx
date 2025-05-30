@@ -12,8 +12,8 @@ export const useCategory = (
         id: category.id,
         name: category.name,
         iconFile: category.iconFile?.originalFileName,
-        code: category.baseResponse.createdBy,
-        update: DateFormatter(category.baseResponse.createdAt),
+        code: category.createdBy,
+        update: DateFormatter(category.createdAt),
         management: (
             <div className="flex flex-wrap gap-1">
             <Button color="primary" className="w-15" onClick={() => onEdit(category.id)}>수정</Button>
