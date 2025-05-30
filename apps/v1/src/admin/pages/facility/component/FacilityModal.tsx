@@ -79,7 +79,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                             <Select.Trigger />
                             <Select.Content>
                                 {modelData.map((item) => {
-
                                     const val = JSON.stringify({
                                         "name": item.displayName,
                                         "floorId": item.floorId
@@ -89,8 +88,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                                         {item.displayName}
                                     </Select.Item>
                                     )
-                                    }
-                                )}
+                                })}
                             </Select.Content>
                         </Select>
                     </FormItem>

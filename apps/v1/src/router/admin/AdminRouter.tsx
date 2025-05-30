@@ -25,9 +25,9 @@ export const AdminRouter: RouteObject[] = [
                     { path: ADMIN_ROUTE.LINE, element: <LinePage /> },
                     { path: ADMIN_ROUTE.USER, element: <UserPage /> },
                     { path: ADMIN_ROUTE.FACILITIES, element: <FacilitiesPage/> },
-                    { path: ADMIN_ROUTE.FACILITIES_DETAIL, element: <FacilitiesDetailPage/> }
+                    { path: ADMIN_ROUTE.FACILITIES_DETAIL, element: <FacilitiesDetailPage/> },
                     { path: ADMIN_ROUTE.DEVICE, element: <DevicePage /> },
-                    { path: ADMIN_ROUTE.DEVICE_CATEGORY, element: <DeviceCategory /> },
+                    { path: ADMIN_ROUTE.DEVICE_CATEGORY, element: <DeviceCategory /> }
                 ]
             },
             { path: ADMIN_ROUTE.VIEWER, element: <Viewer /> },

@@ -7,18 +7,6 @@ import { useLinesSWR } from '@plug/common-services';
 import { FileUploadField } from "@plug/v1/admin/pages/facility/component/FileUploadField";
 import DateFormatter from "@plug/v1/app/utils/dateFormatter";
 
-type FormValues = {
-  name: string;
-  description: string;
-  code: string;
-  lineIds: string[];
-  updatedBy: string;
-  id: string;
-  updatedAt: string;
-  floors: Array<{ name: string; floorId: string }>;
-  externalCode: string;
-};
-
 export default function StationDetail() {
   const { id } = useParams<{ id: string }>();
   const [station, setStation] = useState<StationDetail | null>(null);
@@ -72,7 +60,7 @@ export default function StationDetail() {
     if (fileInput) fileInput.click();
   };
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async () => {
     setIsLoading(true);
     try {
       const updateData = {

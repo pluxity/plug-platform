@@ -43,11 +43,13 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
     }, [onClose, resetFiles, resetModelData]);
 
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleFinish = useCallback(async (values: Record<string, any>) => {
         setIsLoading(true);
         try {
-
-            const floors = values.floors.map((item) => {
+            
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const floors = values.floors.map((item: any) => {
                 const parsed = JSON.parse(item);
                 return {
                     floorId: parsed.floorId,
