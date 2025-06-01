@@ -133,7 +133,7 @@ export default function StationDetail() {
               <tr>
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사 ID</th>
                 <td className="border border-gray-300 p-2 w-1/3">
-                  <FormItem name="id" >
+                  <FormItem name="id">
                     <div>
                       <Input.Text
                           value={formValues.id}
@@ -267,7 +267,7 @@ export default function StationDetail() {
               <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
               <td rowSpan={2}>
               {station.facility.thumbnail?.url && (
-                  <div className="w-full rounded-lg overflow-hidden" >
+                  <div className="w-full overflow-hidden p-2.5" >
                     <img
                         src={station.facility.thumbnail.url}
                         alt="썸네일 이미지"

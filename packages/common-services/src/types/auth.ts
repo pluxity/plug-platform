@@ -21,6 +21,11 @@ export interface UserProfile {
     id: number;
     name: string;
     username: string;
-    roles: string[];
+    roles: Role[];
 }
-  
+
+export interface Role {
+    id: number;
+    name: string;
+    description: string;
+}
