@@ -14,6 +14,7 @@ export const ProtectedRoute = ({ requiredRoles }: ProtectedRouteProps) => {
         return <Navigate to="/" replace />;
     }
 
+    console.log(user);
     if (
         requiredRoles &&
         !requiredRoles.some((requiredRole) =>

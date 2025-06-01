@@ -49,6 +49,11 @@ Event.InternalHandler.addEventListener('onGltfLoaded' as never, (evt: any) => {
  * @returns - 변환된 좌표값
  */
 function convertWorldToFloorLocal(worldPos: THREE.Vector3, floorId: string): THREE.Vector3 {
+    if( !floorObjects.hasOwnProperty(floorId) ) {
+        const targetFloor = getLowestFloorObject();
+        return targetFloor.worldToLocal(worldPos);
+    }
+
     const targetFloor = floorObjects[floorId];
     return targetFloor.worldToLocal(worldPos);
 }
@@ -60,6 +65,11 @@ function convertWorldToFloorLocal(worldPos: THREE.Vector3, floorId: string): THR
  * @returns - 변환된 좌표값
  */
 function convertFloorLocalToWorld(localPos: THREE.Vector3, floorId: string): THREE.Vector3 {
+    if( !floorObjects.hasOwnProperty(floorId) ) {
+        const targetFloor = getLowestFloorObject();
+        return targetFloor.localToWorld(localPos);
+    }
+
     const targetFloor = floorObjects[floorId];
     return targetFloor.localToWorld(localPos);
 }

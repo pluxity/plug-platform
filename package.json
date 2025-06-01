@@ -11,8 +11,8 @@
     "api-hooks": "pnpm --filter @plug/api-hooks",
     "common-services": "pnpm --filter @plug/common-services",
     "prepare": "husky install",
-    "sample": "pnpm --filter @plug/sample",
-    "project:busan": "pnpm --filter @plug/busan-subway"
+    "sample" : "pnpm --filter @plug/sample",
+    "project:busan": "pnpm --filter @plug/v1"
   },
   "keywords": [],
   "author": "",

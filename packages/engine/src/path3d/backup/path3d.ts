@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as Interfaces from '../interfaces';
+import * as Interfaces from '../../interfaces';
 import { PathSegment3D } from './pathsegment';
 import { PathPoint3D } from './pathpoint';
 
@@ -19,7 +19,7 @@ class Path3D extends THREE.Group {
     /**
      * 스플라인을 따라 생성되는 도형의 기본 형태
      */
-    private extrudeShape?: THREE.Shape;
+    private extrudeShape!: THREE.Shape;
     /**
      * 경로 너비
      */
@@ -45,6 +45,10 @@ class Path3D extends THREE.Group {
         this.extrudeShape.lineTo(halfLength, halfLength);
         this.extrudeShape.lineTo(halfLength, -halfLength);
         this.extrudeShape.lineTo(-halfLength, -halfLength);
+    }
+
+    get PathWidth(): number {
+        return this.pathWidth;
     }
 
     get PathColor(): THREE.ColorRepresentation {
@@ -113,6 +117,10 @@ class Path3D extends THREE.Group {
         this.add(pointObj);
         pointObj.position.copy(segment.EndPointWorldPosition);
         this.pointObjects.push(pointObj);
+    }
+
+    updateGeometries() {
+        this.segments.forEach(segment => segment.updateGeometry(this.extrudeShape));
     }
 }
 

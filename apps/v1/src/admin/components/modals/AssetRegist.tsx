@@ -111,23 +111,34 @@ export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAss
   }, [mode, detailAssetData, isOpen]);
 
 
+  // 폼 초기화
+  const resetForm = useCallback(() => {
+    setName('');
+    setModelFile(null);
+    setThumbnailFile(null);
+    setUploadedModelId(null);
+    setUploadThumbnailId(null);
+    onClose();
+  }, [onClose]);
+  
   // 제출 핸들러
   const handleFinish = useCallback(async (values: Record<string, string>) => {
-    // 수정 모달 제출 
-    if(mode === 'edit' && detailAssetData){  
-      try{
-          const asset = await updateAsset({
-            name: values.assetRegistName || name,
-            fileId: uploadedModelId || undefined,
-            thumbnailFileId: uploadThumbnailId || undefined
-          });
+    // 수정 모달 제출
+    if (mode === 'edit' && detailAssetData) {
+      try {
+        const asset = await updateAsset({
+          name: values.assetRegistName || name,
+          fileId: uploadedModelId || undefined,
+          thumbnailFileId: uploadThumbnailId || undefined
+        });
     
-          // 성공 처리
-          if (asset) {
-            alert('아이콘이 성공적으로 수정되었습니다.');
-            resetForm();
-            if (onSuccess) onSuccess();
-          }
+        // 성공 처리
+        if (asset) {
+          alert('아이콘이 성공적으로 수정되었습니다.');
+          resetForm();
+          if (onSuccess) onSuccess();
+        }
+
       } catch(error){
         console.error('아이콘 수정 실패:', error);
       }
@@ -156,17 +167,8 @@ export const AssetRegistModal = ({ isOpen, onClose, onSuccess, mode, selectedAss
         console.error('아이콘 등록 실패:', error);
       }
     }
-  }, [createAsset, uploadedModelId, name, mode, onSuccess, detailAssetData, updateAsset, uploadThumbnailId]);
+  }, [createAsset, uploadedModelId, name, mode, onSuccess, detailAssetData, updateAsset, uploadThumbnailId, resetForm]);
   
-  // 폼 초기화
-  const resetForm = () => {
-    setName('');
-    setModelFile(null);
-    setThumbnailFile(null);
-    setUploadedModelId(null);
-    setUploadThumbnailId(null);
-    onClose();
-  };
 
   // 에러 메시지 표시
   const error = fileError || assetError || assetUpdateError;

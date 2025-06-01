@@ -18,6 +18,15 @@ class Vector3Custom extends THREE.Vector3 {
 }
 
 /**
+ * 임포트용 벡터3 인터페이스
+ */
+interface Vector3 {
+    x: number;
+    y: number;
+    z: number;
+}
+
+/**
  * 데이터 익스포트를 위한 Euler 클래스
  */
 class EulerCustom extends THREE.Euler {
@@ -97,9 +106,9 @@ interface PoiImportOption {
     displayText: string;
     floorId: string;
     property: { [key: string]: any };
-    position: Vector3Custom;
-    rotation: EulerCustom;
-    scale: Vector3Custom;
+    position: Vector3;
+    rotation: Vector3;
+    scale: Vector3;
 }
 
 /**
@@ -135,7 +144,7 @@ interface SBMMesh {
     vertexCount: number;
     posVertices: number[];
     normVertices: number[];
-    uvVertices : number[];
+    uvVertices: number[];
     indices: number[];
 }
 
@@ -159,6 +168,7 @@ interface Path3DData {
 
 export {
     Vector3Custom,
+    Vector3,
     EulerCustom,
     CustomLayer,
     MouseButton,

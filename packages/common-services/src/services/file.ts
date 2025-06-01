@@ -5,10 +5,6 @@ import type { FileUploadResponse } from '@plug/common-services/types';
 const FILE_API = `files`;
 
 /**
- * 파일 업로드 응답 타입 (Location 헤더 기반)
- */
-
-/**
  * 파일 업로드 전용 API 훅
  * Location 헤더에서 fileId를 추출하는 로직을 포함함
  * @template T - 업로드 응답 데이터 타입 (기본값: FileUploadResponse)
