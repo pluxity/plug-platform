@@ -104,12 +104,12 @@ const SidebarMenu = ({
     return(
         <ul
             className={cn(
-                `flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-6 font-bold
+                `flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-4 font-bold
                 [&::-webkit-scrollbar]:w-[6px] 
                 [&::-webkit-scrollbar-track]:bg-transparent 
                 [&::-webkit-scrollbar-thumb]:bg-gray-200 
                 [&::-webkit-scrollbar-thumb]:rounded-full 
-                hover:[&::-webkit-scrollbar-thumb]:bg-gray-200`, 
+                hover:[&::-webkit-scrollbar-thumb]:bg-gray-200`,
                 className
             )}
             {...props}
@@ -213,9 +213,10 @@ const SidebarMenuButton = ({
             type="button"
             onClick={handleClick}
             className={cn(
-                `flex items-center w-full gap-2  ${isOpen ? "" : "justify-center"} cursor-pointer text-lg`,
+                `flex items-center w-full gap-2 ${isOpen ? "" : "justify-center"} cursor-pointer text-lg py-2 px-3 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-[var(--color-primary-600)] active:bg-gray-200`,
                 className,
             )}
+
             {...props}
         >
             {SubChildrenElement}
@@ -275,8 +276,9 @@ const SidebarSubMenuItem = ({
             type="button"
             onClick={handleClick}
             className={cn(
-                "w-full text-left px-2 py-1 text-sm cursor-pointer",
+                "w-full text-left px-3 py-2 text-sm cursor-pointer rounded-md transition-all duration-200 hover:bg-gray-50 hover:text-[var(--color-primary-500)] active:bg-gray-100",
                 className
+
             )}
             {...props}
         >

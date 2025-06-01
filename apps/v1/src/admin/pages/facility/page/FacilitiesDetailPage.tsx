@@ -134,7 +134,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사 ID</th>
                 <td className="border border-gray-300 p-2 w-1/3">
                   <FormItem name="id">
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           value={formValues.id}
                           onChange={(value) => handleChange('id', value)}
@@ -147,7 +147,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사명</th>
                 <td className="border border-gray-300 p-2 w-1/3">
                   <FormItem name="name" required >
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           placeholder={formValues.name}
                           value={formValues.name}
@@ -163,7 +163,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">설명</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="description" required >
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           value={formValues.description}
                           onChange={(e) => handleChange('description', e)}
@@ -175,7 +175,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">코드</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="code" >
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           value={formValues.code}
                           onChange={(e) => handleChange('code', e)}
@@ -192,7 +192,7 @@ export default function StationDetail() {
                   <FormItem name="lineIds" required >
                     <Select
                       type="multiple"
-                      className="w-full"
+                      className="w-full mb-[-16px]"
                       selected={formValues.lineIds}
                       onChange={(value) => handleChange('lineIds', value)}
                     >
@@ -210,7 +210,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="externalCode" >
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           value={formValues.externalCode}
                           onChange={(e) => handleChange('code', e)}
@@ -224,7 +224,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">층 정보</th>
                 <td className="border border-gray-300 p-2" colSpan={3}>
                   <FormItem name="floors" required>
-                    <div className="space-y-2">
+                    <div className="space-y-2 mb-[-16px]">
                       {formValues.floors.map((floor) => (
                           <div key={floor.floorId} className="flex gap-2">
                             <p>{floor.name}</p>
@@ -238,7 +238,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">수정일</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="updatedAt" >
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           value={formValues.updatedAt}
                           onChange={(e) => handleChange('updatedAt', e)}
@@ -251,7 +251,7 @@ export default function StationDetail() {
                 <th className="border border-gray-300 p-2 bg-gray-50">마지막 수정인</th>
                 <td className="border border-gray-300 p-2">
                   <FormItem name="updatedBy" >
-                    <div>
+                    <div className='mb-[-16px]'>
                       <Input.Text
                           value={formValues.updatedBy}
                           onChange={(e) => handleChange('updatedBy', e)}
@@ -306,6 +306,7 @@ export default function StationDetail() {
                     onChange={(e) => console.log(e)}
                     onOpenPicker={() => {openFilePicker('model')}}
                     label='썸네일 파일'
+                    className='mb-[-16px]'
                 />
               </td>
 

@@ -13,6 +13,7 @@ interface FileUploadFieldProps {
     isUploading: boolean;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onOpenPicker: (type: FileType) => void;
+    className?: string;
 }
 
 export const FileUploadField: React.FC<FileUploadFieldProps> = ({
@@ -21,7 +22,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
     fileState,
     isUploading,
     onChange,
-    onOpenPicker
+    onOpenPicker,
 }) => (
     <FormItem name={`${type}Field`} label={label} required>
         <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
