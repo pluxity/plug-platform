@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '@plug/api-hooks/core';
-// import type { FileResponse } from '@plug/common-services/types';
 import useStationStore from '@plug/v1/app/stores/stationStore';
-// import MenuItem from './MenuItem';
+import MenuItem from './MenuItem';
 import DevicePanel from './DevicePanel';
 
-// interface Category {
-//   id: number;
-//   name: string;
-//   parentId: number | null;
-//   iconFile: FileResponse;
-// }
+interface Category{
+  categoryId: string;
+  categoryName: string;
+  iconFile: {url: string;};
+}
 
-// interface MenuItemData {
-//   id: string;
-//   icon: string;
-//   name: string;
-// }
+interface MenuItemData {
+  id: string;
+  name: string;
+  icon: string;
+}
 
 const SideMenu: React.FC = () => {
-  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
-  // const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
+  const [activeMenu, setActiveMenu] = useState<MenuItemData | null>(null);
+  const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
   const [isDevicePanelOpen, setIsDevicePanelOpen] = useState<boolean>(false);
 
   const { stationId } = useStationStore(); 
@@ -34,18 +32,16 @@ const SideMenu: React.FC = () => {
       }
       
       try {
-        const response = await api.get(`devices/station/${stationId}/grouped`);
+        const response = await api.get<Category[]>(`devices/station/${stationId}/grouped`);
         console.log("Fetched categories:", response.data);
 
-        // FIXME : API 변경에 따라 로직 수정
-
         if (response.data) {
-          // const transformedMenuItems = response.data.map(category => ({
-          //   id: category.id.toString(),
-          //   icon: category.iconFile.url, 
-          //   name: category.name,
-          // }));
-          // setMenuItems(transformedMenuItems);
+          const transformedMenuItems = response.data.map(item => ({
+            id: item.categoryId.toString(),
+            name: item.categoryName,
+            icon: item.iconFile?.url,
+          }));
+          setMenuItems(transformedMenuItems);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -54,16 +50,17 @@ const SideMenu: React.FC = () => {
     fetchCategory();
   }, [stationId]);
 
-  // const handleMenuItemClick = (id: string) => {
-  //   setActiveMenuId(prev => {
-  //     const newActiveId = prev === id ? null : id;
-  //     setIsDevicePanelOpen(newActiveId !== null); // Open panel if a menu item is active
-  //     return newActiveId;
-  //   });
-  // };
+  const handleMenuItemClick = (id: string) => {
+    const clickedMenu = menuItems.find(item => item.id === id) || null;
+    setActiveMenu(prev => {
+      const newActive = prev?.id === id ? null : clickedMenu;
+      setIsDevicePanelOpen(newActive !== null);
+      return newActive;
+    });
+  };
 
   const closeDevicePanel = () => {
-    setActiveMenuId(null);
+    setActiveMenu(null);
     setIsDevicePanelOpen(false);
   };
 
@@ -71,19 +68,19 @@ const SideMenu: React.FC = () => {
     <>
       <div className={`fixed left-0 top-16 bottom-0 w-16 bg-primary-400/20 backdrop-blur-xs flex flex-col items-center pt-4 px-2 z-10`}>
         <div className="overflow-y-auto flex-1 mt-2">        
-          {/* {menuItems.map((item) => (
-            <MenuItem
+          {menuItems.map((item) => (
+             <MenuItem
               key={item.id}
               id={item.id}
               icon={item.icon}
-              isActive={activeMenuId === item.id}
+              isActive={activeMenu?.id === item.id}
               onClick={handleMenuItemClick}
-            />
-          ))} */}
+           />
+          ))}
         </div>
       </div>
-      {isDevicePanelOpen && activeMenuId && (
-        <DevicePanel categoryId={activeMenuId} onClose={closeDevicePanel} />
+      {isDevicePanelOpen && activeMenu && (
+        <DevicePanel categoryId={activeMenu.id} categoryName={activeMenu.name} onClose={closeDevicePanel} />
       )}
     </>
   );

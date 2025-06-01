@@ -2,25 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { api } from '@plug/api-hooks/core';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 
-
-interface Device {
+interface DeviceData {
   id: string;
   name: string;
 }
 
+interface DeviceGroup {
+  categoryId: string;
+  categoryName: string;
+  devices: DeviceData[];
+}
+
 interface DevicePanelProps {
+  categoryName: string | null;
   categoryId: string | null;
   onClose: () => void;
 }
 
-const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, onClose }) => {
-  const [devices, setDevices] = useState<Device[]>([]);
+const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onClose }) => {
+  const [devices, setDevices] = useState<DeviceData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { stationId } = useStationStore(); 
+  const { stationId } = useStationStore();
 
   useEffect(() => {
-    if (!categoryId) {
+    if (!categoryId || !stationId) {
       setDevices([]);
       return;
     }
@@ -28,9 +34,17 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, onClose }) => {
     const fetchDevices = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        const response = await api.get<Device[]>(`devices/station/${stationId}/grouped`);
-        setDevices(response.data || []);
+        const response = await api.get<DeviceGroup[]>(`devices/station/${stationId}/grouped`);
+        
+        if (response.data) {
+            const transformDevices = response.data.find(item => {
+                return String(item.categoryId) === String(categoryId)
+            } 
+          );
+          setDevices(transformDevices?.devices || []);
+        } 
       } catch (err) {
         console.error('Error fetching devices:', err);
         setError('Failed to load devices.');
@@ -41,7 +55,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, onClose }) => {
     };
 
     fetchDevices();
-  }, [categoryId]);
+  }, [categoryId, stationId]);
 
   if (!categoryId) {
     return null;
@@ -50,21 +64,23 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, onClose }) => {
   return (
     <div className="fixed left-16 top-16 bottom-0 w-72 bg-primary-400/20 backdrop-blur-xs p-4 z-20 transition-all duration-300 ease-in-out transform translate-x-0">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Devices</h2>
-        <button 
-          onClick={onClose} 
-          className="text-gray-500 hover:text-gray-700 text-2xl"
+        <h2 className="text-lg font-semibold text-white">{categoryName}</h2>
+        <button
+          onClick={onClose}
+          className="text-white hover:text-gray-400 text-2xl"
           aria-label="Close device panel"
         >
           &times;
         </button>
       </div>
-      {loading && <p className="text-gray-500">Loading devices...</p>}
-      {!loading && !error && devices.length === 0 && <p className="text-gray-500">No devices found in this category.</p>}
+
+      {loading && <p className="text-gray-400">Loading devices...</p>}
+      {!loading && error && <p className="text-red-400">{error}</p>}
+      {!loading && !error && devices.length === 0 && (<p className="text-gray-400">No devices found in this category.</p>)}
       {!loading && !error && devices.length > 0 && (
         <ul className="space-y-2">
           {devices.map(device => (
-            <li key={device.id} className="p-2 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700">
+            <li key={device.id} className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white">
               {device.name}
             </li>
           ))}
