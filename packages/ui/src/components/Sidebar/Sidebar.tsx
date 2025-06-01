@@ -98,14 +98,13 @@ const SidebarFooter = ({
 
 const SidebarMenu = ({
     className,
-    children,
     items = [],
     ...props
 }: SidebarMenuProps) => {
     return(
         <ul
             className={cn(
-                `flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-2 
+                `flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-6 font-bold
                 [&::-webkit-scrollbar]:w-[6px] 
                 [&::-webkit-scrollbar-track]:bg-transparent 
                 [&::-webkit-scrollbar-thumb]:bg-gray-200 
@@ -214,7 +213,7 @@ const SidebarMenuButton = ({
             type="button"
             onClick={handleClick}
             className={cn(
-                `flex items-center w-full gap-2  ${isOpen ? "" : "justify-center"}`,
+                `flex items-center w-full gap-2  ${isOpen ? "" : "justify-center"} cursor-pointer text-lg`,
                 className,
             )}
             {...props}

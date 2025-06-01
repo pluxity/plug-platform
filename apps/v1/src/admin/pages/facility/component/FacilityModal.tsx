@@ -31,7 +31,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
 
     return (
         <Modal
-            title="도면 등록"
+            title="역사 정보 등록"
             isOpen={isOpen}
             onClose={isLoading ? undefined : resetForm}
             closeOnOverlayClick={false}
@@ -44,16 +44,33 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                 )}
 
                 <Form onSubmit={handleFinish}>
-                    <FormItem name="name" label="도면 이름" required>
-                        <Input.Text placeholder="도면 이름을 입력하세요" />
+                    <FormItem name="name" label="역사 이름" required>
+                        <Input.Text placeholder="역사 이름을 입력하세요" />
                     </FormItem>
 
-                    <FormItem name="code" label="도면 코드" required>
-                        <Input.Text placeholder="도면 코드를 입력하세요" />
+                    <FormItem name="code" label="역사 코드" required>
+                        <Input.Text placeholder="역사 코드를 입력하세요" />
                     </FormItem>
 
-                    <FormItem name="description" label="도면 설명" required>
-                        <Input.Text placeholder="도면 설명을 입력하세요" />
+                    <FormItem name="externalCode" label="NFLUX STATION ID" required>
+                        <Input.Text placeholder="NFLUX STATION ID를 입력하세요" />
+                    </FormItem>
+
+                    <FormItem name="linesId" label="호선 선택" required>
+                        <Select type="multiple" defaultValue={[]}>
+                            <Select.Trigger/>
+                            <Select.Content>
+                                {lines?.map((line) => (
+                                    <Select.Item key={line.id} value={String(line.id)}>
+                                        {line.name}
+                                    </Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select>
+                    </FormItem>
+
+                    <FormItem name="description" label="역사 설명" required>
+                        <Input.Text placeholder="역사 설명을 입력하세요" />
                     </FormItem>
 
                     <FileUploadField
@@ -91,24 +108,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                                 })}
                             </Select.Content>
                         </Select>
-                    </FormItem>
-
-
-                    <FormItem name="linesId" label="해당호선" required>
-                        <Select type="multiple" defaultValue={[]}>
-                            <Select.Trigger/>
-                            <Select.Content>
-                                {lines?.map((line) => (
-                                    <Select.Item key={line.id} value={String(line.id)}>
-                                        {line.name}
-                                    </Select.Item>
-                                ))}
-                            </Select.Content>
-                        </Select>
-                    </FormItem>
-
-                    <FormItem name="externalCode" label="외부 코드" required>
-                        <Input.Text placeholder="외부 코드를 입력하세요" />
                     </FormItem>
 
                     <div className="mt-6 flex justify-center gap-2">

@@ -54,7 +54,7 @@ const TableBody = <T,>({
                     <td
                         key={String(col.key)}
                         role="cell"
-                        className="p-3 border-t border-slate-200 text-sm"
+                        className="p-3 border-t border-slate-200 text-sm text-center"
                     >
                       {typeof row[col.key] === 'string' && search
                           ? highlightText(row[col.key] as string, search)

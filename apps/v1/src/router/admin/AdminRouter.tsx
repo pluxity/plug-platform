@@ -20,7 +20,6 @@ export const AdminRouter: RouteObject[] = [
                 path: ADMIN_ROUTE.DASHBOARD,
                 element: <Dashboard />,
                 children: [
-                    { path: ADMIN_ROUTE.DASHBOARD, element: <Dashboard /> },
                     { path: ADMIN_ROUTE.ASSET, element: <AssetPage /> },
                     { path: ADMIN_ROUTE.LINE, element: <LinePage /> },
                     { path: ADMIN_ROUTE.USER, element: <UserPage /> },

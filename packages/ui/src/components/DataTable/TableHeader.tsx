@@ -32,7 +32,7 @@ const TableHeader = <T,>({
                     onClick={() => onSort(col.key)}
                     aria-sort={sortKey === col.key ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
                 >
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-center gap-1">
                         {col.label}
                         {sortKey === col.key && (
                             <span className="text-xs text-slate-400">{sortOrder === 'asc' ? '▲' : '▼'}</span>

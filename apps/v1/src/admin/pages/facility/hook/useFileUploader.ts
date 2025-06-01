@@ -26,17 +26,9 @@ export const useFileUploader = (
             const fileResponse = await api.get<FileResponse>(locationHeader.location?.replace(/^\//, '') ?? '');
             const fileUrl = fileResponse.data.url;
 
-            const data = await new Promise<ModelInfo[]>((resolve, reject) => {
-                Px.Model.GetModelHierarchy(fileUrl, (data: ModelInfo[]) => {
-                    resolve(data);
-                }, (error: Error) => {
-                    reject(error);
-                });
+            Px.Model.GetModelHierarchyFromUrl(fileUrl, (data: ModelInfo[]) => {
+                    setModelData(data);
             });
-
-            setModelData(data);
-            console.log(data)
-            return data;
             
         } catch (error) {
             console.error('모델 정보 로드 실패:', error);

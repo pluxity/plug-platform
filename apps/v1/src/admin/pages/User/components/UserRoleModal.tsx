@@ -53,7 +53,7 @@ export const UserRoleModal = ({ isOpen, onClose, onSuccess, selectedUserId}: Use
                             <Select.Content>
                                 {detailRoleData?.map(role => (
                                     <Select.Item key={role.id} value={String(role.id)}>
-                                        {role.description}
+                                        {role.name}
                                     </Select.Item>
                                 ))}
                             </Select.Content>

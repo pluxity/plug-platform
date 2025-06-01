@@ -69,7 +69,7 @@ export default function UserListPage() {
           }
         };
         fetchLoggedInUsers();
-      }, []);
+      }, [loggedInUser, setStatusData, closeModal, openModal, openPasswordModal, openRoleModal]);
       
     
     const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
