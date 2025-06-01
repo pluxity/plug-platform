@@ -8,8 +8,7 @@ const Dashboard = () => {
     return (
         <div className='h-screen w-full flex flex-col overflow-hidden'>
             <div className='flex flex-1 overflow-hidden'>
-                {/*<Sidebar className='h-full bg-[var(--color-primary-100)] shadow-md'>*/}
-                <Sidebar className='h-full shadow-md'>
+                <Sidebar className='h-full bg-[var(--color-primary-100)] shadow-md'>
                     <Sidebar.Menu
                         items={[
                             {

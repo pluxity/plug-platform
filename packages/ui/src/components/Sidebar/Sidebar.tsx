@@ -1,6 +1,6 @@
 import { cn } from "../../utils/classname";
-import React, { useState, useContext, createContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState, useContext, createContext} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import SidebarArrowIcon from "../../assets/icons/sidebar_arrow.svg";
 import type {
     SidebarProps,
@@ -45,10 +45,15 @@ const Sidebar = ({
             <aside
                 aria-hidden={!currentState}
                 className={cn(
-                    'h-screen bg-white shadow-[0_0_15px_-3px_rgba(0,_0,_0,_0.2)] flex flex-col',
-                    currentState ? 'w-60' : 'w-20',
+                    'h-screen flex flex-col',
+                    'bg-gradient-to-b from-white to-gray-50/80',
+                    'backdrop-blur-md',
+                    'border-r border-gray-100/50',
+                    'shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)]',
+                    currentState ? 'w-64' : 'w-20',
                     'transition-all duration-300 ease-in-out',
                     className
+
                 )}
                 {...props}
             >
@@ -104,12 +109,12 @@ const SidebarMenu = ({
     return(
         <ul
             className={cn(
-                `flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-4 font-bold
-                [&::-webkit-scrollbar]:w-[6px] 
-                [&::-webkit-scrollbar-track]:bg-transparent 
-                [&::-webkit-scrollbar-thumb]:bg-gray-200 
-                [&::-webkit-scrollbar-thumb]:rounded-full 
-                hover:[&::-webkit-scrollbar-thumb]:bg-gray-200`,
+                `flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-2 font-bold text-gray-700
+                [&::-webkit-scrollbar]:w-[4px]
+                [&::-webkit-scrollbar-track]:bg-transparent
+                [&::-webkit-scrollbar-thumb]:bg-gray-200/70
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                hover:[&::-webkit-scrollbar-thumb]:bg-gray-300/70`,
                 className
             )}
             {...props}
@@ -207,16 +212,28 @@ const SidebarMenuButton = ({
         return null;
     });
 
-    return(
-        <button 
-            aria-expanded={isSubMenuOpen}
-            type="button"
+    return (
+        <button
             onClick={handleClick}
             className={cn(
-                `flex items-center w-full gap-2 ${isOpen ? "" : "justify-center"} cursor-pointer text-lg py-2 px-3 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-[var(--color-primary-600)] active:bg-gray-200`,
-                className,
+                'group flex items-center w-full',
+                'px-4 py-2 rounded-xl',
+                isOpen ? 'gap-3' : 'justify-center',
+                'text-[15px] tracking-wide',
+                'transition-all duration-200 ease-out',
+                link && location.pathname.includes(link) ? [
+                    'bg-white text-[var(--color-primary-700)]',
+                    'shadow-sm shadow-[var(--color-primary-200)]/50',
+                ].join(' ') : (
+                    [
+                        'text-gray-600',
+                        'hover:bg-white/60 hover:text-[var(--color-primary-700)]',
+                        'hover:shadow-sm hover:shadow-gray-100/50',
+                        'active:bg-white/80'
+                    ].join(' ')
+                ),
+                className
             )}
-
             {...props}
         >
             {SubChildrenElement}
@@ -224,7 +241,7 @@ const SidebarMenuButton = ({
                 <ArrowIcon className={cn(
                     "ml-auto transition-transform duration-200",
                     isSubMenuOpen ? "rotate-90" : "rotate-0"
-                )} />
+                )}/>
             )}
         </button>
     )
@@ -241,8 +258,19 @@ const SidebarSubMenu = ({
             role="menu"
             aria-hidden={!isSubMenuOpen}
             className={cn(
-                `flex flex-col gap-1 my-2 pl-6 ${isSubMenuOpen ? "block" : "hidden"}`,
+                'flex flex-col',
+                'pl-4 ml-2',
+                'border-l border-gray-100/70',
+                'overflow-hidden transition-all duration-300 ease-out',
+                isSubMenuOpen ? [
+                    'max-h-[500px] opacity-100 my-2.5',
+                    'gap-1'
+                ].join(' ') : [
+                    'max-h-0 opacity-0 my-0',
+                    'gap-0'
+                ].join(' '),
                 className
+
             )}
             {...props}
         >   
@@ -251,16 +279,19 @@ const SidebarSubMenu = ({
     )
 }
 
-const SidebarSubMenuItem = ({ 
-    className,
-    children,
-    onClick,
-    beforeNavigate,
-    link,
-    ...props
-}: SidebarSubMenuItemProps) => {
-    const navigate = useNavigate(); 
-    
+const SidebarSubMenuItem = ({
+                                className,
+                                children,
+                                onClick,
+                                beforeNavigate,
+                                link,
+                                ...props
+                            }: SidebarSubMenuItemProps) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // const isActive = link && location.pathname === `/${link}`;
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(e);
         if(beforeNavigate){
@@ -271,19 +302,39 @@ const SidebarSubMenuItem = ({
         }
     };
 
-    return(
+    return (
         <button
             type="button"
             onClick={handleClick}
             className={cn(
-                "w-full text-left px-3 py-2 text-sm cursor-pointer rounded-md transition-all duration-200 hover:bg-gray-50 hover:text-[var(--color-primary-500)] active:bg-gray-100",
+                'w-full text-left relative',
+                'px-4 py-2 rounded-lg',
+                'text-[13px] font-medium',
+                'transition-all duration-200 ease-out',
+                link && location.pathname.includes(link)  ? [
+                    'bg-[var(--color-primary-200)]',
+                    'text-[var(--color-primary-700)]',
+                    'shadow-sm shadow-[var(--color-primary-100)]/50'
+                ].join(' ') : (
+                    [
+                        'text-gray-500',
+                        'hover:bg-white/80',
+                        'hover:text-gray-900',
+                        'hover:shadow-sm hover:shadow-gray-100/50'
+                    ].join(' ')
+                ),
                 className
-
             )}
             {...props}
         >
-            {children}
+            <span className="relative z-10 flex items-center gap-2">
+                {link && location.pathname.includes(link) && (
+                    <span className="w-1 h-1 rounded-full bg-[var(--color-primary-500)]" />
+                )}
+                {children}
+            </span>
         </button>
+
     )
 }
 
