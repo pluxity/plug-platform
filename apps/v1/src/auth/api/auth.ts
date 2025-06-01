@@ -31,6 +31,7 @@ export const logIn = async (data: { username: string; password: string }): Promi
 export const logOut = async (): Promise<Response> => {
     const response = await signOut();
     useProfileStore.getState().clearUser();
+    console.log('logout')
     return response;
 };
 
