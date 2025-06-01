@@ -47,7 +47,7 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
     const handleFinish = useCallback(async (values: Record<string, any>) => {
         setIsLoading(true);
         try {
-            
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const floors = values.floors.map((item: any) => {
                 const parsed = JSON.parse(item);
