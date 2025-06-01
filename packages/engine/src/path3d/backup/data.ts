@@ -1,5 +1,5 @@
 import { Path3D } from './path3d';
-import * as Event from '../eventDispatcher';
+import * as Event from '../../eventDispatcher';
 
 const createdPathObjects: Path3D[] = [];
 

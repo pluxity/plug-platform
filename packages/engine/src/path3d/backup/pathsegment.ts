@@ -12,6 +12,10 @@ class PathSegment3D extends THREE.Mesh {
     private endPointDummy!: THREE.Object3D;
 
     /**
+     * 경로 너비
+     */
+    private segmentWidth: number;
+    /**
      * 경로 구간 색상
      */
     private segmentColor: THREE.ColorRepresentation = 'red';
@@ -19,9 +23,10 @@ class PathSegment3D extends THREE.Mesh {
     /**
      * PathSegment 생성자
      */
-    constructor(color: THREE.ColorRepresentation = 'red') {
+    constructor(_segmentWidth: number, color: THREE.ColorRepresentation = 'red') {
         super();
 
+        this.segmentWidth = _segmentWidth;
         this.segmentColor = color;
     }
 

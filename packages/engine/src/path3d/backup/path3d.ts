@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as Interfaces from '../interfaces';
+import * as Interfaces from '../../interfaces';
 import { PathSegment3D } from './pathsegment';
 import { PathPoint3D } from './pathpoint';
 
@@ -45,6 +45,10 @@ class Path3D extends THREE.Group {
         this.extrudeShape.lineTo(halfLength, halfLength);
         this.extrudeShape.lineTo(halfLength, -halfLength);
         this.extrudeShape.lineTo(-halfLength, -halfLength);
+    }
+
+    get PathWidth(): number {
+        return this.pathWidth;
     }
 
     get PathColor(): THREE.ColorRepresentation {
