@@ -290,8 +290,6 @@ const SidebarSubMenuItem = ({
     const navigate = useNavigate();
     const location = useLocation();
 
-    // const isActive = link && location.pathname === `/${link}`;
-
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(e);
         if(beforeNavigate){
