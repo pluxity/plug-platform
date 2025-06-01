@@ -1,10 +1,12 @@
-import { useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import { Form, FormItem, Input, Select, Button } from '@plug/ui';
 import { useLinesSWR } from '@plug/common-services';
 import {useStationDetail} from "@plug/v1/admin/pages/facility/hook/useStationDetail";
 import {FileUploadField} from "@plug/v1/admin/pages/facility/component/FileUploadField";
 
 export default function FacilitiesDetailPage() {
+  const navigate = useNavigate();
+
   const { id } = useParams<{ id: string }>();
   const { data: lines } = useLinesSWR();
   const {
@@ -173,7 +175,8 @@ export default function FacilitiesDetailPage() {
             </tbody>
           </table>
 
-          <div className="flex justify-center gap-2 mt-6">
+          <div className="flex justify-center gap-2 mt-6 w-1/3 ml-auto">
+            <Button type="button" color="secondary" onClick={() => navigate('/admin/dashboard/facility')}>목록</Button>
             <Button type="submit" color="primary" disabled={isLoading} isLoading={isLoading}>
               저장
             </Button>
