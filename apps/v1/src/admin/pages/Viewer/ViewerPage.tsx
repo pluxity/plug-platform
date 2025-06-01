@@ -1,294 +1,233 @@
-import { api } from "@plug/api-hooks";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, memo, Suspense } from "react";
 import { useParams } from "react-router-dom";
-import type { StationWithFeatures, FeatureResponse } from "./types";
-
-import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
-import * as Px from '@plug/engine/src';
 import { Select } from "@plug/ui";
-import { useStationStore } from './store/stationStore'; 
-import { useAssetStore } from './store/assetStore';
-
-import { Button, Modal, Form, FormItem, Input } from "@plug/ui";
+import { useStationStore } from './store/stationStore';
 import type { ModelInfo, PoiImportOption } from "@plug/engine/src/interfaces";
 
-const Viewer = () => {
-    const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
-    const { currentStationId, setStationId } = useStationStore(); 
+import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
+import { PoiEditModal, ErrorBoundary } from "./components";
+import { useStation, useEditMode, useEngineIntegration } from "./hooks";
+import type { UseEditModeResult } from "./hooks/useEditMode";
+import type { StationWithFeatures } from "./types/station";
 
-    const [stationData, setStationData] = useState<StationWithFeatures | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [hierachies, setHierachies] = useState<ModelInfo[] | null>(null);
-    const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedPoiData, setSelectedPoiData] = useState<{
-        id: string;        
-        displayText: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        property: any;
-    } | null>(null);    
-    // 편집 모드 상태 추가
-    const [currentEditMode, setCurrentEditMode] = useState<'translate' | 'rotate' | 'scale' | 'none'>('none');
+// Loading and Error components with better UX
+const LoadingSpinner = memo(() => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="animate-pulse text-gray-500">역사 데이터 로딩 중...</div>
+  </div>
+));
 
-    useEffect(() => {
-        const idToSet = stationIdFromParams || '2'; 
-        setStationId(idToSet);
-    }, [stationIdFromParams, setStationId]);
+const ErrorMessage = memo(({ message }: { message: string }) => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="text-red-500">{message}</div>
+  </div>
+));
 
-    useEffect(() => {
-        const fetchStation = async () => {
-            if (!currentStationId) {
-                setIsLoading(false);
-                return;
-            }
-            
-            setIsLoading(true);
-            try {
-                const response = await api.get<StationWithFeatures>(`stations/${currentStationId}/with-features`);
-                setStationData(response.data);
-            } catch (err) {
-                console.error('Error fetching station data:', err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (currentStationId) {
-            fetchStation();
-        } else {
-            setIsLoading(false);
-        }
-
-    }, [currentStationId]); 
-
-    const modelPath: string = stationData?.facility?.drawing?.url || '';
-
-    const handleFloorChange = useCallback((floorId: string) => {
-        setSelectedFloor(floorId);
-        Px.Model.HideAll();
-        Px.Model.Show(floorId);
-    }, []);    const handleFeatureData = useCallback(() => {
-        // 스토어에서 최신 assets 값을 직접 가져오기
-        const currentAssets = useAssetStore.getState().assets;
-        
-        if (stationData?.features && currentAssets.length > 0) {
-            const poiData = stationData.features.map((feature: FeatureResponse) => {
-                const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
-                return {
-                    id: feature.id, 
-                    iconUrl: '', 
-                    modelUrl: modelUrl,
-                    displayText: feature.deviceCode || 'Device 할당 필요',
-                    floorId: feature.floorId,
-                    property: {
-                        code: feature.deviceCode || '',
-                    },
-                    position: feature.position,
-                    rotation: feature.rotation,
-                    scale: feature.scale
-                };
-            });
-
-            Px.Poi.Import(JSON.stringify(poiData));
-
-            // Px.Event.AddEventListener('onPoiPointerUp', (event: any) => {
-            //     console.log(event);
-            // });
-        }
-    }, [stationData]);
-
-    const handleCloseModal = useCallback(() => {
-        setIsModalOpen(false);
-        setSelectedPoiData(null);
-    }, []);
-
-    const addEngineEventListeners = useCallback(() => {
-
-        Px.Event.AddEventListener("onPoiPointerUp", (event: { target: PoiImportOption, type: string }) => {
-            const { target } = event;
-            
-            if (target) {
-                setSelectedPoiData({
-                    id: target.id,
-                    displayText: target.displayText || 'Feature',
-                    property: {
-                        code: target.property?.code,
-                    }
-                });
-                setIsModalOpen(true);
-            }
-
-            console.log('POI Pointer Up Event:', target);
-        });
-
-        Px.Event.AddEventListener('onPoiTransformChange', async (event: { target: PoiImportOption, type: string }) => {
-
-            const { target } = event;
-            try {
-                await api.patch(`features/${target.id}/transform`, {
-                    position: target.position,
-                    rotation: target.rotation,
-                    scale: target.scale
-                });
-            } catch (error) {
-                console.error('Error updating POI transform:', error);
-            }
-        });
-    }, []);
-
-    const handleModelLoaded = useCallback(async () => {
-        const modelHierarchy = Px.Model.GetModelHierarchy();
-        if (modelHierarchy) { 
-            setHierachies(modelHierarchy as ModelInfo[]);
-        } else {
-            setHierachies(null);
-        }
-
-        handleFeatureData();
-        handleFloorChange("0");        
-
-        addEngineEventListeners();
-
-    }, [setHierachies, handleFeatureData, handleFloorChange, addEngineEventListeners]);
-
-    const handleSubmit = useCallback(async (values: Record<string, string>) => {
-        if (selectedPoiData) {
-            const code = values.code || selectedPoiData.property.code;
-            const featureId = selectedPoiData.id;
-
-            try {
-                await api.put(`features/${featureId}/assign-device`,{ "code": code });
-                alert('디바이스 정보가 성공적으로 업데이트되었습니다.');
-            } catch (error) {
-                console.error('Error updating POI data:', error);
-                alert('디바이스 정보 업데이트에 실패했습니다.');
-            } finally {
-                handleCloseModal();
-            }
-        }
-    }, [selectedPoiData, handleCloseModal]);    // 편집 모드 핸들러 함수들
-    const handleTranslateMode = useCallback(() => {
-        if (currentEditMode === 'translate') {
-            setCurrentEditMode('none');
-            Px.Poi.FinishEdit();
-        } else {
-            setCurrentEditMode('translate');
-            Px.Poi.StartEdit('translate');
-        }
-    }, [currentEditMode]);
-
-    const handleRotateMode = useCallback(() => {
-        if (currentEditMode === 'rotate') {
-            setCurrentEditMode('none');
-            Px.Poi.FinishEdit();
-        } else {
-            setCurrentEditMode('rotate');
-            Px.Poi.StartEdit('rotate');
-        }
-    }, [currentEditMode]);
-
-    const handleScaleMode = useCallback(() => {
-        if (currentEditMode === 'scale') {
-            setCurrentEditMode('none');
-            Px.Poi.FinishEdit();
-        } else {
-            setCurrentEditMode('scale');
-            Px.Poi.StartEdit('scale');
-        }
-    }, [currentEditMode]);
-
-    // ESC 키로 편집 모드 종료
-    const handleExitEdit = useCallback(() => {
-        setCurrentEditMode('none');
-        Px.Poi.FinishEdit();
-    }, []);
-
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-pulse text-gray-500">역사 데이터 로딩 중...</div>
-            </div>
-        );
+// Floor selector component
+const FloorSelector = memo(({ 
+  hierarchies, 
+  selectedFloor, 
+  onFloorChange 
+}: {
+  hierarchies: ModelInfo[];
+  selectedFloor: string | null;
+  onFloorChange: (floorId: string) => void;
+}) => {  const handleFloorSelect = (values: string[]) => {
+    const floorId = values[0];
+    if (floorId) {
+      onFloorChange(floorId);
     }
+  };
 
-    if (!currentStationId && !isLoading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="text-gray-500">Station ID를 찾을 수 없습니다.</div>
-            </div>
-        );
-    }    return (
-        <>
-            <aside className="bg-white w-1/3 overflow-y-auto">
-                <AssetList /> {/* AssetList에서 useStationStore를 통해 currentStationId 접근 가능 */}
-            </aside>
-            <main className="w-full">
-                <div className="flex absolute text-white pl-4 pt-2 items-center"> 
-                  <h2 className="text-xl font-bold">
-                      {stationData?.facility?.name}
-                  </h2>
-                  { hierachies && 
-                        <Select 
-                            className="text-sm text-gray-300 ml-2 w-64" 
-                            selected={selectedFloor ? [selectedFloor] : []}
-                            onChange={values => handleFloorChange(values[0])}
-                            >
-                            <Select.Trigger/>
-                            <Select.Content>
-                              {hierachies.sort((a, b) => Number(b.floorId) - Number(a.floorId)).map(floor => (
-                                  <Select.Item key={floor.floorId} value={floor.floorId}>
-                                      {floor.displayName}
-                                  </Select.Item>
-                              ))}
-                            </Select.Content>
-                        </Select>
-                    }
-                </div>
-                {stationData && currentStationId && ( // currentStationId도 확인하여 렌더링
-                    <MapViewer 
-                        modelPath={modelPath}
-                        onModelLoaded={handleModelLoaded}
-                    />
-                )}
-                  {/* 3D 편집 툴바 */}
-                <FeatureEditToolbar
-                    onTranslateMode={handleTranslateMode}
-                    onRotateMode={handleRotateMode}
-                    onScaleMode={handleScaleMode}
-                    onExitEdit={handleExitEdit}
-                    currentMode={currentEditMode}
-                />
-            </main>            {/* POI 정보 모달 */}
-            
-            {selectedPoiData && (
-                <Modal
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    title={`${selectedPoiData?.displayText}`}
-                >
-                    <Form
-                        initialValues={{
-                            code: selectedPoiData.property.code || ''
-                        }}
-                        onSubmit={handleSubmit}
-                        >                            
-                        <FormItem 
-                            name="code" label="디바이스 코드" required>
-                            <Input.Text
-                                placeholder="디바이스 코드를 입력하세요"
-                            />
-                        </FormItem>
-                        <Button 
-                            type="submit" 
-                            color="primary" 
-                        >
-                            적용
-                        </Button>
-                    </Form>
-                </Modal>
-            )}
-        </>
-    );
-};
+  return (
+    <Select 
+      className="text-sm text-gray-300 ml-2 w-64" 
+      selected={selectedFloor ? [selectedFloor] : []}
+      onChange={handleFloorSelect}
+    >
+      <Select.Trigger />
+      <Select.Content>
+        {hierarchies
+          .sort((a, b) => Number(b.floorId) - Number(a.floorId))
+          .map(floor => (
+            <Select.Item key={floor.floorId} value={floor.floorId}>
+              {floor.displayName}
+            </Select.Item>
+          ))
+        }
+      </Select.Content>
+    </Select>
+  );
+});
 
-export default Viewer;
+// Main header component
+const ViewerHeader = memo(({ 
+  stationName, 
+  hierarchies, 
+  selectedFloor, 
+  onFloorChange 
+}: {
+  stationName: string;
+  hierarchies: ModelInfo[] | null;
+  selectedFloor: string | null;
+  onFloorChange: (floorId: string) => void;
+}) => (
+  <div className="flex absolute text-white pl-4 pt-2 items-center z-10">
+    <h2 className="text-xl font-bold">{stationName}</h2>
+    {hierarchies && (
+      <FloorSelector 
+        hierarchies={hierarchies}
+        selectedFloor={selectedFloor}
+        onFloorChange={onFloorChange}
+      />
+    )}
+  </div>
+));
+
+// Main viewer content component
+const ViewerContent = memo(({  stationData,
+  hierarchies,
+  selectedFloor,
+  onFloorChange,
+  onModelLoaded,
+  editMode,
+  selectedPoi,
+  isModalOpen,
+  onModalClose
+}: {
+  stationData: StationWithFeatures;
+  hierarchies: ModelInfo[] | null;
+  selectedFloor: string | null;
+  onFloorChange: (floorId: string) => void;
+  onModelLoaded: () => void;
+  editMode: UseEditModeResult;
+  selectedPoi: PoiImportOption | null;
+  isModalOpen: boolean;
+  onModalClose: () => void;
+}) => {
+  const modelPath = stationData?.facility?.drawing?.url || '';
+
+  return (
+    <>
+      <aside className="bg-white w-1/3 overflow-y-auto">
+        <AssetList />
+      </aside>
+      <main className="w-full">
+        <ViewerHeader
+          stationName={stationData?.facility?.name || ''}
+          hierarchies={hierarchies}
+          selectedFloor={selectedFloor}
+          onFloorChange={onFloorChange}
+        />
+        <Suspense fallback={<LoadingSpinner />}>
+          <MapViewer 
+            modelPath={modelPath}
+            onModelLoaded={onModelLoaded}
+          />
+        </Suspense>        <FeatureEditToolbar
+          onTranslateMode={editMode.setTranslateMode}
+          onRotateMode={editMode.setRotateMode}
+          onScaleMode={editMode.setScaleMode}
+          onExitEdit={editMode.exitEdit}
+          currentMode={editMode.currentMode}
+        />
+      </main>
+      
+      {/* POI Edit Modal */}
+      <PoiEditModal
+        poi={selectedPoi}
+        isOpen={isModalOpen}
+        onClose={onModalClose}
+      />
+    </>
+  );
+});
+
+// Main ViewerPage component with React 19 patterns
+const ViewerPage = memo(() => {
+  const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
+  const { currentStationId, setStationId } = useStationStore();
+  
+  // Initialize station ID with proper fallback
+  const stationId = stationIdFromParams || currentStationId || '2';
+  
+  // Ensure station ID is set in store
+  if (stationId !== currentStationId) {
+    setStationId(stationId);
+  }  // Custom hooks for state management
+  const { data: stationData, isLoading, error } = useStation(stationId);
+  const editMode = useEditMode();
+  
+  // Local state
+  const [hierarchies, setHierarchies] = useState<ModelInfo[] | null>(null);
+  const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
+  const [selectedPoi, setSelectedPoi] = useState<PoiImportOption | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Event handlers
+  const handlePoiSelect = useCallback((poi: PoiImportOption) => {
+    setSelectedPoi(poi);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedPoi(null);
+  }, []);
+  const handleHierarchyLoaded = useCallback((hierarchy: ModelInfo[]) => {
+    setHierarchies(hierarchy);
+    // Set initial floor to the highest floor (or first floor if needed)
+    if (hierarchy && hierarchy.length > 0) {
+      const sortedFloors = hierarchy.sort((a, b) => Number(b.floorId) - Number(a.floorId));
+      const initialFloor = sortedFloors[0]?.floorId;
+      if (initialFloor) {
+        setSelectedFloor(initialFloor);
+      }
+    }
+  }, []);
+  const handleFloorChangeUI = useCallback((floorId: string) => {
+    setSelectedFloor(floorId);
+  }, []);
+  // Engine integration with cleanup
+  const { handleModelLoaded, handleFloorChange } = useEngineIntegration({
+    stationData,
+    onPoiSelect: handlePoiSelect,
+    onHierarchyLoaded: handleHierarchyLoaded,
+    onFloorChange: handleFloorChangeUI
+  });
+
+  // Combined floor change handler for UI interactions
+  const handleFloorSelect = useCallback((floorId: string) => {
+    // Call the engine integration's floor change handler
+    handleFloorChange(floorId);
+  }, [handleFloorChange]);
+
+  // Error boundary states
+  if (error) {
+    return <ErrorMessage message="역사 데이터를 불러오는데 실패했습니다." />;
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!stationData) {
+    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;  }
+  return (
+    <ErrorBoundary>      <ViewerContent
+        stationData={stationData}
+        hierarchies={hierarchies}
+        selectedFloor={selectedFloor}
+        onFloorChange={handleFloorSelect}
+        onModelLoaded={handleModelLoaded}
+        editMode={editMode}
+        selectedPoi={selectedPoi}
+        isModalOpen={isModalOpen}
+        onModalClose={handleModalClose}
+      />
+    </ErrorBoundary>
+  );
+});
+
+ViewerPage.displayName = 'ViewerPage';
+
+export default ViewerPage;
