@@ -43,8 +43,8 @@ export default function AssetPage() {
     };
     return (
         <>
-            <div className='flex'>    
-                <div className='ml-auto flex gap-1'>
+            <div className='mt-4 relative h-[90%]'>
+                <div className='ml-auto flex gap-1 w-48 absolute z-10 right-0'>
                     <Button color='primary'
                             className='bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200'
                             onClick={() => (openModal('create'))}>등록</Button>
@@ -52,8 +52,6 @@ export default function AssetPage() {
                             className='bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200'
                             onClick={handleDeleteSelected}>삭제</Button>
                 </div>
-            </div>
-            <div className='mt-4'>
                 {error && <StateInfoWrapper preset="defaultError" />}
                 {isLoading && <Skeleton className="w-full h-100"/>}
                 {!isLoading && !error && AssetData && (

@@ -51,7 +51,7 @@ const Dashboard = () => {
                     <main className='flex-1 overflow-auto p-6'>
                         {title ? (
                             <>
-                                <h2 className='font-bold text-2xl mb-4 ml-2.5 text-gray-800 tracking-tight relative before:absolute before:left-[-10px] before:top-0 before:w-1 before:h-full before:bg-primary-500 before:rounded-full'>{title}</h2>
+                                <h2 className='font-bold text-2xl mb-4 pl-3 text-gray-800 tracking-tight relative before:absolute before:left-[0px] before:top-1 before:w-1 before:bg-primary-500 before:rounded-full before:h-8 border-b border-gray-200 pb-3'>{title}</h2>
                                 <Outlet />
                             </>
                         ) : (

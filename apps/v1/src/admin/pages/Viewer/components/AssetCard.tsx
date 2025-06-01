@@ -88,7 +88,7 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
                     )}
                 </div>
             </Card.Content>
-            <Card.Footer className="justify-center">
+            <Card.Footer className="justify-center p-2 pt-0">
                 {/* <p className="text-sm text-gray-500 mt-1 truncate">{asset.categoryName || 'No Category'}</p> */}
                 <h3 className="font-medium text-gray-800 truncate text-center">{asset.name}</h3>
             </Card.Footer>
