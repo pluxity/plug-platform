@@ -10,13 +10,7 @@ import { useStationStore } from './store/stationStore';
 import { useAssetStore } from './store/assetStore';
 
 import { Button, Modal, Form, FormItem, Input } from "@plug/ui";
-
-interface ModelInfo {
-    objectName: string;
-    displayName: string;
-    sortingOrder: number;
-    floorId: string;
-}
+import type { ModelInfo, PoiImportOption } from "@plug/engine/src/interfaces";
 
 const Viewer = () => {
     const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
@@ -108,6 +102,40 @@ const Viewer = () => {
         setSelectedPoiData(null);
     }, []);
 
+    const addEngineEventListeners = useCallback(() => {
+
+        Px.Event.AddEventListener("onPoiPointerUp", (event: { target: PoiImportOption, type: string }) => {
+            const { target } = event;
+            
+            if (target) {
+                setSelectedPoiData({
+                    id: target.id,
+                    displayText: target.displayText || 'Feature',
+                    property: {
+                        code: target.property?.code,
+                    }
+                });
+                setIsModalOpen(true);
+            }
+
+            console.log('POI Pointer Up Event:', target);
+        });
+
+        Px.Event.AddEventListener('onPoiTransformChange', async (event: { target: PoiImportOption, type: string }) => {
+
+            const { target } = event;
+            try {
+                await api.patch(`features/${target.id}/transform`, {
+                    position: target.position,
+                    rotation: target.rotation,
+                    scale: target.scale
+                });
+            } catch (error) {
+                console.error('Error updating POI transform:', error);
+            }
+        });
+    }, []);
+
     const handleModelLoaded = useCallback(async () => {
         const modelHierarchy = Px.Model.GetModelHierarchy();
         if (modelHierarchy) { 
@@ -118,25 +146,10 @@ const Viewer = () => {
 
         handleFeatureData();
         handleFloorChange("0");        
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Px.Event.AddEventListener("onPoiPointerUp", (event: any) => {
-            const poiData = event.target;
-            
-            if (poiData) {
-                setSelectedPoiData({
-                    id: poiData.id,
-                    displayText: poiData.displayText || 'Feature',
-                    property: {
-                        code: poiData.property?.code,
-                    }
-                });
-                setIsModalOpen(true);
-            }
 
-            console.log('POI Pointer Up Event:', poiData);
-        });
+        addEngineEventListeners();
 
-    }, [setHierachies, handleFeatureData, handleFloorChange]);
+    }, [setHierachies, handleFeatureData, handleFloorChange, addEngineEventListeners]);
 
     const handleSubmit = useCallback(async (values: Record<string, string>) => {
         if (selectedPoiData) {
@@ -216,7 +229,7 @@ const Viewer = () => {
                   </h2>
                   { hierachies && 
                         <Select 
-                            className="text-sm text-gray-300 ml-2 w-96" 
+                            className="text-sm text-gray-300 ml-2 w-64" 
                             selected={selectedFloor ? [selectedFloor] : []}
                             onChange={values => handleFloorChange(values[0])}
                             >

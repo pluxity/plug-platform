@@ -45,7 +45,6 @@ const AssetList = () => {
     
     return (
         <div className="asset-list p-4 pb-16">
-            <h2 className="text-lg font-bold mb-6">Asset List</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {assets.map(asset => (
                     <AssetCard key={asset.id} asset={asset} />
