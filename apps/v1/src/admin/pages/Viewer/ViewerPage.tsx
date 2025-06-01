@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import type { StationWithFeatures, FeatureResponse } from "./types";
 
-import { AssetList, MapViewer } from "./components";
+import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
 import * as Px from '@plug/engine/src';
 import { Select } from "@plug/ui";
 import { useStationStore } from './store/stationStore'; 
@@ -32,7 +32,9 @@ const Viewer = () => {
         displayText: string;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         property: any;
-    } | null>(null);
+    } | null>(null);    
+    // 편집 모드 상태 추가
+    const [currentEditMode, setCurrentEditMode] = useState<'translate' | 'rotate' | 'scale' | 'none'>('none');
 
     useEffect(() => {
         const idToSet = stationIdFromParams || '2'; 
@@ -151,7 +153,42 @@ const Viewer = () => {
                 handleCloseModal();
             }
         }
-    }, [selectedPoiData, handleCloseModal]);
+    }, [selectedPoiData, handleCloseModal]);    // 편집 모드 핸들러 함수들
+    const handleTranslateMode = useCallback(() => {
+        if (currentEditMode === 'translate') {
+            setCurrentEditMode('none');
+            Px.Poi.FinishEdit();
+        } else {
+            setCurrentEditMode('translate');
+            Px.Poi.StartEdit('translate');
+        }
+    }, [currentEditMode]);
+
+    const handleRotateMode = useCallback(() => {
+        if (currentEditMode === 'rotate') {
+            setCurrentEditMode('none');
+            Px.Poi.FinishEdit();
+        } else {
+            setCurrentEditMode('rotate');
+            Px.Poi.StartEdit('rotate');
+        }
+    }, [currentEditMode]);
+
+    const handleScaleMode = useCallback(() => {
+        if (currentEditMode === 'scale') {
+            setCurrentEditMode('none');
+            Px.Poi.FinishEdit();
+        } else {
+            setCurrentEditMode('scale');
+            Px.Poi.StartEdit('scale');
+        }
+    }, [currentEditMode]);
+
+    // ESC 키로 편집 모드 종료
+    const handleExitEdit = useCallback(() => {
+        setCurrentEditMode('none');
+        Px.Poi.FinishEdit();
+    }, []);
 
     if (isLoading) {
         return (
@@ -200,6 +237,14 @@ const Viewer = () => {
                         onModelLoaded={handleModelLoaded}
                     />
                 )}
+                  {/* 3D 편집 툴바 */}
+                <FeatureEditToolbar
+                    onTranslateMode={handleTranslateMode}
+                    onRotateMode={handleRotateMode}
+                    onScaleMode={handleScaleMode}
+                    onExitEdit={handleExitEdit}
+                    currentMode={currentEditMode}
+                />
             </main>            {/* POI 정보 모달 */}
             
             {selectedPoiData && (
