@@ -6,9 +6,9 @@ const Dashboard = () => {
     const title = DashboardTitle();
 
     return (
-        <div className='h-screen w-full flex flex-col overflow-hidden'>
+        <div className='h-full w-full flex flex-col overflow-hidden'>
             <div className='flex flex-1 overflow-hidden'>
-                <Sidebar className='h-full bg-[var(--color-primary-100)] shadow-md'>
+                <Sidebar className='h-full bg-primary-100 shadow-md border-t border-gray-200'>
                     <Sidebar.Menu
                         items={[
                             {
@@ -51,7 +51,7 @@ const Dashboard = () => {
                     <main className='flex-1 overflow-auto p-6'>
                         {title ? (
                             <>
-                                <h2 className='font-bold text-2xl mb-4'>{title}</h2>
+                                <h2 className='font-bold text-2xl mb-4 ml-2.5 text-gray-800 tracking-tight relative before:absolute before:left-[-10px] before:top-0 before:w-1 before:h-full before:bg-primary-500 before:rounded-full'>{title}</h2>
                                 <Outlet />
                             </>
                         ) : (
@@ -60,8 +60,9 @@ const Dashboard = () => {
                             </>
                         )}
                     </main>
-                    <footer className='py-2 px-1 border-t border-gray-200 text-xs text-center'>
-                        <p>Copyright © 2025 PLUXITY.co.,Ltd. All rights reserved.</p>
+                    <footer className='py-3 px-4 border-t border-gray-200 text-xs text-center bg-gray-50'>
+                        <p className='text-gray-600 font-medium'>Copyright © 2025 <span
+                            className='text-primary-600'>PLUXITY</span>.co.,Ltd. All rights reserved.</p>
                     </footer>
                 </div>
             </div>

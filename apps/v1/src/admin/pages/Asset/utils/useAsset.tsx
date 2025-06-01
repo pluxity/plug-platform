@@ -17,10 +17,12 @@ export const useAsset = (
     update: DateFormatter(asset.createdAt),
     management: (
       <div className="flex flex-wrap gap-1">
-        <Button color="primary" className="w-15" onClick={() => onEdit(asset.id)}>수정</Button>
+        <Button color="primary"
+                className="w-15 bg-secondary-100 text-secondary-700 font-semibold hover:bg-secondary-200"
+                onClick={() => onEdit(asset.id)}>수정</Button>
         <Button 
             color="destructive" 
-            className="w-15"
+            className="w-15 bg-destructive-100 text-destructive-700 font-semibold hover:bg-destructive-200"
             onClick={() => {onDelete(asset.id)}}
           >삭제</Button>
       </div>

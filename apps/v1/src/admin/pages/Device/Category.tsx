@@ -43,8 +43,12 @@ export default function DeviceCategory() {
         <>
             <div className='flex'>    
                 <div className='ml-auto flex gap-1'>
-                    <Button color='primary' onClick={() => (openModal('create'))}>등록</Button>
-                    <Button color='destructive' onClick={handleDeleteSelected}>삭제</Button>
+                    <Button color='primary'
+                            className='bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200'
+                            onClick={() => (openModal('create'))}>등록</Button>
+                    <Button color='destructive'
+                            className='bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200'
+                            onClick={handleDeleteSelected}>삭제</Button>
                 </div>
             </div>
             <div className='mt-4'>

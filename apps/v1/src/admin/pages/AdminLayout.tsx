@@ -29,12 +29,26 @@ const AdminLayout = () => {
                     </Link>
                     <div className="flex items-center gap-4">
                         <div
-                            className="flex items-end justify-center h-9 text-end leading-tight gap-1 bg-primary-700/80 px-3 py-1.5 rounded-lg">
-                            <p className="text-white font-medium">{user?.name ? `${user.name}님` : '관리자님'}</p>
-                            <p className="text-xs text-gray-200 animate-pulse">접속 중</p>
+                            className="flex items-center justify-between h-9 text-end leading-tight gap-2 bg-primary-500 px-4 py-1.5 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className="w-6 h-6 rounded-full bg-primary-400 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                         className="w-4 h-4">
+                                        <path fillRule="evenodd"
+                                              d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
+                                              clipRule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <p className="text-white font-medium">{user?.name ? `${user.name}님` : '관리자님'}</p>
+                            </div>
+                            <p className="text-xs text-primary-200 bg-primary-600/50 px-2 py-0.5 rounded-full animate-pulse">접속 중</p>
                         </div>
-                        <Button className="h-9 w-24 px-4 text-sm transition-colors duration-200 hover:bg-primary-300/80"
-                                onClick={logOut}>로그아웃</Button>
+                        <Button
+                            className="h-9 w-24 px-4 text-sm font-medium bg-primary-100 text-primary-700 hover:bg-primary-300 font-semibold transition-colors"
+                            onClick={logOut}>
+                            로그아웃
+                        </Button>
                     </div>
                 </header>
                 <main className="h-full flex-1 flex flex-row">

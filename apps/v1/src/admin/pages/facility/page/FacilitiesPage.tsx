@@ -33,7 +33,9 @@ export default function FacilitiesPage() {
         <div>
             <div className='flex'>
                 <div className='ml-auto flex gap-1'>
-                    <Button color='primary' onClick={() => openModal('create')}>등록</Button>
+                    <Button color='primary'
+                            className='bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200'
+                            onClick={() => openModal('create')}>등록</Button>
                 </div>
             </div>
             <div className='mt-4 grid grid-cols-4 gap-4'>
@@ -54,10 +56,10 @@ export default function FacilitiesPage() {
                                     onClick={() => navigate(`/admin/dashboard/facility/${station.facility?.id}`)}>도면
                                 관리</Button>
                             <Button size="small" className="rounded-none border-x border-x-slate-300"
-                                    onClick={() => navigate(`/admin/dashboard/facility/${station.facility?.id}`)}>공간
+                                    onClick={() => navigate(`/admin/viewer/${station.facility?.id}`)}>공간
                                 관리</Button>
                             <Button size="small" className='rounded-l-none'
-                                    onClick={() => navigate(`/admin/dashboard/facility/${station.facility?.id}`)}>3D
+                                    onClick={() => navigate(`/service/${station.facility?.id}`)}>3D
                                 뷰어</Button>
                         </CardFooter>
                     </Card>
