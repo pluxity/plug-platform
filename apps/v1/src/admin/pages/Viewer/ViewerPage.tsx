@@ -125,7 +125,7 @@ const Viewer = () => {
                     id: poiData.id,
                     displayText: poiData.displayText || 'Feature',
                     property: {
-                        code: poiData.property?.code || '정보 없음',
+                        code: poiData.property?.code,
                     }
                 });
                 setIsModalOpen(true);
@@ -206,17 +206,18 @@ const Viewer = () => {
                 <Modal
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    title={`${selectedPoiData?.displayText} 디바이스 코드 할당`}
+                    title={`${selectedPoiData?.displayText}`}
                 >
                     <Form
+                        initialValues={{
+                            code: selectedPoiData.property.code || ''
+                        }}
                         onSubmit={handleSubmit}
                         >                            
                         <FormItem 
                             name="code" label="디바이스 코드" required>
                             <Input.Text
                                 placeholder="디바이스 코드를 입력하세요"
-                                value={selectedPoiData.property.code}
-                                onChange={value => { console.log(value); }}
                             />
                         </FormItem>
                         <Button 
