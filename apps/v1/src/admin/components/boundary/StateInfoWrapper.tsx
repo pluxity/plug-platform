@@ -5,6 +5,7 @@ interface StateInfoWrapperProps {
     preset: keyof typeof stateInfoPresets;
     onRetry?: () => void;
     className?: string;
+    onClick?: () => void;
 }
 
 export const StateInfoWrapper = ({ preset, onRetry, className }: StateInfoWrapperProps) => {

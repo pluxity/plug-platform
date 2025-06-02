@@ -30,7 +30,6 @@ export default function FacilitiesPage() {
     }, []);
 
     if (error) return <StateInfoWrapper preset={"defaultError"}/>;
-    if (!stations?.length) return <StateInfoWrapper preset={"emptyTable"}/>;
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -55,58 +54,62 @@ export default function FacilitiesPage() {
             </div>
             <div className='flex flex-col gap-6 mt-2.5'>
                 <div className='grid grid-cols-4 gap-4'>
-                    {currentStations.map((station) => (
-                        <Card 
-                            key={station.facility?.id} 
-                            className="w-full hover:shadow-md transition-shadow duration-200"
-                            onClick={() => navigate(`/admin/dashboard/facility/${station.facility.id}`)}
-                        >
-                            <div className="w-full h-[150px] bg-gray-100 rounded-t-lg overflow-hidden">
-                                <img
-                                    src={station.facility?.thumbnail?.url ?? ""}
-                                    alt={station.facility?.name}
-                                    className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                                />
-                            </div>
-                            <CardHeader>
-                                <CardTitle className="text-lg font-semibold">
-                                    {station.facility?.name}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardFooter className="flex">
-                                <Button 
-                                    size="small" 
-                                    className='rounded-r-none hover:bg-primary-50'
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/admin/dashboard/facility/${station.facility?.id}`);
-                                    }}
-                                >
-                                    도면 관리
-                                </Button>
-                                <Button 
-                                    size="small" 
-                                    className="rounded-none border-x border-x-slate-300 hover:bg-primary-50"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/admin/viewer/${station.facility?.id}`);
-                                    }}
-                                >
-                                    공간 관리
-                                </Button>
-                                <Button 
-                                    size="small" 
-                                    className='rounded-l-none hover:bg-primary-50'
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/service/${station.facility?.id}`);
-                                    }}
-                                >
-                                    3D 뷰어
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
+                    {currentStations.length === 0 ? (
+                        <StateInfoWrapper preset="emptyTable" onClick={() => openModal('create')} className="cursor-pointer"/>
+                    ) : (
+                        currentStations.map((station) => (
+                            <Card
+                                key={station.facility?.id}
+                                className="w-full hover:shadow-md transition-shadow duration-200"
+                                onClick={() => navigate(`/admin/dashboard/facility/${station.facility.id}`)}
+                            >
+                                <div className="w-full h-[150px] bg-gray-100 rounded-t-lg overflow-hidden">
+                                    <img
+                                        src={station.facility?.thumbnail?.url ?? ""}
+                                        alt={station.facility?.name}
+                                        className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+                                    />
+                                </div>
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-semibold">
+                                        {station.facility?.name}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardFooter className="flex">
+                                    <Button
+                                        size="small"
+                                        className='rounded-r-none hover:bg-primary-50'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/admin/dashboard/facility/${station.facility?.id}`);
+                                        }}
+                                    >
+                                        도면 관리
+                                    </Button>
+                                    <Button
+                                        size="small"
+                                        className="rounded-none border-x border-x-slate-300 hover:bg-primary-50"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/admin/viewer/${station.facility?.id}`);
+                                        }}
+                                    >
+                                        공간 관리
+                                    </Button>
+                                    <Button
+                                        size="small"
+                                        className='rounded-l-none hover:bg-primary-50'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/service/${station.facility?.id}`);
+                                        }}
+                                    >
+                                        3D 뷰어
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        ))
+                    )}
                 </div>
                 
                 <div className="flex justify-center">
