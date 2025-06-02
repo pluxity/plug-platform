@@ -84,7 +84,7 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
 
             if (result) {
                 addToast({
-                    title: '성공',
+                    title: '등록 완료',
                     description: MESSAGES.SUCCESS,
                     variant: 'normal',
                 });
@@ -95,7 +95,7 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
         } catch (error) {
             console.error(MESSAGES.ERROR, error);
             addToast({
-                title: '오류',
+                title: '등록 실패',
                 description: error instanceof Error ? error.message : MESSAGES.ERROR,
                 variant: 'critical',
             });
