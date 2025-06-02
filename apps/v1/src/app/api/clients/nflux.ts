@@ -21,7 +21,7 @@ export const createNfluxApiClient = (customAuthToken?: string) => {
   }
   
   return ky.create({
-    prefixUrl: 'http://localhost:8090/nflux/',
+    prefixUrl: 'http://192.168.4.84:8090/nflux/',
     headers,
     timeout: 15000,
     retry: 2,

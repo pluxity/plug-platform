@@ -19,7 +19,7 @@ export interface CategoryResponse {
 
 export interface CategoryCreateRequest {
     name: string,
-    contextPath?: number,
+    contextPath?: string,
     iconFileId: number,
 }
 

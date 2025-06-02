@@ -102,14 +102,17 @@ const DataTable = <T extends { id: string | number },>({
   };
 
   return (
-      <div className="w-full overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm p-4">
-        {showSearch && (
-            <SearchFilter search={search} onSearchChange={setSearch} />
-        )}
-        <table className="min-w-full text-sm text-left text-slate-700 border-separate border-spacing-0">
-          <TableHeader columns={columns} sortKey={sortKey} sortOrder={sortOrder} onSort={handleSort} selectable={selectable} selectedAll={selectedAll} onSelectChange={handleSelectAll}/>
-          <TableBody data={paginatedData} columns={columns} search={search} selectable={selectable} onSelectChange={handleSelectRow} selectedRows={isRowSelected}/>
-        </table>
+      <div className="w-full h-full overflow-x-auto flex flex-col justify-between">
+        <div>
+          {showSearch && (
+              <SearchFilter search={search} onSearchChange={setSearch} />
+          )}
+          <table className="min-w-full text-sm text-left text-slate-700 border-separate border-spacing-0">
+            <TableHeader columns={columns} sortKey={sortKey} sortOrder={sortOrder} onSort={handleSort} selectable={selectable} selectedAll={selectedAll} onSelectChange={handleSelectAll}/>
+            <TableBody data={paginatedData} columns={columns} search={search} selectable={selectable} onSelectChange={handleSelectRow} selectedRows={isRowSelected}/>
+          </table>
+        </div>
+
         {showPagination && (
             <div className="mt-4 flex justify-center">
               <Pagination

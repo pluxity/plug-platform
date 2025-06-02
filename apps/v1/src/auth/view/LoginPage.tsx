@@ -2,6 +2,7 @@ import { Form, FormItem, Input, Button, required } from '@plug/ui';
 import { logIn } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import {getRolePermissions, Role, ROUTE_CONFIG} from "@plug/v1/auth/model/roles";
 
 interface LoginFormData {
     username: string;
@@ -13,11 +14,23 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [error, setError] = useState('');
 
+    const getRedirectPath = (roles: string[]): string => {
+        const userRoles = getRolePermissions(roles);
+
+        if (userRoles.includes(Role.ADMIN)) {
+            return ROUTE_CONFIG[Role.ADMIN].defaultRedirect;
+        }
+
+        return ROUTE_CONFIG[Role.USER].defaultRedirect;
+    };
+
     const handleLogin = async (values: LoginFormData) => {
         setError('');
         try {
-            await logIn(values);
-            navigate('/service');
+            const response = await logIn(values);
+            const userRoles = response.data.roles.map(role => role.name);
+            const redirectPath = getRedirectPath(userRoles);
+            navigate(redirectPath, { replace: true });
         } catch (err: Error | unknown) {
             const error = err instanceof Error ? err.message : '로그인에 실패했습니다.';
             setError(error);

@@ -11,7 +11,7 @@ const Pagination = ({
   className,
 }: PaginationProps) => {
 
-    const selectedPageClassName = 'bg-blue-500 text-white font-semibold'
+    const selectedPageClassName = 'bg-primary-600 text-white font-semibold'
     const unSelectedPageClassName = 'text-black bg-white hover:bg-blue-200 hover:text-white'
 
     const handlePageChange = (page: number) => {

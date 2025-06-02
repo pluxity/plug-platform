@@ -38,7 +38,7 @@ export default function FacilitiesDetailPage() {
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사 ID</th>
                 <td className="border border-gray-300 p-2 w-1/3">
                     <FormItem name="id">
-                      <div>
+                        <div className='mb-[-16px]'>
                         <Input.Text
                             value={formValues.id}
                             onChange={(value) => handleChange('id', value)}
@@ -51,7 +51,7 @@ export default function FacilitiesDetailPage() {
                 <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사명</th>
                 <td className="border border-gray-300 p-2 w-1/3">
                     <FormItem name="name">
-                      <div>
+                        <div className='mb-[-16px]'>
                         <Input.Text
                             value={formValues.name}
                             onChange={(value) => handleChange('name', value)}
@@ -65,7 +65,7 @@ export default function FacilitiesDetailPage() {
                 <th className="border border-gray-300 p-2 bg-gray-50">설명</th>
                 <td className="border border-gray-300 p-2">
                     <FormItem name="description">
-                      <div>
+                        <div className='mb-[-16px]'>
                         <Input.Text
                             value={formValues.description}
                             onChange={(value) => handleChange('description', value)}
@@ -77,7 +77,7 @@ export default function FacilitiesDetailPage() {
                 <th className="border border-gray-300 p-2 bg-gray-50">코드</th>
                 <td className="border border-gray-300 p-2">
                     <FormItem name="code">
-                      <div>
+                        <div className='mb-[-16px]'>
                         <Input.Text
                             value={formValues.code}
                             onChange={(value) => handleChange('code', value)}
@@ -94,7 +94,7 @@ export default function FacilitiesDetailPage() {
                   <FormItem name="lineIds" required>
                     <Select
                       type="multiple"
-                      className="w-full"
+                      className="w-full mb-[-16px]"
                       selected={formValues.lineIds}
                       onChange={(value) => handleChange('lineIds', value)}
                     >
@@ -111,12 +111,14 @@ export default function FacilitiesDetailPage() {
                 </td>
                 <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>
                 <td className="border border-gray-300 p-2">
-                  <FormItem name="externalCode">
-                    <Input.Text
-                      value={formValues.externalCode}
-                      onChange={(e) => handleChange('externalCode', e)}
-                      className="w-full"
-                    />
+                  <FormItem name="externalCode" >
+                    <div className='mb-[-16px]'>
+                      <Input.Text
+                          value={formValues.externalCode}
+                          onChange={(e) => handleChange('externalCode', e)}
+                          className="w-full"
+                      />
+                    </div>
                   </FormItem>
                 </td>
               </tr>
@@ -124,7 +126,7 @@ export default function FacilitiesDetailPage() {
                 <th className="border border-gray-300 p-2 bg-gray-50">층 정보</th>
                 <td className="border border-gray-300 p-2" colSpan={3}>
                   <FormItem name="floors" required>
-                    <div className="space-y-2">
+                    <div className="space-y-2 mb-[-16px]">
                       {formValues.floors.map((floor) => (
                           <div key={floor.floorId} className="flex gap-2">
                             <p>{floor.name}</p>
@@ -135,11 +137,40 @@ export default function FacilitiesDetailPage() {
                 </td>
               </tr>
               <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
-                <td className="p-2" rowSpan={2}>
-                  {station.facility.thumbnail?.url && (
-                    <div className="w-full rounded-lg overflow-hidden">
-                      <img
+                <th className="border border-gray-300 p-2 bg-gray-50">수정일</th>
+                <td className="border border-gray-300 p-2">
+                  <FormItem name="updatedAt" >
+                    <div className='mb-[-16px]'>
+                      <Input.Text
+                          value={formValues.updatedAt}
+                          onChange={(e) => handleChange('updatedAt', e)}
+                          className="w-full"
+                          disabled
+                      />
+                    </div>
+                  </FormItem>
+                </td>
+                <th className="border border-gray-300 p-2 bg-gray-50">마지막 수정인</th>
+                <td className="border border-gray-300 p-2">
+                  <FormItem name="updatedBy" >
+                    <div className='mb-[-16px]'>
+                      <Input.Text
+                          value={formValues.updatedBy}
+                          onChange={(e) => handleChange('updatedBy', e)}
+                          className="w-full"
+                          disabled
+                      />
+                    </div>
+                  </FormItem>
+                </td>
+
+              </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
+              <td rowSpan={2}>
+              {station.facility.thumbnail?.url && (
+                  <div className="w-full overflow-hidden p-2.5" >
+                    <img
                         src={station.facility.thumbnail.url}
                         alt="썸네일 이미지"
                         className="w-full h-full object-cover"
@@ -169,6 +200,7 @@ export default function FacilitiesDetailPage() {
                     onChange={(e) => handleFileChange(e, 'model')}
                     onOpenPicker={openFilePicker}
                     label="3D 모델 파일"
+                    className='mb-[-16px]'
                   />
                 </td>
               </tr>

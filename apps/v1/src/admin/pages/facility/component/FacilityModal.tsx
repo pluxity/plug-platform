@@ -69,7 +69,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                         </Select>
                     </FormItem>
 
-                    <FormItem name="description" label="역사 설명" required>
+                    <FormItem name="description" label="역사 설명">
                         <Input.Text placeholder="역사 설명을 입력하세요" />
                     </FormItem>
 
@@ -109,25 +109,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                             </Select.Content>
                         </Select>
                     </FormItem>
-
-
-                    <FormItem name="linesId" label="해당호선" required>
-                        <Select type="multiple" defaultValue={[]}>
-                            <Select.Trigger/>
-                            <Select.Content>
-                                {lines?.map((line) => (
-                                    <Select.Item key={line.id} value={String(line.id)}>
-                                        {line.name}
-                                    </Select.Item>
-                                ))}
-                            </Select.Content>
-                        </Select>
-                    </FormItem>
-
-                    <FormItem name="externalCode" label="외부 코드" required>
-                        <Input.Text placeholder="외부 코드를 입력하세요" />
-                    </FormItem>
-
                     <div className="mt-6 flex justify-center gap-2">
                         <Button
                             type="button"

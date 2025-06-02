@@ -1,10 +1,9 @@
-import { signIn, signOut, getUserProfile  } from '@plug/common-services';
+import {signIn, signOut, getUserProfile, UserProfile} from '@plug/common-services';
 import { api, DataResponseBody } from '@plug/api-hooks';
-import {AuthUserProfile} from "@plug/v1/auth/model/profile";
 import {useProfileStore} from "@plug/v1/auth/controller/useProfileStore";
 
 
-export const logIn = async (data: { username: string; password: string }): Promise<DataResponseBody<AuthUserProfile>> => {
+export const logIn = async (data: { username: string; password: string }): Promise<DataResponseBody<UserProfile>> => {
     const response = await signIn(data);
 
     const location = response.headers?.get?.('Location')
