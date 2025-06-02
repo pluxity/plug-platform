@@ -87,7 +87,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
                 key={device.id} 
                 className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white"
                 onClick={() => {
-                  setSelectedDeviceId(device.id.toString());
+                  setSelectedDeviceId(device.id);
                 }}
               >
                 {device.name}
