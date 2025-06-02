@@ -52,7 +52,7 @@ export default function UserListPage(): React.ReactElement {
         setSelectedUserId(undefined);
     }, [closeRoleModal]);
 
-    // 로그인 된 사용자 정보 조회 
+    // 로그인 된 사용자 정보 조회
     useEffect(() => {
         const fetchLoggedInUsers = async () => {
           try {
@@ -69,7 +69,7 @@ export default function UserListPage(): React.ReactElement {
           }
         };
         fetchLoggedInUsers();
-      }, [loggedInUser, setStatusData, closeModal, openModal, openPasswordModal, openRoleModal]);
+      }, []);
       
     
     const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
@@ -109,7 +109,7 @@ export default function UserListPage(): React.ReactElement {
                     <DataTable
                         data={userData || []}
                         columns={columns}
-                        pageSize={7}
+                        pageSize={8}
                         selectable={true}
                         selectedRows={selectState}
                         onSelectChange={setSelectState}
