@@ -1,6 +1,13 @@
-import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
-import { useCallback, useState, useEffect } from 'react';
-import { useFileUpload, createFileFormData, useCreateCategory, useCategoryDetailSWR, useUpdateCategory } from '@plug/common-services';
+import {Modal, Form, FormItem, Button, Input} from '@plug/ui';
+import {useCallback, useState, useEffect} from 'react';
+import {
+    useFileUpload,
+    createFileFormData,
+    useCreateCategory,
+    useCategoryDetailSWR,
+    useUpdateCategory
+} from '@plug/common-services';
+import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
 
 export interface CategoryModalProps {
     isOpen: boolean;
@@ -10,90 +17,96 @@ export interface CategoryModalProps {
     selectedCategoryId?: number;
 }
 
-export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCategoryId }: CategoryModalProps) => {
-    // 디바이스 카테고리 상태 관리
+export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategoryId}: CategoryModalProps) => {
+    const {addToast} = useToastStore();
     const [name, setName] = useState<string>('');
-
-    // 디바이스 카테고리 아이콘 상태 관리 
     const [iconFile, setIconFile] = useState<File | null>(null);
     const [uploadIconFileId, setUploadIconFileId] = useState<number | null>(null);
-
-    // 디바이스 카테고리 아이콘 파일 로딩 상태 관리 
     const [isUploading, setIsUploading] = useState(false);
+    const {execute: uploadFile, isLoading: isFileUploading, error: fileError} = useFileUpload();
+    const {execute: createCategory, isLoading: isCreating, error: createError} = useCreateCategory();
+    const {data: detailCategoryData} = useCategoryDetailSWR(mode === 'edit' && selectedCategoryId ? Number(selectedCategoryId) : 0);
+    const {
+        execute: updateCategory,
+        isLoading: isCategoryUpdating,
+        error: categoryUpdateError
+    } = useUpdateCategory(Number(selectedCategoryId));
 
-    // 다비이스 카테고리 아이콘 업로드 훅 
-    const { execute: uploadFile, isLoading: isFileUploading, error: fileError } = useFileUpload();
-   
-    // 디바이스 카테고리 생성 훅
-    const { execute: createCategory, isLoading: isCreating, error: createError } = useCreateCategory();
-
-    // 디바이스 카테고리 상세 조회 훅
-    const { data: detailCategoryData } = useCategoryDetailSWR(mode === 'edit' && selectedCategoryId ? Number(selectedCategoryId) : 0);
-
-    // 디바이스 카테고리 수정 훅
-    const { execute: updateCategory, isLoading: isCategoryUpdating, error: categoryUpdateError } = useUpdateCategory(Number(selectedCategoryId));
-
-    // 파일 아이콘 선택 핸들러 
     const handleIconFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-    
-        // IMAGE 파일 체크 추가
+
         if (!file.type.includes('image/')) {
-          alert('image 파일 업로드 가능합니다.');
-          return;
+            addToast({
+                title: '파일 형식 오류',
+                description: 'image 파일만 업로드 가능합니다.',
+                variant: 'warning'
+            });
+            return;
         }
-    
+
         setIconFile(file);
-    
-        // 파일이 선택되면 자동으로 업로드 시작
         setIsUploading(true);
-    
-        // 올바른 MIME 타입으로 FormData 생성
+
         const formData = createFileFormData(file, file.type);
         uploadFile(formData)
-          .then(response => {
-            if (response && response.fileId) {
-                setUploadIconFileId(response.fileId);
-            }
-          })
-          .catch(error => {
-            console.error('디바이스 카테고리 아이콘 업로드 실패:', error);
-          })
-          .finally(() => {
-            setIsUploading(false);
-          });
-      }, [uploadFile]);
+            .then(response => {
+                if (response && response.fileId) {
+                    setUploadIconFileId(response.fileId);
+                    addToast({
+                        description: '파일이 성공적으로 업로드되었습니다.',
+                        variant: 'normal'
+                    });
+                }
+            })
+            .catch(error => {
+                addToast({
+                    title: '업로드 실패',
+                    description: error instanceof Error ? error.message : '디바이스 카테고리 아이콘 업로드에 실패했습니다.',
+                    variant: 'critical'
+                });
+            })
+            .finally(() => {
+                setIsUploading(false);
+            });
+    }, [uploadFile, addToast]);
 
-
-      useEffect(() => {
-        if(mode === 'edit' && detailCategoryData && isOpen){
+    useEffect(() => {
+        if (mode === 'edit' && detailCategoryData && isOpen) {
             setName(detailCategoryData.name);
         }
-      }, [mode, detailCategoryData, isOpen]);
+    }, [mode, detailCategoryData, isOpen]);
 
-    // 제출 핸들러
     const handleFinish = useCallback(async (values: Record<string, string>) => {
-        // 수정 모달 제출
         if (mode === 'edit' && detailCategoryData) {
             try {
                 const category = await updateCategory({
                     name: values.name || name,
-                    iconFileId: uploadIconFileId || undefined, 
+                    iconFileId: uploadIconFileId || undefined,
                 });
 
                 if (category) {
-                    alert('디바이스 카테고리가 성공적으로 수정되었습니다.');
+                    addToast({
+                        title: '수정 완료',
+                        description: '디바이스 카테고리가 성공적으로 수정되었습니다.',
+                        variant: 'normal'
+                    });
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
             } catch (error) {
-                console.error('디바이스 카테고리 수정 실패:', error);
+                addToast({
+                    title: '수정 실패',
+                    description: error instanceof Error ? error.message : '디바이스 카테고리 수정에 실패했습니다.',
+                    variant: 'critical'
+                });
             }
         } else {
-            // 등록 모달 제출
             if (!uploadIconFileId) {
-                alert('아이콘 파일을 업로드해주세요.');
+                addToast({
+                    description: '아이콘 파일을 업로드해주세요.',
+                    variant: 'warning'
+                });
                 return;
             }
             try {
@@ -104,17 +117,24 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
                 });
 
                 if (line) {
-                    alert('디바이스 카테고리가 성공적으로 등록되었습니다.');
+                    addToast({
+                        description: '디바이스 카테고리가 성공적으로 등록되었습니다.',
+                        title: '등록 완료',
+                        variant: 'normal'
+                    });
                     if (onSuccess) onSuccess();
-                    resetForm(); 
+                    resetForm();
                 }
             } catch (error) {
-                console.error('디바이스 카테고리 등록 실패:', error);
+                addToast({
+                    title: '등록 실패',
+                    description: error instanceof Error ? error.message : '디바이스 카테고리 등록에 실패했습니다.',
+                    variant: 'critical'
+                });
             }
         }
-    }, [createCategory, updateCategory, detailCategoryData, onSuccess, name, uploadIconFileId, mode]);
+    }, [createCategory, updateCategory, detailCategoryData, onSuccess, name, uploadIconFileId, mode, addToast]);
 
-    // 폼 초기화
     const resetForm = () => {
         setName('');
         setIconFile(null);
@@ -122,15 +142,13 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
         onClose();
     };
 
-    // 에러 처리
     const error = createError || fileError || categoryUpdateError;
     const isProcessing = isCreating || isFileUploading || isCategoryUpdating;
 
-      // 파일 선택기 열기
     const openFilePicker = () => {
         const fileInput = document.getElementById('icon-file');
         if (fileInput) {
-        fileInput.click();
+            fileInput.click();
         }
     };
 
@@ -146,14 +164,14 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
                 key={mode + (detailCategoryData?.id ?? '')}
                 initialValues={
                     mode === 'edit' && detailCategoryData
-                    ? {
-                        name: detailCategoryData?.name,
-                        iconFile: String(detailCategoryData?.iconFile.id)
-                    }
-                    : {
-                        name: '',
-                        iconFile: ''
-                    }
+                        ? {
+                            name: detailCategoryData?.name,
+                            iconFile: String(detailCategoryData?.iconFile.id)
+                        }
+                        : {
+                            name: '',
+                            iconFile: ''
+                        }
                 }
                 onSubmit={handleFinish}
             >
@@ -189,44 +207,44 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
 
                         {!iconFile ? (
                             <div className="flex items-center">
-                                {mode === 'edit' && detailCategoryData 
-                                    ? <p className="flex-1 text-sm">{detailCategoryData.iconFile?.originalFileName}</p>     
+                                {mode === 'edit' && detailCategoryData
+                                    ? <p className="flex-1 text-sm">{detailCategoryData.iconFile?.originalFileName}</p>
                                     : <p className="flex-1 text-sm text-gray-500">IMAGE 파일 업로드</p>
-                                    }
-                                <Button 
-                                    type="button" 
-                                    color="secondary"
-                                    className="w-30"
-                                    onClick={() => openFilePicker()}
-                                    >
-                                    {mode === 'edit' ? '변경' : '파일 선택'}
-                                </Button>
-                            </div>
-                            ) : (
-                            <div className="flex items-center justify-between w-full">
-                                <span className="text-sm truncate max-w-xs">
-                                {iconFile.name} ({Math.round(iconFile.size / 1024)} KB)
-                                </span>
-                                
-                                {isUploading ? (
-                                <div className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
-                                ) : uploadIconFileId ? (
-                                <div className="text-green-500 text-xs">업로드 완료</div>
-                                ) : (
-                                <Button 
-                                    type="button" 
+                                }
+                                <Button
+                                    type="button"
                                     color="secondary"
                                     className="w-30"
                                     onClick={() => openFilePicker()}
                                 >
-                                    변경
+                                    {mode === 'edit' ? '변경' : '파일 선택'}
                                 </Button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-sm truncate max-w-xs">
+                                {iconFile.name} ({Math.round(iconFile.size / 1024)} KB)
+                                </span>
+
+                                {isUploading ? (
+                                    <div
+                                        className="h-4 w-4 border-2 border-t-primary-500 rounded-full animate-spin"></div>
+                                ) : uploadIconFileId ? (
+                                    <div className="text-green-500 text-xs">업로드 완료</div>
+                                ) : (
+                                    <Button
+                                        type="button"
+                                        color="secondary"
+                                        className="w-30"
+                                        onClick={() => openFilePicker()}
+                                    >
+                                        변경
+                                    </Button>
                                 )}
                             </div>
                         )}
-                   </div>
+                    </div>
                 </FormItem>
-
 
                 <div className="mt-6 flex justify-center gap-2">
                     <Button type="button" onClick={resetForm} disabled={isProcessing}>
@@ -236,7 +254,7 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
                         type="submit"
                         color="primary"
                         isLoading={isProcessing}
-                        >
+                    >
                         {mode === 'create' ? '등록' : '수정'}
                     </Button>
                 </div>

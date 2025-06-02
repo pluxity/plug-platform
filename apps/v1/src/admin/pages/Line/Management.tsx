@@ -18,6 +18,9 @@ export default function LinePage() {
     const [selectedLineId, setSelectedLineId] = useState<number>();
 
     const handleDelete = async (lineId: number) => {
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
+
         try {
             await deleteLine(lineId);
             await mutate();

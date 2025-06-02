@@ -1,6 +1,7 @@
-import { Modal, Form, FormItem, Button, Input ,Select } from '@plug/ui';
-import { useCallback, useState, useEffect } from 'react';
-import { useCategoriesSWR, useCreateDevice, useUpdateDevice, useDeviceDetailSWR } from '@plug/common-services';
+import {Modal, Form, FormItem, Button, Input, Select} from '@plug/ui';
+import {useCallback, useState, useEffect} from 'react';
+import {useCategoriesSWR, useCreateDevice, useUpdateDevice, useDeviceDetailSWR} from '@plug/common-services';
+import {useToastStore} from '@plug/v1/admin/components/hook/useToastStore';
 
 export interface DeviceModalProps {
     isOpen: boolean;
@@ -11,70 +12,90 @@ export interface DeviceModalProps {
 }
 
 export const DeviceModal = ({
-    mode, 
-    isOpen,
-    onClose,
-    onSuccess,
-    selectedDeviceId
-}: DeviceModalProps)=> {
+                                mode,
+                                isOpen,
+                                onClose,
+                                onSuccess,
+                                selectedDeviceId
+                            }: DeviceModalProps) => {
     // 디바이스 상태 관리 
     const [name, setName] = useState<string>('');
     const [code, setCode] = useState<string>('');
-    
+
+    const {addToast} = useToastStore();
+
     // 디바이스 생성 훅 
-    const { execute: createDevice, isLoading: isCreating, error: createError} = useCreateDevice();
+    const {execute: createDevice, isLoading: isCreating, error: createError} = useCreateDevice();
 
     // 디바이스 생성 - 카테고리 목록 조회 
-    const { data: categoryDevice } = useCategoriesSWR();
-    
+    const {data: categoryDevice} = useCategoriesSWR();
+
     // 디바이스 상세 조회 훅 
-    const { data: detailDeviceData } = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? Number(selectedDeviceId) : 0);
+    const {data: detailDeviceData} = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? Number(selectedDeviceId) : 0);
 
     // 디바이스 수정 훅 
-    const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(Number(selectedDeviceId));
+    const {execute: updateDevice, isLoading: isUpdating, error: updateError} = useUpdateDevice(Number(selectedDeviceId));
 
     useEffect(() => {
-        if(mode === 'edit' && detailDeviceData && isOpen){
+        if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
             setCode(detailDeviceData.code);
         }
     }, [mode, detailDeviceData, isOpen]);
 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
-        if(mode === 'edit' && detailDeviceData){
-            try{
+        if (mode === 'edit' && detailDeviceData) {
+            try {
                 const device = await updateDevice({
                     name: values.name || name,
                     code: values.code || code,
                     deviceCategoryId: Number(values.categoryId)
                 })
 
-                if(device) {
-                    alert('디바이스가 성공적으로 수정되었습니다.');
-                    if(onSuccess) onSuccess();
+                if (device) {
+                    addToast({
+                        title: '수정 성공',
+                        description: '디바이스가 성공적으로 수정되었습니다.',
+                        variant: 'normal'
+                    });
+                    if (onSuccess) onSuccess();
                     resetForm();
                 }
-            }catch(error){
+            } catch (error) {
+                addToast({
+                    title: '수정 실패',
+                    description: '디바이스 수정에 실패했습니다.',
+                    variant: 'critical'
+                });
                 console.error('디바이스 수정 실패:', error)
             }
         } else {
-            try{
+            try {
                 const device = await createDevice({
                     name: values.name,
                     code: values.code,
                     deviceCategoryId: Number(values.categoryId)
                 });
-    
+
                 if (device) {
-                    alert('디바이스가 성공적으로 등록되었습니다.');
-                    if(onSuccess) onSuccess();
+                    addToast({
+                        title: '등록 완료',
+                        description: '디바이스가 성공적으로 등록되었습니다.',
+                        variant: 'normal'
+                    });
+                    if (onSuccess) onSuccess();
                     resetForm();
                 }
-            }catch(error){
+            } catch (error) {
+                addToast({
+                    title: '등록 실패',
+                    description: '디바이스 등록에 실패했습니다.',
+                    variant: 'critical'
+                });
                 console.error('디바이스 등록 실패:', error);
             }
         }
-    }, [createDevice, updateDevice, detailDeviceData, onSuccess, name, code, mode]);
+    }, [createDevice, updateDevice, detailDeviceData, onSuccess, name, code, mode, addToast]);
 
     // 폼 초기화
     const resetForm = () => {
@@ -87,7 +108,7 @@ export const DeviceModal = ({
     const error = createError || updateError;
     const isProcessing = isCreating || isUpdating;
 
-    return(
+    return (
         <Modal
             title={mode === 'create' ? '디바이스 등록' : '디바이스 수정'}
             isOpen={isOpen}
@@ -99,16 +120,16 @@ export const DeviceModal = ({
                 key={mode + (detailDeviceData?.id ?? '')}
                 initialValues={
                     mode === 'edit' && detailDeviceData
-                    ? {
-                        name: detailDeviceData?.name,
-                        code: detailDeviceData?.code,
-                        categoryId: String(detailDeviceData?.categoryId)
-                    }
-                    : {
-                        name: '',
-                        code: '',
-                        categoryId: '',
-                    }
+                        ? {
+                            name: detailDeviceData?.name,
+                            code: detailDeviceData?.code,
+                            categoryId: String(detailDeviceData?.categoryId)
+                        }
+                        : {
+                            name: '',
+                            code: '',
+                            categoryId: '',
+                        }
                 }
                 onSubmit={handleFinish}
             >
@@ -122,8 +143,8 @@ export const DeviceModal = ({
                         <Select.Trigger placeholder='카테고리를 선택하세요.'/>
                         <Select.Content>
                             {categoryDevice?.map(role => (
-                                <Select.Item 
-                                    key={role.id} 
+                                <Select.Item
+                                    key={role.id}
                                     value={String(role.id)}
                                 >
                                     {role.name}

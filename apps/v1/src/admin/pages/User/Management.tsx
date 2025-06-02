@@ -1,30 +1,44 @@
-import { Button, DataTable, Skeleton } from '@plug/ui';
-import { columns } from './constants/userColumns';
-import { UserModal } from './components/UserModal';
-import { UserPasswordModal } from './components/UserPasswordModal';
-import { UserRoleModal } from './components/UserRoleModal';
-import { useModal } from '../../components/hook/useModal';
-import { useUsersSWR, deleteUser, useUserLoggedIn } from "@plug/common-services";
-import { useUser } from './utils/useUser';
-import { StateInfoWrapper } from "@plug/v1/admin/components/boundary/StateInfoWrapper";
-import React, { useState, useEffect, useCallback } from 'react';
-import { User } from './types/user.types';
+import {Button, DataTable, Skeleton} from '@plug/ui';
+import {columns} from './constants/userColumns';
+import {UserModal} from './components/UserModal';
+import {UserPasswordModal} from './components/UserPasswordModal';
+import {UserRoleModal} from './components/UserRoleModal';
+import {useModal} from '../../components/hook/useModal';
+import {useUsersSWR, deleteUser, useUserLoggedIn} from "@plug/common-services";
+import {useUser} from './utils/useUser';
+import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
+import React, {useState, useEffect, useCallback} from 'react';
+import {User} from './types/user.types';
+import {useToastStore} from '../../components/hook/useToastStore';
 
 export default function UserListPage(): React.ReactElement {
-    const { isOpen, mode, openModal, closeModal } = useModal();
-    const { isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal } = useModal();
-    const { isOpen: isRoleModalOpen, openModal: openRoleModal, closeModal: closeRoleModal } = useModal();
-    const { data, error, isLoading, mutate } = useUsersSWR();
+    const {isOpen, mode, openModal, closeModal} = useModal();
+    const {isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal} = useModal();
+    const {isOpen: isRoleModalOpen, openModal: openRoleModal, closeModal: closeRoleModal} = useModal();
+    const {data, error, isLoading, mutate} = useUsersSWR();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
     const [selectedUserId, setSelectedUserId] = useState<number>();
     const [statusData, setStatusData] = useState<Record<number, boolean>>({});
-    const { execute: loggedInUser } = useUserLoggedIn();
-    
+    const {execute: loggedInUser} = useUserLoggedIn();
+    const {addToast} = useToastStore();
+
     // 사용자 정보 수정 모달 
     const handleDelete = async (userId: number) => {
-        deleteUser(userId).then(() => {mutate();})
+        try {
+            await deleteUser(userId);
+            await mutate();
+            addToast({
+                description: '사용자가 성공적으로 삭제되었습니다.',
+                variant: 'default'
+            });
+        } catch (error) {
+            addToast({
+                description: error instanceof Error ? error.message : '사용자 삭제 중 오류가 발생했습니다.',
+                variant: 'critical'
+            });
+        }
     };
-    
+
     const handleEdit = useCallback((userId: number) => {
         setSelectedUserId(userId);
         openModal('edit');
@@ -55,40 +69,57 @@ export default function UserListPage(): React.ReactElement {
     // 로그인 된 사용자 정보 조회 
     useEffect(() => {
         const fetchLoggedInUsers = async () => {
-          try {
-            const users = await loggedInUser();
-            if (Array.isArray(users)) {
-              const statusMap: Record<number, boolean> = {};
-              users.forEach(user => {
-                if (user.isLoggedIn) statusMap[user.id] = true;
-              });
-              setStatusData(statusMap);
+            try {
+                const users = await loggedInUser();
+                if (Array.isArray(users)) {
+                    const statusMap: Record<number, boolean> = {};
+                    users.forEach(user => {
+                        if (user.isLoggedIn) statusMap[user.id] = true;
+                    });
+                    setStatusData(statusMap);
+                }
+            } catch (error) {
+                addToast({
+                    description: error instanceof Error ? error.message : '로그인 사용자 정보 조회에 실패했습니다.',
+                    variant: 'critical'
+                });
             }
-          } catch (error) {
-            console.error('로그인 사용자 정보 조회 실패', error);
-          }
         };
         fetchLoggedInUsers();
-      }, [loggedInUser, setStatusData, closeModal, openModal, openPasswordModal, openRoleModal]);
-      
-    
+    }, [loggedInUser, setStatusData, closeModal, openModal, openPasswordModal, openRoleModal, addToast]);
+
+
     const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
 
-    const handleDeleteSelected = async() => {
-        if(selectState.size === 0){
-            return alert('삭제할 항목을 선택해주세요.');
+    const handleDeleteSelected = async () => {
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
+
+        if (selectState.size === 0) {
+            addToast({
+                description: '삭제할 항목을 선택해주세요.',
+                variant: 'warning'
+            });
+            return;
         }
 
-        try{
+        try {
             await Promise.all(
                 Array.from(selectState).map(user => handleDelete(Number(user.id)))
-            )
-            
-            alert(`${selectState.size} 개의 항목이 삭제 되었습니다.`);
+            );
+
+            addToast({
+                description: `${selectState.size}개의 항목이 삭제되었습니다.`,
+                variant: 'default'
+            });
             setSelectState(new Set());
 
         } catch (error) {
-            console.error('삭제 중 오류가 발생했습니다.', error);
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '항목 삭제 중 오류가 발생했습니다.',
+                variant: 'critical'
+            });
         }
     };
 
@@ -103,7 +134,7 @@ export default function UserListPage(): React.ReactElement {
                             className='bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200'
                             onClick={handleDeleteSelected}>삭제</Button>
                 </div>
-                {error && <StateInfoWrapper preset="defaultError" />}
+                {error && <StateInfoWrapper preset="defaultError"/>}
                 {isLoading && <Skeleton className="w-full h-100"/>}
                 {!isLoading && !error && userData && (
                     <DataTable
@@ -118,26 +149,26 @@ export default function UserListPage(): React.ReactElement {
                             const lowerSearch = search.toLowerCase();
                             return (
                                 String(item.id).toLowerCase().includes(lowerSearch) ||
-                                item.username.toLowerCase().includes(lowerSearch) 
+                                item.username.toLowerCase().includes(lowerSearch)
                             );
                         }}
                     />
                 )}
             </div>
-            <UserModal 
+            <UserModal
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}
                 onSuccess={mutate}
                 selectedUserId={selectedUserId}
             />
-            <UserPasswordModal 
+            <UserPasswordModal
                 isOpen={isPasswordModalOpen}
                 onClose={handleClosePasswordModal}
                 onSuccess={mutate}
                 selectedUserId={selectedUserId}
             />
-            <UserRoleModal 
+            <UserRoleModal
                 isOpen={isRoleModalOpen}
                 onClose={handleCloseRoleModal}
                 onSuccess={mutate}
