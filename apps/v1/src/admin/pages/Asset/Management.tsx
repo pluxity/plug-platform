@@ -31,7 +31,7 @@ export default function AssetPage() {
             addToast({
                 variant: 'critical',
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
+                description: error instanceof Error ? error.message : '삭제 중 오류가 발생했습니다.',
             });
         }
     };
@@ -73,7 +73,7 @@ export default function AssetPage() {
             addToast({
                 variant: 'critical',
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
+                description: error instanceof Error ? error.message : '삭제 중 오류가 발생했습니다.',
             });
             console.error('삭제 중 오류가 발생했습니다.', error);
         }
