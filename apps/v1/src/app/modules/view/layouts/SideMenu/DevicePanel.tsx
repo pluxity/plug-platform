@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '@plug/api-hooks/core';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import { DeviceDetailModal } from '../../../components/modals/DeviceDetailModal';
 
 interface DeviceData {
   id: string;
@@ -23,6 +24,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
   const [devices, setDevices] = useState<DeviceData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const { stationId } = useStationStore();
 
   useEffect(() => {
@@ -62,31 +64,46 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
   }
 
   return (
-    <div className="fixed left-16 top-16 bottom-0 w-72 bg-primary-400/20 backdrop-blur-xs p-4 z-20 transition-all duration-300 ease-in-out transform translate-x-0">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-white">{categoryName}</h2>
-        <button
-          onClick={onClose}
-          className="text-white hover:text-gray-400 text-2xl"
-          aria-label="Close device panel"
-        >
-          &times;
-        </button>
-      </div>
+    <>
+      <div className="fixed left-16 top-16 bottom-0 w-72 bg-primary-400/20 backdrop-blur-xs p-4 z-20 transition-all duration-300 ease-in-out transform translate-x-0">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-white">{categoryName}</h2>
+          <button
+            onClick={onClose}
+            className="text-white hover:text-gray-400 text-2xl"
+            aria-label="Close device panel"
+          >
+            &times;
+          </button>
+        </div>
 
-      {loading && <p className="text-gray-400">Loading devices...</p>}
-      {!loading && error && <p className="text-red-400">{error}</p>}
-      {!loading && !error && devices.length === 0 && (<p className="text-gray-400">No devices found in this category.</p>)}
-      {!loading && !error && devices.length > 0 && (
-        <ul className="space-y-2">
-          {devices.map(device => (
-            <li key={device.id} className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white">
-              {device.name}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+        {loading && <p className="text-gray-400">Loading devices...</p>}
+        {!loading && error && <p className="text-red-400">{error}</p>}
+        {!loading && !error && devices.length === 0 && (<p className="text-gray-400">No devices found in this category.</p>)}
+        {!loading && !error && devices.length > 0 && (
+          <ul className="space-y-2">
+            {devices.map(device => (
+              <li 
+                key={device.id} 
+                className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white"
+                onClick={() => {
+                  setSelectedDeviceId(device.id.toString());
+                }}
+              >
+                {device.name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <DeviceDetailModal
+          isOpen={!!selectedDeviceId}
+          onClose={() => {setSelectedDeviceId(null);}}
+          stationId={String(stationId)}
+          selectedDeviceId={selectedDeviceId}
+          deviceType="shutter"
+        />
+    </>
   );
 };
 
