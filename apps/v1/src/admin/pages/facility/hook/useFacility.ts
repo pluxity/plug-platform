@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
-import { createStation } from '../api/station';
-import { useFileUploader } from "@plug/v1/admin/pages/facility/hook/useFileUploader";
+import {useState, useCallback} from 'react';
+import {useFileUploader} from "@plug/v1/admin/pages/facility/hook/useFileUploader";
 import {FileType} from "@plug/v1/admin/pages/facility/types/file";
+import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
+import {useCreateStation} from "@plug/common-services";
 
 interface FacilityProps {
     onClose: () => void;
@@ -13,9 +14,12 @@ const MESSAGES = {
     ERROR: '도면 등록에 실패하였습니다.'
 } as const;
 
-export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
+export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [facilityName, setFacilityName] = useState('');
+
+    const {execute} = useCreateStation();
+    const addToast = useToastStore((state) => state.addToast);
 
     const {
         files,
@@ -45,6 +49,7 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleFinish = useCallback(async (values: Record<string, any>) => {
+
         setIsLoading(true);
         try {
 
@@ -61,33 +66,43 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
                 ? values.linesId.map(Number)
                 : [Number(values.linesId)];
 
-            const result = await createStation({
+
+
+            const result = await execute({
+                externalCode: values.externalCode,
                 facility: {
-                    name: values.name,
                     code: values.code,
                     description: values.description,
                     drawingFileId: files.model.fileId,
+                    name: values.name,
                     thumbnailFileId: files.thumbnail.fileId
                 },
-                floors: floors,
-                lineIds: lineIds,
-                route: '',
-                externalCode: values.externalCode
+                floors,
+                lineIds,
+                route: 'facility'
             });
 
             if (result) {
-                alert(MESSAGES.SUCCESS);
+                addToast({
+                    title: '성공',
+                    description: MESSAGES.SUCCESS,
+                    variant: 'normal',
+                });
                 onSuccess?.();
                 resetForm();
-                onClose();
-                window.location.reload();
             }
+
         } catch (error) {
             console.error(MESSAGES.ERROR, error);
+            addToast({
+                title: '오류',
+                description: error instanceof Error ? error.message : MESSAGES.ERROR,
+                variant: 'critical',
+            });
         } finally {
             setIsLoading(false);
         }
-    }, [files.model.fileId, files.thumbnail.fileId, onClose, onSuccess, resetForm]);
+    }, [files.model.fileId, files.thumbnail.fileId, onClose, onSuccess, resetForm, addToast]);
 
     return {
         isLoading,
@@ -100,5 +115,4 @@ export const useFacility = ({ onClose, onSuccess }: FacilityProps) => {
         resetForm,
         modelData
     };
-
 };

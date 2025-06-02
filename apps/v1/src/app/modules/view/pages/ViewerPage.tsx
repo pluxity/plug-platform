@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
 import { api } from '@plug/api-hooks/core';
-import type { StationData } from '@plug/common-services/types';
+import type { Station } from '@plug/common-services/types';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 
 const ViewerPage = () => {
@@ -11,7 +11,7 @@ const ViewerPage = () => {
     const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
     const { setStationId } = useStationStore();
     
-    const [stationData, setStationData] = useState<StationData | null>(null);
+    const [stationData, setStationData] = useState<Station | null>(null);
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -23,7 +23,7 @@ const ViewerPage = () => {
         const fetchStationData = async () => {
             try {
                 setStationLoading(true);
-                const response = await api.get<StationData>(`stations/${parsedStationId}/with-features`);
+                const response = await api.get<Station>(`stations/${parsedStationId}/with-features`);
                 setStationData(response.data);
                 setError(null);
             } catch (err) {

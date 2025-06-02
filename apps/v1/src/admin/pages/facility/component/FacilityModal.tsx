@@ -36,7 +36,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
             onClose={isLoading ? undefined : resetForm}
             closeOnOverlayClick={false}
         >
-            <div className="p-4">
+            <div>
                 {fileError && (
                     <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
                         {fileError.message}

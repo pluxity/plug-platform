@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from "react";
 import {Card, Button, Pagination} from "@plug/ui";
 import { useNavigate } from "react-router-dom";
-import {fetchStations} from "@plug/v1/admin/pages/facility/api/station";
 import {CardFooter, CardHeader, CardTitle} from "../../../../../../../packages/ui/src/components/Card/Card";
 import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import {useModal} from "@plug/v1/admin/components/hook/useModal";
 import {FacilityModal} from "@plug/v1/admin/pages/facility/component/FacilityModal";
-import {Station} from "@plug/v1/admin/pages/facility/types/facility";
+import {Station, useStationsSWR} from "@plug/common-services";
 
 export default function FacilitiesPage() {
     const navigate = useNavigate();
     const [stations, setStations] = useState<Station[]>([]);
     const [error, setError] = useState<Error | null>(null);
-    const {isOpen, openModal, closeModal} = useModal();
-
     const [currentPage, setCurrentPage] = useState(1);
+
+    const {isOpen, openModal, closeModal} = useModal();
+    const {data, mutate} = useStationsSWR()
+
     const itemsPerPage = 8;
-    
+
     useEffect(() => {
         const loadStations = async () => {
             try {
-                const response = await fetchStations();
-                setStations(response.data);
+                mutate();
+                setStations(data || []);
             } catch (err) {
                 setError(err as Error);
             }
         };
         loadStations();
-    }, []);
+    }, [data, mutate]);
 
     if (error) return <StateInfoWrapper preset={"defaultError"}/>;
 
@@ -55,7 +56,8 @@ export default function FacilitiesPage() {
             <div className='flex flex-col gap-6 mt-2.5'>
                 <div className='grid grid-cols-4 gap-4'>
                     {currentStations.length === 0 ? (
-                        <StateInfoWrapper preset="emptyTable" onClick={() => openModal('create')} className="cursor-pointer"/>
+                        <StateInfoWrapper preset="emptyTable" onClick={() => openModal('create')}
+                                          className="cursor-pointer col-span-4"/>
                     ) : (
                         currentStations.map((station) => (
                             <Card
