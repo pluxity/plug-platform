@@ -1,4 +1,3 @@
-import React from "react";
 import UserProfile from "@plug/v1/app/modules/view/layouts/Header/UserProfile";
 import TimeDisplay from "./TimeDisplay";
 import HeaderEnvInfo from "./HeaderEnvInfo";

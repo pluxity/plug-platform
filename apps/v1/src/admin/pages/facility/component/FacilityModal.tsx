@@ -1,5 +1,4 @@
 import { Modal, Form, FormItem, Button, Input, Select } from '@plug/ui';
-import React from 'react';
 import { useLinesSWR } from '@plug/common-services';
 import {FileUploadField} from "@plug/v1/admin/pages/facility/component/FileUploadField";
 import {useFacility} from "@plug/v1/admin/pages/facility/hook/useFacility";

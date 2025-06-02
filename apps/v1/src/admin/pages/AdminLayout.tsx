@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from '@plug/ui';
 import {Outlet, Link} from 'react-router-dom';
 import {useProfileStore} from "@plug/v1/auth/controller/useProfileStore";
