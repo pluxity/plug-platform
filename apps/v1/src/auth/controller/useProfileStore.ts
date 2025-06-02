@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import {AuthUserProfile} from "@plug/v1/auth/model/profile";
+import {UserProfile} from "@plug/common-services";
 
 interface AuthStore {
-    user: AuthUserProfile | null;
-    setUser: (user: AuthUserProfile) => void;
+    user: UserProfile | null;
+    setUser: (user: UserProfile) => void;
     clearUser: () => void;
 }
 

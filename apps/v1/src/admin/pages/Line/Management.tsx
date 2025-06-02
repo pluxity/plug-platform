@@ -40,13 +40,15 @@ export default function LinePage() {
     };
     return (
         <>
-            <div className='flex'>    
-                <div className='ml-auto flex gap-1'>
-                    <Button color='primary' onClick={() => (openModal('create'))}>등록</Button>
-                    <Button color='destructive' onClick={handleDeleteSelected}>삭제</Button>
+            <div className='mt-4 relative h-[90%]'>
+                <div className='ml-auto flex gap-1 w-48 absolute z-10 right-0'>
+                    <Button color='primary'
+                            className='bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200'
+                            onClick={() => (openModal('create'))}>등록</Button>
+                    <Button color='destructive'
+                            className='bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200'
+                            onClick={handleDeleteSelected}>삭제</Button>
                 </div>
-            </div>
-            <div className='mt-4'>
                 {error && <StateInfoWrapper preset="defaultError" />}
                 {isLoading && <Skeleton className="w-full h-100"/>}
                 {!isLoading && !error && lineData && (
@@ -57,6 +59,7 @@ export default function LinePage() {
                         selectable={true}
                         selectedRows={selectedLines}
                         onSelectChange={setSelectedLines}
+                        showSearch
                         filterFunction={(item, search) => {
                             const lowerSearch = search.toLowerCase();
                             return (
@@ -64,9 +67,9 @@ export default function LinePage() {
                             );
                         }}
                     />
-                )} 
+                )}
             </div>
-            <LineModal 
+            <LineModal
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}

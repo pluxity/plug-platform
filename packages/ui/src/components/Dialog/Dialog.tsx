@@ -52,7 +52,7 @@ const Dialog = React.memo(({
     return createPortal(
       <div 
         className={cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50",
+          "fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[2px] bg-black/20",
           overlayClassName
         )}
         onClick={handleOverlayClick}

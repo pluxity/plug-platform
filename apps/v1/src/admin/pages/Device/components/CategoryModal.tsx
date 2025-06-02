@@ -99,6 +99,7 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
             try {
                 const line = await createCategory({
                     name: values.name,
+                    contextPath: values.contextPath,
                     iconFileId: uploadIconFileId,
                 });
 
@@ -164,6 +165,13 @@ export const CategoryModal = ({ isOpen, onClose, onSuccess, mode, selectedCatego
                 <FormItem name="name" label="카테고리명" required>
                     <Input.Text
                         placeholder="카테고리 이름을 입력하세요"
+                        value={name}
+                        onChange={value => setName(value)}
+                    />
+                </FormItem>
+                <FormItem name="contextPath" label="컨텍스트 패스" required>
+                    <Input.Text
+                        placeholder="컨텍스트 패스를 입력하세요"
                         value={name}
                         onChange={value => setName(value)}
                     />

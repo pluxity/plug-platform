@@ -1,5 +1,4 @@
 import { Modal, Form, FormItem, Button, Input, Select } from '@plug/ui';
-import React from 'react';
 import { useLinesSWR } from '@plug/common-services';
 import {FileUploadField} from "@plug/v1/admin/pages/facility/component/FileUploadField";
 import {useFacility} from "@plug/v1/admin/pages/facility/hook/useFacility";
@@ -69,7 +68,7 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                         </Select>
                     </FormItem>
 
-                    <FormItem name="description" label="역사 설명" required>
+                    <FormItem name="description" label="역사 설명">
                         <Input.Text placeholder="역사 설명을 입력하세요" />
                     </FormItem>
 
@@ -109,7 +108,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                             </Select.Content>
                         </Select>
                     </FormItem>
-
                     <div className="mt-6 flex justify-center gap-2">
                         <Button
                             type="button"
