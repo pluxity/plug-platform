@@ -18,7 +18,7 @@ class Path3DPointObject extends THREE.Group {
         this.add(mesh);
 
         // 스프라이트
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ color: 'yellow', depthTest: false, depthWrite: false, }));
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ color: 'white', depthTest: false, depthWrite: false, }));
         sprite.scale.set(0.1, 0.1, 1);
         this.add(sprite);
     }
@@ -29,6 +29,29 @@ class Path3DPointObject extends THREE.Group {
     dispose() {
         this.parent?.remove(this);
 
+    }
+
+    /**
+     * 월드 좌표
+     */
+    get WorldPosition(): THREE.Vector3 {
+        const worldPoint = new THREE.Vector3();
+        this.getWorldPosition(worldPoint);
+        return worldPoint;
+    }
+
+    updateMatrix(): void {
+        
+        super.updateMatrix();
+
+        if (this.userData['isStraightLine']) {
+            const startPos = this.userData['startPointObj'].WorldPosition;
+            const endPos = this.userData['endPointObj'].WorldPosition;
+            const center = new THREE.Vector3().lerpVectors(startPos, endPos, 0.5);
+
+            const localCenter = this.parent!.worldToLocal(center);
+            this.position.copy(localCenter);
+        }
     }
 }
 
