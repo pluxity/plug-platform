@@ -63,8 +63,6 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
 
   const handleDeviceClick = (device: DeviceData) => {
     try {
-      console.log('feature.id:', device.feature.id);
-      
       if (device.feature.id) {
         Px.Camera.MoveToPoi(device.feature.id, 1.0);
       } 
