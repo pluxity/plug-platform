@@ -78,30 +78,30 @@ function getPickPoint(mousePos: THREE.Vector2) {
  * @param planeBasePoint - 평면의 기준점 (기본값: 원점)
  * @returns - 평면과 교차하는 픽킹 위치
  */
-function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Vector3) {
-    // 마우스 좌표를 뷰포트 공간으로
-    mousePos.x = (mousePos.x / engine.Dom.clientWidth) * 2 - 1;
-    mousePos.y = -(mousePos.y / engine.Dom.clientHeight) * 2 + 1;
-
-    // 마우스 위치를 기준으로 레이캐스트 생성
-    rayCast.setFromCamera(mousePos, engine.Camera);
-
-    // 평면과 교차 테스트
-    const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), planeBasePoint);
-    const point = new THREE.Vector3();
-    if (rayCast.ray.intersectPlane(plane, point)) {
-        const floorObject = Util.getFloorObject();
-        const pickedPointLocal = floorObject.worldToLocal(point.clone());
-
-        return {
-            worldPoint: point,
-            localPoint: pickedPointLocal,
-            pickedFloor: floorObject,
-        };
-    }
-
-    return undefined;
-}
+// function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Vector3) {
+//     // 마우스 좌표를 뷰포트 공간으로
+//     mousePos.x = (mousePos.x / engine.Dom.clientWidth) * 2 - 1;
+//     mousePos.y = -(mousePos.y / engine.Dom.clientHeight) * 2 + 1;
+//
+//     // 마우스 위치를 기준으로 레이캐스트 생성
+//     rayCast.setFromCamera(mousePos, engine.Camera);
+//
+//     // 평면과 교차 테스트
+//     const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), planeBasePoint);
+//     const point = new THREE.Vector3();
+//     if (rayCast.ray.intersectPlane(plane, point)) {
+//         const floorObject = Util.getFloorObject();
+//         const pickedPointLocal = floorObject.worldToLocal(point.clone());
+//
+//         return {
+//             worldPoint: point,
+//             localPoint: pickedPointLocal,
+//             pickedFloor: floorObject,
+//         };
+//     }
+//
+//     return undefined;
+// }
 
 /**
  * 포인터 다운 이벤트 처리
@@ -118,7 +118,7 @@ function onPointerDown(evt: PointerEvent) {
  * 포인터 이동 이벤트 처리
  * @param event - 포인터 이동 이벤트 정보
  */
-function onPointerMove(evt: PointerEvent) {
+function onPointerMove() {
 
 }
 
@@ -133,7 +133,7 @@ function onPointerUp(evt: PointerEvent) {
             const pickData = getPickPoint(mouseUpPos);
 
             if (pickData)
-                workingPath.addPathPoint(pickData.worldPoint, pickData.localPoint, pickData.pickedFloor);
+                workingPath.addPathPoint(pickData.worldPoint, pickData.pickedFloor);
         }
     }
 }

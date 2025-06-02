@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
-import {AdminRouter} from "@plug/v1/router/admin/AdminRouter";
-import {ServiceRouter} from "@plug/v1/router/service/ServiceRouter";
-import {AppRouter} from "@plug/v1/router/auth/AppRouter";
+import {ServiceRouter} from "./service/ServiceRouter";
+import {AppRouter} from "./auth/AppRouter";
+import {AdminRouter} from "./admin/AdminRouter";
 
 export const router = createBrowserRouter([
     ...AdminRouter,

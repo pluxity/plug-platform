@@ -15,10 +15,10 @@ let currentPath: Path3D;
 let workingSegment: PathSegment3D;
 let mouseState: Interfaces.PathCreatorMouseState = Interfaces.PathCreatorMouseState.Default;
 let bLeftBtnDown: boolean = false; // 마우스 왼쪽 버튼이 눌렸는지 여부
-const curveControlPoint: THREE.Vector3 = new THREE.Vector3();
+// const curveControlPoint: THREE.Vector3 = new THREE.Vector3();
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 const rayCast: THREE.Raycaster = new THREE.Raycaster();
-enum MouseState { None = 0, SetStartPoint, SetEndPoint };
+// enum MouseState { None = 0, SetStartPoint, SetEndPoint };
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -261,14 +261,14 @@ function onPointerUp(event: MouseEvent) {
  * 키다운 이벤트 처리
  * @param event - 키다운 이벤트 정보
  */
-function onKeyDown(event: KeyboardEvent) {
+function onKeyDown() {
 }
 
 /**
  * 키업 이벤트 처리
  * @param event - 키업 이벤트 정보
  */
-function onKeyUp(event: KeyboardEvent) {
+function onKeyUp() {
 }
 
 /**

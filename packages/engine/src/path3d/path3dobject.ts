@@ -37,7 +37,7 @@ class Path3DObject extends THREE.Group {
      * @param localPoint - 층기준 로컬좌표
      * @param floor - 레이캐스트된 층 객체
      */
-    addPathPoint(worldPoint: THREE.Vector3, localPoint: THREE.Vector3, floor: THREE.Object3D) {
+    addPathPoint(worldPoint: THREE.Vector3, floor: THREE.Object3D) {
         // 새 위치점 생성
         const newPointObj = new Path3DPointObject(this.pathWidth, this.pathColor);
         newPointObj.name = THREE.MathUtils.generateUUID();

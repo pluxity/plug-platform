@@ -9,7 +9,18 @@ export default defineConfig({
     react(),
     tailwindcss(),
     svgr({
+      svgrOptions: {
+        exportType: 'default',
+        ref: true,
+        svgo: false,
+        titleProp: true,
+      },
       include: "**/*.svg",
     }),
-  ]
+  ],
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  }
 })

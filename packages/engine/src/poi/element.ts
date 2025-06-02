@@ -292,7 +292,5 @@ interface PoiPointMeshData {
     animMeshRef: THREE.Object3D | undefined;
 }
 
-export {
-    PoiElement,
-    PoiPointMeshData,
-}
+export { PoiElement };
+export type { PoiPointMeshData };

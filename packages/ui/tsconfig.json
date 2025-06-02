@@ -7,8 +7,15 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "types": ["vite/client"],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "vite-env.d.ts"
+  ],
   "exclude": ["node_modules", "dist", "**/*.d.ts"]
 }

@@ -58,8 +58,8 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 /**
  * 렌더링 전 이벤트 콜백
  */
-Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => {
-    const deltaTime = evt.deltaTime;
+Event.InternalHandler.addEventListener('onBeforeRender' as never, () => {
+    // const deltaTime = evt.deltaTime;
 
     // 현재 카메라 방향 얻기
     const dirCamLook = new THREE.Vector3(0, 0, -1);

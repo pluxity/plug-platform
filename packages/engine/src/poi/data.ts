@@ -114,8 +114,8 @@ Event.InternalHandler.addEventListener('onModelBeforeMove' as never, (evt: any) 
 /**
  * 층 이동 후 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) => {
-    const floorObjects: Record<string, THREE.Object3D> = evt.floorObjects;
+Event.InternalHandler.addEventListener('onModelAfterMove' as never, () => {
+    // const floorObjects: Record<string, THREE.Object3D> = evt.floorObjects;
 
     // 이동된 더미객체의 위치값을 poi에 적용시킨다.
     poiDummies.forEach(dummy => {
@@ -178,7 +178,7 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
 /**
  * 모든층 가시화 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => {
+Event.InternalHandler.addEventListener('onModelShowAll' as never, () => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = true);
 
@@ -188,7 +188,7 @@ Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => 
 /**
  * 모든층 숨기기 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
+Event.InternalHandler.addEventListener('onModelHideAll' as never, () => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = false);
     

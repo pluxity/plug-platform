@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import * as Addon from 'three/addons';
+// import * as Addon from 'three/addons';
 import * as Event from '../eventDispatcher';
-import * as Interfaces from '../interfaces';
+// import * as Interfaces from '../interfaces';
 import { Engine3D } from '../engine';
 import { SbmBinaryReader } from './sbmBinaryReader';
 import * as ModelInternal from '../model/model';

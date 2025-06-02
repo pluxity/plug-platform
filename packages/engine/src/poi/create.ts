@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import * as Addon from 'three/addons';
+// import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
 import * as Event from '../eventDispatcher';
-import * as Util from '../util';
+// import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 import * as PoiData from './data';

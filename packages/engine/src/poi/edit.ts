@@ -171,7 +171,7 @@ async function createEditPreviewObject() {
     gizmo.addEventListener('dragging-changed', (event) => {
         Camera.SetEnabled(!event.value);
     });
-    gizmo.addEventListener('mouseUp', (event) => {
+    gizmo.addEventListener('mouseUp', () => {
         target.WorldPosition = previewObject.position.clone();
         target.Rotation = previewObject.rotation.clone();
         target.Scale = previewObject.scale.clone();

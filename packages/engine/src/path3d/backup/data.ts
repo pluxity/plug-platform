@@ -6,7 +6,7 @@ const createdPathObjects: Path3D[] = [];
 /**
  * 층 펼치기/접기 이동 후 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelAfterMove' as never, (event: any) => {
+Event.InternalHandler.addEventListener('onModelAfterMove' as never, () => {
     // 변경된 더미 객체 위치에 따라 경로 객체들의 geometry를 업데이트 처리
     createdPathObjects.forEach(path => path.updateGeometries());
 });

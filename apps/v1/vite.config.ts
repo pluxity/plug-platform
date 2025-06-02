@@ -18,6 +18,10 @@ export default defineConfig({
       '@plug/v1': path.resolve(__dirname, './src')
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  },
   assetsInclude: ['**/*.glb'],
   server: {
     host: '0.0.0.0',

@@ -86,7 +86,7 @@ class SbmBinaryReader {
             this.bufferOffsetCursor += 4;
             const ambientB = this.view.getFloat32(this.bufferOffsetCursor, true);
             this.bufferOffsetCursor += 4;
-            const ambientA = this.view.getFloat32(this.bufferOffsetCursor, true);
+            // const ambientA = this.view.getFloat32(this.bufferOffsetCursor, true);
             this.bufferOffsetCursor += 4;
 
             // diffuse 색상
@@ -106,7 +106,7 @@ class SbmBinaryReader {
             this.bufferOffsetCursor += 4;
             const specularB = this.view.getFloat32(this.bufferOffsetCursor, true);
             this.bufferOffsetCursor += 4;
-            const specularA = this.view.getFloat32(this.bufferOffsetCursor, true);
+            // const specularA = this.view.getFloat32(this.bufferOffsetCursor, true);
             this.bufferOffsetCursor += 4;
 
             // 면 렌더링 방향
