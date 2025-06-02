@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '@plug/api-hooks/core';
+import * as Px from '@plug/engine/src';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import { DeviceDetailModal } from '../../../components/modals/DeviceDetailModal';
 
 interface DeviceData {
   id: string;
   name: string;
+  feature: {id: string;};
 }
 
 interface DeviceGroup {
@@ -23,8 +25,8 @@ interface DevicePanelProps {
 const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onClose }) => {
   const [devices, setDevices] = useState<DeviceData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { stationId } = useStationStore();
 
   useEffect(() => {
@@ -59,6 +61,18 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
     fetchDevices();
   }, [categoryId, stationId]);
 
+  const handleDeviceClick = (device: DeviceData) => {
+    try {
+      console.log('feature.id:', device.feature.id);
+      
+      if (device.feature.id) {
+        Px.Camera.MoveToPoi(device.feature.id, 1.0);
+      } 
+    } catch (error) {
+      console.error('이동 중 오류 발생:', error);
+    }
+  };
+
   if (!categoryId) {
     return null;
   }
@@ -88,6 +102,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
                 className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white"
                 onClick={() => {
                   setSelectedDeviceId(device.id);
+                  handleDeviceClick(device)
                 }}
               >
                 {device.name}
@@ -102,7 +117,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
           stationId={String(stationId)}
           selectedDeviceId={selectedDeviceId}
           deviceType="shutter"
-        />
+        /> 
     </>
   );
 };

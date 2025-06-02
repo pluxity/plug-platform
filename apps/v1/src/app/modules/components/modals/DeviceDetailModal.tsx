@@ -23,13 +23,13 @@ type DeviceResponse = {
   airPurifiers?: AirPurifier[];
 };
 
-const Device_MAP = {
+const DEVICE_MAP = {
   light: nfluxService.getStationLights,
   shutter: nfluxService.getStationShutters,
   airPurifier: nfluxService.getAirPurifiers,
 };
 
-const Device_MAP_RESPONSE = {
+const DEVICE_MAP_RESPONSE = {
   light: 'lights',
   shutter: 'shutters',
   airPurifier: 'airPurifiers',
@@ -55,8 +55,8 @@ export const DeviceDetailModal = ({
       setLoading(true);
       setError(null);
       try {
-        const response = await Device_MAP[deviceType](stationId) as DeviceResponse;
-        const responseKey = Device_MAP_RESPONSE[deviceType] as keyof DeviceResponse;
+        const response = await DEVICE_MAP[deviceType](stationId) as DeviceResponse;
+        const responseKey = DEVICE_MAP_RESPONSE[deviceType] as keyof DeviceResponse;
         const data = response[responseKey];
         
 
