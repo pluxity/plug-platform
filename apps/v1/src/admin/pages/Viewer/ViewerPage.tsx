@@ -109,7 +109,7 @@ const ViewerContent = memo(({  stationData,
 
   return (
     <>
-      <aside className="bg-white w-1/3 overflow-y-auto">
+      <aside className="bg-white w-1/4 overflow-y-auto shrink-0">
         <AssetList />
       </aside>
       <main className="w-full">
