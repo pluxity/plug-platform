@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import * as Px from '@plug/engine/src';
-import { useAssetStore } from '../store/assetStore';
+import { useAssetStore } from '../../../../common/store/assetStore';
 import type { FeatureResponse } from '../types';
 import type { PoiImportOption, ModelInfo } from '@plug/engine/src/interfaces';
 import { usePoiApi } from './usePoiApi';
@@ -22,6 +22,9 @@ export function useEngineIntegration({
   const { updateTransform } = usePoiApi();
   // Store event listener references for cleanup
   const poiClickListener = useCallback((event: { target: PoiImportOption }) => {
+
+    console.log('POI clicked:', event);
+
     if (event.target) {
       onPoiSelect(event.target);
     }

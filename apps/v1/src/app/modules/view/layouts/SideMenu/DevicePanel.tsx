@@ -41,7 +41,6 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
 
       try {
         const response = await api.get<DeviceGroup[]>(`devices/station/${stationId}/grouped`);
-        
         if (response.data) {
             const transformDevices = response.data.find(item => {
                 return String(item.categoryId) === String(categoryId)
