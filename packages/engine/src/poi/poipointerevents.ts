@@ -62,7 +62,9 @@ function onPointerUp(evt: PointerEvent) {
                 // 이벤트 통지
                 Event.ExternalHandler.dispatchEvent({
                     type: 'onPoiPointerUp',
-                    target: poi.ExportData
+                    target: poi.ExportData,
+                    pointerEvent: evt,
+                    screenPos: Util.toScreenPos(poi.WorldPosition.clone()),
                 });
             }
         }

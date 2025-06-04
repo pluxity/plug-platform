@@ -279,6 +279,24 @@ function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
 
     return undefined;
 }
+
+/**
+ * 월드상의 3d좌표를 화면상의 2d pixel좌표로 변환
+ * @param target - 좌표값
+ * @returns - 변환값
+ */
+function toScreenPos(target: THREE.Vector3): THREE.Vector2 {
+    const projected = target.clone().project(engine.Camera);
+    const widthHalf = 0.5 * engine.Renderer.domElement.clientWidth;
+    const heightHalf = 0.5 * engine.Renderer.domElement.clientHeight;
+
+    return new THREE.Vector2(
+        (projected.x * widthHalf) + widthHalf,
+        (-projected.y * heightHalf) + heightHalf
+    );
+
+}
+
 /**
  * 색상이나 이미지로 배경 설정
  * @param backgroundData - 배경색상 숫자일경우 0xff0000의 형식으로 판단하고, 문자열일 경우 이미지 주소로 판단하여 배경을 설정한다.
@@ -299,6 +317,7 @@ export {
     setObjectLayer,
     getFloorObject,
     getPoiFromRaycast,
+    toScreenPos,
 
     // 외부노출
     SetBackground,

@@ -52,6 +52,9 @@ class Path3DObject extends THREE.Group {
         this.lineObjects = [];
     }
 
+    /**
+     * 익스포트 데이터
+     */
     get ExportData(): Interfaces.Path3DData {
 
         const points: Interfaces.Path3DPointData[] = [];
@@ -76,14 +79,23 @@ class Path3DObject extends THREE.Group {
             return undefined;
     }
 
+    /**
+     * 경로 너비
+     */
     get PathWidth(): number {
         return this.pathWidth;
     }
 
+    /**
+     * 경로 색상
+     */
     get PathColor(): THREE.Color {
         return this.pathColor;
     }
 
+    /**
+     * 경로 선객체 생성시 사용할 shape객체
+     */
     get ExtrudeShape(): THREE.Shape {
         return this.lineExtrudeShape;
     }
@@ -171,6 +183,10 @@ class Path3DObject extends THREE.Group {
         }
     }
 
+    /**
+     * 층id값에 해당하는 선객체 보이기
+     * @param floorId - 층id값
+     */
     showLine(floorId: string) {
         this.lineObjects.forEach(lineObj => {
             const isMatch = lineObj.checkFloorIdMatch(floorId);
@@ -180,6 +196,10 @@ class Path3DObject extends THREE.Group {
         });
     }
 
+    /**
+     * 층id값에 해당하는 선객체 숨기기
+     * @param floorId - 층id값
+     */
     hideLine(floorId: string) {
         this.lineObjects.forEach(lineObj => {
             const isMatch = lineObj.checkFloorIdMatch(floorId);
@@ -189,12 +209,18 @@ class Path3DObject extends THREE.Group {
         });
     }
 
+    /**
+     * 모든 선객체 보이기
+     */
     showAllLine() {
         this.lineObjects.forEach(lineObj => {
             lineObj.visible = true;
         });
     }
 
+    /**
+     * 모든 선객체 숨기기
+     */
     hideAllLine() {
         this.lineObjects.forEach(lineObj => {
             lineObj.visible = false;

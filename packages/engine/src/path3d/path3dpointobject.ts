@@ -49,6 +49,9 @@ class Path3DPointObject extends THREE.Group {
         return worldPoint;
     }
 
+    /**
+     * 익스포트 데이터
+     */
     get ExportData(): Interfaces.Path3DPointData {
         return {
             id: this.name,
@@ -62,10 +65,14 @@ class Path3DPointObject extends THREE.Group {
         };
     }
 
+    /**
+     * 행렬 업데이트 함수 오버라이드
+     */
     updateMatrix(): void {
         
         super.updateMatrix();
 
+        // 직선의 제어점인 경우 시작-종료점간의 중간위치로 설정
         if (this.userData['isStraightLine']) {
             const startPos = this.userData['startPointObj'].WorldPosition;
             const endPos = this.userData['endPointObj'].WorldPosition;

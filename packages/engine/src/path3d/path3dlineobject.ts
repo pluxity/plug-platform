@@ -36,6 +36,12 @@ class Path3DLineObject extends THREE.Group {
         this.lineColor = _color;
     }
 
+    /**
+     * 선객체의 각 위치점 객체 설정
+     * @param _startPoint - 시작점
+     * @param _controlPoint - 제어점
+     * @param _endPoint - 종료점
+     */
     setPointObjects(_startPoint: Path3DPointObject, _controlPoint: Path3DPointObject, _endPoint: Path3DPointObject) {
 
         this.startPoint = _startPoint;
@@ -43,12 +49,15 @@ class Path3DLineObject extends THREE.Group {
         this.endPoint = _endPoint;
     }
 
+    /**
+     * 곡선
+     */
     get Curve(): THREE.QuadraticBezierCurve3 {
         return this.curve;
     }
 
     /**
-     * 
+     * 시작/종료점의 층id값이 파라미터인 층id값과 같은지 확인
      */
     checkFloorIdMatch(floorId: string): boolean {
         return ((this.startPoint.userData['floorId'] === floorId) && (this.endPoint.userData['floorId'] === floorId));
