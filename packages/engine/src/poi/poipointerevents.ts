@@ -42,6 +42,20 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Poi 생성 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onPoiCreate' as never, () => {
+    clearHoverObjects();
+});
+
+/**
+ * Poi 편집 시작 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onPoiStartEdit' as never, () => {
+    clearHoverObjects();
+});
+
+/**
  * 호버링 객체 해제
  */
 function clearHoverObjects() {
@@ -53,6 +67,7 @@ function clearHoverObjects() {
         }
     });
     hoverObjects = [];
+    outlinePass.selectedObjects = hoverObjects;
 }
 
 /**
@@ -88,9 +103,9 @@ function onPointerMove(evt: PointerEvent) {
     rayCast.layers.set(Interfaces.CustomLayer.Pickable);
     rayCast.setFromCamera(mousePos, engine.Camera);
 
+    clearHoverObjects();
     const poi = Util.getPoiFromRaycast(rayCast);
     if (poi) {
-        clearHoverObjects();
         if (poi.PointMeshData.instanceMeshRef) {
             const instanceCopyMesh = new THREE.Mesh(poi.PointMeshData.instanceMeshRef.geometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
             instanceCopyMesh.position.copy(poi.WorldPosition);

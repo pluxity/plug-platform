@@ -203,6 +203,10 @@ function StartEdit(editMode: string) {
     registerPointerEvents();
 
     bPoiEditEnabled = true;
+
+    Event.InternalHandler.dispatchEvent({
+        type: 'onPoiStartEdit',
+    });
 }
 
 /**
