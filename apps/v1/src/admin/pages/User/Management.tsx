@@ -86,9 +86,9 @@ export default function UserListPage(): React.ReactElement {
             }
         };
         fetchLoggedInUsers();
-    }, [loggedInUser, setStatusData, closeModal, openModal, openPasswordModal, openRoleModal, addToast]);
-
-
+      }, []);
+      
+    
     const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
 
     const handleDeleteSelected = async () => {
@@ -140,7 +140,7 @@ export default function UserListPage(): React.ReactElement {
                     <DataTable
                         data={userData || []}
                         columns={columns}
-                        pageSize={7}
+                        pageSize={8}
                         selectable={true}
                         selectedRows={selectState}
                         onSelectChange={setSelectState}
