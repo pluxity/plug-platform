@@ -50,13 +50,10 @@ export function useEngineIntegration({
       throw error; // Re-throw to handle in calling function
     }
   }, []);
-  // Combined floor change handler that updates both UI and engine
   const handleFloorChange = useCallback((floorId: string) => {
-    console.log(`Floor change requested: ${floorId}`);
     try {
       changeEngineFloor(floorId);
       onFloorChange(floorId);
-      console.log(`Floor change completed: ${floorId}`);
     } catch (error) {
       console.error(`Floor change failed for floor ${floorId}:`, error);
     }
@@ -84,7 +81,6 @@ export function useEngineIntegration({
           scale: feature.scale
         };
         
-        console.log(`POI created for floor ${feature.floorId}:`, poi.displayText);
         return poi;
       });
 

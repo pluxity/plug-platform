@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { api } from '@plug/api-hooks/core';
+import React from 'react';
 import * as Px from '@plug/engine/src';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import { DeviceDetailModal } from '../../../components/modals/DeviceDetailModal';
@@ -17,54 +16,20 @@ interface DeviceFeature {
   deviceCode: string;
 }
 
-interface DeviceGroup {
-  categoryId: string;
-  categoryName: string;
-  devices: DeviceData[];
-}
-
 interface DevicePanelProps {
   categoryName: string | null;
   categoryId: string | null;
+  devices: DeviceData[];
   onClose: () => void;
 }
 
-const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onClose }) => {
-  const [devices, setDevices] = useState<DeviceData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const { stationId, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
-
-  useEffect(() => {
-    if (!categoryId || !stationId) {
-      setDevices([]);
-      return;
-    }
-
-    const fetchDevices = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await api.get<DeviceGroup[]>(`devices/station/${stationId}/grouped`);
-        if (response.data) {
-          const transformDevices = response.data.find(item => {
-                return String(item.categoryId) === String(categoryId)
-            } 
-          );
-          setDevices(transformDevices?.devices || []);
-        } 
-      } catch (err) {
-        console.error('Error fetching devices:', err);
-        setError('Failed to load devices.');
-        setDevices([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDevices();
-  }, [categoryId, stationId]);
+const DevicePanel: React.FC<DevicePanelProps> = ({ 
+  categoryId, 
+  categoryName, 
+  devices = [],
+  onClose 
+}) => {
+  const { facilityCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
 
   const handleDeviceClick = (device: DeviceData) => {
     try {
@@ -98,12 +63,11 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
           >
             &times;
           </button>
-        </div>
-
-        {loading && <p className="text-gray-400">Loading devices...</p>}
-        {!loading && error && <p className="text-red-400">{error}</p>}
-        {!loading && !error && devices.length === 0 && (<p className="text-gray-400">No devices found in this category.</p>)}
-        {!loading && !error && devices.length > 0 && (
+        </div>        {devices.length === 0 && (
+          <p className="text-gray-400">No devices found in this category.</p>
+        )}
+        
+        {devices.length > 0 && (
           <ul className="space-y-2">
             {devices.map(device => (
               <li 
@@ -111,7 +75,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
                 className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white"
                 onClick={() => {
                   setSelectedDeviceId(device.id);
-                  handleDeviceClick(device)
+                  handleDeviceClick(device);
                 }}
               >
                 {device.name}
@@ -120,13 +84,14 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
           </ul>
         )}
       </div>
+      
       <DeviceDetailModal
-          isOpen={!!selectedDeviceId}
-          onClose={() => {setSelectedDeviceId(null);}}
-          stationId={String(stationId)}
-          selectedDeviceId={selectedDeviceId}
-          deviceType="shutter"
-        /> 
+        isOpen={!!selectedDeviceId}
+        onClose={() => setSelectedDeviceId(null)}
+        stationId={String(facilityCode)}
+        selectedDeviceId={selectedDeviceId}
+        deviceType="shutter"
+      /> 
     </>
   );
 };

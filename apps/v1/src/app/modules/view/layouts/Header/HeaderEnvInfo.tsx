@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStationEnv } from '../../../../api/hooks/nflux';
+import { useStationEnv } from '@plug/v1/app/api/hooks/nflux';
 
 interface HeaderEnvInfoProps {
   stationId: string;

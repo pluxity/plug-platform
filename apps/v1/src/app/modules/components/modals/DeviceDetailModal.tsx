@@ -24,8 +24,8 @@ type DeviceResponse = {
 };
 
 const DEVICE_MAP = {
-  light: nfluxService.getStationLights,
-  shutter: nfluxService.getStationShutters,
+  light: nfluxService.getLights,
+  shutter: nfluxService.getShutters,
   airPurifier: nfluxService.getAirPurifiers,
 };
 

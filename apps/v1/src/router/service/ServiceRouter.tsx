@@ -8,8 +8,9 @@ export const ServiceRouter: RouteObject[] = [
         path: '/service',
         element: <ProtectedRoute />,
         children: [
-            { path: '', element: <Navigate to="/service/2" replace /> },
-            { path: SERVICE_ROUTE.VIEWER, element: <ViewerPage/>}
+            { path: '', element: <Navigate to="/service/119" replace /> },
+            { path: SERVICE_ROUTE.VIEWER, element: <ViewerPage/> }
         ],
+
     },
 ]

@@ -46,6 +46,7 @@ export interface StationWithFeatures {
   facility: Facility;
   features: FeatureResponse[];
   floors: Floor[];
-  lineId: number;
+  lineId: number;  
   route: string;
+  externalCode: string;
 }

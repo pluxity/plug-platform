@@ -18,19 +18,17 @@ export function useEngineIntegration({
   
   const poiClickListener = useCallback((event: { target: PoiImportOption }) => {
     if (event.target) {
-      // POI에서 deviceId 추출 (POI의 id가 feature.id와 같음)
       const feature = stationData?.features?.find(f => f.id === event.target.id);
       if (feature) {
-        // 디바이스 ID로 모달 열기 (feature.id를 deviceId로 사용)
         setSelectedDeviceId(feature.id);
       }
       
-      // 기존 onPoiSelect 콜백도 호출
       if (onPoiSelect) {
         onPoiSelect(event.target);
       }
     }
   }, [onPoiSelect, stationData, setSelectedDeviceId]);
+
   const changeEngineFloor = useCallback((floorId: string) => {
     try {
       Px.Model.HideAll();
@@ -53,7 +51,7 @@ export function useEngineIntegration({
     const currentAssets = useAssetStore.getState().assets;
     
     if (stationData?.features && currentAssets.length > 0) {
-      const poiData = stationData.features.map((feature) => {
+      const poiData = stationData.features.filter(feature => feature.deviceCode !== null).map((feature) => {
         const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
         const poi = {
           id: feature.id, 

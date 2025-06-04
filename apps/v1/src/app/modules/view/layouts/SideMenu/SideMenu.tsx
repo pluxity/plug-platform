@@ -4,16 +4,31 @@ import useStationStore from '@plug/v1/app/stores/stationStore';
 import MenuItem from './MenuItem';
 import DevicePanel from './DevicePanel';
 
+interface DeviceData {
+  id: string;
+  name: string;
+  feature: DeviceFeature;
+}
+
+interface DeviceFeature {
+  id: string;
+  floorId: string;
+  assetId: string;
+  deviceCode: string;
+}
+
 interface Category{
   categoryId: string;
   categoryName: string;
   iconFile: {url: string;};
+  devices: DeviceData[];
 }
 
 interface MenuItemData {
   id: string;
   name: string;
   icon: string;
+  devices: DeviceData[];
 }
 
 const SideMenu: React.FC = () => {
@@ -21,25 +36,24 @@ const SideMenu: React.FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
   const [isDevicePanelOpen, setIsDevicePanelOpen] = useState<boolean>(false);
 
-  const { stationId } = useStationStore(); 
+  const { facilityCode } = useStationStore(); 
 
   useEffect(() => {
     const fetchCategory = async () => {
 
-      if (!stationId) {
+      if (!facilityCode) {
         console.log("No stationId available, skipping fetch");
         return;
       }
       
       try {
-        const response = await api.get<Category[]>(`devices/station/${stationId}/grouped`);
-        console.log("Fetched categories:", response.data);
-
-        if (response.data) {
+        const response = await api.get<Category[]>(`devices/station/${facilityCode}/grouped`);
+        console.log("Fetched categories:", response.data);        if (response.data) {
           const transformedMenuItems = response.data.map(item => ({
             id: item.categoryId.toString(),
             name: item.categoryName,
             icon: item.iconFile?.url,
+            devices: item.devices || []
           }));
           setMenuItems(transformedMenuItems);
         }
@@ -48,7 +62,7 @@ const SideMenu: React.FC = () => {
       }
     };
     fetchCategory();
-  }, [stationId]);
+  }, [facilityCode]);
 
   const handleMenuItemClick = (id: string) => {
     const clickedMenu = menuItems.find(item => item.id === id) || null;
@@ -78,9 +92,13 @@ const SideMenu: React.FC = () => {
            />
           ))}
         </div>
-      </div>
-      {isDevicePanelOpen && activeMenu && (
-        <DevicePanel categoryId={activeMenu.id} categoryName={activeMenu.name} onClose={closeDevicePanel} />
+      </div>      {isDevicePanelOpen && activeMenu && (
+        <DevicePanel 
+          categoryId={activeMenu.id} 
+          categoryName={activeMenu.name} 
+          devices={activeMenu.devices}
+          onClose={closeDevicePanel} 
+        />
       )}
     </>
   );

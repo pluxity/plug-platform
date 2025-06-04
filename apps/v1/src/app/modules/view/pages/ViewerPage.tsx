@@ -12,12 +12,13 @@ import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
 
 const ViewerPage = () => {
-    const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
-    const { setStationId, selectedDeviceId, setSelectedDeviceId } = useStationStore();
+    const { code } = useParams<{ code: string }>();
+    const parsedCode = code ?? '1';
+
+    const { setStationCode, selectedDeviceId, setSelectedDeviceId } = useStationStore();
     const { fetchAssets } = useAssetStore();
-    
-    const { stationData, stationLoading, error } = useStationData(parsedStationId);
+
+    const { stationData, stationLoading, error } = useStationData(parsedCode);
     const { floorItems, modelPath } = useFloorData(stationData);
     
     const handleLoadError = useCallback((loadError: Error) => {
@@ -35,9 +36,11 @@ const ViewerPage = () => {
 
     const handleModelLoadedWithEngine = useCallback(() => {
         engineModelLoaded();
-    }, [engineModelLoaded]);    useEffect(() => {
-        setStationId(parsedStationId);
-    }, [parsedStationId, setStationId]);
+    }, [engineModelLoaded]);    
+    
+    useEffect(() => {
+        setStationCode(parsedCode);
+    }, [parsedCode, setStationCode]);
 
     useEffect(() => {
         fetchAssets();
@@ -64,19 +67,21 @@ const ViewerPage = () => {
             {stationLoading && (
                 <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
                     <div className="text-white text-xl">
-                        스테이션 {parsedStationId} 정보 로딩 중...
+                        스테이션 {parsedCode} 정보 로딩 중...
                     </div>                
                 </div>
             )}
             <Header />
             <SideMenu />
-            <EventCounter stationId={parsedStationId.toString()} />
+            { stationData && (
+                    <EventCounter stationId={stationData.externalCode} />
+            )}
             
             {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
             <DeviceDetailModal
                 isOpen={!!selectedDeviceId}
                 onClose={() => setSelectedDeviceId(null)}
-                stationId={String(parsedStationId)}
+                stationId={String(parsedCode)}
                 selectedDeviceId={selectedDeviceId}
                 deviceType="shutter"
             />

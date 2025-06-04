@@ -52,15 +52,12 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
                 onLoadError?.(error as Error);
             }
         }
-    }, [modelPath, onModelLoaded, onLoadError]);    const handleFloorChange = (floorId: string) => {
-        // FloorSelector에서 모든 층 변경 로직을 처리하므로 여기서는 추가 로직이 필요 없음
-        console.log('Floor changed to:', floorId);
-    };
+    }, [modelPath, onModelLoaded, onLoadError]);    
 
     return (
-        <>            <FloorSelector 
+        <>            
+            <FloorSelector 
                 floors={floorSelectorItems} 
-                onFloorChange={handleFloorChange}
             />
             <div className="engine absolute inset-0 z-0">
                 <div

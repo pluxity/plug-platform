@@ -9,22 +9,22 @@ interface UseStationDataReturn {
     refetchStation: () => Promise<void>;
 }
 
-export const useStationData = (stationId: number): UseStationDataReturn => {
+export const useStationData = (code: string): UseStationDataReturn => {
     const [stationData, setStationData] = useState<StationWithFeatures | null>(null);
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
     const fetchStationData = useCallback(async () => {
-        if (isNaN(stationId) || stationId <= 0) {
+        if (!code) {
             setError(new Error('Invalid station ID'));
             setStationLoading(false);
             return;
         }
-
+        
         try {
             setStationLoading(true);
             setError(null);
-            const response = await api.get<StationWithFeatures>(`stations/${stationId}/with-features`);
+            const response = await api.get<StationWithFeatures>(`stations/by-code/${code}`);
             setStationData(response.data);
         } catch (err) {
             setError(err instanceof Error ? err : new Error('Failed to fetch station data'));
@@ -32,7 +32,7 @@ export const useStationData = (stationId: number): UseStationDataReturn => {
         } finally {
             setStationLoading(false);
         }
-    }, [stationId]);
+    }, [code]);
 
     useEffect(() => {
         fetchStationData();
