@@ -58,8 +58,17 @@ function addOutlineObjects(target: THREE.Object3D | THREE.Object3D[]) {
     outlinePass.selectedObjects = outlineTargets;
 }
 
+/**
+ * 외각선 대상 객체 얻기
+ * @returns - 외각선 대상 객체
+ */
+function getOutlineTargets(): THREE.Object3D[] {
+    return outlineTargets;
+}
+
 export {
     clearOutlineObjects,
     setOutlineObjects,
     addOutlineObjects,
+    getOutlineTargets,
 }

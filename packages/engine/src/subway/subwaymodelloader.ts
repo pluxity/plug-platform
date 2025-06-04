@@ -24,7 +24,12 @@ function LoadTrainHead(url: string, onLoad: Function) {
     new Addon.GLTFLoader().load(url, (gltf)=>{
 
         headModelSrc = gltf.scene;
-        engine.RootScene.add(headModelSrc); // 테스트코드
+
+        // 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onSubwayModelLoader_HeadModelLoaded',
+            target: headModelSrc
+        });
 
         // 완료 콜백 호출
 		onLoad?.();
@@ -40,7 +45,12 @@ function LoadTrainBody(url: string, onLoad: Function) {
     new Addon.GLTFLoader().load(url, (gltf)=>{
 
         bodyModelSrc = gltf.scene;
-        engine.RootScene.add(bodyModelSrc); // 테스트코드
+        
+        // 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onSubwayModelLoader_BodyModelLoaded',
+            target: bodyModelSrc
+        });
 
         // 완료 콜백 호출
         onLoad?.();

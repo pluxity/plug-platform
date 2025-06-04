@@ -16,6 +16,7 @@ interface WebGLControlPanelState {
     moveToFloorIdValue: string;
     backgroundImageUrl: string;
     pathVisibleId: string;
+    subwayCreateBodyCount: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -48,6 +49,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             poiAnimNameValue: '',
             backgroundImageUrl: '',
             pathVisibleId: '',
+            subwayCreateBodyCount: '',
             floorData: []
         };
 
@@ -179,7 +181,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainHead')}>LoadTrainHead</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button><br />
+
+                    <input type='text' value={this.state.subwayCreateBodyCount} onChange={this.onSubwayBodyCountInputValueChanged.bind(this)} placeholder='차량개수'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Create')}>Create</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Test') {
@@ -507,6 +512,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Subway.LoadTrainBody': {
                 Subway.LoadTrainBody('/subway_train/body.glb', () => console.log('지하철 몸체 모델 로드 완료'));
             } break;
+            case 'Subway.Create': {
+                const id = window.crypto.randomUUID();
+                const bodyCount = Number.parseInt(this.state.subwayCreateBodyCount);
+                Subway.Create({
+                    id: id,
+                    bodyCount: bodyCount
+                }, () => console.log('지하철 생성 완료'));
+            } break;
 
             /**
              * Test
@@ -668,6 +681,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onPathVisibleInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ pathVisibleId: evt.target.value });
+    }
+
+    /**
+     * 지하철 생성 차량 개수 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSubwayBodyCountInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ subwayCreateBodyCount: evt.target.value });
     }
 
     /**

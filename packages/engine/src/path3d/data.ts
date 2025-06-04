@@ -83,6 +83,14 @@ function exists(id: string) {
 }
 
 /**
+ * 생성되어 있는 경로들을 배열로 얻기
+ * @returns - 경로 객체 배열
+ */
+function getPathObjects(): Path3DObject[] {
+    return Object.values(pathObjectList);
+}
+
+/**
  * 경로 데이터 익스포트
  * @returns - 경로 데이터
  */
@@ -172,6 +180,7 @@ function ShowAll() {
 
 export {
     exists,
+    getPathObjects,
 
     Export,
     Import,

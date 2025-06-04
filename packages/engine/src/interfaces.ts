@@ -76,6 +76,17 @@ enum PathCreatorMouseState {
 }
 
 /**
+ * 지하철 생성 마우스 상태 열거형
+ */
+enum SubwayCreateMouseState {
+    Default = 0,
+    SelectPath,
+    SetEntranceLocation,
+    SetStopLocation,
+    SetExitLocation,
+}
+
+/**
  * 모델 정보
  */
 interface ModelInfo {
@@ -167,6 +178,14 @@ interface Path3DData {
     points: Path3DPointData[];
 }
 
+/**
+ * 지하철 생성 옵션
+ */
+interface SubwayCreateOption {
+    id: string;
+    bodyCount: number;
+}
+
 export {
     Vector3Custom,
     Vector3,
@@ -175,6 +194,7 @@ export {
     MouseButton,
     ModifyKey,
     PathCreatorMouseState,
+    SubwayCreateMouseState,
     ModelInfo,
     ModelInfo as FloorInfo,
     PoiCreateOption,
@@ -184,4 +204,5 @@ export {
     SBMMesh,
     Path3DPointData,
     Path3DData,
+    SubwayCreateOption,
 }
