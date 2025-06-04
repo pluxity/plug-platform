@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useCallback } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
+import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
 
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
@@ -12,7 +13,8 @@ import { useFloorData } from '../hooks/useFloorData';
 
 const ViewerPage = () => {
     const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;    const { setStationId } = useStationStore();
+    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
+    const { setStationId, selectedDeviceId, setSelectedDeviceId } = useStationStore();
     const { fetchAssets } = useAssetStore();
     
     const { stationData, stationLoading, error } = useStationData(parsedStationId);
@@ -49,9 +51,7 @@ const ViewerPage = () => {
                 </div>
             </div>
         );
-    }
-
-    return (         
+    }    return (         
         <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
             {!stationLoading && stationData && (
                 <MapViewer 
@@ -71,6 +71,15 @@ const ViewerPage = () => {
             <Header />
             <SideMenu />
             <EventCounter stationId={parsedStationId.toString()} />
+            
+            {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
+            <DeviceDetailModal
+                isOpen={!!selectedDeviceId}
+                onClose={() => setSelectedDeviceId(null)}
+                stationId={String(parsedStationId)}
+                selectedDeviceId={selectedDeviceId}
+                deviceType="shutter"
+            />
         </div>
     );
 };

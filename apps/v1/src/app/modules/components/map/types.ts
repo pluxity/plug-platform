@@ -30,6 +30,5 @@ export interface FloorItem {
 
 export interface FloorSelectorProps {
   floors: FloorItem[];
-  currentFloor?: string;
   onFloorChange?: (floorId: string) => void;
 }

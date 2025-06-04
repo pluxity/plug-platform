@@ -7,7 +7,14 @@ import { DeviceDetailModal } from '../../../components/modals/DeviceDetailModal'
 interface DeviceData {
   id: string;
   name: string;
-  feature: {id: string;};
+  feature: DeviceFeature;
+}
+
+interface DeviceFeature {
+  id: string;
+  floorId: string;
+  assetId: string;
+  deviceCode: string;
 }
 
 interface DeviceGroup {
@@ -25,9 +32,8 @@ interface DevicePanelProps {
 const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onClose }) => {
   const [devices, setDevices] = useState<DeviceData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { stationId } = useStationStore();
+  const { stationId, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
 
   useEffect(() => {
     if (!categoryId || !stationId) {
@@ -42,7 +48,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
       try {
         const response = await api.get<DeviceGroup[]>(`devices/station/${stationId}/grouped`);
         if (response.data) {
-            const transformDevices = response.data.find(item => {
+          const transformDevices = response.data.find(item => {
                 return String(item.categoryId) === String(categoryId)
             } 
           );
@@ -62,7 +68,13 @@ const DevicePanel: React.FC<DevicePanelProps> = ({ categoryId, categoryName, onC
 
   const handleDeviceClick = (device: DeviceData) => {
     try {
-      if (device.feature.id) {
+      if (device.feature.id && device.feature.floorId) {
+        // 먼저 해당 층으로 변경
+        setCurrentFloor(device.feature.floorId);
+        
+        // 층 변경 후 카메라 이동
+        Px.Model.HideAll();
+        Px.Model.Show(device.feature.floorId);
         Px.Camera.MoveToPoi(device.feature.id, 1.0);
       } 
     } catch (error) {

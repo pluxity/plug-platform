@@ -1,5 +1,5 @@
 // NFlux API용 React 훅들
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { nfluxService } from '../services/nflux';
 import type {
   Station,
@@ -36,7 +36,7 @@ export const useStations = (lineNo: string = '1'): UseApiResult<Station[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const result = await nfluxService.getStations(lineNo);
@@ -47,11 +47,11 @@ export const useStations = (lineNo: string = '1'): UseApiResult<Station[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [lineNo]);
 
   useEffect(() => {
     fetchData();
-  }, [lineNo]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -61,7 +61,7 @@ export const useMapCCTV = (lineNo: string = '1'): UseApiResult<CCTV[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const result = await nfluxService.getMapCCTV(lineNo);
@@ -72,11 +72,11 @@ export const useMapCCTV = (lineNo: string = '1'): UseApiResult<CCTV[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [lineNo]);
 
   useEffect(() => {
     fetchData();
-  }, [lineNo]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -86,7 +86,7 @@ export const useWindGauge = (lineNo: string = '1'): UseApiResult<WindGauge> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const result = await nfluxService.getWindGauge(lineNo);
@@ -97,14 +97,14 @@ export const useWindGauge = (lineNo: string = '1'): UseApiResult<WindGauge> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [lineNo]);
 
   useEffect(() => {
     fetchData();
     // 5분마다 업데이트
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [lineNo]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -115,7 +115,7 @@ export const useStationEnv = (stationId: string): UseApiResult<StationEnv & { st
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -128,14 +128,14 @@ export const useStationEnv = (stationId: string): UseApiResult<StationEnv & { st
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 1분마다 업데이트
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -146,7 +146,7 @@ export const useStationEvents = (stationId: string): UseApiResult<StationEvents>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -159,14 +159,14 @@ export const useStationEvents = (stationId: string): UseApiResult<StationEvents>
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 10초마다 업데이트
     const interval = setInterval(fetchData, 10 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -177,7 +177,7 @@ export const useLights = (stationId: string): UseApiResult<Light[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -190,14 +190,14 @@ export const useLights = (stationId: string): UseApiResult<Light[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 30초마다 업데이트
     const interval = setInterval(fetchData, 30 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -207,7 +207,7 @@ export const useLightGroups = (stationId: string): UseApiResult<LightGroup[]> =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -220,14 +220,14 @@ export const useLightGroups = (stationId: string): UseApiResult<LightGroup[]> =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 30초마다 업데이트
     const interval = setInterval(fetchData, 30 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -238,7 +238,7 @@ export const useShutters = (stationId: string): UseApiResult<Shutter[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -251,14 +251,14 @@ export const useShutters = (stationId: string): UseApiResult<Shutter[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 30초마다 업데이트
     const interval = setInterval(fetchData, 30 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -268,7 +268,7 @@ export const useShutterGroups = (stationId: string): UseApiResult<ShutterGroup[]
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -281,14 +281,14 @@ export const useShutterGroups = (stationId: string): UseApiResult<ShutterGroup[]
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 30초마다 업데이트
     const interval = setInterval(fetchData, 30 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -299,7 +299,7 @@ export const useElevators = (stationId: string): UseApiResult<Elevator[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -312,14 +312,14 @@ export const useElevators = (stationId: string): UseApiResult<Elevator[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 1분마다 업데이트
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -329,7 +329,7 @@ export const useEscalators = (stationId: string): UseApiResult<Escalator[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -342,14 +342,14 @@ export const useEscalators = (stationId: string): UseApiResult<Escalator[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 1분마다 업데이트
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -359,7 +359,7 @@ export const useWaterTanks = (stationId: string): UseApiResult<WaterTank[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -372,14 +372,14 @@ export const useWaterTanks = (stationId: string): UseApiResult<WaterTank[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 5분마다 업데이트
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -389,7 +389,7 @@ export const useCatchpits = (stationId: string): UseApiResult<Catchpit[]> => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -402,14 +402,14 @@ export const useCatchpits = (stationId: string): UseApiResult<Catchpit[]> => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 5분마다 업데이트
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -419,7 +419,7 @@ export const useAirPurifiers = (stationId: string): UseApiResult<AirPurifier[]> 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -432,14 +432,14 @@ export const useAirPurifiers = (stationId: string): UseApiResult<AirPurifier[]> 
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 2분마다 업데이트
     const interval = setInterval(fetchData, 2 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -450,7 +450,7 @@ export const useAlarmCurrentStat = (stationId: string): UseApiResult<AlarmCurren
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -463,14 +463,14 @@ export const useAlarmCurrentStat = (stationId: string): UseApiResult<AlarmCurren
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
     // 30초마다 업데이트
     const interval = setInterval(fetchData, 30 * 1000);
     return () => clearInterval(interval);
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -480,7 +480,7 @@ export const useAlarmTodayStat = (stationId: string): UseApiResult<AlarmTodaySta
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -493,11 +493,11 @@ export const useAlarmTodayStat = (stationId: string): UseApiResult<AlarmTodaySta
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId]);
 
   useEffect(() => {
     fetchData();
-  }, [stationId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -507,7 +507,7 @@ export const useAlarms = (stationId: string, params?: AlarmQueryParams): UseApiR
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!stationId) return;
     
     try {
@@ -520,11 +520,11 @@ export const useAlarms = (stationId: string, params?: AlarmQueryParams): UseApiR
     } finally {
       setLoading(false);
     }
-  };
+  }, [stationId, params]);
 
   useEffect(() => {
     fetchData();
-  }, [stationId, JSON.stringify(params)]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -535,7 +535,7 @@ export const useElevatorWidget = (elevatorId: string): UseApiResult<Elevator> =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!elevatorId) return;
     
     try {
@@ -548,14 +548,14 @@ export const useElevatorWidget = (elevatorId: string): UseApiResult<Elevator> =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [elevatorId]);
 
   useEffect(() => {
     fetchData();
     // 1분마다 업데이트
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
-  }, [elevatorId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };
@@ -565,7 +565,7 @@ export const useWaterTankWidget = (waterTankId: string): UseApiResult<WaterTank>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!waterTankId) return;
     
     try {
@@ -578,14 +578,14 @@ export const useWaterTankWidget = (waterTankId: string): UseApiResult<WaterTank>
     } finally {
       setLoading(false);
     }
-  };
+  }, [waterTankId]);
 
   useEffect(() => {
     fetchData();
     // 5분마다 업데이트
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [waterTankId]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };

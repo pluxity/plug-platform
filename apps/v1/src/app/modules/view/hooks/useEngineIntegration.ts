@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import * as Px from '@plug/engine/src';
 import { useAssetStore } from '@plug/v1/common/store/assetStore';
+import useStationStore from '@plug/v1/app/stores/stationStore';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import type { StationWithFeatures } from '@plug/v1/app/modules/view/types/station';
 
@@ -13,12 +14,23 @@ export function useEngineIntegration({
   stationData,
   onPoiSelect,
 }: UseEngineIntegrationProps) {
+  const { setSelectedDeviceId } = useStationStore();
   
   const poiClickListener = useCallback((event: { target: PoiImportOption }) => {
-    if (event.target && onPoiSelect) {
-      onPoiSelect(event.target);
+    if (event.target) {
+      // POI에서 deviceId 추출 (POI의 id가 feature.id와 같음)
+      const feature = stationData?.features?.find(f => f.id === event.target.id);
+      if (feature) {
+        // 디바이스 ID로 모달 열기 (feature.id를 deviceId로 사용)
+        setSelectedDeviceId(feature.id);
+      }
+      
+      // 기존 onPoiSelect 콜백도 호출
+      if (onPoiSelect) {
+        onPoiSelect(event.target);
+      }
     }
-  }, [onPoiSelect]);
+  }, [onPoiSelect, stationData, setSelectedDeviceId]);
   const changeEngineFloor = useCallback((floorId: string) => {
     try {
       Px.Model.HideAll();

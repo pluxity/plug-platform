@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import * as Px from '@plug/engine/src';
 import type { FloorSelectorProps } from './types';
+import useStationStore from '@plug/v1/app/stores/stationStore';
 
 const FloorSelector: React.FC<FloorSelectorProps> = ({ 
   floors: floors = [], 
-  currentFloor = 'ALL', 
   onFloorChange 
 }) => {
+  const { currentFloor, setCurrentFloor } = useStationStore();
   const [selectedFloor, setSelectedFloor] = useState(currentFloor);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -18,12 +19,12 @@ const FloorSelector: React.FC<FloorSelectorProps> = ({
     if (floorId === selectedFloor) return;
     
     setSelectedFloor(floorId);
+    setCurrentFloor(floorId);
     
     Px.Model.HideAll();
     
     if(floorId === 'ALL') {
       Px.Model.ShowAll();
-      Px.Camera.ExtendView(1.0);
     } else {
       Px.Model.Show(floorId);
       Px.Camera.MoveToFloor(floorId, 1.0);
@@ -52,7 +53,7 @@ const FloorSelector: React.FC<FloorSelectorProps> = ({
                   ${selectedFloor === floor.floorId
                     ? 'bg-primary-900 hover:bg-primary-800'
                     : 'bg-white/80 hover:bg-white'}`}
-                onClick={() => { console.log(floor); handleFloorChange(floor.floorId); }}
+                onClick={() => handleFloorChange(floor.floorId)}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               />
