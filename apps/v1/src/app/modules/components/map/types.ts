@@ -1,5 +1,6 @@
 export interface MapViewerProps {
   modelPath: string;
+  floors?: FloorItem[];
   onModelLoaded?: () => void;
   onLoadError?: (error: Error) => void;
 }

@@ -54,9 +54,7 @@ export function useEngineIntegration({
   const handleFloorChange = useCallback((floorId: string) => {
     console.log(`Floor change requested: ${floorId}`);
     try {
-      // Update the 3D engine first
       changeEngineFloor(floorId);
-      // Notify parent component for UI updates
       onFloorChange(floorId);
       console.log(`Floor change completed: ${floorId}`);
     } catch (error) {

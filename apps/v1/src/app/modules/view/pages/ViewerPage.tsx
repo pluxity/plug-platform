@@ -1,42 +1,45 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
-import { api } from '@plug/api-hooks/core';
-import type { StationData } from '@plug/common-services/types';
+
+import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import { useAssetStore } from '@plug/v1/common/store/assetStore';
+import { useEngineIntegration } from '../hooks/useEngineIntegration';
+import { useStationData } from '../hooks/useStationData';
+import { useFloorData } from '../hooks/useFloorData';
 
 const ViewerPage = () => {
     const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
-    const { setStationId } = useStationStore();
+    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;    const { setStationId } = useStationStore();
+    const { fetchAssets } = useAssetStore();
     
-    const [stationData, setStationData] = useState<StationData | null>(null);
-    const [stationLoading, setStationLoading] = useState<boolean>(true);
-    const [error, setError] = useState<Error | null>(null);
+    const { stationData, stationLoading, error } = useStationData(parsedStationId);
+    const { floorItems, modelPath } = useFloorData(stationData);
+    
+    const handleLoadError = useCallback((loadError: Error) => {
+        console.error('3D 모델 로드 실패:', loadError);
+    }, []);    
+    
+    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
+        console.log('POI 선택됨:', poi);
+    }, []);
 
-    useEffect(() => {
+    const { handleModelLoaded: engineModelLoaded } = useEngineIntegration({
+        stationData,
+        onPoiSelect: handlePoiSelect,
+    });
+
+    const handleModelLoadedWithEngine = useCallback(() => {
+        engineModelLoaded();
+    }, [engineModelLoaded]);    useEffect(() => {
         setStationId(parsedStationId);
     }, [parsedStationId, setStationId]);
 
     useEffect(() => {
-        const fetchStationData = async () => {
-            try {
-                setStationLoading(true);
-                const response = await api.get<StationData>(`stations/${parsedStationId}/with-features`);
-                setStationData(response.data);
-                setError(null);
-            } catch (err) {
-                setError(err instanceof Error ? err : new Error('Unknown error'));
-            } finally {
-                setStationLoading(false);
-            }
-        };
-        
-        if (!isNaN(parsedStationId) && parsedStationId > 0) {
-            fetchStationData();
-        }
-    }, [parsedStationId]);
+        fetchAssets();
+    }, [fetchAssets]);
 
     if (error && !stationLoading) {
         return (
@@ -48,24 +51,13 @@ const ViewerPage = () => {
         );
     }
 
-    const modelPath: string = stationData?.facility?.drawing?.url || '';
-    
-    const handleModelLoaded = () => {
-        console.log('3D 모델 로드 완료');
-    };
-    
-    const handleLoadError = (error: Error) => {
-        console.error('3D 모델 로드 실패:', error);
-        setError(error);
-    };
-    
-
     return (         
-        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">            
+        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
             {!stationLoading && stationData && (
                 <MapViewer 
                     modelPath={modelPath}
-                    onModelLoaded={handleModelLoaded}
+                    floors={floorItems}
+                    onModelLoaded={handleModelLoadedWithEngine}
                     onLoadError={handleLoadError}
                 />
             )}

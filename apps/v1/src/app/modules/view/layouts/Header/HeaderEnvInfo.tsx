@@ -5,7 +5,6 @@ interface HeaderEnvInfoProps {
   stationId: string;
 }
 
-// 타입 정의
 interface EnvDisplayData {
   temperature: {
     watingRoom: number | string;
