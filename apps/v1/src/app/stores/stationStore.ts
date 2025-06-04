@@ -3,19 +3,19 @@ import { create } from 'zustand';
 export interface StationState {
   facilityCode: string;
   currentFloor: string;
-  selectedDeviceId: string | null;
+  selectedDeviceCode: string | null;
   setStationCode: (id: string) => void;
   setCurrentFloor: (floorId: string) => void;
-  setSelectedDeviceId: (deviceId: string | null) => void;
+  setSelectedDeviceCode: (deviceCode: string | null) => void;
 }
 
 const useStationStore = create<StationState>((set) => ({
   facilityCode: '',
   currentFloor: 'ALL',
-  selectedDeviceId: null,
+  selectedDeviceCode: null,
   setStationCode: (code) => set({ facilityCode: code }),
   setCurrentFloor: (floorId) => set({ currentFloor: floorId }),
-  setSelectedDeviceId: (deviceId) => set({ selectedDeviceId: deviceId }),
+  setSelectedDeviceCode: (deviceCode) => set({ selectedDeviceCode: deviceCode }),
 }));
 
 export default useStationStore;

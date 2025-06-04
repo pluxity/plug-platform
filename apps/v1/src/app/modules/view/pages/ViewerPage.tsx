@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useCallback } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
-import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
 
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
@@ -15,7 +14,7 @@ const ViewerPage = () => {
     const { code } = useParams<{ code: string }>();
     const parsedCode = code ?? '1';
 
-    const { setStationCode, selectedDeviceId, setSelectedDeviceId } = useStationStore();
+    const { setStationCode } = useStationStore();
     const { fetchAssets } = useAssetStore();
 
     const { stationData, stationLoading, error } = useStationData(parsedCode);
@@ -78,13 +77,13 @@ const ViewerPage = () => {
             )}
             
             {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
-            <DeviceDetailModal
+            {/* <DeviceDetailModal
                 isOpen={!!selectedDeviceId}
                 onClose={() => setSelectedDeviceId(null)}
-                stationId={String(parsedCode)}
+                stationId={stationData?.externalCode ?? ''}
                 selectedDeviceId={selectedDeviceId}
                 deviceType="shutter"
-            />
+            /> */}
         </div>
     );
 };

@@ -7,6 +7,7 @@ import DevicePanel from './DevicePanel';
 interface DeviceData {
   id: string;
   name: string;
+  code: string;
   feature: DeviceFeature;
 }
 
@@ -14,12 +15,12 @@ interface DeviceFeature {
   id: string;
   floorId: string;
   assetId: string;
-  deviceCode: string;
 }
 
 interface Category{
   categoryId: string;
   categoryName: string;
+  contextPath: string;
   iconFile: {url: string;};
   devices: DeviceData[];
 }
@@ -27,6 +28,7 @@ interface Category{
 interface MenuItemData {
   id: string;
   name: string;
+  type: string;
   icon: string;
   devices: DeviceData[];
 }
@@ -48,10 +50,11 @@ const SideMenu: React.FC = () => {
       
       try {
         const response = await api.get<Category[]>(`devices/station/${facilityCode}/grouped`);
-        console.log("Fetched categories:", response.data);        if (response.data) {
+        if (response.data) {
           const transformedMenuItems = response.data.map(item => ({
             id: item.categoryId.toString(),
             name: item.categoryName,
+            type: item.contextPath.replace(/\//g, ''),
             icon: item.iconFile?.url,
             devices: item.devices || []
           }));
@@ -96,6 +99,7 @@ const SideMenu: React.FC = () => {
         <DevicePanel 
           categoryId={activeMenu.id} 
           categoryName={activeMenu.name} 
+          categoryType={activeMenu.type}
           devices={activeMenu.devices}
           onClose={closeDevicePanel} 
         />

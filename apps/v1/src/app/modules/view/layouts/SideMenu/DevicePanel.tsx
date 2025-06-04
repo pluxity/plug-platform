@@ -6,6 +6,7 @@ import { DeviceDetailModal } from '../../../components/modals/DeviceDetailModal'
 interface DeviceData {
   id: string;
   name: string;
+  code: string;
   feature: DeviceFeature;
 }
 
@@ -13,23 +14,24 @@ interface DeviceFeature {
   id: string;
   floorId: string;
   assetId: string;
-  deviceCode: string;
 }
 
 interface DevicePanelProps {
-  categoryName: string | null;
   categoryId: string | null;
+  categoryType: string;
+  categoryName: string | null;
   devices: DeviceData[];
   onClose: () => void;
 }
 
 const DevicePanel: React.FC<DevicePanelProps> = ({ 
   categoryId, 
+  categoryType, 
   categoryName, 
   devices = [],
   onClose 
 }) => {
-  const { facilityCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
+  const { facilityCode, setCurrentFloor, selectedDeviceCode, setSelectedDeviceCode } = useStationStore();
 
   const handleDeviceClick = (device: DeviceData) => {
     try {
@@ -63,7 +65,8 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
           >
             &times;
           </button>
-        </div>        {devices.length === 0 && (
+        </div>        
+        {devices.length === 0 && (
           <p className="text-gray-400">No devices found in this category.</p>
         )}
         
@@ -74,7 +77,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                 key={device.id} 
                 className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white"
                 onClick={() => {
-                  setSelectedDeviceId(device.id);
+                  setSelectedDeviceCode(device.code);
                   handleDeviceClick(device);
                 }}
               >
@@ -83,15 +86,13 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
             ))}
           </ul>
         )}
-      </div>
-      
-      <DeviceDetailModal
-        isOpen={!!selectedDeviceId}
-        onClose={() => setSelectedDeviceId(null)}
-        stationId={String(facilityCode)}
-        selectedDeviceId={selectedDeviceId}
-        deviceType="shutter"
-      /> 
+      </div>        <DeviceDetailModal
+          isOpen={!!selectedDeviceCode}
+          onClose={() => setSelectedDeviceCode(null)}
+          stationId={String(facilityCode)}
+          deviceCode={selectedDeviceCode}
+          deviceType={categoryType}
+        />
     </>
   );
 };
