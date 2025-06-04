@@ -44,8 +44,8 @@ export const useStationDetail = (stationId: string) => {
 
   const initializeFormValues = (data: StationDetail) => {
     setFormValues({
-      name: data.facility.name,
-      description: data.facility.description,
+      name: data.facility.name || '',
+      description: data.facility.description || '',
       code: data.facility.code || '',
       lineIds: data.lineIds.map(String),
       updatedBy: data.facility.updatedBy,
