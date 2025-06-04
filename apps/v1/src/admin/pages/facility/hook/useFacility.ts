@@ -53,15 +53,6 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
         setIsLoading(true);
         try {
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const floors = values.floors.map((item: any) => {
-                const parsed = JSON.parse(item);
-                return {
-                    floorId: parsed.floorId,
-                    name: parsed.name
-                }
-            });
-
             const lineIds = Array.isArray(values.linesId)
                 ? values.linesId.map(Number)
                 : [Number(values.linesId)];
@@ -77,7 +68,10 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
                     name: values.name,
                     thumbnailFileId: files.thumbnail.fileId
                 },
-                floors,
+                floors: modelData.map(item => ({
+                    floorId: String(item.floorId),
+                    name: item.displayName
+                })),
                 lineIds,
                 route: 'facility'
             });

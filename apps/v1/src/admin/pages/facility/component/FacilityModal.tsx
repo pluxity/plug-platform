@@ -19,7 +19,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
         handleFileUpload,
         handleFinish,
         resetForm,
-        modelData,
     } = useFacility({ onClose, onSuccess });
 
     const { data: lines } = useLinesSWR();
@@ -90,25 +89,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
                         onChange={(e) => handleFileUpload(e, 'thumbnail')}
                         onOpenPicker={openFilePicker}
                     />
-
-                    <FormItem name="floors" label="층 정보" required>
-                        <Select disabled={isLoading} type={"multiple"}>
-                            <Select.Trigger />
-                            <Select.Content>
-                                {modelData.map((item) => {
-                                    const val = JSON.stringify({
-                                        "name": item.displayName,
-                                        "floorId": item.floorId
-                                    })
-
-                                    return (<Select.Item key={item.floorId} value={val}>
-                                        {item.displayName}
-                                    </Select.Item>
-                                    )
-                                })}
-                            </Select.Content>
-                        </Select>
-                    </FormItem>
                     <div className="mt-6 flex justify-center gap-2">
                         <Button
                             type="button"
