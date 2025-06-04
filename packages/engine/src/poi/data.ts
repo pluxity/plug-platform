@@ -578,6 +578,38 @@ function HideAllLine() {
 }
 
 /**
+ * poi 표시명 보이기
+ * @param id - poi id값
+ */
+function ShowDisplayText(id: string) {
+    if (poiDataList.hasOwnProperty(id))
+        poiDataList[id].TextVisible = true;
+}
+
+/**
+ * poi 표시명 숨기기
+ * @param id - poi id값
+ */
+function HideDisplayText(id: string) {
+    if (poiDataList.hasOwnProperty(id))
+        poiDataList[id].TextVisible = false;
+}
+
+/**
+ * 모든 poi 표시명 보이기
+ */
+function ShowAllDisplayText() {
+    Object.values(poiDataList).forEach(poi => poi.TextVisible = true);
+}
+
+/**
+ * 모든 poi 표시명 숨기기
+ */
+function HideAllDisplayText() {
+    Object.values(poiDataList).forEach(poi => poi.TextVisible = false);
+}
+
+/**
  * id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻음
  * @param id - poi id값
  */
@@ -626,7 +658,7 @@ export {
     Import,
     Delete,
     Clear,
-    
+
     Show,
     Hide,
     ShowAll,
@@ -636,6 +668,11 @@ export {
     HideLine,
     ShowAllLine,
     HideAllLine,
+
+    ShowDisplayText,
+    HideDisplayText,
+    ShowAllDisplayText,
+    HideAllDisplayText,
 
     GetAnimationList,
     PlayAnimation,

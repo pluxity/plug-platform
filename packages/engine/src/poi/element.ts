@@ -26,6 +26,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
     private visibleState: boolean;
     private lineVisibleState: boolean = true;
+    private textVisibleState: boolean = true;
 
     private mixer: THREE.AnimationMixer | undefined;
     private actions: Record<string, THREE.AnimationAction>;
@@ -96,6 +97,9 @@ class PoiElement implements Interfaces.PoiCreateOption {
         return this.position;
     }
 
+    /**
+     * 로컬 회전
+     */
     set Rotation(value: THREE.Euler) {
         // 회전값
         this.PointMeshData.rotation.copy(value);
@@ -103,16 +107,25 @@ class PoiElement implements Interfaces.PoiCreateOption {
         // 애니메이션 메시
         this.pointMeshData.animMeshRef?.rotation.copy(value);
     }
+    /**
+     * 로컬 회전
+     */
     get Rotation(): THREE.Euler {
         return this.pointMeshData.rotation;
     }
 
+    /**
+     * 로컬 스케일
+     */
     set Scale(value: THREE.Vector3) {
         this.pointMeshData.scale.copy(value);
 
         this.pointMeshData.animMeshRef?.scale.copy(value);
     }
 
+    /**
+     * 로컬 스케일
+     */
     get Scale() {
         return this.pointMeshData.scale;
     }
@@ -179,8 +192,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
             (this.iconObj as THREE.Sprite).visible = true;
             this.iconObj?.layers.set(Interfaces.CustomLayer.Default);
 
-            (this.textObj as THREE.Object3D).visible = true;
-            this.textObj?.layers.set(Interfaces.CustomLayer.Default);
+            (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+            this.textObj?.layers.set(this.textVisibleState ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
 
             // 위치점 애니메이션 메시
             if (this.pointMeshData.animMeshRef !== undefined) {
@@ -191,8 +204,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
             (this.iconObj as THREE.Sprite).visible = false;
             this.iconObj?.layers.set(Interfaces.CustomLayer.Invisible);
 
-            (this.textObj as THREE.Object3D).visible = false;
-            this.textObj?.layers.set(Interfaces.CustomLayer.Invisible);
+            (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+            this.textObj?.layers.set(this.textVisibleState ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
 
             // 위치점 애니메이션 메시
             if (this.pointMeshData.animMeshRef !== undefined) {
@@ -214,6 +227,23 @@ class PoiElement implements Interfaces.PoiCreateOption {
      */
     set LineVisible(value: boolean) {
         this.lineVisibleState = value;
+    }
+
+    /**
+     * 표시명 텍스트 가시화 여부
+     */
+    get TextVisible(): boolean {
+        return this.textVisibleState;
+    }
+
+    /**
+     * 표시명 텍스트 가시화 여부
+     */
+    set TextVisible(value: boolean) {
+        this.textVisibleState = value;
+
+        (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+        this.textObj?.layers.set(this.textVisibleState ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
     }
 
     /**

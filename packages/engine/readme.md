@@ -14,3 +14,8 @@
   - [Px.Poi.HideLine](./docs/Poi.md#pxpoihidelineid-string)
   - [Px.Poi.ShowAllLine](./docs/Poi.md#pxpoishowallline)
   - [Px.Poi.HIdeAllLine](./docs/Poi.md#pxpoihideallline)
+- Poi 표시명 텍스트 가시화 On/Off
+  - [Px.Poi.ShowDisplayText](./docs/Poi.md#showdisplaytextid-string)
+  - [Px.Poi.HideDisplayText](./docs/Poi.md#hidedisplaytextid-string)
+  - [Px.Poi.ShowAllDisplayText](./docs/Poi.md#showalldisplaytext)
+  - [Px.Poi.HideAllDisplayText](./docs/Poi.md#hidealldisplaytext)

@@ -169,6 +169,32 @@ Px.Poi.ShowLine('TestPoi');
 Px.Poi.ShowAllLine();
 ```
 
+## HideDisplayText(id: string)
+- id: 표시명 텍스트를 숨길 poi id값
+- id에 해당하는 poi의 표시명 텍스트를 숨김
+```javascript
+Px.Poi.HideDisplayText('TestPoi');
+```
+
+## HideAllDisplayText()
+- 모든 표시명 텍스트 숨김처리
+```javascript
+Px.Poi.HideAllDisplayText();
+```
+
+## ShowDisplayText(id: string)
+- id: 표시명 텍스트를 가시화할 poi id값
+- id에 해당하는 poi의 표시명 텍스트를 가시화
+```javascript
+Px.Poi.ShowDisplayText('TestPoi');
+```
+
+## ShowAllDisplayText()
+- 모든 표시명 텍스트 가시화
+```javascript
+Px.Poi.ShowAllDisplayText();
+```
+
 ## Px.Poi.GetAnimationList()
 - id: poi id값
 - id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻는다.
