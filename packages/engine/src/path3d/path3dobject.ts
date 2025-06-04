@@ -35,6 +35,22 @@ class Path3DObject extends THREE.Group {
     }
 
     /**
+     * 가시화 여부
+     */
+    set Visible(value: boolean) {
+        this.visible = value;
+
+        this.pointObjects.forEach(pointObj => pointObj.visible = this.visible);
+    }
+
+    /**
+     * 가시화 여부
+     */
+    get Visible(): boolean {
+        return this.visible;
+    }
+
+    /**
      * 메모리 해제
      */
     dispose() {

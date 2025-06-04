@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Model, Path3D, Poi, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
@@ -15,6 +15,7 @@ interface WebGLControlPanelState {
     poiAnimNameValue: string;
     moveToFloorIdValue: string;
     backgroundImageUrl: string;
+    pathVisibleId: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -46,6 +47,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             getAnimlistPoiIdValue: '',
             poiAnimNameValue: '',
             backgroundImageUrl: '',
+            pathVisibleId: '',
             floorData: []
         };
 
@@ -137,7 +139,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
 
                     <input type='text' value={this.state.poiDisplayTextIdValue} onChange={this.onPoiDisplayTextIdInputValueChanged.bind(this)} placeholder='표시명 변경할 poi id'></input>
                     <input type='text' value={this.state.poiDisplayTextValue} onChange={this.onPoiDisplayTextInputValueChanged.bind(this)} placeholder='표시명 입력'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetDisplayText')}>SetDisplayText</button><br /><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetDisplayText')}>SetDisplayText</button><br /><br />
 
                     <input type='text' value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br />
@@ -158,7 +160,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button><br />
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.Export')}>Export</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.Import')}>Import</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Clear')}>Clear</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Clear')}>Clear</button><br />
+                    <input type='text' value={this.state.pathVisibleId} onChange={this.onPathVisibleInputValueChanged.bind(this)} placeholder='경로명'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.HideAll')}>HideAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.ShowAll')}>ShowAll</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Util') {
@@ -166,6 +173,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <label htmlFor='bgColor'>색상으로 배경설정:</label><input id='bgColor' type='color' onChange={this.onBackgroundColorChange.bind(this)}></input><br />
                     <label htmlFor='bgImgUrl'>이미지Url로 배경설정:</label><input id="bgImgUrl" type="text" value={this.state.backgroundImageUrl} onChange={this.onBackgroundImageUrlChange.bind(this)}></input><button onClick={this.onApiBtnClick.bind(this, 'Util.SetBackgroundImage')}>설정</button><br />
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Subway') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainHead')}>LoadTrainHead</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Test') {
@@ -194,8 +208,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Camera'>Camera</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
-                        <option value='Path'>Path(작업중)</option>
+                        <option value='Path'>Path</option>
                         <option value='Util'>Util</option>
+                        <option value='Subway'>Subway</option>
                         <option value='Test'>Test</option>
                     </select>
                     <br />
@@ -277,6 +292,18 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Path.Clear': {
                 Path3D.Clear();
+            } break;
+            case 'Path.Hide': {
+                Path3D.Hide(this.state.pathVisibleId);
+            } break;
+            case 'Path.Show': {
+                Path3D.Show(this.state.pathVisibleId);
+            } break;
+            case 'Path.HideAll': {
+                Path3D.HideAll();
+            } break;
+            case 'Path.ShowAll': {
+                Path3D.ShowAll();
             } break;
 
             /**
@@ -472,6 +499,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
 
             /**
+             * Subway
+             */
+            case 'Subway.LoadTrainHead': {
+                Subway.LoadTrainHead('/subway_train/head.glb', () => console.log('지하철 머리 모델 로드 완료'));
+            } break;
+            case 'Subway.LoadTrainBody': {
+                Subway.LoadTrainBody('/subway_train/body.glb', () => console.log('지하철 몸체 모델 로드 완료'));
+            } break;
+
+            /**
              * Test
              */
             case 'Test': {
@@ -623,6 +660,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onBackgroundImageUrlChange(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ backgroundImageUrl: evt.target.value });
+    }
+
+    /**
+     * 경로 가시화 설정 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPathVisibleInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ pathVisibleId: evt.target.value });
     }
 
     /**

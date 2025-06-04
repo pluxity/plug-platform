@@ -138,10 +138,47 @@ function Clear() {
     pathObjectList = {};
 }
 
+/**
+ * id에 해당하는 경로 숨기기
+ * @param id - 경로 id값
+ */
+function Hide(id: string) {
+    if (pathObjectList.hasOwnProperty(id))
+        pathObjectList[id].Visible = false;
+}
+
+/**
+ * id에 해당하는 경로 보이기
+ * @param id - 경로 id값
+ */
+function Show(id: string) {
+    if (pathObjectList.hasOwnProperty(id))
+        pathObjectList[id].Visible = true;
+}
+
+/**
+ * 모든 경로 숨기기기
+ */
+function HideAll() {
+    Object.values(pathObjectList).forEach(path => path.Visible = false);
+}
+
+/**
+ * 모든 경로 보이기
+ */
+function ShowAll() {
+    Object.values(pathObjectList).forEach(path => path.Visible = true);
+}
+
 export {
     exists,
 
     Export,
     Import,
     Clear,
+
+    Hide,
+    Show,
+    HideAll,
+    ShowAll,
 }
