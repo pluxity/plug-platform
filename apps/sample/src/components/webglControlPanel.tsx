@@ -104,6 +104,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(MonkeyHead.glb)')}>Create(MonkeyHead.glb)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(ScreenDoor.glb)')}>Create(ScreenDoor.glb)</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(head.glb)')}>Create(subway_train/head.glb)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(body.glb)')}>Create(subway_train/body.glb)</button><br />
                     <input type='text' value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</button> &nbsp;
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</button>
@@ -251,7 +253,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
 
                 console.log('Model.GetModelHierarchy -> ', data);
 
-                this.setState({ floorData: data as any }); // 얻은 층정보로 state 설정
+                this.setState({ floorData: data }); // 얻은 층정보로 state 설정
             } break;
 
             /**
@@ -330,6 +332,42 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     iconUrl: iconUrl,
                     displayText: displayText,
                     modelUrl: 'ScreenDoor.glb',
+                    property: property
+                }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
+            } break;
+            case 'Poi.Create(head.glb)': {
+                const id: string = window.crypto.randomUUID();
+                const iconUrl: string = 'SamplePoiIcon.png';
+                const displayText: string = id.substring(0, 8);
+                const property: { [key: string]: unknown } = {
+                    testText: '테스트 속성',
+                    testInt: 11,
+                    testFloat: 2.2
+                };
+
+                Poi.Create({
+                    id: id,
+                    iconUrl: iconUrl,
+                    displayText: displayText,
+                    modelUrl: 'subway_train/head.glb',
+                    property: property
+                }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
+            } break;
+            case 'Poi.Create(body.glb)': {
+                const id: string = window.crypto.randomUUID();
+                const iconUrl: string = 'SamplePoiIcon.png';
+                const displayText: string = id.substring(0, 8);
+                const property: { [key: string]: unknown } = {
+                    testText: '테스트 속성',
+                    testInt: 11,
+                    testFloat: 2.2
+                };
+
+                Poi.Create({
+                    id: id,
+                    iconUrl: iconUrl,
+                    displayText: displayText,
+                    modelUrl: 'subway_train/body.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
             } break;
