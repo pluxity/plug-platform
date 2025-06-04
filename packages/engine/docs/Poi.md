@@ -1,7 +1,7 @@
 [목록으로](../readme.md)
 ============
 Poi
-=============
+============
 ## Px.Poi.Create(option: [PoiCreateOption](./Interfaces.md#PoiCreateOption), onComplete?: Function)
 - option: 생성 옵션
 - onComplete: 생성 완료 후 호출될 콜백 함수
@@ -141,6 +141,32 @@ Px.Poi.Show('TestPoi');
 - 모든 poi를 가시화 한다.
 ```javascript
 Px.Poi.ShowAll();
+```
+
+## Px.Poi.HideLine(id: string)
+- id: 선을 숨길 poi id값
+- id에 해당하는 poi의 선을 숨김
+```javascript
+Px.Poi.HideLine('TestPoi');
+```
+
+## Px.Poi.HideAllLine()
+- 모든 poi의 선을 숨김
+```javascript
+Px.Poi.HideAllLine();
+```
+
+## Px.Poi.ShowLine(id: string)
+- id: 선을 가시화할 poi id값
+- id에 해당하는 poi의 선을 가시화
+```javascript
+Px.Poi.ShowLine('TestPoi');
+```
+
+## Px.Poi.ShowAllLine()
+- 모든 poi의 선을 가시화
+```javascript
+Px.Poi.ShowAllLine();
 ```
 
 ## Px.Poi.GetAnimationList()

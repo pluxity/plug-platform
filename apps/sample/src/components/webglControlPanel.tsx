@@ -6,6 +6,7 @@ interface WebGLControlPanelState {
     selectedApiName: string;
     deletePoiId: string;
     setVisiblePoiId: string;
+    setLineVisiblePoiId: string;
     moveToPoiIdValue: string;
     getAnimlistPoiIdValue: string;
     poiAnimNameValue: string;
@@ -33,6 +34,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             selectedApiName: 'None',
             deletePoiId: '',
             setVisiblePoiId: '',
+            setLineVisiblePoiId: '',
             moveToPoiIdValue: '',
             moveToFloorIdValue: '',
             getAnimlistPoiIdValue: '',
@@ -112,6 +114,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br /><br />
+
+                    <input type='text' value={this.state.setLineVisiblePoiId} onChange={this.onSetLineVisibleTextInputValueChanged.bind(this)} placeholder='Line Show/Hide Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowLine')}>Show Line</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideLine')}>Hide Line</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllLine')}>Show All Line</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllLine')}>Hide All Line</button><br /><br />
+
                     <input type='text' value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br />
                     <input type='text' value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
@@ -354,6 +363,18 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.HideAll': {
                 Poi.HideAll();
             } break;
+            case 'Poi.ShowLine': {
+                Poi.ShowLine(this.state.setLineVisiblePoiId);
+            } break;
+            case 'Poi.HideLine': {
+                Poi.HideLine(this.state.setLineVisiblePoiId);
+            } break;
+            case 'Poi.ShowAllLine': {
+                Poi.ShowAllLine();
+            } break;
+            case 'Poi.HideAllLine': {
+                Poi.HideAllLine();
+            } break;
             case 'Poi.GetAnimationList': {
                 const data = Poi.GetAnimationList(this.state.getAnimlistPoiIdValue);
                 console.log('Poi.GetAnimationList', data);
@@ -468,6 +489,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onSetVisiblePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ setVisiblePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 선 가시화 설정 텍스트 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSetLineVisibleTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ setLineVisiblePoiId: evt.target.value });
     }
 
     /**

@@ -25,6 +25,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
     private pointMeshData: PoiPointMeshData;
 
     private visibleState: boolean;
+    private lineVisibleState: boolean = true;
 
     private mixer: THREE.AnimationMixer | undefined;
     private actions: Record<string, THREE.AnimationAction>;
@@ -101,7 +102,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
         // 애니메이션 메시
         this.pointMeshData.animMeshRef?.rotation.copy(value);
-    }    
+    }
     get Rotation(): THREE.Euler {
         return this.pointMeshData.rotation;
     }
@@ -182,7 +183,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
             this.textObj?.layers.set(Interfaces.CustomLayer.Default);
 
             // 위치점 애니메이션 메시
-            if( this.pointMeshData.animMeshRef !== undefined ) {
+            if (this.pointMeshData.animMeshRef !== undefined) {
                 this.pointMeshData.animMeshRef.visible = true;
                 Util.setObjectLayer(this.pointMeshData.animMeshRef, Interfaces.CustomLayer.Default);
             }
@@ -192,13 +193,27 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
             (this.textObj as THREE.Object3D).visible = false;
             this.textObj?.layers.set(Interfaces.CustomLayer.Invisible);
-            
+
             // 위치점 애니메이션 메시
-            if( this.pointMeshData.animMeshRef !== undefined ) {
+            if (this.pointMeshData.animMeshRef !== undefined) {
                 this.pointMeshData.animMeshRef.visible = false;
                 Util.setObjectLayer(this.pointMeshData.animMeshRef, Interfaces.CustomLayer.Invisible);
             }
         }
+    }
+
+    /**
+     * 선 가시화 여부
+     */
+    get LineVisible(): boolean {
+        return this.lineVisibleState;
+    }
+
+    /**
+     * 선 가시화 여부
+     */
+    set LineVisible(value: boolean) {
+        this.lineVisibleState = value;
     }
 
     /**
@@ -231,7 +246,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.pointMeshData.animMeshRef?.children.forEach((child) => {
             if (child instanceof THREE.Mesh) {
                 child.geometry.dispose();
-                if( Array.isArray(child.material)) {
+                if (Array.isArray(child.material)) {
                     child.material.forEach((material) => {
                         (material as THREE.Material).dispose();
                         (material as THREE.MeshBasicMaterial).map?.dispose();

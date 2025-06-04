@@ -46,7 +46,7 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => 
     animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
 
     // 업데이트가 필요한경우
-    if( bNeedsUpdate ) {
+    if (bNeedsUpdate) {
         updatePoiLine();
         updatePoiMesh();
         bNeedsUpdate = false;
@@ -157,7 +157,7 @@ Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
             poi.Visible = true;
         }
     });
-    
+
     bNeedsUpdate = true;
 });
 
@@ -171,7 +171,7 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
             poi.Visible = false;
         }
     });
-    
+
     bNeedsUpdate = true;
 });
 
@@ -191,7 +191,7 @@ Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => 
 Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = false);
-    
+
     bNeedsUpdate = true;
 });
 
@@ -257,7 +257,7 @@ function updatePoiLine() {
     // 라인 버텍스 수집
     const linePoints: THREE.Vector3[] = [];
     Object.values(poiDataList).forEach(element => {
-        if (element.Visible) {
+        if (element.Visible && element.LineVisible) {
             const p0 = element.WorldPosition.clone();
             const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
 
@@ -474,7 +474,7 @@ function Delete(id: string) {
         poi.dispose();
 
         delete poiDataList[id];
-        
+
         bNeedsUpdate = true;
     }
 }
@@ -538,6 +538,46 @@ function HideAll() {
 }
 
 /**
+ * poi 선 보이기
+ * @param id - poi id값
+ */
+function ShowLine(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].LineVisible = true;
+    }
+
+    updatePoiLine();
+}
+
+/**
+ * poi 선 숨기기
+ * @param id - poi id값
+ */
+function HideLine(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].LineVisible = false;
+    }
+
+    updatePoiLine();
+}
+
+/**
+ * 모든 poi 선 보이기
+ */
+function ShowAllLine() {
+    Object.values(poiDataList).forEach(poi => poi.LineVisible = true);
+    updatePoiLine();
+}
+
+/**
+ * 모든 poi 선 숨기기
+ */
+function HideAllLine() {
+    Object.values(poiDataList).forEach(poi => poi.LineVisible = false);
+    updatePoiLine();
+}
+
+/**
  * id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻음
  * @param id - poi id값
  */
@@ -586,10 +626,17 @@ export {
     Import,
     Delete,
     Clear,
+    
     Show,
     Hide,
     ShowAll,
     HideAll,
+
+    ShowLine,
+    HideLine,
+    ShowAllLine,
+    HideAllLine,
+
     GetAnimationList,
     PlayAnimation,
     StopAnimation
