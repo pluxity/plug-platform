@@ -149,12 +149,13 @@ interface SBMMesh {
 }
 
 /**
- * Path3D 세그먼트 데이터 인터페이스
+ * Path3D 위치점 데이터 인터페이스
  */
-interface Path3DSegmentData {
-    start: Vector3Custom;
-    control: Vector3Custom;
-    end: Vector3Custom;
+interface Path3DPointData {
+    id: string;
+    point: Vector3;
+    floorId: string;
+    isStraightLine?: boolean;
 }
 
 /**
@@ -162,8 +163,8 @@ interface Path3DSegmentData {
  */
 interface Path3DData {
     id: string;
-    color: THREE.ColorRepresentation;
-    segments: Path3DSegmentData[];
+    color: number;
+    points: Path3DPointData[];
 }
 
 export {
@@ -181,6 +182,6 @@ export {
     SBMHeader,
     SBMMaterial,
     SBMMesh,
-    Path3DSegmentData,
+    Path3DPointData,
     Path3DData,
 }

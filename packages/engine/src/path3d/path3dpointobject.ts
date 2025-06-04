@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Interfaces from '../interfaces';
 
 /**
  * 경로 위치점 객체
@@ -29,6 +30,14 @@ class Path3DPointObject extends THREE.Group {
     dispose() {
         this.parent?.remove(this);
 
+        this.traverse(child=>{
+            if( child instanceof THREE.Sprite ) {
+                child.material.dispose();
+            } else if (child instanceof THREE.Mesh ) {
+                child.geometry.dispose();
+                child.material.dispose();
+            }
+        });
     }
 
     /**
@@ -38,6 +47,19 @@ class Path3DPointObject extends THREE.Group {
         const worldPoint = new THREE.Vector3();
         this.getWorldPosition(worldPoint);
         return worldPoint;
+    }
+
+    get ExportData(): Interfaces.Path3DPointData {
+        return {
+            id: this.name,
+            floorId: this.userData['floorId'],
+            isStraightLine: this.userData['isStraightLine'],
+            point: {
+                x: this.position.x,
+                y: this.position.y,
+                z: this.position.z
+            }
+        };
     }
 
     updateMatrix(): void {

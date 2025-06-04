@@ -41,6 +41,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     pathRenderGroup.add(cursor);
 
     rayCast.layers.set(Interfaces.CustomLayer.Pickable);
+
+    // pathcreator.ts 초기화 완료 내부 통지
+    Event.InternalHandler.dispatchEvent({
+        type: 'onPathCreatorInitialized',
+        pathRenderGroup: pathRenderGroup,
+    });
 });
 
 /**
@@ -297,7 +303,7 @@ function Cancel() {
 /**
  * 경로 생성 작업 완료
  */
-function Finish() {
+function Finish(): Interfaces.Path3DData {
 
     // 카메라 회전 버튼값 복구
     Camera.SetRotateButton(Interfaces.MouseButton.Left);
@@ -317,6 +323,8 @@ function Finish() {
 
     // 이벤트 등록 해제
     unregisterEventListeners();
+
+    return workingPath.ExportData;
 }
 
 export {

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Interfaces from '../interfaces';
 import { Path3DPointObject } from './path3dpointobject';
 import { Path3DLineObject } from './path3dlineobject';
 
@@ -51,8 +52,18 @@ class Path3DObject extends THREE.Group {
         this.lineObjects = [];
     }
 
-    get ExportData(): boolean {
-        return false;
+    get ExportData(): Interfaces.Path3DData {
+
+        const points: Interfaces.Path3DPointData[] = [];
+        this.pointObjects.forEach(pointObj => {
+            points.push(pointObj.ExportData);
+        });
+
+        return {
+            id: this.name,
+            color: this.pathColor.getHex(),
+            points: points,
+        };
     }
 
     /**
@@ -188,6 +199,40 @@ class Path3DObject extends THREE.Group {
         this.lineObjects.forEach(lineObj => {
             lineObj.visible = false;
         });
+    }
+
+    /**
+     * 위치점 데이터 배열로부터 path 생성
+     * @param id - 식별자
+     * @param point - 위치점 좌표
+     * @param floor - 층 객체
+     * @param isStraightLine - 직선 여부
+     */
+    createPointFromData(id: string, point: THREE.Vector3, floor: THREE.Object3D, isStraightLine: boolean | undefined) {
+        const pointObj = new Path3DPointObject(this.pathWidth, this.pathColor);
+        pointObj.name = id;
+        pointObj.userData['floorId'] = floor.userData['floorId'];
+        floor.attach(pointObj);
+        pointObj.position.copy(point);
+        this.pointObjects.push(pointObj);
+
+        if (isStraightLine) {
+            pointObj.userData['isStraightLine'] = isStraightLine;
+        }
+    }
+
+    /**
+     * 제어점 상태 업데이트
+     */
+    updateControlPointState() {
+        for (let i = 0; i < this.pointObjects.length - 2; i += 2) {
+            const startPoint = this.pointObjects[i + 0];
+            const controlPoint = this.pointObjects[i + 1];
+            const endPoint = this.pointObjects[i + 2];
+
+            controlPoint.userData['startPointObj'] = startPoint;
+            controlPoint.userData['endPointObj'] = endPoint;
+        }
     }
 }
 

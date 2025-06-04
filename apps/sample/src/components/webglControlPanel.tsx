@@ -128,7 +128,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
                     <button onClick={() => Path3D.Cancel()}>Cancel</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Export')}>Export</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Import')}>Import</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Clear')}>Clear</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Util') {
@@ -237,6 +240,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Path.Finish': {
                 const pathData = Path3D.Finish();
                 console.log('Path3D.Finish -> ', pathData);
+            } break;
+            case 'Path.Export': {
+                const data = Path3D.Export();
+                console.log('Path3D.Export -> ', data);
+            } break;
+            case 'Path.Import': {
+                fetch('pathSampleData.json').then(res => res.json()).then(data => Path3D.Import(data));
+            } break;
+            case 'Path.Clear': {
+                Path3D.Clear();
             } break;
 
             /**

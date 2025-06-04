@@ -1,7 +1,18 @@
+import * as THREE from 'three';
 import { Path3DObject } from './path3dobject';
 import * as Event from '../eventDispatcher';
+import * as Interfaces from '../interfaces';
+import * as ModelInternal from '../model/model';
 
-const pathObjectList: Record<string, Path3DObject> = {};
+let pathObjectList: Record<string, Path3DObject> = {};
+let pathRenderGroup: THREE.Group;
+
+/**
+ * pathcreator.ts 초기화 완료 이벤트 처리
+ */
+Event.InternalHandler.addEventListener('onPathCreatorInitialized' as never, (evt: any) => {
+    pathRenderGroup = evt.pathRenderGroup;
+});
 
 /**
  * 경로 그리기 완료 이벤트 처리
@@ -71,13 +82,66 @@ function exists(id: string) {
     return pathObjectList.hasOwnProperty(id);
 }
 
-function Export() {    
+/**
+ * 경로 데이터 익스포트
+ * @returns - 경로 데이터
+ */
+function Export(): Interfaces.Path3DData[] {
+    const result: Interfaces.Path3DData[] = [];
+
+    Object.values(pathObjectList).forEach(path => result.push(path.ExportData));
+
+    return result;
 }
 
-function Import() {
+/**
+ * 경로 데이터 임포트
+ * @param data - 경로 데이터
+ */
+function Import(data: string | Interfaces.Path3DData[]) {
+    Clear();
 
+    if (typeof (data) === 'string') {
+        data = JSON.stringify(data);
+    }
+
+    (data as Interfaces.Path3DData[]).forEach(item => {
+        const path = new Path3DObject(item.color);
+        path.name = item.id;
+        pathRenderGroup.add(path);
+
+        item.points.forEach(p => {
+            const id = p.id;
+            const position = new THREE.Vector3(p.point.x, p.point.y, p.point.z);
+            const floor = ModelInternal.getFloorObject(p.floorId);
+            const isStraightLine = p.isStraightLine;
+
+            if (!floor) {
+                console.error('Path3D.Import -> 층객체를 찾지 못함 floorId: ', p.floorId);
+            } else {
+                path.createPointFromData(id, position, floor, isStraightLine);
+            }
+        });
+
+        path.updateControlPointState();
+        path.updateLine();
+        pathObjectList[path.name] = path;
+    });
+
+}
+
+/**
+ * 경로 전체 제거
+ */
+function Clear() {
+    Object.values(pathObjectList).forEach(path => path.dispose());
+    pathObjectList = {};
 }
 
 export {
     exists,
+
+    Export,
+    Import,
+    Clear,
 }
