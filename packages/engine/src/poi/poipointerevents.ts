@@ -5,10 +5,10 @@ import * as Interfaces from '../interfaces';
 import * as Placer from './placer';
 import * as PoiEditor from './edit';
 import * as Util from '../util';
+import * as Effect from '../effect';
 import { Engine3D } from '../engine';
 
 let engine: Engine3D;
-let outlinePass: Addon.OutlinePass;
 let hoverObjects: THREE.Object3D[] = [];
 let poiEventGroup: THREE.Group;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
@@ -23,17 +23,6 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     poiEventGroup = new THREE.Group();
     poiEventGroup.name = '#PoiEventGroup';
     engine.RootScene.add(poiEventGroup);
-
-    // 외각선 렌더링 패스 등록
-    outlinePass = new Addon.OutlinePass(new THREE.Vector2(engine.Dom.clientWidth, engine.Dom.clientHeight), engine.RootScene, engine.Camera);
-    outlinePass.hiddenEdgeColor = new THREE.Color('white');
-    outlinePass.edgeThickness = 5.0;
-    outlinePass.edgeStrength = 10.0;
-    engine.Composer.addPass(outlinePass);
-
-    // 외각선 패스 사용시 씬이 어두워 지는 이슈가 있으므로 GammaCorrectionShader를 추가한다.
-    const gammaCorrectionPass = new Addon.ShaderPass(Addon.GammaCorrectionShader);
-    engine.Composer.addPass(gammaCorrectionPass);
 
     // 이벤트 등록
     engine.Dom.addEventListener('pointerdown', onPointerDown);
@@ -67,7 +56,7 @@ function clearHoverObjects() {
         }
     });
     hoverObjects = [];
-    outlinePass.selectedObjects = hoverObjects;
+    Effect.Outline.setOutlineObjects(hoverObjects);
 }
 
 /**
@@ -116,7 +105,8 @@ function onPointerMove(evt: PointerEvent) {
         }
         else if (poi.PointMeshData.animMeshRef)
             hoverObjects.push(poi.PointMeshData.animMeshRef);
-        outlinePass.selectedObjects = hoverObjects;
+        
+        Effect.Outline.setOutlineObjects(hoverObjects);
     }
 }
 
