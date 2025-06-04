@@ -610,6 +610,26 @@ function HideAllDisplayText() {
 }
 
 /**
+ * poi 표시명 텍스트 변경
+ * @param id - 변경할 poi id값
+ * @param text - 표시명 텍스트
+ */
+function SetDisplayText(id: string, text: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        const poi = poiDataList[id];
+        poi.disposeTextObject();
+
+        const textMesh = createTextMesh(text);
+        poiTextGroup.add(textMesh);
+
+        poi.TextObject = textMesh;
+        poi.WorldPosition = poi.WorldPosition;
+
+        poi.displayText = text;
+    }
+}
+
+/**
  * id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻음
  * @param id - poi id값
  */
@@ -673,6 +693,8 @@ export {
     HideDisplayText,
     ShowAllDisplayText,
     HideAllDisplayText,
+
+    SetDisplayText,
 
     GetAnimationList,
     PlayAnimation,

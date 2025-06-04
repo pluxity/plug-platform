@@ -195,6 +195,14 @@ Px.Poi.ShowDisplayText('TestPoi');
 Px.Poi.ShowAllDisplayText();
 ```
 
+## SetDisplayText(id: string, text: string)
+- id: 표시명을 변경할 poi id값
+- text: 변경할 텍스트 문자열
+- poi의 표시명 텍스트(displayText)를 설정한다.
+```javascript
+Px.Poi.SetDisplayText('TestPoi', '변경된텍스트');
+```
+
 ## Px.Poi.GetAnimationList()
 - id: poi id값
 - id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻는다.

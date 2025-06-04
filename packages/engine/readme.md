@@ -19,3 +19,5 @@
   - [Px.Poi.HideDisplayText](./docs/Poi.md#hidedisplaytextid-string)
   - [Px.Poi.ShowAllDisplayText](./docs/Poi.md#showalldisplaytext)
   - [Px.Poi.HideAllDisplayText](./docs/Poi.md#hidealldisplaytext)
+- Poi 표시명 텍스트 변경
+  - [Px.Poi.SetDisplayText](./docs/Poi.md#setdisplaytextid-string-text-string)

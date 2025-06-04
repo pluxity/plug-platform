@@ -293,15 +293,22 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.iconObj?.parent?.remove(this.iconObj);
 
         // 텍스트 제거
-        this.textObj?.parent?.remove(this.textObj);
-        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).map?.dispose();
-        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).dispose();
+        this.disposeTextObject();
 
         // 내부 이벤트 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onPoiElementDisposed',
             id: this.id,
         });
+    }
+
+    /**
+     * 표시명 텍스트 객체 메모리 해제
+     */
+    disposeTextObject() {
+        this.textObj?.parent?.remove(this.textObj);
+        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).map?.dispose();
+        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).dispose();
     }
 
     /**

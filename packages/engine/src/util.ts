@@ -75,7 +75,7 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
             join: 'bevel',
         },
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: 14,
         fill: 0xffffff,
         align: 'center',
     });
