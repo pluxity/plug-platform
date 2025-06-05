@@ -4,6 +4,7 @@ import { FileState, FileType } from '../types/file';
 import {ModelInfo} from "@plug/engine/src/interfaces";
 import {api} from "@plug/api-hooks";
 import * as Px from "@plug/engine/src";
+import { getFileInfo } from "@plug/common-services";
 
 export const useFileUploader = (
     onNameSet?: (name: string) => void,
@@ -23,8 +24,8 @@ export const useFileUploader = (
 
         setIsLoading(true);
         try {
-            const fileResponse = await api.get<FileResponse>(locationHeader.location?.replace(/^\//, '') ?? '');
-            const fileUrl = fileResponse.data.url;
+            const fileResponse = await getFileInfo(locationHeader);
+            const fileUrl = fileResponse.url;
 
             Px.Model.GetModelHierarchyFromUrl(fileUrl, (data: ModelInfo[]) => {
                     setModelData(data);
