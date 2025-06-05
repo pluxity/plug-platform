@@ -1,7 +1,7 @@
 export interface Asset {
     id: string;
     name: string;
-    file: React.ReactNode;
+    code: string;
     thumbnailFile: React.ReactNode;
     creator: string;
     update: string;

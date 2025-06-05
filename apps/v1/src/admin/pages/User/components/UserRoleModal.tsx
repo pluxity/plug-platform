@@ -1,36 +1,47 @@
-import { Select, Modal, Form, FormItem, Button } from '@plug/ui';
-import { useRolesSWR, useAssignUserRoles} from '@plug/common-services';
-import { useCallback } from 'react';
+import {Select, Modal, Form, FormItem, Button} from '@plug/ui';
+import {useRolesSWR, useAssignUserRoles} from '@plug/common-services';
+import {useCallback} from 'react';
+import {useToastStore} from '../../../components/hook/useToastStore';
 
 export interface UserRoleModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
-    selectedUserId?: number; 
+    selectedUserId?: number;
 }
 
-export const UserRoleModal = ({ isOpen, onClose, onSuccess, selectedUserId}: UserRoleModalProps) => {
+export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: UserRoleModalProps) => {
     // 역할 목록 조회
-    const { data: detailRoleData } = useRolesSWR();
+    const {data: detailRoleData} = useRolesSWR();
+    const {addToast} = useToastStore();
 
     // 사용자 역할 할당
-    const { execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRolesError } = useAssignUserRoles(Number(selectedUserId));
+    const {execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRolesError} = useAssignUserRoles(Number(selectedUserId));
 
     // 제출 핸들러 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
         try {
-            const role = await assignRoles({ roleIds: [Number(values.role)] });
+            const role = await assignRoles({roleIds: [Number(values.role)]});
 
-            if(role){
-                alert('권한이 성공적으로 등록되었습니다.');
-                if(onSuccess) onSuccess();
+            if (role) {
+                addToast({
+                    description: '권한이 성공적으로 등록되었습니다.',
+                    title: '등록 완료',
+                    variant: 'default'
+                });
+                if (onSuccess) onSuccess();
                 onClose();
             }
         } catch (error) {
             console.error('권한 등록 실패:', error);
+            addToast({
+                description: error instanceof Error ? error.message : '권한 등록 중 오류가 발생했습니다.',
+                title: '등록 실패',
+                variant: 'critical'
+            });
         }
-    }, [ onSuccess, assignRoles ]);
-    
+    }, [onSuccess, assignRoles, addToast]);
+
 
     return (
         <Modal
@@ -65,7 +76,7 @@ export const UserRoleModal = ({ isOpen, onClose, onSuccess, selectedUserId}: Use
                     <Button type="submit" isLoading={isAssignRolesUpload} color="primary">등록</Button>
                 </div>
             </Form>
-            
+
         </Modal>
     );
 }; 

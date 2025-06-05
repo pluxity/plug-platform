@@ -11,7 +11,7 @@ export const useAsset = (
   return data.map(asset => ({
     id: String(asset.id),
     name: asset.name,
-    file: asset.file?.originalFileName,
+    code: asset.code,
     thumbnailFile: asset.thumbnailFile?.originalFileName,
     creator: asset.createdBy,
     update: DateFormatter(asset.createdAt),

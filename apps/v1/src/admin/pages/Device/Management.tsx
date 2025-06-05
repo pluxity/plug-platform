@@ -1,22 +1,40 @@
-import { Button, DataTable, Skeleton } from '@plug/ui';
-import { columns } from './constants/deviceColumns';
-import { DeviceModal } from './components/DeviceModal';
-import { useModal } from '../../components/hook/useModal';
-import { useDevicesSWR, deleteDevice } from '@plug/common-services';
-import { useDevice } from './utils/useDevice';
-import { StateInfoWrapper } from '../../components/boundary/StateInfoWrapper';
-import { useState } from 'react';
-import { Device } from './types/device.types';
+import {Button, DataTable, Skeleton} from '@plug/ui';
+import {columns} from './constants/deviceColumns';
+import {DeviceModal} from './components/DeviceModal';
+import {useModal} from '../../components/hook/useModal';
+import {useDevicesSWR, deleteDevice} from '@plug/common-services';
+import {useDevice} from './utils/useDevice';
+import {StateInfoWrapper} from '../../components/boundary/StateInfoWrapper';
+import {useState} from 'react';
+import {Device} from './types/device.types';
+import {useToastStore} from '../../components/hook/useToastStore';
 
 export default function DevicePage() {
-    const { isOpen, mode, openModal, closeModal } = useModal();
-    const { data, error, isLoading, mutate } = useDevicesSWR();
+    const {isOpen, mode, openModal, closeModal} = useModal();
+    const {data, error, isLoading, mutate} = useDevicesSWR();
+    const {addToast} = useToastStore();
 
-    const [ selectedDevices, setSelectedDevices ] = useState<Set<Device>>(new Set());
-    const [ selectedDeviceId, setSelectedDeviceId ] = useState<number>();
+    const [selectedDevices, setSelectedDevices] = useState<Set<Device>>(new Set());
+    const [selectedDeviceId, setSelectedDeviceId] = useState<number>();
 
     const handleDelete = async (deviceId: number) => {
-        deleteDevice(deviceId).then(() => mutate());
+        if (!window.confirm('선택 항목을 삭제하시겠습니까?')) return;
+
+        try {
+            await deleteDevice(deviceId);
+            await mutate();
+            addToast({
+                title: '삭제 완료',
+                description: '장비가 삭제되었습니다.',
+                variant: 'normal'
+            });
+        } catch (error) {
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '장비 삭제 중 오류가 발생했습니다.',
+                variant: 'critical'
+            });
+        }
     }
 
     const handleEdit = (deviceId: number) => {
@@ -24,22 +42,40 @@ export default function DevicePage() {
         openModal('edit');
     }
 
-    const deviceData = useDevice(data || [] , handleDelete, handleEdit);
-    
-    const handleDeleteSelected = () => {
-        if(selectedDevices.size === 0) {
-            return alert('삭제할 항목을 선택해주세요.')
+    const deviceData = useDevice(data || [], handleDelete, handleEdit);
+
+    const handleDeleteSelected = async () => {
+        if (selectedDevices.size === 0) {
+            addToast({
+                description: '삭제할 항목을 선택해주세요.',
+                variant: 'warning'
+            });
+            return;
         }
-        Promise.all(
-            Array.from(selectedDevices).map(device => handleDelete(device.id))
-        )
-        .then(() => {
-            alert(`${selectedDevices.size} 개의 항목이 삭제 되었습니다.`);
+
+        if (!window.confirm(`선택한 ${selectedDevices.size}개의 항목을 삭제하시겠습니까?`)) return;
+
+        try {
+            await Promise.all(
+                Array.from(selectedDevices).map(device => handleDelete(device.id))
+            );
+
+            addToast({
+                title: '삭제 완료',
+                description: `${selectedDevices.size}개의 항목이 삭제되었습니다.`,
+                variant: 'normal'
+            });
             setSelectedDevices(new Set());
-        })
+        } catch (error) {
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '일부 항목 삭제 중 오류가 발생했습니다.',
+                variant: 'critical'
+            });
+        }
     }
 
-    return(
+    return (
         <>
             <div className='mt-4 relative h-[90%]'>
                 <div className='ml-auto flex gap-1 w-48 absolute z-10 right-0'>
@@ -50,9 +86,9 @@ export default function DevicePage() {
                             className='bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200'
                             onClick={handleDeleteSelected}>삭제</Button>
                 </div>
-                {error && <StateInfoWrapper preset="defaultError" />}
+                {error && <StateInfoWrapper preset="defaultError"/>}
                 {isLoading && <Skeleton className="w-full h-100"/>}
-                {!isLoading && !error && deviceData && 
+                {!isLoading && !error && deviceData &&
                     <DataTable
                         data={deviceData || []}
                         columns={columns}
@@ -66,13 +102,13 @@ export default function DevicePage() {
                             return (
                                 item.name.toLowerCase().includes(lowerSearch) ||
                                 item.code.toLowerCase().includes(lowerSearch) ||
-                                item.creator.toLowerCase().includes(lowerSearch) 
+                                item.creator.toLowerCase().includes(lowerSearch)
                             );
                         }}
                     />
                 }
-            </div> 
-            <DeviceModal 
+            </div>
+            <DeviceModal
                 isOpen={isOpen}
                 onClose={closeModal}
                 mode={mode}

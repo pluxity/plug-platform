@@ -1,7 +1,9 @@
-import { Button } from '@plug/ui';
+import React from 'react';
+import {Button} from '@plug/ui';
 import {Outlet, Link} from 'react-router-dom';
-import {useProfileStore} from "@plug/v1/common/auth/controller/useProfileStore";
-import {logOut} from "@plug/v1/common/auth/api/auth";
+import {useProfileStore} from "@plug/v1/auth/controller/useProfileStore";
+import {logOut} from "@plug/v1/auth/api/auth";
+import {ToastContainer} from "@plug/v1/admin/components/toast/ToastContainer";
 
 const AdminLayout = () => {
     const user = useProfileStore((state) => state.user);
@@ -44,16 +46,17 @@ const AdminLayout = () => {
                             <p className="text-xs text-primary-200 bg-primary-600/50 px-2 py-0.5 rounded-full animate-pulse">접속 중</p>
                         </div>
                         <Button
-                            className="h-9 w-24 px-4 text-sm font-medium bg-primary-100 text-primary-700 hover:bg-primary-300 font-semibold transition-colors"
+                            className="h-9 w-24 px-4 text-sm bg-primary-100 text-primary-700 hover:bg-primary-300 font-semibold transition-colors"
                             onClick={logOut}>
                             로그아웃
                         </Button>
                     </div>
                 </header>
                 <main className="h-full flex-1 flex flex-row">
-                    <Outlet />
+                    <Outlet/>
                 </main>
             </div>
+            <ToastContainer/>
         </>
     );
 };
