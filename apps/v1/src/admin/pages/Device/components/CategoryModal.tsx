@@ -20,6 +20,7 @@ export interface CategoryModalProps {
 export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategoryId}: CategoryModalProps) => {
     const {addToast} = useToastStore();
     const [name, setName] = useState<string>('');
+    const [contextPath, setContextPath] = useState<string>('');
     const [iconFile, setIconFile] = useState<File | null>(null);
     const [uploadIconFileId, setUploadIconFileId] = useState<number | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -74,6 +75,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
     useEffect(() => {
         if (mode === 'edit' && detailCategoryData && isOpen) {
             setName(detailCategoryData.name);
+            setContextPath(detailCategoryData.contextPath);
         }
     }, [mode, detailCategoryData, isOpen]);
 
@@ -82,6 +84,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             try {
                 const category = await updateCategory({
                     name: values.name || name,
+                    contextPath: values.contextPath || detailCategoryData.contextPath,
                     iconFileId: uploadIconFileId || undefined,
                 });
 
@@ -137,6 +140,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
 
     const resetForm = () => {
         setName('');
+        setContextPath('');
         setIconFile(null);
         setUploadIconFileId(null);
         onClose();
@@ -166,10 +170,12 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                     mode === 'edit' && detailCategoryData
                         ? {
                             name: detailCategoryData?.name,
+                            contextPath: detailCategoryData?.contextPath,
                             iconFile: String(detailCategoryData?.iconFile.id)
                         }
                         : {
                             name: '',
+                            contextPath: '',
                             iconFile: ''
                         }
                 }
@@ -190,7 +196,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                 <FormItem name="contextPath" label="컨텍스트 패스" required>
                     <Input.Text
                         placeholder="컨텍스트 패스를 입력하세요"
-                        value={name}
+                        value={contextPath}
                         onChange={value => setName(value)}
                     />
                 </FormItem>
