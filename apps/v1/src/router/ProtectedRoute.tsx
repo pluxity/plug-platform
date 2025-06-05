@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useProfileStore } from "@plug/v1/auth/controller/useProfileStore";
-import { Role, RoleType, ROUTE_CONFIG, getRolePermissions } from "@plug/v1/auth/model/roles";
+import { useProfileStore } from "@plug/v1/common/auth/controller/useProfileStore";
+import { Role, RoleType, ROUTE_CONFIG, getRolePermissions } from "@plug/v1/common/auth/model/roles";
 
 interface ProtectedRouteProps {
     requiredRoles?: Role[];

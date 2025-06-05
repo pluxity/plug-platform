@@ -1,5 +1,6 @@
 export interface MapViewerProps {
   modelPath: string;
+  floors?: FloorItem[];
   onModelLoaded?: () => void;
   onLoadError?: (error: Error) => void;
 }
@@ -29,6 +30,5 @@ export interface FloorItem {
 
 export interface FloorSelectorProps {
   floors: FloorItem[];
-  currentFloor?: string;
   onFloorChange?: (floorId: string) => void;
 }

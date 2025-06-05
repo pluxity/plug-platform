@@ -38,12 +38,13 @@ export interface Station {
 export interface CCTV {
   lineNo?: string;
   stationId?: string;
+  stationName?: string;
   cctvId: string;
   cctvName: string;
   fcltsType: string;
   cctvAngle: string;
   streamAddress: string;
-  location: Location | Position;
+  location: Position;
 }
 
 export interface WindGauge {
@@ -65,15 +66,16 @@ export interface IOStatus {
 }
 
 export interface Light {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   lightId: string;
   lightName: string;
   fcltsType: string;
   collectedTime: string;
   status: IOStatus;
   controlPosition: IOStatus;
-  location?: Position;
+  location: Position;
+  orderingSequence: number;
 }
 
 export interface LightGroup {
@@ -88,15 +90,15 @@ export interface LightGroup {
 }
 
 export interface Shutter {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   shutterId: string;
   shutterName: string;
   fcltsType: string;
   collectedTime: string;
   status: IOStatus;
   cctvList: CCTV[];
-  location?: Position;
+  location: Position;
 }
 
 export interface ShutterGroup {
@@ -132,16 +134,21 @@ export interface Pump {
   pumpName: string;
   status: IOStatus;
   error: IOStatus;
+  remoteSetting?: IOStatus;
+  operationTime?: IOStatus;
+  operationMinute?: IOStatus;
+  overtime?: IOStatus;
 }
 
 export interface Elevator {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   elevatorId: string;
   elevatorName: string;
   fcltsType: string;
   collectedTime: string;
   status: IOStatus;
+  downMoveStatus?: IOStatus;
   error: IOStatus;
   pumps: Pump[] | null;
   cctvList: CCTV[];
@@ -149,8 +156,8 @@ export interface Elevator {
 }
 
 export interface Escalator {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   escalatorId: string;
   escalatorName: string;
   fcltsType: string;
@@ -162,8 +169,8 @@ export interface Escalator {
 }
 
 export interface WaterTank {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   waterTankId: string;
   waterTankName: string;
   fcltsType: string;
@@ -175,15 +182,14 @@ export interface WaterTank {
   fullWaterLevelSetting: IOStatus;
   lowWaterLevelStatus: IOStatus;
   highWaterLevelStatus: IOStatus;
+  fullWaterLevelStatus: IOStatus;
   pumps: Pump[];
-  remoteSetting: IOStatus;
-  events: number;
   location: Position;
 }
 
 export interface Catchpit {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   catchpitId: string;
   catchpitName: string;
   fcltsType: string;
@@ -194,18 +200,14 @@ export interface Catchpit {
   fullWaterLevelSetting: IOStatus;
   lowWaterLevelStatus: IOStatus;
   highWaterLevelStatus: IOStatus;
+  fullWaterLevelStatus: IOStatus;
   pumps: Pump[];
-  remoteSetting: IOStatus;
-  events: number;
   location: Position;
-  operationTime?: IOStatus;
-  operationMinute?: IOStatus;
-  overtime?: IOStatus;
 }
 
 export interface AirPurifier {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   airPurifierId: string;
   airPurifierName: string;
   fcltsType: string;
