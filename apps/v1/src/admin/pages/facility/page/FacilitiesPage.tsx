@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {Card, Button, Pagination} from "@plug/ui";
 import { useNavigate } from "react-router-dom";
-import {CardFooter, CardHeader, CardTitle} from "../../../../../../../packages/ui/src/components/Card/Card";
 import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import {useModal} from "@plug/v1/admin/components/hook/useModal";
 import {FacilityModal} from "@plug/v1/admin/pages/facility/component/FacilityModal";
@@ -72,12 +71,12 @@ export default function FacilitiesPage() {
                                         className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
                                     />
                                 </div>
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-semibold">
+                                <Card.Header>
+                                    <Card.Title className="text-lg font-semibold">
                                         {station.facility?.name}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardFooter className="flex">
+                                    </Card.Title>
+                                </Card.Header>
+                                <Card.Footer className="flex">
                                     <Button
                                         size="small"
                                         className='rounded-r-none hover:bg-primary-50'
@@ -108,19 +107,21 @@ export default function FacilitiesPage() {
                                     >
                                         3D 뷰어
                                     </Button>
-                                </CardFooter>
+                                </Card.Footer>
                             </Card>
                         ))
                     )}
                 </div>
-                
-                <div className="flex justify-center">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
-                </div>
+
+                {totalPages > 0 && (
+                    <div className="flex justify-center">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                )}
             </div>
             <FacilityModal
                 isOpen={isOpen}

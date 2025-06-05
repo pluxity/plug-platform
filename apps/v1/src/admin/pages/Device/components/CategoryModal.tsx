@@ -62,7 +62,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             .catch(error => {
                 addToast({
                     title: '업로드 실패',
-                    description: error instanceof Error ? error.message : '디바이스 카테고리 아이콘 업로드에 실패했습니다.',
+                    description: error instanceof Error ? error.message : '장비 카테고리 아이콘 업로드에 실패했습니다.',
                     variant: 'critical'
                 });
             })
@@ -88,7 +88,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                 if (category) {
                     addToast({
                         title: '수정 완료',
-                        description: '디바이스 카테고리가 성공적으로 수정되었습니다.',
+                        description: '장비 카테고리가 성공적으로 수정되었습니다.',
                         variant: 'normal'
                     });
                     resetForm();
@@ -97,7 +97,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             } catch (error) {
                 addToast({
                     title: '수정 실패',
-                    description: error instanceof Error ? error.message : '디바이스 카테고리 수정에 실패했습니다.',
+                    description: error instanceof Error ? error.message : '장비 카테고리 수정에 실패했습니다.',
                     variant: 'critical'
                 });
             }
@@ -118,7 +118,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
 
                 if (line) {
                     addToast({
-                        description: '디바이스 카테고리가 성공적으로 등록되었습니다.',
+                        description: '장비 카테고리가 성공적으로 등록되었습니다.',
                         title: '등록 완료',
                         variant: 'normal'
                     });
@@ -128,7 +128,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             } catch (error) {
                 addToast({
                     title: '등록 실패',
-                    description: error instanceof Error ? error.message : '디바이스 카테고리 등록에 실패했습니다.',
+                    description: error instanceof Error ? error.message : '장비 카테고리 등록에 실패했습니다.',
                     variant: 'critical'
                 });
             }
@@ -154,7 +154,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
 
     return (
         <Modal
-            title={mode === 'create' ? '디바이스 카테고리 등록' : '디바이스 카테고리 수정'}
+            title={mode === 'create' ? '장비 카테고리 등록' : '장비 카테고리 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
             closeOnOverlayClick={false}

@@ -25,13 +25,13 @@ export default function DevicePage() {
             await mutate();
             addToast({
                 title: '삭제 완료',
-                description: '디바이스가 삭제되었습니다.',
+                description: '장비가 삭제되었습니다.',
                 variant: 'normal'
             });
         } catch (error) {
             addToast({
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '디바이스 삭제 중 오류가 발생했습니다.',
+                description: error instanceof Error ? error.message : '장비 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
             });
         }

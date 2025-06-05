@@ -85,7 +85,7 @@ const Pagination = ({
             role="navigation" 
             aria-label="Pagination">  
 
-            <Button  
+            <Button
                 color="primary"  
                 className={  
                     cn(  
@@ -94,7 +94,7 @@ const Pagination = ({
                     )  
                 }  
                 onClick={() => handlePageChange(Math.max(1, currentPage - pageBlock))}  
-                disabled={currentPage === 1}  
+                disabled={currentPage === 1 || !totalPages}
                 aria-label="Previous Page"  
             >  
                 Prev  
@@ -108,8 +108,8 @@ const Pagination = ({
                         unSelectedPageClassName  
                     )  
                 }  
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + pageBlock))}  
-                disabled={currentPage === totalPages}  
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + pageBlock))}
+                disabled={currentPage === totalPages || !totalPages}
                 aria-label="Next Page"  
             >  
                 Next  

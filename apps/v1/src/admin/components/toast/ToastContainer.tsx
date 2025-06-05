@@ -1,7 +1,5 @@
 import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
 import {Toast} from "@plug/ui";
-import {ToastTitle} from "../../../../../../packages/ui/src/components/Toast/Toast";
-import { ToastDescription } from "../../../../../../packages/ui/src/components/Toast/Toast";
 
 export const ToastContainer = () => {
   const { toasts, removeToast } = useToastStore();
@@ -16,8 +14,8 @@ export const ToastContainer = () => {
           onClose={() => removeToast(toast.id)}
           autoCloseDuration={toast.duration || 3000}
         >
-          {toast.title && <ToastTitle>{toast.title}</ToastTitle>}
-          <ToastDescription>{toast.description}</ToastDescription>
+          {toast.title && <Toast.Title>{toast.title}</Toast.Title>}
+          <Toast.Description>{toast.description}</Toast.Description>
         </Toast>
       ))}
     </>

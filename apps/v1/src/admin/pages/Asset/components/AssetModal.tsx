@@ -35,13 +35,13 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
     // 파일 업로드 훅
     const {execute: uploadFile, isLoading: isFileUploading, error: fileError} = useFileUpload();
 
-    // 에셋 생성 훅
+    // 자산 생성 훅
     const {execute: createAsset, isLoading: isAssetCreating, error: assetError} = useAssetCreate();
 
-    // 에셋 상세 조회 훅
+    // 자산 상세 조회 훅
     const {data: detailAssetData} = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
 
-    // 에셋 수정 훅
+    // 자산 수정 훅
     const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError} = useAssetUpdate(Number(selectedAssetId));
 
     // 3D 모델 파일 선택 핸들러
@@ -160,6 +160,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             try {
                 const asset = await updateAsset({
                     name: values.assetRegistName || name,
+                    code: values.assetCode || detailAssetData.code,
                     fileId: uploadedModelId || undefined,
                     thumbnailFileId: uploadThumbnailId || undefined
                 });
@@ -195,9 +196,10 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             }
 
             try {
-                // 에셋 생성 API 호출
+                // 자산 생성 API 호출
                 const asset = await createAsset({
                     name: values.assetRegistName || name,
+                    code: values.assetCode || '',
                     fileId: uploadedModelId,
                     thumbnailFileId: uploadThumbnailId,
                 });
@@ -250,10 +252,12 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                     mode === 'edit' && detailAssetData
                         ? {
                             assetRegistName: detailAssetData?.name,
+                            assetCode: detailAssetData?.code,
                             assetFileId: String(detailAssetData?.file?.id),
                         }
                         : {
                             assetRegistName: '',
+                            assetCode: '',
                             assetFileId: '',
                         }
                 }
@@ -266,7 +270,14 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 )}
                 <FormItem name="assetRegistName" label='이름' required>
                     <Input.Text
-                        placeholder="모델 이름을 입력하세요"
+                        placeholder="자산 이름을 입력하세요"
+                        value={name}
+                        onChange={value => setName(value)}
+                    />
+                </FormItem>
+                <FormItem name="assetCode" label='코드' required>
+                    <Input.Text
+                        placeholder="자산 코드를 입력하세요"
                         value={name}
                         onChange={value => setName(value)}
                     />

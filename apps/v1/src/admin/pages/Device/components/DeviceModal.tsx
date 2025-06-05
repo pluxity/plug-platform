@@ -18,22 +18,22 @@ export const DeviceModal = ({
                                 onSuccess,
                                 selectedDeviceId
                             }: DeviceModalProps) => {
-    // 디바이스 상태 관리 
+    // 장비 상태 관리 
     const [name, setName] = useState<string>('');
     const [code, setCode] = useState<string>('');
 
     const {addToast} = useToastStore();
 
-    // 디바이스 생성 훅 
+    // 장비 생성 훅 
     const {execute: createDevice, isLoading: isCreating, error: createError} = useCreateDevice();
 
-    // 디바이스 생성 - 카테고리 목록 조회 
+    // 장비 생성 - 카테고리 목록 조회 
     const {data: categoryDevice} = useCategoriesSWR();
 
-    // 디바이스 상세 조회 훅 
+    // 장비 상세 조회 훅 
     const {data: detailDeviceData} = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? Number(selectedDeviceId) : 0);
 
-    // 디바이스 수정 훅 
+    // 장비 수정 훅 
     const {execute: updateDevice, isLoading: isUpdating, error: updateError} = useUpdateDevice(Number(selectedDeviceId));
 
     useEffect(() => {
@@ -55,7 +55,7 @@ export const DeviceModal = ({
                 if (device) {
                     addToast({
                         title: '수정 성공',
-                        description: '디바이스가 성공적으로 수정되었습니다.',
+                        description: '장비가 성공적으로 수정되었습니다.',
                         variant: 'normal'
                     });
                     if (onSuccess) onSuccess();
@@ -64,10 +64,10 @@ export const DeviceModal = ({
             } catch (error) {
                 addToast({
                     title: '수정 실패',
-                    description: '디바이스 수정에 실패했습니다.',
+                    description: '장비 수정에 실패했습니다.',
                     variant: 'critical'
                 });
-                console.error('디바이스 수정 실패:', error)
+                console.error('장비 수정 실패:', error)
             }
         } else {
             try {
@@ -80,7 +80,7 @@ export const DeviceModal = ({
                 if (device) {
                     addToast({
                         title: '등록 완료',
-                        description: '디바이스가 성공적으로 등록되었습니다.',
+                        description: '장비가 성공적으로 등록되었습니다.',
                         variant: 'normal'
                     });
                     if (onSuccess) onSuccess();
@@ -89,10 +89,10 @@ export const DeviceModal = ({
             } catch (error) {
                 addToast({
                     title: '등록 실패',
-                    description: '디바이스 등록에 실패했습니다.',
+                    description: '장비 등록에 실패했습니다.',
                     variant: 'critical'
                 });
-                console.error('디바이스 등록 실패:', error);
+                console.error('장비 등록 실패:', error);
             }
         }
     }, [createDevice, updateDevice, detailDeviceData, onSuccess, name, code, mode, addToast]);
@@ -110,7 +110,7 @@ export const DeviceModal = ({
 
     return (
         <Modal
-            title={mode === 'create' ? '디바이스 등록' : '디바이스 수정'}
+            title={mode === 'create' ? '장비 등록' : '장비 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
             closeOnOverlayClick={false}
@@ -153,16 +153,16 @@ export const DeviceModal = ({
                         </Select.Content>
                     </Select>
                 </FormItem>
-                <FormItem name="name" label="디바이스 이름" required>
+                <FormItem name="name" label="장비 이름" required>
                     <Input.Text
-                        placeholder="디바이스 이름을 입력하세요"
+                        placeholder="장비 이름을 입력하세요"
                         value={name}
                         onChange={value => setName(value)}
                     />
                 </FormItem>
-                <FormItem name="code" label="디바이스 코드" required>
+                <FormItem name="code" label="장비 코드" required>
                     <Input.Text
-                        placeholder="디바이스 코드를 입력하세요"
+                        placeholder="장비 코드를 입력하세요"
                         value={code}
                         onChange={value => setCode(value)}
                     />
