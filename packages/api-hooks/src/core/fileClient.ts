@@ -41,10 +41,7 @@ export const fileApi = {
       
       return {
         fileId,
-        location,
-        fileName: formData.get('file') instanceof File 
-          ? (formData.get('file') as File).name 
-          : undefined
+        location
       };
     }
     

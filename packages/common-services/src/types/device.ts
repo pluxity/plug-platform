@@ -1,5 +1,5 @@
 export interface DeviceResponse{
-    id: number,
+    id: string,
     feature: {
         id: string,
         position: {

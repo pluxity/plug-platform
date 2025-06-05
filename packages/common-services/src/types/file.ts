@@ -14,7 +14,6 @@ export interface FileResponse {
 export interface FileUploadResponse {
     fileId: number;
     location: string;
-    fileName: string;
 }
 
 export interface FileState {

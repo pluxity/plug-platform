@@ -5,13 +5,12 @@ import  DateFormatter from '@plug/v1/app/utils/dateFormatter';
 
 export const useDevice = (
     data: DeviceResponse[],
-    onDelete: (deviceId: number) => void,
-    onEdit: (deviceId: number) => void,
+    onDelete: (deviceId: string) => void,
+    onEdit: (deviceId: string) => void,
 ): Device[] => {
     return data.map(device => ({  
         id: device.id,
         name: device.name,
-        code: device.code,
         categoryName: device.categoryName,
         creator: device.createdBy,
         update: DateFormatter(device.createdAt),

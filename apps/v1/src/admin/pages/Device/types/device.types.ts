@@ -1,9 +1,8 @@
 export interface Device{
-    id: number,
+    id: string;
     name: string;
-    code: string;
     categoryName: string; 
     creator: string; 
     update: string;
-    management: React.ReactNode;
+    management: React.ReactNode;    
 }

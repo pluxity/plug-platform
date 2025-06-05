@@ -1,7 +1,10 @@
 export interface AssetResponse {
     id: number,
-    name: string,
-    code: string,
+    name: string;
+    code: string;
+    categoryId: number | null;
+    categoryName: string | null;
+    categoryCode: string | null;
     file: {
       id: number,
       url: string,

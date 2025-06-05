@@ -8,7 +8,7 @@ export interface DeviceModalProps {
     onClose: () => void;
     onSuccess?: () => void;
     mode: 'create' | 'edit';
-    selectedDeviceId?: number;
+    selectedDeviceId?: string;
 }
 
 export const DeviceModal = ({
@@ -20,26 +20,26 @@ export const DeviceModal = ({
                             }: DeviceModalProps) => {
     // 장비 상태 관리 
     const [name, setName] = useState<string>('');
-    const [code, setCode] = useState<string>('');
+    const [id, setId] = useState<string>('');
 
     const {addToast} = useToastStore();
 
-    // 장비 생성 훅 
-    const {execute: createDevice, isLoading: isCreating, error: createError} = useCreateDevice();
+    // 디바이스 생성 훅 
+    const { execute: createDevice, isLoading: isCreating, error: createError} = useCreateDevice();
 
-    // 장비 생성 - 분류 목록 조회 
-    const {data: categoryDevice} = useCategoriesSWR();
+    // 디바이스 생성 - 카테고리 목록 조회 
+    const { data: categoryDevice } = useCategoriesSWR();
+    
+    // 디바이스 상세 조회 훅 
+    const { data: detailDeviceData } = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? selectedDeviceId : '');
 
-    // 장비 상세 조회 훅 
-    const {data: detailDeviceData} = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? Number(selectedDeviceId) : 0);
-
-    // 장비 수정 훅 
-    const {execute: updateDevice, isLoading: isUpdating, error: updateError} = useUpdateDevice(Number(selectedDeviceId));
+    // 디바이스 수정 훅 
+    const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(selectedDeviceId || '');
 
     useEffect(() => {
         if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
-            setCode(detailDeviceData.code);
+            setId(detailDeviceData.id);
         }
     }, [mode, detailDeviceData, isOpen]);
 
@@ -48,7 +48,7 @@ export const DeviceModal = ({
             try {
                 const device = await updateDevice({
                     name: values.name || name,
-                    code: values.code || code,
+                    id: values.id || id,
                     deviceCategoryId: Number(values.categoryId)
                 })
 
@@ -73,7 +73,7 @@ export const DeviceModal = ({
             try {
                 const device = await createDevice({
                     name: values.name,
-                    code: values.code,
+                    id: values.code,
                     deviceCategoryId: Number(values.categoryId)
                 });
 
@@ -95,12 +95,12 @@ export const DeviceModal = ({
                 console.error('장비 등록 실패:', error);
             }
         }
-    }, [createDevice, updateDevice, detailDeviceData, onSuccess, name, code, mode, addToast]);
+    }, [mode, detailDeviceData, name, id, createDevice, updateDevice, onSuccess]);
 
     // 폼 초기화
     const resetForm = () => {
         setName('');
-        setCode('');
+        setId('');
         onClose();
     };
 
@@ -160,11 +160,11 @@ export const DeviceModal = ({
                         onChange={value => setName(value)}
                     />
                 </FormItem>
-                <FormItem name="code" label="장비 코드" required>
+                <FormItem name="id" label="장비 ID" required>
                     <Input.Text
-                        placeholder="장비 코드를 입력하세요"
-                        value={code}
-                        onChange={value => setCode(value)}
+                        placeholder="장비 ID를 입력하세요"
+                        value={id}
+                        onChange={value => setId(value)}
                     />
                 </FormItem>
 

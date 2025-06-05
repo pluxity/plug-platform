@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import {createFileFormData, FileResponse, FileUploadResponse, useFileUpload} from '@plug/common-services';
+import {createFileFormData, FileUploadResponse, useFileUpload} from '@plug/common-services';
 import { FileState, FileType } from '../types/file';
 import {ModelInfo} from "@plug/engine/src/interfaces";
-import {api} from "@plug/api-hooks";
 import * as Px from "@plug/engine/src";
 import { getFileInfo } from "@plug/common-services";
 
