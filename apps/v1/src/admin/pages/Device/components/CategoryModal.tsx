@@ -26,12 +26,19 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
     const [isUploading, setIsUploading] = useState(false);
     const {execute: uploadFile, isLoading: isFileUploading, error: fileError} = useFileUpload();
     const {execute: createCategory, isLoading: isCreating, error: createError} = useCreateCategory();
-    const {data: detailCategoryData} = useCategoryDetailSWR(mode === 'edit' && selectedCategoryId ? Number(selectedCategoryId) : 0);
+    const {data: detailCategoryData, mutate} = useCategoryDetailSWR(mode === 'edit' && selectedCategoryId ? Number(selectedCategoryId) : 0);
     const {
         execute: updateCategory,
         isLoading: isCategoryUpdating,
         error: categoryUpdateError
     } = useUpdateCategory(Number(selectedCategoryId));
+
+  useEffect(() => {
+    if (mode === 'edit' && detailCategoryData && isOpen) {
+      setName(detailCategoryData.name);
+      setContextPath(detailCategoryData.contextPath);
+    }
+  }, [mode, detailCategoryData, isOpen]);
 
     const handleIconFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -71,13 +78,6 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                 setIsUploading(false);
             });
     }, [uploadFile, addToast]);
-
-    useEffect(() => {
-        if (mode === 'edit' && detailCategoryData && isOpen) {
-            setName(detailCategoryData.name);
-            setContextPath(detailCategoryData.contextPath);
-        }
-    }, [mode, detailCategoryData, isOpen]);
 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
         if (mode === 'edit' && detailCategoryData) {
@@ -143,7 +143,10 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
         setContextPath('');
         setIconFile(null);
         setUploadIconFileId(null);
-        onClose();
+      if (selectedCategoryId) {
+        mutate();
+      }
+      onClose();
     };
 
     const error = createError || fileError || categoryUpdateError;
