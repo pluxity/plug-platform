@@ -31,7 +31,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
                 id={`${type}-file`}
                 className="hidden"
                 onChange={onChange}
-                accept={type === 'model' ? '.glb,.gltf' : '.png,.jpeg'}
+                accept={type === 'model' ? '.glb,.gltf' : '.png,.jpeg,.jpg'}
             />
             
             {!fileState.file ? (
@@ -41,7 +41,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
                             fileState.originalFileName
                         ) : (
                             <span className="text-gray-500">
-                                {type === 'model' ? 'GLB, GLTF 파일만 가능합니다.' : 'PNG, JPEG 파일만 가능합니다.'}
+                                {type === 'model' ? 'GLB, GLTF 파일만 가능합니다.' : 'PNG, JPEG, JPG 파일만 가능합니다.'}
                             </span>
                         )}
                     </p>

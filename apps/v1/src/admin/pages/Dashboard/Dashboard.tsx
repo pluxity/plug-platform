@@ -22,19 +22,19 @@ const Dashboard = () => {
                                 toggleable: false,
                             },
                             {
-                                title: 'ASSET 관리',
+                                title: '자산 관리',
                                 link: 'asset/management',
                                 toggleable: false,
                             },
                             {
-                                title: '디바이스 관리',
+                                title: '장비 관리',
                                 submenu: [
                                     {
-                                        title: '디바이스 관리',
+                                        title: '장비 관리',
                                         link: 'device/management'
                                     },
                                     {
-                                        title: '디바이스 카테고리 관리',
+                                        title: '장비 분류 관리',
                                         link: 'device/category'
                                     }
                                 ]

@@ -40,8 +40,8 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
         }}
         onSubmit={handleSubmit}
       >
-        <FormItem name="id" label="디바이스 ID" required>
-          <Input.Text placeholder="디바이스 ID를 입력하세요" />
+        <FormItem name="id" label="장비 ID" required>
+          <Input.Text placeholder="장비 ID를 입력하세요" />
         </FormItem>
         <Button type="submit" color="primary">
           적용

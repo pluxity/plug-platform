@@ -1,6 +1,7 @@
 export interface CategoryResponse {
     id: number,
     name: string,
+    contextPath: string,
     parentId?: number,
     iconFile: {
       id: number,
@@ -25,6 +26,6 @@ export interface CategoryCreateRequest {
 
 export interface CategoryUpdateResquest {
     name: string,
-    contextPath?: number,
+    contextPath?: string,
     iconFileId?: number,
 }

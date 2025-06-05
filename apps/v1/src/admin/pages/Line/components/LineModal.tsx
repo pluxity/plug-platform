@@ -1,7 +1,8 @@
-import { Modal, Form, FormItem, Button, Input } from '@plug/ui';
-import { useCallback, useState, useEffect } from 'react';
-import { ChromePicker } from 'react-color';
-import { useLineCreate, useLineDetailSWR, useLineUpdate } from '@plug/common-services';
+import {Modal, Form, FormItem, Button, Input} from '@plug/ui';
+import {useCallback, useState, useEffect} from 'react';
+import {ChromePicker} from 'react-color';
+import {useLineCreate, useLineDetailSWR, useLineUpdate} from '@plug/common-services';
+import {useToastStore} from '@plug/v1/admin/components/hook/useToastStore';
 
 export interface LineModalProps {
     isOpen: boolean;
@@ -11,19 +12,18 @@ export interface LineModalProps {
     selectedLineId?: number;
 }
 
-export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: LineModalProps) => {
-    // 호선 초기 이름 값
+export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: LineModalProps) => {
+    const {addToast} = useToastStore();
     const [name, setName] = useState<string>('');
-    const [color, setColor] = useState<string>(''); 
-   
-    // 호선 생성 훅
-    const { execute: createLine, isLoading: isCreating, error: createError } = useLineCreate();
+    const [color, setColor] = useState<string>('');
 
-    // 호선 상세 조회 훅
-    const { data: detailLineData } = useLineDetailSWR(mode === 'edit' && selectedLineId ? Number(selectedLineId) : 0);
-
-    // 호선 수정 훅
-    const { execute: updateLine, isLoading: isLineUpdating, error: lineUpdateError } = useLineUpdate(Number(selectedLineId));
+    const {execute: createLine, isLoading: isCreating, error: createError} = useLineCreate();
+    const {data: detailLineData} = useLineDetailSWR(mode === 'edit' && selectedLineId ? Number(selectedLineId) : 0);
+    const {
+        execute: updateLine,
+        isLoading: isLineUpdating,
+        error: lineUpdateError
+    } = useLineUpdate(Number(selectedLineId));
 
     useEffect(() => {
         if (mode === 'edit' && detailLineData && isOpen) {
@@ -32,9 +32,7 @@ export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: 
         }
     }, [detailLineData, mode, isOpen]);
 
-    // 제출 핸들러
     const handleFinish = useCallback(async (values: Record<string, string>) => {
-        // 수정 모달 제출
         if (mode === 'edit' && detailLineData) {
             try {
                 const line = await updateLine({
@@ -43,15 +41,22 @@ export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: 
                 });
 
                 if (line) {
-                    alert('호선이 성공적으로 수정되었습니다.');
+                    addToast({
+                        variant: "normal",
+                        title: "수정 완료",
+                        description: "호선이 수정되었습니다."
+                    });
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
             } catch (error) {
-                console.error('호선 수정 실패:', error);
+                addToast({
+                    variant: "critical",
+                    title: "수정 실패",
+                    description: error instanceof Error ? error.message : "수정 중 오류가 발생했습니다."
+                });
             }
         } else {
-            // 등록 모달 제출
             try {
                 const line = await createLine({
                     name: values.name || name,
@@ -59,24 +64,30 @@ export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: 
                 });
 
                 if (line) {
-                    alert('호선이 성공적으로 등록되었습니다.');
+                    addToast({
+                        variant: "normal",
+                        title: "등록 완료",
+                        description: "호선이 등록되었습니다."
+                    });
                     if (onSuccess) onSuccess();
-                    resetForm(); 
+                    resetForm();
                 }
             } catch (error) {
-                console.error('호선 등록 실패:', error);
+                addToast({
+                    variant: "critical",
+                    title: "등록 실패",
+                    description: error instanceof Error ? error.message : "등록 중 오류가 발생했습니다."
+                });
             }
         }
-    }, [createLine, updateLine, name, color, mode, detailLineData, onSuccess]);
+    }, [createLine, updateLine, name, color, mode, detailLineData, onSuccess, addToast]);
 
-    // 폼 초기화
     const resetForm = () => {
         setName('');
         setColor('');
         onClose();
     };
 
-    // 에러 처리
     const error = createError || lineUpdateError;
     const isProcessing = isCreating || isLineUpdating;
 
@@ -100,9 +111,9 @@ export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: 
                             name: '',
                             color: ''
                         }
-                    }
-                    onSubmit={handleFinish}
-                >
+                }
+                onSubmit={handleFinish}
+            >
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
                         {error.message}
@@ -132,7 +143,7 @@ export const LineModal = ({ isOpen, onClose, onSuccess, mode, selectedLineId }: 
                         color="primary"
                         disabled={!name && !color}
                         isLoading={isProcessing}
-                        >
+                    >
                         {mode === 'create' ? '등록' : '수정'}
                     </Button>
                 </div>

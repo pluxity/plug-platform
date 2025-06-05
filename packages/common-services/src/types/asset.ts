@@ -1,6 +1,7 @@
 export interface AssetResponse {
     id: number,
     name: string,
+    code: string,
     file: {
       id: number,
       url: string,
@@ -27,11 +28,13 @@ export interface AssetResponse {
 
 export interface AssetCreateRequest {
     name: string,
+    code: string,
     fileId: number,
     thumbnailFileId: number,
 }
 export interface AssetUpdateRequest {
     name: string,
+    code: string,
     fileId?: number,
     thumbnailFileId?: number
 }

@@ -1,5 +1,14 @@
-import { useGet, useSWRApi } from '@plug/api-hooks';
-import type { Station, StationData } from '@plug/common-services/types';
+import {
+  BaseResponseBody,
+  CreatedResponseBody,
+  useDelete,
+  useGet,
+  usePatch,
+  usePost,
+  useSWRApi
+} from "@plug/api-hooks";
+import type { Station } from '@plug/common-services/types';
+import {StationCreateRequest, StationDetail, StationUpdateRequest} from "../types";
 
 const STATION_API = `stations`;
 
@@ -10,20 +19,20 @@ export const useStations = () => {
 
 // 역할 상세 조회
 export const useStationDetail = (id: number) => {
-  return useGet<StationData>(`${STATION_API}/${id}`, { requireAuth: true });
+  return useGet<Station>(`${STATION_API}/${id}`, { requireAuth: true });
 };
 
-// export const useCreateStation = () => {
-//   return usePost<CreatedResponseBody, StationCreateRequest>(STATION_API, { requireAuth: true });
-// };
+export const useCreateStation = () => {
+  return usePost<CreatedResponseBody, StationCreateRequest>(STATION_API, { requireAuth: true });
+};
 
-// export const useUpdateStation = (roleId: number) => {
-//   return usePut<BaseResponseBody, StationUpdateRequest>(`${STATION_API}/${roleId}`, { requireAuth: true });
-// };
+export const useUpdateStation = (stationId: number) => {
+  return usePatch<BaseResponseBody, StationUpdateRequest>(`${STATION_API}/${stationId}`, { requireAuth: true });
+};
 
-// export const useDeleteStation = (roleId: number) => {
-//   return useDelete(`${STATION_API}/${roleId}`, { requireAuth: true });
-// };
+export const useDeleteStation = (stationId: number) => {
+  return useDelete(`${STATION_API}/${stationId}`, { requireAuth: true });
+};
 
 // SWR 기반 역할 목록 조회
 export const useStationsSWR = () => {
@@ -32,5 +41,5 @@ export const useStationsSWR = () => {
 
 // SWR 기반 역할 상세 조회
 export const useStationDetailSWR = (id: number) => {
-  return useSWRApi<StationData>(`${STATION_API}/${id}`, 'GET', { requireAuth: true });
+  return useSWRApi<StationDetail>(`${STATION_API}/${id}`, 'GET', { requireAuth: true });
 };

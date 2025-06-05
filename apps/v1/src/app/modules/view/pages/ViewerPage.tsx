@@ -20,18 +20,9 @@ const ViewerPage = () => {
     const { stationData, stationLoading, error } = useStationData(parsedCode);
     const { floorItems, modelPath } = useFloorData(stationData);
     
-    const handleLoadError = useCallback((loadError: Error) => {
-        console.error('3D 모델 로드 실패:', loadError);
-    }, []);    
-    
-    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
-        console.log('POI 선택됨:', poi);
-    }, []);
-
-    const { handleModelLoaded: engineModelLoaded } = useEngineIntegration({
-        stationData,
-        onPoiSelect: handlePoiSelect,
-    });
+    const [stationData, setStationData] = useState<Station | null>(null);
+    const [stationLoading, setStationLoading] = useState<boolean>(true);
+    const [error, setError] = useState<Error | null>(null);
 
     const handleModelLoadedWithEngine = useCallback(() => {
         engineModelLoaded();
