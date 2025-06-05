@@ -25,8 +25,8 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
             id: uuidv4(),
             iconUrl: '',
             modelUrl: asset.file.url,
-            displayText: asset.name,
-            property: asset
+            displayText: 'Device 할당 필요',
+            property: {}
         };
 
         Px.Poi.Create(poiCreateOption, createPoiComplete);
@@ -39,7 +39,6 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
             facilityId: currentStationId,
             floorId: poi.floorId,
             id: poi.id,
-            code: poi.id,
             assetId: asset.id,
             position: {
                 x: poi.position.x,

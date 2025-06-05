@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 
 const Header = () => {
     const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? stationId : '1'; // 기본값 1
+    const parsedStationId = stationId ? stationId : '1';
 
     return (
         <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-primary-400/20 backdrop-blur-xs text-white z-10">

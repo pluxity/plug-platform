@@ -1,4 +1,4 @@
-import {logOut} from "@plug/v1/auth/api/auth";
+import {logOut} from "@plug/v1/common/auth/api/auth";
 
 const UserProfile = () => {
     return(

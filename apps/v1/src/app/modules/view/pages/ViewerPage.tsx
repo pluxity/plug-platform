@@ -1,42 +1,40 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
-import { api } from '@plug/api-hooks/core';
-import type { Station } from '@plug/common-services/types';
+
+import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import { useAssetStore } from '@plug/v1/common/store/assetStore';
+import { useEngineIntegration } from '../hooks/useEngineIntegration';
+import { useStationData } from '../hooks/useStationData';
+import { useFloorData } from '../hooks/useFloorData';
 
 const ViewerPage = () => {
-    const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? parseInt(stationId, 10) : 1;
-    const { setStationId } = useStationStore();
+    const { code } = useParams<{ code: string }>();
+    const parsedCode = code ?? '1';
+
+    const { setStationCode } = useStationStore();
+    const { fetchAssets } = useAssetStore();
+
+    const { stationData, stationLoading, error } = useStationData(parsedCode);
+    const { floorItems, modelPath } = useFloorData(stationData);
     
     const [stationData, setStationData] = useState<Station | null>(null);
     const [stationLoading, setStationLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
+    const handleModelLoadedWithEngine = useCallback(() => {
+        engineModelLoaded();
+    }, [engineModelLoaded]);    
+    
     useEffect(() => {
-        setStationId(parsedStationId);
-    }, [parsedStationId, setStationId]);
+        setStationCode(parsedCode);
+    }, [parsedCode, setStationCode]);
 
     useEffect(() => {
-        const fetchStationData = async () => {
-            try {
-                setStationLoading(true);
-                const response = await api.get<Station>(`stations/${parsedStationId}/with-features`);
-                setStationData(response.data);
-                setError(null);
-            } catch (err) {
-                setError(err instanceof Error ? err : new Error('Unknown error'));
-            } finally {
-                setStationLoading(false);
-            }
-        };
-        
-        if (!isNaN(parsedStationId) && parsedStationId > 0) {
-            fetchStationData();
-        }
-    }, [parsedStationId]);
+        fetchAssets();
+    }, [fetchAssets]);
 
     if (error && !stationLoading) {
         return (
@@ -46,39 +44,37 @@ const ViewerPage = () => {
                 </div>
             </div>
         );
-    }
-
-    const modelPath: string = stationData?.facility?.drawing?.url || '';
-    
-    const handleModelLoaded = () => {
-        console.log('3D 모델 로드 완료');
-    };
-    
-    const handleLoadError = (error: Error) => {
-        console.error('3D 모델 로드 실패:', error);
-        setError(error);
-    };
-    
-
-    return (         
-        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">            
+    }    return (         
+        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
             {!stationLoading && stationData && (
                 <MapViewer 
                     modelPath={modelPath}
-                    onModelLoaded={handleModelLoaded}
+                    floors={floorItems}
+                    onModelLoaded={handleModelLoadedWithEngine}
                     onLoadError={handleLoadError}
                 />
             )}
             {stationLoading && (
                 <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
                     <div className="text-white text-xl">
-                        스테이션 {parsedStationId} 정보 로딩 중...
+                        스테이션 {parsedCode} 정보 로딩 중...
                     </div>                
                 </div>
             )}
             <Header />
             <SideMenu />
-            <EventCounter stationId={parsedStationId.toString()} />
+            { stationData && (
+                    <EventCounter stationId={stationData.externalCode} />
+            )}
+            
+            {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
+            {/* <DeviceDetailModal
+                isOpen={!!selectedDeviceId}
+                onClose={() => setSelectedDeviceId(null)}
+                stationId={stationData?.externalCode ?? ''}
+                selectedDeviceId={selectedDeviceId}
+                deviceType="shutter"
+            /> */}
         </div>
     );
 };

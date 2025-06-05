@@ -10,10 +10,8 @@ const TimeDisplay = () => {
 
     return () => {
       clearInterval(timer);
-    };
-  }, []);
+    };  }, []);
 
-  // 한국 스타일 날짜 및 시간 포맷팅
   const formatDate = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -21,7 +19,6 @@ const TimeDisplay = () => {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     
-    // 요일 추가
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
     const weekday = weekdays[date.getDay()];
 

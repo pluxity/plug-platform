@@ -19,7 +19,7 @@ export interface DeviceResponse{
         },
         assetId: number,
         floorId: number,
-        deviceCode: string
+        deviceId: string
     },
     categoryId: number,
     categoryName: string,
@@ -36,16 +36,16 @@ export interface DeviceResponse{
 
 export interface DeviceCreateRequest{
     deviceCategoryId?: number,
+    id?: string,
     asset?: number,
     name?: string,
-    code?: string,
     description?: string
 }
 
 export interface DeviceUpdateRequest{
     deviceCategoryId?: number,
+    id?: string,
     asset?: number,
     name?: string,
-    code?: string,
     description?: string
 }

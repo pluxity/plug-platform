@@ -3,14 +3,14 @@ import { api } from '@plug/api-hooks';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 
 export interface UsePoiApiResult {
-  updateDeviceCode: (poiId: string, code: string) => Promise<void>;
-  updateTransform: (poiId: string, transform: Partial<Pick<PoiImportOption, 'position' | 'rotation' | 'scale'>>) => Promise<void>;
+  assignDevice: (featureId: string, deviceId: string) => Promise<void>;
+  updateTransform: (featureId: string, transform: Partial<Pick<PoiImportOption, 'position' | 'rotation' | 'scale'>>) => Promise<void>;
 }
 
 export function usePoiApi(): UsePoiApiResult {
-  const updateDeviceCode = useCallback(async (poiId: string, code: string) => {
+  const assignDevice = useCallback(async (featureId: string, deviceId: string) => {
     try {
-      await api.put(`features/${poiId}/assign-device`, { code });
+      await api.put(`features/${featureId}/assign-device`, { id: deviceId });
     } catch (error) {
       console.error('Error updating device code:', error);
       throw error;
@@ -18,11 +18,11 @@ export function usePoiApi(): UsePoiApiResult {
   }, []);
 
   const updateTransform = useCallback(async (
-    poiId: string, 
+    featureId: string,
     transform: Partial<Pick<PoiImportOption, 'position' | 'rotation' | 'scale'>>
   ) => {
     try {
-      await api.patch(`features/${poiId}/transform`, transform);
+      await api.patch(`features/${featureId}/transform`, transform);
     } catch (error) {
       console.error('Error updating POI transform:', error);
       throw error;
@@ -30,7 +30,7 @@ export function usePoiApi(): UsePoiApiResult {
   }, []);
 
   return useMemo(() => ({
-    updateDeviceCode,
+    assignDevice,
     updateTransform,
-  }), [updateDeviceCode, updateTransform]);
+  }), [assignDevice, updateTransform]);
 }

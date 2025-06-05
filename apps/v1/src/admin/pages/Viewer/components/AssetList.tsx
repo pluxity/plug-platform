@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import AssetCard from "./AssetCard";
-import { useAssetStore } from "../store/assetStore"; // Asset 스토어 import
+import { useAssetStore } from "../../../../common/store/assetStore"; // Asset 스토어 import
 
 const AssetList = () => {
     const { assets, isLoading, fetchAssets, error } = useAssetStore(); // 스토어에서 상태와 액션 가져오기

@@ -1,3 +1,3 @@
 export enum SERVICE_ROUTE {
-    VIEWER = ':stationId',
+    VIEWER = ':code',
 }

@@ -1,7 +1,7 @@
 import { RouteObject } from 'react-router-dom';
 import { ADMIN_ROUTE } from "@plug/v1/router/admin/AdminRoutes";
 import { ProtectedRoute } from "@plug/v1/router/ProtectedRoute";
-import { Role } from "@plug/v1/auth/model/roles";
+import { Role } from "@plug/v1/common/auth/model/roles";
 
 import Dashboard from "../../admin/pages/Dashboard/Dashboard";
 import UserPage from "../../admin/pages/User/Management";

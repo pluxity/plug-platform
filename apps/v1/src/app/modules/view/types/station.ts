@@ -1,4 +1,12 @@
-import type { FileResponse } from './index';
+export interface FileResponse {
+  id: number;
+  url: string;
+  originalFileName: string;
+  contentType: string;
+  fileStatus: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Facility {
   id: number;
@@ -31,13 +39,14 @@ export interface FeatureResponse {
 
 export interface Floor {
   name: string;
-  groupId: string;
+  floorId: string;
 }
 
 export interface StationWithFeatures {
   facility: Facility;
   features: FeatureResponse[];
   floors: Floor[];
-  lineId: number;
+  lineId: number;  
   route: string;
+  externalCode: string;
 }
