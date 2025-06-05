@@ -27,7 +27,7 @@ export const DeviceModal = ({
     // 장비 생성 훅 
     const {execute: createDevice, isLoading: isCreating, error: createError} = useCreateDevice();
 
-    // 장비 생성 - 카테고리 목록 조회 
+    // 장비 생성 - 분류 목록 조회 
     const {data: categoryDevice} = useCategoriesSWR();
 
     // 장비 상세 조회 훅 
@@ -138,9 +138,9 @@ export const DeviceModal = ({
                         {error.message}
                     </div>
                 )}
-                <FormItem name='categoryId' label='카테고리' required>
+                <FormItem name='categoryId' label='분류' required>
                     <Select>
-                        <Select.Trigger placeholder='카테고리를 선택하세요.'/>
+                        <Select.Trigger placeholder='분류를 선택하세요.'/>
                         <Select.Content>
                             {categoryDevice?.map(role => (
                                 <Select.Item

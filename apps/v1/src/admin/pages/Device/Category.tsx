@@ -23,13 +23,13 @@ export default function DeviceCategory() {
             mutate();
             addToast({
                 title: '삭제 완료',
-                description: '카테고리가 성공적으로 삭제되었습니다.',
+                description: '분류가 성공적으로 삭제되었습니다.',
                 variant: 'normal'
             });
         } catch (error) {
             addToast({
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '카테고리 삭제 중 오류가 발생했습니다.',
+                description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
             });
         }
@@ -60,7 +60,7 @@ export default function DeviceCategory() {
             .then(() => {
                 addToast({
                     title: '일괄 삭제 완료',
-                    description: `${selectedCategories.size}개의 카테고리가 삭제되었습니다.`,
+                    description: `${selectedCategories.size}개의 분류가 삭제되었습니다.`,
                     variant: 'normal'
                 });
                 setSelectedCategories(new Set());
@@ -68,7 +68,7 @@ export default function DeviceCategory() {
             .catch((error) => {
                 addToast({
                     title: '일괄 삭제 실패',
-                    description: error instanceof Error ? error.message : '카테고리 삭제 중 오류가 발생했습니다.',
+                    description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
                     variant: 'critical'
                 });
             });

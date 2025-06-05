@@ -46,7 +46,7 @@ export const useAssignDeviceFeature = (deviceId: number, featureId: number) => {
     return usePut<DeviceResponse>(`${DEVICE_API}/${deviceId}/feature/${featureId}`, { requireAuth: true });
 };
 
-// 장비에 카테고리 할당
+// 장비에 분류 할당
 export const useAssignDeviceCategory = (deviceId: number, categoryId: number) => {
     return usePut<DeviceResponse>(`${DEVICE_API}/${deviceId}/categories/${categoryId}`, { requireAuth: true });
 };

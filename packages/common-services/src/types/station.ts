@@ -33,7 +33,7 @@ export interface StationFormValues {
   name: string;
   description: string;
   code: string;
-  lineIds: string[];
+  lineIds: number[];
   updatedBy: string;
   id: string;
   updatedAt: string;

@@ -34,137 +34,137 @@ export default function FacilitiesDetailPage() {
         <div className="space-y-6">
           <table className="w-full border-collapse border border-gray-300">
             <tbody>
-              <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사 ID</th>
-                <td className="border border-gray-300 p-2 w-1/3">
-                    <FormItem name="id">
-                        <div className='mb-[-16px]'>
-                        <Input.Text
-                            value={formValues.id}
-                            onChange={(value) => handleChange('id', value)}
-                            className="w-full"
-                            disabled
-                        />
-                      </div>
-                    </FormItem>
-                </td>
-                <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사명</th>
-                <td className="border border-gray-300 p-2 w-1/3">
-                    <FormItem name="name">
-                        <div className='mb-[-16px]'>
-                        <Input.Text
-                            value={formValues.name}
-                            onChange={(value) => handleChange('name', value)}
-                            className="w-full"
-                        />
-                      </div>
-                    </FormItem>
-                </td>
-              </tr>
-              <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50">설명</th>
-                <td className="border border-gray-300 p-2">
-                    <FormItem name="description">
-                        <div className='mb-[-16px]'>
-                        <Input.Text
-                            value={formValues.description}
-                            onChange={(value) => handleChange('description', value)}
-                            className="w-full"
-                        />
-                      </div>
-                    </FormItem>
-                </td>
-                <th className="border border-gray-300 p-2 bg-gray-50">코드</th>
-                <td className="border border-gray-300 p-2">
-                    <FormItem name="code">
-                        <div className='mb-[-16px]'>
-                        <Input.Text
-                            value={formValues.code}
-                            onChange={(value) => handleChange('code', value)}
-                            className="w-full"
-                            disabled
-                        />
-                      </div>
-                    </FormItem>
-                </td>
-              </tr>
-              <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50">노선</th>
-                <td className="border border-gray-300 p-2">
-                  <FormItem name="lineIds" required>
-                    <Select
-                      type="multiple"
-                      className="w-full mb-[-16px]"
-                      selected={formValues.lineIds}
-                      onChange={(value) => handleChange('lineIds', value)}
-                    >
-                      <Select.Trigger />
-                      <Select.Content>
-                        {lines?.map((line) => (
-                          <Select.Item key={line.id} value={String(line.id)}>
-                            {line.name}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select>
-                  </FormItem>
-                </td>
-                <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>
-                <td className="border border-gray-300 p-2">
-                  <FormItem name="externalCode" >
-                    <div className='mb-[-16px]'>
-                      <Input.Text
-                          value={formValues.externalCode}
-                          onChange={(e) => handleChange('externalCode', e)}
-                          className="w-full"
-                      />
-                    </div>
-                  </FormItem>
-                </td>
-              </tr>
-              <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50">층 정보</th>
-                <td className="border border-gray-300 p-2" colSpan={3}>
-                  <FormItem name="floors" required>
-                    <div className="space-y-2 mb-[-16px]">
-                      {formValues.floors.map((floor) => (
-                          <div key={floor.floorId} className="flex gap-2">
-                            <p>{floor.name}</p>
-                          </div>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사 ID</th>
+              <td className="border border-gray-300 p-2 w-1/3">
+                <FormItem name="id">
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.id}
+                      onChange={(value) => handleChange('id', value)}
+                      className="w-full"
+                      disabled
+                    />
+                  </div>
+                </FormItem>
+              </td>
+              <th className="border border-gray-300 p-2 bg-gray-50 w-1/6">역사명</th>
+              <td className="border border-gray-300 p-2 w-1/3">
+                <FormItem name="name">
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.name}
+                      onChange={(value) => handleChange('name', value)}
+                      className="w-full"
+                    />
+                  </div>
+                </FormItem>
+              </td>
+            </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50">설명</th>
+              <td className="border border-gray-300 p-2">
+                <FormItem name="description">
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.description}
+                      onChange={(value) => handleChange('description', value)}
+                      className="w-full"
+                    />
+                  </div>
+                </FormItem>
+              </td>
+              <th className="border border-gray-300 p-2 bg-gray-50">코드</th>
+              <td className="border border-gray-300 p-2">
+                <FormItem name="code">
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.code}
+                      onChange={(value) => handleChange('code', value)}
+                      className="w-full"
+                      disabled
+                    />
+                  </div>
+                </FormItem>
+              </td>
+            </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50">노선</th>
+              <td className="border border-gray-300 p-2">
+                <FormItem name="lineIds" required>
+                  <Select
+                    type="multiple"
+                    className="w-full mb-[-16px]"
+                    selected={formValues.lineIds}
+                    onChange={(value) => handleChange('lineIds', value)}
+                  >
+                    <Select.Trigger />
+                    <Select.Content>
+                      {lines?.map((line) => (
+                        <Select.Item key={line.id} value={String(line.id)}>
+                          {line.name}
+                        </Select.Item>
                       ))}
-                    </div>
-                  </FormItem>
-                </td>
-              </tr>
-              <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50">수정일</th>
-                <td className="border border-gray-300 p-2">
-                  <FormItem name="updatedAt" >
-                    <div className='mb-[-16px]'>
-                      <Input.Text
-                          value={formValues.updatedAt}
-                          onChange={(e) => handleChange('updatedAt', e)}
-                          className="w-full"
-                          disabled
-                      />
-                    </div>
-                  </FormItem>
-                </td>
-                <th className="border border-gray-300 p-2 bg-gray-50">마지막 수정인</th>
-                <td className="border border-gray-300 p-2">
-                  <FormItem name="updatedBy" >
-                    <div className='mb-[-16px]'>
-                      <Input.Text
-                          value={formValues.updatedBy}
-                          onChange={(e) => handleChange('updatedBy', e)}
-                          className="w-full"
-                          disabled
-                      />
-                    </div>
-                  </FormItem>
-                </td>
+                    </Select.Content>
+                  </Select>
+                </FormItem>
+              </td>
+              <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>
+              <td className="border border-gray-300 p-2">
+                <FormItem name="externalCode" >
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.externalCode}
+                      onChange={(e) => handleChange('externalCode', e)}
+                      className="w-full"
+                    />
+                  </div>
+                </FormItem>
+              </td>
+            </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50">층 정보</th>
+              <td className="border border-gray-300 p-2" colSpan={3}>
+                <FormItem name="floors" required>
+                  <div className="space-y-2 mb-[-16px]">
+                    {formValues.floors.map((floor) => (
+                      <div key={floor.floorId} className="flex gap-2">
+                        <p>{floor.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                </FormItem>
+              </td>
+            </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50">수정일</th>
+              <td className="border border-gray-300 p-2">
+                <FormItem name="updatedAt" >
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.updatedAt}
+                      onChange={(e) => handleChange('updatedAt', e)}
+                      className="w-full"
+                      disabled
+                    />
+                  </div>
+                </FormItem>
+              </td>
+              <th className="border border-gray-300 p-2 bg-gray-50">마지막 수정인</th>
+              <td className="border border-gray-300 p-2">
+                <FormItem name="updatedBy" >
+                  <div className='mb-[-16px]'>
+                    <Input.Text
+                      value={formValues.updatedBy}
+                      onChange={(e) => handleChange('updatedBy', e)}
+                      className="w-full"
+                      disabled
+                    />
+                  </div>
+                </FormItem>
+              </td>
 
-              </tr>
+            </tr>
             <tr>
               <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
               <td rowSpan={2}>
@@ -181,33 +181,33 @@ export default function FacilitiesDetailPage() {
                     className="w-full h-full object-cover"
                   />
                 )}
-                </td>
-                <th className="border border-gray-300 p-2 bg-gray-50">썸네일 파일</th>
-                <td className="border border-gray-300 p-2">
-                  <FileUploadField
-                    type="thumbnail"
-                    fileState={fileStates.thumbnail}
-                    isUploading={isUploading}
-                    onChange={(e) => handleFileChange(e, 'thumbnail')}
-                    onOpenPicker={openFilePicker}
-                    label="썸네일 파일"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="border border-gray-300 p-2 bg-gray-50">3D 모델 파일</th>
-                <td className="border border-gray-300 p-2">
-                  <FileUploadField
-                    type="model"
-                    fileState={fileStates.model}
-                    isUploading={isUploading}
-                    onChange={(e) => handleFileChange(e, 'model')}
-                    onOpenPicker={openFilePicker}
-                    label="3D 모델 파일"
-                    className='mb-[-16px]'
-                  />
-                </td>
-              </tr>
+              </td>
+              <th className="border border-gray-300 p-2 bg-gray-50">썸네일 파일</th>
+              <td className="border border-gray-300 p-2">
+                <FileUploadField
+                  type="thumbnail"
+                  fileState={fileStates.thumbnail}
+                  isUploading={isUploading}
+                  onChange={(e) => handleFileChange(e, 'thumbnail')}
+                  onOpenPicker={openFilePicker}
+                  label="썸네일 파일"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th className="border border-gray-300 p-2 bg-gray-50">3D 모델 파일</th>
+              <td className="border border-gray-300 p-2">
+                <FileUploadField
+                  type="model"
+                  fileState={fileStates.model}
+                  isUploading={isUploading}
+                  onChange={(e) => handleFileChange(e, 'model')}
+                  onOpenPicker={openFilePicker}
+                  label="3D 모델 파일"
+                  className='mb-[-16px]'
+                />
+              </td>
+            </tr>
             </tbody>
           </table>
 

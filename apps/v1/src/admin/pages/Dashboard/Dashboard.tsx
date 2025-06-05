@@ -34,7 +34,7 @@ const Dashboard = () => {
                                         link: 'device/management'
                                     },
                                     {
-                                        title: '장비 카테고리 관리',
+                                        title: '장비 분류 관리',
                                         link: 'device/category'
                                     }
                                 ]

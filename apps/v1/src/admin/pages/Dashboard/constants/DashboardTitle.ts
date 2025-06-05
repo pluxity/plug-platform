@@ -7,5 +7,5 @@ export const DASHBOARD_TITLES = [
     { path: 'facility', title: '역사 관리 상세' },
     { path: 'facility/detail', title: '역사 상세' },
     { path : 'device/management', title: '장비 관리' },
-    { path : 'device/category', title: '장비 카테고리 관리' },
+    { path : 'device/category', title: '장비 분류 관리' },
 ];

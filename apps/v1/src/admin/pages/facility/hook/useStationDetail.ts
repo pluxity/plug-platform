@@ -1,182 +1,166 @@
-import {useState, useEffect} from 'react';
-import {FileState, FileType} from '../types/file';
-import {useFileUploader} from './useFileUploader';
+import { useState, useEffect } from 'react';
+import { FileType } from '../types/file';
+import { useFileUploader } from './useFileUploader';
 import DateFormatter from "@plug/v1/app/utils/dateFormatter";
-import {
-    StationDetail,
-    StationFormValues,
-    useDeleteStation,
-    useStationDetailSWR,
-    useUpdateStation
-} from "@plug/common-services";
-import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
-import {useNavigate} from "react-router-dom";
+import { StationDetail, useDeleteStation, useStationDetailSWR, useUpdateStation } from '@plug/common-services';
 
-interface StationFileStates {
-    model: FileState;
-    thumbnail: FileState;
-}
+export const useStationDetail = (stationId: string) => {
+  const [station, setStation] = useState<StationDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    isUploading,
+    fileError,
+    handleFileUpload
+  } = useFileUploader();
 
-const initialFormValues: StationFormValues = {
+  const [formValues, setFormValues] = useState({
     name: '',
     description: '',
     code: '',
-    lineIds: [],
+    lineIds: [] as string[],
     updatedBy: '',
     id: '',
     updatedAt: '',
-    floors: [],
+    floors: [] as Array<{ name: string; floorId: string }>,
     externalCode: ''
-};
+  });
 
-const initialFileStates: StationFileStates = {
-    model: {fileId: null, file: null},
-    thumbnail: {fileId: null, file: null}
-};
+  const [fileStates, setFileStates] = useState({
+    model: { fileId: null as number | null, file: null as File | null, originalFileName: '' },
+    thumbnail: { fileId: null as number | null, file: null as File | null, originalFileName: '' }
+  });
 
-export const useStationDetail = (stationId: string) => {
-    const [station, setStation] = useState<StationDetail | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [formValues, setFormValues] = useState<StationFormValues>(initialFormValues);
-    const [fileStates, setFileStates] = useState<StationFileStates>(initialFileStates);
+  const { data } = useStationDetailSWR(Number(stationId));
+  const { execute: deleteStation } = useDeleteStation(Number(stationId));
+  const { execute: patchStation } = useUpdateStation(Number(stationId));
 
-    const {data} = useStationDetailSWR(Number(stationId));
-    const {execute: deleteStation} = useDeleteStation(Number(stationId));
-    const {execute: patchStation} = useUpdateStation(Number(stationId));
-    const {isUploading, fileError, handleFileUpload} = useFileUploader();
+  const loadStationDetail = async () => {
+    if (!data) return;
 
-    const addToast = useToastStore((state) => state.addToast);
-    const navigate = useNavigate();
+    try {
+      setStation(data);
+      initializeFormValues(data);
+      initializeFileStates(data);
+    } catch (error) {
+      console.error('역사 정보를 불러오는데 실패했습니다:', error);
+    }
+  };
 
-    const handleError = (action: string, error: Error) => {
-        console.error(`${action} 실패:`, error);
-        addToast({
-            variant: 'critical',
-            title: `${action} 실패`,
-            description: error.message || `${action}에 실패했습니다.`
-        });
-    };
+  const initializeFormValues = (data: StationDetail) => {
+    setFormValues({
+      name: data.facility.name || '',
+      description: data.facility.description || '',
+      code: data.facility.code || '',
+      lineIds: data.lineIds.map(String) || [],
+      updatedBy: data.facility.updatedBy || '',
+      id: data.facility.id.toString(),
+      updatedAt: DateFormatter(data.facility.updatedAt),
+      floors: data.floors.map((floor) => ({
+        name: floor.name,
+        floorId: String(floor.floorId),
+      })),
+      externalCode: data.externalCode || '',
+    });
+  };
 
-    const updateStationData = (stationData: StationDetail) => {
-        setStation(stationData);
-        setFormValues({
-            name: stationData.facility.name || '',
-            description: stationData.facility.description || '',
-            code: stationData.facility.code || '',
-            lineIds: stationData.lineIds.map(String),
-            updatedBy: stationData.facility.updatedBy,
-            id: stationData.facility.id.toString(),
-            updatedAt: DateFormatter(stationData.facility.updatedAt),
-            floors: stationData.floors.map(floor => ({
-                name: floor.name,
-                floorId: String(floor.floorId)
-            })),
-            externalCode: stationData.externalCode || ''
-        });
+  const initializeFileStates = (data: StationDetail) => {
+    setFileStates({
+      model: {
+        fileId: data.facility.drawing.id,
+        file: null,
+        originalFileName: data.facility.drawing.originalFileName,
+      },
+      thumbnail: {
+        fileId: data.facility.thumbnail.id,
+        file: null,
+        originalFileName: data.facility.thumbnail.originalFileName,
+      },
+    });
+  };
 
-        setFileStates({
-            model: {
-                fileId: stationData.facility.drawing.id,
-                file: null
-            },
-            thumbnail: {
-                fileId: stationData.facility.thumbnail.id,
-                file: null
-            }
-        });
-    };
+  useEffect(() => {
+    if (data) {
+      loadStationDetail();
+    }
+  }, [data, stationId]);
 
-    useEffect(() => {
-        if (data) {
-            updateStationData(data);
-        }
-    }, [data]);
+  const handleChange = (name: string, value: string | string[]) => {
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  };
 
-    const handleChange = (name: string, value: string | string[]) => {
-        setFormValues(prev => ({...prev, [name]: value}));
-    };
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, type: FileType) => {
+    try {
+      const fileId = await handleFileUpload(event, type);
+      if (fileId && event.target.files?.[0]) {
+        setFileStates(prev => ({
+          ...prev,
+          [type]: {
+            fileId,
+            file: event.target.files![0],
+            originalFileName: event.target.files![0].name
+          }
+        }));
+      }
+    } catch (error) {
+      console.error(`${type} 파일 업로드 실패:`, error);
+    }
+  };
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, type: FileType) => {
-        try {
-            const fileId = await handleFileUpload(event, type);
-            const file = event.target.files?.[0];
-            if (fileId && file) {
-                setFileStates(prev => ({
-                    ...prev,
-                    [type]: {fileId, file}
-                }));
-                addToast({
-                    variant: 'normal',
-                    description: `${type === 'model' ? '모델' : '썸네일'} 파일이 업로드되었습니다.`
-                });
-            }
-        } catch (error) {
-            handleError(`${type} 파일 업로드`, error as Error);
-        }
-    };
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const updateData = {
+        facility: {
+          name: formValues.name,
+          description: formValues.description,
+          code: formValues.code,
+          ...(fileStates.model.fileId && { drawingFileId: fileStates.model.fileId }),
+          ...(fileStates.thumbnail.fileId && { thumbnailFileId: fileStates.thumbnail.fileId })
+        },
+        lineIds: formValues.lineIds.map(Number),
+        floors: formValues.floors.map(floor => ({
+          name: floor.name,
+          floorId: floor.floorId // floorId를 문자열로 유지
+        })),
+        externalCode: formValues.externalCode,
+      };
 
-    const handleSubmit = async () => {
-        setIsLoading(true);
-        try {
-            const updateData = {
-                id: Number(stationId),
-                facility: {
-                    name: formValues.name,
-                    description: formValues.description,
-                    code: formValues.code,
-                    ...(fileStates.model.fileId && {drawingFileId: fileStates.model.fileId}),
-                    ...(fileStates.thumbnail.fileId && {thumbnailFileId: fileStates.thumbnail.fileId})
-                },
-                lineIds: formValues.lineIds.map(Number),
-                floors: formValues.floors,
-                externalCode: formValues.externalCode,
-            };
+      await patchStation({ id: Number(stationId), ...updateData });
+      await loadStationDetail();
+    } catch (error) {
+      console.error('수정 실패:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            await patchStation(updateData);
-            if (data) {
-                updateStationData(data);
-            }
-            addToast({
-                variant: 'normal',
-                title: '수정 완료',
-                description: '역사 정보가 성공적으로 수정되었습니다.'
-            });
-        } catch (error) {
-            handleError('수정', error as Error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const handleDelete = async () => {
+    try {
+      const confirmed = confirm('정말 삭제하시겠습니까?');
+      if (!confirmed) return;
 
-    const handleDelete = async () => {
-        if (!window.confirm('정말 삭제하시겠습니까?')) return;
+      setIsLoading(true);
+      await deleteStation();
+      alert('성공적으로 삭제되었습니다.');
+      window.location.href = '/admin/dashboard/facility';
+    } catch (error) {
+      console.error('삭제 실패:', error);
+      alert('삭제에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        setIsLoading(true);
-        try {
-            await deleteStation();
-            addToast({
-                variant: 'normal',
-                title: '삭제 완료',
-                description: '역사가 성공적으로 삭제되었습니다.'
-            });
-          navigate('/admin/dashboard/facility');
-        } catch (error) {
-            handleError('삭제', error as Error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return {
-        station,
-        formValues,
-        fileStates,
-        isLoading,
-        isUploading,
-        fileError,
-        handleChange,
-        handleFileChange,
-        handleSubmit,
-        handleDelete
-    };
+  return {
+    station,
+    formValues,
+    fileStates,
+    isLoading,
+    isUploading,
+    fileError,
+    handleChange,
+    handleFileChange,
+    handleSubmit,
+    handleDelete
+  };
 };
