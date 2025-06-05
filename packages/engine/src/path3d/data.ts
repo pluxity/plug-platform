@@ -91,6 +91,16 @@ function getPathObjects(): Path3DObject[] {
 }
 
 /**
+ * 경로 객체 인스턴스 얻기
+ * @param id - 경로 id값
+ * @returns - 경로 객체
+ */
+function getPathObject(id: string): Path3DObject | undefined {
+    if (pathObjectList.hasOwnProperty(id))
+        return pathObjectList[id];
+}
+
+/**
  * 경로 데이터 익스포트
  * @returns - 경로 데이터
  */
@@ -142,7 +152,10 @@ function Import(data: string | Interfaces.Path3DData[]) {
  * 경로 전체 제거
  */
 function Clear() {
-    Object.values(pathObjectList).forEach(path => path.dispose());
+    Object.values(pathObjectList).forEach(path => {
+        path.parent?.remove(path);
+        path.dispose();
+    });
     pathObjectList = {};
 }
 
@@ -181,6 +194,7 @@ function ShowAll() {
 export {
     exists,
     getPathObjects,
+    getPathObject,
 
     Export,
     Import,

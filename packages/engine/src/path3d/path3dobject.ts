@@ -51,24 +51,6 @@ class Path3DObject extends THREE.Group {
     }
 
     /**
-     * 메모리 해제
-     */
-    dispose() {
-        // 위치점
-        this.pointObjects.forEach(pointObj => {
-            pointObj.dispose();
-        });
-        this.pointObjects = [];
-
-        // 선
-        this.lineObjects.forEach(lineObj => {
-            this.remove(lineObj);
-            lineObj.dispose();
-        });
-        this.lineObjects = [];
-    }
-
-    /**
      * 익스포트 데이터
      */
     get ExportData(): Interfaces.Path3DData {
@@ -114,6 +96,31 @@ class Path3DObject extends THREE.Group {
      */
     get ExtrudeShape(): THREE.Shape {
         return this.lineExtrudeShape;
+    }
+
+    /**
+     * 생성되어 있는 경로 객체 인스턴스 배열
+     */
+    get LineObjects(): Path3DLineObject[] {
+        return this.lineObjects;
+    }
+
+    /**
+     * 메모리 해제
+     */
+    dispose() {
+        // 위치점
+        this.pointObjects.forEach(pointObj => {
+            pointObj.dispose();
+        });
+        this.pointObjects = [];
+
+        // 선
+        this.lineObjects.forEach(lineObj => {
+            this.remove(lineObj);
+            lineObj.dispose();
+        });
+        this.lineObjects = [];
     }
 
     /**

@@ -186,6 +186,18 @@ interface SubwayCreateOption {
     bodyCount: number;
 }
 
+/**
+ * 지하철 임포트/익스포트 옵션
+ */
+interface SubwayImportOption {
+    id: string;
+    pathId: string;
+    bodyCount: number;
+    entranceUValue: number;
+    stopUValue: number;
+    exitUValue: number;
+}
+
 export {
     Vector3Custom,
     Vector3,
@@ -205,4 +217,5 @@ export {
     Path3DPointData,
     Path3DData,
     SubwayCreateOption,
+    SubwayImportOption,
 }

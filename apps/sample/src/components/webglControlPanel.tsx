@@ -17,6 +17,7 @@ interface WebGLControlPanelState {
     backgroundImageUrl: string;
     pathVisibleId: string;
     subwayCreateBodyCount: string;
+    subwayId: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -50,12 +51,27 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             backgroundImageUrl: '',
             pathVisibleId: '',
             subwayCreateBodyCount: '',
+            subwayId: '',
             floorData: []
         };
 
         this.registerViewerEvents();
 
-        console.warn('Path3D', Path3D);
+        window.addEventListener('keydown', (evt)=>{
+            if( evt.key === '1' ) {
+                Subway.DoEnter('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, ()=>console.log('비동기 이동 테스트'));
+            }
+            if( evt.key === '2' ) {
+                Subway.DoExit('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, ()=>console.log('비동기 이동 테스트'));
+            }
+            
+            if( evt.key === '3' ) {
+                Subway.DoEnter('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, ()=>console.log('비동기 이동 테스트'));
+            }
+            if( evt.key === '4' ) {
+                Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, ()=>console.log('비동기 이동 테스트'));
+            }
+        });
     }
 
     /**
@@ -181,10 +197,27 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainHead')}>LoadTrainHead</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainTail')}>LoadTrainTail</button><br />
 
                     <input type='text' value={this.state.subwayCreateBodyCount} onChange={this.onSubwayBodyCountInputValueChanged.bind(this)} placeholder='차량개수'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Create')}>Create</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Create')}>Create</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Cancel')}>Cancel</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.EnableSetEntranceLocation')}>EnableSetEntranceLocation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.EnableSetStopLocation')}>EnableSetStopLocation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.EnableSetExitLocation')}>EnableSetExitLocation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Finish')}>Finish</button><br />
+
+                    <input type='text' value={this.state.subwayId} onChange={this.onSubwayIdInputValueChanged.bind(this)} placeholder='열차id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.HideAll')}>HideAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.ShowAll')}>ShowAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.DoEnter')}>DoEnter</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.DoExit')}>DoExit</button><br />
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Export')}>Export</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Import')}>Import</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Test') {
@@ -512,6 +545,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Subway.LoadTrainBody': {
                 Subway.LoadTrainBody('/subway_train/body.glb', () => console.log('지하철 몸체 모델 로드 완료'));
             } break;
+            case 'Subway.LoadTrainTail': {
+                Subway.LoadTrainTail('/subway_train/tail.glb', () => console.log('지하철 꼬리 모델 로드 완료'));
+            } break;
             case 'Subway.Create': {
                 const id = window.crypto.randomUUID();
                 const bodyCount = Number.parseInt(this.state.subwayCreateBodyCount);
@@ -520,6 +556,56 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     bodyCount: bodyCount
                 }, () => console.log('지하철 생성 완료'));
             } break;
+            case 'Subway.Cancel': {
+                Subway.Cancel();
+            } break;
+            case 'Subway.EnableSetEntranceLocation': {
+                Subway.EnableSetEntranceLocation();
+            } break;
+            case 'Subway.EnableSetStopLocation': {
+                Subway.EnableSetStopLocation();
+            } break;
+            case 'Subway.EnableSetExitLocation': {
+                Subway.EnableSetExitLocation();
+            } break;
+            case 'Subway.Finish': {
+                const data = Subway.Finish();
+                console.log('subway ->', data);
+            } break;
+            case 'Subway.Hide': {
+                Subway.Hide(this.state.subwayId);
+            } break;
+            case 'Subway.Show': {
+                Subway.Show(this.state.subwayId);
+            } break;
+            case 'Subway.HideAll': {
+                Subway.HideAll();
+            } break;
+            case 'Subway.ShowAll': {
+                Subway.ShowAll();
+            } break;
+            case 'Subway.DoEnter': {
+                Subway.Show(this.state.subwayId);
+                Subway.DoEnter(this.state.subwayId, 5.0, () => console.log('열차 진입 완료:', this.state.subwayId));
+            } break;
+            case 'Subway.DoExit': {
+                Subway.Show(this.state.subwayId);
+                Subway.DoExit(this.state.subwayId, 5.0, () => {
+                    console.log('열차 진출 완료:', this.state.subwayId);
+                    Subway.Hide(this.state.subwayId);
+                });
+            } break;
+            case 'Subway.Export': {
+                const data = Subway.Export();
+                console.log('subway data ->', data);
+            } break;
+            case 'Subway.Import': {
+                fetch('/subway_train/trainSampleData.json').then(res => res.json()).then(data => {
+                    console.log('/subway_train/trainSampleData.json', data);
+                    Subway.Import(data);
+                });
+            } break;
+
 
             /**
              * Test
@@ -689,6 +775,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onSubwayBodyCountInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ subwayCreateBodyCount: evt.target.value });
+    }
+
+    /**
+     * 지하철 id 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSubwayIdInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ subwayId: evt.target.value });
     }
 
     /**
