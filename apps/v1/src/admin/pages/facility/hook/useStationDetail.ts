@@ -4,6 +4,18 @@ import { useFileUploader } from './useFileUploader';
 import DateFormatter from "@plug/v1/app/utils/dateFormatter";
 import { StationDetail, useDeleteStation, useStationDetailSWR, useUpdateStation } from '@plug/common-services';
 
+interface FormValues {
+  name: string;
+  description: string;
+  code: string;
+  lineIds: string[];
+  updatedBy: string;
+  id: string;
+  updatedAt: string;
+  floors: Array<{ name: string; floorId: string }>;
+  externalCode: string;
+}
+
 export const useStationDetail = (stationId: string) => {
   const [station, setStation] = useState<StationDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,15 +25,15 @@ export const useStationDetail = (stationId: string) => {
     handleFileUpload
   } = useFileUploader();
 
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<FormValues>({
     name: '',
     description: '',
     code: '',
-    lineIds: [] as string[],
+    lineIds: [],
     updatedBy: '',
     id: '',
     updatedAt: '',
-    floors: [] as Array<{ name: string; floorId: string }>,
+    floors: [],
     externalCode: ''
   });
 
@@ -51,7 +63,7 @@ export const useStationDetail = (stationId: string) => {
       name: data.facility.name || '',
       description: data.facility.description || '',
       code: data.facility.code || '',
-      lineIds: data.lineIds.map(String) || [],
+      lineIds: data.lineIds.map(id => String(id)),
       updatedBy: data.facility.updatedBy || '',
       id: data.facility.id.toString(),
       updatedAt: DateFormatter(data.facility.updatedAt),
@@ -85,7 +97,18 @@ export const useStationDetail = (stationId: string) => {
   }, [data, stationId]);
 
   const handleChange = (name: string, value: string | string[]) => {
-    setFormValues(prev => ({ ...prev, [name]: value }));
+      if (name === 'lineIds') {
+        const newValue = Array.isArray(value) ? value : [value];
+        setFormValues(prev => ({
+          ...prev,
+          [name]: newValue
+        }));
+      } else {
+        setFormValues(prev => ({
+          ...prev,
+          [name]: value
+        }));
+    }
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, type: FileType) => {
@@ -117,10 +140,10 @@ export const useStationDetail = (stationId: string) => {
           ...(fileStates.model.fileId && { drawingFileId: fileStates.model.fileId }),
           ...(fileStates.thumbnail.fileId && { thumbnailFileId: fileStates.thumbnail.fileId })
         },
-        lineIds: formValues.lineIds.map(Number),
+        lineIds: formValues.lineIds.map(id => Number(id)),
         floors: formValues.floors.map(floor => ({
           name: floor.name,
-          floorId: floor.floorId // floorId를 문자열로 유지
+          floorId: floor.floorId
         })),
         externalCode: formValues.externalCode,
       };

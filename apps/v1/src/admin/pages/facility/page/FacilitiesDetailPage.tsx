@@ -96,7 +96,10 @@ export default function FacilitiesDetailPage() {
                     type="multiple"
                     className="w-full mb-[-16px]"
                     selected={formValues.lineIds}
-                    onChange={(value) => handleChange('lineIds', value)}
+                    onChange={(value) => {
+                      const selectedValues = value || [];
+                      handleChange('lineIds', selectedValues);
+                    }}
                   >
                     <Select.Trigger />
                     <Select.Content>
