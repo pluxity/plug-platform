@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Px from '@plug/engine/src';
 import useStationStore from '@plug/v1/app/stores/stationStore';
-import { DeviceDetailModal } from '../../../components/modals/DeviceDetailModal';
+import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
 
 interface DeviceData {
   id: string;
@@ -31,7 +31,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
   devices = [],
   onClose 
 }) => {
-  const { facilityCode, setCurrentFloor, selectedDeviceCode, setSelectedDeviceCode } = useStationStore();
+  const { facilityCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
 
   const handleDeviceClick = (device: DeviceData) => {
     try {
@@ -77,7 +77,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                 key={device.id} 
                 className="p-2 hover:text-gray-400 rounded-md cursor-pointer text-white"
                 onClick={() => {
-                  setSelectedDeviceCode(device.code);
+                  setSelectedDeviceId(device.id);
                   handleDeviceClick(device);
                 }}
               >
@@ -86,13 +86,14 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
             ))}
           </ul>
         )}
-      </div>        <DeviceDetailModal
-          isOpen={!!selectedDeviceCode}
-          onClose={() => setSelectedDeviceCode(null)}
-          stationId={String(facilityCode)}
-          deviceCode={selectedDeviceCode}
-          deviceType={categoryType}
-        />
+      </div>
+      <DeviceDetailModal
+        isOpen={!!selectedDeviceId}
+        onClose={() => setSelectedDeviceId(null)}
+        stationId={String(facilityCode)}
+        deviceId={selectedDeviceId}
+        deviceType={categoryType}
+      />
     </>
   );
 };

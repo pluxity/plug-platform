@@ -1,8 +1,7 @@
-import { useCallback, useEffect } from 'react';
-import * as Px from '@plug/engine/src';
-import { useAssetStore } from '../../../../common/store/assetStore';
-import type { FeatureResponse } from '../types';
+import { useMemo } from 'react';
+import { useEngineIntegration as useBaseEngineIntegration } from '../../../../common/libs/engine';
 import type { PoiImportOption, ModelInfo } from '@plug/engine/src/interfaces';
+import type { EngineEventHandlers, EngineIntegrationConfig } from '../../../../common/libs/engine';
 import { usePoiApi } from './usePoiApi';
 
 interface UseEngineIntegrationProps {
@@ -20,109 +19,45 @@ export function useEngineIntegration({
   onFloorChange,
 }: UseEngineIntegrationProps) {
   const { updateTransform } = usePoiApi();
-  // Store event listener references for cleanup
-  const poiClickListener = useCallback((event: { target: PoiImportOption }) => {
 
-    console.log('POI clicked:', event);
-
-    if (event.target) {
-      onPoiSelect(event.target);
-    }
-  }, [onPoiSelect]);
-  const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
-    const { target } = event;
-    try {
-      await updateTransform(target.id, {
-        position: target.position,
-        rotation: target.rotation,
-        scale: target.scale
-      });
-    } catch (error) {
-      console.error('Failed to update POI transform:', error);
-    }
-  }, [updateTransform]);  // Internal function to handle 3D engine floor visibility
-  const changeEngineFloor = useCallback((floorId: string) => {
-    try {
-      Px.Model.HideAll();
-      Px.Model.Show(floorId);
-    } catch (error) {
-      console.error('Failed to change floor in engine:', error);
-      throw error; // Re-throw to handle in calling function
-    }
-  }, []);
-  const handleFloorChange = useCallback((floorId: string) => {
-    try {
-      changeEngineFloor(floorId);
-      onFloorChange(floorId);
-    } catch (error) {
-      console.error(`Floor change failed for floor ${floorId}:`, error);
-    }
-  }, [changeEngineFloor, onFloorChange]);
-
-  const handleFeatureData = useCallback(() => {
-    const currentAssets = useAssetStore.getState().assets;
-    
-    if (stationData?.features && currentAssets.length > 0) {
-      console.log(`Processing ${stationData.features.length} features with ${currentAssets.length} assets`);
-      
-      const poiData = stationData.features.map((feature: FeatureResponse) => {
-        const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
-        const poi = {
-          id: feature.id, 
-          iconUrl: '', 
-          modelUrl: modelUrl,
-          displayText: feature.deviceCode || 'Device 할당 필요',
-          floorId: feature.floorId,
-          property: {
-            code: feature.deviceCode || '',
-          },
-          position: feature.position,
-          rotation: feature.rotation,
-          scale: feature.scale
-        };
-        
-        return poi;
-      });
-
-      console.log('Importing POI data:', poiData);
-      Px.Poi.Import(JSON.stringify(poiData));
-    } else {
-      console.log('No features or assets available for POI import');
-    }
-  }, [stationData]);  const addEngineEventListeners = useCallback(() => {
-    console.log('Adding engine event listeners');
-    
-    Px.Event.AddEventListener("onPoiPointerUp", poiClickListener);
-    Px.Event.AddEventListener('onPoiTransformChange', poiTransformListener);
-  }, [poiClickListener, poiTransformListener]);
-  // Cleanup event listeners on unmount
-  useEffect(() => {
-    return () => {
-      console.log('Cleaning up engine event listeners');
+  // 관리자 전용 이벤트 핸들러 설정
+  const handlers: EngineEventHandlers = useMemo(() => ({
+    onPoiClick: (poi: PoiImportOption) => {
+      console.log('POI clicked:', poi);
+      onPoiSelect(poi);
+    },
+    onPoiTransformChange: async (poi: PoiImportOption) => {
       try {
-        Px.Event.RemoveEventListener("onPoiPointerUp", poiClickListener);
-        Px.Event.RemoveEventListener('onPoiTransformChange', poiTransformListener);
-      } catch {
-        console.log('Event listener cleanup completed (some listeners may not have been registered)');
+        await updateTransform(poi.id, {
+          position: poi.position,
+          rotation: poi.rotation,
+          scale: poi.scale
+        });
+      } catch (error) {
+        console.error('Failed to update POI transform:', error);
       }
-    };
-  }, [poiClickListener, poiTransformListener]);
-  
-  const handleModelLoaded = useCallback(async () => {
-    
-    handleFeatureData();
+    },
+    onFloorChange,
+    onHierarchyLoaded,
+  }), [onPoiSelect, onFloorChange, onHierarchyLoaded, updateTransform]);
 
-    const modelHierarchy = Px.Model.GetModelHierarchy();
-    if (modelHierarchy) {
-      onHierarchyLoaded(modelHierarchy as ModelInfo[]);
-      handleFloorChange("0");
-    }
+  // 관리자 전용 설정
+  const config: EngineIntegrationConfig = useMemo(() => ({
+    includeUnassignedDevices: true,
+    enableTransformEdit: true,
+    autoLoadHierarchy: true,
+    defaultFloor: "0",
+  }), []);
 
-    addEngineEventListeners();
-  }, [handleFeatureData, handleFloorChange, addEngineEventListeners, onHierarchyLoaded]);
+  const { handleModelLoaded, handleFloorChange, refreshPoiData } = useBaseEngineIntegration({
+    stationData,
+    handlers,
+    config,
+  });
 
   return {
     handleModelLoaded,
     handleFloorChange,
+    refreshPoiData,
   };
 }

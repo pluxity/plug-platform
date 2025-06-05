@@ -22,7 +22,7 @@ interface Vector3 {
 export interface FeatureResponse {
   id: string;
   assetId: number;
-  deviceCode: string | null;
+  deviceId: string | null;
   floorId: string;
   position: Vector3;
   rotation: Vector3;

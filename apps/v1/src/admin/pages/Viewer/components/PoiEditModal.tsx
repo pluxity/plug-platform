@@ -11,20 +11,20 @@ interface PoiEditModalProps {
 }
 
 export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalProps) {
-  const { updateDeviceCode } = usePoiApi();
+  const { assignDevice } = usePoiApi();
 
   const handleSubmit = useCallback(async (values: Record<string, string>) => {
     if (!poi) return;
     
     try {
-      const code = values.code || poi.property?.code;
-      await updateDeviceCode(poi.id, code);
+      const id = values.id || poi.property?.id;
+      await assignDevice(poi.id, id);
       onSuccess?.();
       onClose();
     } catch (error) {
       console.error('Failed to update device code:', error);
     }
-  }, [poi, updateDeviceCode, onSuccess, onClose]);
+  }, [poi, assignDevice, onSuccess, onClose]);
 
   if (!poi) return null;
 
@@ -40,8 +40,8 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
         }}
         onSubmit={handleSubmit}
       >
-        <FormItem name="code" label="디바이스 코드" required>
-          <Input.Text placeholder="디바이스 코드를 입력하세요" />
+        <FormItem name="id" label="디바이스 ID" required>
+          <Input.Text placeholder="디바이스 ID를 입력하세요" />
         </FormItem>
         <Button type="submit" color="primary">
           적용
