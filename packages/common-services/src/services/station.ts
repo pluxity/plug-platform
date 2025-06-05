@@ -1,4 +1,12 @@
-import {BaseResponseBody, CreatedResponseBody, useDelete, useGet, usePost, usePut, useSWRApi} from '@plug/api-hooks';
+import {
+  BaseResponseBody,
+  CreatedResponseBody,
+  useDelete,
+  useGet,
+  usePatch,
+  usePost,
+  useSWRApi
+} from "@plug/api-hooks";
 import type { Station } from '@plug/common-services/types';
 import {StationCreateRequest, StationDetail, StationUpdateRequest} from "../types";
 
@@ -19,7 +27,7 @@ export const useCreateStation = () => {
 };
 
 export const useUpdateStation = (stationId: number) => {
-  return usePut<BaseResponseBody, StationUpdateRequest>(`${STATION_API}/${stationId}`, { requireAuth: true });
+  return usePatch<BaseResponseBody, StationUpdateRequest>(`${STATION_API}/${stationId}`, { requireAuth: true });
 };
 
 export const useDeleteStation = (stationId: number) => {

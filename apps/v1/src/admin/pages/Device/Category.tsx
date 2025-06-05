@@ -75,43 +75,49 @@ export default function DeviceCategory() {
     }
 
     return (
-        <>
-            <div className='mt-4 relative h-[90%]'>
-                <div className='ml-auto flex gap-1 w-48 absolute z-10 right-0'>
-                    <Button color='primary'
-                            className='bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200'
-                            onClick={() => (openModal('create'))}>등록</Button>
-                    <Button color='destructive'
-                            className='bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200'
-                            onClick={handleDeleteSelected}>삭제</Button>
-                </div>
-                {error && <StateInfoWrapper preset="defaultError"/>}
-                {isLoading && <Skeleton className="w-full h-100"/>}
-                {!isLoading && !error && categoryData && (
-                    <DataTable
-                        data={categoryData || []}
-                        columns={columns}
-                        pageSize={7}
-                        selectable={true}
-                        selectedRows={selectedCategories}
-                        onSelectChange={setSelectedCategories}
-                        showSearch={true}
-                        filterFunction={(item, search) => {
-                            const lowerSearch = search.toLowerCase();
-                            return (
-                                item.name.toLowerCase().includes(lowerSearch)
-                            );
-                        }}
-                    />
-                )}
-            </div>
-            <CategoryModal
-                isOpen={isOpen}
-                onClose={closeModal}
-                mode={mode}
-                onSuccess={mutate}
-                selectedCategoryId={selectedCategoryId}
+      <>
+        <div className="mt-4 relative h-[90%]">
+          <div className="ml-auto flex gap-1 w-48 absolute z-10 right-0">
+            <Button
+              color="primary"
+              className="bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200"
+              onClick={() => openModal('create')}
+            >
+              등록
+            </Button>
+            <Button
+              color="destructive"
+              className="bg-destructive-150 text-destructive-700 font-semibold hover:bg-destructive-200"
+              onClick={handleDeleteSelected}
+            >
+              삭제
+            </Button>
+          </div>
+          {error && <StateInfoWrapper preset="defaultError" />}
+          {isLoading && <Skeleton className="w-full h-100" />}
+          {!isLoading && !error && categoryData && (
+            <DataTable
+              data={categoryData || []}
+              columns={columns}
+              pageSize={7}
+              selectable={true}
+              selectedRows={selectedCategories}
+              onSelectChange={setSelectedCategories}
+              showSearch={true}
+              filterFunction={(item, search) => {
+                const lowerSearch = search.toLowerCase();
+                return item.name.toLowerCase().includes(lowerSearch);
+              }}
             />
-        </>
+          )}
+        </div>
+        <CategoryModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          mode={mode}
+          onSuccess={mutate}
+          selectedCategoryId={selectedCategoryId}
+        />
+      </>
     );
 }

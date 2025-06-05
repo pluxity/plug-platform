@@ -92,24 +92,26 @@ export default function FacilitiesDetailPage() {
               <th className="border border-gray-300 p-2 bg-gray-50">노선</th>
               <td className="border border-gray-300 p-2">
                 <FormItem name="lineIds" required>
-                  <Select
-                    type="multiple"
-                    className="w-full mb-[-16px]"
-                    selected={formValues.lineIds}
-                    onChange={(value) => {
-                      const selectedValues = value || [];
-                      handleChange('lineIds', selectedValues);
-                    }}
-                  >
-                    <Select.Trigger />
-                    <Select.Content>
-                      {lines?.map((line) => (
-                        <Select.Item key={line.id} value={String(line.id)}>
-                          {line.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
+                  <>
+                    <Select
+                      type="multiple"
+                      className="w-full mb-[-16px]"
+                      selected={formValues.lineIds}
+                      onChange={(value) => {
+                        const selectedValues = value || [];
+                        handleChange('lineIds', selectedValues);
+                      }}
+                    >
+                      <Select.Trigger />
+                      <Select.Content>
+                        {lines?.map((line) => (
+                          <Select.Item key={line.id} value={String(line.id)}>
+                            {line.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  </>
                 </FormItem>
               </td>
               <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>

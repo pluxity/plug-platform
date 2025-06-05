@@ -83,7 +83,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
         if (mode === 'edit' && detailCategoryData) {
             try {
                 const category = await updateCategory({
-                    name: values.name || name,
+                    name: values.name || detailCategoryData.name,
                     contextPath: values.contextPath || detailCategoryData.contextPath,
                     iconFileId: uploadIconFileId || undefined,
                 });
