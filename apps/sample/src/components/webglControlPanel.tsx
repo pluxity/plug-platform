@@ -1,16 +1,22 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Model, Path3D, Poi, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
     selectedApiName: string;
     deletePoiId: string;
     setVisiblePoiId: string;
+    setLineVisiblePoiId: string;
+    setTextVisiblePoiId: string;
+    poiDisplayTextIdValue: string;
+    poiDisplayTextValue: string;
     moveToPoiIdValue: string;
     getAnimlistPoiIdValue: string;
     poiAnimNameValue: string;
     moveToFloorIdValue: string;
     backgroundImageUrl: string;
+    pathVisibleId: string;
+    subwayCreateBodyCount: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -33,11 +39,17 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             selectedApiName: 'None',
             deletePoiId: '',
             setVisiblePoiId: '',
+            setLineVisiblePoiId: '',
+            setTextVisiblePoiId: '',
+            poiDisplayTextIdValue: '',
+            poiDisplayTextValue: '',
             moveToPoiIdValue: '',
             moveToFloorIdValue: '',
             getAnimlistPoiIdValue: '',
             poiAnimNameValue: '',
             backgroundImageUrl: '',
+            pathVisibleId: '',
+            subwayCreateBodyCount: '',
             floorData: []
         };
 
@@ -96,6 +108,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create')}>Create</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(MonkeyHead.glb)')}>Create(MonkeyHead.glb)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(ScreenDoor.glb)')}>Create(ScreenDoor.glb)</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(head.glb)')}>Create(subway_train/head.glb)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.Create(body.glb)')}>Create(subway_train/body.glb)</button><br />
                     <input type='text' value={this.state.deletePoiId} onChange={this.onDeletePoiTextInputValueChanged.bind(this)} placeholder='제거할 Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Delete')}>Delete</button> &nbsp;
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Clear')}>Clear</button>
@@ -112,6 +126,23 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.Hide')}>Hide</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br /><br />
+
+                    <input type='text' value={this.state.setLineVisiblePoiId} onChange={this.onSetLineVisibleTextInputValueChanged.bind(this)} placeholder='Line Show/Hide Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowLine')}>Show Line</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideLine')}>Hide Line</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllLine')}>Show All Line</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllLine')}>Hide All Line</button><br /><br />
+
+                    <input type='text' value={this.state.setTextVisiblePoiId} onChange={this.onSetPoiTextVisibleInputValueChanged.bind(this)} placeholder='DisplayText Show/Hide Poi Id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowDisplayText')}>Show DisplayText</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideDisplayText')}>Hide DisplayText</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllDisplayText')}>Show All DisplayText</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllDisplayText')}>Hide All DisplayText</button><br /><br />
+
+                    <input type='text' value={this.state.poiDisplayTextIdValue} onChange={this.onPoiDisplayTextIdInputValueChanged.bind(this)} placeholder='표시명 변경할 poi id'></input>
+                    <input type='text' value={this.state.poiDisplayTextValue} onChange={this.onPoiDisplayTextInputValueChanged.bind(this)} placeholder='표시명 입력'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetDisplayText')}>SetDisplayText</button><br /><br />
+
                     <input type='text' value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br />
                     <input type='text' value={this.state.poiAnimNameValue} onChange={this.onAnimNameTextInputValueChanged.bind(this)} placeholder='Animation Name'></input>
@@ -128,7 +159,15 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Path.CreatePath')}>CreatePath</button>
                     <button onClick={() => Path3D.Cancel()}>Cancel</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Finish')}>Finish</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Export')}>Export</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Import')}>Import</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Clear')}>Clear</button><br />
+                    <input type='text' value={this.state.pathVisibleId} onChange={this.onPathVisibleInputValueChanged.bind(this)} placeholder='경로명'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.HideAll')}>HideAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Path.ShowAll')}>ShowAll</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Util') {
@@ -136,6 +175,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 <span>
                     <label htmlFor='bgColor'>색상으로 배경설정:</label><input id='bgColor' type='color' onChange={this.onBackgroundColorChange.bind(this)}></input><br />
                     <label htmlFor='bgImgUrl'>이미지Url로 배경설정:</label><input id="bgImgUrl" type="text" value={this.state.backgroundImageUrl} onChange={this.onBackgroundImageUrlChange.bind(this)}></input><button onClick={this.onApiBtnClick.bind(this, 'Util.SetBackgroundImage')}>설정</button><br />
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Subway') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainHead')}>LoadTrainHead</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button><br />
+
+                    <input type='text' value={this.state.subwayCreateBodyCount} onChange={this.onSubwayBodyCountInputValueChanged.bind(this)} placeholder='차량개수'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Create')}>Create</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Test') {
@@ -164,8 +213,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Camera'>Camera</option>
                         <option value='Model'>Model</option>
                         <option value='Poi'>Poi</option>
-                        <option value='Path'>Path(작업중)</option>
+                        <option value='Path'>Path</option>
                         <option value='Util'>Util</option>
+                        <option value='Subway'>Subway</option>
                         <option value='Test'>Test</option>
                     </select>
                     <br />
@@ -223,7 +273,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
 
                 console.log('Model.GetModelHierarchy -> ', data);
 
-                this.setState({ floorData: data as any }); // 얻은 층정보로 state 설정
+                this.setState({ floorData: data }); // 얻은 층정보로 state 설정
             } break;
 
             /**
@@ -237,6 +287,28 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Path.Finish': {
                 const pathData = Path3D.Finish();
                 console.log('Path3D.Finish -> ', pathData);
+            } break;
+            case 'Path.Export': {
+                const data = Path3D.Export();
+                console.log('Path3D.Export -> ', data);
+            } break;
+            case 'Path.Import': {
+                fetch('pathSampleData.json').then(res => res.json()).then(data => Path3D.Import(data));
+            } break;
+            case 'Path.Clear': {
+                Path3D.Clear();
+            } break;
+            case 'Path.Hide': {
+                Path3D.Hide(this.state.pathVisibleId);
+            } break;
+            case 'Path.Show': {
+                Path3D.Show(this.state.pathVisibleId);
+            } break;
+            case 'Path.HideAll': {
+                Path3D.HideAll();
+            } break;
+            case 'Path.ShowAll': {
+                Path3D.ShowAll();
             } break;
 
             /**
@@ -295,6 +367,42 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
             } break;
+            case 'Poi.Create(head.glb)': {
+                const id: string = window.crypto.randomUUID();
+                const iconUrl: string = 'SamplePoiIcon.png';
+                const displayText: string = id.substring(0, 8);
+                const property: { [key: string]: unknown } = {
+                    testText: '테스트 속성',
+                    testInt: 11,
+                    testFloat: 2.2
+                };
+
+                Poi.Create({
+                    id: id,
+                    iconUrl: iconUrl,
+                    displayText: displayText,
+                    modelUrl: 'subway_train/head.glb',
+                    property: property
+                }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
+            } break;
+            case 'Poi.Create(body.glb)': {
+                const id: string = window.crypto.randomUUID();
+                const iconUrl: string = 'SamplePoiIcon.png';
+                const displayText: string = id.substring(0, 8);
+                const property: { [key: string]: unknown } = {
+                    testText: '테스트 속성',
+                    testInt: 11,
+                    testFloat: 2.2
+                };
+
+                Poi.Create({
+                    id: id,
+                    iconUrl: iconUrl,
+                    displayText: displayText,
+                    modelUrl: 'subway_train/body.glb',
+                    property: property
+                }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
+            } break;
             case 'Poi.Delete': {
                 if (this.state.deletePoiId !== '') {
                     Poi.Delete(this.state.deletePoiId);
@@ -341,6 +449,33 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.HideAll': {
                 Poi.HideAll();
             } break;
+            case 'Poi.ShowLine': {
+                Poi.ShowLine(this.state.setLineVisiblePoiId);
+            } break;
+            case 'Poi.HideLine': {
+                Poi.HideLine(this.state.setLineVisiblePoiId);
+            } break;
+            case 'Poi.ShowAllLine': {
+                Poi.ShowAllLine();
+            } break;
+            case 'Poi.HideAllLine': {
+                Poi.HideAllLine();
+            } break;
+            case 'Poi.ShowDisplayText': {
+                Poi.ShowDisplayText(this.state.setTextVisiblePoiId);
+            } break;
+            case 'Poi.HideDisplayText': {
+                Poi.HideDisplayText(this.state.setTextVisiblePoiId);
+            } break;
+            case 'Poi.ShowAllDisplayText': {
+                Poi.ShowAllDisplayText();
+            } break;
+            case 'Poi.HideAllDisplayText': {
+                Poi.HideAllDisplayText();
+            } break;
+            case 'Poi.SetDisplayText': {
+                Poi.SetDisplayText(this.state.poiDisplayTextIdValue, this.state.poiDisplayTextValue);
+            } break;
             case 'Poi.GetAnimationList': {
                 const data = Poi.GetAnimationList(this.state.getAnimlistPoiIdValue);
                 console.log('Poi.GetAnimationList', data);
@@ -366,6 +501,24 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              */
             case 'Util.SetBackgroundImage': {
                 Util.SetBackground(this.state.backgroundImageUrl);
+            } break;
+
+            /**
+             * Subway
+             */
+            case 'Subway.LoadTrainHead': {
+                Subway.LoadTrainHead('/subway_train/head.glb', () => console.log('지하철 머리 모델 로드 완료'));
+            } break;
+            case 'Subway.LoadTrainBody': {
+                Subway.LoadTrainBody('/subway_train/body.glb', () => console.log('지하철 몸체 모델 로드 완료'));
+            } break;
+            case 'Subway.Create': {
+                const id = window.crypto.randomUUID();
+                const bodyCount = Number.parseInt(this.state.subwayCreateBodyCount);
+                Subway.Create({
+                    id: id,
+                    bodyCount: bodyCount
+                }, () => console.log('지하철 생성 완료'));
             } break;
 
             /**
@@ -458,6 +611,38 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     }
 
     /**
+     * poi 선 가시화 설정 텍스트 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSetLineVisibleTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ setLineVisiblePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 표시명 텍스트 가시화 설정 텍스트 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSetPoiTextVisibleInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ setTextVisiblePoiId: evt.target.value });
+    }
+
+    /**
+     * poi 표시명 텍스트 변경 id입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPoiDisplayTextIdInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ poiDisplayTextIdValue: evt.target.value });
+    }
+
+    /**
+     * poi 표시명 텍스트 변경 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPoiDisplayTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ poiDisplayTextValue: evt.target.value });
+    }
+
+    /**
      * poi 애니메이션 얻기 입력창 값변경 처리
      * @param evt - 이벤트 정보
      */
@@ -488,6 +673,22 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onBackgroundImageUrlChange(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ backgroundImageUrl: evt.target.value });
+    }
+
+    /**
+     * 경로 가시화 설정 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPathVisibleInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ pathVisibleId: evt.target.value });
+    }
+
+    /**
+     * 지하철 생성 차량 개수 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSubwayBodyCountInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ subwayCreateBodyCount: evt.target.value });
     }
 
     /**

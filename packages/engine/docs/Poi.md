@@ -1,7 +1,7 @@
 [목록으로](../readme.md)
 ============
 Poi
-=============
+============
 ## Px.Poi.Create(option: [PoiCreateOption](./Interfaces.md#PoiCreateOption), onComplete?: Function)
 - option: 생성 옵션
 - onComplete: 생성 완료 후 호출될 콜백 함수
@@ -141,6 +141,66 @@ Px.Poi.Show('TestPoi');
 - 모든 poi를 가시화 한다.
 ```javascript
 Px.Poi.ShowAll();
+```
+
+## Px.Poi.HideLine(id: string)
+- id: 선을 숨길 poi id값
+- id에 해당하는 poi의 선을 숨김
+```javascript
+Px.Poi.HideLine('TestPoi');
+```
+
+## Px.Poi.HideAllLine()
+- 모든 poi의 선을 숨김
+```javascript
+Px.Poi.HideAllLine();
+```
+
+## Px.Poi.ShowLine(id: string)
+- id: 선을 가시화할 poi id값
+- id에 해당하는 poi의 선을 가시화
+```javascript
+Px.Poi.ShowLine('TestPoi');
+```
+
+## Px.Poi.ShowAllLine()
+- 모든 poi의 선을 가시화
+```javascript
+Px.Poi.ShowAllLine();
+```
+
+## HideDisplayText(id: string)
+- id: 표시명 텍스트를 숨길 poi id값
+- id에 해당하는 poi의 표시명 텍스트를 숨김
+```javascript
+Px.Poi.HideDisplayText('TestPoi');
+```
+
+## HideAllDisplayText()
+- 모든 표시명 텍스트 숨김처리
+```javascript
+Px.Poi.HideAllDisplayText();
+```
+
+## ShowDisplayText(id: string)
+- id: 표시명 텍스트를 가시화할 poi id값
+- id에 해당하는 poi의 표시명 텍스트를 가시화
+```javascript
+Px.Poi.ShowDisplayText('TestPoi');
+```
+
+## ShowAllDisplayText()
+- 모든 표시명 텍스트 가시화
+```javascript
+Px.Poi.ShowAllDisplayText();
+```
+
+## SetDisplayText(id: string, text: string)
+- id: 표시명을 변경할 poi id값
+- text: 변경할 텍스트 문자열
+- poi의 표시명 텍스트(displayText)를 설정한다.
+```javascript
+Px.Poi.SetDisplayText('TestPoi', '변경된텍스트');
 ```
 
 ## Px.Poi.GetAnimationList()

@@ -1,5 +1,27 @@
 import './placer';
 import './poipointerevents';
-export { Export, ExportAll, Import, Delete, Clear, Show, Hide, ShowAll, HideAll, GetAnimationList, PlayAnimation, StopAnimation } from './data';
+export {
+    Clear,
+    Delete,
+    Export,
+    ExportAll,
+    GetAnimationList,
+    Hide,
+    HideAll,
+    HideAllDisplayText,
+    HideAllLine,
+    HideDisplayText,
+    HideLine,
+    Import,
+    PlayAnimation,
+    SetDisplayText,
+    Show,
+    ShowAll,
+    ShowAllDisplayText,
+    ShowAllLine,
+    ShowDisplayText,
+    ShowLine,
+    StopAnimation
+} from './data';
 export * from './create';
-export { StartEdit, FinishEdit } from './edit';
+export { StartEdit, FinishEdit } from './edit';``
