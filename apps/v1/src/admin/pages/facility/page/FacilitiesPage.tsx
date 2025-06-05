@@ -67,7 +67,7 @@ export default function FacilitiesPage() {
                             >
                                 <div className="w-full h-[150px] bg-gray-100 rounded-t-lg overflow-hidden">
                                     <img
-                                        src={station.facility?.thumbnail?.url ?? ""}
+                                        src={station.facility?.thumbnail?.url ?? null}
                                         alt={station.facility?.name}
                                         className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
                                     />

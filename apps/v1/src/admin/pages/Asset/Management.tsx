@@ -1,6 +1,6 @@
 import {Button, DataTable, Skeleton} from '@plug/ui';
 import {columns} from './constants/assetColumns';
-import {AssetRegistModal} from '../../components/modals/AssetRegist';
+import {AssetRegistModal} from './components/AssetModal';
 import {useModal} from '../../components/hook/useModal';
 import {useAssetsSWR, deleteAsset} from '@plug/common-services';
 import {useAsset} from './utils/useAsset';

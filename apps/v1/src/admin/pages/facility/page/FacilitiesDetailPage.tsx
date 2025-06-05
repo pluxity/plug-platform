@@ -168,15 +168,19 @@ export default function FacilitiesDetailPage() {
             <tr>
               <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
               <td rowSpan={2}>
-              {station.facility.thumbnail?.url && (
-                  <div className="w-full overflow-hidden p-2.5" >
-                    <img
-                        src={station.facility.thumbnail.url}
-                        alt="썸네일 이미지"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+                {fileStates.thumbnail.file ? (
+                  <img
+                    src={URL.createObjectURL(fileStates.thumbnail.file)}
+                    alt="썸네일 이미지"
+                    className="w-full h-full object-cover"
+                  />
+                ) : station.facility.thumbnail?.url && (
+                  <img
+                    src={station.facility.thumbnail.url}
+                    alt="썸네일 이미지"
+                    className="w-full h-full object-cover"
+                  />
+                )}
                 </td>
                 <th className="border border-gray-300 p-2 bg-gray-50">썸네일 파일</th>
                 <td className="border border-gray-300 p-2">

@@ -203,9 +203,6 @@ importers:
 
   packages/api-hooks:
     dependencies:
-      '@plug/v1':
-        specifier: workspace:*
-        version: link:../../apps/v1
       react:
         specifier: ^19.0.0
         version: 19.1.0

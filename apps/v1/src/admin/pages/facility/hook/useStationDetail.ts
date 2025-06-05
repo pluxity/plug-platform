@@ -60,8 +60,8 @@ export const useStationDetail = (stationId: string) => {
     const updateStationData = (stationData: StationDetail) => {
         setStation(stationData);
         setFormValues({
-            name: stationData.facility.name,
-            description: stationData.facility.description,
+            name: stationData.facility.name || '',
+            description: stationData.facility.description || '',
             code: stationData.facility.code || '',
             lineIds: stationData.lineIds.map(String),
             updatedBy: stationData.facility.updatedBy,
