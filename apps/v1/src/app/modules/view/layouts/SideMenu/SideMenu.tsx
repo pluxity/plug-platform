@@ -3,6 +3,7 @@ import { api } from '@plug/api-hooks/core';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import MenuItem from './MenuItem';
 import DevicePanel from './DevicePanel';
+import { Tooltip } from '@plug/ui';
 
 interface DeviceData {
   id: string;
@@ -83,25 +84,38 @@ const SideMenu: React.FC = () => {
 
   return (
     <>
-      <div className={`fixed left-0 top-16 bottom-0 w-16 bg-primary-400/20 backdrop-blur-xs flex flex-col items-center pt-4 px-2 z-10`}>
-        <div className="overflow-y-auto flex-1 mt-2">        
+      <div
+        className={`fixed left-0 top-16 bottom-0 w-16 bg-primary-400/20 backdrop-blur-xs flex flex-col items-center pt-4 px-2 z-10`}
+      >
+        <div className="flex-1 mt-2">
           {menuItems.map((item) => (
-             <MenuItem
+            <Tooltip
               key={item.id}
-              id={item.id}
-              icon={item.icon}
-              isActive={activeMenu?.id === item.id}
-              onClick={handleMenuItemClick}
-           />
+              position="right"
+              trigger="hover"
+              className="z-50 block"
+            >
+              <Tooltip.Trigger className="w-full" >
+                <MenuItem
+                  id={item.id}
+                  icon={item.icon}
+                  isActive={activeMenu?.id === item.id}
+                  onClick={handleMenuItemClick}
+                />
+              </Tooltip.Trigger>
+              <Tooltip.Content className='bg-primary-800 after:bg-primary-800'>{item.name}</Tooltip.Content>
+            </Tooltip>
+
           ))}
         </div>
-      </div>      {isDevicePanelOpen && activeMenu && (
-        <DevicePanel 
-          categoryId={activeMenu.id} 
-          categoryName={activeMenu.name} 
+      </div>{' '}
+      {isDevicePanelOpen && activeMenu && (
+        <DevicePanel
+          categoryId={activeMenu.id}
+          categoryName={activeMenu.name}
           categoryType={activeMenu.type}
           devices={activeMenu.devices}
-          onClose={closeDevicePanel} 
+          onClose={closeDevicePanel}
         />
       )}
     </>
