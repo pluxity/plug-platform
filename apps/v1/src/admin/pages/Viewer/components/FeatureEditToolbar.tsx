@@ -63,20 +63,26 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
       return;
     }
     
-    // 단축키 처리 (T, R, S, D)
-    switch (event.key.toLowerCase()) {
-      case 't':
-        onTranslateMode();
-        break;
-      case 'r':
-        onRotateMode();
-        break;
-      case 's':
-        onScaleMode();
-        break;
-      case 'd':
-        onDeleteMode();
-        break;
+    // Ctrl + 키 조합으로 단축키 처리
+    if (event.ctrlKey) {
+      switch (event.key.toLowerCase()) {
+        case 't':
+          event.preventDefault(); // 브라우저 기본 동작 방지
+          onTranslateMode();
+          break;
+        case 'r':
+          event.preventDefault(); // 브라우저 새로고침 방지
+          onRotateMode();
+          break;
+        case 's':
+          event.preventDefault(); // 브라우저 저장 방지
+          onScaleMode();
+          break;
+        case 'd':
+          event.preventDefault(); // 브라우저 북마크 추가 방지
+          onDeleteMode();
+          break;
+      }
     }
   }, [currentMode, onExitEdit, onTranslateMode, onRotateMode, onScaleMode, onDeleteMode]);
 
@@ -92,28 +98,28 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
     {
       mode: 'translate',
       label: '이동',
-      title: '이동 모드 (T키)',
+      title: '이동 모드 (Ctrl+T)',
       icon: <MoveIcon />,
       onClick: onTranslateMode
     },
     {
       mode: 'rotate', 
       label: '회전',
-      title: '회전 모드 (R키)',
+      title: '회전 모드 (Ctrl+R)',
       icon: <RotateIcon />,
       onClick: onRotateMode
     },
     {
       mode: 'scale',
       label: '크기',
-      title: '크기조절 모드 (S키)',
+      title: '크기조절 모드 (Ctrl+S)',
       icon: <ScaleIcon />,
       onClick: onScaleMode
     },
     {
       mode: 'delete',
       label: '삭제',
-      title: '삭제 모드 (D키)',
+      title: '삭제 모드 (Ctrl+D)',
       icon: <DeleteIcon />,
       onClick: onDeleteMode
     }

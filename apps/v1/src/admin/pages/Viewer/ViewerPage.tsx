@@ -251,7 +251,10 @@ const ViewerPage = memo(() => {
   }
 
   if (!stationData) {
-    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;  }  return (
+    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;  
+  }  
+  
+  return (
     <ErrorBoundary>
       <ViewerContent
         stationData={stationData}

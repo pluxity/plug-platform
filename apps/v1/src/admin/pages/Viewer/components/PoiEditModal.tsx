@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
-import { Modal, Form, FormItem, Input, Button } from '@plug/ui';
+import { useCallback, useState, useEffect } from 'react';
+import { Modal, Form, FormItem, Button, Select } from '@plug/ui';
 import { useFeatureApi } from '../hooks';
+import { useDevicesSWR } from '@plug/common-services';
 import * as Px from '@plug/engine/src';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
@@ -14,18 +15,45 @@ interface PoiEditModalProps {
 
 export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalProps) {
   const { assignDevice } = useFeatureApi();
+  const { data: devices } = useDevicesSWR();
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>(poi?.property?.code || '');
 
   const addToast = useToastStore((state) => state.addToast);
 
-  const handleSubmit = useCallback(async (values: Record<string, string>) => {
+  // poi가 변경될 때마다 selectedDeviceId 업데이트
+  useEffect(() => {
+    setSelectedDeviceId(poi?.property?.code || '');
+  }, [poi]);  const handleSubmit = useCallback(async () => {
     if (!poi) return;
     
     try {
-      const id = values.id || poi.property?.id;
-      await assignDevice(poi.id, id);
-      Px.Poi.SetDisplayText(poi.id, id || '장비 할당 완료');
+      // selectedDeviceId 상태값 사용
+      const deviceId = selectedDeviceId;
+      if (!deviceId) {
+        addToast({
+          variant: 'critical',
+          title: '장비 선택 필요',
+          placement: 'center',
+          description: '할당할 장비를 선택해주세요.'
+        });
+        return;
+      }
+      
+      await assignDevice(poi.id, deviceId);
+      
+      // 선택된 장비 정보 찾기
+      const selectedDevice = devices?.find(device => device.id === deviceId);
+      const displayText = selectedDevice?.id || deviceId;
+      
+      Px.Poi.SetDisplayText(poi.id, displayText);
       onSuccess?.();
       onClose();
+        addToast({
+        variant: 'normal',
+        title: '장비 할당 완료',
+        placement: 'center',
+        description: `${displayText} 장비가 성공적으로 할당되었습니다.`
+      });
     } catch (error) {
       addToast({
           variant: 'critical',
@@ -33,9 +61,8 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
           placement: 'center',
           description: error instanceof Error ? error.message : '장비 할당 중 오류가 발생했습니다.'
       });
-      // console.error('Failed to update device code:', error);
     }
-  }, [poi, assignDevice, onSuccess, onClose, addToast]);
+  }, [poi, assignDevice, onSuccess, onClose, addToast, devices, selectedDeviceId]);
 
   if (!poi) return null;
 
@@ -44,15 +71,34 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
       isOpen={isOpen}
       onClose={onClose}
       title={poi.displayText || 'Feature'}
-    >
-      <Form
+      contentClassName={'h-full max-h-100 overflow-y-hidden'}
+    >      
+    <Form
         initialValues={{
-          code: poi.property?.code || ''
+          deviceId: poi.property?.code || ''
         }}
         onSubmit={handleSubmit}
-      >
-        <FormItem name="id" label="장비 ID" required>
-          <Input.Text placeholder={poi.displayText ?? "장비 ID를 입력하세요"} />
+        className={'flex flex-col justify-between h-full'}
+      >        
+      <FormItem name="deviceId" label="할당할 장비" required>
+          <div>
+            <Select 
+              selected={selectedDeviceId ? [selectedDeviceId] : []} 
+              onChange={(values: string[]) => {
+                const deviceId = values[0];
+                setSelectedDeviceId(deviceId || '');
+              }}
+            >
+              <Select.Trigger />
+              <Select.Content>
+                {devices?.map((device) => (
+                  <Select.Item key={device.id} value={device.id}>
+                    {device.name} ({device.id})
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+          </div>
         </FormItem>
         <Button type="submit" color="primary">
           적용

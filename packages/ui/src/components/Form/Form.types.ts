@@ -9,6 +9,7 @@ export interface FormProps<T extends FormValues> {
   children: ReactNode
   onSubmit: (values: T) => void
   initialValues?: T
+  className?: string
   validate?: (values: T) => Partial<Record<keyof T, string>>
 }
 
