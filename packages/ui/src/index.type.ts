@@ -8,6 +8,7 @@ export type { TabProps } from './components/Tab';
 export type { CardProps } from './components/Card';
 export type { BadgeProps } from './components/Badge';
 export type { CheckboxProps } from './components/Checkbox';
+export type { ConfirmModalProps } from './components/ConfirmModal';
 export type { SkeletonProps } from './components/Skeleton';
 export type { SliderProps } from './components/Slider';
 export type { SwitchProps } from './components/Switch';
