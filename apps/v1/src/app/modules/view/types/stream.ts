@@ -1,4 +1,5 @@
 export interface TrainData {
+  messageNumber: number;
   opCode: string;
   time: {
     year: string;
@@ -11,5 +12,6 @@ export interface TrainData {
   arrivalStationName: string;
   trainDirection: string;
   thisTrainNumber: string;
+  nextTrainNumber: string,
   lineNumber?: string;
 }
