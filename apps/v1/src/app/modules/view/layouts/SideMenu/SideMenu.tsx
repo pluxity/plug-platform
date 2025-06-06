@@ -103,7 +103,7 @@ const SideMenu: React.FC = () => {
                   onClick={handleMenuItemClick}
                 />
               </Tooltip.Trigger>
-              <Tooltip.Content className='bg-primary-800 after:bg-primary-800'>{item.name}</Tooltip.Content>
+              <Tooltip.Content className='bg-white after:bg-primary-800 border border-1-primary-900 text-primary-900 backdrop-blur-sm rounded-md shadow-lg font-bold'>{item.name}</Tooltip.Content>
             </Tooltip>
 
           ))}
