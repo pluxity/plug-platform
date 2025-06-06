@@ -2,13 +2,14 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useCallback } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
-
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
+import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/types/stream';
+import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 
 const ViewerPage = () => {
     const { code } = useParams<{ code: string }>();
@@ -19,8 +20,9 @@ const ViewerPage = () => {
 
     const { stationData, stationLoading, error } = useStationData(parsedCode);
     const { floorItems, modelPath } = useFloorData(stationData);
+  const { setTtcData, setEventData, setShutterData } = useEventStore();
 
-    const handleLoadError = useCallback((loadError: Error) => {
+  const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
     }, []);    
     
@@ -45,7 +47,50 @@ const ViewerPage = () => {
         fetchAssets();
     }, [fetchAssets]);
 
-    if (error && !stationLoading) {
+  useEffect(() => {
+    const eventSource = new EventSource('/api/sse');
+
+    eventSource.addEventListener('ttc-data', (event) => {
+      const data = JSON.parse(event.data) as TrainData[];
+      const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
+      if (filteredData.length > 0) {
+        setTtcData(filteredData);
+        console.log('ttc-data', filteredData);
+      }
+    });
+
+    eventSource.addEventListener('event', (event) => {
+      const data = JSON.parse(event.data) as EventData[];
+      if (data.length > 0) {
+        setEventData(data);
+        console.log('event-data', data);
+      }
+    });
+
+    eventSource.addEventListener('shutter', (event) => {
+      const data = JSON.parse(event.data) as ShutterData[];
+      if (data.length > 0) {
+        setShutterData(data);
+        console.log('event2-data', data);
+      }
+    });
+
+
+    eventSource.onerror = (err) => {
+      console.error('SSE 에러:', err);
+    };
+
+    return () => {
+      console.log('SSE 연결 종료');
+      eventSource.close();
+    };
+  }, []);
+
+  const eventData = useEventStore(state => state.eventData);
+  const shutterData = useEventStore(state => state.shutterData);
+  console.log('eventData', eventData, 'shutterData', shutterData);
+
+  if (error && !stationLoading) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <div className="text-red-500 text-xl">

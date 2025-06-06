@@ -1,9 +1,9 @@
 import React from 'react';
 import {Button} from '@plug/ui';
 import {Outlet, Link} from 'react-router-dom';
-import {useProfileStore} from "@plug/v1/common/auth/controller/useProfileStore";
-import {logOut} from "@plug/v1/common/auth/api/auth";
 import {ToastContainer} from "@plug/v1/admin/components/toast/ToastContainer";
+import { useProfileStore } from '@plug/v1/common/auth/controller/useProfileStore';
+import { logOut } from '@plug/v1/common/auth/api/auth';
 
 const AdminLayout = () => {
     const user = useProfileStore((state) => state.user);

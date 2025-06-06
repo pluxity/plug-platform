@@ -1,4 +1,3 @@
-import UserProfile from "@plug/v1/app/modules/view/layouts/Header/UserProfile";
 import TimeDisplay from "./TimeDisplay";
 import HeaderEnvInfo from "./HeaderEnvInfo";
 import { useParams } from 'react-router-dom';
@@ -24,7 +23,6 @@ const Header = () => {
             
             <div className="flex items-center gap-4">
                 <HeaderEnvInfo stationId={parsedStationId} />
-                <UserProfile />
             </div>        
         </header>
     );
