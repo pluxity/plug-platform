@@ -34,6 +34,7 @@ const MapViewer = ({ modelPath, onModelLoaded }: MapViewerProps) => {
             try {
                 Px.Loader.LoadGltf(modelPath, () => {
                     isModelLoadedRef.current = true;
+                    Px.Poi.HideAllLine();
                     onModelLoaded?.();
                 });
             } catch (error) {

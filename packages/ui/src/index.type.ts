@@ -21,6 +21,7 @@ export type { DropdownProps } from './components/Dropdown';
 export type { SelectProps } from './components/Select';
 export type { ComboBoxProps } from './components/ComboBox';
 export type { FormProps } from './components/Form';
+export type { ToastProps, ToastPlacement } from './components/Toast';
 
 // chart.js 타입 내보내기
 export type { ChartData, ChartOptions } from 'chart.js';

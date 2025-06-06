@@ -2,12 +2,13 @@ import { useCallback, useMemo } from 'react';
 import { api } from '@plug/api-hooks';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 
-export interface UsePoiApiResult {
+export interface UseFeatureApiResult {
   assignDevice: (featureId: string, deviceId: string) => Promise<void>;
   updateTransform: (featureId: string, transform: Partial<Pick<PoiImportOption, 'position' | 'rotation' | 'scale'>>) => Promise<void>;
+  deleteFeature: (featureId: string) => Promise<void>;
 }
 
-export function usePoiApi(): UsePoiApiResult {
+export function useFeatureApi(): UseFeatureApiResult {
   const assignDevice = useCallback(async (featureId: string, deviceId: string) => {
     try {
       await api.put(`features/${featureId}/assign-device`, { id: deviceId });
@@ -16,7 +17,6 @@ export function usePoiApi(): UsePoiApiResult {
       throw error;
     }
   }, []);
-
   const updateTransform = useCallback(async (
     featureId: string,
     transform: Partial<Pick<PoiImportOption, 'position' | 'rotation' | 'scale'>>
@@ -29,8 +29,18 @@ export function usePoiApi(): UsePoiApiResult {
     }
   }, []);
 
+  const deleteFeature = useCallback(async (featureId: string) => {
+    try {
+      await api.delete(`features/${featureId}`);
+    } catch (error) {
+      console.error('Error deleting feature:', error);
+      throw error;
+    }
+  }, []);
+
   return useMemo(() => ({
     assignDevice,
     updateTransform,
-  }), [assignDevice, updateTransform]);
+    deleteFeature,
+  }), [assignDevice, updateTransform, deleteFeature]);
 }

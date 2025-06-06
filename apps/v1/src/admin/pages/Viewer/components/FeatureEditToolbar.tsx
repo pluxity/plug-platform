@@ -1,12 +1,13 @@
 import { useEffect, useCallback, memo, ReactElement } from 'react';
 import { Button } from "@plug/ui";
 
-type EditMode = 'translate' | 'rotate' | 'scale' | 'none';
+type EditMode = 'translate' | 'rotate' | 'scale' | 'delete' | 'none';
 
 interface FeatureEditToolbarProps {
   onTranslateMode: () => void;
   onRotateMode: () => void;
   onScaleMode: () => void;
+  onDeleteMode: () => void;
   onExitEdit: () => void;
   currentMode: EditMode;
 }
@@ -40,20 +41,44 @@ const ScaleIcon = () => (
   </svg>
 );
 
+const DeleteIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" 
+          fill="currentColor"/>
+  </svg>
+);
+
 const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
   onTranslateMode,
   onRotateMode,
   onScaleMode,
+  onDeleteMode,
   onExitEdit,
   currentMode
 }) => {
-  
-  // ESC 키 핸들링을 위한 이벤트 리스너
+    // 키보드 단축키 핸들링을 위한 이벤트 리스너
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === 'Escape' && currentMode !== 'none') {
       onExitEdit();
+      return;
     }
-  }, [currentMode, onExitEdit]);
+    
+    // 단축키 처리 (T, R, S, D)
+    switch (event.key.toLowerCase()) {
+      case 't':
+        onTranslateMode();
+        break;
+      case 'r':
+        onRotateMode();
+        break;
+      case 's':
+        onScaleMode();
+        break;
+      case 'd':
+        onDeleteMode();
+        break;
+    }
+  }, [currentMode, onExitEdit, onTranslateMode, onRotateMode, onScaleMode, onDeleteMode]);
 
   // 키보드 이벤트 등록/해제
   useEffect(() => {
@@ -62,7 +87,6 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
-
   // 툴바 버튼 설정을 배열로 정의 (데이터 기반 렌더링)
   const toolbarButtons: ToolbarButton[] = [
     {
@@ -85,6 +109,13 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
       title: '크기조절 모드 (S키)',
       icon: <ScaleIcon />,
       onClick: onScaleMode
+    },
+    {
+      mode: 'delete',
+      label: '삭제',
+      title: '삭제 모드 (D키)',
+      icon: <DeleteIcon />,
+      onClick: onDeleteMode
     }
   ];
 
@@ -97,8 +128,7 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
     return currentMode === mode 
       ? `${baseClasses} ${activeClasses}`
       : `${baseClasses} ${inactiveClasses}`;
-  }, [currentMode]);
-  // 현재 모드에 따른 상태 메시지
+  }, [currentMode]);  // 현재 모드에 따른 상태 메시지
   const getModeMessage = () => {
     switch (currentMode) {
       case 'translate':
@@ -107,6 +137,8 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
         return '회전 모드 활성화 중 - 객체를 드래그하여 회전시키세요';
       case 'scale':
         return '크기조절 모드 활성화 중 - 객체를 드래그하여 크기를 조절하세요';
+      case 'delete':
+        return '삭제 모드 활성화 중 - 삭제할 객체를 클릭하세요';
       default:
         return null;
     }
@@ -136,20 +168,31 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
                     ))}        
                 </div>
             </div>
-            
-            {/* 편집 모드 상태 표시 */}
+              {/* 편집 모드 상태 표시 */}
             {isEditingActive && (
-                <div className="absolute top-32 right-4 mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg shadow-sm animate-pulse">
+                <div className={`absolute top-32 right-4 mb-2 p-3 border rounded-lg shadow-sm animate-pulse ${
+                  currentMode === 'delete' 
+                    ? 'bg-red-50 border-red-200' 
+                    : 'bg-blue-50 border-blue-200'
+                }`}>
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                        <span className="text-sm font-medium text-blue-800">
-                        편집 모드 활성화
+                        <div className={`w-2 h-2 rounded-full animate-ping ${
+                          currentMode === 'delete' ? 'bg-red-500' : 'bg-blue-500'
+                        }`}></div>
+                        <span className={`text-sm font-medium ${
+                          currentMode === 'delete' ? 'text-red-800' : 'text-blue-800'
+                        }`}>
+                        {currentMode === 'delete' ? '삭제 모드 활성화' : '편집 모드 활성화'}
                         </span>
                     </div>
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className={`text-xs mt-1 ${
+                      currentMode === 'delete' ? 'text-red-600' : 'text-blue-600'
+                    }`}>
                         {getModeMessage()}
                     </p>
-                    <p className="text-xs text-blue-500 mt-1">
+                    <p className={`text-xs mt-1 ${
+                      currentMode === 'delete' ? 'text-red-500' : 'text-blue-500'
+                    }`}>
                         ESC 키를 눌러 편집 모드를 종료하세요
                     </p>
                 </div>
