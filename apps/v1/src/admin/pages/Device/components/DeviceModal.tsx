@@ -73,7 +73,7 @@ export const DeviceModal = ({
             try {
                 const device = await createDevice({
                     name: values.name,
-                    id: values.code,
+                    id: values.id,
                     deviceCategoryId: Number(values.categoryId)
                 });
 

@@ -35,13 +35,13 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
     // 파일 업로드 훅
     const {execute: uploadFile, isLoading: isFileUploading, error: fileError} = useFileUpload();
 
-    // 자산 생성 훅
+    // 에셋 생성 훅
     const {execute: createAsset, isLoading: isAssetCreating, error: assetError} = useAssetCreate();
 
-    // 자산 상세 조회 훅
+    // 에셋 상세 조회 훅
     const {data: detailAssetData} = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
 
-    // 자산 수정 훅
+    // 에셋 수정 훅
     const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError} = useAssetUpdate(Number(selectedAssetId));
 
     // 3D 모델 파일 선택 핸들러
@@ -87,18 +87,16 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             .finally(() => {
                 setIsUploading(false);
             });
-    }, [uploadFile, name, addToast]);
-
-    // Thumbnail 파일 선택 핸들러
+    }, [uploadFile, name, addToast]);    // Thumbnail 파일 선택 핸들러
     const handleThumbnailChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        // PNG 파일 체크 추가
-        if (!file.type.includes('image/png')) {
+        // 이미지 파일 체크 (JPEG, JPG, PNG, WebP, GIF 등)
+        if (!file.type.startsWith('image/')) {
             addToast({
                 title: '파일 형식 오류',
-                description: 'PNG 파일만 업로드 가능합니다.',
+                description: '이미지 파일만 업로드 가능합니다. (JPEG, JPG, PNG, WebP, GIF 등)',
                 variant: 'warning'
             });
             return;
@@ -107,10 +105,8 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
         setThumbnailFile(file);
 
         // 파일이 선택되면 자동으로 업로드 시작
-        setIsUploading(true);
-
-        // 올바른 MIME 타입으로 FormData 생성
-        const formData = createFileFormData(file, 'image/png');
+        setIsUploading(true);        // 올바른 MIME 타입으로 FormData 생성
+        const formData = createFileFormData(file, file.type);
         uploadFile(formData)
             .then(response => {
                 if (response && response.fileId) {
@@ -169,7 +165,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 if (asset) {
                     addToast({
                         title: '수정 완료',
-                        description: '아이콘이 성공적으로 수정되었습니다.',
+                        description: '에셋이 성공적으로 수정되었습니다.',
                         variant: 'normal'
                     });
                     resetForm();
@@ -177,10 +173,10 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 }
 
             } catch (error) {
-                console.error('아이콘 수정 실패:', error);
+                console.error('에셋 수정 실패:', error);
                 addToast({
                     title: '수정 실패',
-                    description: error instanceof Error ? error.message : '아이콘 수정에 실패했습니다.',
+                    description: error instanceof Error ? error.message : '에셋 수정에 실패했습니다.',
                     variant: 'critical'
                 });
             }
@@ -196,7 +192,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             }
 
             try {
-                // 자산 생성 API 호출
+                // 에셋 생성 API 호출
                 const asset = await createAsset({
                     name: values.assetRegistName || name,
                     code: values.assetCode || '',
@@ -208,17 +204,17 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 if (asset) {
                     addToast({
                         title: '등록 완료',
-                        description: '아이콘이 성공적으로 등록되었습니다.',
+                        description: '에셋이 성공적으로 등록되었습니다.',
                         variant: 'normal'
                     });
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
             } catch (error) {
-                console.error('아이콘 등록 실패:', error);
+                console.error('에셋 등록 실패:', error);
                 addToast({
                     title: '등록 실패',
-                    description: error instanceof Error ? error.message : '아이콘 등록에 실패했습니다.',
+                    description: error instanceof Error ? error.message : '에셋 등록에 실패했습니다.',
                     variant: 'critical'
                 });
             }
@@ -240,7 +236,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
 
     return (
         <Modal
-            title={mode === 'create' ? 'ASSET 등록' : 'ASSET 수정'}
+            title={mode === 'create' ? '에셋 등록' : '에셋 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
             closeOnOverlayClick={false}
@@ -270,34 +266,32 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 )}
                 <FormItem name="assetRegistName" label='이름' required>
                     <Input.Text
-                        placeholder="자산 이름을 입력하세요"
+                        placeholder="에셋 이름을 입력하세요"
                         value={name}
                         onChange={value => setName(value)}
                     />
                 </FormItem>
                 <FormItem name="assetCode" label='코드' required>
                     <Input.Text
-                        placeholder="자산 코드를 입력하세요"
+                        placeholder="에셋 코드를 입력하세요"
                         value={name}
                         onChange={value => setName(value)}
                     />
                 </FormItem>
 
                 <FormItem name="assetRegistThumbnail" label='Thumbnail 파일' required>
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
-                        <input
+                    <div className="border-2 border-dashed border-gray-300 rounded-md p-4">                        <input
                             type="file"
                             id="thumbnail-file"
                             className="hidden"
                             onChange={handleThumbnailChange}
-                            accept=".png"
+                            accept="image/*"
                         />
 
-                        {!thumbnailFile ? (
-                            <div className="flex items-center">
+                        {!thumbnailFile ? (                            <div className="flex items-center">
                                 {mode === 'edit' && detailAssetData
                                     ? <p className="flex-1 text-sm">{detailAssetData.thumbnailFile.originalFileName}</p>
-                                    : <p className="flex-1 text-sm text-gray-500">PNG 파일만 가능합니다.</p>
+                                    : <p className="flex-1 text-sm text-gray-500">이미지 파일만 가능합니다. (JPEG, JPG, PNG, WebP, GIF 등)</p>
                                 }
                                 <Button
                                     type="button"

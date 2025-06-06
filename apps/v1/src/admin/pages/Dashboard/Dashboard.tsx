@@ -22,7 +22,7 @@ const Dashboard = () => {
                                 toggleable: false,
                             },
                             {
-                                title: '자산 관리',
+                                title: '에셋 관리',
                                 link: 'asset/management',
                                 toggleable: false,
                             },
