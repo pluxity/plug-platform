@@ -1,15 +1,14 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
-
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
-import useStreamStore from '@plug/v1/app/stores/streamStore';
+import { TrainData } from '@plug/v1/app/modules/view/types/stream';
 
 const ViewerPage = () => {
     const { code } = useParams<{ code: string }>();
@@ -20,7 +19,6 @@ const ViewerPage = () => {
 
     const { stationData, stationLoading, error } = useStationData(parsedCode);
     const { floorItems, modelPath } = useFloorData(stationData);
-    const setStreamData = useStreamStore(state => state.setStreamData);
 
   const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
@@ -50,11 +48,23 @@ const ViewerPage = () => {
   useEffect(() => {
     const eventSource = new EventSource('/api/ttc/connect-stream');
 
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setStreamData(data);
+    eventSource.addEventListener('ttc-data', (event) => {
+      const data = JSON.parse(event.data) as TrainData[];
+      data.filter(d => d.arrivalStationCode === parsedCode)
+        .forEach((ttc: TrainData) => {
+            console.log('ttc-data', ttc);
+        });
+    });
+
+    eventSource.onerror = (err) => {
+      console.error('SSE 에러:', err);
     };
-  }, [setStreamData]);
+
+    return () => {
+      console.log('SSE 연결 종료');
+      eventSource.close();
+    };
+  }, []);
 
 
   if (error && !stationLoading) {

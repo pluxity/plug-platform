@@ -46,6 +46,7 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
                 Px.Loader.LoadGltf(modelPath, () => {
                     isModelLoadedRef.current = true;
                     onModelLoaded?.();
+                    Px.Poi.HideAllLine();
                 });
             } catch (error) {
                 console.error('3D 모델 로드 중 오류 발생:', error);

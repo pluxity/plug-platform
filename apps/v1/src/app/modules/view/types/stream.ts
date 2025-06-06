@@ -1,10 +1,11 @@
 export interface TrainData {
   messageNumber: number;
   opCode: string;
-  time: string;
+  arrivalStationCode: string;
   arrivalStationName: string;
   trainDirection: string;
   thisTrainNumber: string;
-  nextTrainNumber: string,
-  lineNumber?: string;
+  nextTrainNumber: string;
+  timestamp: string;
+  line: string;
 }

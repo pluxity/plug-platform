@@ -38,18 +38,18 @@ const SideMenu: React.FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
   const [isDevicePanelOpen, setIsDevicePanelOpen] = useState<boolean>(false);
 
-  const { facilityCode } = useStationStore(); 
+  const { stationCode } = useStationStore(); 
 
   useEffect(() => {
     const fetchCategory = async () => {
 
-      if (!facilityCode) {
+      if (!stationCode) {
         console.log("No stationId available, skipping fetch");
         return;
       }
       
       try {
-        const response = await api.get<Category[]>(`devices/station/${facilityCode}/grouped`);
+        const response = await api.get<Category[]>(`devices/station/${stationCode}/grouped`);
         if (response.data) {
           const transformedMenuItems = response.data.map(item => ({
             id: item.categoryId.toString(),
@@ -65,7 +65,7 @@ const SideMenu: React.FC = () => {
       }
     };
     fetchCategory();
-  }, [facilityCode]);
+  }, [stationCode]);
 
   const handleMenuItemClick = (id: string) => {
     const clickedMenu = menuItems.find(item => item.id === id) || null;
