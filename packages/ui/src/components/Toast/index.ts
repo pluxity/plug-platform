@@ -1,3 +1,4 @@
+import { ToastPlacement } from './Toast.types';
 import {
     Toast as ToastComponent,
     ToastTitle,
@@ -17,5 +18,4 @@ const Toast = Object.assign(ToastComponent, {
 });
 
 export { Toast };
-
-export type { ToastPortalProps, ToastTitleProps, ToastDescriptionProps, ToastProps};
+export type { ToastPortalProps, ToastPlacement, ToastTitleProps, ToastDescriptionProps, ToastProps };

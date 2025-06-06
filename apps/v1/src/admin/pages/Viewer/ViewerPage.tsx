@@ -1,14 +1,16 @@
 import { useState, useCallback, memo, Suspense } from "react";
 import { useParams } from "react-router-dom";
-import { Select } from "@plug/ui";
+import { Select, ConfirmModal } from "@plug/ui";
 import { useStationStore } from './store/stationStore';
 import type { ModelInfo, PoiImportOption } from "@plug/engine/src/interfaces";
 
 import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
 import { PoiEditModal, ErrorBoundary } from "./components";
-import { useStation, useEditMode, useEngineIntegration } from "./hooks";
+import { useStation, useEditMode, useEngineIntegration, useFeatureApi } from "./hooks";
 import type { UseEditModeResult } from "./hooks/useEditMode";
 import type { StationWithFeatures } from "./types/station";
+
+import * as Px from '@plug/engine/src';
 
 // Loading and Error components with better UX
 const LoadingSpinner = memo(() => (
@@ -124,10 +126,12 @@ const ViewerContent = memo(({  stationData,
             modelPath={modelPath}
             onModelLoaded={onModelLoaded}
           />
-        </Suspense>        <FeatureEditToolbar
+        </Suspense>          
+        <FeatureEditToolbar
           onTranslateMode={editMode.setTranslateMode}
           onRotateMode={editMode.setRotateMode}
           onScaleMode={editMode.setScaleMode}
+          onDeleteMode={editMode.setDeleteMode}
           onExitEdit={editMode.exitEdit}
           currentMode={editMode.currentMode}
         />
@@ -157,12 +161,25 @@ const ViewerPage = memo(() => {
   }  // Custom hooks for state management
   const { data: stationData, isLoading, error } = useStation(stationId);
   const editMode = useEditMode();
-  
-  // Local state
+  const { deleteFeature } = useFeatureApi();
+    // Local state
   const [hierarchies, setHierarchies] = useState<ModelInfo[] | null>(null);
   const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
   const [selectedPoi, setSelectedPoi] = useState<PoiImportOption | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // ConfirmModal 상태
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title?: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
   // Event handlers
   const handlePoiSelect = useCallback((poi: PoiImportOption) => {
     setSelectedPoi(poi);
@@ -183,16 +200,39 @@ const ViewerPage = memo(() => {
         setSelectedFloor(initialFloor);
       }
     }
-  }, []);
-  const handleFloorChangeUI = useCallback((floorId: string) => {
+  }, []);  const handleFloorChangeUI = useCallback((floorId: string) => {
     setSelectedFloor(floorId);
-  }, []);
-  // Engine integration with cleanup
+  }, []);  // POI 삭제 핸들러
+  const handlePoiDelete = useCallback((poi: PoiImportOption) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'POI 삭제 확인',
+      message: `"${poi.displayText}" POI를 삭제하시겠습니까?`,
+      onConfirm: async () => {
+        try {
+          // 엔진에서 POI 삭제
+          Px.Poi.Delete(poi.id);
+          
+          // API를 통한 서버 삭제
+          await deleteFeature(poi.id);
+          
+          console.log('POI 삭제 완료:', poi);
+        } catch (error) {
+          console.error('POI 삭제 중 오류 발생:', error);
+        }
+      }
+    });  }, [deleteFeature]);
+
+  // ConfirmModal 닫기 핸들러
+  const handleConfirmModalClose = useCallback(() => {
+    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+  }, []); // Engine integration with cleanup
   const { handleModelLoaded, handleFloorChange } = useEngineIntegration({
     stationData,
     onPoiSelect: handlePoiSelect,
     onHierarchyLoaded: handleHierarchyLoaded,
-    onFloorChange: handleFloorChangeUI
+    onFloorChange: handleFloorChangeUI,
+    onPoiDeleteClick: editMode.currentMode === 'delete' ? handlePoiDelete : undefined
   });
 
   // Combined floor change handler for UI interactions
@@ -211,9 +251,12 @@ const ViewerPage = memo(() => {
   }
 
   if (!stationData) {
-    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;  }
+    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;  
+  }  
+  
   return (
-    <ErrorBoundary>      <ViewerContent
+    <ErrorBoundary>
+      <ViewerContent
         stationData={stationData}
         hierarchies={hierarchies}
         selectedFloor={selectedFloor}
@@ -223,6 +266,18 @@ const ViewerPage = memo(() => {
         selectedPoi={selectedPoi}
         isModalOpen={isModalOpen}
         onModalClose={handleModalClose}
+      />
+      
+      {/* Confirm Modal for POI deletion */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={handleConfirmModalClose}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText="삭제"
+        cancelText="취소"
+        isDangerous={true}
       />
     </ErrorBoundary>
   );

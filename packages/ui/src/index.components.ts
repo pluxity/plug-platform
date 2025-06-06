@@ -11,6 +11,7 @@ export { Carousel } from './components/Carousel';
 export { Chart } from './components/Chart';
 export { Checkbox } from './components/Checkbox';
 export { ComboBox } from './components/ComboBox';
+export { ConfirmModal } from './components/ConfirmModal';
 
 export { DataTable } from './components/DataTable';
 export { Dialog } from './components/Dialog';

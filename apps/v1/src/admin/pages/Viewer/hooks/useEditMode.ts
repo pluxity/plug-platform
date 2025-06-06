@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import * as Px from '@plug/engine/src';
 
-export type EditMode = 'translate' | 'rotate' | 'scale' | 'none';
+export type EditMode = 'translate' | 'rotate' | 'scale' | 'delete' | 'none';
 
 export interface UseEditModeResult {
   currentMode: EditMode;
   setTranslateMode: () => void;
   setRotateMode: () => void;
   setScaleMode: () => void;
+  setDeleteMode: () => void;
   exitEdit: () => void;
 }
 
@@ -36,13 +37,20 @@ export function useEditMode(): UseEditModeResult {
       Px.Poi.StartEdit('rotate');
     }
   }, [currentMode, exitEdit]);
-
   const setScaleMode = useCallback(() => {
     if (currentMode === 'scale') {
       exitEdit();
     } else {
       setCurrentMode('scale');
       Px.Poi.StartEdit('scale');
+    }
+  }, [currentMode, exitEdit]);
+
+  const setDeleteMode = useCallback(() => {
+    if (currentMode === 'delete') {
+      exitEdit();
+    } else {
+      setCurrentMode('delete');
     }
   }, [currentMode, exitEdit]);
 
@@ -59,12 +67,12 @@ export function useEditMode(): UseEditModeResult {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [currentMode, exitEdit]);
-
   return {
     currentMode,
     setTranslateMode,
     setRotateMode,
     setScaleMode,
+    setDeleteMode,
     exitEdit,
   };
 }

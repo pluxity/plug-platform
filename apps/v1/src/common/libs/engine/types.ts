@@ -17,6 +17,7 @@ export interface BaseStationData {
 export interface EngineEventHandlers {
   onPoiClick?: (poi: PoiImportOption) => void;
   onPoiTransformChange?: (poi: PoiImportOption) => Promise<void>;
+  onPoiDeleteClick?: (poi: PoiImportOption) => void;
   onFloorChange?: (floorId: string) => void;
   onHierarchyLoaded?: (hierarchy: ModelInfo[]) => void;
 }

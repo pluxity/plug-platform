@@ -44,7 +44,8 @@ const FormInner = <T extends FormValues>(
     const isValid = Object.values(formErrors).every((e) => !e);
 
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} 
+                      className={cn('', props.className)}>
         <FormContext.Provider
             value={{ values: formValues, setFieldValue, validateField, setFormErrors, errors: formErrors, isValid } as FormContextType<T>}
         >
@@ -66,7 +67,7 @@ const FormItem = <T extends FormValues>({
                                           children,
                                           label,
                                           required = false,
-    validate,
+                                          validate,
                                         }: FormItemProps<T>): JSX.Element => {
   const formContext = useContext(FormContext) as FormContextType<T>;
   if (!formContext) throw new Error('Form 컴포넌트 안에서만 사용하세요.')

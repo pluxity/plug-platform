@@ -34,11 +34,12 @@ const Select = ({
                     disabled = false,
                     selected,
                     onChange,
+                    isOpened = false,
                     className,
                     children,
                     ...props
                 }: SelectProps) => {
-    const [isSelectOpen, setIsSelectOpen] = useState(false);
+    const [isSelectOpen, setIsSelectOpen] = useState(isOpened);
     const [selectedItems, setSelectedItems] = useState<Map<string, React.ReactNode>>(new Map());
 
     const [searchValue, setSearchValue] = useState("");
@@ -142,6 +143,8 @@ const Select = ({
             }
             onChange?.(newSelectedValueArray); 
             setIsSelectOpen(false);
+            // Single 모드에서 항목 선택 시 검색값 초기화
+            setSearchValue("");
         } else { 
             if (newItems.has(value)) {
                 newItems.delete(value);
@@ -231,11 +234,11 @@ const SelectTrigger = ({
         >
             {type === "multiple" ? (
                 <>
-                    {currentSelectedValuesArray.map((value: string) => (
-                        <span
-                            key={value}
-                            className="flex items-center gap-1 bg-slate-200 text-slate-800 px-2 py-0.5 text-sm rounded"
-                        >
+                {currentSelectedValuesArray.map((value: string) => (
+                    <span
+                        key={value}
+                        className="flex items-center gap-1 bg-slate-200 text-slate-800 px-2 py-0.5 text-sm rounded"
+                    >
                         {selectedItems.get(value)}
                         <button
                             type="button"
@@ -245,10 +248,10 @@ const SelectTrigger = ({
                             }}
                             className="text-slate-500 hover:text-slate-800"
                         >
-                <SelectCloseIcon />
-              </button>
-            </span>
-                    ))}
+                            <SelectCloseIcon />
+                        </button>
+                    </span>
+                ))}
                     <input
                         className={cn(
                             "flex-1 min-w-[60px] text-sm bg-transparent outline-none",
@@ -264,22 +267,32 @@ const SelectTrigger = ({
                 </>
             ) : (
                 <>
-                    <span
-                        className="text-slate-800 text-sm block flex flex-row"
-                        >
-                        {currentSelectedValuesArray.length > 0
-                            ? (selectedItems.get(currentSelectedValuesArray[0]) || currentSelectedValuesArray[0]) 
-                            : placeholder}
-                        <input
-                            className={cn(
-                                "cursor-pointer outline-none opacity-0 w-0",
-                                inputClassName
-                            )}
-                            placeholder={placeholder}
-                            value={currentSelectedValuesArray.length > 0 ? currentSelectedValuesArray[0] : ""}
-                            readOnly
-                        />
-                    </span>
+                    {/* Single 모드에서 선택된 값이 있고 Select가 닫혀있을 때만 선택된 값 표시 */}
+                    {currentSelectedValuesArray.length > 0 && !isSelected && (
+                        <span className="text-slate-800 text-sm pointer-events-none">
+                            {selectedItems.get(currentSelectedValuesArray[0]) || currentSelectedValuesArray[0]}
+                        </span>
+                    )}
+                    
+                    {/* Single 모드에서도 검색 가능한 input */}
+                    <input
+                        className={cn(
+                            "flex-1 text-sm bg-transparent outline-none",
+                            // Select가 닫혀있고 선택된 값이 있을 때는 숨김
+                            currentSelectedValuesArray.length > 0 && !isSelected && "opacity-0 absolute",
+                            inputClassName
+                        )}
+                        placeholder={currentSelectedValuesArray.length === 0 || isSelected ? placeholder : ""}
+                        value={isSelected ? searchValue : (currentSelectedValuesArray.length > 0 ? "" : "")}
+                        onChange={(e) => {
+                            setSearchValue(e.target.value);
+                            if (!isSelected) setIsSelected(true);
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isSelected) setIsSelected(true);
+                        }}
+                    />
                 </>
             )}
         </div>

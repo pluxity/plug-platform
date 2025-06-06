@@ -8,6 +8,7 @@ export type { TabProps } from './components/Tab';
 export type { CardProps } from './components/Card';
 export type { BadgeProps } from './components/Badge';
 export type { CheckboxProps } from './components/Checkbox';
+export type { ConfirmModalProps } from './components/ConfirmModal';
 export type { SkeletonProps } from './components/Skeleton';
 export type { SliderProps } from './components/Slider';
 export type { SwitchProps } from './components/Switch';
@@ -20,6 +21,7 @@ export type { DropdownProps } from './components/Dropdown';
 export type { SelectProps } from './components/Select';
 export type { ComboBoxProps } from './components/ComboBox';
 export type { FormProps } from './components/Form';
+export type { ToastProps, ToastPlacement } from './components/Toast';
 
 // chart.js 타입 내보내기
 export type { ChartData, ChartOptions } from 'chart.js';

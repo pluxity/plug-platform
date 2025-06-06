@@ -29,6 +29,7 @@ export const useEngineIntegration = ({
 }: UseEngineIntegrationProps): EngineIntegrationResult => {
   const finalConfig = { ...defaultConfig, ...config };
   const eventListenersRef = useRef<Array<{ event: string; handler: (...args: unknown[]) => void }>>([]);
+  const isModelLoadedRef = useRef(false);
 
   // POI 클릭 이벤트 핸들러
   const poiClickListener = useCallback((event: { target: PoiImportOption }) => {
@@ -36,7 +37,6 @@ export const useEngineIntegration = ({
       handlers.onPoiClick(event.target);
     }
   }, [handlers]);
-
   // POI Transform 변경 이벤트 핸들러 (관리자 전용)
   const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
     if (event.target && handlers.onPoiTransformChange) {
@@ -45,6 +45,13 @@ export const useEngineIntegration = ({
       } catch {
         // Ignore transform update errors
       }
+    }
+  }, [handlers]);
+
+  // POI 삭제 클릭 이벤트 핸들러 (삭제 모드 전용)
+  const poiDeleteClickListener = useCallback((event: { target: PoiImportOption }) => {
+    if (event.target && handlers.onPoiDeleteClick) {
+      handlers.onPoiDeleteClick(event.target);
     }
   }, [handlers]);
 
@@ -102,10 +109,8 @@ export const useEngineIntegration = ({
       Px.Poi.Import(JSON.stringify(poiData));
     }
   }, [stationData, finalConfig.includeUnassignedDevices]);
-
-  // 이벤트 리스너 추가
-  const addEngineEventListeners = useCallback(() => {
-    // 기존 이벤트 리스너 제거
+  // 이벤트 리스너 제거
+  const removeEventListeners = useCallback(() => {
     eventListenersRef.current.forEach(({ event, handler }) => {
       try {
         Px.Event.RemoveEventListener(event, handler);
@@ -114,9 +119,19 @@ export const useEngineIntegration = ({
       }
     });
     eventListenersRef.current = [];
+  }, []);
+  // 이벤트 리스너 추가
+  const addEngineEventListeners = useCallback(() => {
+    // 기존 이벤트 리스너 제거
+    removeEventListeners();
 
-    // POI 클릭 이벤트
-    if (handlers.onPoiClick) {
+    // POI 클릭 이벤트 - 삭제 모드일 때는 삭제 핸들러, 일반 모드일 때는 일반 핸들러
+    if (handlers.onPoiDeleteClick) {
+      // 삭제 모드일 때
+      Px.Event.AddEventListener("onPoiPointerUp", poiDeleteClickListener);
+      eventListenersRef.current.push({ event: "onPoiPointerUp", handler: poiDeleteClickListener as (...args: unknown[]) => void });
+    } else if (handlers.onPoiClick) {
+      // 일반 모드일 때
       Px.Event.AddEventListener("onPoiPointerUp", poiClickListener);
       eventListenersRef.current.push({ event: "onPoiPointerUp", handler: poiClickListener as (...args: unknown[]) => void });
     }
@@ -126,10 +141,18 @@ export const useEngineIntegration = ({
       Px.Event.AddEventListener('onPoiTransformChange', poiTransformListener);
       eventListenersRef.current.push({ event: 'onPoiTransformChange', handler: poiTransformListener as (...args: unknown[]) => void });
     }
-  }, [handlers, finalConfig.enableTransformEdit, poiClickListener, poiTransformListener]);
+  }, [handlers, finalConfig.enableTransformEdit, poiClickListener, poiTransformListener, poiDeleteClickListener, removeEventListeners]);
+  // 동적 이벤트 리스너 재등록 - 핸들러 변경 시 자동 업데이트
+  useEffect(() => {
+    if (!isModelLoadedRef.current) return;
 
+    // 핸들러가 변경되면 이벤트 리스너를 재등록
+    addEngineEventListeners();
+  }, [handlers.onPoiClick, handlers.onPoiTransformChange, handlers.onPoiDeleteClick, handlers.onFloorChange, handlers.onHierarchyLoaded, addEngineEventListeners]);
   // 모델 로드 완료 핸들러
   const handleModelLoaded = useCallback(async () => {
+    isModelLoadedRef.current = true;
+    
     // POI 데이터 로드
     handleFeatureData();
 
@@ -153,20 +176,12 @@ export const useEngineIntegration = ({
   const refreshPoiData = useCallback(() => {
     handleFeatureData();
   }, [handleFeatureData]);
-
   // 컴포넌트 언마운트 시 이벤트 리스너 정리
   useEffect(() => {
     return () => {
-      eventListenersRef.current.forEach(({ event, handler }) => {
-        try {
-          Px.Event.RemoveEventListener(event, handler);
-        } catch {
-          // Ignore cleanup errors
-        }
-      });
-      eventListenersRef.current = [];
+      removeEventListeners();
     };
-  }, []);
+  }, [removeEventListeners]);
 
   return {
     handleModelLoaded,

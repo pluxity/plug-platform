@@ -9,6 +9,7 @@ export const ToastContainer = () => {
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
+          placement={toast.placement || 'bottomRight'}
           isOpen={true}
           variant={toast.variant}
           onClose={() => removeToast(toast.id)}

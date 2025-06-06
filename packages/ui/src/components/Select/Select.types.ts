@@ -8,6 +8,7 @@ export interface SelectProps extends Omit<React.ComponentProps<'div'>, 'onChange
     disabled?: boolean;
     selected?: string[];
     onChange?: (values: string[]) => void;
+    isOpened?: boolean;
     children? : React.ReactNode;
 }
 
