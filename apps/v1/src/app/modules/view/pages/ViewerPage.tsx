@@ -9,6 +9,7 @@ import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
+import useStreamStore from '@plug/v1/app/stores/streamStore';
 
 const ViewerPage = () => {
     const { code } = useParams<{ code: string }>();
@@ -19,8 +20,9 @@ const ViewerPage = () => {
 
     const { stationData, stationLoading, error } = useStationData(parsedCode);
     const { floorItems, modelPath } = useFloorData(stationData);
+    const setStreamData = useStreamStore(state => state.setStreamData);
 
-    const handleLoadError = useCallback((loadError: Error) => {
+  const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
     }, []);    
     
@@ -45,7 +47,17 @@ const ViewerPage = () => {
         fetchAssets();
     }, [fetchAssets]);
 
-    if (error && !stationLoading) {
+  useEffect(() => {
+    const eventSource = new EventSource('/api/ttc/connect-stream');
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setStreamData(data);
+    };
+  }, [setStreamData]);
+
+
+  if (error && !stationLoading) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <div className="text-red-500 text-xl">
