@@ -65,7 +65,7 @@ function materialToBillboard(target: THREE.Material) {
  * @param text - 텍스트
  * @param outSize - 생성된 텍스쳐 크기
  */
-function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBasicMaterial {
+function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: boolean = true): THREE.MeshBasicMaterial {
 
     // 텍스트 스타일
     const textStyle = new PIXI.TextStyle({
@@ -106,7 +106,10 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
         transparent: true,
         side: THREE.DoubleSide
     });
-    materialToBillboard(material);
+
+    // 빌보드 사용시 재질변경
+    if (useBillboard)
+        materialToBillboard(material);
 
     // pixi.js 텍스트 제거
     pixiApp.stage.removeChild(pixiText);

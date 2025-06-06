@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
@@ -18,6 +18,7 @@ interface WebGLControlPanelState {
     pathVisibleId: string;
     subwayCreateBodyCount: string;
     subwayId: string;
+    label3DId: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -52,24 +53,25 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             pathVisibleId: '',
             subwayCreateBodyCount: '',
             subwayId: '',
+            label3DId: '',
             floorData: []
         };
 
         this.registerViewerEvents();
 
-        window.addEventListener('keydown', (evt)=>{
-            if( evt.key === '1' ) {
-                Subway.DoEnter('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, ()=>console.log('비동기 이동 테스트'));
+        window.addEventListener('keydown', (evt) => {
+            if (evt.key === '1') {
+                Subway.DoEnter('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
             }
-            if( evt.key === '2' ) {
-                Subway.DoExit('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, ()=>console.log('비동기 이동 테스트'));
+            if (evt.key === '2') {
+                Subway.DoExit('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
             }
-            
-            if( evt.key === '3' ) {
-                Subway.DoEnter('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, ()=>console.log('비동기 이동 테스트'));
+
+            if (evt.key === '3') {
+                Subway.DoEnter('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
             }
-            if( evt.key === '4' ) {
-                Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, ()=>console.log('비동기 이동 테스트'));
+            if (evt.key === '4') {
+                Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
             }
         });
     }
@@ -220,6 +222,28 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Subway.Import')}>Import</button>
                 </span>
             );
+        } else if (this.state.selectedApiName === 'Label3D') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Create')}>Create</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Cancel')}>Cancel</button><br /><br />
+
+                    <input type='text' value={this.state.label3DId} onChange={this.onLabel3DIdInputValueChanged.bind(this)} placeholder='라벨3did'></input><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.HideAll')}>HideAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.ShowAll')}>ShowAll</button><br/><br/>
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Clear')}>Clear</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Export')}>Export</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Import')}>Import</button><br/><br/>
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(translate)')}>StartEdit(translate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(rotate)')}>StartEdit(rotate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(scale)')}>StartEdit(scale)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.FinishEdit')}>FinishEdit</button><br/><br/>
+                </span>
+            );
         } else if (this.state.selectedApiName === 'Test') {
             return (
                 <span>
@@ -249,6 +273,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Path'>Path</option>
                         <option value='Util'>Util</option>
                         <option value='Subway'>Subway</option>
+                        <option value='Label3D'>Label3D</option>
                         <option value='Test'>Test</option>
                     </select>
                     <br />
@@ -606,6 +631,58 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 });
             } break;
 
+            /**
+             * Label3D
+             */
+            case 'Label3D.Create': {
+                const id = window.crypto.randomUUID();
+                Label3D.Create({
+                    id: id,
+                    displayText: '공간명' + (Math.floor(Math.random() * 10).toString()),
+                }, (data: unknown) => {
+                    console.log('라벨 생성', data);
+                });
+            } break;
+            case 'Label3D.Cancel': {
+                Label3D.Cancel();
+            } break;
+            case 'Label3D.Hide': {
+                Label3D.Hide(this.state.label3DId);
+            } break;
+            case 'Label3D.Show': {
+                Label3D.Show(this.state.label3DId);
+            } break;
+            case 'Label3D.HideAll': {
+                Label3D.HideAll();
+            } break;
+            case 'Label3D.ShowAll': {
+                Label3D.ShowAll();
+            } break;
+            case 'Label3D.Clear': {
+                Label3D.Clear();
+            } break;
+            case 'Label3D.Export': {
+                const data = Label3D.Export();
+                console.log('Label3D.Export ->', data);
+            } break;
+            case 'Label3D.Import': {
+                fetch('/label3dsampledata.json').then(res => res.json()).then(data => {
+                    console.log('/label3dsampledata.json', data);
+                    Label3D.Import(data);
+                });
+            } break;
+            case 'Label3D.StartEdit(translate)': {
+                Label3D.StartEdit('translate');
+            } break;
+            case 'Label3D.StartEdit(rotate)': {
+                Label3D.StartEdit('rotate');
+            } break;
+            case 'Label3D.StartEdit(scale)': {
+                Label3D.StartEdit('scale');
+            } break;
+            case 'Label3D.FinishEdit': {
+                Label3D.FinishEdit();
+            } break;
 
             /**
              * Test
@@ -783,6 +860,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onSubwayIdInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ subwayId: evt.target.value });
+    }
+
+    /**
+     * 라벨3d id값 변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onLabel3DIdInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ label3DId: evt.target.value });
     }
 
     /**
