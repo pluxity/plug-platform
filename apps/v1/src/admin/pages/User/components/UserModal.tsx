@@ -43,7 +43,6 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
         if (mode === 'edit' && detailUserData) {
             try {
                 const user = await updateUser({
-                    username: values.username || detailUserData.username,
                     name: values.name || detailUserData.name,
                     phoneNumber: values.phoneNumber || detailUserData.phoneNumber,
                     department: values.department || detailUserData.department,
@@ -59,12 +58,16 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
-            } catch (error) {
-                addToast({
-                    description: error instanceof Error ? error.message : '사용자 수정 중 오류가 발생했습니다.',
-                    title: '수정 오류',
+
+                if (userUpdateError) {
+                  addToast({
+                    description: userUpdateError.message,
+                    title: '사용자 수정 오류',
                     variant: 'critical'
-                });
+                  });
+                }
+            } finally {
+              mutate();
             }
         } else {
             try {
@@ -85,12 +88,15 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
-            } catch (error) {
-                addToast({
-                    description: error instanceof Error ? error.message : '사용자 등록 중 오류가 발생했습니다.',
+                if (createError) {
+                  addToast({
+                    description: createError.message,
                     title: '등록 오류',
                     variant: 'critical'
-                });
+                  });
+                }
+            } finally {
+              mutate();
             }
         }
     }, [detailUserData, updateUser, createUser, onSuccess, addToast]);
@@ -121,7 +127,6 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                 key={mode + (detailUserData?.id ?? '')}
                 initialValues={
                     mode === 'edit' && detailUserData ? {
-                        username: detailUserData.username,
                         name: detailUserData.name,
                         phoneNumber: detailUserData.phoneNumber,
                         department: detailUserData.department,
@@ -139,14 +144,15 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                         {error.message}
                     </div>
                 )}
-                <FormItem name="username" label='아이디' required>
-                    <Input.Text
-                        placeholder="아이디를 입력하세요."
-                        value={id}
-                        onChange={value => setId(value)}
-                    />
-                </FormItem>
-
+                {mode === 'create' ?  
+                    <FormItem name="username" label='아이디' required>
+                        <Input.Text
+                            placeholder="아이디를 입력하세요."
+                            value={id}
+                            onChange={value => setId(value)}
+                        />
+                    </FormItem> : ''
+                }
                 <FormItem name="name" label='이름' required>
                     <Input.Text
                         placeholder="이름을 입력하세요."

@@ -101,15 +101,21 @@ const DataTable = <T extends { id: string | number },>({
     selectedChange(newSelected);
   };
 
+  const handleSearch = (searchValue: string) => {
+    setSearch(searchValue);
+    setCurrentPage(1);
+  };
+
+
   return (
       <div className="w-full h-full overflow-x-auto flex flex-col justify-between">
         <div>
           {showSearch && (
-              <SearchFilter search={search} onSearchChange={setSearch} />
+              <SearchFilter search={search} onSearchChange={handleSearch} />
           )}
           <table className="min-w-full text-sm text-left text-slate-700 border-separate border-spacing-0">
             <TableHeader columns={columns} sortKey={sortKey} sortOrder={sortOrder} onSort={handleSort} selectable={selectable} selectedAll={selectedAll} onSelectChange={handleSelectAll}/>
-            <TableBody data={paginatedData} columns={columns} search={search} selectable={selectable} onSelectChange={handleSelectRow} selectedRows={isRowSelected}/>
+            <TableBody data={showPagination ? paginatedData : filteredAndSortedData} columns={columns} search={search} selectable={selectable} onSelectChange={handleSelectRow} selectedRows={isRowSelected}/>
           </table>
         </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileType } from '../types/file';
 import { useFileUploader } from './useFileUploader';
+import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
 import DateFormatter from "@plug/v1/app/utils/dateFormatter";
 import { StationDetail, useDeleteStation, useStationDetailSWR, useUpdateStation } from '@plug/common-services';
 
@@ -42,9 +43,10 @@ export const useStationDetail = (stationId: string) => {
     thumbnail: { fileId: null as number | null, file: null as File | null, originalFileName: '' }
   });
 
-  const { data } = useStationDetailSWR(Number(stationId));
-  const { execute: deleteStation } = useDeleteStation(Number(stationId));
-  const { execute: patchStation } = useUpdateStation(Number(stationId));
+  const { data, error: detailError, mutate } = useStationDetailSWR(Number(stationId));
+  const { execute: deleteStation, error: deleteError } = useDeleteStation(Number(stationId));
+  const { execute: patchStation, error: updateError } = useUpdateStation(Number(stationId));
+  const addToast = useToastStore((state) => state.addToast);
 
   const loadStationDetail = async () => {
     if (!data) return;
@@ -53,8 +55,16 @@ export const useStationDetail = (stationId: string) => {
       setStation(data);
       initializeFormValues(data);
       initializeFileStates(data);
-    } catch (error) {
-      console.error('역사 정보를 불러오는데 실패했습니다:', error);
+      if (detailError) {
+        console.error('역사 정보를 불러오는데 실패했습니다:', error);
+        addToast({
+          title: '역사 정보 불러오기 실패',
+          description: error.message || '역사 정보를 불러오는데 실패했습니다.',
+          variant: 'critical',
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,8 +134,15 @@ export const useStationDetail = (stationId: string) => {
           }
         }));
       }
-    } catch (error) {
-      console.error(`${type} 파일 업로드 실패:`, error);
+      if (fileError) {
+        addToast({
+          title: '업로드 실패',
+          description: fileError.message || '파일 업로드 중 오류가 발생했습니다.',
+          variant: 'critical',
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,24 +155,39 @@ export const useStationDetail = (stationId: string) => {
           description: formValues.description,
           code: formValues.code,
           ...(fileStates.model.fileId && { drawingFileId: fileStates.model.fileId }),
-          ...(fileStates.thumbnail.fileId && { thumbnailFileId: fileStates.thumbnail.fileId })
+          ...(fileStates.thumbnail.fileId && { thumbnailFileId: fileStates.thumbnail.fileId }),
         },
         lineIds: formValues.lineIds.map(id => Number(id)),
         floors: formValues.floors.map(floor => ({
           name: floor.name,
-          floorId: floor.floorId
+          floorId: floor.floorId,
         })),
         externalCode: formValues.externalCode,
       };
 
-      await patchStation({ id: Number(stationId), ...updateData });
-      await loadStationDetail();
-    } catch (error) {
-      console.error('수정 실패:', error);
+      const result = await patchStation({ id: Number(stationId), ...updateData });
+
+      if (result) {
+        await mutate();
+        addToast({
+          title: '수정 완료',
+          description: '역사 정보가 수정되었습니다.',
+          variant: 'normal',
+        });
+      }
+
+      if (updateError) {
+        addToast({
+          title: '수정 실패',
+          description: updateError.message,
+          variant: 'critical',
+        });
+        console.error('수정 실패:', error);
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   const handleDelete = async () => {
     try {
@@ -166,9 +198,19 @@ export const useStationDetail = (stationId: string) => {
       await deleteStation();
       alert('성공적으로 삭제되었습니다.');
       window.location.href = '/admin/dashboard/facility';
-    } catch (error) {
-      console.error('삭제 실패:', error);
-      alert('삭제에 실패했습니다.');
+
+      addToast({
+        title: '삭제 완료',
+        description: '역사 정보가 삭제되었습니다.',
+        variant: 'normal',
+      })
+
+      if(deleteError) {
+      addToast({
+        title: '삭제 실패',
+        description: deleteError.message,
+        variant: 'critical',
+      })}
     } finally {
       setIsLoading(false);
     }

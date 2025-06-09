@@ -12,11 +12,11 @@ export interface UserRoleModalProps {
 
 export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: UserRoleModalProps) => {
     // 역할 목록 조회
-    const {data: detailRoleData} = useRolesSWR();
+    const {data: detailRoleData, error: assignRolesError} = useRolesSWR();
     const {addToast} = useToastStore();
 
     // 사용자 역할 할당
-    const {execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRolesError} = useAssignUserRoles(Number(selectedUserId));
+    const {execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
 
     // 제출 핸들러 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
@@ -32,13 +32,15 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
                 if (onSuccess) onSuccess();
                 onClose();
             }
-        } catch (error) {
-            console.error('권한 등록 실패:', error);
-            addToast({
-                description: error instanceof Error ? error.message : '권한 등록 중 오류가 발생했습니다.',
-                title: '등록 실패',
+            if (assignRoleUserError) {
+              addToast({
+                description: assignRoleUserError.message,
+                title: '등록 오류',
                 variant: 'critical'
-            });
+              });
+            }
+        } finally {
+          mutate();
         }
     }, [onSuccess, assignRoles, addToast]);
 
