@@ -73,7 +73,7 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
-                addToast({
+                if(createError)addToast({
                     variant: "critical",
                     title: "등록 실패",
                     description: createError.message
