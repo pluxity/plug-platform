@@ -17,13 +17,10 @@ export default function LinePage() {
     const [selectedLines, setSelectedLines] = useState<Set<Line>>(new Set());
     const [selectedLineId, setSelectedLineId] = useState<number>();
 
-    const handleDelete = async (lineId: number) => {
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
+    const handleDelete = async (lineId: number, shouldMutate = true) => {
         try {
             await deleteLine(lineId);
-            await mutate();
+            if(shouldMutate) await mutate();
             addToast({
                 variant: "normal",
                 title: "삭제 완료",
@@ -41,14 +38,17 @@ export default function LinePage() {
         }
     };
 
-    const handleEdit = (lineId: number) => {
-        setSelectedLineId(lineId);
+    const handleEdit = async (lineId: number) => {
+        await setSelectedLineId(lineId);
         openModal('edit');
     };
 
     const lineData = useLine(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = async () => {
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
+        
         if (selectedLines.size === 0) {
             return addToast({
                 variant: "warning",
@@ -59,8 +59,9 @@ export default function LinePage() {
 
         try {
             await Promise.all(
-                Array.from(selectedLines).map(line => handleDelete(line.id))
+                Array.from(selectedLines).map(line => handleDelete(line.id), false)
             );
+            await mutate();
             addToast({
                 variant: "normal",
                 title: '일괄 삭제 완료',

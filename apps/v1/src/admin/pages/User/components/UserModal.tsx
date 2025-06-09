@@ -23,7 +23,7 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
     const {execute: createUser, isLoading: isCreating, error: createError} = useCreateUser();
 
     // 사용자 상세 조회 훅 
-    const {data: detailUserData} = useUserDetailSWR(mode === 'edit' && selectedUserId ? Number(selectedUserId) : 0);
+    const {mutate, data: detailUserData} = useUserDetailSWR(mode === 'edit' && selectedUserId ? Number(selectedUserId) : 0);
 
     // 사용자 수정 훅
     const {
@@ -43,13 +43,13 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
         if (mode === 'edit' && detailUserData) {
             try {
                 const user = await updateUser({
-                    username: values.username || detailUserData.username,
                     name: values.name || detailUserData.name,
                     phoneNumber: values.phoneNumber || detailUserData.phoneNumber,
                     department: values.department || detailUserData.department,
                 });
 
                 if (user) {
+                    await mutate();
                     addToast({
                         description: '사용자가 성공적으로 수정되었습니다.',
                         title: '사용자 수정',
@@ -127,7 +127,6 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                 key={mode + (detailUserData?.id ?? '')}
                 initialValues={
                     mode === 'edit' && detailUserData ? {
-                        username: detailUserData.username,
                         name: detailUserData.name,
                         phoneNumber: detailUserData.phoneNumber,
                         department: detailUserData.department,
@@ -145,14 +144,15 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                         {error.message}
                     </div>
                 )}
-                <FormItem name="username" label='아이디' required>
-                    <Input.Text
-                        placeholder="아이디를 입력하세요."
-                        value={id}
-                        onChange={value => setId(value)}
-                    />
-                </FormItem>
-
+                {mode === 'create' ?  
+                    <FormItem name="username" label='아이디' required>
+                        <Input.Text
+                            placeholder="아이디를 입력하세요."
+                            value={id}
+                            onChange={value => setId(value)}
+                        />
+                    </FormItem> : ''
+                }
                 <FormItem name="name" label='이름' required>
                     <Input.Text
                         placeholder="이름을 입력하세요."

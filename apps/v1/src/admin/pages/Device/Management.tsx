@@ -17,8 +17,22 @@ export default function DevicePage() {
     const [ selectedDevices, setSelectedDevices ] = useState<Set<Device>>(new Set());
     const [ selectedDeviceId, setSelectedDeviceId ] = useState<string>();
 
-    const handleDelete = async (deviceId: string) => {
-        deleteDevice(deviceId).then(() => mutate());
+    const handleDelete = async (deviceId: string, shouldMutate = true) => {
+        try {
+            await deleteDevice(deviceId);
+            if(shouldMutate) await mutate();
+            addToast({
+                variant: "normal",
+                title: "삭제 완료",
+                description: "선택한 항목이 삭제되었습니다."
+            });
+        } catch (err){
+            addToast({
+                variant: "critical",
+                title: "삭제 실패",
+                description: err instanceof Error ? err.message : "삭제 중 오류가 발생했습니다."
+            });
+        }
     }
 
     const handleEdit = (deviceId: string) => {
@@ -29,21 +43,23 @@ export default function DevicePage() {
     const deviceData = useDevice(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = async () => {
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
+
         if (selectedDevices.size === 0) {
-            addToast({
+            return addToast({
                 description: '삭제할 항목을 선택해주세요.',
+                title: '선택 필요',
                 variant: 'warning'
             });
-            return;
         }
-
-        if (!window.confirm(`선택한 ${selectedDevices.size}개의 항목을 삭제하시겠습니까?`)) return;
 
         try {
             await Promise.all(
-                Array.from(selectedDevices).map(device => handleDelete(device.id))
+                Array.from(selectedDevices).map(device => handleDelete(device.id), false)
             );
 
+            await mutate();
             addToast({
                 title: '삭제 완료',
                 description: `${selectedDevices.size}개의 항목이 삭제되었습니다.`,

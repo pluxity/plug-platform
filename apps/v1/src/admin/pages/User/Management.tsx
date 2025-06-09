@@ -24,10 +24,10 @@ export default function UserListPage(): React.ReactElement {
     const {addToast} = useToastStore();
 
     // 사용자 정보 수정 모달 
-    const handleDelete = async (userId: number) => {
+    const handleDelete = async (userId: number, shouldMutate = true) => {
         try {
             await deleteUser(userId);
-            await mutate();
+            if(shouldMutate) await mutate();
             addToast({
                 description: '사용자가 성공적으로 삭제되었습니다.',
                 variant: 'default'
@@ -113,9 +113,9 @@ export default function UserListPage(): React.ReactElement {
 
         try {
             await Promise.all(
-                Array.from(selectState).map(user => handleDelete(Number(user.id)))
+                Array.from(selectState).map(user => handleDelete(Number(user.id)), false)
             );
-
+            await mutate();
             addToast({
                 description: `${selectState.size}개의 항목이 삭제되었습니다.`,
                 variant: 'default'
