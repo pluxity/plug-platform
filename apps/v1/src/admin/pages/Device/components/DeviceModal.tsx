@@ -21,6 +21,7 @@ export const DeviceModal = ({
     // 장비 상태 관리 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
+    const [categoryId, setCategoryId] = useState<number>();
 
     const { addToast } = useToastStore();
 
@@ -37,11 +38,11 @@ export const DeviceModal = ({
     const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(selectedDeviceId || '');
 
     useEffect(() => {
-      console.log(categoryDevice);
         if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
+            setCategoryId(detailDeviceData.categoryId);
         } 
-    }, [mode, detailDeviceData, isOpen]);
+    }, [mode, detailDeviceData, isOpen, categoryDevice]);
 
     // 제출 핸들러
     const handleFinish = useCallback(async (values: Record<string, string>) => {
@@ -49,7 +50,7 @@ export const DeviceModal = ({
             try {
                 const device = await updateDevice({
                     name: values.name || name,
-                    deviceCategoryId: Number(values.categoryId) 
+                    deviceCategoryId: categoryId
                 });
 
                 if (device) {
@@ -79,7 +80,6 @@ export const DeviceModal = ({
                     id: values.id,
                     deviceCategoryId: Number(values.categoryId)
                 });
-                console.log(Number(values.categoryId))
 
                 if (device) {
                     addToast({
@@ -101,7 +101,7 @@ export const DeviceModal = ({
                 mutate();
             }
         }
-    }, [mode, detailDeviceData, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError]);
+    }, [mode, detailDeviceData, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError, categoryDevice]);
 
     // 폼 초기화
     const resetForm = () => {
@@ -139,19 +139,27 @@ export const DeviceModal = ({
             >
 
                 <FormItem name='categoryId' label='분류' required>
-                    <Select>
-                        <Select.Trigger placeholder='분류를 선택하세요.' />
-                        <Select.Content>
-                            {categoryDevice?.map(category => (
-                                <Select.Item
-                                    key={category.id}
-                                    value={String(category.id)}
-                                >
-                                    {category.name}
-                                </Select.Item>
-                            ))}
-                        </Select.Content>
-                    </Select>
+                    <div>
+                        <Select 
+                            selected={categoryId ? [String(categoryId)] : []}
+                            onChange={(value) => {
+                                const selectedValues = value || [];
+                                setCategoryId(Number(selectedValues[0]));
+                            }}
+                        >
+                            <Select.Trigger placeholder='분류를 선택하세요.' />
+                            <Select.Content>
+                                {categoryDevice?.map(category => (
+                                    <Select.Item
+                                        key={category.id}
+                                        value={String(category.id)}
+                                    >
+                                        {category.name}
+                                    </Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select>
+                    </div>
                 </FormItem>
 
                 <FormItem name="name" label="장비 이름" required>
