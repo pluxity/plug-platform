@@ -89,6 +89,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                 });
 
                 if (category) {
+                    await mutate();
                     addToast({
                         title: '수정 완료',
                         description: '장비 분류가 성공적으로 수정되었습니다.',

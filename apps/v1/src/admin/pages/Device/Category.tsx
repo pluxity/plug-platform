@@ -17,10 +17,10 @@ export default function DeviceCategory() {
     const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
     const [selectedCategoryId, setSelectedCategoryId] = useState<number>();
 
-    const handleDelete = async (categoryId: number) => {
+    const handleDelete = async (categoryId: number, shouldMutate = true) => {
         try {
             await deleteCategory(categoryId);
-            mutate();
+            if(shouldMutate) await mutate();
             addToast({
                 title: '삭제 완료',
                 description: '분류가 성공적으로 삭제되었습니다.',
@@ -42,7 +42,7 @@ export default function DeviceCategory() {
 
     const categoryData = useCategory(data || [], handleDelete, handleEdit);
 
-    const handleDeleteSelected = () => {
+    const handleDeleteSelected = async () => {
         const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
         if (!isConfirmed) return;
 
@@ -53,25 +53,24 @@ export default function DeviceCategory() {
             });
             return;
         }
-
-        Promise.all(
-            Array.from(selectedCategories).map(category => handleDelete(category.id))
-        )
-            .then(() => {
-                addToast({
-                    title: '일괄 삭제 완료',
-                    description: `${selectedCategories.size}개의 분류가 삭제되었습니다.`,
-                    variant: 'normal'
-                });
-                setSelectedCategories(new Set());
-            })
-            .catch((error) => {
-                addToast({
-                    title: '일괄 삭제 실패',
-                    description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
-                    variant: 'critical'
-                });
+        try{
+            await Promise.all(
+                Array.from(selectedCategories).map(category => handleDelete(category.id), false)
+            )
+            await mutate();
+            addToast({
+                title: '일괄 삭제 완료',
+                description: `${selectedCategories.size}개의 분류가 삭제되었습니다.`,
+                variant: 'normal'
             });
+            setSelectedCategories(new Set());
+        } catch (error){
+            addToast({
+                title: '일괄 삭제 실패',
+                description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
+                variant: 'critical'
+            });
+        }
     }
 
     return (
