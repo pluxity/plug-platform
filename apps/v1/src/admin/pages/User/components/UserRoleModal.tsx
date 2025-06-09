@@ -16,7 +16,7 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
     const {addToast} = useToastStore();
 
     // 사용자 역할 할당
-    const {execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
+    const {execute: assignRoles, mutate, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
 
     // 제출 핸들러 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
@@ -26,8 +26,8 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
             if (role) {
                 addToast({
                     description: '권한이 성공적으로 등록되었습니다.',
-                    title: '등록 완료',
-                    variant: 'default'
+                    title: '권한 등록 완료',
+                    variant: 'normal'
                 });
                 if (onSuccess) onSuccess();
                 onClose();
@@ -35,7 +35,7 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
             if (assignRoleUserError) {
               addToast({
                 description: assignRoleUserError.message,
-                title: '등록 오류',
+                title: '권한 등록 오류',
                 variant: 'critical'
               });
             }
@@ -55,11 +55,6 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
         >
             <Form onSubmit={handleFinish}>
                 <div className="h-40">
-                    {assignRolesError && (
-                        <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                            {assignRolesError.message}
-                        </div>
-                    )}
                     <FormItem name="role" label='권한' required>
                         <Select>
                             <Select.Trigger placeholder='권한을 선택하세요.'/>
@@ -72,6 +67,12 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
                             </Select.Content>
                         </Select>
                     </FormItem>
+                  {assignRolesError &&
+                    addToast({
+                      description: assignRolesError.message,
+                      title: '조회 오류',
+                      variant: 'critical',
+                    })}
                 </div>
                 <div className="mt-6 flex justify-center gap-2">
                     <Button type="button" onClick={onClose}>취소</Button>

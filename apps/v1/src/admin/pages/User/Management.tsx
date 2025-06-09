@@ -4,7 +4,7 @@ import {UserModal} from './components/UserModal';
 import {UserPasswordModal} from './components/UserPasswordModal';
 import {UserRoleModal} from './components/UserRoleModal';
 import {useModal} from '../../components/hook/useModal';
-import {useUsersSWR, useDeleteUser, useUserLoggedIn} from "@plug/common-services";
+import {useUsersSWR, deleteUser, useUserLoggedIn} from "@plug/common-services";
 import {useUser} from './utils/useUser';
 import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import React, {useState, useEffect, useCallback} from 'react';
@@ -16,7 +16,6 @@ export default function UserListPage(): React.ReactElement {
     const {isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal} = useModal();
     const {isOpen: isRoleModalOpen, openModal: openRoleModal, closeModal: closeRoleModal} = useModal();
     const {data, error, isLoading, mutate} = useUsersSWR();
-    const { execute: deleteUser, error: deleteUserError} = useDeleteUser();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
     const [selectedUserId, setSelectedUserId] = useState<number>();
     const [statusData, setStatusData] = useState<Record<number, boolean>>({});
@@ -24,22 +23,21 @@ export default function UserListPage(): React.ReactElement {
     const {addToast} = useToastStore();
 
     // 사용자 정보 수정 모달 
-    const handleDelete = async (userId: number, shouldMutate = true) => {
+    const handleDelete = async (userId: number) => {
         try {
             await deleteUser(userId);
-            if(shouldMutate) await mutate();
+            await mutate();
             addToast({
+                title: '삭제 완료',
                 description: '사용자가 성공적으로 삭제되었습니다.',
-                variant: 'default'
+                variant: 'normal'
             });
-            if (deleteUserError) {
-              addToast({
-                description: error.message,
+        } catch (error) {
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '사용자 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
-              });
-            }
-        } finally {
-          mutate();
+            });
         }
     };
 
@@ -103,7 +101,8 @@ export default function UserListPage(): React.ReactElement {
         if (selectState.size === 0) {
             addToast({
                 description: '삭제할 항목을 선택해주세요.',
-                variant: 'warning'
+                variant: 'warning',
+                title: '선택 필요'
             });
             return;
         }
@@ -113,23 +112,23 @@ export default function UserListPage(): React.ReactElement {
 
         try {
             await Promise.all(
-                Array.from(selectState).map(user => handleDelete(Number(user.id)), false)
+                Array.from(selectState).map(user => handleDelete(Number(user.id)))
             );
             await mutate();
+
             addToast({
                 description: `${selectState.size}개의 항목이 삭제되었습니다.`,
-                variant: 'default'
+                title: '삭제 완료',
+                variant: 'normal'
             });
             setSelectState(new Set());
 
-            if(deleteUserError) {
-              addToast({
-                description: error.message,
+        } catch (error) {
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '항목 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
-              });
-            }
-        } finally {
-          mutate();
+            });
         }
     };
 

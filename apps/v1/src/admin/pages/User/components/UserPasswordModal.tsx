@@ -30,7 +30,7 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
                 addToast({
                     description: '비밀번호가 성공적으로 수정되었습니다.',
                     title: '수정 완료',
-                    variant: 'default'
+                    variant: 'normal'
                 });
                 if (onSuccess) onSuccess();
                 resetForm();
@@ -63,11 +63,6 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
             overlayClassName="bg-black/50"
         >
             <Form onSubmit={handlePasswordFinish}>
-                {passwordUpdateError && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {passwordUpdateError.message}
-                    </div>
-                )}
                 <FormItem name="currentPassword" label='현재 비밀번호' required>
                     <Input.Password
                         placeholder="현재 비밀번호를 입력하세요."

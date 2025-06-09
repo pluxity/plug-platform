@@ -34,52 +34,55 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
         if (mode === 'edit' && detailLineData) {
-            try {
-                const line = await updateLine({
-                    name: values.name || name,
-                    color: color
-                });
+            
+            const line = await updateLine({
+                name: values.name || name,
+                color: color
+            });
 
-                if (line) {
-                    await mutate();
-                    addToast({
-                        variant: "normal",
-                        title: "수정 완료",
-                        description: "호선이 수정되었습니다."
-                    });
-                    resetForm();
-                    if (onSuccess) onSuccess();
-                }
-            } catch (createError) {
+            if (line) {
+                await mutate();
+                addToast({
+                    variant: "normal",
+                    title: "수정 완료",
+                    description: "호선이 수정되었습니다."
+                });
+                resetForm();
+                if (onSuccess) onSuccess();
+            }
+
+            if (lineUpdateError) {
                 addToast({
                     variant: "critical",
                     title: "수정 실패",
-                    description: createError
+                    description: lineUpdateError.message
                 });
             }
         } else {
-            try {
-                const line = await createLine({
-                    name: values.name || name,
-                    color: color
-                });
 
-                if (line) {
-                    addToast({
-                        variant: "normal",
-                        title: "등록 완료",
-                        description: "호선이 등록되었습니다."
-                    });
-                    if (onSuccess) onSuccess();
-                    resetForm();
-                }
-            } catch (error) {
+            const line = await createLine({
+                name: values.name || name,
+                color: color
+            });
+
+            if (line) {
+                addToast({
+                    variant: "normal",
+                    title: "등록 완료",
+                    description: "호선이 등록되었습니다."
+                });
+                if (onSuccess) onSuccess();
+                resetForm();
+            }
+            if(createError) {
                 addToast({
                     variant: "critical",
                     title: "등록 실패",
-                    description: error instanceof Error ? error.message : "등록 중 오류가 발생했습니다."
+                    description: createError.message
                 });
             }
+            
+            mutate();
         }
     }, [createLine, updateLine, name, color, mode, detailLineData, onSuccess, addToast]);
 
@@ -87,13 +90,14 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
         setName('');
         setColor('');
         onClose();
+        mutate();
     };
 
-    const error = createError || lineUpdateError;
     const isProcessing = isCreating || isLineUpdating;
 
     return (
         <Modal
+            key={isOpen ? 'modal-open' : 'modal-closed'}
             title={mode === 'create' ? '호선 등록' : '호선 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
@@ -115,11 +119,6 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
                 <FormItem name="name" label="호선" required>
                     <Input.Text
                         placeholder="호선 이름을 입력하세요"

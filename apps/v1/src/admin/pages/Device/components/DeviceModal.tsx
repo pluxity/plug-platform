@@ -38,6 +38,7 @@ export const DeviceModal = ({
     const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(selectedDeviceId || '');
 
     useEffect(() => {
+      console.log(categoryDevice);
         if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
             setId(detailDeviceData.id);
@@ -68,8 +69,8 @@ export const DeviceModal = ({
                 if (updateError) {
                     addToast({
                         title: '수정 실패',
-                        description: '장비 수정에 실패했습니다.',
-                        variant: 'critical'
+                        variant: 'critical',
+                        description: updateError.message
                     });
                 }
             } finally {
@@ -95,7 +96,7 @@ export const DeviceModal = ({
                 if (createError) {
                     addToast({
                         title: '등록 실패',
-                        description: '장비 등록에 실패했습니다.',
+                        description: createError.message,
                         variant: 'critical'
                     });
                 }
@@ -114,7 +115,6 @@ export const DeviceModal = ({
     };
 
     // 에러 처리
-    const error = createError || updateError;
     const isProcessing = isCreating || isUpdating;
 
     return (

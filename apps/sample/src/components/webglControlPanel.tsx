@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
@@ -17,6 +17,8 @@ interface WebGLControlPanelState {
     backgroundImageUrl: string;
     pathVisibleId: string;
     subwayCreateBodyCount: string;
+    subwayId: string;
+    label3DId: string;
     floorData: Interfaces.FloorInfo[];
 }
 
@@ -50,12 +52,28 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             backgroundImageUrl: '',
             pathVisibleId: '',
             subwayCreateBodyCount: '',
+            subwayId: '',
+            label3DId: '',
             floorData: []
         };
 
         this.registerViewerEvents();
 
-        console.warn('Path3D', Path3D);
+        window.addEventListener('keydown', (evt) => {
+            if (evt.key === '1') {
+                Subway.DoEnter('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
+            }
+            if (evt.key === '2') {
+                Subway.DoExit('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
+            }
+
+            if (evt.key === '3') {
+                Subway.DoEnter('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
+            }
+            if (evt.key === '4') {
+                Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
+            }
+        });
     }
 
     /**
@@ -181,10 +199,49 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainHead')}>LoadTrainHead</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainBody')}>LoadTrainBody</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.LoadTrainTail')}>LoadTrainTail</button><br />
 
                     <input type='text' value={this.state.subwayCreateBodyCount} onChange={this.onSubwayBodyCountInputValueChanged.bind(this)} placeholder='차량개수'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Create')}>Create</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Create')}>Create</button><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Cancel')}>Cancel</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.EnableSetEntranceLocation')}>EnableSetEntranceLocation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.EnableSetStopLocation')}>EnableSetStopLocation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.EnableSetExitLocation')}>EnableSetExitLocation</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Finish')}>Finish</button><br />
+
+                    <input type='text' value={this.state.subwayId} onChange={this.onSubwayIdInputValueChanged.bind(this)} placeholder='열차id'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.HideAll')}>HideAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.ShowAll')}>ShowAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.DoEnter')}>DoEnter</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.DoExit')}>DoExit</button><br />
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Export')}>Export</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Subway.Import')}>Import</button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Label3D') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Create')}>Create</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Cancel')}>Cancel</button><br /><br />
+
+                    <input type='text' value={this.state.label3DId} onChange={this.onLabel3DIdInputValueChanged.bind(this)} placeholder='라벨3did'></input><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Hide')}>Hide</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Show')}>Show</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.HideAll')}>HideAll</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.ShowAll')}>ShowAll</button><br/><br/>
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Clear')}>Clear</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Export')}>Export</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Import')}>Import</button><br/><br/>
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(translate)')}>StartEdit(translate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(rotate)')}>StartEdit(rotate)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(scale)')}>StartEdit(scale)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.FinishEdit')}>FinishEdit</button><br/><br/>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Test') {
@@ -216,6 +273,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Path'>Path</option>
                         <option value='Util'>Util</option>
                         <option value='Subway'>Subway</option>
+                        <option value='Label3D'>Label3D</option>
                         <option value='Test'>Test</option>
                     </select>
                     <br />
@@ -512,6 +570,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Subway.LoadTrainBody': {
                 Subway.LoadTrainBody('/subway_train/body.glb', () => console.log('지하철 몸체 모델 로드 완료'));
             } break;
+            case 'Subway.LoadTrainTail': {
+                Subway.LoadTrainTail('/subway_train/tail.glb', () => console.log('지하철 꼬리 모델 로드 완료'));
+            } break;
             case 'Subway.Create': {
                 const id = window.crypto.randomUUID();
                 const bodyCount = Number.parseInt(this.state.subwayCreateBodyCount);
@@ -520,38 +581,115 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     bodyCount: bodyCount
                 }, () => console.log('지하철 생성 완료'));
             } break;
+            case 'Subway.Cancel': {
+                Subway.Cancel();
+            } break;
+            case 'Subway.EnableSetEntranceLocation': {
+                Subway.EnableSetEntranceLocation();
+            } break;
+            case 'Subway.EnableSetStopLocation': {
+                Subway.EnableSetStopLocation();
+            } break;
+            case 'Subway.EnableSetExitLocation': {
+                Subway.EnableSetExitLocation();
+            } break;
+            case 'Subway.Finish': {
+                const data = Subway.Finish();
+                console.log('subway ->', data);
+            } break;
+            case 'Subway.Hide': {
+                Subway.Hide(this.state.subwayId);
+            } break;
+            case 'Subway.Show': {
+                Subway.Show(this.state.subwayId);
+            } break;
+            case 'Subway.HideAll': {
+                Subway.HideAll();
+            } break;
+            case 'Subway.ShowAll': {
+                Subway.ShowAll();
+            } break;
+            case 'Subway.DoEnter': {
+                Subway.Show(this.state.subwayId);
+                Subway.DoEnter(this.state.subwayId, 5.0, () => console.log('열차 진입 완료:', this.state.subwayId));
+            } break;
+            case 'Subway.DoExit': {
+                Subway.Show(this.state.subwayId);
+                Subway.DoExit(this.state.subwayId, 5.0, () => {
+                    console.log('열차 진출 완료:', this.state.subwayId);
+                    Subway.Hide(this.state.subwayId);
+                });
+            } break;
+            case 'Subway.Export': {
+                const data = Subway.Export();
+                console.log('subway data ->', data);
+            } break;
+            case 'Subway.Import': {
+                fetch('/subway_train/trainSampleData.json').then(res => res.json()).then(data => {
+                    console.log('/subway_train/trainSampleData.json', data);
+                    Subway.Import(data);
+                });
+            } break;
+
+            /**
+             * Label3D
+             */
+            case 'Label3D.Create': {
+                const id = window.crypto.randomUUID();
+                Label3D.Create({
+                    id: id,
+                    displayText: '공간명' + (Math.floor(Math.random() * 10).toString()),
+                }, (data: unknown) => {
+                    console.log('라벨 생성', data);
+                });
+            } break;
+            case 'Label3D.Cancel': {
+                Label3D.Cancel();
+            } break;
+            case 'Label3D.Hide': {
+                Label3D.Hide(this.state.label3DId);
+            } break;
+            case 'Label3D.Show': {
+                Label3D.Show(this.state.label3DId);
+            } break;
+            case 'Label3D.HideAll': {
+                Label3D.HideAll();
+            } break;
+            case 'Label3D.ShowAll': {
+                Label3D.ShowAll();
+            } break;
+            case 'Label3D.Clear': {
+                Label3D.Clear();
+            } break;
+            case 'Label3D.Export': {
+                const data = Label3D.Export();
+                console.log('Label3D.Export ->', data);
+            } break;
+            case 'Label3D.Import': {
+                fetch('/label3dsampledata.json').then(res => res.json()).then(data => {
+                    console.log('/label3dsampledata.json', data);
+                    Label3D.Import(data);
+                });
+            } break;
+            case 'Label3D.StartEdit(translate)': {
+                Label3D.StartEdit('translate');
+            } break;
+            case 'Label3D.StartEdit(rotate)': {
+                Label3D.StartEdit('rotate');
+            } break;
+            case 'Label3D.StartEdit(scale)': {
+                Label3D.StartEdit('scale');
+            } break;
+            case 'Label3D.FinishEdit': {
+                Label3D.FinishEdit();
+            } break;
 
             /**
              * Test
              */
             case 'Test': {
-                Poi.Import({
-                    "id": "f8ad0d19-5c66-450f-ac80-b9c54125aec1",
-                    "iconUrl": "SamplePoiIcon.png",
-                    "modelUrl": "ScreenDoor.glb",
-                    "displayText": "f8ad0d19",
-                    "property": {
-                        "testText": "테스트 속성",
-                        "testInt": 11,
-                        "testFloat": 2.2
-                    },
-                    "floorId": "1",
-                    "position": {
-                        "x": 12.850335184656242,
-                        "y": -4.210000038146973,
-                        "z": -3.049856412525531
-                    },
-                    "rotation": {
-                        "x": 0,
-                        "y": -1.1702129926350338,
-                        "z": 0
-                    },
-                    "scale": {
-                        "x": 1.9616787134943003,
-                        "y": 1.9616787134943003,
-                        "z": 1.9616787134943003
-                    }
-                });
+                Model.HideAll();
+                Model.Show('0');
             } break;
         }
     }
@@ -689,6 +827,22 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onSubwayBodyCountInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ subwayCreateBodyCount: evt.target.value });
+    }
+
+    /**
+     * 지하철 id 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onSubwayIdInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ subwayId: evt.target.value });
+    }
+
+    /**
+     * 라벨3d id값 변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onLabel3DIdInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ label3DId: evt.target.value });
     }
 
     /**

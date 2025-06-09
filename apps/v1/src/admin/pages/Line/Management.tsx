@@ -64,7 +64,7 @@ export default function LinePage() {
             await mutate();
             addToast({
                 variant: "normal",
-                title: '일괄 삭제 완료',
+                title: '삭제 완료',
                 description: `${selectedLines.size}개의 항목이 삭제되었습니다.`
             });
             setSelectedLines(new Set());

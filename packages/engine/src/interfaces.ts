@@ -186,6 +186,38 @@ interface SubwayCreateOption {
     bodyCount: number;
 }
 
+/**
+ * 지하철 임포트/익스포트 옵션
+ */
+interface SubwayImportOption {
+    id: string;
+    pathId: string;
+    bodyCount: number;
+    entranceUValue: number;
+    stopUValue: number;
+    exitUValue: number;
+}
+
+/**
+ * 라벨3d 생성 옵션
+ */
+interface Label3DCreateOption {
+    id: string;
+    displayText: string;
+}
+
+/**
+ * 라벨3d 임포트 옵션
+ */
+interface Label3DImportOption {
+    id: string;
+    displayText: string;
+    floorId: string;
+    localPosition: Vector3;
+    localRotation: Vector3;
+    localScale: Vector3;
+}
+
 export {
     Vector3Custom,
     Vector3,
@@ -205,4 +237,7 @@ export {
     Path3DPointData,
     Path3DData,
     SubwayCreateOption,
+    SubwayImportOption,
+    Label3DCreateOption,
+    Label3DImportOption,
 }
