@@ -11,7 +11,6 @@ export interface UserCreateRequest {
 }
 
 export interface UserUpdateRequest {
-    username: string;
     name: string;
     code?: string;
     phoneNumber: string;

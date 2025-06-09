@@ -18,13 +18,13 @@ export default function AssetPage() {
 
     const addToast = useToastStore((state) => state.addToast);
 
-    const handleDelete = async (assetId: number) => {
+    const handleDelete = async (assetId: number, shouldMutate = true) => {
         const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
         if (!isConfirmed) return;
 
         try {
             await deleteAsset(assetId);
-            await mutate();
+            if (shouldMutate) await mutate();
             addToast({
                 variant: 'normal',
                 title: '삭제 완료',
@@ -64,9 +64,9 @@ export default function AssetPage() {
 
         try {
             await Promise.all(
-                Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)))
+                Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)), false)
             );
-
+            await mutate();
             addToast({
                 variant: 'normal',
                 title: '일괄 삭제 완료',

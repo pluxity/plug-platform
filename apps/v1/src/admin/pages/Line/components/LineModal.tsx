@@ -18,7 +18,7 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
     const [color, setColor] = useState<string>('');
 
     const {execute: createLine, isLoading: isCreating, error: createError} = useLineCreate();
-    const {data: detailLineData} = useLineDetailSWR(mode === 'edit' && selectedLineId ? Number(selectedLineId) : 0);
+    const {mutate, data: detailLineData} = useLineDetailSWR(mode === 'edit' && selectedLineId ? Number(selectedLineId) : 0);
     const {
         execute: updateLine,
         isLoading: isLineUpdating,
@@ -41,6 +41,7 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                 });
 
                 if (line) {
+                    await mutate();
                     addToast({
                         variant: "normal",
                         title: "수정 완료",

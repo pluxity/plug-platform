@@ -4,7 +4,7 @@ import {UserModal} from './components/UserModal';
 import {UserPasswordModal} from './components/UserPasswordModal';
 import {UserRoleModal} from './components/UserRoleModal';
 import {useModal} from '../../components/hook/useModal';
-import {useUsersSWR, useDeleteUser, useUserLoggedIn} from "@plug/common-services";
+import {useUsersSWR, deleteUser, useUserLoggedIn} from "@plug/common-services";
 import {useUser} from './utils/useUser';
 import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import React, {useState, useEffect, useCallback} from 'react';
@@ -16,7 +16,6 @@ export default function UserListPage(): React.ReactElement {
     const {isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal} = useModal();
     const {isOpen: isRoleModalOpen, openModal: openRoleModal, closeModal: closeRoleModal} = useModal();
     const {data, error, isLoading, mutate} = useUsersSWR();
-    const { execute: deleteUser, error: deleteUserError} = useDeleteUser();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
     const [selectedUserId, setSelectedUserId] = useState<number>();
     const [statusData, setStatusData] = useState<Record<number, boolean>>({});
@@ -29,17 +28,16 @@ export default function UserListPage(): React.ReactElement {
             await deleteUser(userId);
             await mutate();
             addToast({
+                title: '삭제 완료',
                 description: '사용자가 성공적으로 삭제되었습니다.',
                 variant: 'default'
             });
-            if (deleteUserError) {
-              addToast({
-                description: error.message,
+        } catch (error) {
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '사용자 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
-              });
-            }
-        } finally {
-          mutate();
+            });
         }
     };
 
@@ -107,6 +105,7 @@ export default function UserListPage(): React.ReactElement {
             addToast({
                 description: '삭제할 항목을 선택해주세요.',
                 variant: 'warning'
+                title: '선택 필요'
             });
             return;
         }
@@ -122,14 +121,12 @@ export default function UserListPage(): React.ReactElement {
             });
             setSelectState(new Set());
 
-            if(deleteUserError) {
-              addToast({
-                description: error.message,
+        } catch (error) {
+            addToast({
+                title: '삭제 실패',
+                description: error instanceof Error ? error.message : '항목 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
-              });
-            }
-        } finally {
-          mutate();
+            });
         }
     };
 
