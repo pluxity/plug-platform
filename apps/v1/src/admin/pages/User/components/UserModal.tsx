@@ -23,7 +23,7 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
     const {execute: createUser, isLoading: isCreating, error: createError} = useCreateUser();
 
     // 사용자 상세 조회 훅 
-    const {data: detailUserData} = useUserDetailSWR(mode === 'edit' && selectedUserId ? Number(selectedUserId) : 0);
+    const {mutate, data: detailUserData} = useUserDetailSWR(mode === 'edit' && selectedUserId ? Number(selectedUserId) : 0);
 
     // 사용자 수정 훅
     const {
@@ -50,6 +50,7 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                 });
 
                 if (user) {
+                    await mutate();
                     addToast({
                         description: '사용자가 성공적으로 수정되었습니다.',
                         title: '사용자 수정',
