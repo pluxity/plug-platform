@@ -46,9 +46,6 @@ export default function LinePage() {
     const lineData = useLine(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = async () => {
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-        
         if (selectedLines.size === 0) {
             return addToast({
                 variant: "warning",
@@ -56,6 +53,9 @@ export default function LinePage() {
                 description: "삭제할 항목을 선택해주세요."
             });
         }
+
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
 
         try {
             await Promise.all(
