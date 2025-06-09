@@ -688,33 +688,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              * Test
              */
             case 'Test': {
-                Poi.Import({
-                    "id": "f8ad0d19-5c66-450f-ac80-b9c54125aec1",
-                    "iconUrl": "SamplePoiIcon.png",
-                    "modelUrl": "ScreenDoor.glb",
-                    "displayText": "f8ad0d19",
-                    "property": {
-                        "testText": "테스트 속성",
-                        "testInt": 11,
-                        "testFloat": 2.2
-                    },
-                    "floorId": "1",
-                    "position": {
-                        "x": 12.850335184656242,
-                        "y": -4.210000038146973,
-                        "z": -3.049856412525531
-                    },
-                    "rotation": {
-                        "x": 0,
-                        "y": -1.1702129926350338,
-                        "z": 0
-                    },
-                    "scale": {
-                        "x": 1.9616787134943003,
-                        "y": 1.9616787134943003,
-                        "z": 1.9616787134943003
-                    }
-                });
+                Model.HideAll();
+                Model.Show('0');
             } break;
         }
     }
