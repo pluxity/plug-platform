@@ -114,9 +114,11 @@ export default function UserListPage(): React.ReactElement {
             await Promise.all(
                 Array.from(selectState).map(user => handleDelete(Number(user.id)))
             );
+            await mutate();
 
             addToast({
                 description: `${selectState.size}개의 항목이 삭제되었습니다.`,
+                title: '삭제 완료',
                 variant: 'default'
             });
             setSelectState(new Set());
