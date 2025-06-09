@@ -66,8 +66,8 @@ export const DeviceModal = ({
                 if (updateError) {
                     addToast({
                         title: '수정 실패',
-                        description: updateError.error,
-                        variant: 'critical'
+                        variant: 'critical',
+                        description: updateError.message
                     });
                 }
             } finally {
@@ -111,7 +111,6 @@ export const DeviceModal = ({
     };
 
     // 에러 처리
-    const error = createError || updateError;
     const isProcessing = isCreating || isUpdating;
 
     return (
