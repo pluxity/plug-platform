@@ -226,7 +226,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
 
 
     // 에러 메시지 표시
-    const error = fileError || assetError || assetUpdateError;
     const isProcessing = isFileUploading || isAssetCreating || isAssetUpdating;
 
     // 파일 선택기 열기
@@ -262,11 +261,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
                 <FormItem name="assetRegistName" label='이름' required>
                     <Input.Text
                         placeholder="에셋 이름을 입력하세요"

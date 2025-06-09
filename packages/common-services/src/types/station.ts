@@ -25,7 +25,6 @@ export interface StationCreateRequest {
     floorId: string;
   }[],
   lineIds: number[],
-  route: string;
   externalCode: string;
 }
 

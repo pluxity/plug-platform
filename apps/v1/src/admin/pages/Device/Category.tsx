@@ -62,14 +62,14 @@ export default function DeviceCategory() {
             )
             await mutate();
             addToast({
-                title: '일괄 삭제 완료',
+                title: '삭제 완료',
                 description: `${selectedCategories.size}개의 분류가 삭제되었습니다.`,
                 variant: 'normal'
             });
             setSelectedCategories(new Set());
         } catch (error){
             addToast({
-                title: '일괄 삭제 실패',
+                title: '삭제 실패',
                 description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
                 variant: 'critical'
             });

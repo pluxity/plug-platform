@@ -54,7 +54,7 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                 addToast({
                     variant: "critical",
                     title: "수정 실패",
-                    description: createError
+                    description: createError.message
                 });
             }
         } else {
@@ -73,12 +73,13 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
-            } catch (error) {
-                addToast({
+                if(createError)addToast({
                     variant: "critical",
                     title: "등록 실패",
-                    description: error instanceof Error ? error.message : "등록 중 오류가 발생했습니다."
+                    description: createError.message
                 });
+            } finally {
+                mutate();
             }
         }
     }, [createLine, updateLine, name, color, mode, detailLineData, onSuccess, addToast]);
@@ -87,13 +88,14 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
         setName('');
         setColor('');
         onClose();
+        mutate();
     };
 
-    const error = createError || lineUpdateError;
     const isProcessing = isCreating || isLineUpdating;
 
     return (
         <Modal
+            key={isOpen ? 'modal-open' : 'modal-closed'}
             title={mode === 'create' ? '호선 등록' : '호선 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
@@ -115,11 +117,6 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
                 <FormItem name="name" label="호선" required>
                     <Input.Text
                         placeholder="호선 이름을 입력하세요"

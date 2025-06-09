@@ -30,7 +30,7 @@ export default function UserListPage(): React.ReactElement {
             addToast({
                 title: '삭제 완료',
                 description: '사용자가 성공적으로 삭제되었습니다.',
-                variant: 'default'
+                variant: 'normal'
             });
         } catch (error) {
             addToast({
@@ -119,7 +119,7 @@ export default function UserListPage(): React.ReactElement {
             addToast({
                 description: `${selectState.size}개의 항목이 삭제되었습니다.`,
                 title: '삭제 완료',
-                variant: 'default'
+                variant: 'normal'
             });
             setSelectState(new Set());
 

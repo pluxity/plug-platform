@@ -69,7 +69,7 @@ export default function AssetPage() {
             await mutate();
             addToast({
                 variant: 'normal',
-                title: '일괄 삭제 완료',
+                title: '삭제 완료',
                 description: `${selectedAssets.size}개의 항목이 삭제되었습니다.`
             });
             setSelectedAssets(new Set());
