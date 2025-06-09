@@ -31,7 +31,7 @@ export const DeviceModal = ({
     const { data: categoryDevice } = useCategoriesSWR();
     
     // 디바이스 상세 조회 훅 
-    const { data: detailDeviceData } = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? selectedDeviceId : '');
+    const { data: detailDeviceData, mutate } = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? selectedDeviceId : '');
 
     // 디바이스 수정 훅 
     const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(selectedDeviceId || '');
@@ -53,6 +53,7 @@ export const DeviceModal = ({
                 })
 
                 if (device) {
+                    await mutate();
                     addToast({
                         title: '수정 성공',
                         description: '장비가 성공적으로 수정되었습니다.',

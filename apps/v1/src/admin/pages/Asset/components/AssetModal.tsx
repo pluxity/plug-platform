@@ -39,7 +39,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
     const {execute: createAsset, isLoading: isAssetCreating, error: assetError} = useAssetCreate();
 
     // 에셋 상세 조회 훅
-    const {data: detailAssetData} = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
+    const {mutate, data: detailAssetData} = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
 
     // 에셋 수정 훅
     const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError} = useAssetUpdate(Number(selectedAssetId));
@@ -163,6 +163,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
 
                 // 성공 처리
                 if (asset) {
+                    await mutate();
                     addToast({
                         title: '수정 완료',
                         description: '에셋이 성공적으로 수정되었습니다.',
