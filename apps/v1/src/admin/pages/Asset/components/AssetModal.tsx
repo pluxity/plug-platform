@@ -75,14 +75,13 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                         variant: 'normal'
                     });
                 }
-            })
-            .catch(err => {
-                console.error('3D 파일 업로드 실패:', err);
-                addToast({
+                if(fileError){
+                  addToast({
                     title: '업로드 실패',
-                    description: err instanceof Error ? err.message : '3D 모델 파일 업로드에 실패했습니다.',
+                    description: fileError.message,
                     variant: 'critical'
-                });
+                  })
+                }
             })
             .finally(() => {
                 setIsUploading(false);
@@ -117,14 +116,13 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                         variant: 'normal'
                     });
                 }
-            })
-            .catch(err => {
-                console.error('썸네일 파일 업로드 실패:', err);
-                addToast({
+                if(fileError){
+                  addToast({
                     title: '업로드 실패',
-                    description: err instanceof Error ? err.message : '썸네일 업로드에 실패했습니다.',
+                    description: fileError.message,
                     variant: 'critical'
-                });
+                  })
+                }
             })
             .finally(() => {
                 setIsUploading(false);
@@ -173,13 +171,15 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                     if (onSuccess) onSuccess();
                 }
 
-            } catch (error) {
-                console.error('에셋 수정 실패:', error);
-                addToast({
+                if(assetUpdateError){
+                  addToast({
                     title: '수정 실패',
-                    description: error instanceof Error ? error.message : '에셋 수정에 실패했습니다.',
+                    description: assetUpdateError.message,
                     variant: 'critical'
-                });
+                  })
+                }
+            }  finally {
+               setIsUploading(false);
             }
             // 등록 모달 제출
         } else {
@@ -211,13 +211,15 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
-            } catch (error) {
-                console.error('에셋 등록 실패:', error);
-                addToast({
+                if(assetError){
+                  addToast({
                     title: '등록 실패',
-                    description: error instanceof Error ? error.message : '에셋 등록에 실패했습니다.',
+                    description: assetError.message,
                     variant: 'critical'
-                });
+                  })
+                }
+            } finally {
+              setIsUploading(false);
             }
         }
     }, [createAsset, uploadedModelId, name, mode, onSuccess, detailAssetData, updateAsset, uploadThumbnailId, resetForm, addToast]);

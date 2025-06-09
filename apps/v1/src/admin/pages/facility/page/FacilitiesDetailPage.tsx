@@ -92,7 +92,7 @@ export default function FacilitiesDetailPage() {
               <th className="border border-gray-300 p-2 bg-gray-50">노선</th>
               <td className="border border-gray-300 p-2">
                 <FormItem name="lineIds" required>
-                  <>
+                  <div>
                     <Select
                       type="multiple"
                       className="w-full mb-[-16px]"
@@ -111,7 +111,7 @@ export default function FacilitiesDetailPage() {
                         ))}
                       </Select.Content>
                     </Select>
-                  </>
+                  </div>
                 </FormItem>
               </td>
               <th className="border border-gray-300 p-2 bg-gray-50">외부 코드</th>
@@ -172,7 +172,7 @@ export default function FacilitiesDetailPage() {
             </tr>
             <tr>
               <th className="border border-gray-300 p-2 bg-gray-50" rowSpan={2}>썸네일 이미지</th>
-              <td rowSpan={2}>
+              <td rowSpan={2} className='p-2'>
                 {fileStates.thumbnail.file ? (
                   <img
                     src={URL.createObjectURL(fileStates.thumbnail.file)}

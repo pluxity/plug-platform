@@ -1,4 +1,4 @@
-import { api } from '@plug/api-hooks';
+import { api, useDelete } from "@plug/api-hooks";
 import { useGet, usePost, usePatch, useSWRApi, usePut } from '@plug/api-hooks';
 import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
 import type { UserResponse, UserCreateRequest, UserUpdateRequest, UserUpdatePasswordRequest } from '@plug/common-services';
@@ -26,8 +26,8 @@ export const useCreateUser = () => {
 };
 
 // 사용자 삭제
-export const deleteUser = async (userId: number) => {
-  return await api.delete(`${USER_API}/${userId}`, { requireAuth: true });
+export const useDeleteUser = async (userId: number) => {
+  return useDelete(`${USER_API}/${userId}`, { requireAuth: true });
 }
 
 // 사용자 정보 수정

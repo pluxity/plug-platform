@@ -9,16 +9,11 @@ interface FacilityProps {
     onSuccess?: () => void;
 }
 
-const MESSAGES = {
-    SUCCESS: '도면이 성공적으로 등록되었습니다.',
-    ERROR: '도면 등록에 실패하였습니다.'
-} as const;
-
 export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [facilityName, setFacilityName] = useState('');
 
-    const {execute} = useCreateStation();
+    const {execute, error: createError} = useCreateStation();
     const addToast = useToastStore((state) => state.addToast);
 
     const {
@@ -76,23 +71,24 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
                 route: 'facility'
             });
 
-            if (result) {
+          if (createError) {
+            addToast({
+              title: '등록 실패',
+              description: createError.message || '역사 정보 등록 중 오류가 발생했습니다.',
+              variant: 'critical',
+            });
+          }
+
+          if (result) {
                 addToast({
                     title: '등록 완료',
-                    description: MESSAGES.SUCCESS,
+                    description: '역사 정보가 등록되었습니다.',
                     variant: 'normal',
                 });
                 onSuccess?.();
                 resetForm();
             }
 
-        } catch (error) {
-            console.error(MESSAGES.ERROR, error);
-            addToast({
-                title: '등록 실패',
-                description: error instanceof Error ? error.message : MESSAGES.ERROR,
-                variant: 'critical',
-            });
         } finally {
             setIsLoading(false);
         }
