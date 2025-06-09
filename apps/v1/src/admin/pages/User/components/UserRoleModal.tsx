@@ -16,7 +16,7 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
     const {addToast} = useToastStore();
 
     // 사용자 역할 할당
-    const {execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
+    const {execute: assignRoles, mutate, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
 
     // 제출 핸들러 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
@@ -26,8 +26,8 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
             if (role) {
                 addToast({
                     description: '권한이 성공적으로 등록되었습니다.',
-                    title: '등록 완료',
-                    variant: 'default'
+                    title: '권한 등록 완료',
+                    variant: 'normal'
                 });
                 if (onSuccess) onSuccess();
                 onClose();
@@ -35,7 +35,7 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
             if (assignRoleUserError) {
               addToast({
                 description: assignRoleUserError.message,
-                title: '등록 오류',
+                title: '권한 등록 오류',
                 variant: 'critical'
               });
             }

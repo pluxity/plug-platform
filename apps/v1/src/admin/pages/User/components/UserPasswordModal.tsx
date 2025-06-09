@@ -30,7 +30,7 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
                 addToast({
                     description: '비밀번호가 성공적으로 수정되었습니다.',
                     title: '수정 완료',
-                    variant: 'default'
+                    variant: 'normal'
                 });
                 if (onSuccess) onSuccess();
                 resetForm();

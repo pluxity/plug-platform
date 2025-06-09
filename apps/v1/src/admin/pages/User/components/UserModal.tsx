@@ -53,7 +53,7 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                     addToast({
                         description: '사용자가 성공적으로 수정되었습니다.',
                         title: '사용자 수정',
-                        variant: 'default'
+                        variant: 'normal'
                     });
                     resetForm();
                     if (onSuccess) onSuccess();
@@ -83,7 +83,7 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                     addToast({
                         description: '사용자가 성공적으로 등록되었습니다.',
                         title: '등록 성공',
-                        variant: 'default'
+                        variant: 'normal'
                     });
                     resetForm();
                     if (onSuccess) onSuccess();
