@@ -6,6 +6,7 @@ import { Engine3D } from '../engine';
 let engine: Engine3D;
 let headModelSrc: THREE.Group;
 let bodyModelSrc: THREE.Group;
+let tailModelSrc: THREE.Group;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -57,7 +58,29 @@ function LoadTrainBody(url: string, onLoad: Function) {
     });
 }
 
+/**
+ * 지하철 열차 꼬리 모델 로드
+ * @param url - 모델링 주소
+ * @param onLoad - 로드 완료 후 호출 콜백
+ */
+function LoadTrainTail(url: string, onLoad: Function) {
+    new Addon.GLTFLoader().load(url, (gltf)=>{
+
+        tailModelSrc = gltf.scene;
+        
+        // 이벤트 내부 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onSubwayModelLoader_TailModelLoaded',
+            target: tailModelSrc
+        });
+
+        // 완료 콜백 호출
+        onLoad?.();
+    });
+}
+
 export {
     LoadTrainHead,
-    LoadTrainBody
+    LoadTrainBody,
+    LoadTrainTail,
 };

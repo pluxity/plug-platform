@@ -7,6 +7,7 @@ export * as Poi from './poi';
 export * as Path3D from './path3d';
 export * as Interfaces from './interfaces';
 export * as Subway from './subway';
+export * as Label3D from './label3d';
 
 // Util의 경우 내부사용 함수도 있으므로 지정한것들만 export하도록 처리
 import * as UtilInternal from './util';

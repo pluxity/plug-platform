@@ -1,2 +1,3 @@
 export * from './create';
-export { LoadTrainBody, LoadTrainHead } from './subwaymodelloader';
+export { LoadTrainBody, LoadTrainHead, LoadTrainTail } from './subwaymodelloader';
+export * from './data';
