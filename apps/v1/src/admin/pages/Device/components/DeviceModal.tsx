@@ -61,13 +61,15 @@ export const DeviceModal = ({
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
-            } catch (error) {
-                addToast({
-                    title: '수정 실패',
-                    description: '장비 수정에 실패했습니다.',
-                    variant: 'critical'
-                });
-                console.error('장비 수정 실패:', error)
+                if (updateError) {
+                    addToast({
+                        title: '수정 실패',
+                        description: '장비 수정에 실패했습니다.',
+                        variant: 'critical'
+                    });
+                }
+            } finally {
+              mutate();
             }
         } else {
             try {
@@ -86,13 +88,15 @@ export const DeviceModal = ({
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
-            } catch (error) {
-                addToast({
-                    title: '등록 실패',
-                    description: '장비 등록에 실패했습니다.',
-                    variant: 'critical'
-                });
-                console.error('장비 등록 실패:', error);
+                if (createError) {
+                    addToast({
+                        title: '등록 실패',
+                        description: '장비 등록에 실패했습니다.',
+                        variant: 'critical'
+                    });
+                }
+            } finally {
+              mutate();
             }
         }
     }, [mode, detailDeviceData, name, id, createDevice, updateDevice, onSuccess]);

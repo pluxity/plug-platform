@@ -4,6 +4,7 @@ import { FileState, FileType } from '../types/file';
 import {ModelInfo} from "@plug/engine/src/interfaces";
 import * as Px from "@plug/engine/src";
 import { getFileInfo } from "@plug/common-services";
+import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
 
 export const useFileUploader = (
     onNameSet?: (name: string) => void,
@@ -14,6 +15,7 @@ export const useFileUploader = (
     });
     const [isUploading, setIsUploading] = useState(false);
     const { execute: uploadFile, error: fileError } = useFileUpload();
+  const addToast = useToastStore((state) => state.addToast);
 
     const [modelData, setModelData] = useState<ModelInfo[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -29,11 +31,16 @@ export const useFileUploader = (
             Px.Model.GetModelHierarchyFromUrl(fileUrl, (data: ModelInfo[]) => {
                     setModelData(data);
             });
-            
-        } catch (error) {
-            console.error('모델 정보 로드 실패:', error);
-            throw error;
-        } finally {
+
+            if (fileError) {
+              addToast({
+                title: '업로드 실패',
+                description: fileError.message || '모델 정보 로드 중 오류가 발생했습니다.',
+                variant: 'critical',
+              });
+              throw fileError;
+            }
+        }  finally {
             setIsLoading(false);
         }
     };
@@ -80,8 +87,14 @@ export const useFileUploader = (
             }
 
             return fileId;
-        } catch (err) {
-            console.error(`${fileType} 파일 업로드 실패:`, err);
+            if (fileError) {
+              addToast({
+                title: '업로드 실패',
+                description: fileError.message || '파일 업로드 중 오류가 발생했습니다.',
+                variant: 'critical',
+              });
+              throw fileError;
+            }
         } finally {
             setIsUploading(false);
         }

@@ -49,11 +49,11 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
-            } catch (error) {
+            } catch (createError) {
                 addToast({
                     variant: "critical",
                     title: "수정 실패",
-                    description: error instanceof Error ? error.message : "수정 중 오류가 발생했습니다."
+                    description: createError
                 });
             }
         } else {

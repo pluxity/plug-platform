@@ -35,13 +35,15 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
                 if (onSuccess) onSuccess();
                 resetForm();
             }
-        } catch (error) {
-            console.error('사용자 비밀번호 수정 실패:', error);
-            addToast({
-                description: error instanceof Error ? error.message : '비밀번호 수정 중 오류가 발생했습니다.',
-                title: '수정 오류',
+            if (passwordUpdateError) {
+              addToast({
+                description: passwordUpdateError.message,
+                title: '비밀번호 수정 오류',
                 variant: 'critical'
-            });
+              });
+            }
+        } finally {
+          mutate();
         }
     }, [updatePassword, onSuccess, currentPassword, newPassword, addToast]);
 

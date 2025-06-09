@@ -4,7 +4,7 @@ import {UserModal} from './components/UserModal';
 import {UserPasswordModal} from './components/UserPasswordModal';
 import {UserRoleModal} from './components/UserRoleModal';
 import {useModal} from '../../components/hook/useModal';
-import {useUsersSWR, deleteUser, useUserLoggedIn} from "@plug/common-services";
+import {useUsersSWR, useDeleteUser, useUserLoggedIn} from "@plug/common-services";
 import {useUser} from './utils/useUser';
 import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrapper";
 import React, {useState, useEffect, useCallback} from 'react';
@@ -16,10 +16,11 @@ export default function UserListPage(): React.ReactElement {
     const {isOpen: isPasswordModalOpen, openModal: openPasswordModal, closeModal: closePasswordModal} = useModal();
     const {isOpen: isRoleModalOpen, openModal: openRoleModal, closeModal: closeRoleModal} = useModal();
     const {data, error, isLoading, mutate} = useUsersSWR();
+    const { execute: deleteUser, error: deleteUserError} = useDeleteUser();
     const [selectState, setSelectState] = useState<Set<User>>(new Set());
     const [selectedUserId, setSelectedUserId] = useState<number>();
     const [statusData, setStatusData] = useState<Record<number, boolean>>({});
-    const {execute: loggedInUser} = useUserLoggedIn();
+    const {execute: loggedInUser, error: userLoggedInError} = useUserLoggedIn();
     const {addToast} = useToastStore();
 
     // 사용자 정보 수정 모달 
@@ -31,11 +32,14 @@ export default function UserListPage(): React.ReactElement {
                 description: '사용자가 성공적으로 삭제되었습니다.',
                 variant: 'default'
             });
-        } catch (error) {
-            addToast({
-                description: error instanceof Error ? error.message : '사용자 삭제 중 오류가 발생했습니다.',
+            if (deleteUserError) {
+              addToast({
+                description: error.message,
                 variant: 'critical'
-            });
+              });
+            }
+        } finally {
+          mutate();
         }
     };
 
@@ -78,11 +82,15 @@ export default function UserListPage(): React.ReactElement {
                     });
                     setStatusData(statusMap);
                 }
-            } catch (error) {
-                addToast({
-                    description: error instanceof Error ? error.message : '로그인 사용자 정보 조회에 실패했습니다.',
-                    variant: 'critical'
-                });
+                if (userLoggedInError) {
+                  addToast({
+                    description: error.message,
+                    variant: 'critical',
+                    title: '로그인 사용자 정보 조회 실패'
+                  });
+                }
+            } finally {
+              mutate();
             }
         };
         fetchLoggedInUsers();
@@ -114,12 +122,14 @@ export default function UserListPage(): React.ReactElement {
             });
             setSelectState(new Set());
 
-        } catch (error) {
-            addToast({
-                title: '삭제 실패',
-                description: error instanceof Error ? error.message : '항목 삭제 중 오류가 발생했습니다.',
+            if(deleteUserError) {
+              addToast({
+                description: error.message,
                 variant: 'critical'
-            });
+              });
+            }
+        } finally {
+          mutate();
         }
     };
 

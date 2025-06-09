@@ -66,13 +66,13 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                         variant: 'normal'
                     });
                 }
-            })
-            .catch(error => {
-                addToast({
-                    title: '업로드 실패',
-                    description: error instanceof Error ? error.message : '장비 분류 아이콘 업로드에 실패했습니다.',
+                if(fileError) {
+                  addToast({
+                    title: '파일 업로드 실패',
+                    description: fileError.message,
                     variant: 'critical'
-                });
+                  });
+                }
             })
             .finally(() => {
                 setIsUploading(false);
@@ -97,12 +97,15 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
-            } catch (error) {
-                addToast({
+                if (categoryUpdateError) {
+                  addToast({
                     title: '수정 실패',
-                    description: error instanceof Error ? error.message : '장비 분류 수정에 실패했습니다.',
+                    description: categoryUpdateError.message,
                     variant: 'critical'
-                });
+                  });
+                }
+            } finally {
+              setIsUploading(false);
             }
         } else {
             if (!uploadIconFileId) {
@@ -128,12 +131,15 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                     if (onSuccess) onSuccess();
                     resetForm();
                 }
-            } catch (error) {
-                addToast({
+                if (createError) {
+                  addToast({
                     title: '등록 실패',
-                    description: error instanceof Error ? error.message : '장비 분류 등록에 실패했습니다.',
+                    description: createError.message,
                     variant: 'critical'
-                });
+                  });
+                }
+            } finally {
+              setIsUploading(false);
             }
         }
     }, [createCategory, updateCategory, detailCategoryData, onSuccess, name, uploadIconFileId, mode, addToast]);

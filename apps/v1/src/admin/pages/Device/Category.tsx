@@ -26,12 +26,15 @@ export default function DeviceCategory() {
                 description: '분류가 성공적으로 삭제되었습니다.',
                 variant: 'normal'
             });
-        } catch (error) {
-            addToast({
+            if (error) {
+              addToast({
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
+                description: error.message,
                 variant: 'critical'
-            });
+              });
+            }
+        } finally {
+          mutate();
         }
     };
 
@@ -64,14 +67,14 @@ export default function DeviceCategory() {
                     variant: 'normal'
                 });
                 setSelectedCategories(new Set());
-            })
-            .catch((error) => {
-                addToast({
-                    title: '일괄 삭제 실패',
-                    description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
+                if (error) {
+                  addToast({
+                    title: '삭제 실패',
+                    description: error.message,
                     variant: 'critical'
-                });
-            });
+                  });
+                }
+            })
     }
 
     return (

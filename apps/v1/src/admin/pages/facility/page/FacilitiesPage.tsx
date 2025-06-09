@@ -5,6 +5,7 @@ import {StateInfoWrapper} from "@plug/v1/admin/components/boundary/StateInfoWrap
 import {useModal} from "@plug/v1/admin/components/hook/useModal";
 import {FacilityModal} from "@plug/v1/admin/pages/facility/component/FacilityModal";
 import {Station, useStationsSWR} from "@plug/common-services";
+import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
 
 export default function FacilitiesPage() {
     const navigate = useNavigate();
@@ -13,7 +14,8 @@ export default function FacilitiesPage() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const {isOpen, openModal, closeModal} = useModal();
-    const {data, mutate} = useStationsSWR()
+    const {data, error: listError, mutate} = useStationsSWR()
+  const addToast = useToastStore((state) => state.addToast);
 
     const itemsPerPage = 8;
 
@@ -22,6 +24,13 @@ export default function FacilitiesPage() {
             try {
                 mutate();
                 setStations(data || []);
+                if (listError) {
+                  addToast({
+                    variant: 'critical',
+                    title: '서비스 불러오기 실패',
+                    description: listError.message,
+                  })
+                }
             } catch (err) {
                 setError(err as Error);
             }

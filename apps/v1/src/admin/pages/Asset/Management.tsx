@@ -30,12 +30,15 @@ export default function AssetPage() {
                 title: '삭제 완료',
                 description: '선택한 항목이 삭제되었습니다.'
             });
-        } catch (error) {
-            addToast({
+            if(error) {
+              addToast({
                 variant: 'critical',
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '삭제 중 오류가 발생했습니다.',
-            });
+                description: error.message,
+              })
+            }
+        } finally {
+          mutate();
         }
     };
 
@@ -71,13 +74,15 @@ export default function AssetPage() {
             });
             setSelectedAssets(new Set());
 
-        } catch (error) {
-            addToast({
+            if(error) {
+              addToast({
                 variant: 'critical',
                 title: '삭제 실패',
-                description: error instanceof Error ? error.message : '삭제 중 오류가 발생했습니다.',
-            });
-            console.error('삭제 중 오류가 발생했습니다.', error);
+                description: error.message,
+              })
+            }
+        } finally {
+          mutate();
         }
     };
     return (

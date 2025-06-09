@@ -29,12 +29,15 @@ export default function LinePage() {
                 title: "삭제 완료",
                 description: "선택한 항목이 삭제되었습니다."
             });
-        } catch (err) {
-            addToast({
+            if(error) {
+              addToast({
                 variant: "critical",
                 title: "삭제 실패",
-                description: err instanceof Error ? err.message : "삭제 중 오류가 발생했습니다."
-            });
+                description: error.message,
+              })
+            }
+        } finally {
+          mutate();
         }
     };
 
@@ -64,12 +67,15 @@ export default function LinePage() {
                 description: `${selectedLines.size}개의 항목이 삭제되었습니다.`
             });
             setSelectedLines(new Set());
-        } catch (err) {
-            addToast({
+            if(error) {
+              addToast({
                 variant: "critical",
-                title: '삭제 실패',
-                description: err instanceof Error ? err.message : "삭제 중 오류가 발생했습니다."
-            });
+                title: "삭제 실패",
+                description: error.message,
+              })
+            }
+        } finally {
+          mutate();
         }
     };
 

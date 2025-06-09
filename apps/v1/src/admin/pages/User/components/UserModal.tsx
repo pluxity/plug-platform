@@ -58,12 +58,16 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
-            } catch (error) {
-                addToast({
-                    description: error instanceof Error ? error.message : '사용자 수정 중 오류가 발생했습니다.',
-                    title: '수정 오류',
+
+                if (userUpdateError) {
+                  addToast({
+                    description: userUpdateError.message,
+                    title: '사용자 수정 오류',
                     variant: 'critical'
-                });
+                  });
+                }
+            } finally {
+              mutate();
             }
         } else {
             try {
@@ -84,12 +88,15 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                     resetForm();
                     if (onSuccess) onSuccess();
                 }
-            } catch (error) {
-                addToast({
-                    description: error instanceof Error ? error.message : '사용자 등록 중 오류가 발생했습니다.',
+                if (createError) {
+                  addToast({
+                    description: createError.message,
                     title: '등록 오류',
                     variant: 'critical'
-                });
+                  });
+                }
+            } finally {
+              mutate();
             }
         }
     }, [detailUserData, updateUser, createUser, onSuccess, addToast]);
