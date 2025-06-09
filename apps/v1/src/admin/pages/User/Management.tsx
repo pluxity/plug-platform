@@ -104,7 +104,7 @@ export default function UserListPage(): React.ReactElement {
         if (selectState.size === 0) {
             addToast({
                 description: '삭제할 항목을 선택해주세요.',
-                variant: 'warning'
+                variant: 'warning',
                 title: '선택 필요'
             });
             return;
