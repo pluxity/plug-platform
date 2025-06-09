@@ -21,7 +21,7 @@ export const DeviceModal = ({
     // 장비 상태 관리 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
-
+    
     const {addToast} = useToastStore();
 
     // 디바이스 생성 훅 
@@ -39,7 +39,7 @@ export const DeviceModal = ({
     useEffect(() => {
         if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
-            setId(detailDeviceData.id);
+            setId(detailDeviceData.id);           
         }
     }, [mode, detailDeviceData, isOpen]);
 
@@ -126,14 +126,14 @@ export const DeviceModal = ({
                 initialValues={
                     mode === 'edit' && detailDeviceData
                         ? {
+                            categoryId: String(detailDeviceData?.categoryId),
                             name: detailDeviceData?.name,
-                            code: detailDeviceData?.code,
-                            categoryId: String(detailDeviceData?.categoryId)
+                            id: detailDeviceData?.id,
                         }
                         : {
-                            name: '',
-                            code: '',
                             categoryId: '',
+                            name: '',
+                            id: '',
                         }
                 }
                 onSubmit={handleFinish}
