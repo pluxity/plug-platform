@@ -21,7 +21,6 @@ export const DeviceModal = ({
     // 장비 상태 관리 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]); 
 
     const { addToast } = useToastStore();
 
@@ -41,8 +40,6 @@ export const DeviceModal = ({
       console.log(categoryDevice);
         if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
-            setId(detailDeviceData.id);
-            setSelectedCategories([String(detailDeviceData.categoryId)]); 
         } 
     }, [mode, detailDeviceData, isOpen]);
 
@@ -52,8 +49,7 @@ export const DeviceModal = ({
             try {
                 const device = await updateDevice({
                     name: values.name || name,
-                    id: values.id || id,
-                    deviceCategoryId: Number(selectedCategories[0] || '')
+                    deviceCategoryId: Number(values.categoryId) 
                 });
 
                 if (device) {
@@ -83,6 +79,7 @@ export const DeviceModal = ({
                     id: values.id,
                     deviceCategoryId: Number(values.categoryId)
                 });
+                console.log(Number(values.categoryId))
 
                 if (device) {
                     addToast({
@@ -104,13 +101,12 @@ export const DeviceModal = ({
                 mutate();
             }
         }
-    }, [mode, detailDeviceData, name, id, selectedCategories, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError]);
+    }, [mode, detailDeviceData, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError]);
 
     // 폼 초기화
     const resetForm = () => {
         setName('');
         setId('');
-        setSelectedCategories([]);
         onClose();
     };
 
@@ -132,7 +128,6 @@ export const DeviceModal = ({
                         ? {
                             categoryId: String(detailDeviceData?.categoryId),
                             name: detailDeviceData?.name,
-                            id: detailDeviceData?.id,
                         }
                         : {
                             categoryId: '',
@@ -142,17 +137,9 @@ export const DeviceModal = ({
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
 
                 <FormItem name='categoryId' label='분류' required>
-                    <Select
-                        selected={selectedCategories}
-                        onChange={(values: string[]) => setSelectedCategories(values)}
-                    >
+                    <Select>
                         <Select.Trigger placeholder='분류를 선택하세요.' />
                         <Select.Content>
                             {categoryDevice?.map(category => (
@@ -175,13 +162,15 @@ export const DeviceModal = ({
                     />
                 </FormItem>
 
-                <FormItem name="id" label="장비 ID" required>
-                    <Input.Text
-                        placeholder="장비 ID를 입력하세요"
-                        value={id}
-                        onChange={value => setId(value)}
-                    />
-                </FormItem>
+                {mode === 'create' ? 
+                    <FormItem name="id" label="장비 ID" required>
+                        <Input.Text
+                            placeholder="장비 ID를 입력하세요"
+                            value={id}
+                            onChange={value => {setId(value);}}
+                        />
+                    </FormItem> : ''
+                }
 
                 <div className="mt-6 flex justify-center gap-2">
                     <Button type="button" onClick={resetForm}>
