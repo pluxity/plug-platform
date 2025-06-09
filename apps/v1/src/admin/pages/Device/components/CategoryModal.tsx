@@ -156,7 +156,6 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
       onClose();
     };
 
-    const error = createError || fileError || categoryUpdateError;
     const isProcessing = isCreating || isFileUploading || isCategoryUpdating;
 
     const openFilePicker = () => {
@@ -191,11 +190,6 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
                 <FormItem name="name" label="분류명" required>
                     <Input.Text
                         placeholder="분류 이름을 입력하세요"

@@ -37,6 +37,7 @@ export const DeviceModal = ({
     const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(selectedDeviceId || '');
 
     useEffect(() => {
+      console.log(categoryDevice);
         if (mode === 'edit' && detailDeviceData && isOpen) {
             setName(detailDeviceData.name);
             setId(detailDeviceData.id);
@@ -65,7 +66,7 @@ export const DeviceModal = ({
                 if (updateError) {
                     addToast({
                         title: '수정 실패',
-                        description: '장비 수정에 실패했습니다.',
+                        description: updateError.error,
                         variant: 'critical'
                     });
                 }
@@ -92,7 +93,7 @@ export const DeviceModal = ({
                 if (createError) {
                     addToast({
                         title: '등록 실패',
-                        description: '장비 등록에 실패했습니다.',
+                        description: createError.message,
                         variant: 'critical'
                     });
                 }
@@ -127,22 +128,17 @@ export const DeviceModal = ({
                     mode === 'edit' && detailDeviceData
                         ? {
                             name: detailDeviceData?.name,
-                            code: detailDeviceData?.code,
+                            id: detailDeviceData?.id,
                             categoryId: String(detailDeviceData?.categoryId)
                         }
                         : {
                             name: '',
-                            code: '',
+                            id: '',
                             categoryId: '',
                         }
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
                 <FormItem name='categoryId' label='분류' required>
                     <Select>
                         <Select.Trigger placeholder='분류를 선택하세요.'/>

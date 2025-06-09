@@ -30,7 +30,7 @@ const Modal = React.memo(({
             )}
         >
             <div
-                className="flex-1 flex flex-col w-full overflow-auto py-4"
+                className="flex-1 flex flex-col w-full overflow-auto"
                 style={{
                     width: typeof width === 'number' ? `${width}px` : width,
                     height: typeof height === 'number' ? `${height}px` : height,

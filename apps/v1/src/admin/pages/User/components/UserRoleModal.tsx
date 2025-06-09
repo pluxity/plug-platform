@@ -55,11 +55,6 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
         >
             <Form onSubmit={handleFinish}>
                 <div className="h-40">
-                    {assignRolesError && (
-                        <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                            {assignRolesError.message}
-                        </div>
-                    )}
                     <FormItem name="role" label='권한' required>
                         <Select>
                             <Select.Trigger placeholder='권한을 선택하세요.'/>
@@ -72,6 +67,12 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
                             </Select.Content>
                         </Select>
                     </FormItem>
+                  {assignRolesError &&
+                    addToast({
+                      description: assignRolesError.message,
+                      title: '조회 오류',
+                      variant: 'critical',
+                    })}
                 </div>
                 <div className="mt-6 flex justify-center gap-2">
                     <Button type="button" onClick={onClose}>취소</Button>

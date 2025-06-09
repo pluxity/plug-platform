@@ -63,11 +63,6 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
             overlayClassName="bg-black/50"
         >
             <Form onSubmit={handlePasswordFinish}>
-                {passwordUpdateError && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {passwordUpdateError.message}
-                    </div>
-                )}
                 <FormItem name="currentPassword" label='현재 비밀번호' required>
                     <Input.Password
                         placeholder="현재 비밀번호를 입력하세요."

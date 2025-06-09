@@ -111,8 +111,7 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
         onClose();
     };
 
-    // 에러 메시지 표시 
-    const error = createError || userUpdateError;
+    // 에러 메시지 표시
     const isProcessing = isCreating || isUserUpdating;
 
     return (
@@ -139,11 +138,6 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
                 }
                 onSubmit={handleFinish}
             >
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {error.message}
-                    </div>
-                )}
                 {mode === 'create' ?  
                     <FormItem name="username" label='아이디' required>
                         <Input.Text
