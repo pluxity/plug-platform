@@ -149,8 +149,10 @@ export const useEngineIntegration = ({
     // 핸들러가 변경되면 이벤트 리스너를 재등록
     addEngineEventListeners();
   }, [handlers.onPoiClick, handlers.onPoiTransformChange, handlers.onPoiDeleteClick, handlers.onFloorChange, handlers.onHierarchyLoaded, addEngineEventListeners]);
+  
   // 모델 로드 완료 핸들러
   const handleModelLoaded = useCallback(async () => {
+
     isModelLoadedRef.current = true;
     
     // POI 데이터 로드
@@ -167,7 +169,6 @@ export const useEngineIntegration = ({
         }
       }
     }
-
     // 이벤트 리스너 추가
     addEngineEventListeners();
   }, [handleFeatureData, finalConfig.autoLoadHierarchy, finalConfig.defaultFloor, handlers, handleFloorChange, addEngineEventListeners]);

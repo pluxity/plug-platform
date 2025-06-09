@@ -10,16 +10,19 @@ import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
 import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/types/stream';
 import useEventStore from '@plug/v1/app/stores/eventSourceStore';
+import * as Px from '@plug/engine/src';
 
 const ViewerPage = () => {
-    const { code } = useParams<{ code: string }>();
-    const parsedCode = code ?? '1';
 
-    const { setStationCode } = useStationStore();
-    const { fetchAssets } = useAssetStore();
+  const { code } = useParams<{ code: string }>();
+  const parsedCode = code ?? '1';
 
-    const { stationData, stationLoading, error } = useStationData(parsedCode);
-    const { floorItems, modelPath } = useFloorData(stationData);
+  const { setStationCode } = useStationStore();
+  const { fetchAssets } = useAssetStore();
+
+  const { stationData, stationLoading, error } = useStationData(parsedCode);
+  const { floorItems, modelPath } = useFloorData(stationData);
+
   const { setTtcData, setEventData, setShutterData } = useEventStore();
 
   const handleLoadError = useCallback((loadError: Error) => {
@@ -37,7 +40,21 @@ const ViewerPage = () => {
 
     const handleModelLoadedWithEngine = useCallback(() => {
         engineModelLoaded();
-    }, [engineModelLoaded]);    
+
+        if(stationData?.route) {
+            Px.Path3D.Import(JSON.parse(stationData?.route));
+        }
+
+        if(stationData?.subway) {
+            Px.Subway.LoadTrainHead("/assets/models/head.glb", () => { console.log("지하철 헤더 로드 완료")});
+            Px.Subway.LoadTrainBody("/assets/models/body.glb", () => { console.log("지하철 본체 로드 완료")});
+            Px.Subway.LoadTrainTail("/assets/models/tail.glb", () => { console.log("지하철 꼬리 로드 완료")});
+
+            Px.Subway.Import(JSON.parse(stationData?.subway));
+            Px.Subway.HideAll();
+        }
+
+    }, [engineModelLoaded, stationData]);    
     
     useEffect(() => {
         setStationCode(parsedCode);
@@ -47,44 +64,51 @@ const ViewerPage = () => {
         fetchAssets();
     }, [fetchAssets]);
 
-  useEffect(() => {
-    const eventSource = new EventSource('/api/sse');
+    useEffect(() => {
+      const eventSource = new EventSource('/api/sse');
 
-    eventSource.addEventListener('ttc-data', (event) => {
-      const data = JSON.parse(event.data) as TrainData[];
-      const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
-      if (filteredData.length > 0) {
-        setTtcData(filteredData);
-        console.log('ttc-data', filteredData);
-      }
-    });
-
-    eventSource.addEventListener('event', (event) => {
-      const data = JSON.parse(event.data) as EventData[];
-      if (data.length > 0) {
-        setEventData(data);
-        console.log('event-data', data);
-      }
-    });
-
-    eventSource.addEventListener('shutter', (event) => {
-      const data = JSON.parse(event.data) as ShutterData[];
-      if (data.length > 0) {
-        setShutterData(data);
-        console.log('event2-data', data);
-      }
-    });
+      eventSource.addEventListener('ttc-data', (event) => {
+        const data = JSON.parse(event.data) as TrainData[];
+        const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
+        if (filteredData.length > 0) {
+          setTtcData(filteredData);
 
 
-    eventSource.onerror = (err) => {
-      console.error('SSE 에러:', err);
-    };
+          // 접근
+          Px.Subway.Show('1_UP_SUBWAY');
+          Px.Subway.DoEnter('1_UP_SUBWAY', 0, () => {});
 
-    return () => {
-      console.log('SSE 연결 종료');
-      eventSource.close();
-    };
-  }, []);
+
+          // 출발
+          Px.Subway.DoExit('1_UP_SUBWAY', 5, () => {
+            Px.Subway.Hide('1_UP_SUBWAY');
+          });
+        }
+      });
+
+      eventSource.addEventListener('event', (event) => {
+        const data = JSON.parse(event.data) as EventData[];
+        if (data.length > 0) {
+          setEventData(data);
+        }
+      });
+
+      eventSource.addEventListener('shutter', (event) => {
+        const data = JSON.parse(event.data) as ShutterData[];
+        if (data.length > 0) {
+          setShutterData(data);
+        }
+      });
+
+      eventSource.onerror = (err) => {
+        console.error('SSE 에러:', err);
+      };
+
+      return () => {
+        console.log('SSE 연결 종료');
+        eventSource.close();
+      };
+    }, []);
 
   const eventData = useEventStore(state => state.eventData);
   const shutterData = useEventStore(state => state.shutterData);
