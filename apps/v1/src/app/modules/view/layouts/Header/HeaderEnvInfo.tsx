@@ -72,7 +72,7 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
             <span className="text-gray-100 text-sm font-medium tracking-wide">{label}</span>
               <div
                 className="text-white flex gap-1 text-sm font-medium tracking-wide tabular-nums px-2.5 py-1 bg-white/15 rounded-md backdrop-blur-lg shadow-inner">
-                <div class='flex items-center gap-1'>
+                <div className='flex items-center gap-1'>
                   <span>{value}</span>
                   <span className="text-xs">°C</span>
                 </div>
