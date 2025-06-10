@@ -71,13 +71,6 @@ const DataTable = <T extends { id: string | number },>({
     onSelectChange?.(newSelected);
   }
 
-  const selectedAll = currentSelected.size === data.length;
-
-  const handleSelectAll = () => {
-    const newSelected = selectedAll ? new Set<T>() : new Set(data);
-    selectedChange(newSelected);
-  }
-
   const isRowSelected = (row: T) => {
     for (const selectedRow of currentSelected) {
       if (selectedRow.id === row.id) {
@@ -86,6 +79,27 @@ const DataTable = <T extends { id: string | number },>({
     }
     return false;
   };
+
+  const selectedAll = paginatedData.length > 0 && paginatedData.every(row => isRowSelected(row));
+
+  const handleSelectAll = () => {
+    const newSelected = new Set(currentSelected);
+    
+    if (selectedAll) {
+      paginatedData.forEach(row => {
+        for (const selectedRow of newSelected) {
+          if (selectedRow.id === row.id) {
+            newSelected.delete(selectedRow);
+          }
+        }
+      });
+    } else {
+      paginatedData.forEach(row => {
+        newSelected.add(row);
+      });
+    }
+    selectedChange(newSelected);
+  }
 
   const handleSelectRow = (row: T) => {
     const newSelected = new Set(currentSelected);

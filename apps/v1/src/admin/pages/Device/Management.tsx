@@ -43,9 +43,6 @@ export default function DevicePage() {
     const deviceData = useDevice(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = async () => {
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
         if (selectedDevices.size === 0) {
             return addToast({
                 description: '삭제할 항목을 선택해주세요.',
@@ -53,6 +50,9 @@ export default function DevicePage() {
                 variant: 'warning'
             });
         }
+
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
 
         try {
             await Promise.all(

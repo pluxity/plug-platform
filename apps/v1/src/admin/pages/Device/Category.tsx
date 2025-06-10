@@ -46,9 +46,6 @@ export default function DeviceCategory() {
     const categoryData = useCategory(data || [], handleDelete, handleEdit);
 
     const handleDeleteSelected = async () => {
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
         if (selectedCategories.size === 0) {
             addToast({
                 description: '삭제할 항목을 선택해주세요.',
@@ -56,6 +53,10 @@ export default function DeviceCategory() {
             });
             return;
         }
+
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
+
         try{
             await Promise.all(
                 Array.from(selectedCategories).map(category => handleDelete(category.id), false)

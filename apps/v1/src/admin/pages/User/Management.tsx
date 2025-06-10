@@ -98,9 +98,6 @@ export default function UserListPage(): React.ReactElement {
     const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
 
     const handleDeleteSelected = async () => {
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
         if (selectState.size === 0) {
             addToast({
                 description: '삭제할 항목을 선택해주세요.',
@@ -109,6 +106,9 @@ export default function UserListPage(): React.ReactElement {
             });
             return;
         }
+
+        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
+        if (!isConfirmed) return;
 
         try {
             await Promise.all(
