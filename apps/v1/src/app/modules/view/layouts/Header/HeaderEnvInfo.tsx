@@ -81,7 +81,8 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
                 height={18}
                 className="brightness-0 invert opacity-80"
               />
-              <span className="text-white text-sm font-medium tracking-wide tabular-nums">
+              <span
+                className="text-white text-sm font-medium tracking-wide tabular-nums px-2 py-0.5 bg-white/10 rounded-md backdrop-blur-sm">
                 {`${value}${typeof value === 'number' ? '°C' : ''}`}
               </span>
             </div>
@@ -94,7 +95,7 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
       <div className="flex items-center gap-2">
         <span className="text-gray-200 text-sm font-medium tracking-wide">초미세먼지</span>
         <div className="flex items-center gap-2">
-          <span className="text-white text-sm font-medium tracking-wide tabular-nums">
+          <span className="text-white text-sm font-medium tracking-wide tabular-nums px-2 py-0.5 bg-white/10 rounded-md backdrop-blur-sm">
             {`${displayData.airQuality.ultrafineDust}${typeof displayData.airQuality.ultrafineDust === 'number' ? ' ㎍/㎥' : ''}`}
           </span>
           {typeof displayData.airQuality.ultrafineDust === 'number' && (
