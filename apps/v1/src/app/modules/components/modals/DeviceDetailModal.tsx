@@ -136,17 +136,9 @@ const PumpList = ({ pumps }: { pumps: Pump[] }) => (
     <div className="grid gap-4">
       {pumps.map((pump, index) => (
         <div key={`${pump.pumpName}-${index}`}
-             className="
-               relative overflow-hidden
-               bg-primary-900/30 hover:bg-primary-900/40
-               backdrop-blur-md rounded-xl p-4
-               border border-primary-700/30
-               transition-all duration-200
-             "
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-transparent" />
+             className="relative overflow-hidden !bg-gray-800/20 rounded-xl p-4 border border-gray-800/10 transition-all duration-200" >
           <div className="relative">
-            <h5 className="font-medium text-primary-100 pb-3 mb-4 border-b border-primary-700/30 flex items-center gap-2">
+            <h5 className="font-medium text-primary-100 pb-3 mb-4 border-b border-gray-300/30 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
               펌프 {index + 1}: {pump.pumpName}
             </h5>
@@ -274,7 +266,7 @@ const FireSensorDetails = ({ device }: { device: FireSensor }) => (
 const ElevatorDetails = ({ device }: { device: Elevator }) => (
   <DeviceDetailsWrapper title="엘리베이터 상태">
     <div className="grid gap-3">
-      <div className="bg-primary-900/30 rounded-lg p-4 border border-primary-700/20">
+      <div className="bg-gray-800/20 rounded-lg p-4 border border-primary-700/20">
         <div className="grid gap-3">
           <StatusRow label="동작 상태" status={device.status} type="elevator" />
           {device.downMoveStatus && (
@@ -522,7 +514,7 @@ export const DeviceDetailModal = ({
         </Button>
       }
     >
-      <div className="max-h-96 overflow-y-auto">
+      <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
         {loading && (
           <div className="flex justify-center items-center py-8">
             <div className="text-primary-100 flex items-center gap-2">
