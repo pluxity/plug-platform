@@ -37,14 +37,14 @@ const TimeDisplay = () => {
         <span className="mx-2 text-gray-500 select-none">|</span>
         <span className="text-gray-200 text-sm font-medium tracking-wide">
           {weekday}
-          <span className="text-gray-400">요일</span>
+          <span>요일</span>
         </span>
       </div>
-      <div className="w-px h-4 bg-gray-600/80" />
-      <div className="flex items-center gap-2 font-mono tracking-wider text-white">
+      <div className="w-px h-4 bg-gray-500" />
+      <div className="flex items-center gap-1 font-mono tracking-wider text-white">
         <svg
-          width="20"
-          height="20"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

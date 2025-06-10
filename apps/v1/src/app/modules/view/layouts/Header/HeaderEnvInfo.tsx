@@ -67,7 +67,7 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="flex items-center gap-2 border-r border-white/20 last:border-r-0 pr-3 last:pr-0"
+            className="flex items-center gap-2 last:border-r-0"
           >
             <span className="text-gray-100 text-sm font-medium tracking-wide">{label}</span>
               <div
@@ -79,16 +79,14 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
                 <img
                   src="/assets/station/temp.svg"
                   alt="온도"
-                  width={14}
-                  height={18}
+                  width={12}
+                  height={14}
                   className="brightness-0 invert opacity-90"
                 />
               </div>
           </div>
         ))}
       </div>
-
-      <div className="w-px h-5 bg-white/20" />
 
       <div className="flex items-center gap-1">
         <span className="text-gray-100 text-sm font-medium tracking-wide">초미세먼지</span>
