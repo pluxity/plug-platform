@@ -82,7 +82,7 @@ export default function UserListPage(): React.ReactElement {
                 }
                 if (userLoggedInError) {
                   addToast({
-                    description: error.message,
+                    description: userLoggedInError.message,
                     variant: 'critical',
                     title: '로그인 사용자 정보 조회 실패'
                   });

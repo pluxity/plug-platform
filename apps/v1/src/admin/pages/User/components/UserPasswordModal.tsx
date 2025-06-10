@@ -20,7 +20,6 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
 
     // 비밀번호 수정 제출 핸들러
     const handlePasswordFinish = useCallback(async (values: Record<string, string>) => {
-        try {
             const password = await updatePassword({
                 currentPassword: values.currentPassword || currentPassword,
                 newPassword: values.newPassword || newPassword
@@ -42,9 +41,6 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
                 variant: 'critical'
               });
             }
-        } finally {
-          mutate();
-        }
     }, [updatePassword, onSuccess, currentPassword, newPassword, addToast]);
 
     // 폼 초기화 
