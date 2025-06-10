@@ -4,12 +4,12 @@ import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layout
 import { MapViewer } from '@plug/v1/app/modules/components/map';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
 import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/types/stream';
-import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 import * as Px from '@plug/engine/src';
 
 const ViewerPage = () => {
@@ -43,18 +43,37 @@ const ViewerPage = () => {
 
         if(stationData?.route) {
             Px.Path3D.Import(JSON.parse(stationData?.route));
+            Px.Path3D.HideAll();
         }
+        
+        const loadTrainModels = () => {
+          return Promise.all([
+              new Promise<void>((resolve) => {
+                  Px.Subway.LoadTrainHead("/assets/models/head.glb", () => { 
+                      resolve();
+                  });
+              }),
+              new Promise<void>((resolve) => {
+                  Px.Subway.LoadTrainBody("/assets/models/body.glb", () => {
+                      resolve();
+                  });
+              }),
+              new Promise<void>((resolve) => {
+                  Px.Subway.LoadTrainTail("/assets/models/tail.glb", () => {
+                      resolve();
+                  });
+              })
+          ]);
+      };
 
-        if(stationData?.subway) {
-            Px.Subway.LoadTrainHead("/assets/models/head.glb", () => { console.log("지하철 헤더 로드 완료")});
-            Px.Subway.LoadTrainBody("/assets/models/body.glb", () => { console.log("지하철 본체 로드 완료")});
-            Px.Subway.LoadTrainTail("/assets/models/tail.glb", () => { console.log("지하철 꼬리 로드 완료")});
+      loadTrainModels().then(() => {
+          if(stationData?.subway) {
+              Px.Subway.Import(JSON.parse(stationData?.subway));
+              Px.Subway.HideAll();
+          }
+      });
 
-            Px.Subway.Import(JSON.parse(stationData?.subway));
-            Px.Subway.HideAll();
-        }
-
-    }, [engineModelLoaded, stationData]);    
+    }, [engineModelLoaded, stationData]);  
     
     useEffect(() => {
         setStationCode(parsedCode);
@@ -72,17 +91,6 @@ const ViewerPage = () => {
         const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
         if (filteredData.length > 0) {
           setTtcData(filteredData);
-
-
-          // 접근
-          Px.Subway.Show('1_UP_SUBWAY');
-          Px.Subway.DoEnter('1_UP_SUBWAY', 0, () => {});
-
-
-          // 출발
-          Px.Subway.DoExit('1_UP_SUBWAY', 5, () => {
-            Px.Subway.Hide('1_UP_SUBWAY');
-          });
         }
       });
 

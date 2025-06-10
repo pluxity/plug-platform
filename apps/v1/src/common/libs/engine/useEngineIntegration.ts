@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
 import { useAssetStore } from '../../store/assetStore';
+import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 import type { 
   BaseStationData, 
   EngineEventHandlers, 
@@ -8,6 +9,7 @@ import type {
   EngineIntegrationResult 
 } from './types';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
+import { TrainData } from '@plug/v1/app/modules/view/types/stream';
 
 interface UseEngineIntegrationProps {
   stationData: BaseStationData | null;
@@ -31,13 +33,34 @@ export const useEngineIntegration = ({
   const eventListenersRef = useRef<Array<{ event: string; handler: (...args: unknown[]) => void }>>([]);
   const isModelLoadedRef = useRef(false);
 
-  // POI 클릭 이벤트 핸들러
+  const { ttcData } = useEventStore();
+
+  useEffect(() => {
+
+    ttcData.forEach((ttc: TrainData) => {
+
+      const id = `${ttc.line}_${ttc.trainDirection === '상행' ? 'UP' : 'DOWN'}_SUBWAY`;
+
+      if(ttc.opCode === '열차 접근') {
+        Px.Subway.Show(id);
+        Px.Subway.DoEnter(id, 5, () => {});
+      } else if(ttc.opCode === '출발') {
+        Px.Subway.DoExit(id, 5, () => {
+            Px.Subway.Hide(id);
+        });
+      } else if(ttc.opCode === '도착') {
+
+        return;
+      }
+    });
+
+  }, [ttcData]);
+
   const poiClickListener = useCallback((event: { target: PoiImportOption }) => {
     if (event.target && handlers.onPoiClick) {
       handlers.onPoiClick(event.target);
     }
   }, [handlers]);
-  // POI Transform 변경 이벤트 핸들러 (관리자 전용)
   const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
     if (event.target && handlers.onPoiTransformChange) {
       try {
