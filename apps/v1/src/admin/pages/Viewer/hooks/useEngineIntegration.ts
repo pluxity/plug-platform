@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { useEngineIntegration as useBaseEngineIntegration } from '../../../../common/libs/engine';
 import type { PoiImportOption, ModelInfo } from '@plug/engine/src/interfaces';
 import type { EngineEventHandlers, EngineIntegrationConfig } from '../../../../common/libs/engine';
+import type { FeatureResponse as Feature } from '@plug/v1/admin/pages/Viewer/types/station';
 import { useFeatureApi } from './useFeatureApi';
 
 interface UseEngineIntegrationProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stationData: any;
+  features: Feature[] | null;
   onPoiSelect: (poi: PoiImportOption) => void;
   onHierarchyLoaded: (hierarchy: ModelInfo[]) => void;
   onFloorChange: (floorId: string) => void;
@@ -14,7 +14,7 @@ interface UseEngineIntegrationProps {
 }
 
 export function useEngineIntegration({
-  stationData,
+  features,
   onPoiSelect,
   onHierarchyLoaded,
   onFloorChange,
@@ -55,7 +55,7 @@ export function useEngineIntegration({
   }), []);
 
   const { handleModelLoaded, handleFloorChange, refreshPoiData } = useBaseEngineIntegration({
-    stationData,
+    features,
     handlers,
     config,
   });

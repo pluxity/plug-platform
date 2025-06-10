@@ -47,6 +47,7 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
                     isModelLoadedRef.current = true;
                     onModelLoaded?.();
                     Px.Poi.HideAllLine();
+                    // Px.Poi.HideAllDisplayText();
                 });
             } catch (error) {
                 console.error('3D 모델 로드 중 오류 발생:', error);

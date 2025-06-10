@@ -3,7 +3,7 @@ import * as Px from '@plug/engine/src';
 import { useAssetStore } from '../../store/assetStore';
 import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 import type { 
-  BaseStationData, 
+  BaseFeature, 
   EngineEventHandlers, 
   EngineIntegrationConfig, 
   EngineIntegrationResult 
@@ -12,7 +12,7 @@ import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import { TrainData } from '@plug/v1/app/modules/view/types/stream';
 
 interface UseEngineIntegrationProps {
-  stationData: BaseStationData | null;
+  features: BaseFeature[] | null;
   handlers: EngineEventHandlers;
   config?: EngineIntegrationConfig;
 }
@@ -25,7 +25,7 @@ const defaultConfig: EngineIntegrationConfig = {
 };
 
 export const useEngineIntegration = ({
-  stationData,
+  features,
   handlers,
   config = {},
 }: UseEngineIntegrationProps): EngineIntegrationResult => {
@@ -104,11 +104,11 @@ export const useEngineIntegration = ({
   const handleFeatureData = useCallback(() => {
     const currentAssets = useAssetStore.getState().assets;
     
-    if (stationData?.features && currentAssets.length > 0) {
+    if (features && currentAssets.length > 0) {
       // 설정에 따라 미할당 디바이스 포함 여부 결정
       const filteredFeatures = finalConfig.includeUnassignedDevices 
-        ? stationData.features 
-        : stationData.features.filter(feature => feature.deviceId !== null);
+        ? features
+        : features.filter(feature => feature.deviceId !== null);
 
       const poiData = filteredFeatures.map((feature) => {
         const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
@@ -116,7 +116,7 @@ export const useEngineIntegration = ({
           id: feature.id, 
           iconUrl: '', 
           modelUrl: modelUrl,
-          displayText: feature.deviceId || 'Device 할당 필요',
+          displayText: feature.deviceName ? feature.deviceName : '장비 할당 필요',
           floorId: feature.floorId,
           property: {
             code: feature.deviceId || '',
@@ -131,7 +131,7 @@ export const useEngineIntegration = ({
 
       Px.Poi.Import(JSON.stringify(poiData));
     }
-  }, [stationData, finalConfig.includeUnassignedDevices]);
+  }, [features, finalConfig.includeUnassignedDevices]);
   // 이벤트 리스너 제거
   const removeEventListeners = useCallback(() => {
     eventListenersRef.current.forEach(({ event, handler }) => {

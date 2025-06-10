@@ -2,16 +2,16 @@ import { useMemo } from 'react';
 import { useEngineIntegration as useBaseEngineIntegration } from '@plug/v1/common/libs/engine';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
-import type { StationWithFeatures } from '@plug/v1/app/modules/view/types/station';
+import type { FeatureResponse as Feature } from '@plug/v1/app/modules/view/types/station';
 import type { EngineEventHandlers, EngineIntegrationConfig } from '@plug/v1/common/libs/engine';
 
 interface UseEngineIntegrationProps {
-  stationData: StationWithFeatures | null;
+  features: Feature[] | null;
   onPoiSelect?: (poi: PoiImportOption) => void;
 }
 
 export function useEngineIntegration({
-  stationData,
+  features,
   onPoiSelect,
 }: UseEngineIntegrationProps) {
   const { setSelectedDeviceId } = useStationStore();
@@ -19,7 +19,7 @@ export function useEngineIntegration({
   // 사용자 페이지 전용 이벤트 핸들러 설정
   const handlers: EngineEventHandlers = useMemo(() => ({
     onPoiClick: (poi: PoiImportOption) => {
-      const feature = stationData?.features?.find(f => f.id === poi.id);
+      const feature = features?.find(f => f.id === poi.id);
       if (feature?.deviceId) {
         setSelectedDeviceId(feature.deviceId);
       }
@@ -28,7 +28,7 @@ export function useEngineIntegration({
         onPoiSelect(poi);
       }
     },
-  }), [onPoiSelect, stationData, setSelectedDeviceId]);
+  }), [onPoiSelect, features, setSelectedDeviceId]);
 
   // 사용자 페이지 전용 설정
   const config: EngineIntegrationConfig = useMemo(() => ({
@@ -39,7 +39,7 @@ export function useEngineIntegration({
   }), []);
 
   const { handleModelLoaded, handleFloorChange, refreshPoiData } = useBaseEngineIntegration({
-    stationData,
+    features,
     handlers,
     config,
   });
