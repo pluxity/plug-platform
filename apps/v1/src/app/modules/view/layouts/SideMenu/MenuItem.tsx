@@ -6,35 +6,35 @@ interface MenuItemProps {
   onClick: (id: string) => void;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ 
-  id, 
-  icon, 
-  isActive,
-  onClick
-}) => {
+const MenuItem: React.FC<MenuItemProps> = ({
+                                             id,
+                                             icon,
+                                             isActive,
+                                             onClick
+                                           }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClick?.(id);
+  };
 
-    const handleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onClick?.(id);
-    }
-    
-    return (
-    <div className="mb-1 border border-white/50 rounded-md cursor-pointer user-select-none">
-      <button 
-        onClick={handleClick}
-        className={`text-white flex cursor-pointer
-          w-full py-3 px-2 hover:bg-indigo-800 rounded-md transition-colors duration-200 ease-in-out
-          ${isActive ? 'bg-indigo-800' : ''}`}
-      >
-        <div className={`bg-opacity-10 rounded-md flex items-center justify-center flex-shrink-0`}>
-          <img 
-            src={icon as string} 
-            alt="Menu Icon" 
-            className="w-8 h-8"
-          />
-        </div>
-      </button>
-    </div>
+  return (
+    <button
+      onClick={handleClick}
+      className={`
+        group flex items-center justify-center w-12 h-12 rounded-lg border transition-all duration-200 
+        ${isActive ? 'bg-primary-900/90 shadow-md border-primary-700/20' : 'bg-primary-300/10 border-none hover:bg-primary-300/30'}
+      `}
+    >
+      <img
+        src={icon as string}
+        alt="Menu Icon"
+        className={`
+          w-6 h-6 transition-transform duration-200
+          brightness-150
+          ${isActive ? 'scale-110 brightness-200' : 'opacity-80 group-hover:opacity-100'}
+        `}
+      />
+    </button>
   );
 };
 

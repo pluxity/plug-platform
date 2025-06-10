@@ -1,30 +1,35 @@
 import TimeDisplay from "./TimeDisplay";
 import HeaderEnvInfo from "./HeaderEnvInfo";
-import { useParams } from 'react-router-dom';
+import {useParams} from 'react-router-dom';
+import React from "react";
 
 const Header = () => {
     const { stationId } = useParams<{ stationId: string }>();
     const parsedStationId = stationId ? stationId : '1';
 
     return (
-        <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-primary-400/20 backdrop-blur-xs text-white z-10">
-            <div className="flex items-center gap-2">
-                <img
-                    src="/assets/logo.png"
-                    alt="부산교통공사 로고"
-                    className="w-10 h-10 rounded-full"
-                />
-                <div className="text-2xl font-bold tracking-tight">부산교통공사</div>
-            </div>
-            
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-                <TimeDisplay />
-            </div>
-            
-            <div className="flex items-center gap-4">
-                <HeaderEnvInfo stationId={parsedStationId} />
-            </div>        
-        </header>
+      <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-gradient-to-b from-primary-300/30 to-primary-700/30 backdrop-blur-lg text-white z-10 shadow-lg border-b border-primary-900/10">
+        <div className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:opacity-75 transition-opacity">
+          <img
+            src="/assets/logo.png"
+            height={30}
+            width={30}
+            alt="Logo"
+            className="[filter:brightness(0)_saturate(100%)_invert(100%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(100%)_contrast(100%)] hover:scale-105 transition-transform"
+          />
+          <h1 className="text-white font-bold text-xl whitespace-nowrap hover:text-primary-100 transition-colors">
+            부산도시철도공사
+          </h1>
+        </div>
+
+        <div className="absolute left-1/2 transform -translate-x-1/2">
+          <TimeDisplay />
+        </div>
+
+        <div className="flex items-center gap-6">
+          <HeaderEnvInfo stationId={parsedStationId} />
+        </div>
+      </header>
     );
 };
 

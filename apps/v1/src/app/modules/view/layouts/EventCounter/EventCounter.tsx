@@ -5,23 +5,24 @@ interface EventInfoPanelProps {
   stationId: string;
 }
 
-const EventCounter: React.FC<EventInfoPanelProps> =({ stationId }) => {
+const EventCounter: React.FC<EventInfoPanelProps> = ({ stationId }) => {
   const { data, loading, refetch } = useStationEvents(stationId);
   const [displayData, setDisplayData] = useState({
     equips: { critical: 0, major: 0, minor: 0 },
-    electrics: { critical: 0, major: 0, minor: 0 }  });
-  
+    electrics: { critical: 0, major: 0, minor: 0 },
+  });
+
   useEffect(() => {
     if (data && !loading) {
       setDisplayData(data);
     }
   }, [data, loading]);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
     }, 10 * 1000);
-    
+
     return () => clearInterval(interval);
   }, [refetch]);
 
@@ -29,30 +30,45 @@ const EventCounter: React.FC<EventInfoPanelProps> =({ stationId }) => {
   const totalMajor = displayData.equips.major + displayData.electrics.major;
   const totalMinor = displayData.equips.minor + displayData.electrics.minor;
 
+  const eventTypes = [
+    {
+      label: 'Critical',
+      count: totalCritical,
+      textColor: 'text-red-100',
+      borderColor: 'border-red-500/50',
+      bgColor: 'bg-red-500',
+    },
+    {
+      label: 'Major',
+      count: totalMajor,
+      textColor: 'text-yellow-100',
+      borderColor: 'border-yellow-500/50',
+      bgColor: 'bg-yellow-500',
+    },
+    {
+      label: 'Minor',
+      count: totalMinor,
+      textColor: 'text-primary-100',
+      borderColor: 'border-primary-400/50',
+      bgColor: 'bg-primary-400',
+    },
+  ];
+
   return (
     <div className="fixed top-20 right-4 z-20">
-      <div className="w-[340px] h-9 relative">
-        <div className="w-[340px] h-9 left-0 top-0 absolute bg-primary-400/20 rounded-[5px] backdrop-blur-[5px]" />
-
-        {/* Critical */}
-        <div className="w-3 h-3 left-[10px] top-[12px] absolute bg-red-600 rounded-full" />
-        <div className="left-[29px] top-[7px] absolute justify-start text-white text-sm font-normal font-['Noto_Sans_KR']">Critical</div>        <div className="left-[92px] top-[6px] absolute justify-start text-white text-base font-bold font-['Noto_Sans_KR']">
-          {totalCritical}
-        </div>
-        
-        {/* Major */}
-        <div className="w-3 h-3 left-[125px] top-[12px] absolute bg-amber-500 rounded-full" />
-        <div className="left-[146px] top-[7px] absolute justify-start text-white text-sm font-normal font-['Noto_Sans_KR']">Major</div>
-        <div className="left-[207px] top-[6px] absolute justify-start text-white text-base font-bold font-['Noto_Sans_KR']">
-          {totalMajor}
-        </div>
-        
-        {/* Minor */}
-        <div className="w-3 h-3 left-[240px] top-[12px] absolute bg-primary-400 rounded-full" />
-        <div className="left-[261px] top-[7px] absolute justify-start text-white text-sm font-normal font-['Noto_Sans_KR']">Minor</div>
-        <div className="left-[322px] top-[6px] absolute justify-start text-white text-base font-bold font-['Noto_Sans_KR']">
-          {totalMinor}
-        </div>
+      <div className="flex items-center gap-4 bg-primary-900/30 backdrop-blur-md px-4 py-2 rounded-lg">
+        {eventTypes.map(({ label, count, textColor, borderColor, bgColor }) => (
+          <div
+            key={label}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md border ${borderColor} ${bgColor}/20 transition-colors`}
+          >
+            <div className={`w-2 h-2 ${bgColor} rounded-full animate-pulse`} />
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-xs font-medium">{label}</span>
+              <span className={`${textColor} text-sm font-bold tabular-nums`}>{count}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
