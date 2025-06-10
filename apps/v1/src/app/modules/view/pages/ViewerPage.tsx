@@ -123,44 +123,60 @@ const ViewerPage = () => {
 
   if (error && !stationLoading) {
         return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="text-red-500 text-xl">
-                    스테이션 정보를 불러올 수 없습니다: {error.message}
-                </div>
-            </div>
-        );
-    }    return (         
-        <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
-            {!stationLoading && stationData && (
-                <MapViewer 
-                    modelPath={modelPath}
-                    floors={floorItems}
-                    onModelLoaded={handleModelLoadedWithEngine}
-                    onLoadError={handleLoadError}
+          <div className="flex items-center justify-center h-screen bg-gray-900">
+            <div className="bg-red-900/30 backdrop-blur-lg border border-red-500/30 rounded-xl px-8 py-6 flex items-center gap-4 shadow-lg">
+              <svg
+                className="w-8 h-8 text-red-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
-            )}
-            {stationLoading && (
-                <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
-                    <div className="text-white text-xl">
-                        스테이션 {parsedCode} 정보 로딩 중...
-                    </div>                
-                </div>
-            )}
-            <Header />
-            <SideMenu />
-            { stationData && (
-                    <EventCounter stationId={stationData.externalCode} />
-            )}
-            
-            {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
-            {/* <DeviceDetailModal
+              </svg>
+              <div className="text-red-200 text-xl font-semibold tracking-wide">
+                스테이션 정보를 불러올 수 없습니다: {error.message}
+              </div>
+            </div>
+          </div>
+        );
+    }    return (
+      <div className="relative w-screen h-screen overflow-hidden bg-indigo-950">
+        {!stationLoading && stationData && (
+          <MapViewer
+            modelPath={modelPath}
+            floors={floorItems}
+            onModelLoaded={handleModelLoadedWithEngine}
+            onLoadError={handleLoadError}
+          />
+        )}
+        {stationLoading && (
+          <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center z-10 backdrop-blur-sm">
+            <div className="bg-primary-900/30 backdrop-blur-md border border-primary-500/20 rounded-xl px-8 py-6 flex items-center gap-4 shadow-lg">
+              <div className="animate-spin w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+              <div className="text-primary-100 text-xl font-medium tracking-wide">
+                스테이션 {parsedCode} 정보 로딩 중...
+              </div>
+            </div>
+          </div>
+        )}
+        <Header />
+        <SideMenu />
+        {stationData && <EventCounter stationId={stationData.externalCode} />}
+
+        {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
+        {/* <DeviceDetailModal
                 isOpen={!!selectedDeviceId}
                 onClose={() => setSelectedDeviceId(null)}
                 stationId={stationData?.externalCode ?? ''}
                 selectedDeviceId={selectedDeviceId}
                 deviceType="shutter"
             /> */}
-        </div>
+      </div>
     );
 };
 
