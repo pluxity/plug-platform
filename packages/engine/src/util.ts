@@ -98,7 +98,7 @@ function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: 
     pixiApp.render();
 
     // three.js 캔버스 텍스쳐 생성
-    const texture = new THREE.CanvasTexture(pixiApp.canvas);
+    const texture = new THREE.CanvasTexture(pixiApp.canvas, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter);
     engine.Renderer.initTexture(texture);
 
     // three.js 재질 생성
