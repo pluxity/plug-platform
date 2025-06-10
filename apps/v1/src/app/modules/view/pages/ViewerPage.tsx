@@ -118,9 +118,8 @@ const ViewerPage = () => {
       };
     }, []);
 
-  const eventData = useEventStore(state => state.eventData);
-  const shutterData = useEventStore(state => state.shutterData);
-  console.log('eventData', eventData, 'shutterData', shutterData);
+//   const eventData = useEventStore(state => state.eventData);
+//   const shutterData = useEventStore(state => state.shutterData);
 
   if (error && !stationLoading) {
         return (
