@@ -30,17 +30,28 @@ const TimeDisplay = () => {
   const { date, weekday, time } = formatDate(currentTime);
 
   return (
-    <div className="flex items-center gap-3 bg-primary-300/10 rounded-lg px-4 py-1 border border-gray-700/50">
+    <div
+      className="flex items-center gap-3 !bg-primary-900/5 rounded-lg px-4 py-1 border border-gray-300/10 backdrop-blur-sm hover:bg-primary-300/25 transition-colors">
       <div className="flex items-center">
-        <span className="text-gray-300 text-sm font-medium">{date}</span>
-        <span className="mx-2 text-gray-500">|</span>
-        <span className="text-gray-300 text-sm font-medium">
+        <span className="text-gray-200 text-sm font-medium tracking-wide">{date}</span>
+        <span className="mx-2 text-gray-500 select-none">|</span>
+        <span className="text-gray-200 text-sm font-medium tracking-wide">
           {weekday}
           <span className="text-gray-400">요일</span>
         </span>
       </div>
-      <div className="w-px h-4 bg-gray-600" />
-      <div className="font-mono text-lg tracking-wider text-white">
+      <div className="w-px h-4 bg-gray-600/80" />
+      <div className="flex items-center gap-2 font-mono tracking-wider text-white">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+          <path d="M12 7V12L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
         {time}
       </div>
     </div>
