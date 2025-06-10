@@ -27,13 +27,13 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 
     // 공용 텍스트 geometry
-    sharedTextGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
+    sharedTextGeometry = new THREE.PlaneGeometry(1, 1.10, 1, 1);
     sharedTextGeometry.translate(0, 2.0, 0);
 
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
 });
 
 /**

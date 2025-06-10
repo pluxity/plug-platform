@@ -111,7 +111,7 @@ export default function FacilitiesPage() {
                                         className='rounded-l-none hover:bg-primary-50'
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            navigate(`/service/${station.facility?.id}`);
+                                            navigate(`/service/${station.facility?.code}`);
                                         }}
                                     >
                                         3D 뷰어

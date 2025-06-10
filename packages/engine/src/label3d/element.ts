@@ -18,14 +18,14 @@ class Label3DElement extends THREE.Mesh {
 
         this.baseSize = size.clone();
         this.material = material;
-        this.geometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
+        this.geometry = new THREE.PlaneGeometry(1, 1.10, 1, 1);
         // this.geometry.translate(0, 2.0, 0);
 
         this.geometry.rotateX(Math.PI * -0.5);
-        (this.geometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
-        (this.geometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
-        (this.geometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
-        (this.geometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
+        // (this.geometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
+        // (this.geometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
+        // (this.geometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
+        // (this.geometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
 
         this.scale.set(this.baseSize.x * 0.1, 1, this.baseSize.y * 0.1);
     }
