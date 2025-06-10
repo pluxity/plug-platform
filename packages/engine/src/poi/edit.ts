@@ -216,6 +216,7 @@ function FinishEdit() {
 
     bPoiEditEnabled = false;
 
+    unregisterPointerEvents();
     disposePreviewObject();
 
     if (gizmo) {
