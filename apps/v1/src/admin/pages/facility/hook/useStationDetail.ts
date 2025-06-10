@@ -22,7 +22,6 @@ export const useStationDetail = (stationId: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const {
     isUploading,
-    fileError,
     handleFileUpload
   } = useFileUploader();
 
@@ -56,10 +55,9 @@ export const useStationDetail = (stationId: string) => {
       initializeFormValues(data);
       initializeFileStates(data);
       if (detailError) {
-        console.error('역사 정보를 불러오는데 실패했습니다:', error);
         addToast({
           title: '역사 정보 불러오기 실패',
-          description: error.message || '역사 정보를 불러오는데 실패했습니다.',
+          description: detailError.message || '역사 정보를 불러오는데 실패했습니다.',
           variant: 'critical',
         });
       }
@@ -134,13 +132,6 @@ export const useStationDetail = (stationId: string) => {
           }
         }));
       }
-      if (fileError) {
-        addToast({
-          title: '업로드 실패',
-          description: fileError.message || '파일 업로드 중 오류가 발생했습니다.',
-          variant: 'critical',
-        });
-      }
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +173,7 @@ export const useStationDetail = (stationId: string) => {
           description: updateError.message,
           variant: 'critical',
         });
-        console.error('수정 실패:', error);
+        console.error('수정 실패:', updateError);
       }
     } finally {
       setIsLoading(false);
@@ -222,7 +213,6 @@ export const useStationDetail = (stationId: string) => {
     fileStates,
     isLoading,
     isUploading,
-    fileError,
     handleChange,
     handleFileChange,
     handleSubmit,

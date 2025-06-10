@@ -1,6 +1,8 @@
+type OpCode = '열차 접근' | '출발' | '도착';
+
 export interface TrainData {
   messageNumber: number;
-  opCode: string;
+  opCode: OpCode;
   arrivalStationCode: string;
   arrivalStationName: string;
   trainDirection: string;

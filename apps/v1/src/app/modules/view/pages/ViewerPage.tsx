@@ -4,22 +4,25 @@ import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layout
 import { MapViewer } from '@plug/v1/app/modules/components/map';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
 import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/types/stream';
-import useEventStore from '@plug/v1/app/stores/eventSourceStore';
+import * as Px from '@plug/engine/src';
 
 const ViewerPage = () => {
-    const { code } = useParams<{ code: string }>();
-    const parsedCode = code ?? '1';
 
-    const { setStationCode } = useStationStore();
-    const { fetchAssets } = useAssetStore();
+  const { code } = useParams<{ code: string }>();
+  const parsedCode = code ?? '1';
 
-    const { stationData, stationLoading, error } = useStationData(parsedCode);
-    const { floorItems, modelPath } = useFloorData(stationData);
+  const { setStationCode } = useStationStore();
+  const { fetchAssets } = useAssetStore();
+
+  const { stationData, stationLoading, error } = useStationData(parsedCode);
+  const { floorItems, modelPath } = useFloorData(stationData);
+
   const { setTtcData, setEventData, setShutterData } = useEventStore();
 
   const handleLoadError = useCallback((loadError: Error) => {
@@ -37,7 +40,40 @@ const ViewerPage = () => {
 
     const handleModelLoadedWithEngine = useCallback(() => {
         engineModelLoaded();
-    }, [engineModelLoaded]);    
+
+        if(stationData?.route) {
+            Px.Path3D.Import(JSON.parse(stationData?.route));
+            Px.Path3D.HideAll();
+        }
+        
+        const loadTrainModels = () => {
+          return Promise.all([
+              new Promise<void>((resolve) => {
+                  Px.Subway.LoadTrainHead("/assets/models/head.glb", () => { 
+                      resolve();
+                  });
+              }),
+              new Promise<void>((resolve) => {
+                  Px.Subway.LoadTrainBody("/assets/models/body.glb", () => {
+                      resolve();
+                  });
+              }),
+              new Promise<void>((resolve) => {
+                  Px.Subway.LoadTrainTail("/assets/models/tail.glb", () => {
+                      resolve();
+                  });
+              })
+          ]);
+      };
+
+      loadTrainModels().then(() => {
+          if(stationData?.subway) {
+              Px.Subway.Import(JSON.parse(stationData?.subway));
+              Px.Subway.HideAll();
+          }
+      });
+
+    }, [engineModelLoaded, stationData]);  
     
     useEffect(() => {
         setStationCode(parsedCode);
@@ -47,48 +83,43 @@ const ViewerPage = () => {
         fetchAssets();
     }, [fetchAssets]);
 
-  useEffect(() => {
-    const eventSource = new EventSource('/api/sse');
+    useEffect(() => {
+      const eventSource = new EventSource('/api/sse');
 
-    eventSource.addEventListener('ttc-data', (event) => {
-      const data = JSON.parse(event.data) as TrainData[];
-      const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
-      if (filteredData.length > 0) {
-        setTtcData(filteredData);
-        console.log('ttc-data', filteredData);
-      }
-    });
+      eventSource.addEventListener('ttc-data', (event) => {
+        const data = JSON.parse(event.data) as TrainData[];
+        const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
+        if (filteredData.length > 0) {
+          setTtcData(filteredData);
+        }
+      });
 
-    eventSource.addEventListener('event', (event) => {
-      const data = JSON.parse(event.data) as EventData[];
-      if (data.length > 0) {
-        setEventData(data);
-        console.log('event-data', data);
-      }
-    });
+      eventSource.addEventListener('event', (event) => {
+        const data = JSON.parse(event.data) as EventData[];
+        if (data.length > 0) {
+          setEventData(data);
+        }
+      });
 
-    eventSource.addEventListener('shutter', (event) => {
-      const data = JSON.parse(event.data) as ShutterData[];
-      if (data.length > 0) {
-        setShutterData(data);
-        console.log('event2-data', data);
-      }
-    });
+      eventSource.addEventListener('shutter', (event) => {
+        const data = JSON.parse(event.data) as ShutterData[];
+        if (data.length > 0) {
+          setShutterData(data);
+        }
+      });
 
+      eventSource.onerror = (err) => {
+        console.error('SSE 에러:', err);
+      };
 
-    eventSource.onerror = (err) => {
-      console.error('SSE 에러:', err);
-    };
+      return () => {
+        console.log('SSE 연결 종료');
+        eventSource.close();
+      };
+    }, []);
 
-    return () => {
-      console.log('SSE 연결 종료');
-      eventSource.close();
-    };
-  }, []);
-
-  const eventData = useEventStore(state => state.eventData);
-  const shutterData = useEventStore(state => state.shutterData);
-  console.log('eventData', eventData, 'shutterData', shutterData);
+//   const eventData = useEventStore(state => state.eventData);
+//   const shutterData = useEventStore(state => state.shutterData);
 
   if (error && !stationLoading) {
         return (

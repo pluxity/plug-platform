@@ -14,7 +14,7 @@ const useEventStore = create<EventStore>((set) => ({
   ttcData: [],
   eventData: [],
   shutterData: [],
-  setTtcData: (data) => set((state) => ({ ttcData: [...state.ttcData, ...data] })),
+  setTtcData: (data) => set(() => ({ ttcData: [...data] })),
   setEventData: (data) => set((state) => ({ eventData: [...state.eventData, ...data] })),
   setShutterData: (data) => set((state) => ({ shutterData: [...state.shutterData, ...data] })),
 }));

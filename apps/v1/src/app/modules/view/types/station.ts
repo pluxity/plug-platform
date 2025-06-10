@@ -48,5 +48,6 @@ export interface StationWithFeatures {
   floors: Floor[];
   lineId: number;  
   route: string;
+  subway: string;
   externalCode: string;
 }
