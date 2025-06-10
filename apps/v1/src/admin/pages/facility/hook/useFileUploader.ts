@@ -87,14 +87,6 @@ export const useFileUploader = (
             }
 
             return fileId;
-            if (fileError) {
-              addToast({
-                title: '업로드 실패',
-                description: fileError.message || '파일 업로드 중 오류가 발생했습니다.',
-                variant: 'critical',
-              });
-              throw fileError;
-            }
         } finally {
             setIsUploading(false);
         }
@@ -103,7 +95,6 @@ export const useFileUploader = (
     return {
         files,
         isUploading,
-        fileError,
         handleFileUpload,
         modelData,
         isLoading,

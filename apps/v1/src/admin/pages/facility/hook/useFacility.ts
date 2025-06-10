@@ -21,7 +21,6 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
         modelData,
         resetModelData,
         isUploading,
-        fileError,
         handleFileUpload: originalHandleFileUpload,
         resetFiles
     } = useFileUploader(setFacilityName);
@@ -67,8 +66,7 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
                     floorId: String(item.floorId),
                     name: item.displayName
                 })),
-                lineIds,
-                route: 'facility'
+                lineIds
             });
 
           if (createError) {
@@ -99,7 +97,6 @@ export const useFacility = ({onClose, onSuccess}: FacilityProps) => {
         facilityName,
         files,
         isUploading,
-        fileError,
         handleFileUpload,
         handleFinish,
         resetForm,

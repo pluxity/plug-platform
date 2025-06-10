@@ -11,7 +11,6 @@ type FacilityModalProps = {
 
 export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps) => {
     const {
-        fileError,
         isLoading,
         files,
         isUploading,
@@ -35,12 +34,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
             closeOnOverlayClick={false}
         >
             <div>
-                {fileError && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-                        {fileError.message}
-                    </div>
-                )}
-
                 <Form onSubmit={handleFinish}>
                     <FormItem name="name" label="역사 이름" required>
                         <Input.Text placeholder="역사 이름을 입력하세요" />
