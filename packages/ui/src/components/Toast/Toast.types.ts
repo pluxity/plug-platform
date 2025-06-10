@@ -7,7 +7,7 @@ export interface ToastPortalProps {
 }
 
 export interface ToastProps extends React.ComponentProps<'div'>{
-    variant?: 'default' | 'normal' | 'warning' | 'critical';
+    variant?: 'default' | 'normal' | 'caution' | 'warning' | 'critical';
     placement?: ToastPlacement;
     closable?: boolean;
     duration?: number;

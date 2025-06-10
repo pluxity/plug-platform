@@ -86,7 +86,8 @@ const Toast = ({
     const toastVariant = {
         default: 'bg-white border-gray-200 text-slate-800',
         normal: 'bg-green-50 border-green-200 text-green-900',
-        warning: 'bg-yellow-50 border-yellow-200 text-yellow-900',
+        caution: 'bg-yellow-50 border-yellow-200 text-yellow-900',
+        warning: 'bg-orange-50 border-orange-200 text-orange-900',
         critical: 'bg-rose-50 border-rose-200 text-rose-900',
     }[variant];
 
