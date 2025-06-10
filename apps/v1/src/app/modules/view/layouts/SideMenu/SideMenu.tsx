@@ -84,7 +84,7 @@ const SideMenu: React.FC = () => {
 
   return (
     <>
-      <div className="fixed left-0 top-16 bottom-0 w-16 bg-gradient-to-b from-primary-900/30 to-primary-900/20 backdrop-blur-md flex flex-col items-center pt-4 px-2 z-30 shadow-xl border-r border-primary-700/30">
+      <div className="fixed left-0 top-16 bottom-0 w-16 bg-gradient-to-b from-primary-900/30 to-primary-900/20 backdrop-blur-md flex flex-col items-center pt-4 px-2 z-30 shadow-xl border-r border-primary-100/5">
         <div className="flex-1 mt-2 space-y-3">
           {menuItems.map((item) => (
             <Tooltip key={item.id} position="right" trigger="hover" className="z-50 block">
@@ -96,7 +96,7 @@ const SideMenu: React.FC = () => {
                   onClick={handleMenuItemClick}
                 />
               </Tooltip.Trigger>
-              <Tooltip.Content className="bg-primary-900/60 text-white backdrop-blur-md rounded-lg shadow-2xl px-4 py-2 text-sm font-medium after:bg-none after:content-none border border-primary-400/30">
+              <Tooltip.Content className="bg-[#10385E] text-white backdrop-blur-md rounded-lg shadow-2xl px-4 py-2 text-sm font-medium after:bg-none after:content-none border border-primary-400/30">
                 {item.name}
               </Tooltip.Content>
             </Tooltip>

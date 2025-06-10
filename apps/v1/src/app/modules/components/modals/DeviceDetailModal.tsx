@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal } from '@plug/ui';
+import { Button, Modal } from '@plug/ui';
 import { nfluxService } from '@plug/v1/app/api';
 import type { Light, Shutter, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, IOStatus, Pump } from '@plug/v1/app/api/types/nflux';
 
@@ -82,8 +82,9 @@ const StatusRow = ({
   type?: StatusType;
   suffix?: string;
 }) => (
-  <div className="flex justify-between">
-    <span>{label}:</span>
+  <div
+    className="flex justify-between items-center bg-gray-800/20 backdrop-blur-md rounded px-4 py-2.5 border border-primary-700/30">
+    <span className="text-primary-200">{label}:</span>
     <span className={type === 'value' ? 'text-blue-600' : getStatusColor(status, type)}>
       {type === 'value' ? status.ioValue : getStatusText(status, type)}{suffix}
     </span>
@@ -92,12 +93,15 @@ const StatusRow = ({
 
 const PumpList = ({ pumps }: { pumps: Pump[] }) => (
   <div>
-    <span className="font-medium">펌프 상태:</span>
-    <div className="mt-1 space-y-2">
+    <span className="font-medium text-primary-100">펌프 상태:</span>
+    <div className="mt-2 space-y-3">
       {pumps.map((pump, index) => (
-        <div key={`${pump.pumpName}-${index}`} className="bg-gray-50 p-3 rounded space-y-2">
-          <h5 className="font-medium text-gray-800">펌프 {index + 1}: {pump.pumpName}</h5>
-          <div className="grid grid-cols-2 gap-2 text-sm">
+        <div key={`${pump.pumpName}-${index}`}
+             className="bg-primary-800/25 backdrop-blur-md border border-primary-700/30 rounded-lg p-4 space-y-3">
+          <h5 className="font-medium text-primary-100 pb-2 border-b border-primary-700/30">
+            펌프 {index + 1}: {pump.pumpName}
+          </h5>
+          <div className="grid grid-cols-2 gap-3 text-sm">
             <StatusRow label="상태" status={pump.status} type="operation" />
             <StatusRow label="오류" status={pump.error} type="normalError" />
             {pump.remoteSetting && (
@@ -115,11 +119,12 @@ const PumpList = ({ pumps }: { pumps: Pump[] }) => (
 
 const CCTVList = ({ cctvs }: { cctvs: Array<{ cctvName: string }> }) => (
   <div>
-    <span className="font-medium">연관 CCTV:</span>
-    <div className="mt-1 space-y-1">
+    <span className="font-medium text-primary-100">연관 CCTV:</span>
+    <div className="mt-2 space-y-2">
       {cctvs.map((cctv, index) => (
-        <div key={index} className="text-sm text-gray-600 ml-4">
-          • {cctv.cctvName}
+        <div key={index} className="text-sm text-primary-100/80 ml-4 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary-400/60" />
+          {cctv.cctvName}
         </div>
       ))}
     </div>
@@ -127,18 +132,21 @@ const CCTVList = ({ cctvs }: { cctvs: Array<{ cctvName: string }> }) => (
 );
 
 const CommonInfo = ({ device }: { device: DeviceData }) => (
-  <div className="mb-6 space-y-2">
-    <div className="flex justify-between">
-      <span className="font-medium text-gray-700">장비명:</span>
-      <span className="text-gray-900">{getDeviceName(device)}</span>
+  <div className="mb-6 space-y-3">
+    <div
+      className="flex justify-between items-center bg-gray-800/20 backdrop-blur-md rounded px-4 py-2.5 border border-primary-700/30">
+      <span className="font-medium text-primary-200">장비명</span>
+      <span className="text-primary-100">{getDeviceName(device)}</span>
     </div>
-    <div className="flex justify-between">
-      <span className="font-medium text-gray-700">수집시간:</span>
-      <span className="text-gray-900">{device.collectedTime || '정보 없음'}</span>
+    <div
+      className="flex justify-between items-center bg-gray-800/20 backdrop-blur-md rounded px-4 py-2.5 border border-primary-700/30">
+      <span className="font-medium text-primary-200">수집시간</span>
+      <span className="text-primary-100">{device.collectedTime || '정보 없음'}</span>
     </div>
-    <div className="flex justify-between">
-      <span className="font-medium text-gray-700">역사:</span>
-      <span className="text-gray-900">{getStationName(device)}</span>
+    <div
+      className="flex justify-between items-center bg-gray-800/20 backdrop-blur-md rounded px-4 py-2.5 border border-primary-700/30">
+      <span className="font-medium text-primary-200">역사</span>
+      <span className="text-primary-100">{getStationName(device)}</span>
     </div>
   </div>
 );
@@ -146,19 +154,20 @@ const CommonInfo = ({ device }: { device: DeviceData }) => (
 // Device-specific components
 const LightDetails = ({ device }: { device: Light }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">조명 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b pb-2">조명 상태</h4>
     <StatusRow label="동작 상태" status={device.status} type="onoff" />
     <StatusRow label="제어 위치" status={device.controlPosition} type="remoteLocal" />
-    <div className="flex justify-between">
-      <span>순서:</span>
-      <span>{device.orderingSequence}</span>
+    <div
+      className="flex justify-between items-center bg-gray-800/20 backdrop-blur-md rounded px-4 py-2.5 border border-primary-700/30">
+      <span className="text-primary-200">순서:</span>
+      <span className="text-primary-100">{device.orderingSequence}</span>
     </div>
   </div>
 );
 
 const ShutterDetails = ({ device }: { device: Shutter }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">셔터 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">셔터 상태</h4>
     <StatusRow label="동작 상태" status={device.status} type="shutter" />
     {device.cctvList && device.cctvList.length > 0 && (
       <CCTVList cctvs={device.cctvList} />
@@ -168,14 +177,14 @@ const ShutterDetails = ({ device }: { device: Shutter }) => (
 
 const FireSensorDetails = ({ device }: { device: FireSensor }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">화재수신기 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">화재수신기 상태</h4>
     <StatusRow label="감지 상태" status={device.status} type="fire" />
   </div>
 );
 
 const ElevatorDetails = ({ device }: { device: Elevator }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">엘리베이터 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">엘리베이터 상태</h4>
     <StatusRow label="동작 상태" status={device.status} type="elevator" />
     {device.downMoveStatus && (
       <StatusRow label="하강 상태" status={device.downMoveStatus} type="operation" />
@@ -187,7 +196,7 @@ const ElevatorDetails = ({ device }: { device: Elevator }) => (
 
 const EscalatorDetails = ({ device }: { device: Escalator }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">에스컬레이터 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">에스컬레이터 상태</h4>
     <StatusRow label="동작 상태" status={device.status} type="escalator" />
     <StatusRow label="오류 상태" status={device.error} type="normalError" />
   </div>
@@ -195,7 +204,7 @@ const EscalatorDetails = ({ device }: { device: Escalator }) => (
 
 const WaterTankDetails = ({ device }: { device: WaterTank }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">물탱크 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">물탱크 상태</h4>
     <StatusRow label="수압" status={device.waterPressure} type="value" />
     <StatusRow label="수위" status={device.waterLevel} type="value" />
     <StatusRow label="저수위 상태" status={device.lowWaterLevelStatus} type="waterLevel" />
@@ -207,7 +216,7 @@ const WaterTankDetails = ({ device }: { device: WaterTank }) => (
 
 const CatchpitDetails = ({ device }: { device: Catchpit }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">집수정 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">집수정 상태</h4>
     <StatusRow label="수위" status={device.waterLevel} type="value" />
     <StatusRow label="저수위 상태" status={device.lowWaterLevelStatus} type="waterLevel" />
     <StatusRow label="고수위 상태" status={device.highWaterLevelStatus} type="waterLevel" />
@@ -218,7 +227,7 @@ const CatchpitDetails = ({ device }: { device: Catchpit }) => (
 
 const AirPurifierDetails = ({ device }: { device: AirPurifier }) => (
   <div className="space-y-3">
-    <h4 className="font-semibold text-gray-800 border-b pb-2">공기청정기 상태</h4>
+    <h4 className="font-semibold text-primary-100 border-b border-primary-700/30 pb-2">공기청정기 상태</h4>
     <StatusRow label="동작 상태" status={device.status} type="operation" />
     <StatusRow label="오류 상태" status={device.error} type="normalError" />
     <StatusRow label="통신 상태" status={device.communicationFailure} type="normalError" />
@@ -364,20 +373,43 @@ export const DeviceDetailModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title={`${deviceId} 상세정보`}
+      contentClassName="!bg-primary-900/40  backdrop-blur-xl border border-primary-700/30"
+      headerClassName="!bg-transparent !border-b text-white !border-primary-700/30 !px-6 !py-4"
+      titleClassName="!text-white"
+      footer={
+        <Button
+          variant="outline"
+          onClick={onClose}
+          className="text-primary-100 border-primary-400/30 hover:bg-primary-400/10"
+        >
+          닫기
+        </Button>
+      }
+      showCloseButton={false}
+      bodyClassName="!bg-transparent "
+      footerClassName="!bg-transparent !border-t !border-primary-700/30 !px-6 !py-4"
     >
       <div className="max-h-96 overflow-y-auto">
         {loading && (
           <div className="flex justify-center items-center py-8">
-            <div className="text-gray-500">장비 정보를 불러오는 중...</div>
+            <div className="text-primary-100 flex items-center gap-2">
+              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              <span>장비 정보를 불러오는 중...</span>
+            </div>
           </div>
         )}
-        
+
         {error && (
-          <div className="text-red-500 text-center py-4">
+          <div
+            className="text-red-500/90 text-center py-4 bg-red-900/40 border border-red-500/20 rounded-lg backdrop-blur-xl shadow-lg">
             {error}
           </div>
         )}
-        
+
         {deviceData && !loading && !error && (
           <>
             <CommonInfo device={deviceData} />

@@ -82,7 +82,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
         )}
 
         {devices.length > 0 && (
-          <ul className="space-y-2">
+          <ul className="space-y-2 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-primary-900/20">
             {devices.map((device) => (
               <li
                 key={device.id}
