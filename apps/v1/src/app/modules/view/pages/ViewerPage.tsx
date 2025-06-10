@@ -34,7 +34,7 @@ const ViewerPage = () => {
     }, []);
 
     const { handleModelLoaded: engineModelLoaded } = useEngineIntegration({
-        stationData,
+        features: stationData?.features || [],
         onPoiSelect: handlePoiSelect,
     });
 

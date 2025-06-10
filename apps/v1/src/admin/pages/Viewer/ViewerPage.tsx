@@ -226,9 +226,9 @@ const ViewerPage = memo(() => {
   // ConfirmModal 닫기 핸들러
   const handleConfirmModalClose = useCallback(() => {
     setConfirmModal(prev => ({ ...prev, isOpen: false }));
-  }, []); // Engine integration with cleanup
+  }, []);  // Engine integration with cleanup
   const { handleModelLoaded, handleFloorChange } = useEngineIntegration({
-    stationData,
+    features: stationData?.features || [],
     onPoiSelect: handlePoiSelect,
     onHierarchyLoaded: handleHierarchyLoaded,
     onFloorChange: handleFloorChangeUI,
