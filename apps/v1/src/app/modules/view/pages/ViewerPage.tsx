@@ -102,10 +102,19 @@ const ViewerPage = () => {
         try {
           const data = JSON.parse(event.data) as EventData;
           setEventData([data]);
+          let toastVariant: 'critical' | 'warning' | 'caution' = 'caution';
+          if (data.level === 'CRITICAL') {
+            toastVariant = 'critical';
+          } else if (data.level === 'MAJOR') {
+            toastVariant = 'warning';
+          } else if (data.level === 'MINOR') {
+            toastVariant = 'caution';
+          }
+
           addToast({
             description: data.message,
             title: data.level,
-            variant: 'warning',
+            variant: toastVariant,
             duration: 5000,
           });
         } catch (error) {

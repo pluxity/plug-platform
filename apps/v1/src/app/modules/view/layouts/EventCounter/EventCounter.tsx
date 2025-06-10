@@ -56,16 +56,16 @@ const EventCounter: React.FC<EventCounterProps> = ({ stationId }) => {
     {
       label: 'Major',
       count: displayData.major,
-      textColor: 'text-yellow-100',
-      borderColor: 'border-yellow-500/50',
-      bgColor: 'bg-yellow-500',
+      textColor: 'text-orange-100',
+      borderColor: 'border-orange-500/50',
+      bgColor: 'bg-orange-500',
     },
     {
       label: 'Minor',
       count: displayData.minor,
-      textColor: 'text-primary-100',
-      borderColor: 'border-primary-400/50',
-      bgColor: 'bg-primary-400',
+      textColor: 'text-yellow-100',
+      borderColor: 'border-yellow-500/50',
+      bgColor: 'bg-yellow-500',
     },
   ];
 

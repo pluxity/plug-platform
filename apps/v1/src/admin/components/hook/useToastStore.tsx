@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import type { ToastPlacement } from '@plug/ui';
 
-type ToastVariant = 'default' | 'normal' | 'warning' | 'critical';
+type ToastVariant = 'default' | 'normal' | 'caution' | 'warning' | 'critical';
 
 interface ToastItem {
   id: string;
