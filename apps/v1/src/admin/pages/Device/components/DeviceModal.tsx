@@ -78,7 +78,7 @@ export const DeviceModal = ({
                 const device = await createDevice({
                     name: values.name,
                     id: values.id,
-                    deviceCategoryId: Number(values.categoryId)
+                    deviceCategoryId: categoryId
                 });
 
                 if (device) {
@@ -101,7 +101,7 @@ export const DeviceModal = ({
                 mutate();
             }
         }
-    }, [mode, detailDeviceData, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError, categoryDevice]);
+    }, [mode, detailDeviceData, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError, categoryDevice, categoryId, name]);
 
     // 폼 초기화
     const resetForm = () => {
