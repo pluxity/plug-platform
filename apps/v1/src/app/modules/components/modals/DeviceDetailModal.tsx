@@ -159,6 +159,7 @@ const PumpList = ({ pumps }: { pumps: Pump[] }) => (
   </div>
 );
 
+/*
 const CCTVList = ({ cctvs }: { cctvs: Array<{ cctvName: string }> }) => (
   <div className="rounded-lg bg-primary-950/40 border border-primary-700/30 p-4">
     <h4 className="text-primary-100 font-medium flex items-center gap-2">
@@ -187,6 +188,7 @@ const CCTVList = ({ cctvs }: { cctvs: Array<{ cctvName: string }> }) => (
     </div>
   </div>
 );
+*/
 
 const CommonInfo = ({ device }: { device: DeviceData }) => (
   <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30 space-y-4 mb-6">
@@ -304,90 +306,16 @@ const FireSensorDetails = ({ device }: { device: FireSensor }) => (
       </svg>
       화재수신기 상태
     </h4>
-    <div className="grid gap-4">
-      <div className="bg-red-950/20 rounded-lg p-4 border border-red-500/20">
-        <div className="grid gap-4">
-          <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
-            <div className="flex items-center gap-2 mb-2 text-red-300">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              감지 상태 정보
-            </div>
-            <div className="relative">
-              <div className="absolute -left-1 top-0 bottom-0 w-[2px] bg-gradient-to-b from-red-500/50 via-red-500/20 to-transparent" />
-              <StatusRow label="감지 상태" status={device.status} type="fire" />
-            </div>
-          </div>
-
-          <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
-            <div className="flex items-center gap-2 mb-2 text-red-300">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              시스템 상태
-            </div>
-            <div className="grid gap-2">
-              <div className="group relative bg-primary-950/40 hover:bg-primary-900/40
-                rounded-lg px-4 py-3 border border-primary-700/20
-                transition-all duration-200">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent
-                  rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-sm text-primary-100">시스템 정상</span>
-                  </div>
-                  <span className="text-xs text-primary-300">실시간 모니터링 중</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
-            <div className="flex items-center gap-2 mb-2 text-red-300">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              최근 상태 변경
-            </div>
-            <div className="group relative bg-primary-950/40 hover:bg-primary-900/40
-              rounded-lg px-4 py-3 border border-primary-700/20
-              transition-all duration-200">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent
-                rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center justify-between text-sm">
-                <span className="text-primary-200">마지막 점검</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-primary-100">정상</span>
-                  <div className="px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30
-                    text-green-300 text-xs">확인완료</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
+      <div className="flex items-center gap-2 mb-2 text-red-300">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        감지 상태 정보
       </div>
-
-      <div className="bg-red-950/20 rounded-lg p-4 border border-red-500/20">
-        <div className="flex items-center gap-2 mb-3 text-red-300">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-          <span className="font-medium">비상 연락처</span>
-        </div>
-        <div className="grid gap-2">
-          <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-primary-200">관제실</span>
-              <span className="text-primary-100 font-medium">119</span>
-            </div>
-          </div>
-        </div>
+      <div className="relative">
+        <div className="absolute -left-1 top-0 bottom-0 w-[2px] bg-gradient-to-b from-red-500/50 via-red-500/20 to-transparent" />
+        <StatusRow label="감지 상태" status={device.status} type="fire" />
       </div>
     </div>
   </div>
@@ -396,9 +324,11 @@ const FireSensorDetails = ({ device }: { device: FireSensor }) => (
 const ElevatorDetails = ({ device }: { device: Elevator }) => (
   <div className="space-y-4">
     <h4 className="text-primary-100 font-medium flex items-center gap-2">
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M19 9l-7 7-7-7M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className="w-5 h-5 text-blue-400">
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M15 3v18"/>
       </svg>
       엘리베이터 상태
     </h4>
@@ -521,7 +451,7 @@ const WaterTankDetails = ({ device }: { device: WaterTank }) => (
               <div className="flex items-center gap-2 mb-2 text-primary-300">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
                 </svg>
                 수압
               </div>
@@ -531,7 +461,7 @@ const WaterTankDetails = ({ device }: { device: WaterTank }) => (
               <div className="flex items-center gap-2 mb-2 text-primary-300">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
                 </svg>
                 수위
               </div>
@@ -561,64 +491,48 @@ const CatchpitDetails = ({ device }: { device: Catchpit }) => (
       </svg>
       <span className="font-medium text-primary-100">집수정 상태</span>
     </h4>
-    <div className="grid gap-4">
-      <div className="bg-blue-950/20 rounded-lg p-4 border border-blue-500/20">
-            <div className="grid gap-3">
-                <div className="relative">
-                  <StatusRow
-                    label="저수위 상태"
-                    status={device.lowWaterLevelStatus}
-                    type="waterLevel"
-                  />
-                </div>
+    <div className="grid gap-3 mt-4">
+      <div className="relative">
+        <StatusRow label="저수위 상태" status={device.lowWaterLevelStatus} type="waterLevel" />
+      </div>
+      <div className="relative">
+        <StatusRow label="고수위 상태" status={device.highWaterLevelStatus} type="waterLevel" />
+      </div>
+      <div className="relative">
+        <StatusRow label="만수위 상태" status={device.fullWaterLevelStatus} type="waterLevel" />
+      </div>
+      <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
+        <div className="flex items-center gap-2 mb-3 text-blue-300">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          현재 수위 상태
+        </div>
+        <div className="h-24 bg-primary-950/80 rounded-lg border border-primary-700/30 relative overflow-hidden">
 
-                <div className="relative">
-                  <StatusRow
-                    label="고수위 상태"
-                    status={device.highWaterLevelStatus}
-                    type="waterLevel"
-                  />
-                </div>
-
-                <div className="relative">
-                  <StatusRow
-                    label="만수위 상태"
-                    status={device.fullWaterLevelStatus}
-                    type="waterLevel"
-                  />
-                </div>
-            </div>
+          <div
+            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-500/40 to-blue-500/20 transition-all duration-500"
+            style={{
+              height: device.waterLevel?.ioValue ? `${device.waterLevel.ioValue}%` : '35%',
+            }}
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-blue-400/40 shadow-lg shadow-blue-400/30" />
           </div>
-      
-          <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
-            <div className="flex items-center gap-2 mb-3 text-blue-300">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              현재 수위 상태
-            </div>
-            <div className="h-24 bg-primary-950/80 rounded-lg border border-primary-700/30 relative overflow-hidden">
-
-              <div
-                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-500/40 to-blue-500/20 transition-all duration-500"
-                style={{
-                  height: device.waterLevel?.ioValue ? `${device.waterLevel.ioValue}%` : '35%',
-                }}
-              >
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-blue-400/40 shadow-lg shadow-blue-400/30" />
-              </div>
-              <div className="absolute top-1/4 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end">
-                <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">만수위</div>
-              </div>
-              <div className="absolute top-1/2 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end">
-                <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">고수위</div>
-              </div>
-              <div className="absolute top-3/4 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end">
-                <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">저수위</div>
-              </div>
-            </div>
+          <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
+               style={{ top: `${100 - Number(device.fullWaterLevelSetting.ioValue)}%` }}>
+            <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">만수위</div>
           </div>
+          <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
+               style={{ top: `${100 - Number(device.highWaterLevelSetting.ioValue)}%` }}>
+            <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">고수위</div>
+          </div>
+          <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
+               style={{ top: `${100 - Number(device.lowWaterLevelSetting.ioValue)}%` }}>
+            <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">저수위</div>
+          </div>
+        </div>
+      </div>
       {device.pumps && device.pumps.length > 0 && <PumpList pumps={device.pumps} />}
     </div>
   </div>
@@ -801,6 +715,7 @@ export const DeviceDetailModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      closable={false}
       title={
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
@@ -815,7 +730,6 @@ export const DeviceDetailModal = ({
       headerClassName="!bg-transparent !border-b !border-primary-600/20 !px-6 !py-4"
       bodyClassName="!bg-transparent !px-6 !py-4"
       footerClassName="!bg-transparent !border-t !border-primary-600/20 !px-6 !py-4"
-      showCloseButton={false}
       footer={
         <Button
           variant="outline"
