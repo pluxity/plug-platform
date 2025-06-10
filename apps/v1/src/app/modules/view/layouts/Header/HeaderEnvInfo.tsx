@@ -60,64 +60,46 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
     return () => clearInterval(interval);
   }, [refetch]);
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-1">
-        <span className="text-white text-xs">대합실:</span>
-        <div className="flex items-center">
-          <img 
-            src="/assets/station/temp.svg" 
-            alt="온도" 
-            width={14} 
-            height={18} 
-            className="mr-1"
-          />
-          <span className="text-white text-sm font-bold">
-            {`${displayData.temperature.watingRoom}${typeof displayData.temperature.watingRoom === 'number' ? '°C' : ''}`}
-          </span>
+    <div className="flex items-center gap-6 border border-gray-300/10 bg-primary-300/10 rounded-lg px-4 py-2">
+      {[
+        { label: '대합실', value: displayData.temperature.watingRoom, type: 'temp' },
+        { label: '승강장', value: displayData.temperature.platform, type: 'temp' },
+        { label: '외부', value: displayData.temperature.external, type: 'temp' },
+      ].map(({ label, value }) => (
+        <div
+          key={label}
+          className="flex items-center gap-2 border-r border-gray-600 last:border-r-0 pr-6 last:pr-0"
+        >
+          <span className="text-gray-300 text-xs">{label}</span>
+          <div className="flex items-center">
+            <img
+              src="/assets/station/temp.svg"
+              alt="온도"
+              width={14}
+              height={18}
+              className="mr-1.5 opacity-80"
+            />
+            <span className="text-white text-sm font-medium">
+              {`${value}${typeof value === 'number' ? '°C' : ''}`}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-1">
-        <span className="text-white text-xs">승강장:</span>
+      ))}
+      <div className="flex items-center gap-2">
+        <span className="text-gray-300 text-xs">초미세먼지</span>
         <div className="flex items-center">
-          <img 
-            src="/assets/station/temp.svg" 
-            alt="온도" 
-            width={14} 
-            height={18} 
-            className="mr-1"
-          />
-          <span className="text-white text-sm font-bold">
-            {`${displayData.temperature.platform}${typeof displayData.temperature.platform === 'number' ? '°C' : ''}`}
+          <span className="text-white text-sm font-medium">
+            {`${displayData.airQuality.ultrafineDust}${typeof displayData.airQuality.ultrafineDust === 'number' ? ' ㎍/㎥' : ''}`}
           </span>
+          {typeof displayData.airQuality.ultrafineDust === 'number' && (
+            <span
+              className={`ml-2 text-xs px-2 py-0.5 rounded ${getAirQualityStatusColor(displayData.airQuality.ultrafineDust)}`}
+            >
+              {getAirQualityStatus(displayData.airQuality.ultrafineDust)}
+            </span>
+          )}
         </div>
-      </div>
-      <div className="flex items-center gap-1">
-        <span className="text-white text-xs">외부:</span>
-        <div className="flex items-center">
-          <img 
-            src="/assets/station/temp.svg" 
-            alt="온도" 
-            width={14} 
-            height={18} 
-            className="mr-1"
-          />
-          <span className="text-white text-sm font-bold">
-            {`${displayData.temperature.external}${typeof displayData.temperature.external === 'number' ? '°C' : ''}`}
-          </span>
-        </div>
-      </div>      <div className="flex items-center gap-1">
-        <span className="text-white text-xs">초미세먼지:</span>
-        <span className="text-white text-sm font-bold">
-          {`${displayData.airQuality.ultrafineDust}${typeof displayData.airQuality.ultrafineDust === 'number' ? ' ㎍/㎥' : ''}`}
-        </span>
-        {typeof displayData.airQuality.ultrafineDust === 'number' && (
-          <span className="text-xs text-white">
-            ({getAirQualityStatus(displayData.airQuality.ultrafineDust)})
-          </span>
-        )}
-        {error && !loading && (
-          <span className="text-xs text-red-300 ml-1">(오류)</span>
-        )}
+        {error && !loading && <span className="text-red-400 text-xs ml-1">(오류)</span>}
       </div>
     </div>
   );
@@ -129,6 +111,13 @@ const getAirQualityStatus = (value: number): string => {
   if (value <= 35) return '보통';
   if (value <= 75) return '나쁨';
   return '매우 나쁨';
+};
+
+const getAirQualityStatusColor = (value: number): string => {
+  if (value <= 15) return 'bg-green-500/20 text-green-300';
+  if (value <= 35) return 'bg-yellow-500/20 text-yellow-300';
+  if (value <= 75) return 'bg-orange-500/20 text-orange-300';
+  return 'bg-red-500/20 text-red-300';
 };
 
 export default HeaderEnvInfo;

@@ -29,30 +29,26 @@ const EventCounter: React.FC<EventInfoPanelProps> =({ stationId }) => {
   const totalMajor = displayData.equips.major + displayData.electrics.major;
   const totalMinor = displayData.equips.minor + displayData.electrics.minor;
 
+  const eventTypes = [
+    { label: 'Critical', count: totalCritical, color: 'bg-red-500', textColor: 'text-red-100' },
+    { label: 'Major', count: totalMajor, color: 'bg-amber-500', textColor: 'text-amber-100' },
+    { label: 'Minor', count: totalMinor, color: 'bg-primary-400', textColor: 'text-primary-100' }
+  ];
+
   return (
     <div className="fixed top-20 right-4 z-20">
-      <div className="w-[340px] h-9 relative">
-        <div className="w-[340px] h-9 left-0 top-0 absolute bg-primary-400/20 rounded-[5px] backdrop-blur-[5px]" />
-
-        {/* Critical */}
-        <div className="w-3 h-3 left-[10px] top-[12px] absolute bg-red-600 rounded-full" />
-        <div className="left-[29px] top-[7px] absolute justify-start text-white text-sm font-normal font-['Noto_Sans_KR']">Critical</div>        <div className="left-[92px] top-[6px] absolute justify-start text-white text-base font-bold font-['Noto_Sans_KR']">
-          {totalCritical}
-        </div>
-        
-        {/* Major */}
-        <div className="w-3 h-3 left-[125px] top-[12px] absolute bg-amber-500 rounded-full" />
-        <div className="left-[146px] top-[7px] absolute justify-start text-white text-sm font-normal font-['Noto_Sans_KR']">Major</div>
-        <div className="left-[207px] top-[6px] absolute justify-start text-white text-base font-bold font-['Noto_Sans_KR']">
-          {totalMajor}
-        </div>
-        
-        {/* Minor */}
-        <div className="w-3 h-3 left-[240px] top-[12px] absolute bg-primary-400 rounded-full" />
-        <div className="left-[261px] top-[7px] absolute justify-start text-white text-sm font-normal font-['Noto_Sans_KR']">Minor</div>
-        <div className="left-[322px] top-[6px] absolute justify-start text-white text-base font-bold font-['Noto_Sans_KR']">
-          {totalMinor}
-        </div>
+      <div className="flex items-center gap-4 bg-primary-400/20 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50">
+        {eventTypes.map(({ label, count, color, textColor }) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className={`w-2.5 h-2.5 ${color} rounded-full shadow-lg shadow-${color}/30`} />
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-sm">{label}</span>
+              <span className={`${textColor} text-base font-bold tabular-nums`}>
+                {count}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
