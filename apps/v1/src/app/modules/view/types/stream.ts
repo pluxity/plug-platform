@@ -13,10 +13,9 @@ export interface TrainData {
 }
 
 export interface EventData {
-  // TODO: Event 데이터 구조 정의
   id: string;
   message: string;
-  level: string;
+  level: 'CRITICAL' | 'MAJOR' | 'MINOR';
 }
 
 export interface ShutterData {

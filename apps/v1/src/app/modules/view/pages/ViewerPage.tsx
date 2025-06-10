@@ -11,6 +11,8 @@ import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
 import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/types/stream';
 import * as Px from '@plug/engine/src';
+import {useToastStore} from '@plug/v1/admin/components/hook/useToastStore';
+import { ToastContainer } from '@plug/v1/admin/components/toast/ToastContainer';
 
 const ViewerPage = () => {
 
@@ -24,6 +26,7 @@ const ViewerPage = () => {
   const { floorItems, modelPath } = useFloorData(stationData);
 
   const { setTtcData, setEventData, setShutterData } = useEventStore();
+  const { addToast } = useToastStore();
 
   const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
@@ -94,10 +97,19 @@ const ViewerPage = () => {
         }
       });
 
-      eventSource.addEventListener('event', (event) => {
-        const data = JSON.parse(event.data) as EventData[];
-        if (data.length > 0) {
-          setEventData(data);
+      eventSource.addEventListener('event-data', (event) => {
+        console.log('SSE 데이터:', event.data);
+        try {
+          const data = JSON.parse(event.data) as EventData;
+          setEventData([data]);
+          addToast({
+            description: data.message,
+            title: data.level,
+            variant: 'warning',
+            duration: 5000,
+          });
+        } catch (error) {
+          console.error('이벤트 데이터 파싱 오류:', error);
         }
       });
 
@@ -166,6 +178,7 @@ const ViewerPage = () => {
         )}
         <Header />
         <SideMenu />
+        <ToastContainer />
         {stationData && <EventCounter stationId={stationData.externalCode} />}
 
         {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
