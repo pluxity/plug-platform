@@ -72,12 +72,13 @@ function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: 
         stroke: {
             color: 0x000000,
             width: 5,
-            join: 'bevel',
+            join: 'round',
         },
         fontFamily: 'Arial',
         fontSize: 14,
         fill: 0xffffff,
         align: 'center',
+        textBaseline: 'alphabetic',
     });
 
     // 사이즈 계산
