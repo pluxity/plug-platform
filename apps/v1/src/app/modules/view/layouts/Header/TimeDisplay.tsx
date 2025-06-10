@@ -31,7 +31,7 @@ const TimeDisplay = () => {
 
   return (
     <div
-      className="flex items-center gap-3 !bg-primary-900/5 rounded-lg px-4 py-1 border border-gray-300/10 backdrop-blur-sm hover:bg-primary-300/25 transition-colors">
+      className="flex items-center gap-3 !bg-primary-900/15 rounded-lg px-4 py-1 border border-gray-300/10 backdrop-blur-sm hover:bg-primary-300/25 transition-colors">
       <div className="flex items-center">
         <span className="text-gray-200 text-sm font-medium tracking-wide">{date}</span>
         <span className="mx-2 text-gray-500 select-none">|</span>

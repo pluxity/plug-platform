@@ -61,7 +61,7 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
   }, [refetch]);
 
   return (
-    <div className="flex items-center gap-3 !bg-primary-900/5 rounded-lg px-4 py-1.5 border border-gray-300/10 backdrop-blur-sm hover:bg-primary-300/15 transition-colors">
+    <div className="flex items-center gap-3 !bg-primary-900/15 rounded-lg px-4 py-1.5 border border-gray-300/10 backdrop-blur-sm hover:bg-primary-300/15 transition-colors">
       <div className="flex items-center gap-6">
         {[
           { label: '대합실', value: displayData.temperature.watingRoom },

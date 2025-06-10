@@ -8,7 +8,7 @@ const Header = () => {
     const parsedStationId = stationId ? stationId : '1';
 
     return (
-      <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-gradient-to-b from-primary-300/40 to-primary-900/20 backdrop-blur-lg text-white z-10 shadow-lg border-b border-primary-900/20">
+      <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-gradient-to-b from-primary-300/30 to-primary-700/30 backdrop-blur-lg text-white z-10 shadow-lg border-b border-primary-900/10">
         <div className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:opacity-75 transition-opacity">
           <img
             src="/assets/logo.png"
