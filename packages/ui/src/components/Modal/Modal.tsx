@@ -14,7 +14,8 @@ const Modal = React.memo(({
                               closable = true,
                               contentClassName,
                               headerClassName,
-                              bodyClassName,
+  titleClassName, showCloseButton,
+bodyClassName,
                               footerClassName,
                               ref,
                               ...props
@@ -44,11 +45,11 @@ const Modal = React.memo(({
                         )}
                     >
                         {title && (
-                            <h2 className="text-base md:text-lg font-semibold text-slate-800 leading-tight">
+                            <h2 className={cn("text-base md:text-lg font-semibold text-slate-800 leading-tight", titleClassName)}>
                                 {title}
                             </h2>
                         )}
-                        {closable && (
+                        {closable && showCloseButton && (
                             <Button
                                 variant="ghost"
                                 size="icon"
