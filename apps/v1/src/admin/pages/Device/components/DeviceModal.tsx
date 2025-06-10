@@ -137,48 +137,49 @@ export const DeviceModal = ({
                 }
                 onSubmit={handleFinish}
             >
+                <div className='min-h-50'>
+                    <FormItem name='categoryId' label='분류' required>
+                        <div>
+                            <Select 
+                                selected={categoryId ? [String(categoryId)] : []}
+                                onChange={(value) => {
+                                    const selectedValues = value || [];
+                                    setCategoryId(Number(selectedValues[0]));
+                                }}
+                            >
+                                <Select.Trigger placeholder='분류를 선택하세요.' />
+                                <Select.Content>
+                                    {categoryDevice?.map(category => (
+                                        <Select.Item
+                                            key={category.id}
+                                            value={String(category.id)}
+                                        >
+                                            {category.name}
+                                        </Select.Item>
+                                    ))}
+                                </Select.Content>
+                            </Select>
+                        </div>
+                    </FormItem>
 
-                <FormItem name='categoryId' label='분류' required>
-                    <div>
-                        <Select 
-                            selected={categoryId ? [String(categoryId)] : []}
-                            onChange={(value) => {
-                                const selectedValues = value || [];
-                                setCategoryId(Number(selectedValues[0]));
-                            }}
-                        >
-                            <Select.Trigger placeholder='분류를 선택하세요.' />
-                            <Select.Content>
-                                {categoryDevice?.map(category => (
-                                    <Select.Item
-                                        key={category.id}
-                                        value={String(category.id)}
-                                    >
-                                        {category.name}
-                                    </Select.Item>
-                                ))}
-                            </Select.Content>
-                        </Select>
-                    </div>
-                </FormItem>
-
-                <FormItem name="name" label="장비 이름" required>
-                    <Input.Text
-                        placeholder="장비 이름을 입력하세요"
-                        value={name}
-                        onChange={value => setName(value)}
-                    />
-                </FormItem>
-
-                {mode === 'create' ? 
-                    <FormItem name="id" label="장비 ID" required>
+                    <FormItem name="name" label="장비 이름" required>
                         <Input.Text
-                            placeholder="장비 ID를 입력하세요"
-                            value={id}
-                            onChange={value => {setId(value);}}
+                            placeholder="장비 이름을 입력하세요"
+                            value={name}
+                            onChange={value => setName(value)}
                         />
-                    </FormItem> : ''
-                }
+                    </FormItem>
+
+                    {mode === 'create' ? 
+                        <FormItem name="id" label="장비 ID" required>
+                            <Input.Text
+                                placeholder="장비 ID를 입력하세요"
+                                value={id}
+                                onChange={value => {setId(value);}}
+                            />
+                        </FormItem> : ''
+                    }
+                </div>
 
                 <div className="mt-6 flex justify-center gap-2">
                     <Button type="button" onClick={resetForm}>

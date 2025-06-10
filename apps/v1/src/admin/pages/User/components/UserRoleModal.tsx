@@ -12,15 +12,14 @@ export interface UserRoleModalProps {
 
 export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: UserRoleModalProps) => {
     // 역할 목록 조회
-    const {data: detailRoleData, error: assignRolesError} = useRolesSWR();
+    const {data: detailRoleData} = useRolesSWR();
     const {addToast} = useToastStore();
 
     // 사용자 역할 할당
-    const {execute: assignRoles, mutate, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
+    const {execute: assignRoles, isLoading: isAssignRolesUpload, error: assignRoleUserError} = useAssignUserRoles(Number(selectedUserId));
 
     // 제출 핸들러 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
-        try {
             const role = await assignRoles({roleIds: [Number(values.role)]});
 
             if (role) {
@@ -39,9 +38,6 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
                 variant: 'critical'
               });
             }
-        } finally {
-          mutate();
-        }
     }, [onSuccess, assignRoles, addToast]);
 
 
@@ -54,7 +50,7 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
             overlayClassName="bg-black/50"
         >
             <Form onSubmit={handleFinish}>
-                <div className="h-40">
+                <div className="min-h-40">
                     <FormItem name="role" label='권한' required>
                         <Select>
                             <Select.Trigger placeholder='권한을 선택하세요.'/>
@@ -67,12 +63,6 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
                             </Select.Content>
                         </Select>
                     </FormItem>
-                  {assignRolesError &&
-                    addToast({
-                      description: assignRolesError.message,
-                      title: '조회 오류',
-                      variant: 'critical',
-                    })}
                 </div>
                 <div className="mt-6 flex justify-center gap-2">
                     <Button type="button" onClick={onClose}>취소</Button>
