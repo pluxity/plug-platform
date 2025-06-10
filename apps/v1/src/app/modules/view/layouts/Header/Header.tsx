@@ -12,13 +12,13 @@ const Header = () => {
         <div className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:opacity-75 transition-opacity">
           <img
             src="/assets/logo.png"
-            height={36}
-            width={36}
+            height={30}
+            width={30}
             alt="Logo"
             className="[filter:brightness(0)_saturate(100%)_invert(100%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(100%)_contrast(100%)] hover:scale-105 transition-transform"
           />
           <h1 className="text-white font-bold text-xl whitespace-nowrap hover:text-primary-100 transition-colors">
-            부산도시철도 사상하단선
+            부산도시철도공사
           </h1>
         </div>
 
