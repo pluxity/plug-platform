@@ -1,6 +1,6 @@
 import type { Placement } from '../types';
 
-type ToastPlacement = Exclude<Placement, 'left' | 'right'>;
+export type ToastPlacement = Exclude<Placement, 'left' | 'right'>;
 
 export interface ToastPortalProps {
     children: React.ReactNode;

@@ -17,7 +17,15 @@ export interface SignInResponse {
 }
 
 export interface UserProfile {
-    name: string;
     code: string;
+    id: number;
+    name: string;
+    username: string;
+    roles: Role[];
 }
-  
+
+export interface Role {
+    id: number;
+    name: string;
+    description: string;
+}

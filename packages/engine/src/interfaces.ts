@@ -18,6 +18,15 @@ class Vector3Custom extends THREE.Vector3 {
 }
 
 /**
+ * 임포트용 벡터3 인터페이스
+ */
+interface Vector3 {
+    x: number;
+    y: number;
+    z: number;
+}
+
+/**
  * 데이터 익스포트를 위한 Euler 클래스
  */
 class EulerCustom extends THREE.Euler {
@@ -58,6 +67,26 @@ enum ModifyKey {
 }
 
 /**
+ * 경로 생성기 마우스 상태 열거형
+ */
+enum PathCreatorMouseState {
+    Default = 0,
+    SetStartPoint,
+    SetEndPoint,
+}
+
+/**
+ * 지하철 생성 마우스 상태 열거형
+ */
+enum SubwayCreateMouseState {
+    Default = 0,
+    SelectPath,
+    SetEntranceLocation,
+    SetStopLocation,
+    SetExitLocation,
+}
+
+/**
  * 모델 정보
  */
 interface ModelInfo {
@@ -88,9 +117,9 @@ interface PoiImportOption {
     displayText: string;
     floorId: string;
     property: { [key: string]: any };
-    position: Vector3Custom;
-    rotation: EulerCustom;
-    scale: Vector3Custom;
+    position: Vector3;
+    rotation: Vector3;
+    scale: Vector3;
 }
 
 /**
@@ -126,20 +155,89 @@ interface SBMMesh {
     vertexCount: number;
     posVertices: number[];
     normVertices: number[];
-    uvVertices : number[];
+    uvVertices: number[];
     indices: number[];
+}
+
+/**
+ * Path3D 위치점 데이터 인터페이스
+ */
+interface Path3DPointData {
+    id: string;
+    point: Vector3;
+    floorId: string;
+    isStraightLine?: boolean;
+}
+
+/**
+ * Path3D 데이터 인터페이스
+ */
+interface Path3DData {
+    id: string;
+    color: number;
+    points: Path3DPointData[];
+}
+
+/**
+ * 지하철 생성 옵션
+ */
+interface SubwayCreateOption {
+    id: string;
+    bodyCount: number;
+}
+
+/**
+ * 지하철 임포트/익스포트 옵션
+ */
+interface SubwayImportOption {
+    id: string;
+    pathId: string;
+    bodyCount: number;
+    entranceUValue: number;
+    stopUValue: number;
+    exitUValue: number;
+}
+
+/**
+ * 라벨3d 생성 옵션
+ */
+interface Label3DCreateOption {
+    id: string;
+    displayText: string;
+}
+
+/**
+ * 라벨3d 임포트 옵션
+ */
+interface Label3DImportOption {
+    id: string;
+    displayText: string;
+    floorId: string;
+    localPosition: Vector3;
+    localRotation: Vector3;
+    localScale: Vector3;
 }
 
 export {
     Vector3Custom,
+    Vector3,
     EulerCustom,
     CustomLayer,
     MouseButton,
     ModifyKey,
+    PathCreatorMouseState,
+    SubwayCreateMouseState,
     ModelInfo,
+    ModelInfo as FloorInfo,
     PoiCreateOption,
     PoiImportOption,
     SBMHeader,
     SBMMaterial,
     SBMMesh,
+    Path3DPointData,
+    Path3DData,
+    SubwayCreateOption,
+    SubwayImportOption,
+    Label3DCreateOption,
+    Label3DImportOption,
 }

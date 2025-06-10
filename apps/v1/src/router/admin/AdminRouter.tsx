@@ -1,32 +1,48 @@
 import { RouteObject } from 'react-router-dom';
 import { ADMIN_ROUTE } from "@plug/v1/router/admin/AdminRoutes";
+import { ProtectedRoute } from "@plug/v1/router/ProtectedRoute";
+import { Role } from "@plug/v1/common/auth/model/roles";
+
 import Dashboard from "../../admin/pages/Dashboard/Dashboard";
-import UserList from "../../admin/pages/User/UserList";
-import PoiList from "../../admin/pages/Poi/PoiList";
-import PoiIcon from "../../admin/pages/Poi/PoiIcon";
-import Viewer from "../../admin/pages/Viewer/Viewer";
-import Poi from "../../admin/pages/Viewer/Poi";
-import Text3d from '../../admin/pages/Viewer/Text3d';
-import Topology from '../../admin/pages/Viewer/Topology';
+import UserPage from "../../admin/pages/User/Management";
+import AssetPage from "../../admin/pages/Asset/Management";
+import LinePage from "../../admin/pages/Line/Management"
+import DevicePage from '../../admin/pages/Device/Management';
+import DeviceCategory from '../../admin/pages/Device/Category';
+import Viewer from "../../admin/pages/Viewer/ViewerPage";
+import AdminLayout from "../../admin/pages/AdminLayout";
+import FacilitiesPage from "@plug/v1/admin/pages/facility/page/FacilitiesPage";
+import FacilitiesDetailPage from "@plug/v1/admin/pages/facility/page/FacilitiesDetailPage";
+
+const dashboardChildren = [
+    { path: ADMIN_ROUTE.ASSET, element: <AssetPage /> },
+    { path: ADMIN_ROUTE.LINE, element: <LinePage /> },
+    { path: ADMIN_ROUTE.USER, element: <UserPage /> },
+    { path: ADMIN_ROUTE.FACILITIES, element: <FacilitiesPage /> },
+    { path: ADMIN_ROUTE.FACILITIES_DETAIL, element: <FacilitiesDetailPage /> },
+    { path: ADMIN_ROUTE.DEVICE, element: <DevicePage /> },
+    { path: ADMIN_ROUTE.DEVICE_CATEGORY, element: <DeviceCategory /> }
+];
 
 export const AdminRouter: RouteObject[] = [
     {
-        path: '/admin',
-        element: <Dashboard />,
+        element: <ProtectedRoute requiredRoles={[Role.ADMIN]} />,
         children: [
-            { path: ADMIN_ROUTE.DASHBOARD, element: <Dashboard /> },
-            { path: ADMIN_ROUTE.USERLIST, element: <UserList /> },
-            { path: ADMIN_ROUTE.POILIST, element: <PoiList /> },
-            { path: ADMIN_ROUTE.POIICON, element: <PoiIcon /> }
-        ],
-    },
-    {
-        path: '/admin/viewer',
-        element: <Viewer />,
-        children: [
-            { path: ADMIN_ROUTE.POI, element: <Poi /> },
-            { path: ADMIN_ROUTE.TEXT3D, element: <Text3d /> },
-            { path: ADMIN_ROUTE.TOPOLOGY, element: <Topology /> },
-        ],
-    },
+            {
+                path: ADMIN_ROUTE.LAYOUT,
+                element: <AdminLayout />,
+                children: [
+                    {
+                        path: ADMIN_ROUTE.DASHBOARD,
+                        element: <Dashboard />,
+                        children: dashboardChildren
+                    },
+                    {
+                        path: `${ADMIN_ROUTE.VIEWER}/:stationId?`,
+                        element: <Viewer />
+                    }
+                ]
+            }
+        ]
+    }
 ];

@@ -44,6 +44,6 @@ export interface Column<T> {
     columns: Column<T>[]
     search?: string; // 검색어 추가
     selectable?: boolean
-    selectedRows?: Set<T>
+    selectedRows?: (row: T) => boolean
     onSelectChange?: (row: T) => void
   }

@@ -18,6 +18,7 @@ let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
 let sharedTextGeometry: THREE.PlaneGeometry;
 let poiDummies: THREE.Object3D[] = [];
+let bNeedsUpdate: boolean = false;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -43,6 +44,13 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => 
     // 애니메이션 믹서 업데이트
     const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined);
     animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
+
+    // 업데이트가 필요한경우
+    if (bNeedsUpdate) {
+        updatePoiLine();
+        updatePoiMesh();
+        bNeedsUpdate = false;
+    }
 });
 
 /**
@@ -62,8 +70,7 @@ Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
     const data: PoiElement = evt.target as PoiElement;
     poiDataList[data.id] = data;
 
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 });
 
 /**
@@ -124,8 +131,7 @@ Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) =
     poiDummies = [];
 
     // poi선, 위치점메시 업데이트
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 
     // 가시화 요소 보이기
     poiIconGroup.visible = true;
@@ -151,8 +157,8 @@ Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
             poi.Visible = true;
         }
     });
-    updatePoiLine();
-    updatePoiMesh();
+
+    bNeedsUpdate = true;
 });
 
 /**
@@ -165,8 +171,8 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
             poi.Visible = false;
         }
     });
-    updatePoiLine();
-    updatePoiMesh();
+
+    bNeedsUpdate = true;
 });
 
 /**
@@ -175,8 +181,8 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
 Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = true);
-    updatePoiLine();
-    updatePoiMesh();
+
+    bNeedsUpdate = true;
 });
 
 /**
@@ -185,8 +191,8 @@ Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => 
 Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = false);
-    updatePoiLine();
-    updatePoiMesh();
+
+    bNeedsUpdate = true;
 });
 
 /**
@@ -251,7 +257,7 @@ function updatePoiLine() {
     // 라인 버텍스 수집
     const linePoints: THREE.Vector3[] = [];
     Object.values(poiDataList).forEach(element => {
-        if (element.Visible) {
+        if (element.Visible && element.LineVisible) {
             const p0 = element.WorldPosition.clone();
             const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
 
@@ -325,6 +331,11 @@ async function updatePoiMesh() {
                 }
                 // 위치 설정
                 poi.PointMeshData.animMeshRef?.position.copy(poi.WorldPosition);
+                poi.PointMeshData.animMeshRef?.rotation.copy(poi.Rotation);
+                poi.PointMeshData.animMeshRef?.scale.copy(poi.Scale);
+
+                // 레이어 설정
+                Util.setObjectLayer(poi.PointMeshData.animMeshRef as THREE.Object3D, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
             });
 
         } else {
@@ -368,6 +379,9 @@ async function updatePoiMesh() {
             pointMeshGroup.add(mesh);
             // 위치점 메시 리스트에 추가
             pointMeshStorage[url] = mesh;
+
+            // 레이어 설정
+            Util.setObjectLayer(mesh as THREE.Object3D, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
         }
     }
 }
@@ -397,7 +411,6 @@ function ExportAll() {
  * @param data - 임포트 데이터
  */
 function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] | string) {
-    console.log('data.ts Import Called.', data);
 
     // 비주얼 리소스 업데이트 없이 이전의 생성 요소 제거
     Clear(false);
@@ -448,8 +461,7 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
     });
 
     // 업데이트
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 }
 
 /**
@@ -463,8 +475,7 @@ function Delete(id: string) {
 
         delete poiDataList[id];
 
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -476,8 +487,7 @@ function Clear(bUpdateVisuals: boolean = true) {
     poiDataList = {};
 
     if (bUpdateVisuals) {
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -489,8 +499,7 @@ function Show(id: string) {
     if (poiDataList.hasOwnProperty(id)) {
         poiDataList[id].Visible = true;
 
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -502,8 +511,7 @@ function Hide(id: string) {
     if (poiDataList.hasOwnProperty(id)) {
         poiDataList[id].Visible = false;
 
-        updatePoiLine();
-        updatePoiMesh();
+        bNeedsUpdate = true;
     }
 }
 
@@ -515,8 +523,7 @@ function ShowAll() {
         poi.Visible = true;
     });
 
-    updatePoiLine();
-    updatePoiMesh();
+    bNeedsUpdate = true;
 }
 
 /**
@@ -527,8 +534,99 @@ function HideAll() {
         poi.Visible = false;
     });
 
+    bNeedsUpdate = true;
+}
+
+/**
+ * poi 선 보이기
+ * @param id - poi id값
+ */
+function ShowLine(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].LineVisible = true;
+    }
+
     updatePoiLine();
-    updatePoiMesh();
+}
+
+/**
+ * poi 선 숨기기
+ * @param id - poi id값
+ */
+function HideLine(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].LineVisible = false;
+    }
+
+    updatePoiLine();
+}
+
+/**
+ * 모든 poi 선 보이기
+ */
+function ShowAllLine() {
+    Object.values(poiDataList).forEach(poi => poi.LineVisible = true);
+    updatePoiLine();
+}
+
+/**
+ * 모든 poi 선 숨기기
+ */
+function HideAllLine() {
+    Object.values(poiDataList).forEach(poi => poi.LineVisible = false);
+    updatePoiLine();
+}
+
+/**
+ * poi 표시명 보이기
+ * @param id - poi id값
+ */
+function ShowDisplayText(id: string) {
+    if (poiDataList.hasOwnProperty(id))
+        poiDataList[id].TextVisible = true;
+}
+
+/**
+ * poi 표시명 숨기기
+ * @param id - poi id값
+ */
+function HideDisplayText(id: string) {
+    if (poiDataList.hasOwnProperty(id))
+        poiDataList[id].TextVisible = false;
+}
+
+/**
+ * 모든 poi 표시명 보이기
+ */
+function ShowAllDisplayText() {
+    Object.values(poiDataList).forEach(poi => poi.TextVisible = true);
+}
+
+/**
+ * 모든 poi 표시명 숨기기
+ */
+function HideAllDisplayText() {
+    Object.values(poiDataList).forEach(poi => poi.TextVisible = false);
+}
+
+/**
+ * poi 표시명 텍스트 변경
+ * @param id - 변경할 poi id값
+ * @param text - 표시명 텍스트
+ */
+function SetDisplayText(id: string, text: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        const poi = poiDataList[id];
+        poi.disposeTextObject();
+
+        const textMesh = createTextMesh(text);
+        poiTextGroup.add(textMesh);
+
+        poi.TextObject = textMesh;
+        poi.WorldPosition = poi.WorldPosition;
+
+        poi.displayText = text;
+    }
 }
 
 /**
@@ -536,7 +634,7 @@ function HideAll() {
  * @param id - poi id값
  */
 function GetAnimationList(id: string) {
-    if( poiDataList.hasOwnProperty(id) ) {
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         return Object.keys(poi.AnimationActions);
     }
@@ -548,7 +646,7 @@ function GetAnimationList(id: string) {
  * @param animName - 애니메이션 이름
  */
 function PlayAnimation(id: string, animName: string) {
-    if( poiDataList.hasOwnProperty(id) ) {
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         poi.playAnimation(animName);
     }
@@ -559,27 +657,45 @@ function PlayAnimation(id: string, animName: string) {
  * @param id - poi id값
  */
 function StopAnimation(id: string) {
-    if( poiDataList.hasOwnProperty(id) ) {
+    if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
         poi.stopAnimation();
     }
 }
 
 export {
+    poiDataList as PoiDataList,
+
     getIcon,
     createTextMesh,
     exists,
     getPoiElement,
+    updatePoiLine,
+    updatePoiMesh,
 
     Export,
     ExportAll,
     Import,
     Delete,
     Clear,
+
     Show,
     Hide,
     ShowAll,
     HideAll,
+
+    ShowLine,
+    HideLine,
+    ShowAllLine,
+    HideAllLine,
+
+    ShowDisplayText,
+    HideDisplayText,
+    ShowAllDisplayText,
+    HideAllDisplayText,
+
+    SetDisplayText,
+
     GetAnimationList,
     PlayAnimation,
     StopAnimation

@@ -16,8 +16,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "swr": "^2.2.5",
-    "@plug/v1": "workspace:*"
+    "swr": "^2.2.5"
   },
   "peerDependencies": {
     "react": "^19.0.0",

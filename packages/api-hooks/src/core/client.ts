@@ -2,6 +2,7 @@ import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
 export const baseKy = ky.create({
+  prefixUrl: '/api/',
   credentials: 'include',
   headers: {
     'Content-Type': 'application/json'
@@ -64,5 +65,9 @@ export const api = {
 
   delete: (endpoint: string, options: RequestOptions = {}): Promise<Response> => {
     return buildKy(options).delete(endpoint);
-  }
+  },
+
+  getAbsolute: async <T>(absoluteUrl: string): Promise<ResponseTypes<T>['GET']> => {
+    return externalApiClient.get(absoluteUrl).json();
+  },
 };

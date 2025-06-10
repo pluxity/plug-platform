@@ -16,12 +16,12 @@ export type AllowedMethod = 'GET' | 'DELETE';
  *
  * SWR을 기반으로 한 API 훅이 반환하는 상태값 및 유틸리티입니다.
  * - `data`: 성공 시 반환되는 응답 데이터
- * - `error`: 실패 시 발생한 에러 객체
+ * - `boundary`: 실패 시 발생한 에러 객체
  * - `isLoading`: 요청 진행 여부
  * - `mutate`: 캐시를 갱신하거나 데이터를 다시 불러오는 함수
  *
  * @example
- * const { data, error, isLoading, mutate } = useSWRApi<User[]>('/api/users');
+ * const { data, boundary, isLoading, mutate } = useSWRApi<User[]>('/api/users');
  */
 export interface UseSWRApiReturn<T> {
   /** 성공 시 응답 데이터 (초기값: null) */

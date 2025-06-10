@@ -1,1 +1,1 @@
-export { GetModelHierarchy, Show, Hide, ShowAll, HideAll, Expand, Collapse } from './model';
+export { GetModelHierarchy, GetModelHierarchyFromUrl, Show, Hide, ShowAll, HideAll, Expand, Collapse } from './model';

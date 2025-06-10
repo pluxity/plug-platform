@@ -25,9 +25,9 @@ const Button = React.memo(({
 
     const colorStyles = {
         default: "",
-        primary: "bg-blue-600 text-white hover:bg-blue-700",
-        secondary: "bg-slate-600 text-white hover:bg-slate-700",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
+        primary: "bg-primary-600 text-white hover:bg-primary-700",
+        secondary: "bg-secondary-600 text-white hover:bg-secondary-700",
+        destructive: "bg-destructive-500 text-white hover:bg-red-700",
     };
 
     const sizeStyles = {

@@ -1,5 +1,5 @@
 import { RouteObject } from 'react-router-dom';
-import LoginPage from "@plug/v1/auth/view/LoginPage";
+import LoginPage from "@plug/v1/common/auth/view/LoginPage";
 
 export const AppRouter: RouteObject[] = [
     {

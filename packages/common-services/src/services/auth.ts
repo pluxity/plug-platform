@@ -18,5 +18,5 @@ export const signOut = async (): Promise<Response> => {
 };
 
 export const getUserProfile = (): Promise<DataResponseBody<UserProfile>> => {
-  return api.get<UserProfile>('auth/users/me', { requireAuth: true });
+  return api.get<UserProfile>('users/me', { requireAuth: true });
 };

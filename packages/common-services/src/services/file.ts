@@ -1,18 +1,9 @@
-import { useFileApi } from '@plug/api-hooks';
+import { api, useFileApi } from "@plug/api-hooks";
 import type { RequestOptions } from '@plug/api-hooks';
+import type { FileUploadResponse } from '@plug/common-services/types';
+import { FileResponse } from "../types";
 
 const FILE_API = `files`;
-
-/**
- * 파일 업로드 응답 타입 (Location 헤더 기반)
- */
-export interface FileUploadResponse {
-  fileId?: number;
-  location?: string;
-  fileName?: string;
-  success?: boolean;
-  status?: number;
-}
 
 /**
  * 파일 업로드 전용 API 훅
@@ -44,6 +35,15 @@ export const createFileFormData = (file: File, mimeTypeOverride?: string): FormD
   }
   
   return formData;
+};
+
+export const getFileInfo = async (locationHeader: FileUploadResponse | null): Promise<FileResponse> => {
+  if (!locationHeader) {
+    throw new Error('업로드 응답에 Location이 없습니다.');
+  }
+
+  const response = await api.get<FileResponse>(locationHeader.location?.replace(/^\//, '') ?? '');
+  return response.data;
 };
 
 // 다중 파일 업로드를 위한 헬퍼 함수(나중이 필요할 수도?)

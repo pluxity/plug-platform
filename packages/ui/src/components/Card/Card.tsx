@@ -59,7 +59,7 @@ const CardHeader = React.memo(({
     return (
       <div
         ref={ref}
-        className={cn("flex flex-col space-y-1.5 p-6", className)}
+        className={cn("flex flex-col space-y-1.5 p-4", className)}
         {...props}
       />
     );
@@ -110,7 +110,7 @@ const CardContent = React.memo(({
     return (
       <div
         ref={ref}
-        className={cn("p-6 pt-0", className)}
+        className={cn("p-4 pt-0", className)}
         {...props}
       />
     );
@@ -126,7 +126,7 @@ const CardFooter = React.memo(({
     return (
       <div
         ref={ref}
-        className={cn("flex items-center p-6 pt-0", className)}
+        className={cn("flex items-center p-4 pt-0", className)}
         {...props}
       />
     );

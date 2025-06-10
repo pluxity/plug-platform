@@ -43,6 +43,9 @@ const Toast = ({
             setIsVisible(false);
             const timer = setTimeout(() => {
                 setIsMounted(false);
+                if (onClose) {
+                    onClose();
+                }
             }, duration);
             return () => clearTimeout(timer);
         }
@@ -94,7 +97,8 @@ const Toast = ({
 
     return (
         <ToastPortal>
-            <div
+            {isVisible && (
+                <div
                 className={cn(
                     'fixed inset-0 z-[9999] flex pointer-events-none',
                     getPlacementClasses(placement)
@@ -126,6 +130,7 @@ const Toast = ({
                     )}
                 </div>
             </div>
+            )}
         </ToastPortal>
     );
 };
