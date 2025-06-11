@@ -81,9 +81,6 @@ export const useStationEvents = (stationId: string): UseApiResult<StationEvents>
 
   useEffect(() => {
     fetchData();
-    // 10초마다 업데이트 (이벤트는 실시간성이 중요)
-    const interval = setInterval(fetchData, 10 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
@@ -114,9 +111,6 @@ export const useLights = (stationId: string): UseApiResult<Light[]> => {
 
   useEffect(() => {
     fetchData();
-    // 30초마다 업데이트
-    const interval = setInterval(fetchData, 30 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
@@ -232,9 +226,6 @@ export const useElevators = (stationId: string): UseApiResult<Elevator[]> => {
 
   useEffect(() => {
     fetchData();
-    // 1분마다 업데이트
-    const interval = setInterval(fetchData, 60 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
@@ -262,9 +253,6 @@ export const useEscalators = (stationId: string): UseApiResult<Escalator[]> => {
 
   useEffect(() => {
     fetchData();
-    // 1분마다 업데이트
-    const interval = setInterval(fetchData, 60 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
@@ -292,9 +280,6 @@ export const useWaterTanks = (stationId: string): UseApiResult<WaterTank[]> => {
 
   useEffect(() => {
     fetchData();
-    // 5분마다 업데이트
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
@@ -322,9 +307,6 @@ export const useCatchpits = (stationId: string): UseApiResult<Catchpit[]> => {
 
   useEffect(() => {
     fetchData();
-    // 5분마다 업데이트
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
@@ -352,9 +334,6 @@ export const useAirPurifiers = (stationId: string): UseApiResult<AirPurifier[]> 
 
   useEffect(() => {
     fetchData();
-    // 2분마다 업데이트
-    const interval = setInterval(fetchData, 2 * 60 * 1000);
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };

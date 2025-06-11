@@ -51,7 +51,7 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
-    }, 10 * 1000);
+    }, 10 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, [refetch]);

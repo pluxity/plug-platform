@@ -25,9 +25,9 @@ const FloorSelector: React.FC<FloorSelectorProps> = ({
     
     if(floorId === 'ALL') {
       Px.Model.ShowAll();
+      Px.Camera.ExtendView(1.0);
     } else {
       Px.Model.Show(floorId);
-      // Px.Camera.MoveToFloor(floorId, 1.0);
     }
 
     if (onFloorChange) {

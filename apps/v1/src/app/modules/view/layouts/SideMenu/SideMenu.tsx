@@ -37,17 +37,13 @@ const SideMenu: React.FC = () => {
     setIsDevicePanelOpen 
   } = useSideMenuStore();
 
-  const { stationCode } = useStationStore();
-  useEffect(() => {
+  const { stationCode } = useStationStore();  useEffect(() => {
     const fetchCategory = async () => {
-
       if (!stationCode) {
-        console.log("No stationId available, skipping fetch");
         return;
       }
       
       try {
-        console.log('Fetching categories for station:', stationCode);
         const response = await api.get<Category[]>(`devices/station/${stationCode}/grouped`);
         if (response.data) {
           const transformedMenuItems = response.data.map(item => ({
@@ -57,14 +53,14 @@ const SideMenu: React.FC = () => {
             icon: item.iconFile?.url,
             devices: item.devices || []
           }));
-          console.log('Setting menuItems:', transformedMenuItems);
           setMenuItems(transformedMenuItems);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-    fetchCategory();  }, [stationCode, setMenuItems]);
+    fetchCategory();
+  }, [stationCode, setMenuItems]);
   const handleMenuItemClick = (id: string) => {
     const clickedMenu = menuItems.find(item => item.id === id) || null;
     const newActive = activeMenu?.id === id ? null : clickedMenu;

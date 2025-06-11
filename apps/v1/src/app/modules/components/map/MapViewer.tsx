@@ -42,22 +42,18 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
 
     useEffect(() => {
         if (engineRef.current && modelPath && !isModelLoadedRef.current) {
-            try {
-                Px.Loader.LoadGltf(modelPath, () => {
+            try {                Px.Loader.LoadGltf(modelPath, () => {
                     isModelLoadedRef.current = true;
                     onModelLoaded?.();
                     Px.Poi.HideAllLine();
-                    // Px.Poi.HideAllDisplayText();
                 });
             } catch (error) {
                 console.error('3D 모델 로드 중 오류 발생:', error);
                 onLoadError?.(error as Error);
             }
         }
-    }, [modelPath, onModelLoaded, onLoadError]);    
-
-    return (
-        <>            
+    }, [modelPath, onModelLoaded, onLoadError]);        return (
+        <>
             <FloorSelector 
                 floors={floorSelectorItems} 
             />

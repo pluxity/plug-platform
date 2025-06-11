@@ -60,8 +60,7 @@ export const useEngineIntegration = ({
     if (event.target && handlers.onPoiClick) {
       handlers.onPoiClick(event.target);
     }
-  }, [handlers]);
-  const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
+  }, [handlers]);  const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
     if (event.target && handlers.onPoiTransformChange) {
       try {
         await handlers.onPoiTransformChange(event.target);
@@ -71,20 +70,15 @@ export const useEngineIntegration = ({
     }
   }, [handlers]);
 
-  // POI 삭제 클릭 이벤트 핸들러 (삭제 모드 전용)
   const poiDeleteClickListener = useCallback((event: { target: PoiImportOption }) => {
     if (event.target && handlers.onPoiDeleteClick) {
       handlers.onPoiDeleteClick(event.target);
-    }
-  }, [handlers]);
+    }  }, [handlers]);
 
-  // Floor 변경 핸들러
   const changeEngineFloor = useCallback((floorId: string) => {
-    try {
-      Px.Model.HideAll();
+    try {      Px.Model.HideAll();
       Px.Model.Show(floorId);
     } catch {
-      // Ignore floor change errors in engine
       throw new Error(`Failed to change floor in engine: ${floorId}`);
     }
   }, []);
@@ -92,27 +86,22 @@ export const useEngineIntegration = ({
   const handleFloorChange = useCallback((floorId: string) => {
     try {
       changeEngineFloor(floorId);
-      if (handlers.onFloorChange) {
-        handlers.onFloorChange(floorId);
+      if (handlers.onFloorChange) {        handlers.onFloorChange(floorId);
       }
     } catch {
       // Floor change failed, but continue execution
     }
   }, [changeEngineFloor, handlers]);
-  // POI 데이터 생성 및 임포트
+
   const handleFeatureData = useCallback(() => {
     const currentAssets = useAssetStore.getState().assets;
     
-    console.log('handleFeatureData called - features:', features);
-    console.log('currentAssets:', currentAssets);
-    
     if (features && currentAssets.length > 0) {
-      // 설정에 따라 미할당 디바이스 포함 여부 결정
       const filteredFeatures = finalConfig.includeUnassignedDevices 
         ? features
         : features.filter(feature => feature.deviceId !== null);
 
-      console.log('filteredFeatures:', filteredFeatures);      const poiData = filteredFeatures.map((feature) => {
+      const poiData = filteredFeatures.map((feature) => {
         const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
         const poi: PoiImportOption = {
           id: feature.id, 
@@ -132,12 +121,10 @@ export const useEngineIntegration = ({
       });
 
       Px.Poi.Import(JSON.stringify(poiData));
-    }
-  }, [features, finalConfig.includeUnassignedDevices]);
-  // 이벤트 리스너 제거
+    }  }, [features, finalConfig.includeUnassignedDevices]);
+
   const removeEventListeners = useCallback(() => {
-    eventListenersRef.current.forEach(({ event, handler }) => {
-      try {
+    eventListenersRef.current.forEach(({ event, handler }) => {      try {
         Px.Event.RemoveEventListener(event, handler);
       } catch {
         // Ignore cleanup errors
@@ -145,64 +132,46 @@ export const useEngineIntegration = ({
     });
     eventListenersRef.current = [];
   }, []);
-  // 이벤트 리스너 추가
-  const addEngineEventListeners = useCallback(() => {
-    // 기존 이벤트 리스너 제거
-    removeEventListeners();
 
-    // POI 클릭 이벤트 - 삭제 모드일 때는 삭제 핸들러, 일반 모드일 때는 일반 핸들러
-    if (handlers.onPoiDeleteClick) {
-      // 삭제 모드일 때
+  const addEngineEventListeners = useCallback(() => {
+    removeEventListeners();    if (handlers.onPoiDeleteClick) {
       Px.Event.AddEventListener("onPoiPointerUp", poiDeleteClickListener);
       eventListenersRef.current.push({ event: "onPoiPointerUp", handler: poiDeleteClickListener as (...args: unknown[]) => void });
     } else if (handlers.onPoiClick) {
-      // 일반 모드일 때
       Px.Event.AddEventListener("onPoiPointerUp", poiClickListener);
       eventListenersRef.current.push({ event: "onPoiPointerUp", handler: poiClickListener as (...args: unknown[]) => void });
     }
 
-    // POI Transform 변경 이벤트 (관리자 전용)
     if (finalConfig.enableTransformEdit && handlers.onPoiTransformChange) {
       Px.Event.AddEventListener('onPoiTransformChange', poiTransformListener);
       eventListenersRef.current.push({ event: 'onPoiTransformChange', handler: poiTransformListener as (...args: unknown[]) => void });
-    }
-  }, [handlers, finalConfig.enableTransformEdit, poiClickListener, poiTransformListener, poiDeleteClickListener, removeEventListeners]);
-  // 동적 이벤트 리스너 재등록 - 핸들러 변경 시 자동 업데이트
+    }  }, [handlers, finalConfig.enableTransformEdit, poiClickListener, poiTransformListener, poiDeleteClickListener, removeEventListeners]);
+
   useEffect(() => {
     if (!isModelLoadedRef.current) return;
 
-    // 핸들러가 변경되면 이벤트 리스너를 재등록
     addEngineEventListeners();
   }, [handlers.onPoiClick, handlers.onPoiTransformChange, handlers.onPoiDeleteClick, handlers.onFloorChange, handlers.onHierarchyLoaded, addEngineEventListeners]);
   
-  // 모델 로드 완료 핸들러
-  const handleModelLoaded = useCallback(async () => {
-
-    isModelLoadedRef.current = true;
+  const handleModelLoaded = useCallback(async () => {    isModelLoadedRef.current = true;
     
-    // POI 데이터 로드
     handleFeatureData();
 
-    // 모델 계층 구조 로드 (관리자 전용)
     if (finalConfig.autoLoadHierarchy && handlers.onHierarchyLoaded) {
       const modelHierarchy = Px.Model.GetModelHierarchy();
       if (modelHierarchy) {
         handlers.onHierarchyLoaded(modelHierarchy);
-        // 기본 층으로 변경
         if (finalConfig.defaultFloor) {
           handleFloorChange(finalConfig.defaultFloor);
         }
       }
     }
-    // 이벤트 리스너 추가
     addEngineEventListeners();
   }, [handleFeatureData, finalConfig.autoLoadHierarchy, finalConfig.defaultFloor, handlers, handleFloorChange, addEngineEventListeners]);
 
-  // POI 데이터 새로고침
   const refreshPoiData = useCallback(() => {
-    handleFeatureData();
-  }, [handleFeatureData]);
-  // 컴포넌트 언마운트 시 이벤트 리스너 정리
+    handleFeatureData();  }, [handleFeatureData]);
+  
   useEffect(() => {
     return () => {
       removeEventListeners();

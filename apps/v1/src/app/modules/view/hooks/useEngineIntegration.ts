@@ -12,22 +12,15 @@ interface UseEngineIntegrationProps {
 export function useEngineIntegration({
   features,
   onPoiSelect,
-}: UseEngineIntegrationProps) {
-  // 사용자 페이지 전용 이벤트 핸들러 설정
-  const handlers: EngineEventHandlers = useMemo(() => ({
+}: UseEngineIntegrationProps) {  const handlers: EngineEventHandlers = useMemo(() => ({
     onPoiClick: (poi: PoiImportOption) => {
-      console.log('View page POI clicked:', poi);
-      
-      // POI 선택 핸들러 호출 (사이드 메뉴 열기)
       if (onPoiSelect) {
         onPoiSelect(poi);
       }
     },
   }), [onPoiSelect]);
-
-  // 사용자 페이지 전용 설정
   const config: EngineIntegrationConfig = useMemo(() => ({
-    includeUnassignedDevices: false, // 사용자 페이지에서는 할당된 디바이스만 표시
+    includeUnassignedDevices: false,
     enableTransformEdit: false,
     autoLoadHierarchy: false,
     defaultFloor: undefined,

@@ -36,16 +36,12 @@ const ViewerPage = () => {
   const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
     }, []);    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
-      console.log('ViewerPage handlePoiSelect called with POI:', poi);
       const deviceId = poi.property?.deviceId;
-      console.log('POI deviceId:', deviceId);
       
       if (deviceId) {
-        console.log('Calling openMenuByDeviceId with:', deviceId);
         openMenuByDeviceId(deviceId);
         
-        // deviceType 결정 (menuItems에서 찾기)
-        let deviceType = 'shutter'; // 기본값
+        let deviceType = 'shutter';
         for (const menuItem of menuItems) {
           const device = menuItem.devices.find(d => d.id === deviceId);
           if (device) {
@@ -54,11 +50,8 @@ const ViewerPage = () => {
           }
         }
         
-        console.log('Setting selectedDeviceId for modal:', deviceId, 'deviceType:', deviceType);
         setSelectedDeviceId(deviceId);
         setSelectedDeviceType(deviceType);
-      } else {
-        console.log('No deviceId found in POI property');
       }
     }, [openMenuByDeviceId, setSelectedDeviceId, setSelectedDeviceType, menuItems]);
 
@@ -102,9 +95,7 @@ const ViewerPage = () => {
           }
       });
 
-    }, [engineModelLoaded, stationData]);  
-      useEffect(() => {
-        console.log('Setting stationCode:', parsedCode);
+    }, [engineModelLoaded, stationData]);      useEffect(() => {
         setStationCode(parsedCode);
     }, [parsedCode, setStationCode]);
 
@@ -121,10 +112,7 @@ const ViewerPage = () => {
         if (filteredData.length > 0) {
           setTtcData(filteredData);
         }
-      });
-
-      eventSource.addEventListener('event-data', (event) => {
-        console.log('SSE 데이터:', event.data);
+      });      eventSource.addEventListener('event-data', (event) => {
         try {
           const data = JSON.parse(event.data) as EventData;
           setEventData([data]);
@@ -158,15 +146,11 @@ const ViewerPage = () => {
       eventSource.onerror = (err) => {
         console.error('SSE 에러:', err);
       };      return () => {
-        console.log('SSE 연결 종료');
         eventSource.close();
       };
     }, [parsedCode, setTtcData, setEventData, setShutterData, addToast]);
 
-//   const eventData = useEventStore(state => state.eventData);
-//   const shutterData = useEventStore(state => state.shutterData);
-
-  if (error && !stationLoading) {
+    if (error && !stationLoading) {
         return (
           <div className="flex items-center justify-center h-screen bg-gray-900">
             <div className="bg-red-900/30 backdrop-blur-lg border border-red-500/30 rounded-xl px-8 py-6 flex items-center gap-4 shadow-lg">
@@ -210,9 +194,9 @@ const ViewerPage = () => {
           </div>
         )}
         <Header />
-        <SideMenu />
-        <ToastContainer />
-        {stationData && <EventCounter stationId={stationData.externalCode} />}        {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
+        <SideMenu />        <ToastContainer />
+        {stationData && <EventCounter stationId={stationData.externalCode} />}
+
         <DeviceDetailModal
                 isOpen={!!selectedDeviceId}
                 onClose={() => setSelectedDeviceId(null)}

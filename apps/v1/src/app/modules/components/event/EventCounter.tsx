@@ -6,7 +6,7 @@ interface EventInfoPanelProps {
 }
 
 const EventCounter: React.FC<EventInfoPanelProps> =({ stationId }) => {
-  const { data, loading, refetch } = useStationEvents(stationId);
+  const { data, loading } = useStationEvents(stationId);
   const [displayData, setDisplayData] = useState({
     equips: { critical: 0, major: 0, minor: 0 },
     electrics: { critical: 0, major: 0, minor: 0 }
@@ -18,17 +18,6 @@ const EventCounter: React.FC<EventInfoPanelProps> =({ stationId }) => {
     }
   }, [data, loading]);
   
-  // 10초마다 데이터 새로고침
-  useEffect(() => {
-    // 첫 로드 후 10초마다 데이터 새로고침
-    const interval = setInterval(() => {
-      refetch();
-    }, 10 * 1000);
-    
-    // 컴포넌트 언마운트 시 interval 정리
-    return () => clearInterval(interval);
-  }, [refetch]);
-
   // 전체 이벤트 계산
   const totalCritical = displayData.equips.critical + displayData.electrics.critical;
   const totalMajor = displayData.equips.major + displayData.electrics.major;

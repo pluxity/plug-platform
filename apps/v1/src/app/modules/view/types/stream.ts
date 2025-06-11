@@ -19,7 +19,6 @@ export interface EventData {
 }
 
 export interface ShutterData {
-  // TODO: Shutter 데이터 구조 정의
   id: string;
   status: {
     ioId: string;

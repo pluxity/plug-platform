@@ -32,14 +32,11 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
   onClose 
 }) => {
   const { stationCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
-
   const handleDeviceClick = (device: DeviceData) => {
     try {
       if (device.feature.id && device.feature.floorId) {
-        // 먼저 해당 층으로 변경
         setCurrentFloor(device.feature.floorId);
         
-        // 층 변경 후 카메라 이동
         Px.Model.HideAll();
         Px.Model.Show(device.feature.floorId);
         Px.Camera.MoveToPoi(device.feature.id, 1.0);
@@ -82,7 +79,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
         )}
 
         {devices.length > 0 && (
-          <ul className="space-y-2 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-primary-900/20">
+          <ul className="space-y-2 h-[90%] overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-primary-900/20">
             {devices.map((device) => (
               <li
                 key={device.id}
