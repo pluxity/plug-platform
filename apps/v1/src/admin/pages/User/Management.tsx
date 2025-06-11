@@ -1,4 +1,4 @@
-import {Button, DataTable, Skeleton} from '@plug/ui';
+import {Button, DataTable, Skeleton, ConfirmModal} from '@plug/ui';
 import {columns} from './constants/userColumns';
 import {UserModal} from './components/UserModal';
 import {UserPasswordModal} from './components/UserPasswordModal';
@@ -21,6 +21,17 @@ export default function UserListPage(): React.ReactElement {
     const [statusData, setStatusData] = useState<Record<number, boolean>>({});
     const {execute: loggedInUser, error: userLoggedInError} = useUserLoggedIn();
     const {addToast} = useToastStore();
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title?: string;
+        message: string;
+        onConfirm: () => void;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    });
 
     // 사용자 정보 수정 모달 
     const handleDelete = async (userId: number) => {
@@ -39,6 +50,19 @@ export default function UserListPage(): React.ReactElement {
                 variant: 'critical'
             });
         }
+    };
+
+    const handleDeleteClick = (userId: number) => {
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: '선택한 항목을 삭제하시겠습니까?',
+            onConfirm: () => handleDelete(userId)
+        });
+    };
+
+    const handleConfirmModalClose = () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
     };
 
     const handleEdit = useCallback((userId: number) => {
@@ -95,7 +119,7 @@ export default function UserListPage(): React.ReactElement {
       }, []);
       
     
-    const userData = useUser(data || [], statusData, handleDelete, handleEdit, handlePasswordEdit, handleRoleEdit);
+    const userData = useUser(data || [], statusData, handleDeleteClick, handleEdit, handlePasswordEdit, handleRoleEdit);
 
     const handleDeleteSelected = async () => {
         if (selectState.size === 0) {
@@ -107,29 +131,33 @@ export default function UserListPage(): React.ReactElement {
             return;
         }
 
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
-        try {
-            await Promise.all(
-                Array.from(selectState).map(user => handleDelete(Number(user.id)))
-            );
-            await mutate();
-
-            addToast({
-                description: `${selectState.size}개의 항목이 삭제되었습니다.`,
-                title: '삭제 완료',
-                variant: 'normal'
-            });
-            setSelectState(new Set());
-
-        } catch (error) {
-            addToast({
-                title: '삭제 실패',
-                description: error instanceof Error ? error.message : '항목 삭제 중 오류가 발생했습니다.',
-                variant: 'critical'
-            });
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: `${selectState.size}개의 항목을 삭제하시겠습니까?`,
+            onConfirm: async () => {
+                try {
+                    await Promise.all(
+                        Array.from(selectState).map(user => handleDelete(Number(user.id)))
+                    );
+                    await mutate();
+        
+                    addToast({
+                        description: `${selectState.size}개의 항목이 삭제되었습니다.`,
+                        title: '삭제 완료',
+                        variant: 'normal'
+                    });
+                    setSelectState(new Set());
+        
+                } catch (error) {
+                    addToast({
+                        title: '삭제 실패',
+                        description: error instanceof Error ? error.message : '항목 삭제 중 오류가 발생했습니다.',
+                        variant: 'critical'
+                    });
+                }
+            }
+        });
     };
 
     return (
@@ -182,6 +210,16 @@ export default function UserListPage(): React.ReactElement {
                 onClose={handleCloseRoleModal}
                 onSuccess={mutate}
                 selectedUserId={selectedUserId}
+            />
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={handleConfirmModalClose}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText="삭제"
+                cancelText="취소"
+                isDangerous={true}
             />
         </>
     );
