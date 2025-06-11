@@ -1,10 +1,12 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { MapViewer } from '@plug/v1/app/modules/components/map';
+import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import useEventStore from '@plug/v1/app/stores/eventSourceStore';
+import useSideMenuStore from '@plug/v1/app/stores/sideMenuStore';
 import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
@@ -17,10 +19,13 @@ import { ToastContainer } from '@plug/v1/admin/components/toast/ToastContainer';
 const ViewerPage = () => {
 
   const { code } = useParams<{ code: string }>();
-  const parsedCode = code ?? '1';
-
+  const parsedCode = code ?? '119';
   const { setStationCode } = useStationStore();
   const { fetchAssets } = useAssetStore();
+  const { openMenuByDeviceId, menuItems } = useSideMenuStore();
+
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [selectedDeviceType, setSelectedDeviceType] = useState<string>('shutter');
 
   const { stationData, stationLoading, error } = useStationData(parsedCode);
   const { floorItems, modelPath } = useFloorData(stationData);
@@ -30,16 +35,32 @@ const ViewerPage = () => {
 
   const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
-    }, []);    
-    
-    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
-
+    }, []);    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
+      console.log('ViewerPage handlePoiSelect called with POI:', poi);
       const deviceId = poi.property?.deviceId;
-      console.log('POI 선택됨:', poi, '디바이스 ID:', deviceId);
-
-
+      console.log('POI deviceId:', deviceId);
       
-    }, []);
+      if (deviceId) {
+        console.log('Calling openMenuByDeviceId with:', deviceId);
+        openMenuByDeviceId(deviceId);
+        
+        // deviceType 결정 (menuItems에서 찾기)
+        let deviceType = 'shutter'; // 기본값
+        for (const menuItem of menuItems) {
+          const device = menuItem.devices.find(d => d.id === deviceId);
+          if (device) {
+            deviceType = menuItem.type;
+            break;
+          }
+        }
+        
+        console.log('Setting selectedDeviceId for modal:', deviceId, 'deviceType:', deviceType);
+        setSelectedDeviceId(deviceId);
+        setSelectedDeviceType(deviceType);
+      } else {
+        console.log('No deviceId found in POI property');
+      }
+    }, [openMenuByDeviceId, setSelectedDeviceId, setSelectedDeviceType, menuItems]);
 
     const { handleModelLoaded: engineModelLoaded } = useEngineIntegration({
         features: stationData?.features || [],
@@ -82,8 +103,8 @@ const ViewerPage = () => {
       });
 
     }, [engineModelLoaded, stationData]);  
-    
-    useEffect(() => {
+      useEffect(() => {
+        console.log('Setting stationCode:', parsedCode);
         setStationCode(parsedCode);
     }, [parsedCode, setStationCode]);
 
@@ -136,13 +157,11 @@ const ViewerPage = () => {
 
       eventSource.onerror = (err) => {
         console.error('SSE 에러:', err);
-      };
-
-      return () => {
+      };      return () => {
         console.log('SSE 연결 종료');
         eventSource.close();
       };
-    }, []);
+    }, [parsedCode, setTtcData, setEventData, setShutterData, addToast]);
 
 //   const eventData = useEventStore(state => state.eventData);
 //   const shutterData = useEventStore(state => state.shutterData);
@@ -193,16 +212,14 @@ const ViewerPage = () => {
         <Header />
         <SideMenu />
         <ToastContainer />
-        {stationData && <EventCounter stationId={stationData.externalCode} />}
-
-        {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
-        {/* <DeviceDetailModal
+        {stationData && <EventCounter stationId={stationData.externalCode} />}        {/* POI 클릭 시 나타나는 디바이스 상세 모달 */}
+        <DeviceDetailModal
                 isOpen={!!selectedDeviceId}
                 onClose={() => setSelectedDeviceId(null)}
                 stationId={stationData?.externalCode ?? ''}
-                selectedDeviceId={selectedDeviceId}
-                deviceType="shutter"
-            /> */}
+                deviceId={selectedDeviceId}
+                deviceType={selectedDeviceType}
+            />
       </div>
     );
 };

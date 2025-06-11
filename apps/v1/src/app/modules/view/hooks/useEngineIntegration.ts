@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useEngineIntegration as useBaseEngineIntegration } from '@plug/v1/common/libs/engine';
-import useStationStore from '@plug/v1/app/stores/stationStore';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import type { FeatureResponse as Feature } from '@plug/v1/app/modules/view/types/station';
 import type { EngineEventHandlers, EngineIntegrationConfig } from '@plug/v1/common/libs/engine';
@@ -14,21 +13,17 @@ export function useEngineIntegration({
   features,
   onPoiSelect,
 }: UseEngineIntegrationProps) {
-  const { setSelectedDeviceId } = useStationStore();
-
   // 사용자 페이지 전용 이벤트 핸들러 설정
   const handlers: EngineEventHandlers = useMemo(() => ({
     onPoiClick: (poi: PoiImportOption) => {
-      const feature = features?.find(f => f.id === poi.id);
-      if (feature?.deviceId) {
-        setSelectedDeviceId(feature.deviceId);
-      }
+      console.log('View page POI clicked:', poi);
       
+      // POI 선택 핸들러 호출 (사이드 메뉴 열기)
       if (onPoiSelect) {
         onPoiSelect(poi);
       }
     },
-  }), [onPoiSelect, features, setSelectedDeviceId]);
+  }), [onPoiSelect]);
 
   // 사용자 페이지 전용 설정
   const config: EngineIntegrationConfig = useMemo(() => ({

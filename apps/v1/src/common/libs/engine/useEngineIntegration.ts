@@ -99,10 +99,12 @@ export const useEngineIntegration = ({
       // Floor change failed, but continue execution
     }
   }, [changeEngineFloor, handlers]);
-
   // POI 데이터 생성 및 임포트
   const handleFeatureData = useCallback(() => {
     const currentAssets = useAssetStore.getState().assets;
+    
+    console.log('handleFeatureData called - features:', features);
+    console.log('currentAssets:', currentAssets);
     
     if (features && currentAssets.length > 0) {
       // 설정에 따라 미할당 디바이스 포함 여부 결정
@@ -110,7 +112,7 @@ export const useEngineIntegration = ({
         ? features
         : features.filter(feature => feature.deviceId !== null);
 
-      const poiData = filteredFeatures.map((feature) => {
+      console.log('filteredFeatures:', filteredFeatures);      const poiData = filteredFeatures.map((feature) => {
         const modelUrl = currentAssets.find(asset => asset.id === feature.assetId)?.file?.url || '';
         const poi: PoiImportOption = {
           id: feature.id, 

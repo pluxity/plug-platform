@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { api } from '@plug/api-hooks/core';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import useSideMenuStore from '@plug/v1/app/stores/sideMenuStore';
 import MenuItem from './MenuItem';
 import DevicePanel from './DevicePanel';
 import { Tooltip } from '@plug/ui';
@@ -26,21 +27,17 @@ interface Category{
   devices: DeviceData[];
 }
 
-interface MenuItemData {
-  id: string;
-  name: string;
-  type: string;
-  icon: string;
-  devices: DeviceData[];
-}
-
 const SideMenu: React.FC = () => {
-  const [activeMenu, setActiveMenu] = useState<MenuItemData | null>(null);
-  const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
-  const [isDevicePanelOpen, setIsDevicePanelOpen] = useState<boolean>(false);
+  const { 
+    activeMenu, 
+    menuItems, 
+    isDevicePanelOpen, 
+    setActiveMenu, 
+    setMenuItems, 
+    setIsDevicePanelOpen 
+  } = useSideMenuStore();
 
-  const { stationCode } = useStationStore(); 
-
+  const { stationCode } = useStationStore();
   useEffect(() => {
     const fetchCategory = async () => {
 
@@ -50,6 +47,7 @@ const SideMenu: React.FC = () => {
       }
       
       try {
+        console.log('Fetching categories for station:', stationCode);
         const response = await api.get<Category[]>(`devices/station/${stationCode}/grouped`);
         if (response.data) {
           const transformedMenuItems = response.data.map(item => ({
@@ -59,27 +57,19 @@ const SideMenu: React.FC = () => {
             icon: item.iconFile?.url,
             devices: item.devices || []
           }));
+          console.log('Setting menuItems:', transformedMenuItems);
           setMenuItems(transformedMenuItems);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-    fetchCategory();
-  }, [stationCode]);
-
+    fetchCategory();  }, [stationCode, setMenuItems]);
   const handleMenuItemClick = (id: string) => {
     const clickedMenu = menuItems.find(item => item.id === id) || null;
-    setActiveMenu(prev => {
-      const newActive = prev?.id === id ? null : clickedMenu;
-      setIsDevicePanelOpen(newActive !== null);
-      return newActive;
-    });
-  };
-
-  const closeDevicePanel = () => {
-    setActiveMenu(null);
-    setIsDevicePanelOpen(false);
+    const newActive = activeMenu?.id === id ? null : clickedMenu;
+    setActiveMenu(newActive);
+    setIsDevicePanelOpen(newActive !== null);
   };
 
   return (
@@ -108,8 +98,10 @@ const SideMenu: React.FC = () => {
           categoryId={activeMenu.id}
           categoryName={activeMenu.name}
           categoryType={activeMenu.type}
-          devices={activeMenu.devices}
-          onClose={closeDevicePanel}
+          devices={activeMenu.devices}          onClose={() => {
+            setActiveMenu(null);
+            setIsDevicePanelOpen(false);
+          }}
         />
       )}
     </>
