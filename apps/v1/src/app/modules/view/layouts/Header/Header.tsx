@@ -18,7 +18,7 @@ const Header = () => {
             className="[filter:brightness(0)_saturate(100%)_invert(100%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(100%)_contrast(100%)] hover:scale-105 transition-transform"
           />
           <h1 className="text-white font-bold text-xl whitespace-nowrap hover:text-primary-100 transition-colors">
-            부산도시철도공사
+            부산교통공사
           </h1>
         </div>
 
