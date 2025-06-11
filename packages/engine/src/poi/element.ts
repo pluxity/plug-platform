@@ -44,7 +44,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.property = option.property;
 
         this.position = new Interfaces.Vector3Custom();
-        this.lineHeight = 0.0;
+        this.lineHeight = 0.5;
 
         this.pointMeshData = {
             instanceMeshRef: undefined,
