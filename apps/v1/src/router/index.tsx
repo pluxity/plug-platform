@@ -7,4 +7,6 @@ export const router = createBrowserRouter([
     ...AdminRouter,
     ...ServiceRouter,
     ...AppRouter
-]);
+], {
+   basename: '/3d-map' 
+});

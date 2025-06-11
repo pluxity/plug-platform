@@ -21,7 +21,7 @@ const AdminLayout = () => {
                             className="flex items-center justify-center rounded-full h-10 w-10 bg-white shadow-lg transition-transform hover:scale-105">
                             <div
                                 className="flex items-center justify-center rounded-full h-8 w-8 ring-2 ring-primary-500 bg-white">
-                                <img src="/assets/logo.png" height={22} width={22} alt="Logo"/>
+                                <img src="/3d-map/assets/logo.png" height={22} width={22} alt="Logo"/>
                             </div>
                         </div>
                         <h1 className="text-white font-bold text-lg whitespace-nowrap">

@@ -1,8 +1,10 @@
 import ky, { Options } from 'ky';
 
+const CONTEXT_PATH = '/3d-map';
+
 export const fileClient = ky.create({
   credentials: 'include',
-  prefixUrl: '/api',
+  prefixUrl: `${CONTEXT_PATH}/api`,
   hooks: {
     afterResponse: [
       async (_request, _options, response) => {

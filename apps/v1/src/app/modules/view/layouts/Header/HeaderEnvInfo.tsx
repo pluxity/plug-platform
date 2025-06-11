@@ -72,7 +72,7 @@ const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
                 <span className="text-xs">°C</span>
               </div>
               <img
-                src="/assets/station/temp.svg"
+                src="/3d-map/assets/station/temp.svg"
                 alt="온도"
                 width={12}
                 height={14}

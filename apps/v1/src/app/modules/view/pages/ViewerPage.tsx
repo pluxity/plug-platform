@@ -33,7 +33,12 @@ const ViewerPage = () => {
     }, []);    
     
     const handlePoiSelect = useCallback((poi: PoiImportOption) => {
-        console.log('POI 선택됨:', poi);
+
+      const deviceId = poi.property?.deviceId;
+      console.log('POI 선택됨:', poi, '디바이스 ID:', deviceId);
+
+
+      
     }, []);
 
     const { handleModelLoaded: engineModelLoaded } = useEngineIntegration({
@@ -52,17 +57,17 @@ const ViewerPage = () => {
         const loadTrainModels = () => {
           return Promise.all([
               new Promise<void>((resolve) => {
-                  Px.Subway.LoadTrainHead("/assets/models/head.glb", () => { 
+                  Px.Subway.LoadTrainHead("/3d-map/assets/models/head.glb", () => { 
                       resolve();
                   });
               }),
               new Promise<void>((resolve) => {
-                  Px.Subway.LoadTrainBody("/assets/models/body.glb", () => {
+                  Px.Subway.LoadTrainBody("/3d-map/assets/models/body.glb", () => {
                       resolve();
                   });
               }),
               new Promise<void>((resolve) => {
-                  Px.Subway.LoadTrainTail("/assets/models/tail.glb", () => {
+                  Px.Subway.LoadTrainTail("/3d-map/assets/models/tail.glb", () => {
                       resolve();
                   });
               })
@@ -87,7 +92,7 @@ const ViewerPage = () => {
     }, [fetchAssets]);
 
     useEffect(() => {
-      const eventSource = new EventSource('/api/sse');
+      const eventSource = new EventSource('/3d-map/api/sse');
 
       eventSource.addEventListener('ttc-data', (event) => {
         const data = JSON.parse(event.data) as TrainData[];

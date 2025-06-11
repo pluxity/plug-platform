@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
+  base: '/3d-map/',
   plugins: [
     react(),
     tailwindcss(),

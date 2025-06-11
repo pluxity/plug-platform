@@ -119,7 +119,7 @@ export const useEngineIntegration = ({
           displayText: feature.deviceName ? feature.deviceName : '장비 할당 필요',
           floorId: feature.floorId,
           property: {
-            code: feature.deviceId || '',
+            deviceId: feature.deviceId || '',
           },
           position: feature.position,
           rotation: feature.rotation,

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { FileType } from '../types/file';
 import { useFileUploader } from './useFileUploader';
 import {useToastStore} from "@plug/v1/admin/components/hook/useToastStore";
@@ -18,6 +19,7 @@ interface FormValues {
 }
 
 export const useStationDetail = (stationId: string) => {
+  const navigate = useNavigate();
   const [station, setStation] = useState<StationDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -202,7 +204,8 @@ export const useStationDetail = (stationId: string) => {
             setIsLoading(true);
             await deleteStation();
             alert('성공적으로 삭제되었습니다.');
-            window.location.href = '/admin/dashboard/facility';
+            // window.location.href = '/admin/dashboard/facility';
+            navigate(`/admin/dashboard/facility`);
       
             addToast({
               title: '삭제 완료',
