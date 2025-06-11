@@ -7,9 +7,11 @@ import * as PoiEditor from './edit';
 import * as Util from '../util';
 import * as Effect from '../effect';
 import { Engine3D } from '../engine';
+import { PoiElement } from './element';
 
 let engine: Engine3D;
 let hoverObjects: THREE.Object3D[] = [];
+let hoverPoiList: PoiElement[] = [];
 let poiEventGroup: THREE.Group;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
@@ -48,6 +50,11 @@ Event.InternalHandler.addEventListener('onPoiStartEdit' as never, () => {
  * 호버링 객체 해제
  */
 function clearHoverObjects() {
+    hoverPoiList.forEach(poi => {
+        poi.TextVisible = false;
+    });
+    hoverPoiList = [];
+
     hoverObjects.forEach(item => {
         if (item instanceof THREE.Mesh) {
             poiEventGroup.remove(item);
@@ -106,6 +113,9 @@ function onPointerMove(evt: PointerEvent) {
         else if (poi.PointMeshData.animMeshRef)
             hoverObjects.push(poi.PointMeshData.animMeshRef);
         
+        poi.TextVisible = true;
+        hoverPoiList.push(poi);
+
         Effect.Outline.setOutlineObjects(hoverObjects);
     }
 }
