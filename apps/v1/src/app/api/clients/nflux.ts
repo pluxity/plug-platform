@@ -6,6 +6,16 @@ let authToken: string | null = null;
 // 클라이언트 인스턴스 캐시
 const clientCache = new Map<string, ReturnType<typeof ky.create>>();
 
+// LocalStorage에서 accessToken 가져오기
+const getAccessTokenFromStorage = (): string | null => {
+  try {
+    return localStorage.getItem('accessToken');
+  } catch (error) {
+    console.warn('LocalStorage에서 accessToken을 가져올 수 없습니다:', error);
+    return null;
+  }
+};
+
 export const setAuthToken = (token: string) => {
   authToken = token;
   // 토큰이 변경되면 캐시 초기화
@@ -19,8 +29,11 @@ const createKyClient = (baseUrl: string, token?: string) => {
     'Content-Type': 'application/json',
   };
   
-  if (token) {
-    headers['Authorization'] = token;
+  // 토큰 우선순위: 파라미터 토큰 > 설정된 authToken > LocalStorage의 accessToken
+  const finalToken = token || authToken || getAccessTokenFromStorage();
+  
+  if (finalToken) {
+    headers['Authorization'] = `Bearer ${finalToken}`;
   }
 
   return ky.create({
@@ -52,10 +65,11 @@ const createKyClient = (baseUrl: string, token?: string) => {
 };
 
 export const createNfluxApiClient = (customAuthToken?: string, stationId?: string) => {
-  const token = customAuthToken || authToken;
+  // 토큰 우선순위: customAuthToken > authToken > LocalStorage의 accessToken
+  const token = customAuthToken || authToken || getAccessTokenFromStorage();
   const baseUrl = stationId 
-    ? `http://192.168.4.84:8090/nflux/HI-SMP/poi/station/${stationId}`
-    : 'http://192.168.4.84:8090/nflux/HI-SMP/poi/station';
+    ? `http://101.254.21.120/nflux/HI-SMP/poi/station/${stationId}`
+    : 'http://101.254.21.120/nflux/HI-SMP/poi/station';
   
   // 캐시 키 생성 (baseUrl + token)
   const cacheKey = `${baseUrl}:${token || 'no-token'}`;
@@ -84,4 +98,10 @@ export const clearClientCache = () => {
 
 export const getCacheSize = () => {
   return clientCache.size;
+};
+
+// LocalStorage의 accessToken이 변경되었을 때 캐시를 초기화하는 함수
+export const refreshTokenCache = () => {
+  clientCache.clear();
+  console.log('API 클라이언트 캐시가 초기화되었습니다.');
 };
