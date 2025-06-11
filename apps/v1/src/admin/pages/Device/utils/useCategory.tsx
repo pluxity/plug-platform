@@ -22,7 +22,7 @@ export const useCategory = (
             <Button 
                 color="destructive" 
                 className="w-15 bg-destructive-100 text-destructive-700 font-semibold hover:bg-destructive-200"
-                onClick={() => {onDelete(category.id)}}
+                onClick={() => onDelete(category.id)}
               >삭제</Button>
           </div>
         )

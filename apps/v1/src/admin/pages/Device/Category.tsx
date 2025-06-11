@@ -1,4 +1,4 @@
-import {Button, DataTable, Skeleton} from '@plug/ui';
+import {Button, DataTable, Skeleton, ConfirmModal} from '@plug/ui';
 import {columns} from './constants/categoryColumns';
 import {CategoryModal} from './components/CategoryModal';
 import {useModal} from '../../components/hook/useModal';
@@ -16,6 +16,17 @@ export default function DeviceCategory() {
 
     const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
     const [selectedCategoryId, setSelectedCategoryId] = useState<number>();
+    const [confirmModal, setConfirmModal] = useState<{
+      isOpen: boolean;
+      title?: string;
+      message: string;
+      onConfirm: () => void;
+  }>({
+      isOpen: false,
+      title: '',
+      message: '',
+      onConfirm: () => {}
+  });
 
     const handleDelete = async (categoryId: number, shouldMutate = true) => {
         try {
@@ -38,12 +49,25 @@ export default function DeviceCategory() {
         }
     };
 
+    const handleDeleteClick = (categoryId: number) => {
+      setConfirmModal({
+          isOpen: true,
+          title: '삭제 확인',
+          message: '선택한 항목을 삭제하시겠습니까?',
+          onConfirm: () => handleDelete(categoryId)
+      });
+  };
+
+  const handleConfirmModalClose = () => {
+      setConfirmModal(prev => ({ ...prev, isOpen: false }));
+  };
+
     const handleEdit = (categoryId: number) => {
         setSelectedCategoryId(categoryId);
         openModal('edit');
     };
 
-    const categoryData = useCategory(data || [], handleDelete, handleEdit);
+    const categoryData = useCategory(data || [], handleDeleteClick, handleEdit);
 
     const handleDeleteSelected = async () => {
         if (selectedCategories.size === 0) {
@@ -54,27 +78,31 @@ export default function DeviceCategory() {
             return;
         }
 
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
-        try{
-            await Promise.all(
-                Array.from(selectedCategories).map(category => handleDelete(category.id), false)
-            )
-            await mutate();
-            addToast({
-                title: '삭제 완료',
-                description: `${selectedCategories.size}개의 분류가 삭제되었습니다.`,
-                variant: 'normal'
-            });
-            setSelectedCategories(new Set());
-        } catch (error){
-            addToast({
-                title: '삭제 실패',
-                description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
-                variant: 'critical'
-            });
-        }
+        setConfirmModal({
+          isOpen: true,
+          title: '삭제 확인',
+          message: `${selectedCategories.size}개의 항목을 삭제하시겠습니까?`,
+          onConfirm: async () => {
+              try{
+                await Promise.all(
+                    Array.from(selectedCategories).map(category => handleDelete(category.id), false)
+                )
+                await mutate();
+                addToast({
+                    title: '삭제 완료',
+                    description: `${selectedCategories.size}개의 분류가 삭제되었습니다.`,
+                    variant: 'normal'
+                });
+                setSelectedCategories(new Set());
+            } catch (error){
+                addToast({
+                    title: '삭제 실패',
+                    description: error instanceof Error ? error.message : '분류 삭제 중 오류가 발생했습니다.',
+                    variant: 'critical'
+                });
+            }
+          }
+      });  
     }
 
     return (
@@ -121,6 +149,16 @@ export default function DeviceCategory() {
           onSuccess={mutate}
           selectedCategoryId={selectedCategoryId}
         />
+          <ConfirmModal
+              isOpen={confirmModal.isOpen}
+              onClose={handleConfirmModalClose}
+              onConfirm={confirmModal.onConfirm}
+              title={confirmModal.title}
+              message={confirmModal.message}
+              confirmText="삭제"
+              cancelText="취소"
+              isDangerous={true}
+          />
       </>
     );
 }

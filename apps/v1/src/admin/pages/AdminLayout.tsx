@@ -25,7 +25,7 @@ const AdminLayout = () => {
                             </div>
                         </div>
                         <h1 className="text-white font-bold text-lg whitespace-nowrap">
-                            부산도시철도 사상하단선 관리자 페이지
+                            부산교통공사 사상하단선 관리자 페이지
                         </h1>
                     </Link>
                     <div className="flex items-center gap-4">

@@ -509,7 +509,7 @@ const CatchpitDetails = ({ device }: { device: Catchpit }) => (
           </svg>
           현재 수위 상태
         </div>
-        <div className="h-24 bg-primary-950/80 rounded-lg border border-primary-700/30 relative overflow-hidden">
+        <div className="h-50 bg-primary-950/80 rounded-lg border border-primary-700/30 relative overflow-hidden">
 
           <div
             className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-500/40 to-blue-500/20 transition-all duration-500"

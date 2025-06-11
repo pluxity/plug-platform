@@ -1,4 +1,4 @@
-import {Button, DataTable, Skeleton} from '@plug/ui';
+import {Button, DataTable, Skeleton, ConfirmModal} from '@plug/ui';
 import {columns} from './constants/deviceColumns';
 import {DeviceModal} from './components/DeviceModal';
 import {useModal} from '../../components/hook/useModal';
@@ -16,6 +16,17 @@ export default function DevicePage() {
 
     const [ selectedDevices, setSelectedDevices ] = useState<Set<Device>>(new Set());
     const [ selectedDeviceId, setSelectedDeviceId ] = useState<string>();
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title?: string;
+        message: string;
+        onConfirm: () => void;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    });
 
     const handleDelete = async (deviceId: string, shouldMutate = true) => {
         try {
@@ -40,7 +51,20 @@ export default function DevicePage() {
         openModal('edit');
     }
 
-    const deviceData = useDevice(data || [], handleDelete, handleEdit);
+    const handleDeleteClick = (deviceId: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: '선택한 항목을 삭제하시겠습니까?',
+            onConfirm: () => handleDelete(deviceId)
+        });
+    };
+
+    const handleConfirmModalClose = () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    };
+
+    const deviceData = useDevice(data || [], handleDeleteClick, handleEdit);
 
     const handleDeleteSelected = async () => {
         if (selectedDevices.size === 0) {
@@ -51,28 +75,32 @@ export default function DevicePage() {
             });
         }
 
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: `${selectedDevices.size}개의 항목을 삭제하시겠습니까?`,
+            onConfirm: async () => {
+                try {
+                    await Promise.all(
+                        Array.from(selectedDevices).map(device => handleDelete(device.id, false))
+                    );
 
-        try {
-            await Promise.all(
-                Array.from(selectedDevices).map(device => handleDelete(device.id), false)
-            );
-
-            await mutate();
-            addToast({
-                title: '삭제 완료',
-                description: `${selectedDevices.size}개의 항목이 삭제되었습니다.`,
-                variant: 'normal'
-            });
-            setSelectedDevices(new Set());
-        } catch (error) {
-            addToast({
-                title: '삭제 실패',
-                description: error instanceof Error ? error.message : '일부 항목 삭제 중 오류가 발생했습니다.',
-                variant: 'critical'
-            });
-        }
+                    await mutate();
+                    addToast({
+                        title: '삭제 완료',
+                        description: `${selectedDevices.size}개의 항목이 삭제되었습니다.`,
+                        variant: 'normal'
+                    });
+                    setSelectedDevices(new Set());
+                } catch (error) {
+                    addToast({
+                        title: '삭제 실패',
+                        description: error instanceof Error ? error.message : '일부 항목 삭제 중 오류가 발생했습니다.',
+                        variant: 'critical'
+                    });
+                }
+            }
+        });
     }
 
     return (
@@ -114,6 +142,16 @@ export default function DevicePage() {
                 mode={mode}
                 onSuccess={mutate}
                 selectedDeviceId={selectedDeviceId}
+            />
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={handleConfirmModalClose}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText="삭제"
+                cancelText="취소"
+                isDangerous={true}
             />
         </>
     )

@@ -1,4 +1,4 @@
-import {Button, DataTable, Skeleton} from '@plug/ui';
+import {Button, DataTable, Skeleton, ConfirmModal} from '@plug/ui';
 import {columns} from './constants/lineColumns';
 import {LineModal} from './components/LineModal';
 import {useModal} from '../../components/hook/useModal';
@@ -16,6 +16,17 @@ export default function LinePage() {
 
     const [selectedLines, setSelectedLines] = useState<Set<Line>>(new Set());
     const [selectedLineId, setSelectedLineId] = useState<number>();
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title?: string;
+        message: string;
+        onConfirm: () => void;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    });
 
     const handleDelete = async (lineId: number, shouldMutate = true) => {
         try {
@@ -38,12 +49,25 @@ export default function LinePage() {
         }
     };
 
+    const handleDeleteClick = (lineId: number) => {
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: '선택한 항목을 삭제하시겠습니까?',
+            onConfirm: () => handleDelete(lineId)
+        });
+    };
+
+    const handleConfirmModalClose = () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    };
+
     const handleEdit = async (lineId: number) => {
         await setSelectedLineId(lineId);
         openModal('edit');
     };
 
-    const lineData = useLine(data || [], handleDelete, handleEdit);
+    const lineData = useLine(data || [], handleDeleteClick, handleEdit);
 
     const handleDeleteSelected = async () => {
         if (selectedLines.size === 0) {
@@ -54,30 +78,34 @@ export default function LinePage() {
             });
         }
 
-        const isConfirmed = window.confirm("선택한 항목을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
-        try {
-            await Promise.all(
-                Array.from(selectedLines).map(line => handleDelete(line.id), false)
-            );
-            await mutate();
-            addToast({
-                variant: "normal",
-                title: '삭제 완료',
-                description: `${selectedLines.size}개의 항목이 삭제되었습니다.`
-            });
-            setSelectedLines(new Set());
-            if(error) {
-              addToast({
-                variant: "critical",
-                title: "삭제 실패",
-                description: error.message,
-              })
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: `${selectedLines.size}개의 항목을 삭제하시겠습니까?`,
+            onConfirm: async () => {
+                try {
+                    await Promise.all(
+                        Array.from(selectedLines).map(line => handleDelete(line.id), false)
+                    );
+                    await mutate();
+                    addToast({
+                        variant: "normal",
+                        title: '삭제 완료',
+                        description: `${selectedLines.size}개의 항목이 삭제되었습니다.`
+                    });
+                    setSelectedLines(new Set());
+                    if(error) {
+                      addToast({
+                        variant: "critical",
+                        title: "삭제 실패",
+                        description: error.message,
+                      })
+                    }
+                } finally {
+                  mutate();
+                }
             }
-        } finally {
-          mutate();
-        }
+        });
     };
 
     return (
@@ -117,6 +145,16 @@ export default function LinePage() {
                 mode={mode}
                 onSuccess={mutate}
                 selectedLineId={selectedLineId}
+            />
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={handleConfirmModalClose}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText="삭제"
+                cancelText="취소"
+                isDangerous={true}
             />
         </>
     );
