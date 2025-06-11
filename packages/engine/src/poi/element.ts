@@ -26,7 +26,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
     private visibleState: boolean;
     private lineVisibleState: boolean = true;
-    private textVisibleState: boolean = false;
+    private textVisibleState: boolean = true;
 
     private mixer: THREE.AnimationMixer | undefined;
     private actions: Record<string, THREE.AnimationAction>;
@@ -44,7 +44,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.property = option.property;
 
         this.position = new Interfaces.Vector3Custom();
-        this.lineHeight = 0.5;
+        this.lineHeight = 1.0;
 
         this.pointMeshData = {
             instanceMeshRef: undefined,
