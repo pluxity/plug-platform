@@ -33,9 +33,7 @@ export const useUser = (
               <Button
                   color="destructive"
                   className="w-15 bg-destructive-200 text-destructive-800 font-semibold hover:bg-destructive-300"
-                  onClick={() => {
-                      onDelete(user.id)
-                  }}
+                  onClick={() => onDelete(user.id)}
               >삭제</Button>
           </div>
       ),

@@ -1,4 +1,4 @@
-import {Button, DataTable, Skeleton} from '@plug/ui';
+import {Button, DataTable, Skeleton, ConfirmModal} from '@plug/ui';
 import {columns} from './constants/assetColumns';
 import {AssetRegistModal} from './components/AssetModal';
 import {useModal} from '../../components/hook/useModal';
@@ -15,6 +15,17 @@ export default function AssetPage() {
 
     const [selectedAssets, setSelectedAssets] = useState<Set<Asset>>(new Set());
     const [selectedAssetId, setSelectedAssetId] = useState<number>();
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title?: string;
+        message: string;
+        onConfirm: () => void;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    });
 
     const addToast = useToastStore((state) => state.addToast);
 
@@ -39,12 +50,25 @@ export default function AssetPage() {
         }
     };
 
+    const handleDeleteClick = (assetId: number) => {
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: '선택한 항목을 삭제하시겠습니까?',
+            onConfirm: () => handleDelete(assetId)
+        });
+    };
+
+    const handleConfirmModalClose = () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    };
+
     const handleEdit = (assetId: number) => {
         setSelectedAssetId(assetId);
         openModal('edit');
     };
 
-    const AssetData = useAsset(data || [], handleDelete, handleEdit);
+    const AssetData = useAsset(data || [], handleDeleteClick, handleEdit);
 
     const handleDeleteSelected = async () => {
         if (selectedAssets.size === 0) {
@@ -56,31 +80,35 @@ export default function AssetPage() {
             return;
         }
 
-        const isConfirmed = window.confirm('선택한 항목을 삭제하시겠습니까?');
-        if (!isConfirmed) return;
-
-        try {
-            await Promise.all(
-                Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)), false)
-            );
-            await mutate();
-            addToast({
-                variant: 'normal',
-                title: '삭제 완료',
-                description: `${selectedAssets.size}개의 항목이 삭제되었습니다.`
-            });
-            setSelectedAssets(new Set());
-
-            if(error) {
-              addToast({
-                variant: 'critical',
-                title: '삭제 실패',
-                description: error.message,
-              })
+        setConfirmModal({
+            isOpen: true,
+            title: '삭제 확인',
+            message: `${selectedAssets.size}개의 항목을 삭제하시겠습니까?`,
+            onConfirm: async () => {
+                try {
+                    await Promise.all(
+                        Array.from(selectedAssets).map(asset => handleDelete(Number(asset.id)), false)
+                    );
+                    await mutate();
+                    addToast({
+                        variant: 'normal',
+                        title: '삭제 완료',
+                        description: `${selectedAssets.size}개의 항목이 삭제되었습니다.`
+                    });
+                    setSelectedAssets(new Set());
+        
+                    if(error) {
+                      addToast({
+                        variant: 'critical',
+                        title: '삭제 실패',
+                        description: error.message,
+                      })
+                    }
+                } finally {
+                  mutate();
+                }
             }
-        } finally {
-          mutate();
-        }
+        });
     };
     return (
         <>
@@ -119,6 +147,16 @@ export default function AssetPage() {
                 mode={mode}
                 onSuccess={mutate}
                 selectedAssetId={selectedAssetId}
+            />
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={handleConfirmModalClose}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText="삭제"
+                cancelText="취소"
+                isDangerous={true}
             />
         </>
     );

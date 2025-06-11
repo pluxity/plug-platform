@@ -22,7 +22,7 @@ export const useDevice = (
             <Button 
                 color="destructive" 
                 className="w-15 bg-destructive-100 text-destructive-700 font-semibold hover:bg-destructive-200"
-                onClick={() => {onDelete(device.id)}}
+                onClick={() => onDelete(device.id)}
               >삭제</Button>
           </div>
         )

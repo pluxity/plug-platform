@@ -42,6 +42,18 @@ export const useStationDetail = (stationId: string) => {
     thumbnail: { fileId: null as number | null, file: null as File | null, originalFileName: '' }
   });
 
+  const [confirmModal, setConfirmModal] = useState<{
+      isOpen: boolean;
+      title?: string;
+      message: string;
+      onConfirm: () => void;
+  }>({
+      isOpen: false,
+      title: '',
+      message: '',
+      onConfirm: () => {}
+  });
+
   const { data, error: detailError, mutate } = useStationDetailSWR(Number(stationId));
   const { execute: deleteStation, error: deleteError } = useDeleteStation(Number(stationId));
   const { execute: patchStation, error: updateError } = useUpdateStation(Number(stationId));
@@ -181,30 +193,34 @@ export const useStationDetail = (stationId: string) => {
   }
 
   const handleDelete = async () => {
-    try {
-      const confirmed = confirm('정말 삭제하시겠습니까?');
-      if (!confirmed) return;
-
-      setIsLoading(true);
-      await deleteStation();
-      alert('성공적으로 삭제되었습니다.');
-      window.location.href = '/admin/dashboard/facility';
-
-      addToast({
-        title: '삭제 완료',
-        description: '역사 정보가 삭제되었습니다.',
-        variant: 'normal',
-      })
-
-      if(deleteError) {
-      addToast({
-        title: '삭제 실패',
-        description: deleteError.message,
-        variant: 'critical',
-      })}
-    } finally {
-      setIsLoading(false);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '삭제 확인',
+      message: `해당 항목을 삭제하시겠습니까?`,
+      onConfirm: async () => {
+          try {
+            setIsLoading(true);
+            await deleteStation();
+            alert('성공적으로 삭제되었습니다.');
+            window.location.href = '/admin/dashboard/facility';
+      
+            addToast({
+              title: '삭제 완료',
+              description: '역사 정보가 삭제되었습니다.',
+              variant: 'normal',
+            })
+      
+            if(deleteError) {
+            addToast({
+              title: '삭제 실패',
+              description: deleteError.message,
+              variant: 'critical',
+            })}
+          } finally {
+            setIsLoading(false);
+          }
+        }
+    });
   };
 
   return {
@@ -213,6 +229,8 @@ export const useStationDetail = (stationId: string) => {
     fileStates,
     isLoading,
     isUploading,
+    confirmModal,
+    setConfirmModal,
     handleChange,
     handleFileChange,
     handleSubmit,

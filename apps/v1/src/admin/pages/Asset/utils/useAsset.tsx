@@ -23,7 +23,7 @@ export const useAsset = (
         <Button 
             color="destructive" 
             className="w-15 bg-destructive-100 text-destructive-700 font-semibold hover:bg-destructive-200"
-            onClick={() => {onDelete(asset.id)}}
+            onClick={() => onDelete(asset.id)}
           >삭제</Button>
       </div>
     ),
