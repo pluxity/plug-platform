@@ -9,7 +9,7 @@ const clientCache = new Map<string, ReturnType<typeof ky.create>>();
 // LocalStorage에서 accessToken 가져오기
 const getAccessTokenFromStorage = (): string | null => {
   try {
-    return localStorage.getItem('accessToken');
+    return localStorage.getItem('LOCAL_TOCKEN');
   } catch (error) {
     console.warn('LocalStorage에서 accessToken을 가져올 수 없습니다:', error);
     return null;
