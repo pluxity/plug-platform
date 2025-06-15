@@ -19,68 +19,68 @@ import type {
 export const nfluxService = {
   // === 역사 기본 정보 ===
   // 역사 환경정보
-  getStationEnv: async (stationId: string): Promise<{ stationEnv: StationEnv & { stationId: string; fcltsType: string } }> => {
+  getStationEnv: async (stationId: string): Promise<StationEnv & { stationId: string; fcltsType: string }> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('env').json();
   },
 
   // 역사 이벤트 현황
-  getStationEvents: async (stationId: string): Promise<{ events: StationEvents }> => {
+  getStationEvents: async (stationId: string): Promise<StationEvents> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('events').json();
   },
 
   // === 역사별 시설물 정보 조회 ===
   // 조명 정보
-  getLights: async (stationId: string): Promise<{ lights: Light[] }> => {
+  getLights: async (stationId: string): Promise<Light[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('lights').json();
   },
 
   // 셔터 정보
-  getShutters: async (stationId: string): Promise<{ shutters: Shutter[] }> => {
+  getShutters: async (stationId: string): Promise<Shutter[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('shutters').json();
   },
 
   // 역사 CCTV 정보
-  getCCTV: async (stationId: string): Promise<{ cctv: CCTV[] }> => {
+  getCCTV: async (stationId: string): Promise<CCTV[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('cctv').json();
   },
 
   // 화재수신기 정보
-  getFireSensors: async (stationId: string): Promise<{ 'fire-sensors': FireSensor[] }> => {
+  getFireSensors: async (stationId: string): Promise<FireSensor[] > => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('fire-sensors').json();
   },
 
   // 엘리베이터 정보
-  getElevators: async (stationId: string): Promise<{ elevators: Elevator[] }> => {
+  getElevators: async (stationId: string): Promise <Elevator[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('elevators').json();
   },
 
   // 에스컬레이터 정보
-  getEscalators: async (stationId: string): Promise<{ escalators: Escalator[] }> => {
+  getEscalators: async (stationId: string): Promise<Escalator[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('escalators').json();
   },
 
   // 물탱크 정보(급수탱크/소방탱크)
-  getWaterTanks: async (stationId: string): Promise<{ waterTanks: WaterTank[] }> => {
+  getWaterTanks: async (stationId: string): Promise<WaterTank[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('waterTanks').json();
   },
 
   // 집수정 정보(오수조/배수조)
-  getCatchpits: async (stationId: string): Promise<{ catchpits: Catchpit[] }> => {
+  getCatchpits: async (stationId: string): Promise<Catchpit[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('catchpits').json();
   },
 
   // 공기청정기 정보
-  getAirPurifiers: async (stationId: string): Promise<{ airPurifiers: AirPurifier[] }> => {
+  getAirPurifiers: async (stationId: string): Promise<AirPurifier[]> => {
     const client = createNfluxApiClient(undefined, stationId);
     return client.get('airPurifiers').json();
   },

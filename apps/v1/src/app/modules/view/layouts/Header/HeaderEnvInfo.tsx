@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStationEnv } from '@plug/v1/app/api/hooks/nflux';
 
 interface HeaderEnvInfoProps {
-  stationId: string;
+  externalCode: string;
 }
 
 interface EnvDisplayData {
@@ -16,8 +16,8 @@ interface EnvDisplayData {
   };
 }
 
-const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ stationId }) => {
-  const { data, loading, error, refetch } = useStationEnv(stationId);
+const HeaderEnvInfo: React.FC<HeaderEnvInfoProps> = ({ externalCode }) => {
+  const { data, loading, error, refetch } = useStationEnv(externalCode);
 
   const defaultData: EnvDisplayData = {
     temperature: {

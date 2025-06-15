@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal } from '@plug/ui';
 import { nfluxService } from '@plug/v1/app/api';
-import type { Light, Shutter, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, IOStatus, Pump } from '@plug/v1/app/api/types/nflux';
+import type { Light, Shutter, CCTV, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, IOStatus, Pump } from '@plug/v1/app/api/types/nflux';
 
 // Types
-type DeviceData = Light | Shutter | FireSensor | Elevator | Escalator | WaterTank | Catchpit | AirPurifier;
+type DeviceData = Light | Shutter | CCTV | FireSensor | Elevator | Escalator | WaterTank | Catchpit | AirPurifier;
 type StatusType = 'onoff' | 'operation' | 'shutter' | 'fire' | 'elevator' | 'escalator' | 'remoteLocal' | 'normalError' | 'waterLevel' | 'value';
 
 export interface DeviceDetailProps {
@@ -44,18 +44,19 @@ const STATUS_COLOR_MAP: Record<StatusType, Record<string, string>> = {
 
 // Utility functions
 const getStatusText = (status: IOStatus, type: StatusType = 'normalError'): string => {
-  const value = status.ioValue;
+  const value = status?.ioValue;
   return STATUS_TEXT_MAP[type][value] || value || '정보 없음';
 };
 
 const getStatusColor = (status: IOStatus, type: StatusType = 'normalError'): string => {
-  const value = status.ioValue;
+  const value = status?.ioValue;
   return STATUS_COLOR_MAP[type][value] || STATUS_COLOR_MAP[type].default || 'text-gray-400';
 };
 
 const getDeviceName = (device: DeviceData): string => {
   if ('lightName' in device) return device.lightName;
   if ('shutterName' in device) return device.shutterName;
+  if ('cctvName' in device) return device.cctvName;
   if ('fireSensorName' in device) return device.fireSensorName;
   if ('elevatorName' in device) return device.elevatorName;
   if ('escalatorName' in device) return device.escalatorName;
@@ -116,7 +117,7 @@ const StatusRow = ({
     <div className="flex items-center gap-3">
       {type === 'value' ? (
         <span className="text-primary-100 font-medium tabular-nums">
-          {status.ioValue}{suffix}
+          {status?.ioValue}{suffix}
         </span>
       ) : (
         <StatusBadge status={status} type={type} />
@@ -195,7 +196,7 @@ const CommonInfo = ({ device }: { device: DeviceData }) => (
     <div className="grid gap-3">
       {[
         { label: "장비명", value: getDeviceName(device) },
-        { label: "수집시간", value: device.collectedTime || '정보 없음' },
+        { label: "수집시간", value: device.collectedTime ?? '정보 없음' },
         { label: "역사", value: getStationName(device) }
       ].map(({ label, value }, index) => (
         <div
@@ -601,49 +602,55 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
           case 'light':
           case 'lights': {
             const result = await nfluxService.getLights(stationId);
-            data = result.lights.find(item => item.lightId === deviceId) || null;
+            data = result.find(item => item.lightId === deviceId) || null;
+            break;
+          }
+          case 'cctv':
+          case 'cctvs': {
+            const result = await nfluxService.getCCTV(stationId);
+            data = result.find(item => item.cctvId === deviceId) || null;
             break;
           }
           case 'shutter':
           case 'shutters': {
             const result = await nfluxService.getShutters(stationId);
-            data = result.shutters.find(item => item.shutterId === deviceId) || null;
+            data = result.find(item => item.shutterId === deviceId) || null;
             break;
           }
           case 'fire-sensor':
           case 'fire-sensors': {
             const result = await nfluxService.getFireSensors(stationId);
-            data = result['fire-sensors'].find(item => item.fireSensorId === deviceId) || null;
+            data = result.find(item => item.fireSensorId === deviceId) || null;
             break;
           }
           case 'elevator':
           case 'elevators': {
             const result = await nfluxService.getElevators(stationId);
-            data = result.elevators.find(item => item.elevatorId === deviceId) || null;
+            data = result.find(item => item.elevatorId === deviceId) || null;
             break;
           }
           case 'escalator':
           case 'escalators': {
             const result = await nfluxService.getEscalators(stationId);
-            data = result.escalators.find(item => item.escalatorId === deviceId) || null;
+            data = result.find(item => item.escalatorId === deviceId) || null;
             break;
           }
           case 'watertank':
           case 'watertanks': {
             const result = await nfluxService.getWaterTanks(stationId);
-            data = result.waterTanks.find(item => item.waterTankId === deviceId) || null;
+            data = result.find(item => item.waterTankId === deviceId) || null;
             break;
           }
           case 'catchpit':
           case 'catchpits': {
             const result = await nfluxService.getCatchpits(stationId);
-            data = result.catchpits.find(item => item.catchpitId === deviceId) || null;
+            data = result.find(item => item.catchpitId === deviceId) || null;
             break;
           }
           case 'airpurifier':
           case 'airpurifiers': {
             const result = await nfluxService.getAirPurifiers(stationId);
-            data = result.airPurifiers.find(item => item.airPurifierId === deviceId) || null;
+            data = result.find(item => item.airPurifierId === deviceId) || null;
             break;
           }
           default:

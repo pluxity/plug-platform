@@ -20,7 +20,7 @@ const ViewerPage = () => {
 
   const { code } = useParams<{ code: string }>();
   const parsedCode = code ?? '119';
-  const { setStationCode } = useStationStore();
+  const {setExternalCode, setStationCode } = useStationStore();
   const { fetchAssets } = useAssetStore();
   const { openMenuByDeviceId, menuItems } = useSideMenuStore();
 
@@ -35,7 +35,9 @@ const ViewerPage = () => {
 
   const handleLoadError = useCallback((loadError: Error) => {
         console.error('3D 모델 로드 실패:', loadError);
-    }, []);    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
+    }, []);    
+    
+    const handlePoiSelect = useCallback((poi: PoiImportOption) => {
       const deviceId = poi.property?.deviceId;
       
       if (deviceId) {
@@ -95,9 +97,16 @@ const ViewerPage = () => {
           }
       });
 
-    }, [engineModelLoaded, stationData]);      useEffect(() => {
+    }, [engineModelLoaded, stationData]);      
+    
+    
+    useEffect(() => {
         setStationCode(parsedCode);
     }, [parsedCode, setStationCode]);
+
+    useEffect(() => {
+      setExternalCode(stationData?.externalCode);
+    }, [setExternalCode, stationData])
 
     useEffect(() => {
         fetchAssets();

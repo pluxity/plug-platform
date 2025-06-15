@@ -31,7 +31,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
   devices = [],
   onClose 
 }) => {
-  const { stationCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
+  const { externalCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
   const handleDeviceClick = (device: DeviceData) => {
     try {
       if (device.feature.id && device.feature.floorId) {
@@ -112,7 +112,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
       <DeviceDetailModal
         isOpen={!!selectedDeviceId}
         onClose={() => setSelectedDeviceId(null)}
-        stationId={String(stationCode)}
+        stationId={String(externalCode)}
         deviceId={selectedDeviceId}
         deviceType={categoryType}
       />

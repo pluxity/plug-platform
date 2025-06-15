@@ -1,11 +1,12 @@
 import TimeDisplay from "./TimeDisplay";
 import HeaderEnvInfo from "./HeaderEnvInfo";
-import {useParams} from 'react-router-dom';
+import useStationStore from "@plug/v1/app/stores/stationStore";
 import React from "react";
 
 const Header = () => {
-    const { stationId } = useParams<{ stationId: string }>();
-    const parsedStationId = stationId ? stationId : '1';
+    // const { stationId } = useParams<{ stationId: string }>();
+    const { externalCode } = useStationStore();
+    // const parsedStationId = stationId ? stationId : '1';
 
     return (
       <header className="absolute top-0 left-0 w-full h-16 px-6 flex items-center justify-between bg-gradient-to-b from-primary-300/30 to-primary-700/30 backdrop-blur-lg text-white z-10 shadow-lg border-b border-primary-900/10">
@@ -27,7 +28,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          <HeaderEnvInfo stationId={parsedStationId} />
+          <HeaderEnvInfo externalCode={externalCode} />
         </div>
       </header>
     );

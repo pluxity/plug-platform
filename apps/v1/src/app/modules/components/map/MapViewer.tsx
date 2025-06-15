@@ -41,8 +41,10 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
     }, [floors]);
 
     useEffect(() => {
-        if (engineRef.current && modelPath && !isModelLoadedRef.current) {
-            try {                Px.Loader.LoadGltf(modelPath, () => {
+        if (engineRef.current && modelPath) {
+            try {               
+                
+                Px.Loader.LoadGltf(modelPath, () => {
                     isModelLoadedRef.current = true;
                     onModelLoaded?.();
                     Px.Poi.HideAllLine();
@@ -52,7 +54,9 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
                 onLoadError?.(error as Error);
             }
         }
-    }, [modelPath, onModelLoaded, onLoadError]);        return (
+    }, [modelPath]);        
+    
+    return (
         <>
             <FloorSelector 
                 floors={floorSelectorItems} 
