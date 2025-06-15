@@ -24,9 +24,9 @@ export default defineConfig({
     host: '0.0.0.0',
     allowedHosts: ['app.plug-platform.com'],
     proxy: {
-      '/api': {
+      '/3d-map/api': {
         target: 'http://api.plug-platform.com:8080',
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/3d-map\/api/, ''),
       },
     },
   },

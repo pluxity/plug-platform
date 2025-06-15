@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Px from '@plug/engine/src';
 import useStationStore from '@plug/v1/app/stores/stationStore';
-import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
+import useDeviceModalStore from '@plug/v1/app/stores/deviceModalStore';
 
 interface DeviceData {
   id: string;
@@ -31,7 +31,9 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
   devices = [],
   onClose 
 }) => {
-  const { stationCode, setCurrentFloor, selectedDeviceId, setSelectedDeviceId } = useStationStore();
+  const { externalCode, setCurrentFloor } = useStationStore();
+  const { openModal } = useDeviceModalStore();
+  
   const handleDeviceClick = (device: DeviceData) => {
     try {
       if (device.feature.id && device.feature.floorId) {
@@ -83,9 +85,8 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
             {devices.map((device) => (
               <li
                 key={device.id}
-                className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
-                onClick={() => {
-                  setSelectedDeviceId(device.id);
+                className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"                onClick={() => {
+                  openModal(device.id, categoryType, String(externalCode));
                   handleDeviceClick(device);
                 }}
               >
@@ -106,16 +107,8 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                 {device.name}
               </li>
             ))}
-          </ul>
-        )}
+          </ul>        )}
       </div>
-      <DeviceDetailModal
-        isOpen={!!selectedDeviceId}
-        onClose={() => setSelectedDeviceId(null)}
-        stationId={String(stationCode)}
-        deviceId={selectedDeviceId}
-        deviceType={categoryType}
-      />
     </>
   );
 };

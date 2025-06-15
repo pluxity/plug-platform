@@ -39,7 +39,7 @@ export const useStationEnv = (stationId: string): UseApiResult<StationEnv & { st
     try {
       setLoading(true);
       const result = await nfluxService.getStationEnv(stationId);
-      setData(result.stationEnv);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -70,7 +70,7 @@ export const useStationEvents = (stationId: string): UseApiResult<StationEvents>
     try {
       setLoading(true);
       const result = await nfluxService.getStationEvents(stationId);
-      setData(result.events);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -100,7 +100,7 @@ export const useLights = (stationId: string): UseApiResult<Light[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getLights(stationId);
-      setData(result.lights);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -128,7 +128,7 @@ export const useShutters = (stationId: string): UseApiResult<Shutter[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getShutters(stationId);
-      setData(result.shutters);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -159,7 +159,7 @@ export const useCCTV = (stationId: string): UseApiResult<CCTV[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getCCTV(stationId);
-      setData(result.cctv);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -187,7 +187,7 @@ export const useFireSensors = (stationId: string): UseApiResult<FireSensor[]> =>
     try {
       setLoading(true);
       const result = await nfluxService.getFireSensors(stationId);
-      setData(result['fire-sensors']);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -215,7 +215,7 @@ export const useElevators = (stationId: string): UseApiResult<Elevator[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getElevators(stationId);
-      setData(result.elevators);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -242,7 +242,7 @@ export const useEscalators = (stationId: string): UseApiResult<Escalator[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getEscalators(stationId);
-      setData(result.escalators);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -269,7 +269,7 @@ export const useWaterTanks = (stationId: string): UseApiResult<WaterTank[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getWaterTanks(stationId);
-      setData(result.waterTanks);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -296,7 +296,7 @@ export const useCatchpits = (stationId: string): UseApiResult<Catchpit[]> => {
     try {
       setLoading(true);
       const result = await nfluxService.getCatchpits(stationId);
-      setData(result.catchpits);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -323,7 +323,7 @@ export const useAirPurifiers = (stationId: string): UseApiResult<AirPurifier[]> 
     try {
       setLoading(true);
       const result = await nfluxService.getAirPurifiers(stationId);
-      setData(result.airPurifiers);
+      setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -438,17 +438,17 @@ export const useStationFacilities = (stationId: string): UseApiResult<StationFac
       ]);
 
       setData({
-        env: envResult.stationEnv,
-        events: eventsResult.events,
-        lights: lightsResult.lights,
-        shutters: shuttersResult.shutters,
-        cctv: cctvResult.cctv,
-        fireSensors: fireSensorsResult['fire-sensors'],
-        elevators: elevatorsResult.elevators,
-        escalators: escalatorsResult.escalators,
-        waterTanks: waterTanksResult.waterTanks,
-        catchpits: catchpitsResult.catchpits,
-        airPurifiers: airPurifiersResult.airPurifiers
+        env: envResult,
+        events: eventsResult,
+        lights: lightsResult,
+        shutters: shuttersResult,
+        cctv: cctvResult,
+        fireSensors: fireSensorsResult,
+        elevators: elevatorsResult,
+        escalators: escalatorsResult,
+        waterTanks: waterTanksResult,
+        catchpits: catchpitsResult,
+        airPurifiers: airPurifiersResult
       });
       setError(null);
     } catch (err) {

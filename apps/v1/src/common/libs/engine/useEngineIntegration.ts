@@ -86,7 +86,8 @@ export const useEngineIntegration = ({
   const handleFloorChange = useCallback((floorId: string) => {
     try {
       changeEngineFloor(floorId);
-      if (handlers.onFloorChange) {        handlers.onFloorChange(floorId);
+      if (handlers.onFloorChange) {
+        handlers.onFloorChange(floorId);
       }
     } catch {
       // Floor change failed, but continue execution

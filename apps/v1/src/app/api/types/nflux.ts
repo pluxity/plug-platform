@@ -45,6 +45,7 @@ export interface CCTV {
   cctvAngle: string;
   streamAddress: string;
   location: Position;
+  collectedTime?: string;
 }
 
 export interface WindGauge {

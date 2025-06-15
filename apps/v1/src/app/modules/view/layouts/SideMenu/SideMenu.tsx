@@ -1,33 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { api } from '@plug/api-hooks/core';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import useSideMenuStore from '@plug/v1/app/stores/sideMenuStore';
+import usePoiStore from '@plug/v1/app/stores/poiStore';
+import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import MenuItem from './MenuItem';
 import DevicePanel from './DevicePanel';
 import { Tooltip } from '@plug/ui';
+import type { PoiImportOption } from '@plug/engine/src/interfaces';
+import type { Category } from '@plug/v1/app/modules/view/types/sidemenu';
+import * as Px from '@plug/engine/src';
 
 interface DeviceData {
   id: string;
   name: string;
-  code: string;
-  feature: DeviceFeature;
-}
-
-interface DeviceFeature {
-  id: string;
-  floorId: string;
-  assetId: string;
-}
-
-interface Category{
-  categoryId: string;
-  categoryName: string;
-  contextPath: string;
-  iconFile: {url: string;};
-  devices: DeviceData[];
+  feature: {
+    id: string;
+    floorId: string;
+  };
 }
 
 const SideMenu: React.FC = () => {
+  const [devicesByCategory, setDevicesByCategory] = useState<Record<string, DeviceData[]>>({});
+  
   const { 
     activeMenu, 
     menuItems, 
@@ -37,7 +32,9 @@ const SideMenu: React.FC = () => {
     setIsDevicePanelOpen 
   } = useSideMenuStore();
 
-  const { stationCode } = useStationStore();  useEffect(() => {
+  const { stationCode, currentFloor } = useStationStore();
+  const { assets } = useAssetStore();
+  const { setPendingPoiData } = usePoiStore();useEffect(() => {
     const fetchCategory = async () => {
       if (!stationCode) {
         return;
@@ -52,18 +49,76 @@ const SideMenu: React.FC = () => {
             type: item.contextPath.replace(/\//g, ''),
             icon: item.iconFile?.url,
             devices: item.devices || []
-          }));
+          }));          
+          
           setMenuItems(transformedMenuItems);
+
+          // 카테고리별 디바이스 데이터 저장
+          const categoryDevices: Record<string, DeviceData[]> = {};
+          response.data.forEach(category => {
+            categoryDevices[category.categoryId.toString()] = category.devices.map(device => ({
+              id: device.id,
+              name: device.name,
+              feature: {
+                id: device.feature.id,
+                floorId: device.feature.floorId
+              }
+            }));
+          });
+          setDevicesByCategory(categoryDevices);
+
+          const allDevices = response.data.flatMap(category => 
+            category.devices.map(device => ({
+              ...device,
+              categoryType: category.contextPath.replace(/\//g, '')
+            }))
+          );const poiData: PoiImportOption[] = allDevices.map(device => {
+            const modelUrl = assets.find(asset => asset.id === parseInt(device.feature.assetId))?.file?.url || '';
+            
+            return {
+              id: device.feature.id,
+              iconUrl: '',
+              modelUrl: modelUrl,
+              displayText: device.name,
+              floorId: device.feature.floorId,
+              property: {
+                deviceId: device.id,
+                deviceType: device.categoryType
+              },
+              position: device.feature.position || { x: 0, y: 0, z: 0 }, // 기본 위치값
+              rotation: device.feature.rotation || { x: 0, y: 0, z: 0 }, // 기본 회전값
+              scale: device.feature.scale || { x: 1, y: 1, z: 1 } // 기본 스케일값
+            };          });
+
+          setPendingPoiData(poiData);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-    fetchCategory();
-  }, [stationCode, setMenuItems]);
+    
+    if (assets.length > 0) {
+      fetchCategory();
+    }  }, [stationCode, setMenuItems, assets, setPendingPoiData]);  // activeMenu가 변경될 때마다 POI 텍스트 제어
+  useEffect(() => {
+    // 모든 POI 텍스트 숨기기
+    Px.Poi.HideAllDisplayText();
+    
+    // 활성화된 메뉴가 있고 해당 카테고리의 디바이스 데이터가 있으면 POI 텍스트 표시
+    if (activeMenu && devicesByCategory[activeMenu.id]) {
+      devicesByCategory[activeMenu.id].forEach(device => {
+        // 현재 층이 'ALL'이거나 디바이스가 현재 층에 있을 때만 텍스트 표시
+        if (currentFloor === 'ALL' || device.feature.floorId === currentFloor) {
+          Px.Poi.ShowDisplayText(device.feature.id);
+        }
+      });
+    }
+  }, [activeMenu, devicesByCategory, currentFloor]);
+
   const handleMenuItemClick = (id: string) => {
     const clickedMenu = menuItems.find(item => item.id === id) || null;
     const newActive = activeMenu?.id === id ? null : clickedMenu;
+    
     setActiveMenu(newActive);
     setIsDevicePanelOpen(newActive !== null);
   };

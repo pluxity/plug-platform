@@ -16,22 +16,27 @@ const MenuItem: React.FC<MenuItemProps> = ({
     e.stopPropagation();
     onClick?.(id);
   };
-
   return (
     <button
       onClick={handleClick}
       className={`
         group flex items-center justify-center w-12 h-12 rounded-lg border transition-all duration-200 
-        ${isActive ? 'bg-primary-900/90 shadow-md border-primary-700/20' : 'bg-primary-300/10 border-none hover:bg-primary-300/30'}
+        ${isActive 
+          ? 'bg-gradient-to-br from-primary-500/40 to-primary-600/50 shadow-lg shadow-primary-500/30 border-2 border-primary-400/60 ring-2 ring-primary-400/20' 
+          : 'bg-primary-300/10 border-none hover:bg-primary-300/30'
+        }
       `}
     >
       <img
         src={icon as string}
         alt="Menu Icon"
         className={`
-          w-6 h-6 transition-transform duration-200
+          w-6 h-6 transition-all duration-200
           brightness-150
-          ${isActive ? 'scale-110 brightness-200' : 'opacity-80 group-hover:opacity-100'}
+          ${isActive 
+            ? 'scale-125 brightness-[2.5] drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' 
+            : 'opacity-80 group-hover:opacity-100 group-hover:scale-105'
+          }
         `}
       />
     </button>

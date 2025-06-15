@@ -68,8 +68,10 @@ export const createNfluxApiClient = (customAuthToken?: string, stationId?: strin
   // 토큰 우선순위: customAuthToken > authToken > LocalStorage의 accessToken
   const token = customAuthToken || authToken || getAccessTokenFromStorage();
   const baseUrl = stationId 
-    ? `http://101.254.21.120/nflux/HI-SMP/poi/station/${stationId}`
-    : 'http://101.254.21.120/nflux/HI-SMP/poi/station';
+     ? `http://101.254.21.120:10300/HI-SMP/poi/station/${stationId}`
+     : 'http://101.254.21.120:10300/HI-SMP/poi/station';
+    // ? `http://192.168.4.84:8090/HI-SMP/poi/station/${stationId}`
+    // : 'http://192.168.4.84:8090/HI-SMP/poi/station';
   
   // 캐시 키 생성 (baseUrl + token)
   const cacheKey = `${baseUrl}:${token || 'no-token'}`;
