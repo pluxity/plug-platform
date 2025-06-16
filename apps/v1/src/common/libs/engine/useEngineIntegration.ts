@@ -8,7 +8,7 @@ import type {
   EngineIntegrationConfig, 
   EngineIntegrationResult 
 } from './types';
-import type { PoiImportOption } from '@plug/engine/src/interfaces';
+import type { Label3DImportOption, PoiImportOption } from '@plug/engine/src/interfaces';
 import { TrainData } from '@plug/v1/app/modules/view/types/stream';
 
 interface UseEngineIntegrationProps {
@@ -60,10 +60,23 @@ export const useEngineIntegration = ({
     if (event.target && handlers.onPoiClick) {
       handlers.onPoiClick(event.target);
     }
-  }, [handlers]);  const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
+  }, [handlers]);  
+  
+  const poiTransformListener = useCallback(async (event: { target: PoiImportOption }) => {
     if (event.target && handlers.onPoiTransformChange) {
       try {
         await handlers.onPoiTransformChange(event.target);
+      } catch {
+        // Ignore transform update errors
+      }
+    }
+  }, [handlers]);
+
+  const label3DTransformListener = useCallback(async (event: { target: Label3DImportOption }) => {
+    if (event.target && handlers.onLabel3DTransformChange) {
+      try {
+        console.log('Label3D Transform Change:', event.target);
+        await handlers.onLabel3DTransformChange(event.target);
       } catch {
         // Ignore transform update errors
       }
@@ -76,7 +89,8 @@ export const useEngineIntegration = ({
     }  }, [handlers]);
 
   const changeEngineFloor = useCallback((floorId: string) => {
-    try {      Px.Model.HideAll();
+    try {      
+      Px.Model.HideAll();
       Px.Model.Show(floorId);
     } catch {
       throw new Error(`Failed to change floor in engine: ${floorId}`);
@@ -135,7 +149,9 @@ export const useEngineIntegration = ({
   }, []);
 
   const addEngineEventListeners = useCallback(() => {
-    removeEventListeners();    if (handlers.onPoiDeleteClick) {
+    removeEventListeners();    
+    
+    if (handlers.onPoiDeleteClick) {
       Px.Event.AddEventListener("onPoiPointerUp", poiDeleteClickListener);
       eventListenersRef.current.push({ event: "onPoiPointerUp", handler: poiDeleteClickListener as (...args: unknown[]) => void });
     } else if (handlers.onPoiClick) {
@@ -146,7 +162,16 @@ export const useEngineIntegration = ({
     if (finalConfig.enableTransformEdit && handlers.onPoiTransformChange) {
       Px.Event.AddEventListener('onPoiTransformChange', poiTransformListener);
       eventListenersRef.current.push({ event: 'onPoiTransformChange', handler: poiTransformListener as (...args: unknown[]) => void });
-    }  }, [handlers, finalConfig.enableTransformEdit, poiClickListener, poiTransformListener, poiDeleteClickListener, removeEventListeners]);
+    }
+
+    if (handlers.onLabel3DTransformChange) {
+      Px.Event.AddEventListener('onLabel3DTransformChange', label3DTransformListener);
+      eventListenersRef.current.push({ event: 'onLabel3DTransformChange', handler: label3DTransformListener as (...args: unknown[]) => void });
+    }
+
+
+  
+  }, [handlers, finalConfig.enableTransformEdit, poiClickListener, poiTransformListener, label3DTransformListener, poiDeleteClickListener, removeEventListeners]);
 
   useEffect(() => {
     if (!isModelLoadedRef.current) return;

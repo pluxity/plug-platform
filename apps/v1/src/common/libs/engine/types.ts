@@ -1,4 +1,4 @@
-import type { PoiImportOption, ModelInfo } from '@plug/engine/src/interfaces';
+import type { PoiImportOption, ModelInfo, Label3DImportOption } from '@plug/engine/src/interfaces';
 
 export interface BaseFeature {
   id: string;
@@ -14,6 +14,7 @@ export interface BaseFeature {
 export interface EngineEventHandlers {
   onPoiClick?: (poi: PoiImportOption) => void;
   onPoiTransformChange?: (poi: PoiImportOption) => Promise<void>;
+  onLabel3DTransformChange?: (label3D: Label3DImportOption) => Promise<void>;
   onPoiDeleteClick?: (poi: PoiImportOption) => void;
   onFloorChange?: (floorId: string) => void;
   onHierarchyLoaded?: (hierarchy: ModelInfo[]) => void;

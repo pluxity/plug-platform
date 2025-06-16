@@ -1,16 +1,19 @@
-import { useState, useCallback, memo, Suspense } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useCallback, memo, Suspense, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Select, ConfirmModal } from "@plug/ui";
 import { useStationStore } from './store/stationStore';
 import type { ModelInfo, PoiImportOption } from "@plug/engine/src/interfaces";
 
 import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
-import { PoiEditModal, ErrorBoundary } from "./components";
+import { PoiEditModal, ErrorBoundary, TextLabelModal } from "./components";
 import { useStation, useEditMode, useEngineIntegration, useFeatureApi } from "./hooks";
 import type { UseEditModeResult } from "./hooks/useEditMode";
 import type { StationWithFeatures } from "./types/station";
 
-import * as Px from '@plug/engine/src';
+import { Poi, Label3D } from '@plug/engine/src';
+import { v4 as uuidv4 } from 'uuid';
+import { label3dService } from "@plug/common-services";
+import type { Label3DCreateRequest } from "@plug/common-services";
 
 // Loading and Error components with better UX
 const LoadingSpinner = memo(() => (
@@ -34,7 +37,8 @@ const FloorSelector = memo(({
   hierarchies: ModelInfo[];
   selectedFloor: string | null;
   onFloorChange: (floorId: string) => void;
-}) => {  const handleFloorSelect = (values: string[]) => {
+}) => {
+  const handleFloorSelect = (values: string[]) => {
     const floorId = values[0];
     if (floorId) {
       onFloorChange(floorId);
@@ -67,14 +71,14 @@ const ViewerHeader = memo(({
   stationName, 
   hierarchies, 
   selectedFloor, 
-  onFloorChange 
+  onFloorChange
 }: {
   stationName: string;
   hierarchies: ModelInfo[] | null;
   selectedFloor: string | null;
   onFloorChange: (floorId: string) => void;
 }) => (
-  <div className="flex absolute text-white pl-4 pt-2 items-center z-10">
+  <div className="flex absolute text-white pl-4 pt-2 items-center z-10 space-x-4">
     <h2 className="text-xl font-bold">{stationName}</h2>
     {hierarchies && (
       <FloorSelector 
@@ -87,7 +91,8 @@ const ViewerHeader = memo(({
 ));
 
 // Main viewer content component
-const ViewerContent = memo(({  stationData,
+const ViewerContent = memo(({
+  stationData,
   hierarchies,
   selectedFloor,
   onFloorChange,
@@ -126,7 +131,7 @@ const ViewerContent = memo(({  stationData,
             modelPath={modelPath}
             onModelLoaded={onModelLoaded}
           />
-        </Suspense>          
+        </Suspense>
         <FeatureEditToolbar
           onTranslateMode={editMode.setTranslateMode}
           onRotateMode={editMode.setRotateMode}
@@ -147,26 +152,33 @@ const ViewerContent = memo(({  stationData,
   );
 });
 
-// Main ViewerPage component with React 19 patterns
 const ViewerPage = memo(() => {
-  const { stationId: stationIdFromParams } = useParams<{ stationId: string }>();
+  const { stationId: stationIdParam } = useParams<{ stationId: string }>();
+  const navigate = useNavigate();
   const { currentStationId, setStationId } = useStationStore();
   
-  // Initialize station ID with proper fallback
-  const stationId = stationIdFromParams || currentStationId || '2';
-  
-  // Ensure station ID is set in store
-  if (stationId !== currentStationId) {
-    setStationId(stationId);
-  }  // Custom hooks for state management
-  const { data: stationData, isLoading, error } = useStation(stationId);
+  // stationId를 number로 처리
+  const stationId = useMemo(() => {
+    if (stationIdParam) {
+      const parsed = parseInt(stationIdParam, 10);
+      return isNaN(parsed) ? null : parsed;
+    }
+    return currentStationId;
+  }, [stationIdParam, currentStationId]);
+
+  // Custom hooks for state management (항상 호출)
+  const { data: stationData, isLoading, error } = useStation(stationId ? stationId.toString() : null);
   const editMode = useEditMode();
   const { deleteFeature } = useFeatureApi();
-    // Local state
+  
+  // Local state (항상 호출)
   const [hierarchies, setHierarchies] = useState<ModelInfo[] | null>(null);
   const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
   const [selectedPoi, setSelectedPoi] = useState<PoiImportOption | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // 3D 텍스트 라벨 모달 상태
+  const [isTextLabelModalOpen, setIsTextLabelModalOpen] = useState(false);
   
   // ConfirmModal 상태
   const [confirmModal, setConfirmModal] = useState<{
@@ -180,6 +192,20 @@ const ViewerPage = memo(() => {
     message: '',
     onConfirm: () => {}
   });
+
+  // stationId가 없으면 홈으로 리다이렉트
+  useEffect(() => {
+    if (stationId === null) {
+      navigate('/');
+      return;
+    }
+    
+    // Ensure station ID is set in store
+    if (stationId !== currentStationId) {
+      setStationId(stationId.toString());
+    }
+  }, [stationId, currentStationId, setStationId, navigate]);
+
   // Event handlers
   const handlePoiSelect = useCallback((poi: PoiImportOption) => {
     setSelectedPoi(poi);
@@ -190,6 +216,7 @@ const ViewerPage = memo(() => {
     setIsModalOpen(false);
     setSelectedPoi(null);
   }, []);
+
   const handleHierarchyLoaded = useCallback((hierarchy: ModelInfo[]) => {
     setHierarchies(hierarchy);
     // Set initial floor to the highest floor (or first floor if needed)
@@ -200,9 +227,12 @@ const ViewerPage = memo(() => {
         setSelectedFloor(initialFloor);
       }
     }
-  }, []);  const handleFloorChangeUI = useCallback((floorId: string) => {
+  }, []);
+  
+  const handleFloorChangeUI = useCallback((floorId: string) => {
     setSelectedFloor(floorId);
-  }, []);  // POI 삭제 핸들러
+  }, []);
+
   const handlePoiDelete = useCallback((poi: PoiImportOption) => {
     setConfirmModal({
       isOpen: true,
@@ -210,23 +240,52 @@ const ViewerPage = memo(() => {
       message: `"${poi.displayText}" POI를 삭제하시겠습니까?`,
       onConfirm: async () => {
         try {
-          // 엔진에서 POI 삭제
-          Px.Poi.Delete(poi.id);
-          
-          // API를 통한 서버 삭제
+          Poi.Delete(poi.id);
           await deleteFeature(poi.id);
-          
           console.log('POI 삭제 완료:', poi);
         } catch (error) {
           console.error('POI 삭제 중 오류 발생:', error);
         }
       }
-    });  }, [deleteFeature]);
+    });
+  }, [deleteFeature]);
 
   // ConfirmModal 닫기 핸들러
   const handleConfirmModalClose = useCallback(() => {
     setConfirmModal(prev => ({ ...prev, isOpen: false }));
-  }, []);  // Engine integration with cleanup
+  }, []);
+
+  // 3D 텍스트 라벨 관련 핸들러
+  const handleOpenTextLabelModal = useCallback(() => {
+    setIsTextLabelModalOpen(true);
+  }, []);
+
+  const handleCloseTextLabelModal = useCallback(() => {
+    setIsTextLabelModalOpen(false);
+  }, []);
+
+  const handleCreateTextLabel = useCallback((text: string) => {
+    const id = uuidv4();
+
+    Label3D.Create({
+      id: id,
+      displayText: text
+    }, async (data: Omit<Label3DCreateRequest, 'facilityId'>) => {
+      const labelData: Label3DCreateRequest = {
+        ...data,
+        facilityId: stationData?.facility?.id || 0,
+      };
+
+      try {
+        const savedLabel = await label3dService.post(labelData);
+        console.log('라벨 서버 저장 완료:', savedLabel);
+      } catch (error) {
+        console.error('라벨 서버 저장 중 오류:', error);
+      }
+    });
+  }, [stationData?.facility?.id]);
+
+  // Engine integration with cleanup
   const { handleModelLoaded, handleFloorChange } = useEngineIntegration({
     features: stationData?.features || [],
     onPoiSelect: handlePoiSelect,
@@ -241,6 +300,11 @@ const ViewerPage = memo(() => {
     handleFloorChange(floorId);
   }, [handleFloorChange]);
 
+  // stationId가 없으면 렌더링하지 않음
+  if (stationId === null) {
+    return null;
+  }
+
   // Error boundary states
   if (error) {
     return <ErrorMessage message="역사 데이터를 불러오는데 실패했습니다." />;
@@ -251,9 +315,9 @@ const ViewerPage = memo(() => {
   }
 
   if (!stationData) {
-    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;  
-  }  
-  
+    return <ErrorMessage message="Station ID를 찾을 수 없습니다." />;
+  }
+
   return (
     <ErrorBoundary>
       <ViewerContent
@@ -266,6 +330,27 @@ const ViewerPage = memo(() => {
         selectedPoi={selectedPoi}
         isModalOpen={isModalOpen}
         onModalClose={handleModalClose}
+      />
+      
+      {/* 플로팅 버튼 - 3D 텍스트 추가 */}
+      <button
+        onClick={handleOpenTextLabelModal}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50 group"
+        title="3D 텍스트 추가"
+      >
+        <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,7.16 17.26,6.73C16.73,6.3 16.05,6.08 15.27,6.08H13.05V18.4C13.05,19.08 13.27,19.55 13.72,19.82C14.17,20.08 14.65,20.22 15.14,20.22V21H8.96V20.22C9.42,20.22 9.88,20.08 10.33,19.82C10.78,19.55 11,19.08 11,18.4V6.08H8.75C8,6.08 7.31,6.3 6.78,6.73C6.25,7.16 5.79,7.74 5.34,8.61L4.38,8.35L5.54,4H18.5Z"/>
+        </svg>
+        <span className="absolute right-full mr-3 px-2 py-1 bg-black text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          3D 텍스트 추가
+        </span>
+      </button>
+      
+      {/* 3D 텍스트 라벨 생성 모달 */}
+      <TextLabelModal
+        isOpen={isTextLabelModalOpen}
+        onClose={handleCloseTextLabelModal}
+        onCreateLabel={handleCreateTextLabel}
       />
       
       {/* Confirm Modal for POI deletion */}

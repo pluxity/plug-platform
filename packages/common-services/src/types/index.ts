@@ -4,6 +4,7 @@ export * from './role';
 export * from './user';
 export * from './asset';
 export * from './file';
+export * from './label3d';
 export * from './line';
 export * from './station';
 export * from './device';

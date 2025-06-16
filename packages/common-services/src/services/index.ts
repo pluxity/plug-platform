@@ -6,6 +6,7 @@ export * from './user_admin';
 export * from './file';
 export * from './asset';
 export * from './file';
+export * from './label3d';
 export * from './line';
 export * from './station';
 export * from './device';

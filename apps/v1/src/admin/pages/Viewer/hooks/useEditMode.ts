@@ -18,6 +18,7 @@ export function useEditMode(): UseEditModeResult {
   const exitEdit = useCallback(() => {
     setCurrentMode('none');
     Px.Poi.FinishEdit();
+    Px.Label3D.FinishEdit();
   }, []);
 
   const setTranslateMode = useCallback(() => {
@@ -26,6 +27,7 @@ export function useEditMode(): UseEditModeResult {
     } else {
       setCurrentMode('translate');
       Px.Poi.StartEdit('translate');
+      Px.Label3D.StartEdit('translate');
     }
   }, [currentMode, exitEdit]);
 
@@ -35,6 +37,7 @@ export function useEditMode(): UseEditModeResult {
     } else {
       setCurrentMode('rotate');
       Px.Poi.StartEdit('rotate');
+      Px.Label3D.StartEdit('rotate'); 
     }
   }, [currentMode, exitEdit]);
   const setScaleMode = useCallback(() => {
@@ -43,6 +46,7 @@ export function useEditMode(): UseEditModeResult {
     } else {
       setCurrentMode('scale');
       Px.Poi.StartEdit('scale');
+      Px.Label3D.StartEdit('scale');
     }
   }, [currentMode, exitEdit]);
 
