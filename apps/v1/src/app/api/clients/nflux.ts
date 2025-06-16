@@ -64,23 +64,38 @@ const createKyClient = (baseUrl: string, token?: string) => {
   });
 };
 
+
+const BASE_URL = 'http://192.168.4.84:8090/HI-SMP/poi';
+// const BASE_URL = 'http://101.254.21.120:10300/HI-SMP/poi';
+
 export const createNfluxApiClient = (customAuthToken?: string, stationId?: string) => {
-  // 토큰 우선순위: customAuthToken > authToken > LocalStorage의 accessToken
   const token = customAuthToken || authToken || getAccessTokenFromStorage();
   const baseUrl = stationId 
-     ? `http://101.254.21.120:10300/HI-SMP/poi/station/${stationId}`
-     : 'http://101.254.21.120:10300/HI-SMP/poi/station';
-    // ? `http://192.168.4.84:8090/HI-SMP/poi/station/${stationId}`
-    // : 'http://192.168.4.84:8090/HI-SMP/poi/station';
-  
-  // 캐시 키 생성 (baseUrl + token)
+    ? `${BASE_URL}/station/${stationId}`
+    : `${BASE_URL}/station`;
+
   const cacheKey = `${baseUrl}:${token || 'no-token'}`;
   
-  // 캐시에서 기존 클라이언트 확인
   if (clientCache.has(cacheKey)) {
     return clientCache.get(cacheKey)!;
   }
-    // 새 클라이언트 생성 및 캐시 저장
+  
+  const client = createKyClient(baseUrl, token || undefined);
+  clientCache.set(cacheKey, client);
+  
+  return client;
+}
+
+export const createNfluxWidgetApiClient = (customAuthToken?: string) => {
+  const token = customAuthToken || authToken || getAccessTokenFromStorage();
+  const baseUrl = `${BASE_URL}/widget`;
+
+  const cacheKey = `widget:${baseUrl}:${token || 'no-token'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey)!;
+  }
+  
   const client = createKyClient(baseUrl, token || undefined);
   clientCache.set(cacheKey, client);
   

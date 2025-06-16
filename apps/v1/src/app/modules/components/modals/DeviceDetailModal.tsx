@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal } from '@plug/ui';
-import { nfluxService } from '@plug/v1/app/api';
-import type { Light, Shutter, CCTV, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, IOStatus, Pump } from '@plug/v1/app/api/types/nflux';
+import { nfluxService, nfluxWidgetService } from '@plug/v1/app/api';
+import type { Light, Shutter, CCTV, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, IOStatus, Pump, LightGroup, ShutterGroup } from '@plug/v1/app/api/types/nflux';
 
-type DeviceData = Light | Shutter | CCTV | FireSensor | Elevator | Escalator | WaterTank | Catchpit | AirPurifier;
+type DeviceData = Light | Shutter | CCTV | FireSensor | Elevator | Escalator | WaterTank | Catchpit | AirPurifier | LightGroup | ShutterGroup;
 type StatusType = 'onoff' | 'operation' | 'shutter' | 'fire' | 'elevator' | 'vl_up' | 'vl_down' |  'escalator' | 'remoteLocal' | 'normalError' | 'waterLevel' | 'value';
 
 export interface DeviceDetailProps {
@@ -63,6 +63,8 @@ const getDeviceName = (device: DeviceData): string => {
   if ('waterTankName' in device) return device.waterTankName;
   if ('catchpitName' in device) return device.catchpitName;
   if ('airPurifierName' in device) return device.airPurifierName;
+  if ('lightGroupName' in device) return device.lightGroupName;
+  if ('shutterGroupName' in device) return device.shutterGroupName;
   return '알 수 없음';
 };
 
@@ -491,7 +493,8 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
       try {
         let data: DeviceData | null = null;
 
-        switch (deviceType.toLowerCase()) {          case 'light':
+        switch (deviceType.toLowerCase()) {          
+          case 'light':
           case 'lights': {
             const result = await nfluxService.getLights(stationId);
             data = result.find(item => item.lightId === deviceId) || null;
@@ -538,11 +541,22 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
             const result = await nfluxService.getCatchpits(stationId);
             data = result.find(item => item.catchpitId === deviceId) || null;
             break;
-          }
-          case 'airpurifier':
+          }          case 'airpurifier':
           case 'airpurifiers': {
             const result = await nfluxService.getAirPurifiers(stationId);
             data = result.find(item => item.airPurifierId === deviceId) || null;
+            break;
+          }
+          case 'lightgroup':
+          case 'lightgroups': {
+            const result = await nfluxWidgetService.getLightGroups(stationId);
+            data = result.find(item => item.lightGroupId === deviceId) || null;
+            break;
+          }
+          case 'shuttergroup':
+          case 'shuttergroups': {
+            const result = await nfluxWidgetService.getShutterGroups(stationId);
+            data = result.find(item => item.shutterGroupId === deviceId) || null;
             break;
           }
           default:
@@ -574,12 +588,23 @@ export const DeviceDetailModal = ({
   stationId,
   deviceId,
 }: DeviceDetailProps) => {
-  const { deviceData, loading, error } = useDeviceData(isOpen, deviceId, deviceType, stationId);
-  const getCctvList = (): CCTV[] => {
+  const { deviceData, loading, error } = useDeviceData(isOpen, deviceId, deviceType, stationId);  const getCctvList = (): CCTV[] => {
     if (!deviceData) return [];
     
     if ('cctvList' in deviceData && deviceData.cctvList) {
-      return deviceData.cctvList;
+      return deviceData.cctvList.map(cctv => {
+        if ('streamAddress' in cctv && 'cctvId' in cctv && 'cctvName' in cctv) {
+          return {
+            cctvId: cctv.cctvId,
+            cctvName: cctv.cctvName,
+            streamAddress: cctv.streamAddress,
+            fcltsType: 'cctv',
+            cctvAngle: '0',
+            location: { xValue: 0, yValue: 0 }
+          } as CCTV;
+        }
+        return cctv as CCTV;
+      });
     }
     
     return [];
@@ -609,10 +634,15 @@ export const DeviceDetailModal = ({
         return <WaterTankDetails device={deviceData as WaterTank} />;
       case 'catchpit':
       case 'catchpits':
-        return <CatchpitDetails device={deviceData as Catchpit} />;
-      case 'airpurifier':
+        return <CatchpitDetails device={deviceData as Catchpit} />;      case 'airpurifier':
       case 'airpurifiers':
         return <AirPurifierDetails device={deviceData as AirPurifier} />;
+      case 'lightgroup':
+      case 'lightgroups':
+        return <LightGroupDetails device={deviceData as LightGroup} />;
+      case 'shuttergroup':
+      case 'shuttergroups':
+        return <ShutterGroupDetails device={deviceData as ShutterGroup} />;
       case 'cctv':
       case 'cctvs':
         return <CctvStream cctv={deviceData as CCTV} />;
@@ -758,3 +788,94 @@ export const DeviceDetailModal = ({
     </Modal>
   );
 };
+
+const LightGroupDetails = ({ device }: { device: LightGroup }) => (
+  <div className="space-y-4">
+    <h4 className="text-primary-100 font-medium flex items-center gap-2">
+      <svg className="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+      조명 그룹 상태
+    </h4>
+    <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
+      <div className="grid gap-4">
+        <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
+          <div className="flex items-center gap-2 mb-2 text-yellow-300">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            그룹 제어 정보
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <StatusRow label="동작 상태" status={device.status} type="onoff" />
+            <StatusRow label="제어 위치" status={device.controlPosition} type="remoteLocal" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const ShutterGroupDetails = ({ device }: { device: ShutterGroup }) => (
+  <div className="space-y-4">
+    <h4 className="text-primary-100 font-medium flex items-center gap-2">
+      <svg className="w-5 h-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M19 9l-7 7-7-7M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      셔터 그룹 상태
+    </h4>
+    <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30 space-y-4">
+      <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
+        <div className="flex items-center gap-2 mb-2 text-orange-300">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          스케줄 설정
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="bg-primary-950/40 rounded-lg px-3 py-2">
+            <span className="text-primary-200 text-sm">자동개폐</span>
+            <div className="text-primary-100 font-medium">
+              {device.scheduleSetting === '1' ? '설정중' : '없음'}
+            </div>
+          </div>
+          {device.scheduleSetting === '1' && (
+            <div className="bg-primary-950/40 rounded-lg px-3 py-2">
+              <span className="text-primary-200 text-sm">예약시간</span>
+              <div className="text-primary-100 font-medium text-xs">
+                ON: {device.scheduleTime.on} / OFF: {device.scheduleTime.off}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {device.shutterList && device.shutterList.length > 0 && (
+        <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
+          <div className="flex items-center gap-2 mb-3 text-orange-300">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            그룹 내 셔터 목록 ({device.shutterList.length}개)
+          </div>
+          <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
+            {device.shutterList.map((shutter, index) => (
+              <div key={`${shutter.shutterId}-${index}`} 
+                   className="bg-primary-950/40 rounded-lg px-3 py-2 border border-primary-700/10">
+                <div className="flex justify-between items-center">
+                  <span className="text-primary-100 text-sm font-medium">{shutter.shutterName}</span>
+                  <StatusBadge status={shutter.status} type="shutter" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);

@@ -100,7 +100,7 @@ const SideMenu: React.FC = () => {
     if (assets.length > 0) {
       fetchCategory();
     }  }, [stationCode, setMenuItems, assets, setPendingPoiData]);  // activeMenu가 변경될 때마다 POI 텍스트 제어
-  useEffect(() => {
+    useEffect(() => {
     // 모든 POI 텍스트 숨기기
     Px.Poi.HideAllDisplayText();
     

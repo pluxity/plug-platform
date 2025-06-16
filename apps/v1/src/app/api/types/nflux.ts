@@ -79,12 +79,17 @@ export interface Light {
   orderingSequence: number;
 }
 
+export interface ScheduleTime {
+  on: string;
+  off: string;
+}
+
 export interface LightGroup {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   lightGroupId: string;
   lightGroupName: string;
-  fcltsType: string;
+  fcltsType: 'lightGroup';
   collectedTime: string;
   status: IOStatus;
   controlPosition: IOStatus;
@@ -102,24 +107,32 @@ export interface Shutter {
   location: Position;
 }
 
+export interface ShutterInGroup {
+  stationId: string;
+  stationName: string;
+  shutterId: string;
+  shutterName: string;
+  fcltsType: string;
+  status: IOStatus;
+}
+
+export interface CCTVInGroup {
+  cctvId: string;
+  cctvName: string;
+  streamAddress: string;
+}
+
 export interface ShutterGroup {
-  stationId?: string;
-  stationName?: string;
+  stationId: string;
+  stationName: string;
   shutterGroupId: string;
   shutterGroupName: string;
-  fcltsType: string;
+  fcltsType: 'shutterGroup';
   collectedTime: string;
-  scheduleSetting: '0' | '1';
-  scheduleTime: {
-    on: string;
-    off: string;
-  };
-  shutterList: {
-    shutterId: string;
-    shutterName: string;
-    status?: IOStatus;
-  }[];
-  cctvList: CCTV[];
+  scheduleSetting: string;
+  scheduleTime: ScheduleTime;
+  shutterList: ShutterInGroup[];
+  cctvList: CCTVInGroup[];
 }
 
 export interface FireSensor {
@@ -296,4 +309,10 @@ export interface AlarmQueryParams {
   dayFrom?: string;
   dayTo?: string;
   keyword?: string;
+}
+
+// Widget API 타입들
+export interface WidgetApiResponse<T> {
+  lightGroups?: T[];
+  shutterGroups?: T[];
 }
