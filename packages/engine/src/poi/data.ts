@@ -47,9 +47,9 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, async (evt: an
 
     // 업데이트가 필요한경우
     if (bNeedsUpdate) {
+        bNeedsUpdate = false;
         await updatePoiMesh();
         updatePoiLine();
-        bNeedsUpdate = false;
     }
 });
 
