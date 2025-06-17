@@ -1,3 +1,4 @@
+// import './label3dpointerevents';
 export * from './create';
-export { Hide, HideAll, Show, ShowAll, Clear, Export, Import } from './data';
-export * from './edit';
+export { Hide, HideAll, Show, ShowAll, Delete, Clear, Export, Import } from './data';
+export { StartEdit, FinishEdit } from './edit';

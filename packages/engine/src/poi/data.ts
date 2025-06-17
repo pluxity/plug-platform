@@ -39,7 +39,7 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 /**
  * Engine3D 렌더링 전 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => {
+Event.InternalHandler.addEventListener('onBeforeRender' as never, async (evt: any) => {
     const deltaTime = evt.deltaTime as number;
     // 애니메이션 믹서 업데이트
     const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined);
@@ -47,8 +47,8 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => 
 
     // 업데이트가 필요한경우
     if (bNeedsUpdate) {
+        await updatePoiMesh();
         updatePoiLine();
-        updatePoiMesh();
         bNeedsUpdate = false;
     }
 });
@@ -258,10 +258,41 @@ function updatePoiLine() {
     const linePoints: THREE.Vector3[] = [];
     Object.values(poiDataList).forEach(element => {
         if (element.Visible && element.LineVisible) {
-            const p0 = element.WorldPosition.clone();
-            const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
 
-            linePoints.push(p0, p1);
+            if (element.PointMeshData.animMeshRef !== undefined) {
+
+                // 애니메이션 메시가 있는 경우
+                const center = new THREE.Vector3();
+                const size = new THREE.Vector3();
+                const bounding = new THREE.Box3().setFromObject(element.PointMeshData.animMeshRef);
+                bounding.getSize(size);
+                bounding.getCenter(center);
+
+                const p0 = center.clone().addScaledVector(new THREE.Vector3(0, 1, 0), size.y * 0.5);
+                const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
+
+                linePoints.push(p0, p1);
+                
+                element.MeshBoundingHeight = p1.y - element.WorldPosition.y;
+
+            } else {
+
+                const bounding = element.PointMeshData.instanceMeshRef?.geometry.boundingBox?.clone();
+                const matrix = new THREE.Matrix4().compose(element.WorldPosition, new THREE.Quaternion().setFromEuler(element.Rotation), element.Scale);
+                bounding?.applyMatrix4(matrix);
+
+                const center = new THREE.Vector3();
+                const size = new THREE.Vector3();
+                bounding?.getCenter(center);
+                bounding?.getSize(size);
+
+                const p0 = center.clone().addScaledVector(new THREE.Vector3(0, 1, 0), size.y * 0.5);
+                const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
+
+                linePoints.push(p0, p1);
+
+                element.MeshBoundingHeight = p1.y - element.WorldPosition.y;;
+            }
         }
     });
 
@@ -353,6 +384,9 @@ async function updatePoiMesh() {
                     mergedMaterial = [].concat(data.material as any);
                 });
             }
+
+            mergedGeometry?.computeBoundingBox();
+            mergedGeometry?.computeBoundingSphere();
 
             // 인스턴스 메시 생성
             const mesh = new THREE.InstancedMesh(mergedGeometry, mergedMaterial, currPoiArray.length);

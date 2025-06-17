@@ -54,9 +54,9 @@ class Label3DElement extends THREE.Mesh {
             id: this.name,
             displayText: this.userData['displayText'],
             floorId: this.userData['floorId'],
-            localPosition: pos.ExportData,
-            localRotation: rot.ExportData,
-            localScale: scale.ExportData,
+            position: pos.ExportData,
+            rotation: rot.ExportData,
+            scale: scale.ExportData,
         };
     }
 }

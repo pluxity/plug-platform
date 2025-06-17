@@ -272,6 +272,14 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * 메시 바운딩 높이
+     */
+    set MeshBoundingHeight(value: number) {
+        this.iconObj!.position.copy(this.position.clone().addScaledVector(new THREE.Vector3(0, 1, 0), value));
+        this.textObj!.position.copy(this.position.clone().addScaledVector(new THREE.Vector3(0, 1, 0), value));
+    }
+
+    /**
      * poi 요소 제거 및 메모리 해제
      */
     dispose() {

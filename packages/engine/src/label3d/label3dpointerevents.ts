@@ -2,17 +2,17 @@ import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
-import * as Placer from './placer';
-import * as PoiEditor from './edit';
+import * as LabelCreator from './create';
+import * as LabelEditor from './edit';
+import * as LabelData from './data';
 import * as Util from '../util';
 import * as Effect from '../effect';
 import { Engine3D } from '../engine';
-import { PoiElement } from './element';
+import { Label3DElement } from './element';
 
 let engine: Engine3D;
 let hoverObjects: THREE.Object3D[] = [];
-// let hoverPoiList: PoiElement[] = [];
-let poiEventGroup: THREE.Group;
+let labelEventGroup: THREE.Group;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
@@ -21,10 +21,10 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
 
-    // poi 이벤트 처리에서 사용할 그룹 객체
-    poiEventGroup = new THREE.Group();
-    poiEventGroup.name = '#PoiEventGroup';
-    engine.RootScene.add(poiEventGroup);
+    // label3d 이벤트 처리에서 사용할 그룹 객체
+    labelEventGroup = new THREE.Group();
+    labelEventGroup.name = '#PoiEventGroup';
+    engine.RootScene.add(labelEventGroup);
 
     // 이벤트 등록
     engine.Dom.addEventListener('pointerdown', onPointerDown);
@@ -33,16 +33,16 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
- * Poi 생성 이벤트 처리
+ * 라벨 생성 시작 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onPoiCreate' as never, () => {
+Event.InternalHandler.addEventListener('onLabel3DCreateStarted' as never, () => {
     clearHoverObjects();
 });
 
 /**
- * Poi 편집 시작 이벤트 처리
+ * 라벨 편집 시작 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onPoiStartEdit' as never, () => {
+Event.InternalHandler.addEventListener('onLabel3DEditStarted' as never, () => {
     clearHoverObjects();
 });
 
@@ -50,18 +50,6 @@ Event.InternalHandler.addEventListener('onPoiStartEdit' as never, () => {
  * 호버링 객체 해제
  */
 function clearHoverObjects() {
-    // hoverPoiList.forEach(poi => {
-    //     poi.TextVisible = false;
-    // });
-    // hoverPoiList = [];
-
-    hoverObjects.forEach(item => {
-        if (item instanceof THREE.Mesh) {
-            poiEventGroup.remove(item);
-            item.geometry.dispose();
-            item.material.dispose();
-        }
-    });
     hoverObjects = [];
     Effect.Outline.setOutlineObjects(hoverObjects);
 }
@@ -72,7 +60,7 @@ function clearHoverObjects() {
  */
 function onPointerDown(evt: PointerEvent) {
 
-    if (Placer.Enabled || PoiEditor.Enabled)
+    if (LabelCreator.Enabled || LabelEditor.Enabled)
         return;
 
     if (evt.button === 0) {
@@ -87,7 +75,7 @@ function onPointerDown(evt: PointerEvent) {
  */
 function onPointerMove(evt: PointerEvent) {
 
-    if (Placer.Enabled || PoiEditor.Enabled)
+    if (LabelCreator.Enabled || LabelEditor.Enabled)
         return;
 
     const mousePos = new THREE.Vector2(
@@ -100,21 +88,14 @@ function onPointerMove(evt: PointerEvent) {
     rayCast.setFromCamera(mousePos, engine.Camera);
 
     clearHoverObjects();
-    const poi = Util.getPoiFromRaycast(rayCast);
-    if (poi) {
-        if (poi.PointMeshData.instanceMeshRef) {
-            const instanceCopyMesh = new THREE.Mesh(poi.PointMeshData.instanceMeshRef.geometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
-            instanceCopyMesh.position.copy(poi.WorldPosition);
-            instanceCopyMesh.rotation.copy(poi.Rotation);
-            instanceCopyMesh.scale.copy(poi.Scale);
-            poiEventGroup.attach(instanceCopyMesh);
-            hoverObjects.push(instanceCopyMesh);
-        }
-        else if (poi.PointMeshData.animMeshRef)
-            hoverObjects.push(poi.PointMeshData.animMeshRef);
-
+    const labels: Label3DElement[] = LabelData.getPickableObjects();
+    labels.forEach(label => Util.setObjectLayer(label, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable));
+    const intersects = rayCast.intersectObjects(labels, false);
+    if (intersects.length > 0) {
+        hoverObjects.push(intersects[0].object);
         Effect.Outline.setOutlineObjects(hoverObjects);
     }
+    labels.forEach(label => Util.setObjectLayer(label, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable));
 }
 
 /**
@@ -123,7 +104,7 @@ function onPointerMove(evt: PointerEvent) {
  */
 function onPointerUp(evt: PointerEvent) {
 
-    if (Placer.Enabled || PoiEditor.Enabled)
+    if (LabelCreator.Enabled || LabelEditor.Enabled)
         return;
 
     if (evt.button === 0) {
@@ -139,14 +120,17 @@ function onPointerUp(evt: PointerEvent) {
             rayCast.layers.set(Interfaces.CustomLayer.Pickable);
             rayCast.setFromCamera(mousePos, engine.Camera);
 
-            const poi = Util.getPoiFromRaycast(rayCast);
-            if (poi !== undefined) {
+            const labels: Label3DElement[] = LabelData.getPickableObjects();
+            const intersects = rayCast.intersectObjects(labels, false);
+            if (intersects.length > 0) {
+                const target: Label3DElement = intersects[0].object as Label3DElement;
+
                 // 이벤트 통지
                 Event.ExternalHandler.dispatchEvent({
-                    type: 'onPoiPointerUp',
-                    target: poi.ExportData,
+                    type: 'onLabel3DPointerUp',
+                    target: target.ExportData,
                     pointerEvent: evt,
-                    screenPos: Util.toScreenPos(poi.WorldPosition.clone()),
+                    screenPos: Util.toScreenPos(target.position.clone()),
                 });
             }
         }

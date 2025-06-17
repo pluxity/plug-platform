@@ -11,6 +11,7 @@ let onCompleteCallback: Function | undefined;
 // let label3DRenderGroup: THREE.Group;
 let currentPicktarget: THREE.Object3D | undefined;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
+let enabled: boolean = false;
 
 /**
  * Engine3D 초기화 이벤트 콜백
@@ -103,6 +104,8 @@ function onPointerUp(evt: PointerEvent) {
 
             // 이벤트 해제
             unregisterPointerEvents();
+
+            enabled = false;
         }
     }
 }
@@ -114,7 +117,7 @@ function onPointerUp(evt: PointerEvent) {
  */
 function Create(option: Interfaces.Label3DCreateOption, onComplete?: Function) {
     const size = new THREE.Vector2();
-    const material = Util.createTextMaterial(option.displayText, size, false);
+    const material = Util.createTextMaterial(option.displayText, size, false, 32);
     workingLabel = new Label3DElement(material, size);
     workingLabel.name = option.id;
     workingLabel.userData['displayText'] = option.displayText;
@@ -123,6 +126,13 @@ function Create(option: Interfaces.Label3DCreateOption, onComplete?: Function) {
     onCompleteCallback = onComplete;
 
     registerPointerEvents();
+
+    // 라벨생성 시작 이벤트 내부 통지
+    Event.InternalHandler.dispatchEvent({
+        type: 'onLabel3DCreateStarted',
+    });
+
+    enabled = true;
 }
 
 /**
@@ -135,9 +145,14 @@ function Cancel() {
     }
 
     unregisterPointerEvents();
+
+    enabled = false;
+
 }
 
 export {
+    enabled as Enabled,
+
     Create,
     Cancel,
 }

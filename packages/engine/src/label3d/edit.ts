@@ -16,6 +16,8 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 let gizmo: Addon.TransformControls;
 let editMode: Addon.TransformControlsMode = 'translate';
 
+let enabled: boolean = false;
+
 /**
  * Engine3D 초기화 이벤트 콜백
  */
@@ -112,6 +114,13 @@ function StartEdit(_editMode: string) {
     // 픽킹 대상 객체로 처리
     const labelArray = LabelDataInternal.getPickableObjects();
     labelArray.forEach(label => Util.setObjectLayer(label, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable));
+
+    // 라벨편집 시작 이벤트 내부 통지
+    Event.InternalHandler.dispatchEvent({
+        type: 'onLabel3DEditStarted',
+    });
+    enabled = true;
+
 }
 
 /**
@@ -127,9 +136,12 @@ function FinishEdit() {
         engine.RootScene.remove(helper);
         gizmo.dispose();
     }
+    enabled = false;
 }
 
 export {
+    enabled as Enabled,
+
     StartEdit,
     FinishEdit,
 }

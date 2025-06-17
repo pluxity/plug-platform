@@ -59,21 +59,21 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
 
         this.registerViewerEvents();
 
-        window.addEventListener('keydown', (evt) => {
-            if (evt.key === '1') {
-                Subway.DoEnter('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
-            }
-            if (evt.key === '2') {
-                Subway.DoExit('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
-            }
+        // window.addEventListener('keydown', (evt) => {
+        //     if (evt.key === '1') {
+        //         Subway.DoEnter('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
+        //     }
+        //     if (evt.key === '2') {
+        //         Subway.DoExit('1c233aed-f849-4797-b5e1-03a373cc51e6', 5.0, () => console.log('비동기 이동 테스트'));
+        //     }
 
-            if (evt.key === '3') {
-                Subway.DoEnter('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
-            }
-            if (evt.key === '4') {
-                Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
-            }
-        });
+        //     if (evt.key === '3') {
+        //         Subway.DoEnter('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
+        //     }
+        //     if (evt.key === '4') {
+        //         Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
+        //     }
+        // });
     }
 
     /**
@@ -234,6 +234,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.HideAll')}>HideAll</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.ShowAll')}>ShowAll</button><br/><br/>
 
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Delete')}>Delete</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Clear')}>Clear</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Export')}>Export</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Import')}>Import</button><br/><br/>
@@ -658,6 +659,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Label3D.ShowAll': {
                 Label3D.ShowAll();
             } break;
+            case 'Label3D.Delete': {
+                Label3D.Delete(this.state.label3DId);
+            } break;
             case 'Label3D.Clear': {
                 Label3D.Clear();
             } break;
@@ -851,11 +855,19 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     registerViewerEvents() {
         // poi 편집 이벤트 등록
         Event.AddEventListener('onPoiTransformChange' as never, (evt: any) => {
-            console.log(evt);
+            console.log('onPoiTransformChange', evt);
         });
         // poi 객체 포인터업 이벤트 등록
         Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {
-            console.log(evt);
+            console.log('onPoiPointerUp', evt);
+        });
+        // 라벨 3d 편집 이벤트 등록
+        Event.AddEventListener('onLabel3DTransformChange' as never, (evt: any) => {
+            console.log('onLabel3DTransformChange', evt);
+        });
+        // 라벨 3d 포인터업 이벤트 등록
+        Event.AddEventListener('onLabel3DPointerUp' as never, (evt: any) => {
+            console.log('onLabel3DPointerUp', evt);
         });
     }
 }
