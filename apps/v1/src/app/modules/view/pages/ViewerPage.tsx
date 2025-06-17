@@ -51,8 +51,7 @@ const ViewerPage = () => {
   const { handleModelLoaded: engineModelLoaded } = useEngineIntegration({
     features: [],
     onPoiSelect: handlePoiSelect,
-  });
-  const handleModelLoadedWithEngine = useCallback(() => {
+  });  const handleModelLoadedWithEngine = useCallback(() => {
     engineModelLoaded(); 
     if (pendingPoiData && pendingPoiData.length > 0) {
       Px.Poi.Import(JSON.stringify(pendingPoiData));
@@ -73,6 +72,27 @@ const ViewerPage = () => {
           usePoiStore.getState().clearPendingPoiData();
         }
       }, 2000);
+    }
+
+    // Import Label3Ds if available
+    if (stationData?.label3Ds && stationData.label3Ds.length > 0) {
+      try {
+        // Convert Label3Ds to the format expected by Label3D.Import
+        const label3DsForImport = stationData.label3Ds.map(label => ({
+          id: label.id,
+          displayText: label.displayText,
+          floorId: label.floorId,
+          localPosition: label.position,
+          localRotation: label.rotation,
+          localScale: label.scale
+        }));
+        
+        // Import the Label3Ds
+        Px.Label3D.Import(JSON.stringify(label3DsForImport));
+        console.log('Label3Ds imported successfully:', label3DsForImport.length);
+      } catch (error) {
+        console.error('Failed to import Label3Ds:', error);
+      }
     }
 
     if (stationData?.route) {
@@ -98,9 +118,7 @@ const ViewerPage = () => {
           });
         })
       ]);
-    };
-
-    loadTrainModels().then(() => {
+    };    loadTrainModels().then(() => {
       if (stationData?.subway) {
         Px.Subway.Import(JSON.parse(stationData?.subway));
         Px.Subway.HideAll();

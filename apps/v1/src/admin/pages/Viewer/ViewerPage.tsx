@@ -125,8 +125,7 @@ const ViewerContent = memo(({
           hierarchies={hierarchies}
           selectedFloor={selectedFloor}
           onFloorChange={onFloorChange}
-        />
-        <Suspense fallback={<LoadingSpinner />}>
+        />        <Suspense fallback={<LoadingSpinner />}>
           <MapViewer 
             modelPath={modelPath}
             onModelLoaded={onModelLoaded}
@@ -293,6 +292,32 @@ const ViewerPage = memo(() => {
     onFloorChange: handleFloorChangeUI,
     onPoiDeleteClick: editMode.currentMode === 'delete' ? handlePoiDelete : undefined
   });
+  // Custom model loaded handler to import Label3Ds after model loading
+  const handleCustomModelLoaded = useCallback(() => {
+    // First call the original handler from useEngineIntegration
+    handleModelLoaded();
+    
+    // Then import Label3Ds if available
+    if (stationData?.label3Ds && stationData.label3Ds.length > 0) {
+      try {
+        // Convert Label3Ds to the format expected by Label3D.Import
+        const label3DsForImport = stationData.label3Ds.map(label => ({
+          id: label.id,
+          displayText: label.displayText,
+          floorId: label.floorId,
+          localPosition: label.position,
+          localRotation: label.rotation,
+          localScale: label.scale
+        }));
+        
+        // Import the Label3Ds
+        Label3D.Import(JSON.stringify(label3DsForImport));
+        console.log('Label3Ds imported successfully:', label3DsForImport.length);
+      } catch (error) {
+        console.error('Failed to import Label3Ds:', error);
+      }
+    }
+  }, [handleModelLoaded, stationData?.label3Ds]);
 
   // Combined floor change handler for UI interactions
   const handleFloorSelect = useCallback((floorId: string) => {
@@ -325,7 +350,7 @@ const ViewerPage = memo(() => {
         hierarchies={hierarchies}
         selectedFloor={selectedFloor}
         onFloorChange={handleFloorSelect}
-        onModelLoaded={handleModelLoaded}
+        onModelLoaded={handleCustomModelLoaded}
         editMode={editMode}
         selectedPoi={selectedPoi}
         isModalOpen={isModalOpen}

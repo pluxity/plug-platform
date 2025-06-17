@@ -29,6 +29,15 @@ export interface FeatureResponse {
   scale: Vector3;
 }
 
+export interface Label3D {
+  id: string;
+  floorId: string;
+  displayText: string;
+  position: Vector3;
+  rotation: Vector3;
+  scale: Vector3;
+}
+
 export interface Floor {
   name: string;
   groupId: string;
@@ -37,7 +46,9 @@ export interface Floor {
 export interface StationWithFeatures {
   facility: Facility;
   features: FeatureResponse[];
+  label3Ds: Label3D[];
   floors: Floor[];
-  lineId: number;
+  lineIds: number[];
   route: string;
+  subway: string;
 }
