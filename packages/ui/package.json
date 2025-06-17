@@ -6,8 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./types": "./src/index.type.ts",
-    "./icons": "./src/index.icons.ts"
+    "./types": "./src/index.type.ts"
   },
   "scripts": {
     "lint": "eslint .",

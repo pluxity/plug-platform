@@ -16,7 +16,6 @@ import {
   Sidebar,
 } from "@plug/ui";
 import type { ButtonProps } from "@plug/ui";
-import { MenuIcon, NoticeIcon, HomeIcon } from "@plug/ui/icons";
 
 
 // 제품 데이터 샘플
