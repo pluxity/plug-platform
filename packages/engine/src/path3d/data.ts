@@ -116,11 +116,15 @@ function Export(): Interfaces.Path3DData[] {
  * 경로 데이터 임포트
  * @param data - 경로 데이터
  */
-function Import(data: string | Interfaces.Path3DData[]) {
+function Import(data: string | Interfaces.Path3DData | Interfaces.Path3DData[]) {
     Clear();
 
     if (typeof (data) === 'string') {
         data = JSON.stringify(data);
+    }
+
+    if (Array.isArray(data) === false) {
+        data = [data as Interfaces.Path3DData];
     }
 
     (data as Interfaces.Path3DData[]).forEach(item => {

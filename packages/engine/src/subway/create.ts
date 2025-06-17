@@ -240,7 +240,7 @@ function Create(option: Interfaces.SubwayCreateOption, onCreate?: Function) {
         return;
     }
 
-    if (!headModelSrc || !bodyModelSrc) {
+    if (!headModelSrc || !bodyModelSrc || !tailModelSrc) {
         console.error('지하철 모델이 로드되지 않음');
         return;
     }

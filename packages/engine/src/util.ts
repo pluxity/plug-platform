@@ -233,7 +233,7 @@ function collectPickableObjects() {
  * 포인터 레이캐스트로부터 poi얻기
  * @param rayCast - 레이캐스트
  */
-function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
+function getPoiFromRaycast(rayCast: THREE.Raycaster): { [key: string]: any } | undefined {
 
     const pickObjects = collectPickableObjects();
 
@@ -260,7 +260,10 @@ function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
                 return false;
             });
 
-            return matchTarget[0];
+            return {
+                poi: matchTarget[0],
+                distance: combinedIntersects[0].distance,
+            };
 
         } else {
             // 애니메이션 메시일 경우 메시의 자식 객체가 픽킹 되는 경우가 있으므로
@@ -277,7 +280,10 @@ function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
             });
 
             // 이벤트 통지
-            return matchTarget[0];
+            return {
+                poi: matchTarget[0],
+                distance: combinedIntersects[0].distance,
+            };
         }
     }
 

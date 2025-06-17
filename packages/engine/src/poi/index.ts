@@ -1,5 +1,4 @@
 import './placer';
-import './poipointerevents';
 export {
     Clear,
     Delete,
