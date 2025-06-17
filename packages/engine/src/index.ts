@@ -25,3 +25,5 @@ export const Event = {
         EventInternal.ExternalHandler.removeEventListener(type as never, callback as never);
     }
 };
+
+import './objectselector';
