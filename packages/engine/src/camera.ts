@@ -511,7 +511,7 @@ function SetState(state: Record<string, any>, transitionTime: number) {
  * @param id - poi id
  * @param transitionTime - 이동시간
  */
-function MoveToPoi(id: string, transitionTime: number) {
+function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset: number = 5.0) {
 
     // poi데이터
     const poiElement = PoiDataInternal.getPoiElement(id);
@@ -569,7 +569,7 @@ function MoveToPoi(id: string, transitionTime: number) {
     poiDir.applyEuler(poiElement.Rotation);
 
     // 카메라 이동대상 위치점
-    const camPos = center.clone().addScaledVector(poiDir, radius);
+    const camPos = center.clone().addScaledVector(poiDir, radius + additionalDistanceOffset);
 
     // 이전 트윈 중지
     if (posTween instanceof TWEEN.Tween) {
