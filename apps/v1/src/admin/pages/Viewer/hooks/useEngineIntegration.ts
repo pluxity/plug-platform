@@ -37,9 +37,9 @@ export function useEngineIntegration({
     onLabel3DTransformChange: async (label3D: Label3DImportOption) => {
       try {
         await updateTransform(label3D.id, {
-          position: label3D.localPosition,
-          rotation: label3D.localRotation,
-          scale: label3D.localScale
+          position: label3D.position,
+          rotation: label3D.rotation,
+          scale: label3D.scale
         });
       } catch (error) {
         console.error('Failed to update Label3D transform:', error);

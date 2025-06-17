@@ -82,9 +82,9 @@ const ViewerPage = () => {
           id: label.id,
           displayText: label.displayText,
           floorId: label.floorId,
-          localPosition: label.position,
-          localRotation: label.rotation,
-          localScale: label.scale
+          position: label.position,
+          rotation: label.rotation,
+          scale: label.scale
         }));
         
         // Import the Label3Ds
