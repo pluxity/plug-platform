@@ -191,7 +191,8 @@ export const CctvStream = ({ cctv, className }: { cctv: CCTV; className?: string
     <div className="p-3">
       <div className="aspect-video bg-gray-900 rounded border border-gray-700/50">
         <iframe 
-          src={`http://192.168.4.29:8888/${cctv.cctvId.replace(/[()]/g, '_')}`} 
+          // src={`http://192.168.4.29:8888/${cctv.cctvId.replace(/[()]/g, '_')}`} 
+          src={`http://101.254.21.120:10300/3d-map/cctv/${cctv.cctvId.replace(/[()]/g, '_')}`} 
           className="w-full h-full rounded"
           title={`CCTV ${cctv.cctvName}`}
           allowFullScreen
