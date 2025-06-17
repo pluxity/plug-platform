@@ -24,4 +24,4 @@ export {
     StopAnimation
 } from './data';
 export * from './create';
-export { StartEdit, FinishEdit } from './edit';``
+export { StartEdit, FinishEdit } from './edit';

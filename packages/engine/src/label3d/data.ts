@@ -64,6 +64,18 @@ function ShowAll() {
 }
 
 /**
+ * id로 라벨 제거
+ * @param id - 제거할 라벨 id값
+ */
+function Delete(id: string) {
+    if (labels.hasOwnProperty(id)) {
+        const label = labels[id];
+        label.dispose();
+        delete labels[id];
+    }
+}
+
+/**
  * 데이터 비우기
  */
 function Clear() {
@@ -110,16 +122,16 @@ function Import(data: Interfaces.Label3DImportOption | Interfaces.Label3DImportO
         }
 
         const size = new THREE.Vector2();
-        const material = Util.createTextMaterial(item.displayText, size, false);
+        const material = Util.createTextMaterial(item.displayText, size, false, 32);
         const label = new Label3DElement(material, size);
         label.name = item.id;
         label.userData['displayText'] = item.displayText;
         label.userData['floorId'] = item.floorId;
         floorObj.add(label);
 
-        label.position.set(item.localPosition.x, item.localPosition.y, item.localPosition.z);
-        label.rotation.set(item.localRotation.x, item.localRotation.y, item.localRotation.z);
-        label.scale.set(item.localScale.x, item.localScale.y, item.localScale.z);
+        label.position.set(item.position.x, item.position.y, item.position.z);
+        label.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
+        label.scale.set(item.scale.x, item.scale.y, item.scale.z);
 
         labels[label.name] = label;
 
@@ -135,6 +147,7 @@ export {
     HideAll,
     ShowAll,
 
+    Delete,
     Clear,
     Export,
     Import,

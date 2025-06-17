@@ -213,9 +213,9 @@ interface Label3DImportOption {
     id: string;
     displayText: string;
     floorId: string;
-    localPosition: Vector3;
-    localRotation: Vector3;
-    localScale: Vector3;
+    position: Vector3;
+    rotation: Vector3;
+    scale: Vector3;
 }
 
 export {

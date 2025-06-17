@@ -65,7 +65,7 @@ function materialToBillboard(target: THREE.Material) {
  * @param text - 텍스트
  * @param outSize - 생성된 텍스쳐 크기
  */
-function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: boolean = true): THREE.MeshBasicMaterial {
+function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: boolean = true, fontSize: number = 14): THREE.MeshBasicMaterial {
 
     // 텍스트 스타일
     const textStyle = new PIXI.TextStyle({
@@ -76,7 +76,7 @@ function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: 
             cap: 'round',
         },
         fontFamily: 'Arial',
-        fontSize: 14,
+        fontSize: fontSize,
         fill: 0xffffff,
         align: 'center',
     });

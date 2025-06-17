@@ -515,21 +515,70 @@ function MoveToPoi(id: string, transitionTime: number) {
 
     // poi데이터
     const poiElement = PoiDataInternal.getPoiElement(id);
+    if(!poiElement){
+        console.error('poi를 찾을 수 없음:', id);
+        return;
+    }
 
-    // 거리값
-    const radius = poiElement.LineHeight * 2.0;
+    // 바운딩 계산
+    let center = new THREE.Vector3();
+    let radius = 1.0;
+    if (poiElement.PointMeshData.animMeshRef !== undefined) {
+        const bounding = new THREE.Box3().setFromObject(poiElement.PointMeshData.animMeshRef);
+        const boundCenter = new THREE.Vector3();
+        const boundSize = new THREE.Vector3();
+        bounding.getCenter(boundCenter);
+        bounding.getSize(boundSize);
+
+        const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
+        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
+
+        bounding.expandByPoint(p);
+        const sphere = new THREE.Sphere();
+        bounding.getBoundingSphere(sphere);
+
+        center = sphere.center.clone();
+        radius = sphere.radius * 2.0;
+    } else {
+        const bounding = poiElement.PointMeshData.instanceMeshRef?.geometry.boundingBox?.clone();
+        const matrix = new THREE.Matrix4().compose(poiElement.WorldPosition, new THREE.Quaternion().setFromEuler(poiElement.Rotation), poiElement.Scale);
+        bounding?.applyMatrix4(matrix);
+        
+        const boundCenter = new THREE.Vector3();
+        const boundSize = new THREE.Vector3();
+        bounding?.getCenter(boundCenter);
+        bounding?.getSize(boundSize);
+        
+        const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
+        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
+
+        bounding?.expandByPoint(p);
+        const sphere = new THREE.Sphere();
+        bounding?.getBoundingSphere(sphere);
+
+        center = sphere.center.clone();
+        radius = sphere.radius * 2.0;
+    }
 
     // 카메라 방향
-    const direction = new THREE.Vector3();
-    engine.Camera.getWorldDirection(direction);
+    const cameraDir = new THREE.Vector3();
+    engine.Camera.getWorldDirection(cameraDir);
+
+    // poi 방향
+    const poiDir = new THREE.Vector3(0, 1, 1).normalize();
+    poiDir.applyEuler(poiElement.Rotation);
 
     // 카메라 이동대상 위치점
-    const camPos = poiElement.WorldPosition.clone().addScaledVector(direction, -radius);
+    const camPos = center.clone().addScaledVector(poiDir, radius);
 
     // 이전 트윈 중지
     if (posTween instanceof TWEEN.Tween) {
         posTween.stop();
         engine.TweenUpdateGroups.remove(posTween);
+    }    
+    if (rotTween instanceof TWEEN.Tween) {
+        rotTween.stop();
+        engine.TweenUpdateGroups.remove(rotTween);
     }
 
     // 트윈 생성
@@ -542,8 +591,24 @@ function MoveToPoi(id: string, transitionTime: number) {
         .easing(TWEEN.Easing.Quartic.InOut)
         .start();
 
+    // 보는 위치
+    const lookAtPos = engine.Camera.position.clone().addScaledVector(cameraDir, 1.0);
+    rotTween = new TWEEN.Tween(lookAtPos)
+        .to({
+            x: center.x,
+            y: center.y,
+            z: center.z,
+        }, transitionTime * 1000)
+        .easing(TWEEN.Easing.Quartic.Out)
+        .onUpdate(() => {
+            // 카메라 바라보는 위치 업데이트
+            engine.Camera.lookAt(lookAtPos);
+        })
+        .start();
+
     // 트윈 업데이트 그룹에 추가
     engine.TweenUpdateGroups.add(posTween);
+    engine.TweenUpdateGroups.add(rotTween);
 }
 
 /**
