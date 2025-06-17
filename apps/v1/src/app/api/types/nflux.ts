@@ -89,7 +89,7 @@ export interface LightGroup {
   stationName: string;
   lightGroupId: string;
   lightGroupName: string;
-  fcltsType: 'lightGroup';
+  fcltsType: string;
   collectedTime: string;
   status: IOStatus;
   controlPosition: IOStatus;
@@ -127,7 +127,7 @@ export interface ShutterGroup {
   stationName: string;
   shutterGroupId: string;
   shutterGroupName: string;
-  fcltsType: 'shutterGroup';
+  fcltsType: string;
   collectedTime: string;
   scheduleSetting: string;
   scheduleTime: ScheduleTime;
@@ -311,8 +311,14 @@ export interface AlarmQueryParams {
   keyword?: string;
 }
 
-// Widget API 타입들
-export interface WidgetApiResponse<T> {
-  lightGroups?: T[];
-  shutterGroups?: T[];
+// 환기설비 개별 조회
+export interface VentilationMachine {
+  fcltsId: string;
+  name: string;
+  remote: string;
+  forward: string;
+  auto: string;
+  active: string;
+  error: string;
+  collectedTime: string;
 }

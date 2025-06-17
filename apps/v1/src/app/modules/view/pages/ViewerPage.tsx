@@ -25,7 +25,7 @@ const ViewerPage = () => {
   const { setExternalCode, setStationCode } = useStationStore();
   const { fetchAssets } = useAssetStore();
   const { openMenuByDeviceId } = useSideMenuStore();
-  const { openModal, closeModal, isOpen, deviceId, deviceType, stationId } = useDeviceModalStore();
+  const { openModal, closeModal, isOpen, title, deviceId, deviceType, stationId } = useDeviceModalStore();
   const { pendingPoiData, clearPendingPoiData } = usePoiStore();
 
   const { stationData, stationLoading, error } = useStationData(parsedCode);
@@ -39,11 +39,12 @@ const ViewerPage = () => {
 
   const handlePoiSelect = useCallback((poi: PoiImportOption) => {
     const deviceId = poi.property?.deviceId;
+    const displayText = poi.displayText || '장치 정보';
     const deviceType = poi.property?.deviceType || 'shutter';
     
     if (deviceId && stationData?.externalCode) {
       openMenuByDeviceId(deviceId);
-      openModal(deviceId, deviceType, stationData.externalCode);
+      openModal(displayText, deviceId, deviceType, stationData.externalCode);
     }
   }, [openMenuByDeviceId, openModal, stationData?.externalCode]);
 
@@ -221,6 +222,7 @@ const ViewerPage = () => {
       <DeviceDetailModal
         isOpen={isOpen}
         onClose={closeModal}
+        title={title}
         stationId={stationId}
         deviceId={deviceId}
         deviceType={deviceType}

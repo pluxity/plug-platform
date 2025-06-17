@@ -86,7 +86,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
               <li
                 key={device.id}
                 className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"                onClick={() => {
-                  openModal(device.id, categoryType, String(externalCode));
+                  openModal(device.name, device.id, categoryType, String(externalCode));
                   handleDeviceClick(device);
                 }}
               >
