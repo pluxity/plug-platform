@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
+@import "./SUIT.css";
+@import "./typography.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -36,6 +38,8 @@
     --color-destructive-800: #b00606;
     --color-destructive-900: #8a0404;
     --color-destructive-foreground: #ffffff;
+
+    --size-title: 15px
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -85,6 +89,7 @@
 }
 
 :root {
+    --font-suit: 'SUIT', sans-serif;
     --radius: 0.625rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.141 0.005 285.823);

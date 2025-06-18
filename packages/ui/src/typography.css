@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .text-title {
+        @apply text-[24px] leading-[30px] font-bold tracking-[-0.02em];
+    }
+
+    .text-subtitle {
+        @apply text-[18px] leading-[30px] font-bold tracking-[-0.02em];
+    }
+
+    .text-content {
+        @apply text-[14px] leading-[17px] font-normal tracking-[-0.02em];
+    }
+
+    .text-info {
+        @apply text-[12px] leading-[15px] font-normal tracking-[-0.02em];
+    }
+
+    .text-muted {
+        @apply text-[11px] leading-[14px] font-normal tracking-[-0.02em];
+    }
+
+    .text-blockquote {
+        @apply border-l-2 pl-6 italic;
+    }
+
+    .text-inline-code {
+        @apply bg-muted rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+    }
+}
