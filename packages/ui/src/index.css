@@ -46,9 +46,11 @@
     --color-custom-text-light-gray: #B6B7B2;
 
     /* 배경 색상 */
+    --color-content: #F1F3F5;
     --color-blue-gray: #313843;
     --color-light-gray: #6B7482;
     --color-gray-point: #9CA8BA;
+    --color-gray-point-light: #E1E6EE;
     --color-light-blue-1: #EEF5FF;
     --color-light-blue-2: #C7DDFD;
     --color-light-gray-2: #EFEFEF;
