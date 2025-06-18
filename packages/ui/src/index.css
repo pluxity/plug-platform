@@ -14,7 +14,7 @@
     --color-primary-800: #1e40af;
     --color-primary-900: #1e3a8a;
     --color-primary-foreground: #ffffff;
-
+    
     --color-secondary-100: #e0f2f1;
     --color-secondary-200: #b2dfdb;
     --color-secondary-300: #80cbc4;
@@ -36,6 +36,28 @@
     --color-destructive-800: #b00606;
     --color-destructive-900: #8a0404;
     --color-destructive-foreground: #ffffff;
+
+    /*----- 디자인 시스템 -----*/
+
+    /* 기본 텍스트 컬러 */
+    --color-black: #313843;
+    --color-custom-text-gray: #6B7482;
+    --color-custom-text-light-gray: #B6B7B2; 
+
+    /* 배경 색상 */
+    --color-blue-gray: #313843;    
+    --color-light-gray: #6B7482;   
+    --color-gray-point: #9CA8BA;   
+    --color-light-blue-1: #EEF5FF;  
+    --color-light-blue-2: #C7DDFD;  
+    --color-light-gray-2: #EFEFEF; 
+
+    /* 포인트 컬러 */
+    --color-point-blue: #0066FF;     
+    --color-point-blue-dark: #0054D1; 
+    --color-point-blue-disable: #93A9CA; 
+    --color-point-error: #CF0000;   
+
 }
 
 .scrollbar-thin::-webkit-scrollbar {
