@@ -54,6 +54,7 @@ export const VariantComparison: Story = {
             <Button variant="outline">Outline</Button>
             <Button variant="destructive">Destructive</Button>
             <Button variant="ghost">Ghost</Button>
+            <Button variant="link">Link</Button>
         </div>
     )
 }
@@ -76,6 +77,18 @@ export const WithIcon: Story = {
                     아이콘 
                 <PlusIcon />
             </Button>
+            <Button variant="link">
+                <PlusIcon />
+                    링크
+                <PlusIcon />
+            </Button>
+            <div className="bg-[#6B7482] rounded-sm">
+                <Button variant="link" onBackground>
+                    <PlusIcon />
+                        배경위 링크
+                    <PlusIcon />
+                </Button>
+            </div>
         </div>
     )
 }

@@ -21,7 +21,7 @@ const buttonVariants = cva(
           "bg-muted-light-blue1 border border-point-blue text-point-blue hover:bg-muted-light-blue2 disabled:border-gray2 disabled:bg-point-blue-disable",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-primary underline-offset-4 hover:text-point-blue underline active:text-black disabled:text-gray2",
       },
       size: {
         default: "h-9 min-w-25 has-[>svg]:px-3 text-[14px]",
@@ -29,10 +29,15 @@ const buttonVariants = cva(
         lg: "h-12 min-w-38 has-[>svg]:px-4 text-[20px]",
         icon: "size-4",
       },
+      onBackground: {
+        true: "text-gray2 hover:text-muted-light-blue1 active:text-gray2 disabled:text-light-gray",
+        false: "",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      onBackground: false,
     },
   }
 )
@@ -42,6 +47,7 @@ function Button({
   variant,
   size,
   asChild = false,
+  onBackground,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -52,7 +58,7 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, onBackground, className }))}
       {...props}
     />
   )
