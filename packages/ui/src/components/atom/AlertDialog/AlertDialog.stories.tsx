@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import {
     AlertDialog,
+    AlertDialogCancel,
     AlertDialogAction,
     AlertDialogContent,
     AlertDialogDescription,
@@ -35,6 +36,7 @@ export const Default: Story = {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -56,7 +58,8 @@ export const WithTitle: Story = {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction>확인</AlertDialogAction>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction>확인</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
