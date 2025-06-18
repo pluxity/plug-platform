@@ -31,11 +31,11 @@ export const Side: StoryObj = {
     <div className="flex justify-center items-center h-40">
       <Tooltip>
         <TooltipTrigger asChild>
-          <div>호버해보세요</div>
+          <div className='text-title'>호버해보세요</div>
         </TooltipTrigger>
         <TooltipContent side="left" color='destructive'>왼쪽에 뜨는 툴팁</TooltipContent>
         <TooltipContent side="right" color="custom" bgColor="#c5dfff" textColor="#000" borderColor="#5d8ec9">오른쪽에 뜨는 툴팁</TooltipContent>
-        <TooltipContent side="bottom" color="custom" bgColor="var(--chart-1)" textColor="#fff">아래쪽에 뜨는 툴팁</TooltipContent>
+        <TooltipContent side="bottom" color="custom" bgColor="#c5dfff" textColor="#333">아래쪽에 뜨는 툴팁</TooltipContent>
       </Tooltip>
     </div>
   )
