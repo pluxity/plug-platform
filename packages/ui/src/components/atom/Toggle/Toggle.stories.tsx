@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Toggle } from "./Toggle";
-import { Bold, Underline } from "lucide-react";
+import { Bold, Italic, Underline } from "lucide-react";
 
 const meta: Meta = {
-  title: "Design System/Toggle",
+  title: "ATOM/Toggle",
   component: Toggle,
   tags: ["autodocs"],
   argTypes: {
@@ -46,3 +46,32 @@ export const TextToggle: StoryObj = {
   )
 }
 
+export const DisabledToggle: StoryObj = {
+  args: {
+    children: <Italic />,
+    disabled: true,
+    "aria-label": "Italic",
+  },
+};
+
+export const InvalidToggle: StoryObj = {
+  args: {
+    children: "Error",
+    "aria-invalid": true,
+    variant: "outline",
+  },
+};
+
+export const CustomStyledToggle: StoryObj = {
+  render: () => (
+    <Toggle
+      isCustom
+      bgColor="#f2f2f2"
+      activeBgColor="#333"
+      textColor="#000"
+      iconColor="#ff6600"
+    >
+      🎨 커스텀
+    </Toggle>
+  ),
+};

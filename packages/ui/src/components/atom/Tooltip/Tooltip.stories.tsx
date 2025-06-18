@@ -6,7 +6,7 @@ import {
 } from "./Tooltip";
 
 const meta: Meta = {
-  title: "Design System/Tooltip",
+  title: "ATOM/Tooltip",
   component: Tooltip,
   tags: ["autodocs"],
 };
