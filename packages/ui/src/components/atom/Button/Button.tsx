@@ -27,7 +27,7 @@ const buttonVariants = cva(
         default: "h-9 min-w-25 has-[>svg]:px-3 text-[14px]",
         sm: "h-6 min-w-12 has-[>svg]:px-2 text-[12px]",
         lg: "h-12 min-w-38 has-[>svg]:px-4 text-[20px]",
-        icon: "size-4",
+        icon: "w-[var(--cell-size)] h-[var(--cell-size)] p-0",
       },
       onBackground: {
         true: "text-gray2 hover:text-muted-light-blue1 active:text-gray2 disabled:text-light-gray",
