@@ -4,7 +4,7 @@ import { useState } from "react"
 import type { DateRange } from "react-day-picker"
 
 const meta: Meta<typeof Calendar> = {
-    title: 'Design System/Calendar',
+    title: 'ATOM/Calendar',
     component: Calendar,
     parameters: {
         layout: 'centered',

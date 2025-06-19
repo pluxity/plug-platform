@@ -12,7 +12,7 @@ import {
 } from "./Chart"
 
 const meta: Meta<typeof ChartContainer> = {
-    title: 'Design System/ChartContainer',
+    title: 'ATOM/ChartContainer',
     component: ChartContainer,
     parameters: {
         layout: 'centered',

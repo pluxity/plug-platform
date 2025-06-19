@@ -13,7 +13,7 @@ import { Button } from "../Button/Button";
 import { AspectRatio } from "../AspectRatio/AspectRatio";
 
 const meta: Meta<typeof Card> = {
-    title: 'Design System/Card',
+    title: 'ATOM/Card',
     component: Card,
     parameters: {
         layout: 'centered',

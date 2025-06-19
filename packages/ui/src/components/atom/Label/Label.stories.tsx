@@ -3,7 +3,7 @@ import { Label} from "./Label"
 import { Checkbox } from "../Checkbox/Checkbox"
 
 const meta: Meta<typeof Label> = {
-    title: 'Design System/Label',
+    title: 'ATOM/Label',
     component: Label,
     parameters: {
         layout: 'centered',
