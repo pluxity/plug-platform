@@ -19,15 +19,27 @@ const meta: Meta<typeof Carousel> = {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs'],    
+    tags: ['autodocs'],   
+    argTypes: {
+        orientation: {
+            options: ['horizontal', 'vertical'],
+            control: { type: 'radio' },
+        },
+        opts: {
+            control: { type: 'object' },
+        },
+        plugins: {
+            control: { type: 'object' },
+        },
+    } 
 }
 
 export default meta
 type Story = StoryObj<typeof Carousel>
 
 export const Default: Story = {
-    render: () => (
-        <Carousel className="w-full max-w-xs">
+    render: (args) => (
+        <Carousel {...args} className="w-full max-w-xs">
             <CarouselContent>
             {Array.from({ length: 5 }).map((_, index) => (
                 <CarouselItem key={index}>
