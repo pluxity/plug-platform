@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 
 const meta: Meta<typeof Alert> = {
-  title: 'atom/Alert',
+  title: 'Design System/Alert',
   component: Alert,
   parameters: {
     layout: 'centered',
