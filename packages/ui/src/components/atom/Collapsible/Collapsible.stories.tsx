@@ -5,7 +5,7 @@ import { ChevronsUpDown } from "lucide-react";
 import React from "react";
 
 const meta: Meta<typeof Collapsible> = {
-    title: 'Design System/Collapsible',
+    title: 'ATOM/Collapsible',
     component: Collapsible,
     parameters: {
         layout: 'centered',
