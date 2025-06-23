@@ -40,6 +40,7 @@ function AvatarImage({
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn("aspect-square size-full bg-muted-blue-gray", className)}
+      src={src}
       {...props}
     />
   )
