@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
-import { Button } from "../Button/Button"
+import { Button } from "../../atom/Button/Button"
 import {
   Command,
   CommandEmpty,
@@ -9,12 +9,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../Command/Command"
+} from "../../atom/Command/Command"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../Popover/Popover"
+} from "../../atom/Popover/Popover"
 import { cn } from "../../../utils/utils"
 
 const meta: Meta<typeof Command> = {
