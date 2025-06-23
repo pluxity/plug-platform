@@ -3,45 +3,24 @@ import { cn } from "../../../utils/utils";
 
 interface TableBaseProps {
   unstyled?: boolean;
-  variant?: "default" | "custom";
 }
 
-const tableVariants = {
-  default: "w-full caption-bottom text-sm",
-  custom: "w-full caption-bottom text-sm",
-};
-
-const headerVariants = {
-  default: "[&_tr]:border-b",
-  custom: "bg-content",
-};
-
-const rowVariants = {
-  default: "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-  custom: "flex justify-between items-center",
-};
-
-const headVariants = {
-  default: "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap",
-  custom: "h-9 text-gray-500 font-medium text-center justify-start flex flex-1 justify-center items-center border border-gray-point-light",
-};
-
-const cellVariants = {
-  default: "p-2 align-middle whitespace-nowrap",
-  custom: "h-9 text-zinc-700 text-sm font-medium text-center justify-start border border-gray-point-light flex flex-1 items-center justify-center",
-};
+const tableStyles = "w-full caption-bottom text-sm";
+const headerStyles = "bg-content";
+const rowStyles = "flex justify-between items-center";
+const headStyles = "h-9 text-gray-500 font-medium text-center justify-start flex flex-1 justify-center items-center border border-gray-point-light";
+const cellStyles = "h-9 text-zinc-700 text-sm font-medium text-center justify-start border border-gray-point-light flex flex-1 items-center justify-center";
 
 function Table({
-                 className,
-                 unstyled,
-                 variant = "default",
-                 ...props
-               }: React.ComponentProps<"table"> & TableBaseProps) {
+  className,
+  unstyled,
+  ...props
+}: React.ComponentProps<"table"> & TableBaseProps) {
   return (
     <div data-slot="table-container" className="relative w-full overflow-x-auto">
       <table
         data-slot="table"
-        className={cn(!unstyled && tableVariants[variant], className)}
+        className={cn(!unstyled && tableStyles, className)}
         {...props}
       />
     </div>
@@ -49,25 +28,24 @@ function Table({
 }
 
 function TableHeader({
-                       className,
-                       unstyled,
-                       variant = "default",
-                       ...props
-                     }: React.ComponentProps<"thead"> & TableBaseProps) {
+  className,
+  unstyled,
+  ...props
+}: React.ComponentProps<"thead"> & TableBaseProps) {
   return (
     <thead
       data-slot="table-header"
-      className={cn(!unstyled && headerVariants[variant], className)}
+      className={cn(!unstyled && headerStyles, className)}
       {...props}
     />
   );
 }
 
 function TableBody({
-                     className,
-                     unstyled,
-                     ...props
-                   }: React.ComponentProps<"tbody"> & TableBaseProps) {
+  className,
+  unstyled,
+  ...props
+}: React.ComponentProps<"tbody"> & TableBaseProps) {
   return (
     <tbody
       data-slot="table-body"
@@ -78,45 +56,42 @@ function TableBody({
 }
 
 function TableRow({
-                    className,
-                    unstyled,
-                    variant = "default",
-                    ...props
-                  }: React.ComponentProps<"tr"> & TableBaseProps) {
+  className,
+  unstyled,
+  ...props
+}: React.ComponentProps<"tr"> & TableBaseProps) {
   return (
     <tr
       data-slot="table-row"
-      className={cn(!unstyled && rowVariants[variant], className)}
+      className={cn(!unstyled && rowStyles, className)}
       {...props}
     />
   );
 }
 
 function TableHead({
-                     className,
-                     unstyled,
-                     variant = "default",
-                     ...props
-                   }: React.ComponentProps<"th"> & TableBaseProps) {
+  className,
+  unstyled,
+  ...props
+}: React.ComponentProps<"th"> & TableBaseProps) {
   return (
     <th
       data-slot="table-head"
-      className={cn(!unstyled && headVariants[variant], className)}
+      className={cn(!unstyled && headStyles, className)}
       {...props}
     />
   );
 }
 
 function TableCell({
-                     className,
-                     unstyled,
-                     variant = "default",
-                     ...props
-                   }: React.ComponentProps<"td"> & TableBaseProps) {
+  className,
+  unstyled,
+  ...props
+}: React.ComponentProps<"td"> & TableBaseProps) {
   return (
     <td
       data-slot="table-cell"
-      className={cn(!unstyled && cellVariants[variant], className)}
+      className={cn(!unstyled && cellStyles, className)}
       {...props}
     />
   );
@@ -133,9 +108,9 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
 }
 
 function TableCaption({
-                        className,
-                        ...props
-                      }: React.ComponentProps<"caption">) {
+  className,
+  ...props
+}: React.ComponentProps<"caption">) {
   return (
     <caption
       data-slot="table-caption"

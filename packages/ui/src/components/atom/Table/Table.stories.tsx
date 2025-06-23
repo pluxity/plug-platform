@@ -43,14 +43,14 @@ export const Default: Story = {
   ),
 };
 
-export const Custom: Story = {
+export const ManyData: Story = {
   render: () => (
     <div className="w-[1240px]">
-      <Table variant="custom">
-        <TableHeader variant="custom">
-          <TableRow variant="custom">
+      <Table >
+        <TableHeader>
+          <TableRow>
             {columns.map((col, idx) => (
-              <TableHead key={idx} variant="custom">
+              <TableHead key={idx}>
                 {col}
               </TableHead>
             ))}
@@ -58,9 +58,9 @@ export const Custom: Story = {
         </TableHeader>
         <TableBody>
           {rows.map((row, idx) => (
-            <TableRow key={idx} variant="custom">
+            <TableRow key={idx} >
               {row.map((cell, cIdx) => (
-                <TableCell key={cIdx} variant="custom">
+                <TableCell key={cIdx}>
                   {cell}
                 </TableCell>
               ))}
