@@ -21,7 +21,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../../atom/DropdownMenu/dropdown-menu"
+} from "../../atom/DropdownMenu/DropdownMenu"
 import { Input } from "../../atom/Input/input"
 import {
   Table,
