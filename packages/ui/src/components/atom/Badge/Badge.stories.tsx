@@ -3,7 +3,7 @@ import { Badge } from "./Badge"
 import { CheckIcon } from "lucide-react"
 
 const meta: Meta<typeof Badge> = {
-    title: 'Design System/Badge',
+    title: 'ATOM/Badge',
     component: Badge,
     parameters: {
         layout: 'centered',

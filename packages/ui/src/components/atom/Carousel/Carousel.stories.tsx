@@ -14,7 +14,7 @@ import { Card, CardContent } from "../Card/Card";
 
 
 const meta: Meta<typeof Carousel> = {
-    title: 'Design System/Carousel',
+    title: 'ATOM/Carousel',
     component: Carousel,
     parameters: {
         layout: 'centered',

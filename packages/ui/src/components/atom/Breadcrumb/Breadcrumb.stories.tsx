@@ -10,7 +10,7 @@ import {
 } from "./Breadcrumb"
 
 const meta: Meta<typeof Breadcrumb> = {
-    title: 'Design System/BreadCrumb',
+    title: 'ATOM/BreadCrumb',
     component: Breadcrumb,
     parameters: {
         layout: 'centered',

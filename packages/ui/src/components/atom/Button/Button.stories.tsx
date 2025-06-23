@@ -3,7 +3,7 @@ import {Button} from "./Button"
 import { PlusIcon } from "lucide-react"
 
 const meta: Meta<typeof Button> = {
-    title: 'Design System/Button',
+    title: 'ATOM/Button',
     component: Button,
     parameters: {
         layout: 'centered',

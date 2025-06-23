@@ -12,7 +12,7 @@ import {
 import { Button } from "../Button/Button";
 
 const meta: Meta<typeof AlertDialog> = {
-    title: 'Design System/AlertDialog',
+    title: 'ATOM/AlertDialog',
     component: AlertDialog,
     parameters: {
         layout: 'centered',
