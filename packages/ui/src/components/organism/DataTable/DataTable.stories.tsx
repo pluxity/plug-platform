@@ -21,8 +21,8 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../../atom/DropdownMenu/dropdown-menu"
-import { Input } from "../../atom/Input/input"
+} from "../../atom/DropdownMenu/DropdownMenu"
+import { Input } from "../../atom/Input/Input"
 import {
   Table,
   TableBody,
@@ -157,12 +157,14 @@ const columns: ColumnDef<typeof data[0]>[] = [
         <div className="flex items-center justify-center gap-2">
           <Button
             variant="default"
+            size="sm"
             onClick={handleEdit}
           >
             수정
           </Button>
           <Button 
             variant="secondary"
+            size="sm"
             onClick={handleDelete}
           >
             삭제

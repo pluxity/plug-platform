@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import ProfileSvg from "../../../assets/icons/Avatar/profile.svg"
 
 import { cn } from "../../../utils/utils";
 
@@ -21,12 +22,24 @@ function Avatar({
 
 function AvatarImage({
   className,
+  src,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+  if (!src) {
+    return (
+      <div
+        data-slot="avatar-image"
+        className={cn("aspect-square size-full bg-muted-blue-gray flex items-center justify-center", className)}
+      >
+        <ProfileSvg />
+      </div>
+    )
+  }
+
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
+      className={cn("aspect-square size-full bg-muted-blue-gray", className)}
       {...props}
     />
   )
