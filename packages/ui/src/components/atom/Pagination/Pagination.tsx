@@ -48,9 +48,11 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
       data-active={isActive}
       className={cn(
         buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
+          variant: "ghost",
+          size
         }),
+        "hover:bg-transparent hover:text-black cursor-pointer text-gray w-6 h-6",
+        isActive && "text-black font-bold",
         className
       )}
       {...props}
@@ -66,8 +68,8 @@ function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
       {...props}
     >
-      <ChevronLeftIcon />
-      <span className="hidden sm:block">Prev</span>
+      <ChevronLeftIcon className="size-5" />
+      <span className="hidden">Prev</span>
     </PaginationLink>
   )
 }
@@ -80,8 +82,8 @@ function PaginationNext({ className, ...props }: React.ComponentProps<typeof Pag
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
       {...props}
     >
-      <span className="hidden sm:block">Next</span>
-      <ChevronRightIcon />
+      <span className="hidden">Next</span>
+      <ChevronRightIcon className="size-5" />
     </PaginationLink>
   )
 }
