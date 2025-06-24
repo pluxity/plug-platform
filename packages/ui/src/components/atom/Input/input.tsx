@@ -5,10 +5,11 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   error?: boolean;
   icon?: 'info' | 'none';
   type?: string;
+  ariaLabel?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, error, disabled, icon, type = 'text', ...props }, ref) => {
+  ({ className, error, disabled, icon, type = 'text', ariaLabel, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     
@@ -36,6 +37,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           type={inputType}
+          aria-label={ariaLabel}
           className={cn(
             "bg-transparent border-none outline-none w-full",
             "text-sm font-medium",

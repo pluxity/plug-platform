@@ -90,7 +90,7 @@ export const WithLabel: Story = {
       <label htmlFor="with-label" className="text-sm font-medium">
         이메일
       </label>
-      <Input id="with-label" placeholder="example@email.com" type="email" />
+      <Input id="with-label" placeholder="example@email.com" type="email" ariaLabel="이메일" />
     </div>
   ),
 };

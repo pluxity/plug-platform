@@ -1,16 +1,12 @@
 import { SketchPicker, ColorResult } from "react-color"
 
-type ColorPickerProps = {
+interface ColorPickerProps {
   color: string
   onChange: (color: string) => void
   className?: string
 }
 
-function ColorPicker ({ 
-    color, 
-    onChange, 
-    className, 
-}: ColorPickerProps) {
+const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange, className }) => {
 
   const handleChange = (colorResult: ColorResult) => {
     onChange(colorResult.hex)
