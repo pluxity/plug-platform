@@ -327,6 +327,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.7
         version: 1.2.7(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@storybook/preview-api':
+        specifier: ^8.6.14
+        version: 8.6.14(storybook@8.6.12(prettier@3.5.3))
       '@tailwindcss/vite':
         specifier: ^4.0.6
         version: 4.1.4(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)(yaml@2.7.1))
@@ -1740,6 +1743,11 @@ packages:
 
   '@storybook/preview-api@8.6.12':
     resolution: {integrity: sha512-84FE3Hrs0AYKHqpDZOwx1S/ffOfxBdL65lhCoeI8GoWwCkzwa9zEP3kvXBo/BnEDO7nAfxvMhjASTZXbKRJh5Q==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+
+  '@storybook/preview-api@8.6.14':
+    resolution: {integrity: sha512-2GhcCd4dNMrnD7eooEfvbfL4I83qAqEyO0CO7JQAmIO6Rxb9BsOLLI/GD5HkvQB73ArTJ+PT50rfaO820IExOQ==}
     peerDependencies:
       storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
 
@@ -5688,6 +5696,10 @@ snapshots:
       storybook: 8.6.12(prettier@3.5.3)
 
   '@storybook/preview-api@8.6.12(storybook@8.6.12(prettier@3.5.3))':
+    dependencies:
+      storybook: 8.6.12(prettier@3.5.3)
+
+  '@storybook/preview-api@8.6.14(storybook@8.6.12(prettier@3.5.3))':
     dependencies:
       storybook: 8.6.12(prettier@3.5.3)
 
