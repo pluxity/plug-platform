@@ -85,9 +85,9 @@ const Sidebar: React.FC<SidebarProps> = ({ items, activeItemId, expandedItemIds,
               style={{ filter: isActive ? activeColor : inactiveColor }}
             />
           )}
-        </div>
-        <div className={`text-center justify-start text-sm ${depth === 1 ? 'font-bold' : ''} ${isActive ? 'text-[#0066FF]' : 'text-[#6B7482]'} hover:text-[#0066FF]`}>
-          {label}
+          <div className={`text-center justify-start text-sm ${depth === 1 ? 'font-bold' : ''} ${isActive ? 'text-[#0066FF]' : 'text-[#6B7482]'} hover:text-[#0066FF]`}>
+            {label}
+          </div>
         </div>
       </div>
     );
