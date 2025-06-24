@@ -63,25 +63,25 @@ const Sidebar: React.FC<SidebarProps> = ({ items, activeItemId, expandedItemIds,
         >
           {showToggle ? (
             isExpanded ? (
-              <div className="w-[10px] h-[10px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
+              <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
                 <UnfoldIcon />
               </div>
 
             ) : (
-              <div className="w-[10px] h-[10px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
+              <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
                 <FoldIcon  />
               </div>
             )
           ) : depth === 2 ? (
-            <div className="w-[10px] h-[10px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
+            <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
               <DepthIcon />
             </div>
           ) : (
             <img
               src={icon}
               alt="icon"
-              width={10}
-              height={10}
+              width={12}
+              height={12}
               style={{ filter: isActive ? activeColor : inactiveColor }}
             />
           )}
