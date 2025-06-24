@@ -177,9 +177,12 @@ const columns: ColumnDef<typeof data[0]>[] = [
 
 export const Default: Story = {
   render: (args) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [sorting, setSorting] = React.useState<SortingState>([])
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [rowSelection, setRowSelection] = React.useState({})
 
     const table = useReactTable({
