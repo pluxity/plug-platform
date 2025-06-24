@@ -5,9 +5,12 @@ import {
   ChevronRightIcon,
 } from "lucide-react"
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
+import { ko, enUS } from "date-fns/locale"
 
 import { cn } from "../../../utils/utils";
 import { Button, buttonVariants } from "../Button/Button"
+
+type CalendarLanguage = "ko" | "en"
 
 function Calendar({
   className,
@@ -17,15 +20,31 @@ function Calendar({
   buttonVariant = "ghost",
   formatters,
   components,
+  language = "ko",
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
+  language?: CalendarLanguage
 }) {
   const defaultClassNames = getDefaultClassNames()
+
+  const locale = language === "en" ? enUS : ko
+  const mergedFormatters = {
+    formatMonthDropdown: (date: Date) =>
+      date.toLocaleString(language === "en" ? "en-US" : "ko-KR", { month: "short" }),
+    formatYearDropdown: (date: Date) =>
+      date.toLocaleString(language === "en" ? "en-US" : "ko-KR", { year: "numeric" }),
+    formatCaption: (date: Date) =>
+      date.toLocaleString(language === "en" ? "en-US" : "ko-KR", { year: "numeric", month: "long" }),
+    formatWeekdayName: (date: Date) =>
+      date.toLocaleString(language === "en" ? "en-US" : "ko-KR", { weekday: "short" }),
+    ...formatters,
+  }
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      locale={locale}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -33,11 +52,7 @@ function Calendar({
         className
       )}
       captionLayout={captionLayout}
-      formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
-        ...formatters,
-      }}
+      formatters={mergedFormatters}
       classNames={{
         root: cn("w-fit", defaultClassNames.root),
         months: cn(

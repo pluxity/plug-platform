@@ -43,3 +43,24 @@ export const Default: Story = {
       </Dialog>
     )
 }
+
+export const OverlayDimmed: Story = {
+  render: () => (
+      <Dialog>
+        <DialogTrigger>Open</DialogTrigger>
+        <DialogContent dimmed>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your account
+              and remove your data from our servers.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline">취소</Button>
+            <Button>저장</Button>
+          </DialogFooter>
+        </DialogContent>
+    </Dialog>
+  )
+}

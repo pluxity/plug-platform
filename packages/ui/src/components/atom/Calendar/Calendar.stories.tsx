@@ -25,11 +25,16 @@ const meta: Meta<typeof Calendar> = {
             control: 'boolean',
             description: '외부 날짜 표시 여부',
         },
+        language: {
+            control: 'select',
+            options: ['ko', 'en'],
+            description: '언어 설정 (한국어/영어)',
+        },
     },
-
 }
 
 export default meta
+
 type Story = StoryObj<typeof Calendar>
 
 export const Default: Story = {
@@ -39,6 +44,7 @@ export const Default: Story = {
             captionLayout={args.captionLayout}
             showOutsideDays={args.showOutsideDays}
             buttonVariant={args.buttonVariant}
+            language={args.language}
             className="rounded-lg border"
         />
     )
@@ -56,10 +62,11 @@ export const MonthAndYear: Story = {
                     selected={date}
                     onSelect={setDate}
                     captionLayout="dropdown"
+                    language={args.language}
                     className="rounded-lg border"
                 />
                 <p className="text-sm text-muted-foreground">
-                    선택된 날짜: {date ? date.toLocaleDateString() : '없음'}
+                    선택된 날짜: {date ? date.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR') : '없음'}
                 </p>
             </div>
         )
@@ -77,10 +84,11 @@ export const WithDateSelection: Story = {
                     mode="single"
                     selected={date}
                     onSelect={setDate}
+                    language={args.language}
                     className="rounded-lg border"
                 />
                 <p className="text-sm text-muted-foreground">
-                    선택된 날짜: {date ? date.toLocaleDateString() : '없음'}
+                    선택된 날짜: {date ? date.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR') : '없음'}
                 </p>
             </div>
         )
@@ -98,11 +106,12 @@ export const UseDateRange: Story = {
                     mode="range"
                     selected={date}
                     onSelect={setDate}
+                    language={args.language}
                     className="rounded-lg border"
                 />
                 <p className="text-sm text-muted-foreground">
-                    선택된 범위: {date?.from ? date.from.toLocaleDateString() : '없음'} 
-                    {date?.to ? ` ~ ${date.to.toLocaleDateString()}` : ''}
+                    선택된 범위: {date?.from ? date.from.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR') : '없음'} 
+                    {date?.to ? ` ~ ${date.to.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR')}` : ''}
                 </p>
             </div>
         )
@@ -120,10 +129,32 @@ export const MultipleSelection: Story = {
                     mode="multiple"
                     selected={dates}
                     onSelect={setDates}
+                    language={args.language}
                     className="rounded-lg border"
                 />
                 <p className="text-sm text-muted-foreground">
-                    선택된 날짜: {dates?.length ? dates.map(d => d.toLocaleDateString()).join(', ') : '없음'}
+                    선택된 날짜: {dates?.length ? dates.map(d => d.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR')).join(', ') : '없음'}
+                </p>
+            </div>
+        )
+    }
+}
+
+export const LanguageSwitchExample: Story = {
+    args: { language: 'ko' },
+    render: (args) => {
+        const [date, setDate] = useState<Date | undefined>(new Date())
+        return (
+            <div className="flex flex-col gap-4">
+                <Calendar
+                    {...args}
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    className="rounded-lg border"
+                />
+                <p className="text-sm text-muted-foreground">
+                    {args.language === 'en' ? 'Selected date:' : '선택된 날짜:'} {date ? date.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR') : (args.language === 'en' ? 'None' : '없음')}
                 </p>
             </div>
         )
