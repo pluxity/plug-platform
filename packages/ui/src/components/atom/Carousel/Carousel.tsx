@@ -47,8 +47,9 @@ function Carousel({
   plugins,
   className,
   children,
+  indicator = false,
   ...props
-}: React.ComponentProps<"div"> & CarouselProps) {
+}: React.ComponentProps<"div"> & CarouselProps & { indicator?: boolean }) {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -102,6 +103,22 @@ function Carousel({
     }
   }, [api, onSelect])
 
+  const [current, setCurrent] = React.useState(0)
+  const [count, setCount] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!api) return
+    setCount(api.scrollSnapList().length)
+    setCurrent(api.selectedScrollSnap())
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap())
+    })
+  }, [api])
+
+  const handleSelect = (idx: number) => {
+    api?.scrollTo(idx)
+  }
+
   return (
     <CarouselContext.Provider
       value={{
@@ -125,6 +142,9 @@ function Carousel({
         {...props}
       >
         {children}
+        {indicator && (
+          <CarouselIndicator count={count} current={current} onSelect={handleSelect} />
+        )}
       </div>
     </CarouselContext.Provider>
   )
@@ -226,6 +246,32 @@ function CarouselNext({
       <ArrowRight />
       <span className="sr-only">Next slide</span>
     </Button>
+  )
+}
+
+function CarouselIndicator({
+  count,
+  current,
+  onSelect,
+}: {
+  count: number
+  current: number
+  onSelect?: (idx: number) => void
+}) {
+  return (
+    <div className="flex gap-2 justify-center mt-4">
+      {Array.from({ length: count }).map((_, idx) => (
+        <button
+          key={idx}
+          type="button"
+          aria-label={`Go to slide ${idx + 1}`}
+          tabIndex={0}
+          onClick={() => onSelect?.(idx)}
+          className={`w-3 h-3 rounded-full border border-muted-light-blue2 transition
+            ${current === idx ? 'bg-point-blue' : 'bg-white'}`}
+        />
+      ))}
+    </div>
   )
 }
 

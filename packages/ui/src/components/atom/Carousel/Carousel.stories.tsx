@@ -26,11 +26,11 @@ const meta: Meta<typeof Carousel> = {
             control: { type: 'radio' },
         },
         opts: {
-            control: { type: 'object' },
+            table: {disable: true},
         },
-        plugins: {
-            control: { type: 'object' },
-        },
+        plugins: {          
+            table: { disable: true }
+        }
     } 
 }
 
@@ -38,25 +38,34 @@ export default meta
 type Story = StoryObj<typeof Carousel>
 
 export const Default: Story = {
-    render: (args) => (
-        <Carousel {...args} className="w-full max-w-xs">
-            <CarouselContent>
-            {Array.from({ length: 5 }).map((_, index) => (
-                <CarouselItem key={index}>
-                <div className="p-1">
-                    <Card>
-                    <CardContent className="flex aspect-square items-center justify-center p-6">
-                        <span className="text-4xl font-semibold">{index + 1}</span>
-                    </CardContent>
-                    </Card>
-                </div>
-                </CarouselItem>
-            ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-        </Carousel>
-    )
+  render: ({ orientation, ...args }) => (
+    <Carousel {...args} orientation={orientation} className="w-full max-w-xs">
+      <CarouselContent
+        className={
+          orientation === 'vertical'
+            ? '-mt-1 h-[200px] flex-col'
+            : ''
+        }
+      >
+        {Array.from({ length: 5 }).map((_, index) => (
+          <CarouselItem
+            key={index}
+            className={orientation === 'vertical' ? 'pt-1 md:basis-1/2' : ''}
+          >
+            <div className="p-1">
+              <Card>
+                <CardContent className="flex aspect-square items-center justify-center p-6">
+                  <span className="text-4xl font-semibold">{index + 1}</span>
+                </CardContent>
+              </Card>
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  ),
 }
 
 export const Sizes: Story = {
@@ -209,6 +218,28 @@ export const Api: Story = {
       );
     }
   };
+
+export const Indicator: Story = {
+  render: (args) => (
+    <Carousel {...args} indicator className="w-full max-w-xs">
+      <CarouselContent>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <CarouselItem key={index}>
+            <div className="p-1">
+              <Card>
+                <CardContent className="flex aspect-square items-center justify-center p-6">
+                  <span className="text-4xl font-semibold">{index + 1}</span>
+                </CardContent>
+              </Card>
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  )
+}
 
 
 
