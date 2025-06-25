@@ -41,7 +41,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             "bg-transparent border-none outline-none w-full",
             "text-sm font-medium",
-            "text-neutral-300",
+            "text-text-black",
             isFocused && "text-zinc-700",
             props.value && "text-zinc-700",
             props.defaultValue && "text-zinc-700",
