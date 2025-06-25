@@ -71,7 +71,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       <Popover.Trigger asChild disabled={disabled}>
         <button
           className={cn(
-            "w-44 h-auto min-h-9 min-w-16 px-2.5 py-2 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-between items-center group rounded-[2px]",
+            "w-full h-auto min-h-9 min-w-16 px-2.5 py-2 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-between items-center group rounded-[2px]",
             "focus:outline-slate-400 focus:text-zinc-700",
             "data-[state=open]:outline-slate-400",
             invalid && "outline-red-700 text-red-700",
@@ -124,7 +124,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       <Popover.Portal>
         <Popover.Content 
           className={cn(
-            "w-44 p-2.5 bg-white rounded-[2px] outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex flex-col justify-center items-start gap-3",
+            "min-w-[var(--radix-popover-trigger-width)] p-2.5 bg-white rounded-[2px] outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex flex-col justify-center items-start gap-3",
             "z-50 max-h-60 overflow-y-auto"
           )} 
           align="start"

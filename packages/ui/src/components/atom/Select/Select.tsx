@@ -39,7 +39,7 @@ function SelectTrigger({ className, size = "default", children, ...props }: Reac
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "w-44 h-9 min-w-16 px-2.5 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-between items-center group rounded-[2px]",
+        "w-full h-9 min-w-16 px-2.5 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-between items-center group rounded-[2px]",
         "focus:outline-slate-400 focus:text-zinc-700",
         "data-[state=open]:outline-slate-400",
         "data-[invalid=true]:outline-red-700 data-[invalid=true]:text-red-700",
@@ -67,7 +67,7 @@ function SelectContent({ className, children, position = "popper", ...props }: R
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "w-44 p-2.5 bg-white rounded-[2px] !outline !outline-1 !outline-offset-[-1px] !outline-slate-400 inline-flex flex-col justify-center items-start gap-3",
+          "min-w-[var(--radix-select-trigger-width)] p-2.5 bg-white rounded-[2px] !outline !outline-1 !outline-offset-[-1px] !outline-slate-400 inline-flex flex-col justify-center items-start gap-3",
           "z-50 overflow-hidden",
           position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
@@ -101,7 +101,7 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "justify-start text-gray-500 text-sm font-medium  w-full cursor-default select-none outline-none",
+        "justify-start text-gray-500 text-sm font-medium w-full cursor-default select-none outline-none",
         "data-[highlighted]:text-zinc-700",
         "data-[state=checked]:text-blue-600",
         "data-[disabled]:opacity-50 data-[disabled]:pointer-events-none",
