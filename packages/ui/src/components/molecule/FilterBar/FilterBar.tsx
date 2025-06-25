@@ -7,7 +7,7 @@ type SelectOption = {
     value: string 
 };
 
-type FilterSelect = {
+export type FilterSelect = {
     key: string;
     placeholder?: string;
     options: SelectOption[];
