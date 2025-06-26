@@ -20,6 +20,7 @@ const meta: Meta<typeof Drawer> = {
       control: "select",
       options: ["top", "right", "bottom", "left"],
       defaultValue: "bottom",
+      description: "Drawer의 방향을 선택합니다",
     },
   },
 };

@@ -17,15 +17,32 @@ const meta: Meta<typeof AlertDialog> = {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs']
+    tags: ['autodocs'],
+    argTypes: {
+      open: {
+        description: '다이얼로그의 열림/닫힘 상태',
+        control: 'boolean',
+        table: {
+            type: { summary: 'boolean' },
+            defaultValue: { summary: 'false' }
+        }
+    },
+    onOpenChange: {
+        description: '다이얼로그 상태 변경 시 호출되는 콜백',
+        control: false,
+        table: {
+                type: { summary: '(open: boolean) => void' }
+            }
+        }
+    },
 }
 
 export default meta
 type Story = StoryObj<typeof AlertDialog>
 
 export const Default: Story = {
-    render: () => (
-        <AlertDialog>
+    render: (args) => (
+        <AlertDialog {...args}>
             <AlertDialogTrigger asChild>
             <Button variant="outline">Show Dialog</Button>
             </AlertDialogTrigger>
@@ -65,5 +82,6 @@ export const WithTitle: Story = {
     </AlertDialog>
   ),
 };
+
 
   

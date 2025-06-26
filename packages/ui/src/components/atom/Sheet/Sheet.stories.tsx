@@ -119,11 +119,6 @@ export const AllOptions: Story = {
           <SheetContent 
             side={args.side}
             className={args.className}
-            overlayClassName={args.overlayClassName}
-            closeOnClickOutside={args.closeOnClickOutside}
-            closeOnEsc={args.closeOnEsc}
-            showCloseButton={args.showCloseButton}
-            preventScroll={args.preventScroll}
           >
             <SheetHeader>
               <SheetTitle>시트 제목</SheetTitle>
@@ -131,7 +126,7 @@ export const AllOptions: Story = {
                 이 시트는 {args.side} 방향에서 나타납니다. 크기: {args.size}
               </SheetDescription>
             </SheetHeader>
-            <div className="py-6">
+            <div className="py-6 px-4">
               <p className="text-sm text-gray-600 mb-4">
                 시트 내용입니다. 다양한 옵션들을 조합하여 테스트할 수 있습니다.
               </p>
@@ -202,7 +197,7 @@ export const Positions: Story = {
                 오른쪽에서 슬라이드되어 나타납니다.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-4">
+            <div className="py-4 px-4">
               <p className="text-sm">오른쪽 시트의 내용입니다.</p>
             </div>
           </SheetContent>
@@ -223,7 +218,7 @@ export const Positions: Story = {
                 왼쪽에서 슬라이드되어 나타납니다.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-4">
+            <div className="py-4 px-4">
               <p className="text-sm">왼쪽 시트의 내용입니다.</p>
             </div>
           </SheetContent>
@@ -244,7 +239,7 @@ export const Positions: Story = {
                 상단에서 슬라이드되어 나타납니다.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-4">
+            <div className="py-4 px-4">
               <p className="text-sm">상단 시트의 내용입니다.</p>
             </div>
           </SheetContent>
@@ -265,7 +260,7 @@ export const Positions: Story = {
                 하단에서 슬라이드되어 나타납니다.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-4">
+            <div className="py-4 px-4">
               <p className="text-sm">하단 시트의 내용입니다.</p>
             </div>
           </SheetContent>
@@ -293,7 +288,7 @@ export const ContentTemplates: Story = {
                 프로필 정보를 확인하고 수정하세요.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-6 space-y-6">
+            <div className="py-6 px-4 space-y-6">
               <div className="flex items-center">
                 <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
                 <div className="ml-4">
@@ -348,7 +343,7 @@ export const ContentTemplates: Story = {
                 애플리케이션 설정을 관리합니다.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-6">
+            <div className="py-6 px-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -416,7 +411,7 @@ export const ContentTemplates: Story = {
                 최근 알림 목록
               </SheetDescription>
             </SheetHeader>
-            <div className="py-4">
+            <div className="py-4 px-4">
               <div className="space-y-3">
                 {[
                   { icon: <Info className="h-4 w-4 text-blue-500" />, title: "시스템 업데이트", desc: "새로운 버전이 설치되었습니다.", time: "방금 전" },
@@ -464,7 +459,7 @@ export const ContentTemplates: Story = {
             <SheetHeader>
               <SheetTitle>메뉴</SheetTitle>
             </SheetHeader>
-            <div className="py-4">
+            <div className="py-4 px-4">
               <nav className="space-y-1">
                 {[
                   { icon: <Home className="h-4 w-4" />, name: "홈" },
@@ -517,7 +512,7 @@ export const NestedSheets: Story = {
               중첩된 시트 예제입니다.
             </SheetDescription>
           </SheetHeader>
-          <div className="py-6">
+          <div className="py-6 px-4">
             <p className="text-sm mb-4">
               첫 번째 시트의 내용입니다. 아래 버튼을 클릭하여 두 번째 시트를 열 수 있습니다.
             </p>
@@ -605,7 +600,7 @@ export const ControlledSheet: Story = {
                 외부 상태에 의해 제어되는 시트입니다.
               </SheetDescription>
             </SheetHeader>
-            <div className="py-6">
+            <div className="py-6 px-4">
               <p className="text-sm">
                 이 시트는 외부 버튼을 통해 열리고 닫힙니다.
                 시트의 상태는 컴포넌트 외부에서 관리됩니다.

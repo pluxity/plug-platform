@@ -10,21 +10,28 @@ const meta: Meta<typeof Collapsible> = {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs']
+    tags: ['autodocs'],
+    argTypes: {
+      disabled:{
+        control: 'boolean',
+        description: 'disabled',
+      },
+    }
 }
 
 export default meta
 type Story = StoryObj<typeof Collapsible>
 
 export const Default: Story = {
-    render: () => {
+    render: (args) => {
         const [isOpen, setIsOpen] = React.useState(false);
         
         return (
             <Collapsible
-                open={isOpen}
-                onOpenChange={setIsOpen}
-                className="flex w-[350px] flex-col gap-2"
+              {...args}
+              open={isOpen}
+              onOpenChange={setIsOpen}
+              className="flex w-[350px] flex-col gap-2"
             >
                 <div className="flex items-center justify-between gap-4 px-4">
                 <h4 className="text-sm font-semibold">

@@ -16,7 +16,13 @@ const meta: Meta<typeof Command> = {
         layout: 'centered',
     },
     tags: ['autodocs'],    
-}
+    argTypes: {
+      className: {
+        control: 'text',
+        description: 'className',
+      },
+    },
+  }
 
 export default meta
 type Story = StoryObj<typeof Command>

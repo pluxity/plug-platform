@@ -8,15 +8,20 @@ const meta: Meta<typeof Avatar> = {
         layout: 'centered',
     },
     tags: ['autodocs'],
-   
+    argTypes: {
+        className: {
+            control: 'text',
+            description: 'Avatar 컨테이너의 CSS 클래스',
+        },
+    }
 }
 
 export default meta
 type Story = StoryObj<typeof Avatar>
 
 export const Default: Story = {
-    render: () => (
-        <Avatar>
+    render: (args) => (
+        <Avatar {...args}>
             <AvatarImage />
             <AvatarFallback>프로필 이미지를 불러올 수 없을 경우 보여줄 텍스트가 들어갑니다.</AvatarFallback>
         </Avatar>

@@ -77,7 +77,7 @@ function SelectContent({ className, children, position = "popper", ...props }: R
         {...props}
       >
         <SelectScrollUpButton />
-        <SelectPrimitive.Viewport>
+        <SelectPrimitive.Viewport className="w-full">
           {children}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
@@ -101,7 +101,7 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "justify-start text-gray-500 text-sm font-medium w-full cursor-default select-none outline-none",
+        "justify-start text-gray-500 text-sm font-medium w-full py-1 cursor-default select-none outline-none",
         "data-[highlighted]:text-zinc-700",
         "data-[state=checked]:text-blue-600",
         "data-[disabled]:opacity-50 data-[disabled]:pointer-events-none",
@@ -118,7 +118,7 @@ function SelectSeparator({ className, ...props }: React.ComponentProps<typeof Se
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("bg-slate-200 -mx-1 my-1 h-px", className)}
+      className={cn("bg-slate-200 my-1 h-px", className)}
       {...props}
     />
   )

@@ -87,4 +87,15 @@ export const WithLabel: Story = {
   )
 }
 
+export const CustomStyling: Story = {
+  render: () => (
+      <div className="flex items-center gap-4">
+        <Checkbox 
+          id="custom1" 
+          className="w-6 h-6 border-2 border-yellow-500 data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-600" 
+        />
+        <Label htmlFor="custom1">커스텀 테마</Label>
+      </div>
+  )
+}
 

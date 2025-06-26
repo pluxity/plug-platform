@@ -15,7 +15,13 @@ const meta: Meta<typeof Breadcrumb> = {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs'],    
+    tags: ['autodocs'],  
+    argTypes:{
+        className: {
+            control: 'text',
+            description: 'className',
+        }
+    }  
 }
 
 export default meta

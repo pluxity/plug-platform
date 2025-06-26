@@ -13,7 +13,7 @@ import {
 const meta: Meta<typeof Select> = {
   title: "ATOM/Select",
   component: Select,
-  tags: ["autodocs"],
+  tags: ["autodocs"]   
 };
 
 export default meta;

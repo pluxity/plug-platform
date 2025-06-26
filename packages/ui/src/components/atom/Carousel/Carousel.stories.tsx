@@ -8,6 +8,7 @@ import {
     CarouselItem,
     CarouselPrevious,
     CarouselNext,
+    CarouselIndicator,
 } from "./Carousel"
 
 import { Card, CardContent } from "../Card/Card";
@@ -221,7 +222,7 @@ export const Api: Story = {
 
 export const Indicator: Story = {
   render: (args) => (
-    <Carousel {...args} indicator className="w-full max-w-xs">
+    <Carousel {...args} className="w-full max-w-xs">
       <CarouselContent>
         {Array.from({ length: 5 }).map((_, index) => (
           <CarouselItem key={index}>
@@ -237,6 +238,7 @@ export const Indicator: Story = {
       </CarouselContent>
       <CarouselPrevious />
       <CarouselNext />
+      <CarouselIndicator buttonClassName="border-red-500" activeButtonClassName="bg-red-500" inactiveButtonClassName="bg-red-200"/>
     </Carousel>
   )
 }

@@ -18,7 +18,20 @@ const meta: Meta<typeof Dialog> = {
         layout: 'centered',
     },
     tags: ['autodocs'],    
-}
+    argTypes: {
+      open: {
+        control: 'boolean',
+        description: '다이얼로그의 열림/닫힘 상태를 제어합니다',
+      },
+      defaultOpen: {
+        control: 'boolean',
+        description: '다이얼로그의 초기 열림 상태를 설정합니다',
+      },
+      onOpenChange: {
+        description: '다이얼로그 상태가 변경될 때 호출되는 콜백 함수',
+      },
+    },
+  }
 
 export default meta
 type Story = StoryObj<typeof Dialog>

@@ -10,14 +10,27 @@ const meta: Meta<typeof DialogStylePopover> = {
   title: "ATOM/DialogStylePopover",
   component: DialogStylePopover,
   tags: ["autodocs"],
+  argTypes: {
+    open: {
+      control: 'boolean',
+      description: '팝오버의 열림/닫힘 상태를 제어합니다',
+    },
+    defaultOpen: {
+      control: 'boolean',
+      description: '팝오버의 초기 열림 상태를 설정합니다',
+    },
+    onOpenChange: {
+      description: '팝오버 상태가 변경될 때 호출되는 콜백 함수',
+    },
+  },
 }
 
 export default meta
 type Story = StoryObj<typeof DialogStylePopover>
 
 export const Basic: Story = {
-  render: () => (
-    <DialogStylePopover>
+  render: (args) => (
+    <DialogStylePopover {...args}>
       <DialogStylePopoverTrigger asChild>
         <button className="bg-primary text-white px-4 py-2 rounded-md shadow-sm">
           클릭해서 다이얼로그 스타일 팝오버 열기

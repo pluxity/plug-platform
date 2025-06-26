@@ -26,6 +26,9 @@ type CarouselContextProps = {
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
+  current: number
+  count: number
+  handleSelect: (idx: number) => void
 } & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
@@ -47,9 +50,8 @@ function Carousel({
   plugins,
   className,
   children,
-  indicator = false,
   ...props
-}: React.ComponentProps<"div"> & CarouselProps & { indicator?: boolean }) {
+}: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -131,6 +133,9 @@ function Carousel({
         scrollNext,
         canScrollPrev,
         canScrollNext,
+        current,
+        count,
+        handleSelect,
       }}
     >
       <div
@@ -142,9 +147,6 @@ function Carousel({
         {...props}
       >
         {children}
-        {indicator && (
-          <CarouselIndicator count={count} current={current} onSelect={handleSelect} />
-        )}
       </div>
     </CarouselContext.Provider>
   )
@@ -250,25 +252,39 @@ function CarouselNext({
 }
 
 function CarouselIndicator({
-  count,
-  current,
-  onSelect,
+  className,
+  buttonClassName,
+  activeButtonClassName,
+  inactiveButtonClassName,
+  ...props
 }: {
-  count: number
-  current: number
-  onSelect?: (idx: number) => void
-}) {
+  className?: string
+  buttonClassName?: string
+  activeButtonClassName?: string
+  inactiveButtonClassName?: string
+} & React.HTMLAttributes<HTMLDivElement>) {
+  const { current, count, handleSelect } = useCarousel()
+  
   return (
-    <div className="flex gap-2 justify-center mt-4">
+    <div 
+      className={cn("flex gap-2 justify-center mt-4", className)}
+      data-slot="carousel-indicator"
+      {...props}
+    >
       {Array.from({ length: count }).map((_, idx) => (
         <button
           key={idx}
           type="button"
           aria-label={`Go to slide ${idx + 1}`}
           tabIndex={0}
-          onClick={() => onSelect?.(idx)}
-          className={`w-3 h-3 rounded-full border border-muted-light-blue2 transition
-            ${current === idx ? 'bg-point-blue' : 'bg-white'}`}
+          onClick={() => handleSelect(idx)}
+          className={cn(
+            "w-3 h-3 rounded-full border border-muted-light-blue2 transition-all duration-200",
+            buttonClassName,
+            current === idx 
+              ? cn("bg-point-blue scale-110", activeButtonClassName)
+              : cn("bg-white", inactiveButtonClassName)
+          )}
         />
       ))}
     </div>
@@ -282,4 +298,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  CarouselIndicator,
 }

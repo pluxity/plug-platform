@@ -4,6 +4,7 @@ import { Button } from '../../atom/Button/Button';
 import { Input } from '../../atom/Input/Input';
 
 interface SearchInputProps {
+    buttonClassName?: string;
     className?: string;
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -12,6 +13,7 @@ interface SearchInputProps {
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({ 
+    buttonClassName,
     className,
     value,
     onChange,
@@ -26,7 +28,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                 value={value}
                 onChange={onChange}
             />
-            <Button className="w-15" onClick={onSubmit}>검색</Button>
+            <Button className={cn("w-15", buttonClassName)} onClick={onSubmit}>검색</Button>
         </div>
     )
 }

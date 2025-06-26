@@ -34,3 +34,29 @@ export const Default: Story = {
     );
   },
 };
+
+export const CustomStyle: Story = {
+  render: (args) => {
+    const [value, setValue] = React.useState("");
+    const allSuggestions = ["김포공항", "김포역", "김포한강", "서울역", "인천공항"];
+    const filteredSuggestions = allSuggestions.filter((item) =>
+      item.toLowerCase().includes(value.toLowerCase())
+    );
+
+    return (
+      <SearchForm
+        {...args}
+        value={value}
+        onChange={setValue}
+        onSelect={(item) => setValue(item)}
+        suggestions={value ? filteredSuggestions : []}
+        className="bg-yellow-50"
+        inputClassName="bg-yellow-50"
+        listClassName="bg-blue-50"
+        itemClassName="hover:bg-blue-100"
+        clearButtonClassName="text-red-500"
+        placeholder="여기서 검색하세요!"
+      />
+    );
+  },
+};

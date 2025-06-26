@@ -1,106 +1,37 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { Button } from "../../atom/Button/Button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../../atom/Command/Command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../atom/Popover/Popover"
-import { cn } from "../../../utils/utils"
+import { Combobox, ComboboxOption } from "./Combobox"
 
-const meta: Meta<typeof Command> = {
-  title: 'ATOM/Combobox',
-  component: Command,
+const meta: Meta<typeof Combobox> = {
+  title: 'Molecule/Combobox',
+  component: Combobox,
   parameters: {
-      layout: 'centered',
+    layout: 'centered',
   },
-  tags: ['autodocs'],    
+  tags: ['autodocs'],
 }
-
 export default meta
-type Story = StoryObj<typeof Command>
+type Story = StoryObj<typeof Combobox>
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
+const frameworks: ComboboxOption[] = [
+  { value: "next.js", label: "Next.js" },
+  { value: "sveltekit", label: "SvelteKit" },
+  { value: "nuxt.js", label: "Nuxt.js" },
+  { value: "remix", label: "Remix" },
+  { value: "astro", label: "Astro" },
 ]
 
 export const Default: Story = {
   render: (args) => {
-    const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
-
     return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            {value
-              ? frameworks.find((framework) => framework.value === value)?.label
-              : "Select framework..."}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command {...args}>
-            <CommandInput placeholder="Search framework..." className="h-9" />
-            <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
-              <CommandGroup>
-                {frameworks.map((framework) => (
-                  <CommandItem
-                    key={framework.value}
-                    value={framework.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue)
-                      setOpen(false)
-                    }}
-                  >
-                    {framework.label}
-                    <Check
-                      className={cn(
-                        "ml-auto",
-                        value === framework.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <Combobox
+        {...args}
+        options={frameworks}
+        value={value}
+        onChange={setValue}
+        placeholder="Select framework..."
+      />
     )
   },
 }

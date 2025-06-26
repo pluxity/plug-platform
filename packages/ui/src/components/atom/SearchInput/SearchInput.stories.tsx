@@ -13,6 +13,7 @@ const meta: Meta<typeof SearchInput> = {
     onChange: { action: 'onChange' },
     value: { control: 'text' },
     placeholder: { control: 'text' },
+    buttonClassName: { control: 'text' },
   },
 }
 
@@ -40,6 +41,7 @@ export const Default: Story = {
                     placeholder="입력하세요"
                     onChange={handleChange}
                     onSubmit={handleSubmit}
+                    buttonClassName="bg-secondary-500 active:bg-secondary-600 hover:bg-secondary-400"
                 />
             </>
         )

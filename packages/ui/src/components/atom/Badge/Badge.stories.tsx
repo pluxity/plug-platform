@@ -14,7 +14,7 @@ const meta: Meta<typeof Badge> = {
             control: 'select',
             options: ['default', 'secondary', 'destructive', 'outline'],
             description: '뱃지 유형',
-        }
+        },
     }
 }
 
@@ -44,5 +44,11 @@ export const WithIcon: Story = {
             <CheckIcon className="w-3 h-3 mr-1" />
             아이콘 뱃지
         </Badge>
+    )
+}
+
+export const Custom: Story = {
+    render: () => (
+        <Badge className="bg-point-blue h-10">custom badge</Badge>
     )
 }

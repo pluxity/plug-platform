@@ -15,6 +15,11 @@ interface SearchFormProps {
   onSelect: (item: string) => void;
   suggestions: string[];
   placeholder?: string;
+  className?: string;
+  inputClassName?: string;
+  listClassName?: string;
+  itemClassName?: string;
+  clearButtonClassName?: string;
 }
 
 const SearchForm = ({ 
@@ -22,16 +27,21 @@ const SearchForm = ({
     onChange, 
     onSelect, 
     suggestions,
-    placeholder = "검색어 입력"
+    placeholder = "검색어 입력",
+    className,
+    inputClassName,
+    listClassName,
+    itemClassName,
+    clearButtonClassName,
 }: SearchFormProps) => {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className="relative">
+    <div className={cn("relative")}>
       <Command
-        className="rounded-sm border border-gray-200 bg-white text-black border-b-0"
+        className={cn("rounded-sm border border-gray-200 bg-white text-black border-b-0", className)}
         onFocus={() => setOpen(true)}
       >
         <div className="relative flex items-center">
@@ -40,6 +50,7 @@ const SearchForm = ({
             value={value}
             onValueChange={onChange}
             placeholder={placeholder}
+            className={cn("flex-1 h-full border-none outline-none text-black placeholder:text-gray-400 text-sm pr-8", inputClassName)}
           />
           {value && (
             <Button
@@ -51,7 +62,7 @@ const SearchForm = ({
                 e.preventDefault();
                 onChange("");
               }}
-              className="absolute right-1"
+              className={cn("absolute right-1", clearButtonClassName)}
             >
               <X className="size-4 text-gray-400" />
             </Button>
@@ -59,7 +70,7 @@ const SearchForm = ({
         </div>
 
         {open && (
-          <CommandList className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-auto rounded-sm border border-gray-200 bg-white z-50">
+          <CommandList className={cn("absolute top-full left-0 right-0 mt-1 max-h-60 overflow-auto rounded-sm border border-gray-200 bg-white z-50", listClassName)}>
             {suggestions.length > 0 ? (
               suggestions.map((item, idx) => (
                 <CommandItem
@@ -69,12 +80,13 @@ const SearchForm = ({
                     onSelect(item);
                     setOpen(false);
                   }}
+                  className={itemClassName}
                 >
                   {item}
                 </CommandItem>
               ))
             ) : (
-              <div className="px-4 py-2 text-gray-400 text-sm">추천 항목이 없습니다.</div>
+              <div className="px-4 py-2 text-gray-400 text-sm">검색 결과가 없습니다.</div>
             )}
           </CommandList>
         )}

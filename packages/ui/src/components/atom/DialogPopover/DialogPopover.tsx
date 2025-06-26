@@ -39,14 +39,14 @@ function DialogStylePopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "bg-white text-zinc-700 rounded-[5px] shadow-[0px_0px_20px_0px_rgba(0,0,0,0.20)] outline outline-1 outline-offset-[-1px] outline-slate-400 overflow-hidden z-50 w-96",
+          "bg-white rounded-[5px] shadow-[0px_0px_20px_0px_rgba(0,0,0,0.20)] outline outline-1 outline-offset-[-1px] outline-slate-300 overflow-hidden z-50 w-96",
           className,
         )}
         {...props}
       >
         {/* Header */}
-        <div className="w-full p-5 bg-blue-50 inline-flex justify-between items-center">
-          <div className="justify-start text-zinc-700 text-lg font-bold font-['SUIT']">
+        <div className="w-full p-4 bg-blue-50 inline-flex justify-between items-center">
+          <div className="text-lg font-semibold text-black">
             {title}
           </div>
           {showCloseButton && (
