@@ -1,5 +1,7 @@
+@import "./base.css";
 @import 'tailwindcss';
 @import "tw-animate-css";
+@import "./typography.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -36,6 +38,31 @@
     --color-destructive-800: #b00606;
     --color-destructive-900: #8a0404;
     --color-destructive-foreground: #ffffff;
+
+    /*----- 디자인 시스템 -----*/
+
+    /* 기본 텍스트 컬러 */
+    --color-black: #313843;
+    --color-gray: #6B7482;
+    --color-gray2: #C2C6CC;
+    --color-light-gray: #9CA8BA;
+
+    /* 배경 색상 */
+    --color-content: #F1F3F5;
+    --color-gray-point: #9CA8BA;
+    --color-muted-blue-gray: #EBEFF5;
+    --color-muted-light-gray: #F1F3F5;
+    --color-muted-gray-point: #E1E6EE;
+    --color-muted-light-blue1: #EEF5FF;
+    --color-muted-light-blue2: #C7DDFD;
+    --color-muted-light-gray2: #EFEFEF;
+
+    /* 포인트 컬러 */
+    --color-point-blue: #06F;
+    --color-point-blue-dark: #0054D1;
+    --color-point-blue-disable: #ECEDEF;
+    --color-point-error: #CF0000;
+
 }
 
 .scrollbar-thin::-webkit-scrollbar {
