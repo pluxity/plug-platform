@@ -22,7 +22,7 @@ interface SearchFormProps {
   clearButtonClassName?: string;
   searchData?: string[];
   onSearch?: (search: string) => void;
-  externalSuggestions?: string[];
+  searchResult?: string[];
 }
 
 const SearchForm = ({ 
@@ -37,7 +37,7 @@ const SearchForm = ({
     clearButtonClassName,
     searchData,
     onSearch,
-    externalSuggestions,
+    searchResult,
 }: SearchFormProps) => {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -79,7 +79,7 @@ const SearchForm = ({
     setOpen(false);
   }
 
-  const suggestions = onSearch ? (externalSuggestions || []) : data;
+  const suggestions = onSearch ? (searchResult || []) : data;
 
   return (
     <div className={cn("relative")}>

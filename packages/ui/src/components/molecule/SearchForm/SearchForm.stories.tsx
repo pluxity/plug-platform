@@ -11,7 +11,7 @@ const meta: Meta<typeof SearchForm> = {
   },
   tags: ["autodocs"],
   argTypes: {
-    externalSuggestions: {
+    searchResult: {
       description: "API 결과",
     },
     onSearch: {
@@ -91,7 +91,7 @@ export const WithMockAPI: Story = {
         placeholder="API 모드 테스트 (500ms 지연)"
         // API 호출
         onSearch={handleSearch} 
-        externalSuggestions={apiSuggestions} 
+        searchResult={apiSuggestions} 
       />
     );
   },
