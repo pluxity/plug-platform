@@ -118,7 +118,7 @@ const buttonStyles = {
 };
 
 export const Default: Story = {
-  render: (args) => {
+   render: function Render(args) {
     const prevArgsRef = useRef(args);
     const [key, setKey] = useState(0);
     
@@ -170,11 +170,9 @@ export const Default: Story = {
           );
           break;
         case "custom":
-          toast.custom((t) => (
+          toast.custom((id) => (
             <div
-              className={`${
-                t.visible ? 'animate-enter' : 'animate-leave'
-              } bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
+              className={`animate-enter bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
             >
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -187,7 +185,7 @@ export const Default: Story = {
                 )}
               </div>
               <button
-                onClick={() => toast.dismiss(t.id)}
+                onClick={() => toast.dismiss(id)}
                 className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500"
               >
                 <span className="sr-only">닫기</span>
@@ -299,7 +297,7 @@ export const Default: Story = {
 };
 
 export const Positions: Story = {
-  render: () => {
+  render: function Render() {
     const [position, setPosition] = useState<string>("top-right");
     
     const positions = [
@@ -319,7 +317,7 @@ export const Positions: Story = {
     
     return (
       <div className="p-4 space-y-4">
-        <Toast position={position as any} />
+        <Toast position={position as ToastProps['position']} />
         
         <div className="flex flex-wrap gap-2 mb-4">
           {positions.map((pos) => (
@@ -456,7 +454,7 @@ export const ToastTypes: Story = {
 };
 
 export const StylingOptions: Story = {
-  render: () => {
+  render: function Render() {
     const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light');
     const [richColors, setRichColors] = useState(false);
     const [expand, setExpand] = useState(false);
@@ -563,11 +561,9 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">직접 디자인한 토스트를 표시합니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.custom}`}
-              onClick={() => toast.custom((t) => (
+              onClick={() => toast.custom((id) => (
                 <div
-                  className={`${
-                    t.visible ? 'animate-enter' : 'animate-leave'
-                  } bg-white shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
+                  className={`animate-enter bg-white shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
                 >
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">
@@ -578,7 +574,7 @@ export const CustomToasts: Story = {
                     </p>
                   </div>
                   <button
-                    onClick={() => toast.dismiss(t.id)}
+                    onClick={() => toast.dismiss(id)}
                     className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500"
                   >
                     <XCircleIcon className="h-5 w-5" />
@@ -612,11 +608,9 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">카드 형태의 커스텀 토스트입니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.custom}`}
-              onClick={() => toast.custom((t) => (
+              onClick={() => toast.custom((id) => (
                 <div
-                  className={`${
-                    t.visible ? 'animate-enter' : 'animate-leave'
-                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex flex-col`}
+                  className={`animate-enter max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex flex-col`}
                 >
                   <div className="flex-1 p-4">
                     <div className="flex items-start">
@@ -634,14 +628,14 @@ export const CustomToasts: Story = {
                           <button
                             onClick={() => {
                               console.log("View review");
-                              toast.dismiss(t.id);
+                              toast.dismiss(id);
                             }}
                             className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             리뷰 보기
                           </button>
                           <button
-                            onClick={() => toast.dismiss(t.id)}
+                            onClick={() => toast.dismiss(id)}
                             className="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             닫기
@@ -662,11 +656,9 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">알림 형태의 커스텀 토스트입니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.info}`}
-              onClick={() => toast.custom((t) => (
+              onClick={() => toast.custom((id) => (
                 <div
-                  className={`${
-                    t.visible ? 'animate-enter' : 'animate-leave'
-                  } max-w-md w-full bg-blue-50 border-l-4 border-blue-500 shadow-md rounded-r-lg pointer-events-auto flex p-4`}
+                  className={`animate-enter max-w-md w-full bg-blue-50 border-l-4 border-blue-500 shadow-md rounded-r-lg pointer-events-auto flex p-4`}
                 >
                   <div className="flex-shrink-0">
                     <BellIcon className="h-6 w-6 text-blue-500" />
@@ -681,7 +673,7 @@ export const CustomToasts: Story = {
                   </div>
                   <div className="ml-4 flex-shrink-0 flex">
                     <button
-                      onClick={() => toast.dismiss(t.id)}
+                      onClick={() => toast.dismiss(id)}
                       className="bg-blue-50 rounded-md inline-flex text-blue-500 hover:text-blue-700 focus:outline-none"
                     >
                       <XCircleIcon className="h-5 w-5" />
@@ -736,7 +728,7 @@ export const RealWorldExamples: Story = {
         new Promise((resolve) => setTimeout(resolve, 2000)),
         {
           loading: '양식 제출 중...',
-          success: (data) => {
+          success: () => {
             return (
               <div>
                 <p>양식이 성공적으로 제출되었습니다.</p>

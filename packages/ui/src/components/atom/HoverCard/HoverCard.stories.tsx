@@ -168,11 +168,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const AllOptions: Story = {
-  render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render(args) {
     const [isOpen, setIsOpen] = useState(args.defaultOpen || false);
     
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       if (args.open !== undefined) {
         setIsOpen(args.open);

@@ -24,7 +24,7 @@ export default meta;
 type Story = StoryObj<typeof SearchForm>;
 
 export const Default: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [value, setValue] = React.useState("");
     const [apiSuggestions, setApiSuggestions] = React.useState<string[]>([]);
     const allData = ["김포공항", "김포역", "김포한강", "서울역", "인천공항", "부산역", "대구역", "광주역"];
@@ -56,7 +56,7 @@ export const Default: Story = {
 
 
 export const CustomStyle: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [value, setValue] = React.useState("");
     const [apiSuggestions, setApiSuggestions] = React.useState<string[]>([]);
     const allData = ["김포공항", "김포역", "김포한강", "서울역", "인천공항", "부산역", "대구역", "광주역"];

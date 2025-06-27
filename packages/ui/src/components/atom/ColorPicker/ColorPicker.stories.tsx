@@ -16,7 +16,7 @@ export default meta
 type Story = StoryObj<typeof ColorPicker>
 
 export const Default: Story = {
-    render: (args) => {
+  render: function Render(args) {
         const [color, setColor] = React.useState("");
         return(
             <ColorPicker {...args} color={color} onChange={setColor} />
@@ -25,7 +25,7 @@ export const Default: Story = {
 }
 
 export const ShowResult: Story = {
-    render: (args) => {
+  render: function Render(args) {
         const [color, setColor] = React.useState("");
         return(
           <div className="flex flex-col gap-2">

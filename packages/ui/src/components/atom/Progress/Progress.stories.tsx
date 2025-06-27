@@ -18,11 +18,9 @@ export const Static: Story = {
 };
 
 export const Animated: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [value, setValue] = useState(0);
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       const interval = setInterval(() => {
         setValue((prev) => (prev >= 100 ? 0 : prev + 10));

@@ -18,7 +18,7 @@ import type { FilterSelect } from "../../molecule/FilterBar/FilterBar";
 import { Checkbox } from "../../atom/Checkbox/Checkbox";
 
 type DataTableProps<TData> = {
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData, unknown>[];
   data: TData[];
   pageSize?: number;
   filterColumnKey?: string;
@@ -45,7 +45,7 @@ export function DataTable<TData>({
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelectionState, setRowSelection] = React.useState({});
 
-  const selectionColumn: ColumnDef<TData, any> = {
+  const selectionColumn: ColumnDef<TData, unknown> = {
     id: "select",
     header: ({ table }) => (
       <Checkbox

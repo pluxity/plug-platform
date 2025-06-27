@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof SearchInput>;
 
 export const Default: Story = {
-    render:(args) => {
+    render: function Render(args) {
         const [value, setValue] = useState("");
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

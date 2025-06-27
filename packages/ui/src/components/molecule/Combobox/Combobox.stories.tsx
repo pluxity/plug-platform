@@ -22,7 +22,7 @@ const frameworks: ComboboxOption[] = [
 ]
 
 export const Default: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [value, setValue] = React.useState("")
     return (
       <Combobox

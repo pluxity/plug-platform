@@ -22,7 +22,7 @@ export default meta;
 type Story = StoryObj<typeof LabeledInput>;
 
 export const Default: Story = {
-    render:(args) => {
+    render: function Render(args) {
         const [value, setValue] = useState("");
         const [isValid, setIsValid] = useState(true);
 
@@ -51,7 +51,7 @@ export const Default: Story = {
 }
 
 export const MultipleInputs: Story = {
-    render:() => {
+    render: function Render() {
         const [value, setValue] = useState("");
         const [secondValue, setSecondValue] = useState("");
 

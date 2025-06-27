@@ -22,7 +22,7 @@ type Option = { label: string; value: string };
 type OptionMap = Record<string, Option[]>;
 
 export const Default: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [main, setMain] = React.useState("");
     const [sub, setSub] = React.useState("");
     const [detail, setDetail] = React.useState("");
@@ -95,7 +95,7 @@ export const Default: Story = {
 }
 
 export const NoDetail: Story = {
-  render: () => {
+  render: function Render() {
     const [main, setMain] = React.useState("");
     const [sub, setSub] = React.useState("");
     const [search, setSearch] = React.useState("");
@@ -142,7 +142,7 @@ export const NoDetail: Story = {
 }
 
 export const NoSearchInput: Story = {
-  render: () => {
+  render: function Render() {
     const [main, setMain] = React.useState("");
     const [sub, setSub] = React.useState("");
     const [detail, setDetail] = React.useState("");

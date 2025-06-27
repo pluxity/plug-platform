@@ -177,7 +177,7 @@ export const Loop: Story = {
 }
 
 export const Api: Story = {
-    render: () => {
+  render: function Render() {
       const [api, setApi] = React.useState<CarouselApi>();
       const [current, setCurrent] = React.useState(0);
       const [count, setCount] = React.useState(0);

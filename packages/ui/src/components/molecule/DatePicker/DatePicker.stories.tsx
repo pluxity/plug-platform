@@ -14,7 +14,7 @@ export default meta
 type Story = StoryObj<typeof DatePicker>
 
 export const Default: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [date, setDate] = React.useState<Date>()
     return (
       <DatePicker

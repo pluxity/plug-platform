@@ -124,11 +124,9 @@ const meta: Meta<NavigationMenuProps> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const AllOptions: Story = {
-  render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render(args) {
     const [activeItem, setActiveItem] = useState(args.defaultValue || "home");
     
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       if (args.value !== undefined) {
         setActiveItem(args.value);

@@ -22,8 +22,7 @@ export default meta
 type Story = StoryObj<typeof MultiSelect>
 
 export const Default: Story = {
-  render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render(args) {
     const [value, setValue] = useState<string[]>([])
 
     return (
@@ -35,7 +34,7 @@ export const Default: Story = {
 }
 
 export const PreSelected: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [value, setValue] = useState<string[]>(["apple", "banana"])
 
     return (

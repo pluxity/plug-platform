@@ -43,7 +43,7 @@ export default meta;
 type Story = StoryObj<typeof DataTable<typeof data[0]>>;
 
 export const Default: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [main, setMain] = useState("");
 
     const mainOptions = [
@@ -82,7 +82,7 @@ export const Default: Story = {
 };
 
 export const PanginationSize: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [main, setMain] = useState("");
     const mainOptions = [
       { label: "전체", value: "all" },
@@ -120,7 +120,7 @@ export const PanginationSize: Story = {
 };
 
 export const NoFilter: Story = {
-  render: (args) => {
+  render: function Render(args) {
     return (
       <DataTable
         {...args}
@@ -141,7 +141,7 @@ export const NoFilter: Story = {
 };
 
 export const NoButtons: Story = {
-  render: (args) => {
+  render: function Render(args) {
     return (
       <DataTable
         {...args}
@@ -154,7 +154,7 @@ export const NoButtons: Story = {
 };
 
 export const RowSelection: Story = {
-  render: (args) => {
+  render: function Render(args) {
     return (
       <DataTable 
         {...args} 
