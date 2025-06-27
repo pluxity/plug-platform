@@ -20,7 +20,6 @@ interface SearchFormProps {
   listClassName?: string;
   itemClassName?: string;
   clearButtonClassName?: string;
-  searchData?: string[];
   onSearch?: (search: string) => void;
   searchResult?: string[];
 }
@@ -35,14 +34,12 @@ const SearchForm = ({
     listClassName,
     itemClassName,
     clearButtonClassName,
-    searchData,
     onSearch,
     searchResult,
 }: SearchFormProps) => {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
-  const [data, setData] = React.useState<string[]>(searchData || []);
 
   const searchDebounce = React.useMemo(
     () => debounce((search: string) => {
@@ -53,19 +50,9 @@ const SearchForm = ({
         } else {
           setOpen(false);
         }
-      } else {
-        const filtered = (searchData || []).filter(item => 
-          item.toLowerCase().includes(search.toLowerCase())
-        );
-        setData(filtered);
-        if (search.trim()) {
-          setOpen(true);
-        } else {
-          setOpen(false);
-        }
-      }
+      } 
     }, 300),
-    [searchData, onSearch]
+    [onSearch]
   );
 
   const handleChange = (search: string) => {
@@ -79,7 +66,7 @@ const SearchForm = ({
     setOpen(false);
   }
 
-  const suggestions = onSearch ? (searchResult || []) : data;
+  const suggestions = onSearch ? (searchResult || []) : [];
 
   return (
     <div className={cn("relative")}>
