@@ -22,6 +22,27 @@ export const Default: Story = {
             <ColorPicker {...args} color={color} onChange={setColor} />
         )
     }
-    
 }
 
+export const ShowResult: Story = {
+    render: (args) => {
+        const [color, setColor] = React.useState("");
+        return(
+          <div className="flex flex-col gap-2">
+            <ColorPicker {...args} color={color} onChange={setColor} />
+            {
+              color && (
+                <div className="flex items-center gap-2">
+                  <span 
+                    className="w-8 h-8 rounded-full" 
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-sm text-gray-600">{color}</span>
+                </div>
+              )
+            }
+
+          </div>
+        )
+    }
+}
