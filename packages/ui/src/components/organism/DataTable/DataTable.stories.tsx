@@ -34,7 +34,7 @@ const columns: ColumnDef<typeof data[0]>[] = [
 ];
 
 const meta: Meta<typeof DataTable<typeof data[0]>> = {
-  title: "MOLECULE/DataTable",
+  title: "ORGANISM/DataTable",
   component: DataTable,
   tags: ["autodocs"],
 };

@@ -56,8 +56,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 value={select.value}
                 onValueChange={select.onChange}
             >
-                <SelectTrigger>
-                <SelectValue placeholder={select.placeholder} />
+                <SelectTrigger className="w-fit min-w-30">
+                    <SelectValue placeholder={select.placeholder} />
                 </SelectTrigger>
                 <SelectContent>
                 {select.options.map(opt => (

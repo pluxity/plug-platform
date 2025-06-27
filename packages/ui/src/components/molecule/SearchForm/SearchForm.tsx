@@ -8,47 +8,87 @@ import {
  } from "../../atom/Command/Command";
 import { X } from "lucide-react";
 import { Button } from "../../atom/Button/Button";
+import { debounce } from "lodash";
 
 interface SearchFormProps {
   value: string;
   onChange: (value: string) => void;
   onSelect: (item: string) => void;
-  suggestions: string[];
   placeholder?: string;
   className?: string;
   inputClassName?: string;
   listClassName?: string;
   itemClassName?: string;
   clearButtonClassName?: string;
+  searchData?: string[];
+  onSearch?: (search: string) => void;
+  externalSuggestions?: string[];
 }
 
 const SearchForm = ({ 
     value, 
     onChange, 
     onSelect, 
-    suggestions,
     placeholder = "검색어 입력",
     className,
     inputClassName,
     listClassName,
     itemClassName,
     clearButtonClassName,
+    searchData,
+    onSearch,
+    externalSuggestions,
 }: SearchFormProps) => {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
+  const [data, setData] = React.useState<string[]>(searchData || []);
+
+  const searchDebounce = React.useMemo(
+    () => debounce((search: string) => {
+      if (onSearch) {
+        onSearch(search);
+        if (search.trim()) {
+          setOpen(true);
+        } else {
+          setOpen(false);
+        }
+      } else {
+        const filtered = (searchData || []).filter(item => 
+          item.toLowerCase().includes(search.toLowerCase())
+        );
+        setData(filtered);
+        if (search.trim()) {
+          setOpen(true);
+        } else {
+          setOpen(false);
+        }
+      }
+    }, 300),
+    [searchData, onSearch]
+  );
+
+  const handleChange = (search: string) => {
+    onChange(search);
+    searchDebounce(search);
+  };
+
+  const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    onChange("");
+    setOpen(false);
+  }
+
+  const suggestions = onSearch ? (externalSuggestions || []) : data;
 
   return (
     <div className={cn("relative")}>
-      <Command
-        className={cn("rounded-sm border border-gray-200 bg-white text-black border-b-0", className)}
-        onFocus={() => setOpen(true)}
-      >
+      <Command className={cn("rounded-sm border border-gray-200 bg-white text-black border-b-0", className)}>
         <div className="relative flex items-center">
           <CommandInput
             ref={inputRef}
             value={value}
-            onValueChange={onChange}
+            onValueChange={handleChange}
             placeholder={placeholder}
             className={cn("flex-1 h-full border-none outline-none text-black placeholder:text-gray-400 text-sm pr-8", inputClassName)}
           />
@@ -58,10 +98,7 @@ const SearchForm = ({
               variant="ghost"
               size="icon"
               aria-label="검색어 삭제"
-              onClick={(e) => {
-                e.preventDefault();
-                onChange("");
-              }}
+              onClick={handleClear}
               className={cn("absolute right-1", clearButtonClassName)}
             >
               <X className="size-4 text-gray-400" />

@@ -13,8 +13,8 @@ import {
 } from "@tanstack/react-table";
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "../../atom/Table/Table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../atom/Pagination/Pagination";
-import { FilterBar } from "../FilterBar/FilterBar";
-import type { FilterSelect } from "../FilterBar/FilterBar";
+import { FilterBar } from "../../molecule/FilterBar/FilterBar";
+import type { FilterSelect } from "../../molecule/FilterBar/FilterBar";
 import { Checkbox } from "../../atom/Checkbox/Checkbox";
 
 type DataTableProps<TData> = {
