@@ -1,13 +1,13 @@
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
-import ProfileSvg from "../../../assets/icons/Avatar/profile.svg"
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import ProfileSvg from "../../../assets/icons/Avatar/profile.svg";
+import { AvatarProps, AvatarImageProps, AvatarFallbackProps } from "./Avatar.types";
 
 import { cn } from "../../../utils/utils";
 
 function Avatar({
   className,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+}: AvatarProps) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
@@ -24,7 +24,7 @@ function AvatarImage({
   className,
   src,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+}: AvatarImageProps) {
   if (!src) {
     return (
       <div
@@ -49,7 +49,7 @@ function AvatarImage({
 function AvatarFallback({
   className,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+}: AvatarFallbackProps) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
