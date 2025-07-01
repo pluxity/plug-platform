@@ -1,26 +1,17 @@
-import React from "react";
 import { cn } from "../../../utils/utils";
 import { Label } from '../../atom/Label/Label';
 import { Input } from '../../atom/Input/Input';
 import { useId } from 'react';
+import { LabeledInputProps } from './LabeldInput.types';
 
-interface LabeledInputProps {
-    className?: string;
-    label: string;
-    value: string;
-    error?: boolean;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-}
-
-const LabeledInput: React.FC<LabeledInputProps> = ({ 
+function LabeledInput({ 
     className,
     label,
     value,
     error,
     onChange,
     placeholder
- }) => {
+ }: LabeledInputProps) {
     const inputId = useId();
 
     return(

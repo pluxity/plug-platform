@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import * as React from "react"
-import { DatePicker } from "./DatePicker"
+import type { Meta, StoryObj } from "@storybook/react";
+import * as React from "react";
+import { DatePicker } from "./DatePicker";
 
 const meta: Meta<typeof DatePicker> = {
   title: 'Molecule/DatePicker',

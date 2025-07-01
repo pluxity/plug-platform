@@ -44,7 +44,7 @@ export interface ChartTooltipContentProps {
   hideLabel?: boolean;
   hideIndicator?: boolean;
   label?: string | number;
-  labelFormatter?: (value: string | number, payload: ChartTooltipContentProps["payload"]) => React.ReactNode;
+  labelFormatter?: (value: React.ReactNode, payload: ChartTooltipContentProps["payload"]) => React.ReactNode;
   labelClassName?: string;
   formatter?: (value: number, name: string, props: { value?: number; name?: string; dataKey?: string; color?: string; payload?: Record<string, unknown> }, index: number, payload: ChartTooltipContentProps["payload"]) => React.ReactNode;
   color?: string;

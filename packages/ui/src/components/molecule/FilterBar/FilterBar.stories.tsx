@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import * as React from "react"
-import { FilterBar } from "./FilterBar"
+import type { Meta, StoryObj } from "@storybook/react";
+import * as React from "react";
+import { FilterBar } from "./FilterBar";
 
 const meta: Meta<typeof FilterBar> = {
   title: 'MOLECULE/FilterBar',
@@ -10,8 +10,8 @@ const meta: Meta<typeof FilterBar> = {
   },
   tags: ['autodocs'],
   argTypes: {
-    searchPlaceholder: { control: 'text' },
     showSearchInput: { control: 'boolean' },
+    searchPlaceholder: { control: 'text' },
   }
 }
 

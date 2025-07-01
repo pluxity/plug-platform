@@ -15,27 +15,15 @@ import {
   PopoverTrigger,
 } from "../../atom/Popover/Popover"
 import { cn } from "../../../utils/utils"
+import { ComboboxProps } from "./Combobox.types"
 
-export type ComboboxOption = {
-  value: string
-  label: string
-}
-
-type ComboboxProps = {
-  options: ComboboxOption[]
-  placeholder?: string
-  value: string
-  onChange: (value: string) => void
-  className?: string
-}
-
-export const Combobox: React.FC<ComboboxProps> = ({
+function Combobox({
   options,
   placeholder = "Select...",
   value,
   onChange,
   className,
-}) => {
+}: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -84,3 +72,7 @@ export const Combobox: React.FC<ComboboxProps> = ({
     </Popover>
   )
 }
+
+Combobox.displayName = "Combobox";
+
+export { Combobox };

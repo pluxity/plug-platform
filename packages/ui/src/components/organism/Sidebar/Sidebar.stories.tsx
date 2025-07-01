@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { MemoryRouter } from "react-router-dom";
-import Sidebar, { SidebarItem } from "./Sidebar";
+import Sidebar from "./Sidebar";
+import { SidebarItem } from "./Sidebar.types";
 import { useState } from "react";
 
 const meta: Meta<typeof Sidebar> = {
@@ -10,7 +11,6 @@ const meta: Meta<typeof Sidebar> = {
 };
 
 export default meta;
-
 type Story = StoryObj<typeof Sidebar>;
 
 const sidebarItems: SidebarItem[] = [

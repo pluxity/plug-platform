@@ -14,22 +14,10 @@ import {
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "../../atom/Table/Table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../atom/Pagination/Pagination";
 import { FilterBar } from "../../molecule/FilterBar/FilterBar";
-import type { FilterSelect } from "../../molecule/FilterBar/FilterBar";
 import { Checkbox } from "../../atom/Checkbox/Checkbox";
+import { DataTableProps } from "./DataTable.types";
 
-type DataTableProps<TData> = {
-  columns: ColumnDef<TData, unknown>[];
-  data: TData[];
-  pageSize?: number;
-  filterColumnKey?: string;
-  filterPlaceholder?: string;
-  showFilter?: boolean;
-  selects?: FilterSelect[];
-  buttons?: React.ReactNode;
-  rowSelection?: boolean;
-};
-
-export function DataTable<TData>({
+function DataTable<TData>({
   columns,
   data,
   pageSize = 10,
@@ -179,3 +167,7 @@ export function DataTable<TData>({
     </div>
   );
 }
+
+DataTable.displayName = "DataTable";
+
+export { DataTable };

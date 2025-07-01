@@ -9,22 +9,8 @@ import {
 import { X } from "lucide-react";
 import { Button } from "../../atom/Button/Button";
 import { debounce } from "lodash";
-
-interface SearchFormProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSelect: (item: string) => void;
-  placeholder?: string;
-  className?: string;
-  inputClassName?: string;
-  listClassName?: string;
-  itemClassName?: string;
-  clearButtonClassName?: string;
-  onSearch?: (search: string) => void;
-  searchResult?: string[];
-}
-
-const SearchForm = ({ 
+import { SearchFormProps } from "./SearchForm.types";
+function SearchForm({ 
     value, 
     onChange, 
     onSelect, 
@@ -36,7 +22,7 @@ const SearchForm = ({
     clearButtonClassName,
     onSearch,
     searchResult,
-}: SearchFormProps) => {
+}: SearchFormProps) {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
@@ -120,4 +106,5 @@ const SearchForm = ({
 }
 
 SearchForm.displayName = "SearchForm";
+
 export { SearchForm }

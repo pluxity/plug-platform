@@ -1,27 +1,21 @@
-import * as React from "react"
-import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { Button } from "../../atom/Button/Button"
-import { Calendar } from "../../atom/Calendar/Calendar"
+import * as React from "react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Button } from "../../atom/Button/Button";
+import { Calendar } from "../../atom/Calendar/Calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../atom/Popover/Popover"
+} from "../../atom/Popover/Popover";
+import { DatePickerProps } from "./DatePicker.types";
 
-type DatePickerProps = {
-  value?: Date
-  onChange?: (date: Date | undefined) => void
-  placeholder?: string
-  className?: string
-}
-
-export const DatePicker: React.FC<DatePickerProps> = ({
+function DatePicker({
   value,
   onChange,
   placeholder = "Pick a date",
   className,
-}) => {
+}: DatePickerProps) {
   const [internalDate, setInternalDate] = React.useState<Date | undefined>(value)
 
   React.useEffect(() => {
@@ -51,3 +45,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     </Popover>
   )
 }
+
+DatePicker.displayName = "DatePicker";
+
+export { DatePicker };
