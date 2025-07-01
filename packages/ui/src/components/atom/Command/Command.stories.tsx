@@ -21,6 +21,26 @@ const meta: Meta<typeof Command> = {
         control: 'text',
         description: 'className',
       },
+      value: {
+        control: 'text',
+        description: 'value',
+      },
+      onValueChange: {
+        control: 'text',
+        description: 'onValueChange',
+      },
+      defaultValue: {
+        control: 'text',
+        description: 'defaultValue',
+      },  
+      label: {
+        control: 'text',
+        description: 'label',
+      },
+      asChild: {
+        control: 'boolean',
+        description: 'asChild',
+      },
     },
   }
 

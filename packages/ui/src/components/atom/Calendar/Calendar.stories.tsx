@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Calendar } from "./Calendar"
-import { useState } from "react"
-import { DateRange } from "react-day-picker"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Calendar } from "./Calendar";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
 
 const meta: Meta<typeof Calendar> = {
     title: 'ATOM/Calendar',

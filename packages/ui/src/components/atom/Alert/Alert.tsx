@@ -16,6 +16,8 @@ function Alert({
   )
 }
 
+Alert.displayName = "Alert";
+
 function AlertTitle({ className, ...props }: AlertTitleProps) {
   return (
     <div
@@ -28,6 +30,8 @@ function AlertTitle({ className, ...props }: AlertTitleProps) {
     />
   )
 }
+
+AlertTitle.displayName = "AlertTitle";
 
 function AlertDescription({
   className,
@@ -44,5 +48,7 @@ function AlertDescription({
     />
   )
 }
+
+AlertDescription.displayName = "AlertDescription";
 
 export { Alert, AlertTitle, AlertDescription }

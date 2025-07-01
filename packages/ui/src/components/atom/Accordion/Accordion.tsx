@@ -10,6 +10,8 @@ function Accordion({
   return <AccordionPrimitive.Root data-slot="accordion" {...props} />
 }
 
+Accordion.displayName = "Accordion";
+
 function AccordionItem({
   className,
   ...props
@@ -22,6 +24,8 @@ function AccordionItem({
     />
   )
 }
+
+AccordionItem.displayName = "AccordionItem";
 
 function AccordionTrigger({
   className,
@@ -45,6 +49,7 @@ function AccordionTrigger({
   )
 }
 
+AccordionTrigger.displayName = "AccordionTrigger";
 function AccordionContent({
   className,
   children,
@@ -60,5 +65,7 @@ function AccordionContent({
     </AccordionPrimitive.Content>
   )
 }
+
+AccordionContent.displayName = "AccordionContent";
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }

@@ -14,6 +14,8 @@ function Card({ className, ...props }: CardProps) {
   )
 }
 
+Card.displayName = "Card";
+
 function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
     <div
@@ -27,6 +29,8 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
   )
 }
 
+CardHeader.displayName = "CardHeader";
+
 function CardTitle({ className, ...props }: CardTitleProps) {
   return (
     <div
@@ -37,6 +41,8 @@ function CardTitle({ className, ...props }: CardTitleProps) {
   )
 }
 
+CardTitle.displayName = "CardTitle";
+
 function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
     <div
@@ -46,6 +52,8 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
     />
   )
 }
+
+CardDescription.displayName = "CardDescription";
 
 function CardAction({ className, ...props }: CardActionProps) {
   return (
@@ -60,6 +68,8 @@ function CardAction({ className, ...props }: CardActionProps) {
   )
 }
 
+CardAction.displayName = "CardAction";
+
 function CardContent({ className, ...props }: CardContentProps) {
   return (
     <div
@@ -70,6 +80,8 @@ function CardContent({ className, ...props }: CardContentProps) {
   )
 }
 
+CardContent.displayName = "CardContent";
+
 function CardFooter({ className, ...props }: CardFooterProps) {
   return (
     <div
@@ -79,6 +91,8 @@ function CardFooter({ className, ...props }: CardFooterProps) {
     />
   )
 }
+
+CardFooter.displayName = "CardFooter";
 
 export {
   Card,

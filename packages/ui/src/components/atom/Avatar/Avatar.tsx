@@ -20,6 +20,8 @@ function Avatar({
   )
 }
 
+Avatar.displayName = "Avatar";
+
 function AvatarImage({
   className,
   src,
@@ -46,6 +48,8 @@ function AvatarImage({
   )
 }
 
+AvatarImage.displayName = "AvatarImage";
+
 function AvatarFallback({
   className,
   ...props
@@ -61,5 +65,7 @@ function AvatarFallback({
     />
   )
 }
+
+AvatarFallback.displayName = "AvatarFallback";
 
 export { Avatar, AvatarImage, AvatarFallback }

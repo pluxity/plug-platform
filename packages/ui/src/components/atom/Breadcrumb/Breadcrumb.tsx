@@ -8,6 +8,9 @@ function Breadcrumb({ ...props }: BreadcrumbProps) {
   return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
 }
 
+Breadcrumb.displayName = "Breadcrumb";
+
+
 function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (
     <ol
@@ -21,6 +24,8 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   )
 }
 
+BreadcrumbList.displayName = "BreadcrumbList";
+
 function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
   return (
     <li
@@ -30,6 +35,8 @@ function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
     />
   )
 }
+
+BreadcrumbItem.displayName = "BreadcrumbItem";
 
 function BreadcrumbLink({
   asChild,
@@ -47,6 +54,8 @@ function BreadcrumbLink({
   )
 }
 
+BreadcrumbLink.displayName = "BreadcrumbLink";
+
 function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
   return (
     <span
@@ -59,6 +68,8 @@ function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
     />
   )
 }
+
+BreadcrumbPage.displayName = "BreadcrumbPage";
 
 function BreadcrumbSeparator({
   children,
@@ -78,6 +89,8 @@ function BreadcrumbSeparator({
   )
 }
 
+BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
+
 function BreadcrumbEllipsis({
   className,
   ...props
@@ -95,6 +108,8 @@ function BreadcrumbEllipsis({
     </span>
   )
 }
+
+BreadcrumbEllipsis.displayName = "BreadcrumbEllipsis";
 
 export {
   Breadcrumb,

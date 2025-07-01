@@ -1,48 +1,58 @@
-import * as React from "react"
-import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
+import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
+import { ContextMenuProps, ContextMenuTriggerProps, ContextMenuGroupProps, ContextMenuPortalProps, ContextMenuSubProps, ContextMenuRadioGroupProps, ContextMenuSubTriggerProps, ContextMenuSubContentProps, ContextMenuContentProps, ContextMenuItemProps, ContextMenuCheckboxItemProps, ContextMenuRadioItemProps, ContextMenuLabelProps, ContextMenuSeparatorProps, ContextMenuShortcutProps } from "./ContextMenu.types";
 
 import { cn } from "../../../utils/utils";
 
 function ContextMenu({
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Root>) {
+}: ContextMenuProps) {
   return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />
 }
 
+ContextMenu.displayName = "ContextMenu";
+
 function ContextMenuTrigger({
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Trigger>) {
+}: ContextMenuTriggerProps) {
   return (
     <ContextMenuPrimitive.Trigger data-slot="context-menu-trigger" {...props} />
   )
 }
 
+ContextMenuTrigger.displayName = "ContextMenuTrigger";
+
 function ContextMenuGroup({
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Group>) {
+}: ContextMenuGroupProps) {
   return (
     <ContextMenuPrimitive.Group data-slot="context-menu-group" {...props} />
   )
-}
+  }
+
+ContextMenuGroup.displayName = "ContextMenuGroup";
 
 function ContextMenuPortal({
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
+}: ContextMenuPortalProps) {
   return (
     <ContextMenuPrimitive.Portal data-slot="context-menu-portal" {...props} />
   )
 }
 
+ContextMenuPortal.displayName = "ContextMenuPortal";
+
 function ContextMenuSub({
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Sub>) {
+}: ContextMenuSubProps) {
   return <ContextMenuPrimitive.Sub data-slot="context-menu-sub" {...props} />
 }
 
+ContextMenuSub.displayName = "ContextMenuSub";
+
 function ContextMenuRadioGroup({
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.RadioGroup>) {
+}: ContextMenuRadioGroupProps) {
   return (
     <ContextMenuPrimitive.RadioGroup
       data-slot="context-menu-radio-group"
@@ -51,14 +61,14 @@ function ContextMenuRadioGroup({
   )
 }
 
+ContextMenuRadioGroup.displayName = "ContextMenuRadioGroup";
+
 function ContextMenuSubTrigger({
   className,
   inset,
   children,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.SubTrigger> & {
-  inset?: boolean
-}) {
+}: ContextMenuSubTriggerProps) {
   return (
     <ContextMenuPrimitive.SubTrigger
       data-slot="context-menu-sub-trigger"
@@ -75,10 +85,12 @@ function ContextMenuSubTrigger({
   )
 }
 
+ContextMenuSubTrigger.displayName = "ContextMenuSubTrigger";
+
 function ContextMenuSubContent({
   className,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.SubContent>) {
+}: ContextMenuSubContentProps) {
   return (
     <ContextMenuPrimitive.SubContent
       data-slot="context-menu-sub-content"
@@ -91,10 +103,12 @@ function ContextMenuSubContent({
   )
 }
 
+ContextMenuSubContent.displayName = "ContextMenuSubContent";
+
 function ContextMenuContent({
   className,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Content>) {
+}: ContextMenuContentProps) {
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
@@ -109,15 +123,14 @@ function ContextMenuContent({
   )
 }
 
+ContextMenuContent.displayName = "ContextMenuContent";
+
 function ContextMenuItem({
   className,
   inset,
   variant = "default",
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
-}) {
+}: ContextMenuItemProps) {
   return (
     <ContextMenuPrimitive.Item
       data-slot="context-menu-item"
@@ -132,12 +145,14 @@ function ContextMenuItem({
   )
 }
 
+ContextMenuItem.displayName = "ContextMenuItem";
+
 function ContextMenuCheckboxItem({
   className,
   children,
   checked,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.CheckboxItem>) {
+}: ContextMenuCheckboxItemProps) {
   return (
     <ContextMenuPrimitive.CheckboxItem
       data-slot="context-menu-checkbox-item"
@@ -158,11 +173,13 @@ function ContextMenuCheckboxItem({
   )
 }
 
+ContextMenuCheckboxItem.displayName = "ContextMenuCheckboxItem";
+
 function ContextMenuRadioItem({
   className,
   children,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.RadioItem>) {
+}: ContextMenuRadioItemProps) {
   return (
     <ContextMenuPrimitive.RadioItem
       data-slot="context-menu-radio-item"
@@ -180,15 +197,15 @@ function ContextMenuRadioItem({
       {children}
     </ContextMenuPrimitive.RadioItem>
   )
-}
+  }
+
+ContextMenuRadioItem.displayName = "ContextMenuRadioItem";
 
 function ContextMenuLabel({
   className,
   inset,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Label> & {
-  inset?: boolean
-}) {
+}: ContextMenuLabelProps) {
   return (
     <ContextMenuPrimitive.Label
       data-slot="context-menu-label"
@@ -202,10 +219,12 @@ function ContextMenuLabel({
   )
 }
 
+ContextMenuLabel.displayName = "ContextMenuLabel";
+
 function ContextMenuSeparator({
   className,
   ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Separator>) {
+}: ContextMenuSeparatorProps) {
   return (
     <ContextMenuPrimitive.Separator
       data-slot="context-menu-separator"
@@ -215,10 +234,12 @@ function ContextMenuSeparator({
   )
 }
 
+ContextMenuSeparator.displayName = "ContextMenuSeparator";
+
 function ContextMenuShortcut({
   className,
   ...props
-}: React.ComponentProps<"span">) {
+}: ContextMenuShortcutProps) {
   return (
     <span
       data-slot="context-menu-shortcut"
@@ -229,7 +250,9 @@ function ContextMenuShortcut({
       {...props}
     />
   )
-}
+  }
+
+ContextMenuShortcut.displayName = "ContextMenuShortcut";
 
 export {
   ContextMenu,

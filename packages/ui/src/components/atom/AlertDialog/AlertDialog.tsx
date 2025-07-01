@@ -9,6 +9,8 @@ function AlertDialog({
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
 }
 
+AlertDialog.displayName = "AlertDialog";
+
 function AlertDialogTrigger({
   ...props
 }: AlertDialogTriggerProps) {
@@ -17,6 +19,8 @@ function AlertDialogTrigger({
   )
 }
 
+AlertDialogTrigger.displayName = "AlertDialogTrigger";
+
 function AlertDialogPortal({
   ...props
 }: AlertDialogPortalProps) {
@@ -24,6 +28,8 @@ function AlertDialogPortal({
     <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
   )
 }
+
+AlertDialogPortal.displayName = "AlertDialogPortal";
 
 function AlertDialogOverlay({
   className,
@@ -40,6 +46,8 @@ function AlertDialogOverlay({
     />
   )
 }
+
+AlertDialogOverlay.displayName = "AlertDialogOverlay";
 
 function AlertDialogContent({
   className,
@@ -60,6 +68,8 @@ function AlertDialogContent({
   )
 }
 
+AlertDialogContent.displayName = "AlertDialogContent";
+
 function AlertDialogHeader({
   className,
   ...props
@@ -72,6 +82,8 @@ function AlertDialogHeader({
     />
   )
 }
+
+AlertDialogHeader.displayName = "AlertDialogHeader";
 
 function AlertDialogFooter({
   className,
@@ -89,6 +101,8 @@ function AlertDialogFooter({
   )
 }
 
+AlertDialogFooter.displayName = "AlertDialogFooter";
+
 function AlertDialogTitle({
   className,
   ...props
@@ -101,6 +115,8 @@ function AlertDialogTitle({
     />
   )
 }
+
+AlertDialogTitle.displayName = "AlertDialogTitle";
 
 function AlertDialogDescription({
   className,
@@ -115,6 +131,8 @@ function AlertDialogDescription({
   )
 }
 
+AlertDialogDescription.displayName = "AlertDialogDescription";
+
 function AlertDialogAction({
   className,
   ...props
@@ -127,6 +145,8 @@ function AlertDialogAction({
   )
 }
 
+AlertDialogAction.displayName = "AlertDialogAction";
+
 function AlertDialogCancel({
   className,
   ...props
@@ -138,6 +158,8 @@ function AlertDialogCancel({
     />
   )
 }
+
+AlertDialogCancel.displayName = "AlertDialogCancel";
 
 export {
   AlertDialog,

@@ -1,8 +1,18 @@
-import * as React from "react"
-import { Command as CommandPrimitive } from "cmdk"
-import { SearchIcon } from "lucide-react"
-
+import { Command as CommandPrimitive } from "cmdk";
+import { SearchIcon } from "lucide-react";
 import { cn } from "../../../utils/utils";
+import { 
+  CommandProps, 
+  CommandInputProps, 
+  CommandListProps, 
+  CommandEmptyProps, 
+  CommandGroupProps, 
+  CommandSeparatorProps, 
+  CommandItemProps, 
+  CommandShortcutProps,
+  CommandDialogProps
+} from "./Command.types";
+
 import {
   Dialog,
   DialogContent,
@@ -14,7 +24,7 @@ import {
 function Command({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive>) {
+}: CommandProps) {
   return (
     <CommandPrimitive
       data-slot="command"
@@ -27,6 +37,8 @@ function Command({
   )
 }
 
+Command.displayName = "Command";      
+
 function CommandDialog({
   title = "Command Palette",
   description = "Search for a command to run...",
@@ -34,12 +46,7 @@ function CommandDialog({
   className,
   showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof Dialog> & {
-  title?: string
-  description?: string
-  className?: string
-  showCloseButton?: boolean
-}) {
+}: CommandDialogProps) {
   return (
     <Dialog {...props}>
       <DialogHeader className="sr-only">
@@ -58,10 +65,11 @@ function CommandDialog({
   )
 }
 
+CommandDialog.displayName = "CommandDialog";
 function CommandInput({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+}: CommandInputProps) {
   return (
     <div
       data-slot="command-input-wrapper"
@@ -80,10 +88,12 @@ function CommandInput({
   )
 }
 
+CommandInput.displayName = "CommandInput";
+
 function CommandList({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.List>) {
+}: CommandListProps) {
   return (
     <CommandPrimitive.List
       data-slot="command-list"
@@ -96,9 +106,11 @@ function CommandList({
   )
 }
 
+CommandList.displayName = "CommandList";
+
 function CommandEmpty({
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Empty>) {
+}: CommandEmptyProps) {
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
@@ -108,10 +120,12 @@ function CommandEmpty({
   )
 }
 
+CommandEmpty.displayName = "CommandEmpty";
+
 function CommandGroup({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Group>) {
+}: CommandGroupProps) {
   return (
     <CommandPrimitive.Group
       data-slot="command-group"
@@ -124,10 +138,12 @@ function CommandGroup({
   )
 }
 
+CommandGroup.displayName = "CommandGroup";
+
 function CommandSeparator({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Separator>) {
+}: CommandSeparatorProps) {
   return (
     <CommandPrimitive.Separator
       data-slot="command-separator"
@@ -137,10 +153,12 @@ function CommandSeparator({
   )
 }
 
+CommandSeparator.displayName = "CommandSeparator";
+
 function CommandItem({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Item>) {
+}: CommandItemProps) {
   return (
     <CommandPrimitive.Item
       data-slot="command-item"
@@ -163,10 +181,12 @@ function CommandItem({
   )
 }
 
+CommandItem.displayName = "CommandItem";
+
 function CommandShortcut({
   className,
   ...props
-}: React.ComponentProps<"span">) {
+}: CommandShortcutProps) {
   return (
     <span
       data-slot="command-shortcut"
@@ -178,6 +198,8 @@ function CommandShortcut({
     />
   )
 }
+
+CommandShortcut.displayName = "CommandShortcut";
 
 export {
   Command,

@@ -1,18 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import React from "react"
-
+import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { 
-    type CarouselApi,
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselPrevious,
-    CarouselNext,
-    CarouselIndicator,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselIndicator,
 } from "./Carousel"
-
+import { CarouselApi } from "./Carousel.types";
 import { Card, CardContent } from "../Card/Card";
-
 
 const meta: Meta<typeof Carousel> = {
     title: 'ATOM/Carousel',

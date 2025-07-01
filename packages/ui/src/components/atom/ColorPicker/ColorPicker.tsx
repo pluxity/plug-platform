@@ -1,22 +1,24 @@
-import { SketchPicker, ColorResult } from "react-color"
+import { SketchPicker, ColorResult } from "react-color";  
+import { ColorPickerProps } from "./ColorPicker.types";
 
-interface ColorPickerProps {
-  color: string
-  onChange: (color: string) => void
-  className?: string
-}
-
-const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange, className }) => {
+function ColorPicker ({ 
+  color, 
+  onChange, 
+  className,
+  ...props
+}: ColorPickerProps) {
 
   const handleChange = (colorResult: ColorResult) => {
     onChange(colorResult.hex)
   }
 
   return (
-    <div className={className}>
+    <div className={className} {...props}>
       <SketchPicker color={color} onChange={handleChange} />
     </div>
   )
 }
+
+ColorPicker.displayName = "ColorPicker";
 
 export { ColorPicker } 

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./Collapsible"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./Collapsible";
 import { Button } from '../Button/Button';
 import { ChevronsUpDown } from "lucide-react";
 import React from "react";

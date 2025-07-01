@@ -1,24 +1,16 @@
-import * as React from "react"
-import * as RechartsPrimitive from "recharts"
+import * as React from "react";
+import * as RechartsPrimitive from "recharts";
 
 import { cn } from "../../../utils/utils";
-
-// Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const
-
-export type ChartConfig = {
-  [k in string]: {
-    label?: React.ReactNode
-    icon?: React.ComponentType
-  } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  )
-}
-
-type ChartContextProps = {
-  config: ChartConfig
-}
+import {
+  THEMES,
+  ChartConfig,
+  ChartContextProps,
+  ChartContainerProps,
+  ChartStyleProps,
+  ChartTooltipContentProps,
+  ChartLegendContentProps
+} from "./Chart.types";
 
 const ChartContext = React.createContext<ChartContextProps | null>(null)
 
@@ -38,12 +30,7 @@ function ChartContainer({
   children,
   config,
   ...props
-}: React.ComponentProps<"div"> & {
-  config: ChartConfig
-  children: React.ComponentProps<
-    typeof RechartsPrimitive.ResponsiveContainer
-  >["children"]
-}) {
+}: ChartContainerProps) {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
@@ -67,7 +54,9 @@ function ChartContainer({
   )
 }
 
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+ChartContainer.displayName = "ChartContainer"
+
+const ChartStyle = ({ id, config }: ChartStyleProps) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
   )
@@ -97,6 +86,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   )
 }
 
+ChartStyle.displayName = "ChartStyle"
+
 const ChartTooltip = RechartsPrimitive.Tooltip
 
 function ChartTooltipContent({
@@ -113,14 +104,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-  }) {
+}: ChartTooltipContentProps) {
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -251,11 +235,7 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-    hideIcon?: boolean
-    nameKey?: string
-  }) {
+}: ChartLegendContentProps) {
   const { config } = useChart()
 
   if (!payload?.length) {
