@@ -10,6 +10,12 @@ const meta: Meta<typeof Popover> = {
   title: "ATOM/Popover",
   component: Popover,
   tags: ["autodocs"],
+  argTypes: {
+    open: { control: "boolean" },
+    defaultOpen: { control: "boolean" },
+    onOpenChange: { control: false },
+    modal: { control: "boolean" },
+  },
 }
 
 export default meta

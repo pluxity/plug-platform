@@ -1,8 +1,9 @@
-import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "../../atom/Button/Button";
 import { Calendar } from "../../atom/Calendar/Calendar";
+import { useState, useEffect } from "react";
+
 import {
   Popover,
   PopoverContent,
@@ -16,9 +17,9 @@ function DatePicker({
   placeholder = "Pick a date",
   className,
 }: DatePickerProps) {
-  const [internalDate, setInternalDate] = React.useState<Date | undefined>(value)
+  const [internalDate, setInternalDate] = useState<Date | undefined>(value)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (value !== undefined) setInternalDate(value)
   }, [value])
 

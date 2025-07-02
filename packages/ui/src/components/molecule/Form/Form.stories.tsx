@@ -85,7 +85,7 @@ export const BasicForm: Story = {
               </FormItem>
             )}
           />
-          <Button type="submit">제출</Button>
+          <Button type="submit" className="w-full">제출</Button>
         </form>
       </Form>
     );
@@ -145,7 +145,7 @@ export const WithErrors: Story = {
               </FormItem>
             )}
           />
-          <Button type="submit">제출</Button>
+          <Button type="submit" className="w-full">제출</Button>
         </form>
       </Form>
     );

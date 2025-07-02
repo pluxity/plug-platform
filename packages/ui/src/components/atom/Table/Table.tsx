@@ -1,9 +1,5 @@
-import * as React from "react";
 import { cn } from "../../../utils/utils";
-
-interface TableBaseProps {
-  unstyled?: boolean;
-}
+import { TableProps, TableHeaderProps, TableBodyProps, TableRowProps, TableHeadProps, TableCellProps, TableFooterProps, TableCaptionProps } from "./Table.types";
 
 const tableStyles = "w-full caption-bottom text-sm";
 const headerStyles = "bg-content";
@@ -15,7 +11,7 @@ function Table({
   className,
   unstyled,
   ...props
-}: React.ComponentProps<"table"> & TableBaseProps) {
+}: TableProps) {
   return (
     <div data-slot="table-container" className="relative w-full overflow-x-auto">
       <table
@@ -27,11 +23,13 @@ function Table({
   );
 }
 
+Table.displayName = "Table";
+
 function TableHeader({
   className,
   unstyled,
   ...props
-}: React.ComponentProps<"thead"> & TableBaseProps) {
+}: TableHeaderProps) {
   return (
     <thead
       data-slot="table-header"
@@ -41,11 +39,13 @@ function TableHeader({
   );
 }
 
+TableHeader.displayName = "TableHeader";
+
 function TableBody({
   className,
   unstyled,
   ...props
-}: React.ComponentProps<"tbody"> & TableBaseProps) {
+}: TableBodyProps) {
   return (
     <tbody
       data-slot="table-body"
@@ -55,11 +55,13 @@ function TableBody({
   );
 }
 
+TableBody.displayName = "TableBody";
+
 function TableRow({
   className,
   unstyled,
   ...props
-}: React.ComponentProps<"tr"> & TableBaseProps) {
+}: TableRowProps) {
   return (
     <tr
       data-slot="table-row"
@@ -69,11 +71,13 @@ function TableRow({
   );
 }
 
+TableRow.displayName = "TableRow";
+
 function TableHead({
   className,
   unstyled,
   ...props
-}: React.ComponentProps<"th"> & TableBaseProps) {
+}: TableHeadProps) {
   return (
     <th
       data-slot="table-head"
@@ -83,11 +87,13 @@ function TableHead({
   );
 }
 
+TableHead.displayName = "TableHead";
+
 function TableCell({
   className,
   unstyled,
   ...props
-}: React.ComponentProps<"td"> & TableBaseProps) {
+}: TableCellProps) {
   return (
     <td
       data-slot="table-cell"
@@ -97,7 +103,9 @@ function TableCell({
   );
 }
 
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
+TableCell.displayName = "TableCell";
+
+function TableFooter({ className, ...props }: TableFooterProps) {
   return (
     <tfoot
       data-slot="table-footer"
@@ -107,10 +115,12 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   );
 }
 
+TableFooter.displayName = "TableFooter";
+
 function TableCaption({
   className,
   ...props
-}: React.ComponentProps<"caption">) {
+}: TableCaptionProps) {
   return (
     <caption
       data-slot="table-caption"
@@ -119,6 +129,8 @@ function TableCaption({
     />
   );
 }
+
+TableCaption.displayName = "TableCaption";
 
 export {
   Table,

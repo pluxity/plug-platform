@@ -1,5 +1,5 @@
-import * as React from "react";
 import * as RechartsPrimitive from "recharts";
+import { createContext, useContext, useMemo, useId } from "react";
 
 import { cn } from "../../../utils/utils";
 import {
@@ -12,10 +12,10 @@ import {
   ChartLegendContentProps
 } from "./Chart.types";
 
-const ChartContext = React.createContext<ChartContextProps | null>(null)
+const ChartContext = createContext<ChartContextProps | null>(null)
 
 function useChart() {
-  const context = React.useContext(ChartContext)
+  const context = useContext(ChartContext)
 
   if (!context) {
     throw new Error("useChart must be used within a <ChartContainer />")
@@ -31,7 +31,7 @@ function ChartContainer({
   config,
   ...props
 }: ChartContainerProps) {
-  const uniqueId = React.useId()
+  const uniqueId = useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
   return (
@@ -107,7 +107,7 @@ function ChartTooltipContent({
 }: ChartTooltipContentProps) {
   const { config } = useChart()
 
-  const tooltipLabel = React.useMemo(() => {
+  const tooltipLabel = useMemo(() => {
     if (hideLabel || !payload?.length) {
       return null
     }

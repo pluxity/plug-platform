@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { FilterSelect } from "../../molecule/FilterBar/FilterBar";
+import { FilterSelect } from "../../molecule/FilterBar/FilterBar.types";
 
 export interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];

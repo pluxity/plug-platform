@@ -1,25 +1,25 @@
-import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { XIcon } from "lucide-react"
 import { cn } from "../../../utils/utils";
+import {
+  DialogStylePopoverProps,
+  DialogStylePopoverTriggerProps,
+  DialogStylePopoverContentProps,
+  DialogStylePopoverAnchorProps,
+} from "./DialogPopover.types";
 
 function DialogStylePopover({ ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+}: DialogStylePopoverProps) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />
 }
 
-function DialogStylePopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
+DialogStylePopover.displayName = "DialogStylePopover";  
+
+function DialogStylePopoverTrigger({ ...props }: DialogStylePopoverTriggerProps) {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-interface DialogStylePopoverContentProps extends React.ComponentProps<typeof PopoverPrimitive.Content> {
-  title?: React.ReactNode;
-  showCloseButton?: boolean;
-  footer?: React.ReactNode;
-  onClose?: () => void;
-}
+DialogStylePopoverTrigger.displayName = "DialogStylePopoverTrigger";
 
 function DialogStylePopoverContent({
   className,
@@ -74,9 +74,13 @@ function DialogStylePopoverContent({
   );
 }
 
-function DialogStylePopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
+DialogStylePopoverContent.displayName = "DialogStylePopoverContent";
+
+function DialogStylePopoverAnchor({ ...props }: DialogStylePopoverAnchorProps) {
   return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />
 }
+
+DialogStylePopoverAnchor.displayName = "DialogStylePopoverAnchor";
 
 export { 
   DialogStylePopover, 

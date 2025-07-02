@@ -1,9 +1,9 @@
-import { useTheme } from "next-themes"
-import { Toaster, ToasterProps } from "sonner"
-import React from "react";
+import { useTheme } from "next-themes";
+import { Toaster, ToasterProps } from "sonner";
+import { ToastProps } from "./Toast.types";
 
-const Toast = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+function Toast ({ ...props }: ToastProps) {
+  const { theme = "system" } = useTheme();
 
   return (
     <Toaster
@@ -19,6 +19,6 @@ const Toast = ({ ...props }: ToasterProps) => {
       {...props}
     />
   )
-}
+};
 
-export default Toast;
+export { Toast };

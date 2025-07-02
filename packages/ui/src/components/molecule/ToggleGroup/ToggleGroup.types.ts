@@ -4,8 +4,8 @@ import { ToggleVariants } from "../../atom/Toggle/Toggle";
 
 export type ToggleGroupContextValue = VariantProps<typeof ToggleVariants>
 
-export type ToggleGroupProps = (ToggleGroupPrimitive.ToggleGroupSingleProps | ToggleGroupPrimitive.ToggleGroupMultipleProps) &
+export type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof ToggleVariants>
 
-export type ToggleGroupItemProps = ToggleGroupPrimitive.ToggleGroupItemProps &
+export type ToggleGroupItemProps = React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
   VariantProps<typeof ToggleVariants>

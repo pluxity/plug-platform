@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   ColumnDef,
   flexRender,
@@ -16,6 +15,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { FilterBar } from "../../molecule/FilterBar/FilterBar";
 import { Checkbox } from "../../atom/Checkbox/Checkbox";
 import { DataTableProps } from "./DataTable.types";
+import { useState } from "react";
 
 function DataTable<TData>({
   columns,
@@ -28,10 +28,10 @@ function DataTable<TData>({
   buttons,
   rowSelection,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [rowSelectionState, setRowSelection] = React.useState({});
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelectionState, setRowSelection] = useState({});
 
   const selectionColumn: ColumnDef<TData, unknown> = {
     id: "select",

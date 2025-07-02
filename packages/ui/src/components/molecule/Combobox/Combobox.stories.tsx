@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import * as React from "react"
-import { Combobox } from "./Combobox"
-import { ComboboxOption } from "./Combobox.types"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Combobox } from "./Combobox";
+import { ComboboxOption } from "./Combobox.types";
+import { useState } from "react";
 
 const meta: Meta<typeof Combobox> = {
   title: 'Molecule/Combobox',
@@ -24,7 +24,7 @@ const frameworks: ComboboxOption[] = [
 
 export const Default: Story = {
   render: function Render(args) {
-    const [value, setValue] = React.useState("")
+    const [value, setValue] = useState("")
     return (
       <Combobox
         {...args}

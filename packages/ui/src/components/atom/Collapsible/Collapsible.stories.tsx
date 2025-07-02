@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./Collapsible";
 import { Button } from '../Button/Button';
 import { ChevronsUpDown } from "lucide-react";
-import React from "react";
+import { useState } from "react";
 
 const meta: Meta<typeof Collapsible> = {
     title: 'ATOM/Collapsible',
@@ -24,7 +24,7 @@ type Story = StoryObj<typeof Collapsible>
 
 export const Default: Story = {
     render: function Render(args) {
-        const [isOpen, setIsOpen] = React.useState(false);
+        const [isOpen, setIsOpen] = useState(false);
         
         return (
             <Collapsible
@@ -83,7 +83,7 @@ export const Disabled: Story = {
 
 export const LongContent: Story = {
   render: function Render() {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     return (
       <Collapsible
         open={isOpen}

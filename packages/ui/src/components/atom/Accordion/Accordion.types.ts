@@ -1,6 +1,6 @@
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 
-export type AccordionProps = (AccordionPrimitive.AccordionSingleProps | AccordionPrimitive.AccordionMultipleProps) & {
+export type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root> & {
     type?: "single" | "multiple";
     value?: string | string[];
     defaultValue?: string | string[];
@@ -10,18 +10,18 @@ export type AccordionProps = (AccordionPrimitive.AccordionSingleProps | Accordio
     children?: React.ReactNode;
 }
 
-export interface AccordionItemProps extends AccordionPrimitive.AccordionItemProps {
+export interface AccordionItemProps extends React.ComponentProps<typeof AccordionPrimitive.Item> {
     value: string;
     className?: string;
     children?: React.ReactNode;
 }
 
-export interface AccordionTriggerProps extends AccordionPrimitive.AccordionTriggerProps {
+export interface AccordionTriggerProps extends React.ComponentProps<typeof AccordionPrimitive.Trigger> {
     className?: string;
     children?: React.ReactNode;
 }
 
-export interface AccordionContentProps extends AccordionPrimitive.AccordionContentProps {
+export interface AccordionContentProps extends React.ComponentProps<typeof AccordionPrimitive.Content> {
     className?: string;
     children?: React.ReactNode;
 }

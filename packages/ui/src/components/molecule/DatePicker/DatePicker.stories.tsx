@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import * as React from "react";
 import { DatePicker } from "./DatePicker";
+import { useState } from "react";
 
 const meta: Meta<typeof DatePicker> = {
   title: 'Molecule/DatePicker',
@@ -15,7 +15,7 @@ type Story = StoryObj<typeof DatePicker>
 
 export const Default: Story = {
   render: function Render(args) {
-    const [date, setDate] = React.useState<Date>()
+    const [date, setDate] = useState<Date>()
     return (
       <DatePicker
         {...args}

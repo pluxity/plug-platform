@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import * as React from "react";
 import { FilterBar } from "./FilterBar";
+import { useState } from "react";
 
 const meta: Meta<typeof FilterBar> = {
   title: 'MOLECULE/FilterBar',
@@ -23,10 +23,10 @@ type OptionMap = Record<string, Option[]>;
 
 export const Default: Story = {
   render: function Render(args) {
-    const [main, setMain] = React.useState("");
-    const [sub, setSub] = React.useState("");
-    const [detail, setDetail] = React.useState("");
-    const [search, setSearch] = React.useState("");
+    const [main, setMain] = useState("");
+    const [sub, setSub] = useState("");
+    const [detail, setDetail] = useState("");
+    const [search, setSearch] = useState("");
 
     const mainOptions = [
         { label: "대분류A", value: "a" },
@@ -96,9 +96,9 @@ export const Default: Story = {
 
 export const NoDetail: Story = {
   render: function Render() {
-    const [main, setMain] = React.useState("");
-    const [sub, setSub] = React.useState("");
-    const [search, setSearch] = React.useState("");
+    const [main, setMain] = useState("");
+    const [sub, setSub] = useState("");
+    const [search, setSearch] = useState("");
 
     const mainOptions = [
       { label: "대분류A", value: "a" },
@@ -143,9 +143,9 @@ export const NoDetail: Story = {
 
 export const NoSearchInput: Story = {
   render: function Render() {
-    const [main, setMain] = React.useState("");
-    const [sub, setSub] = React.useState("");
-    const [detail, setDetail] = React.useState("");
+    const [main, setMain] = useState("");
+    const [sub, setSub] = useState("");
+    const [detail, setDetail] = useState("");
 
     const mainOptions = [
       { label: "대분류A", value: "a" },

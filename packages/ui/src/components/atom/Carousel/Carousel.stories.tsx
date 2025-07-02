@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import React from "react";
+import { useState, useEffect } from "react";
 import { 
   Carousel,
   CarouselContent,
@@ -175,11 +175,11 @@ export const Loop: Story = {
 
 export const Api: Story = {
   render: function Render() {
-      const [api, setApi] = React.useState<CarouselApi>();
-      const [current, setCurrent] = React.useState(0);
-      const [count, setCount] = React.useState(0);
+      const [api, setApi] = useState<CarouselApi>();
+      const [current, setCurrent] = useState(0);
+      const [count, setCount] = useState(0);
   
-      React.useEffect(() => {
+      useEffect(() => {
         if (!api) return;
   
         setCount(api.scrollSnapList().length);

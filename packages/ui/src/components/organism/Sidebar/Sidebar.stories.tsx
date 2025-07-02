@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { MemoryRouter } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import { Sidebar }from "./Sidebar";
 import { SidebarItem } from "./Sidebar.types";
 import { useState } from "react";
 

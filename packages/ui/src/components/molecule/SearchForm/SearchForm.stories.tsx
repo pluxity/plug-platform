@@ -1,7 +1,7 @@
 // SearchForm.stories.tsx
 import type { Meta, StoryObj } from "@storybook/react";
 import { SearchForm } from "./SearchForm";
-import * as React from "react";
+import { useState } from "react";
 
 const meta: Meta<typeof SearchForm> = {
   title: "Molecule/SearchForm",
@@ -25,8 +25,8 @@ type Story = StoryObj<typeof SearchForm>;
 
 export const Default: Story = {
   render: function Render(args) {
-    const [value, setValue] = React.useState("");
-    const [apiSuggestions, setApiSuggestions] = React.useState<string[]>([]);
+    const [value, setValue] = useState("");
+    const [apiSuggestions, setApiSuggestions] = useState<string[]>([]);
     const allData = ["김포공항", "김포역", "김포한강", "서울역", "인천공항", "부산역", "대구역", "광주역"];
 
     const handleSearch = (search: string) => {
@@ -57,8 +57,8 @@ export const Default: Story = {
 
 export const CustomStyle: Story = {
   render: function Render(args) {
-    const [value, setValue] = React.useState("");
-    const [apiSuggestions, setApiSuggestions] = React.useState<string[]>([]);
+    const [value, setValue] = useState("");
+    const [apiSuggestions, setApiSuggestions] = useState<string[]>([]);
     const allData = ["김포공항", "김포역", "김포한강", "서울역", "인천공항", "부산역", "대구역", "광주역"];
 
     const handleSearch = (search: string) => {

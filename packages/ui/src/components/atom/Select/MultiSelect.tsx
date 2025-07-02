@@ -1,6 +1,6 @@
-import * as React from "react"
 import * as Popover from "@radix-ui/react-popover"
 import { cn } from "../../../utils/utils"
+import { MultiSelectProps } from "./MultiSelect.types";
 
 const ChevronDownArrow = ({ className }: { className?: string }) => (
   <svg
@@ -32,22 +32,7 @@ const DeleteIcon = ({ onClick }: { onClick?: (e: React.MouseEvent) => void }) =>
   </div>
 );
 
-type Option = {
-  label: string
-  value: string
-}
-
-interface MultiSelectProps {
-  options: Option[]
-  value: string[]
-  onChange: (value: string[]) => void
-  placeholder?: string
-  className?: string
-  disabled?: boolean
-  invalid?: boolean
-}
-
-export const MultiSelect: React.FC<MultiSelectProps> = ({ 
+function MultiSelect ({ 
   options, 
   value, 
   onChange, 
@@ -55,7 +40,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   className,
   disabled = false,
   invalid = false
-}) => {
+}: MultiSelectProps) {
   const toggleValue = (v: string) => {
     if (value.includes(v)) {
       onChange(value.filter((item) => item !== v))
@@ -153,3 +138,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
     </Popover.Root>
   )
 }
+
+MultiSelect.displayName = "MultiSelect";
+
+export { MultiSelect };

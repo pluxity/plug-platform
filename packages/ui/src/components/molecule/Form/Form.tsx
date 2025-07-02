@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import {
   Controller,
@@ -11,6 +10,7 @@ import {
 } from "react-hook-form";
 import { cn } from "../../../utils/utils";
 import { Label } from "../../atom/Label/Label";
+import { createContext, useContext, useId } from "react";
 import { 
   FormFieldContextValue, 
   FormItemContextValue,
@@ -23,7 +23,7 @@ import {
 
 const Form = FormProvider
 
-const FormFieldContext = React.createContext<FormFieldContextValue>(
+const FormFieldContext = createContext<FormFieldContextValue>(
   {} as FormFieldContextValue
 )
 
@@ -41,8 +41,8 @@ function FormField<
 }
 
 const useFormField = () => {
-  const fieldContext = React.useContext(FormFieldContext)
-  const itemContext = React.useContext(FormItemContext)
+  const fieldContext = useContext(FormFieldContext)
+  const itemContext = useContext(FormItemContext)
   const { getFieldState } = useFormContext()
   const formState = useFormState({ name: fieldContext.name })
   const fieldState = getFieldState(fieldContext.name, formState)
@@ -63,12 +63,12 @@ const useFormField = () => {
   }
 }
 
-const FormItemContext = React.createContext<FormItemContextValue>(
+const FormItemContext = createContext<FormItemContextValue>(
   {} as FormItemContextValue
 )
 
 function FormItem({ className, ...props }: FormItemProps) {
-  const id = React.useId()
+  const id = useId()
 
   return (
     <FormItemContext.Provider value={{ id }}>

@@ -1,10 +1,6 @@
-import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
-import { cn } from "../../../utils/utils"
-
-interface LabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {
-  disabled?: boolean
-}
+import * as LabelPrimitive from "@radix-ui/react-label";
+import { cn } from "../../../utils/utils";
+import { LabelProps } from "./Label.types";
 
 function Label({
   disabled,
@@ -31,4 +27,5 @@ function Label({
   )
 }
 
+Label.displayName = 'Label';
 export { Label }

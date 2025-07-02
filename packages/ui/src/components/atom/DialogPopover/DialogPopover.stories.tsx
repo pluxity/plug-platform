@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 import {
   DialogStylePopover,
   DialogStylePopoverTrigger,
   DialogStylePopoverContent,
   DialogStylePopoverAnchor,
-} from "./DialogPopover"
+} from "./DialogPopover";
 
 const meta: Meta<typeof DialogStylePopover> = {
   title: "ATOM/DialogStylePopover",

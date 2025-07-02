@@ -1,6 +1,6 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
-export interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
+export interface AlertDialogProps extends React.ComponentProps<typeof AlertDialogPrimitive.Root> {
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
@@ -8,21 +8,21 @@ export interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps 
     children?: React.ReactNode;
 }
 
-export interface AlertDialogTriggerProps extends AlertDialogPrimitive.AlertDialogTriggerProps {
+export interface AlertDialogTriggerProps extends React.ComponentProps<typeof AlertDialogPrimitive.Trigger> {
     asChild?: boolean;
     children?: React.ReactNode;
 }
 
-export interface AlertDialogPortalProps extends AlertDialogPrimitive.AlertDialogPortalProps {
+export interface AlertDialogPortalProps extends React.ComponentProps<typeof AlertDialogPrimitive.Portal> {
     children?: React.ReactNode;
 }
 
-export interface AlertDialogOverlayProps extends AlertDialogPrimitive.AlertDialogOverlayProps {
+export interface AlertDialogOverlayProps extends React.ComponentProps<typeof AlertDialogPrimitive.Overlay> {
     className?: string;
     children?: React.ReactNode;
 }
 
-export interface AlertDialogContentProps extends AlertDialogPrimitive.AlertDialogContentProps {
+export interface AlertDialogContentProps extends React.ComponentProps<typeof AlertDialogPrimitive.Content> {
     className?: string;
     children?: React.ReactNode;
 }
@@ -37,22 +37,22 @@ export interface AlertDialogFooterProps extends React.ComponentProps<"div"> {
     children?: React.ReactNode;
 }
 
-export interface AlertDialogTitleProps extends AlertDialogPrimitive.AlertDialogTitleProps {
+export interface AlertDialogTitleProps extends React.ComponentProps<typeof AlertDialogPrimitive.Title> {
     className?: string;
     children?: React.ReactNode;
 }
 
-export interface AlertDialogDescriptionProps extends AlertDialogPrimitive.AlertDialogDescriptionProps {
+export interface AlertDialogDescriptionProps extends React.ComponentProps<typeof AlertDialogPrimitive.Description> {
     className?: string;
     children?: React.ReactNode;
 }   
 
-export interface AlertDialogActionProps extends AlertDialogPrimitive.AlertDialogActionProps {
+export interface AlertDialogActionProps extends React.ComponentProps<typeof AlertDialogPrimitive.Action> {
     className?: string;
     children?: React.ReactNode;
 }           
 
-export interface AlertDialogCancelProps extends AlertDialogPrimitive.AlertDialogCancelProps {
+export interface AlertDialogCancelProps extends React.ComponentProps<typeof AlertDialogPrimitive.Cancel> {
     className?: string;
     children?: React.ReactNode;
 }
