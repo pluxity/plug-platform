@@ -70,6 +70,7 @@ function DialogContent({
   children,
   showCloseButton = true,
   dimmed = false,
+  title,
   ...props
 }: DialogContentProps) {
   return (
@@ -87,7 +88,7 @@ function DialogContent({
         {...props}
       >
         <div className="flex items-center justify-between bg-muted-light-blue1 p-4">
-          <DialogTitle className="text-subtitle text-black">도면 수정</DialogTitle>
+          {title && <DialogTitle className="text-subtitle text-black">{title}</DialogTitle>}
           {showCloseButton && (
             <DialogPrimitive.Close className="text-black">
               <XIcon />

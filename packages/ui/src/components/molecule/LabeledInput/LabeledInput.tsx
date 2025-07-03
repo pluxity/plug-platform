@@ -2,7 +2,7 @@ import { cn } from "../../../utils/utils";
 import { Label } from '../../atom/Label/Label';
 import { Input } from '../../atom/Input/Input';
 import { useId } from 'react';
-import { LabeledInputProps } from './LabeldInput.types';
+import { LabeledInputProps } from './LabeledInput.types';
 
 function LabeledInput({ 
     className,

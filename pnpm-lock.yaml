@@ -354,6 +354,9 @@ importers:
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.1.0)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: ^0.516.0
         version: 0.516.0(react@19.1.0)
@@ -430,6 +433,9 @@ importers:
       '@storybook/test':
         specifier: ^8.6
         version: 8.6.12(storybook@8.6.12(prettier@3.5.3))
+      '@types/lodash':
+        specifier: ^4.14.202
+        version: 4.17.16
       '@types/react':
         specifier: ^19.0.8
         version: 19.1.2
