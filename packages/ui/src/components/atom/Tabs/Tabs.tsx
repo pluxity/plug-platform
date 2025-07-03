@@ -1,4 +1,4 @@
-import * as TabsPrimitive from "@radix-ui/react-tabs"
+import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "../../../utils/utils";
 import { TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps } from "./Tabs.types";
 

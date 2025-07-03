@@ -1,5 +1,5 @@
-import * as Popover from "@radix-ui/react-popover"
-import { cn } from "../../../utils/utils"
+import * as Popover from "@radix-ui/react-popover";
+import { cn } from "../../../utils/utils";
 import { MultiSelectProps } from "./MultiSelect.types";
 
 const ChevronDownArrow = ({ className }: { className?: string }) => (

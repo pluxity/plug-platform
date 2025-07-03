@@ -1,4 +1,4 @@
-import * as ProgressPrimitive from "@radix-ui/react-progress"
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "../../../utils/utils";
 import { ProgressProps } from "./Progress.types";
 

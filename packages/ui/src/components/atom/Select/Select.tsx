@@ -1,4 +1,4 @@
-import * as SelectPrimitive from "@radix-ui/react-select"
+import * as SelectPrimitive from "@radix-ui/react-select";
 import { ChevronUpIcon } from "lucide-react";
 import { cn } from "../../../utils/utils";
 import { SelectProps, SelectGroupProps, SelectValueProps, SelectTriggerProps, SelectContentProps, SelectLabelProps, SelectItemProps, SelectSeparatorProps, SelectScrollUpButtonProps, SelectScrollDownButtonProps } from "./Select.types";

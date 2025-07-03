@@ -1,4 +1,4 @@
-import * as MenubarPrimitive from "@radix-ui/react-menubar"
+import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 import { cn } from "../../../utils/utils";
 import { MenubarProps, MenubarMenuProps, MenubarGroupProps, MenubarRadioGroupProps, MenubarTriggerProps, MenubarContentrops, MenubarItemProps, MenubarCheckboxItemProps, MenubarRadioItemProps, MenubarLabelProps, MenubarSeparatorProps, MenubarShortcutProps, MenubarSubProps, MenubarSubTriggerProps, MenubarSubContentProps } from "./Menubar.types";

@@ -1,5 +1,5 @@
-import * as PopoverPrimitive from "@radix-ui/react-popover"
-import { XIcon } from "lucide-react"
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { XIcon } from "lucide-react";
 import { cn } from "../../../utils/utils";
 import {
   DialogStylePopoverProps,

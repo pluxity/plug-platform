@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs"
-import { useState, useEffect } from "react"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
+import { useState, useEffect } from "react";
 import {
   Flame,
   Cloud,

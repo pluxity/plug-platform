@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { RadioGroup, RadioGroupItem } from "./RadioGroup"
+import type { Meta, StoryObj } from "@storybook/react";
+import { RadioGroup, RadioGroupItem } from "./RadioGroup";
 import { useState } from "react";
 
 const meta: Meta = {

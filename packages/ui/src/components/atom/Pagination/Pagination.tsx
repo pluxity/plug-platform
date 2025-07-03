@@ -3,7 +3,7 @@ import {
   ChevronRightIcon,
   MoreHorizontalIcon,
 } from "lucide-react";
-import { cn } from "../../../utils/utils"
+import { cn } from "../../../utils/utils";
 import { buttonVariants } from "../Button/Button";
 import { PaginationProps, PaginationContentProps, PaginationItemProps, PaginationLinkProps, PaginationPreviousProps, PaginationNextProps, PaginationEllipsisProps } from "./Pagination.types";
 
