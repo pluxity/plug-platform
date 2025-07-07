@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Light, Shutter, CCTV, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, IOStatus, Pump, LightGroup, ShutterGroup, VentilationMachine } from '@plug/v1/app/api/types/nflux';
+import CctvStream from './CctvStream';
 
 type DeviceData = Light | Shutter | CCTV | FireSensor | Elevator | Escalator | WaterTank | Catchpit | AirPurifier | LightGroup | ShutterGroup | VentilationMachine;
 type StatusType = 'onoff' | 'operation' | 'shutter' | 'fire' | 'elevator' | 'vl_up' | 'vl_down' |  'escalator' | 'remoteLocal' | 'normalError' | 'waterLevel' | 'value' | 'ventRemote' | 'ventForward' | 'ventAuto' | 'ventActive' | 'ventError';
@@ -176,28 +177,6 @@ export const CommonInfo = ({ device }: { device: DeviceData }) => (
           </div>
         </div>
       ))}
-    </div>
-  </div>
-);
-
-export const CctvStream = ({ cctv, className }: { cctv: CCTV; className?: string }) => (
-  <div className={`bg-primary-950/40 rounded-lg border border-primary-700/30 ${className}`}>
-    <div className="p-3 border-b border-primary-700/30">
-      <div className="flex items-center justify-between">
-        <span className="text-primary-100 font-medium">{cctv.cctvName}</span>
-        <span className="text-xs text-primary-400">{cctv.cctvId}</span>
-      </div>
-    </div>
-    <div className="p-3">
-      <div className="aspect-video bg-gray-900 rounded border border-gray-700/50">
-        <iframe 
-          // src={`http://192.168.4.29:8888/${cctv.cctvId.replace(/[()]/g, '_')}`} 
-          src={`http://101.254.21.120:10300/3d-map/cctv/${cctv.cctvId.replace(/[()]/g, '_')}`} 
-          className="w-full h-full rounded"
-          title={`CCTV ${cctv.cctvName}`}
-          allowFullScreen
-        />
-      </div>
     </div>
   </div>
 );
