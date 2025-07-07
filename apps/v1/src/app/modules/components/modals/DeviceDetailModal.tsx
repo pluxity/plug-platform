@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal } from '@plug/ui';
 import { nfluxService, nfluxWidgetService } from '@plug/v1/app/api';
 import type { Light, Shutter, CCTV, FireSensor, Elevator, Escalator, WaterTank, Catchpit, AirPurifier, LightGroup, ShutterGroup, VentilationMachine } from '@plug/v1/app/api/types/nflux';
-import DeviceDetailContent, { CommonInfo, CctvStream } from './DeviceDetailContent';
+import DeviceDetailContent, { CommonInfo } from './DeviceDetailContent';
+import CctvStream from './CctvStream';
 
 type DeviceData = Light | Shutter | CCTV | FireSensor | Elevator | Escalator | WaterTank | Catchpit | AirPurifier | LightGroup | ShutterGroup | VentilationMachine;
 

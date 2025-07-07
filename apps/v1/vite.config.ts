@@ -22,10 +22,10 @@ export default defineConfig({
   assetsInclude: ['**/*.glb'],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['app.plug-platform.com'],
+    allowedHosts: ['app.pluxity.com'],
     proxy: {
       '/3d-map/api': {
-        target: 'http://api.plug-platform.com:8080',
+        target: 'http://api.pluxity.com:8080',
         rewrite: (path) => path.replace(/^\/3d-map\/api/, ''),
       },
     },
