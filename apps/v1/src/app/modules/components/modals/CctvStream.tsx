@@ -1,14 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { CCTV, WebRTCOptions } from '@plug/v1/app/api';
+import { CCTV } from '@plug/v1/app/api';
 
 interface CctvStreamProps {
-  webRtc: WebRTCOptions;
   cctv: CCTV
   className?: string;
   onStreamError?: (error: Error) => void;
 }
 
-const CctvStream: React.FC<CctvStreamProps> = ({ webRtc, cctv, className = '', onStreamError }) => {
+const CctvStream: React.FC<CctvStreamProps> = ({cctv, className = '', onStreamError }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -46,7 +45,7 @@ const CctvStream: React.FC<CctvStreamProps> = ({ webRtc, cctv, className = '', o
         await pc.setLocalDescription(offer);
 
         const response = await fetch(
-          `${webRtc?.host}/stream`,
+          'http://101.254.21.220:8083/stream',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

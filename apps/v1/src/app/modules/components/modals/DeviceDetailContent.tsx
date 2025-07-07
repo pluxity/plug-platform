@@ -665,7 +665,7 @@ const DeviceDetailContent: React.FC<DeviceDetailContentProps> = ({ deviceData, d
       return <ShutterGroupDetails device={deviceData as ShutterGroup} />;
     case 'cctv':
     case 'cctvs':
-      return <CctvStream cctv={deviceData as CCTV} />;
+      return <CctvStream cctv={deviceData as CCTV}  />;
     default:
       return <div>지원하지 않는 장비 타입입니다.</div>;
   }
