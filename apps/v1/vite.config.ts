@@ -24,9 +24,9 @@ export default defineConfig({
     host: '0.0.0.0',
     allowedHosts: ['app.pluxity.com'],
     proxy: {
-      '/3d-map/api': {
+      '/api': {
         target: 'http://api.pluxity.com:8080',
-        rewrite: (path) => path.replace(/^\/3d-map\/api/, ''),
+        rewrite: (path) => path.replace(/api/, ''),
       },
     },
   },
