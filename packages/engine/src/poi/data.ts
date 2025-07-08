@@ -27,29 +27,29 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 
     // 공용 텍스트 geometry
-    sharedTextGeometry = new THREE.PlaneGeometry(1, 2.5, 1, 1);
+    sharedTextGeometry = new THREE.PlaneGeometry(1, 1.10, 1, 1);
     sharedTextGeometry.translate(0, 2.0, 0);
 
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
-    (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
+    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
 });
 
 /**
  * Engine3D 렌더링 전 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => {
+Event.InternalHandler.addEventListener('onBeforeRender' as never, async (evt: any) => {
     const deltaTime = evt.deltaTime as number;
     // 애니메이션 믹서 업데이트
     const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined);
     animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
 
     // 업데이트가 필요한경우
-    if( bNeedsUpdate ) {
-        updatePoiLine();
-        updatePoiMesh();
+    if (bNeedsUpdate) {
         bNeedsUpdate = false;
+        await updatePoiMesh();
+        updatePoiLine();
     }
 });
 
@@ -157,7 +157,7 @@ Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
             poi.Visible = true;
         }
     });
-    
+
     bNeedsUpdate = true;
 });
 
@@ -171,7 +171,7 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
             poi.Visible = false;
         }
     });
-    
+
     bNeedsUpdate = true;
 });
 
@@ -191,7 +191,7 @@ Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => 
 Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = false);
-    
+
     bNeedsUpdate = true;
 });
 
@@ -257,11 +257,42 @@ function updatePoiLine() {
     // 라인 버텍스 수집
     const linePoints: THREE.Vector3[] = [];
     Object.values(poiDataList).forEach(element => {
-        if (element.Visible) {
-            const p0 = element.WorldPosition.clone();
-            const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
+        if (element.Visible && element.LineVisible) {
 
-            linePoints.push(p0, p1);
+            if (element.PointMeshData.animMeshRef !== undefined) {
+
+                // 애니메이션 메시가 있는 경우
+                const center = new THREE.Vector3();
+                const size = new THREE.Vector3();
+                const bounding = new THREE.Box3().setFromObject(element.PointMeshData.animMeshRef);
+                bounding.getSize(size);
+                bounding.getCenter(center);
+
+                const p0 = center.clone().addScaledVector(new THREE.Vector3(0, 1, 0), size.y * 0.5);
+                const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
+
+                linePoints.push(p0, p1);
+                
+                element.MeshBoundingHeight = p1.y - element.WorldPosition.y;
+
+            } else {
+
+                const bounding = element.PointMeshData.instanceMeshRef?.geometry.boundingBox?.clone();
+                const matrix = new THREE.Matrix4().compose(element.WorldPosition, new THREE.Quaternion().setFromEuler(element.Rotation), element.Scale);
+                bounding?.applyMatrix4(matrix);
+
+                const center = new THREE.Vector3();
+                const size = new THREE.Vector3();
+                bounding?.getCenter(center);
+                bounding?.getSize(size);
+
+                const p0 = center.clone().addScaledVector(new THREE.Vector3(0, 1, 0), size.y * 0.5);
+                const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
+
+                linePoints.push(p0, p1);
+
+                element.MeshBoundingHeight = p1.y - element.WorldPosition.y;;
+            }
         }
     });
 
@@ -353,6 +384,9 @@ async function updatePoiMesh() {
                     mergedMaterial = [].concat(data.material as any);
                 });
             }
+
+            mergedGeometry?.computeBoundingBox();
+            mergedGeometry?.computeBoundingSphere();
 
             // 인스턴스 메시 생성
             const mesh = new THREE.InstancedMesh(mergedGeometry, mergedMaterial, currPoiArray.length);
@@ -474,7 +508,7 @@ function Delete(id: string) {
         poi.dispose();
 
         delete poiDataList[id];
-        
+
         bNeedsUpdate = true;
     }
 }
@@ -538,6 +572,98 @@ function HideAll() {
 }
 
 /**
+ * poi 선 보이기
+ * @param id - poi id값
+ */
+function ShowLine(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].LineVisible = true;
+    }
+
+    updatePoiLine();
+}
+
+/**
+ * poi 선 숨기기
+ * @param id - poi id값
+ */
+function HideLine(id: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        poiDataList[id].LineVisible = false;
+    }
+
+    updatePoiLine();
+}
+
+/**
+ * 모든 poi 선 보이기
+ */
+function ShowAllLine() {
+    Object.values(poiDataList).forEach(poi => poi.LineVisible = true);
+    updatePoiLine();
+}
+
+/**
+ * 모든 poi 선 숨기기
+ */
+function HideAllLine() {
+    Object.values(poiDataList).forEach(poi => poi.LineVisible = false);
+    updatePoiLine();
+}
+
+/**
+ * poi 표시명 보이기
+ * @param id - poi id값
+ */
+function ShowDisplayText(id: string) {
+    if (poiDataList.hasOwnProperty(id))
+        poiDataList[id].TextVisible = true;
+}
+
+/**
+ * poi 표시명 숨기기
+ * @param id - poi id값
+ */
+function HideDisplayText(id: string) {
+    if (poiDataList.hasOwnProperty(id))
+        poiDataList[id].TextVisible = false;
+}
+
+/**
+ * 모든 poi 표시명 보이기
+ */
+function ShowAllDisplayText() {
+    Object.values(poiDataList).forEach(poi => poi.TextVisible = true);
+}
+
+/**
+ * 모든 poi 표시명 숨기기
+ */
+function HideAllDisplayText() {
+    Object.values(poiDataList).forEach(poi => poi.TextVisible = false);
+}
+
+/**
+ * poi 표시명 텍스트 변경
+ * @param id - 변경할 poi id값
+ * @param text - 표시명 텍스트
+ */
+function SetDisplayText(id: string, text: string) {
+    if (poiDataList.hasOwnProperty(id)) {
+        const poi = poiDataList[id];
+        poi.disposeTextObject();
+
+        const textMesh = createTextMesh(text);
+        poiTextGroup.add(textMesh);
+
+        poi.TextObject = textMesh;
+        poi.WorldPosition = poi.WorldPosition;
+
+        poi.displayText = text;
+    }
+}
+
+/**
  * id에 해당하는 poi가 가지고 있는 애니메이션 목록을 얻음
  * @param id - poi id값
  */
@@ -586,10 +712,24 @@ export {
     Import,
     Delete,
     Clear,
+
     Show,
     Hide,
     ShowAll,
     HideAll,
+
+    ShowLine,
+    HideLine,
+    ShowAllLine,
+    HideAllLine,
+
+    ShowDisplayText,
+    HideDisplayText,
+    ShowAllDisplayText,
+    HideAllDisplayText,
+
+    SetDisplayText,
+
     GetAnimationList,
     PlayAnimation,
     StopAnimation

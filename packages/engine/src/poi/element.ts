@@ -25,6 +25,8 @@ class PoiElement implements Interfaces.PoiCreateOption {
     private pointMeshData: PoiPointMeshData;
 
     private visibleState: boolean;
+    private lineVisibleState: boolean = true;
+    private textVisibleState: boolean = true;
 
     private mixer: THREE.AnimationMixer | undefined;
     private actions: Record<string, THREE.AnimationAction>;
@@ -42,7 +44,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.property = option.property;
 
         this.position = new Interfaces.Vector3Custom();
-        this.lineHeight = 3.0;
+        this.lineHeight = 1.0;
 
         this.pointMeshData = {
             instanceMeshRef: undefined,
@@ -95,23 +97,35 @@ class PoiElement implements Interfaces.PoiCreateOption {
         return this.position;
     }
 
+    /**
+     * 로컬 회전
+     */
     set Rotation(value: THREE.Euler) {
         // 회전값
         this.PointMeshData.rotation.copy(value);
 
         // 애니메이션 메시
         this.pointMeshData.animMeshRef?.rotation.copy(value);
-    }    
+    }
+    /**
+     * 로컬 회전
+     */
     get Rotation(): THREE.Euler {
         return this.pointMeshData.rotation;
     }
 
+    /**
+     * 로컬 스케일
+     */
     set Scale(value: THREE.Vector3) {
         this.pointMeshData.scale.copy(value);
 
         this.pointMeshData.animMeshRef?.scale.copy(value);
     }
 
+    /**
+     * 로컬 스케일
+     */
     get Scale() {
         return this.pointMeshData.scale;
     }
@@ -178,11 +192,11 @@ class PoiElement implements Interfaces.PoiCreateOption {
             (this.iconObj as THREE.Sprite).visible = true;
             this.iconObj?.layers.set(Interfaces.CustomLayer.Default);
 
-            (this.textObj as THREE.Object3D).visible = true;
-            this.textObj?.layers.set(Interfaces.CustomLayer.Default);
+            // (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+            // this.textObj?.layers.set(this.textVisibleState ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
 
             // 위치점 애니메이션 메시
-            if( this.pointMeshData.animMeshRef !== undefined ) {
+            if (this.pointMeshData.animMeshRef !== undefined) {
                 this.pointMeshData.animMeshRef.visible = true;
                 Util.setObjectLayer(this.pointMeshData.animMeshRef, Interfaces.CustomLayer.Default);
             }
@@ -190,15 +204,50 @@ class PoiElement implements Interfaces.PoiCreateOption {
             (this.iconObj as THREE.Sprite).visible = false;
             this.iconObj?.layers.set(Interfaces.CustomLayer.Invisible);
 
-            (this.textObj as THREE.Object3D).visible = false;
-            this.textObj?.layers.set(Interfaces.CustomLayer.Invisible);
-            
+            // (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+            // this.textObj?.layers.set(this.textVisibleState ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
+
             // 위치점 애니메이션 메시
-            if( this.pointMeshData.animMeshRef !== undefined ) {
+            if (this.pointMeshData.animMeshRef !== undefined) {
                 this.pointMeshData.animMeshRef.visible = false;
                 Util.setObjectLayer(this.pointMeshData.animMeshRef, Interfaces.CustomLayer.Invisible);
             }
         }
+
+        // poi 표시명 텍스트 가시화 상태 설정
+        (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+        this.textObj?.layers.set((this.textVisibleState && this.visibleState) ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
+    }
+
+    /**
+     * 선 가시화 여부
+     */
+    get LineVisible(): boolean {
+        return this.lineVisibleState;
+    }
+
+    /**
+     * 선 가시화 여부
+     */
+    set LineVisible(value: boolean) {
+        this.lineVisibleState = value;
+    }
+
+    /**
+     * 표시명 텍스트 가시화 여부
+     */
+    get TextVisible(): boolean {
+        return this.textVisibleState;
+    }
+
+    /**
+     * 표시명 텍스트 가시화 여부
+     */
+    set TextVisible(value: boolean) {
+        this.textVisibleState = value;
+
+        (this.textObj as THREE.Object3D).visible = this.textVisibleState;
+        this.textObj?.layers.set(this.textVisibleState ? Interfaces.CustomLayer.Default : Interfaces.CustomLayer.Invisible);
     }
 
     /**
@@ -223,6 +272,14 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * 메시 바운딩 높이
+     */
+    set MeshBoundingHeight(value: number) {
+        this.iconObj!.position.copy(this.position.clone().addScaledVector(new THREE.Vector3(0, 1, 0), value));
+        this.textObj!.position.copy(this.position.clone().addScaledVector(new THREE.Vector3(0, 1, 0), value));
+    }
+
+    /**
      * poi 요소 제거 및 메모리 해제
      */
     dispose() {
@@ -231,7 +288,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.pointMeshData.animMeshRef?.children.forEach((child) => {
             if (child instanceof THREE.Mesh) {
                 child.geometry.dispose();
-                if( Array.isArray(child.material)) {
+                if (Array.isArray(child.material)) {
                     child.material.forEach((material) => {
                         (material as THREE.Material).dispose();
                         (material as THREE.MeshBasicMaterial).map?.dispose();
@@ -248,15 +305,22 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.iconObj?.parent?.remove(this.iconObj);
 
         // 텍스트 제거
-        this.textObj?.parent?.remove(this.textObj);
-        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).map?.dispose();
-        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).dispose();
+        this.disposeTextObject();
 
         // 내부 이벤트 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onPoiElementDisposed',
             id: this.id,
         });
+    }
+
+    /**
+     * 표시명 텍스트 객체 메모리 해제
+     */
+    disposeTextObject() {
+        this.textObj?.parent?.remove(this.textObj);
+        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).map?.dispose();
+        ((this.textObj as THREE.Mesh).material as THREE.MeshBasicMaterial).dispose();
     }
 
     /**

@@ -49,7 +49,7 @@ Event.InternalHandler.addEventListener('onGltfLoaded' as never, (evt: any) => {
  * @returns - 변환된 좌표값
  */
 function convertWorldToFloorLocal(worldPos: THREE.Vector3, floorId: string): THREE.Vector3 {
-    if( !floorObjects.hasOwnProperty(floorId) ) {
+    if (!floorObjects.hasOwnProperty(floorId)) {
         const targetFloor = getLowestFloorObject();
         return targetFloor.worldToLocal(worldPos);
     }
@@ -65,7 +65,7 @@ function convertWorldToFloorLocal(worldPos: THREE.Vector3, floorId: string): THR
  * @returns - 변환된 좌표값
  */
 function convertFloorLocalToWorld(localPos: THREE.Vector3, floorId: string): THREE.Vector3 {
-    if( !floorObjects.hasOwnProperty(floorId) ) {
+    if (!floorObjects.hasOwnProperty(floorId)) {
         const targetFloor = getLowestFloorObject();
         return targetFloor.localToWorld(localPos);
     }
@@ -108,6 +108,19 @@ function getLowestFloorObject(): THREE.Object3D {
     });
 
     return floorArray[0];
+}
+
+/**
+ * 층 id값에 해당하는 층객체 얻기
+ * @param id - 층 id값
+ * @returns - 층객체
+ */
+function getFloorObject(id: string): THREE.Object3D | undefined {
+
+    if (floorObjects.hasOwnProperty(id))
+        return floorObjects[id];
+
+    return undefined;
 }
 
 /**
@@ -381,6 +394,7 @@ export {
     convertFloorLocalToWorld,
     calculateFloorBounding,
     getLowestFloorObject,
+    getFloorObject,
 
     GetModelHierarchyFromUrl,
     GetModelHierarchy,

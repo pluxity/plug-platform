@@ -76,6 +76,17 @@ enum PathCreatorMouseState {
 }
 
 /**
+ * 지하철 생성 마우스 상태 열거형
+ */
+enum SubwayCreateMouseState {
+    Default = 0,
+    SelectPath,
+    SetEntranceLocation,
+    SetStopLocation,
+    SetExitLocation,
+}
+
+/**
  * 모델 정보
  */
 interface ModelInfo {
@@ -149,12 +160,13 @@ interface SBMMesh {
 }
 
 /**
- * Path3D 세그먼트 데이터 인터페이스
+ * Path3D 위치점 데이터 인터페이스
  */
-interface Path3DSegmentData {
-    start: Vector3Custom;
-    control: Vector3Custom;
-    end: Vector3Custom;
+interface Path3DPointData {
+    id: string;
+    point: Vector3;
+    floorId: string;
+    isStraightLine?: boolean;
 }
 
 /**
@@ -162,8 +174,48 @@ interface Path3DSegmentData {
  */
 interface Path3DData {
     id: string;
-    color: THREE.ColorRepresentation;
-    segments: Path3DSegmentData[];
+    color: number;
+    points: Path3DPointData[];
+}
+
+/**
+ * 지하철 생성 옵션
+ */
+interface SubwayCreateOption {
+    id: string;
+    bodyCount: number;
+}
+
+/**
+ * 지하철 임포트/익스포트 옵션
+ */
+interface SubwayImportOption {
+    id: string;
+    pathId: string;
+    bodyCount: number;
+    entranceUValue: number;
+    stopUValue: number;
+    exitUValue: number;
+}
+
+/**
+ * 라벨3d 생성 옵션
+ */
+interface Label3DCreateOption {
+    id: string;
+    displayText: string;
+}
+
+/**
+ * 라벨3d 임포트 옵션
+ */
+interface Label3DImportOption {
+    id: string;
+    displayText: string;
+    floorId: string;
+    position: Vector3;
+    rotation: Vector3;
+    scale: Vector3;
 }
 
 export {
@@ -174,6 +226,7 @@ export {
     MouseButton,
     ModifyKey,
     PathCreatorMouseState,
+    SubwayCreateMouseState,
     ModelInfo,
     ModelInfo as FloorInfo,
     PoiCreateOption,
@@ -181,6 +234,10 @@ export {
     SBMHeader,
     SBMMaterial,
     SBMMesh,
-    Path3DSegmentData,
+    Path3DPointData,
     Path3DData,
+    SubwayCreateOption,
+    SubwayImportOption,
+    Label3DCreateOption,
+    Label3DImportOption,
 }

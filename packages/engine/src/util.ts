@@ -65,17 +65,18 @@ function materialToBillboard(target: THREE.Material) {
  * @param text - 텍스트
  * @param outSize - 생성된 텍스쳐 크기
  */
-function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBasicMaterial {
+function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: boolean = true, fontSize: number = 14): THREE.MeshBasicMaterial {
 
     // 텍스트 스타일
     const textStyle = new PIXI.TextStyle({
         stroke: {
             color: 0x000000,
             width: 5,
-            join: 'bevel',
+            join: 'round',
+            cap: 'round',
         },
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: fontSize,
         fill: 0xffffff,
         align: 'center',
     });
@@ -97,7 +98,7 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
     pixiApp.render();
 
     // three.js 캔버스 텍스쳐 생성
-    const texture = new THREE.CanvasTexture(pixiApp.canvas);
+    const texture = new THREE.CanvasTexture(pixiApp.canvas, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter);
     engine.Renderer.initTexture(texture);
 
     // three.js 재질 생성
@@ -106,7 +107,10 @@ function createTextMaterial(text: string, outSize: THREE.Vector2): THREE.MeshBas
         transparent: true,
         side: THREE.DoubleSide
     });
-    materialToBillboard(material);
+
+    // 빌보드 사용시 재질변경
+    if (useBillboard)
+        materialToBillboard(material);
 
     // pixi.js 텍스트 제거
     pixiApp.stage.removeChild(pixiText);
@@ -229,7 +233,7 @@ function collectPickableObjects() {
  * 포인터 레이캐스트로부터 poi얻기
  * @param rayCast - 레이캐스트
  */
-function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
+function getPoiFromRaycast(rayCast: THREE.Raycaster): { [key: string]: any } | undefined {
 
     const pickObjects = collectPickableObjects();
 
@@ -256,7 +260,10 @@ function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
                 return false;
             });
 
-            return matchTarget[0];
+            return {
+                poi: matchTarget[0],
+                distance: combinedIntersects[0].distance,
+            };
 
         } else {
             // 애니메이션 메시일 경우 메시의 자식 객체가 픽킹 되는 경우가 있으므로
@@ -273,12 +280,82 @@ function getPoiFromRaycast(rayCast: THREE.Raycaster): PoiElement | undefined {
             });
 
             // 이벤트 통지
-            return matchTarget[0];
+            return {
+                poi: matchTarget[0],
+                distance: combinedIntersects[0].distance,
+            };
         }
     }
 
     return undefined;
 }
+
+/**
+ * 월드상의 3d좌표를 화면상의 2d pixel좌표로 변환
+ * @param target - 좌표값
+ * @returns - 변환값
+ */
+function toScreenPos(target: THREE.Vector3): THREE.Vector2 {
+    const projected = target.clone().project(engine.Camera);
+    const widthHalf = 0.5 * engine.Renderer.domElement.clientWidth;
+    const heightHalf = 0.5 * engine.Renderer.domElement.clientHeight;
+
+    return new THREE.Vector2(
+        (projected.x * widthHalf) + widthHalf,
+        (-projected.y * heightHalf) + heightHalf
+    );
+
+}
+
+/**
+ * 곡선상의 가장 가까운 위치점 찾기
+ * @param curvePath - 커브패스
+ * @param point - 위치점
+ * @param divisions - 분할개수
+ * @returns - 곡선상 위치점
+ */
+function getClosestPointOnCurvePath(curvePath: THREE.CurvePath<THREE.Vector3>, point: THREE.Vector3, divisions = 100) {
+    let closestPoint = null;
+    let minDistance = Infinity;
+    let closestCurve = null;
+    let closestT = 0;
+    let totalLength = 0;
+    let lengthAtClosest = 0;
+
+    for (let i = 0; i < curvePath.curves.length; i++) {
+        const curve = curvePath.curves[i];
+        const points = curve.getPoints(divisions);
+
+        for (let j = 0; j < points.length; j++) {
+            const curvePoint = points[j];
+            const dist = curvePoint.distanceTo(point);
+
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestPoint = curvePoint;
+                closestCurve = curve;
+                closestT = j / divisions;
+                // 전체 길이 위치 추적
+                const partialLength = curve.getLength() * closestT;
+                lengthAtClosest = totalLength + partialLength;
+            }
+        }
+
+        totalLength += curve.getLength();
+    }
+
+    const totalCurveLength = curvePath.getLength();
+    const u = lengthAtClosest / totalCurveLength;
+
+    return {
+        point: closestPoint,
+        distance: minDistance,
+        curve: closestCurve,
+        t: closestT,
+        u: u,
+    };
+}
+
 /**
  * 색상이나 이미지로 배경 설정
  * @param backgroundData - 배경색상 숫자일경우 0xff0000의 형식으로 판단하고, 문자열일 경우 이미지 주소로 판단하여 배경을 설정한다.
@@ -299,6 +376,8 @@ export {
     setObjectLayer,
     getFloorObject,
     getPoiFromRaycast,
+    toScreenPos,
+    getClosestPointOnCurvePath,
 
     // 외부노출
     SetBackground,

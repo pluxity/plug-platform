@@ -55,9 +55,9 @@ function onPointerUp(evt: MouseEvent) {
             rayCast.layers.set(Interfaces.CustomLayer.Pickable);
             rayCast.setFromCamera(mousePos, engine.Camera);
 
-            const poi = Util.getPoiFromRaycast(rayCast);
-            if (poi !== undefined) {
-                target = poi;
+            const result = Util.getPoiFromRaycast(rayCast);
+            if (result !== undefined) {
+                target = result.poi;
                 createEditPreviewObject();
                 unregisterPointerEvents();
             }
@@ -203,6 +203,10 @@ function StartEdit(editMode: string) {
     registerPointerEvents();
 
     bPoiEditEnabled = true;
+
+    Event.InternalHandler.dispatchEvent({
+        type: 'onPoiStartEdit',
+    });
 }
 
 /**
@@ -212,6 +216,7 @@ function FinishEdit() {
 
     bPoiEditEnabled = false;
 
+    unregisterPointerEvents();
     disposePreviewObject();
 
     if (gizmo) {

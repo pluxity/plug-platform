@@ -86,3 +86,62 @@ interface Vector3 {
     z: number;
 }
 ```
+
+## Path3DPointData
+```javascript
+interface Path3DPointData {
+    id: string; // 위치점 id
+    point: Vector3; // 위치 좌표값
+    floorId: string; // 층 id값
+    isStraightLine?: boolean; // 제어점일경우 직선 여부
+}
+```
+
+## Path3DData
+```javascript
+interface Path3DData {
+    id: string; // 경로 id
+    color: number; // 색상코드
+    points: Path3DPointData[]; // 위치점 배열
+}
+```
+
+## SubwayCreateOption
+```javascript
+interface SubwayCreateOption {
+    id: string; // 지하철 열차 id
+    bodyCount: number; // 열차 개수 (머리,꼬리 포함)
+}
+```
+
+## SubwayImportOption
+```javascript
+interface SubwayImportOption {
+    id: string; // 열차 id값
+    pathId: string; // path3d 경로 id값
+    bodyCount: number; // 열차 개수 (머리,꼬리포함)
+    entranceUValue: number; // 경로상의 진입지점 거리 비율값
+    stopUValue: number; // 경로상의 정차지점 거리 비율값
+    exitUValue: number; // 경로상의 진출지점 거리 비율값
+}
+```
+
+## Label3DCreateOption
+```javascript
+interface Label3DCreateOption {
+    id: string; // 라벨 id
+    displayText: string; // 표시명 텍스트
+}
+```
+
+## Label3DImportOption
+```javascript
+interface Label3DImportOption {
+    id: string; // 라벨 id
+    displayText: string; // 표시명 텍스트
+    floorId: string; // 층 id값
+    position: Vector3; // 위치값
+    rotation: Vector3; // 회전값
+    scale: Vector3; // 스케일값
+}
+```
