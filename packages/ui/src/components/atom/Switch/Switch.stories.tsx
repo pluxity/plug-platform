@@ -17,8 +17,7 @@ export default meta;
 type Story = StoryObj<typeof Switch>;
 
 export const Default: Story = {
-  render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render(args) {
     const [checked, setChecked] = useState(args.checked ?? false);
     return (
       <div className="flex items-center gap-4">
@@ -48,8 +47,7 @@ export const Disabled: Story = {
 };
 
 export const CustomStyle: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [checked, setChecked] = useState(false);
 
     return (

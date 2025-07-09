@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Checkbox} from "./Checkbox"
-import { Label } from "../Label/Label"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Checkbox} from "./Checkbox";
+import { Label } from "../Label/Label";
 
 const meta: Meta<typeof Checkbox> = {
     title: 'ATOM/Checkbox',

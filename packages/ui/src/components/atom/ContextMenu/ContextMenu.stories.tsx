@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 import {
     ContextMenu,
     ContextMenuCheckboxItem,
@@ -22,6 +22,20 @@ const meta: Meta<typeof ContextMenu> = {
         layout: 'centered',
     },
     tags: ["autodocs"],
+    argTypes: {
+        onOpenChange: {
+            control: false,
+        },
+        modal: {
+            control: "boolean",
+        },
+        className: {
+            control: "text",
+        },
+        children: {
+            control: "text",
+        },
+    },
 }
 
 export default meta

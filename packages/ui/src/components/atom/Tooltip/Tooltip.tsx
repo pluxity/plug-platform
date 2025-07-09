@@ -1,11 +1,11 @@
-import * as React from "react"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "../../../utils/utils";
+import { TooltipProviderProps, TooltipContentProps, TooltipProps, TooltipTriggerProps } from "./Tooltip.types";
 
 function TooltipProvider({
   delayDuration = 0,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+}: TooltipProviderProps) {
   return (
     <TooltipPrimitive.Provider
       data-slot="tooltip-provider"
@@ -15,9 +15,11 @@ function TooltipProvider({
   )
 }
 
+TooltipProvider.displayName = "TooltipProvider";  
+
 function Tooltip({
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+}: TooltipProps) {
   return (
     <TooltipProvider>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
@@ -25,20 +27,15 @@ function Tooltip({
   )
 }
 
+Tooltip.displayName = "Tooltip";
+
 function TooltipTrigger({
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+}: TooltipTriggerProps) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 
-type TooltipColor = 'primary' | 'destructive' | 'muted' | 'custom';
-
-interface TooltipContentProps extends React.ComponentProps<typeof TooltipPrimitive.Content> {
-  color?: TooltipColor;
-  bgColor?: string;
-  textColor?: string;
-  borderColor?: string;
-}
+TooltipTrigger.displayName = "TooltipTrigger";
 
 function TooltipContent({
                             className,
@@ -105,6 +102,8 @@ function TooltipContent({
             </TooltipPrimitive.Content>
         </TooltipPrimitive.Portal>
     );
-}
+} 
+
+TooltipContent.displayName = "TooltipContent";
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }

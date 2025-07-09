@@ -1,13 +1,7 @@
-import * as React from "react"
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { CheckIcon } from "lucide-react"
-
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { CheckIcon } from "lucide-react";
 import { cn } from "../../../utils/utils";
-
-interface CheckboxProps extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> {
-  variant?: 'square' | 'round';
-}
-
+import { CheckboxProps } from "./Checkbox.types";
 
 function Checkbox({
   variant = 'square',
@@ -52,5 +46,7 @@ function Checkbox({
     </CheckboxPrimitive.Root>
   )
 }
+
+Checkbox.displayName = "Checkbox";
 
 export { Checkbox }

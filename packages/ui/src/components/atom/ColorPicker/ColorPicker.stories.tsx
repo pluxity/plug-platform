@@ -1,7 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-
+import type { Meta, StoryObj } from "@storybook/react";
 import { ColorPicker } from "./ColorPicker";
-import React from "react";
+import { useState } from "react";
 
 const meta: Meta<typeof ColorPicker> = {
   title: "Atom/ColorPicker",
@@ -16,8 +15,8 @@ export default meta
 type Story = StoryObj<typeof ColorPicker>
 
 export const Default: Story = {
-    render: (args) => {
-        const [color, setColor] = React.useState("");
+  render: function Render(args) {
+        const [color, setColor] = useState("");
         return(
             <ColorPicker {...args} color={color} onChange={setColor} />
         )
@@ -25,8 +24,8 @@ export const Default: Story = {
 }
 
 export const ShowResult: Story = {
-    render: (args) => {
-        const [color, setColor] = React.useState("");
+  render: function Render(args) {
+        const [color, setColor] = useState("");
         return(
           <div className="flex flex-col gap-2">
             <ColorPicker {...args} color={color} onChange={setColor} />

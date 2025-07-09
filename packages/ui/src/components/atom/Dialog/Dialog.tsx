@@ -1,20 +1,33 @@
-import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { XIcon } from "lucide-react"
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { XIcon } from "lucide-react";
 
 import { cn } from "../../../utils/utils";
+import {
+  DialogProps,
+  DialogTriggerProps,
+  DialogOverlayProps,
+  DialogContentProps,
+  DialogHeaderProps,
+  DialogFooterProps,
+  DialogTitleProps,
+  DialogDescriptionProps,
+} from "./Dialog.types";
 
 function Dialog({
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+}: DialogProps) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
+Dialog.displayName = "Dialog";    
+
 function DialogTrigger({
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+}: DialogTriggerProps) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
+
+DialogTrigger.displayName = "DialogTrigger";
 
 function DialogPortal({
   ...props
@@ -22,19 +35,21 @@ function DialogPortal({
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
+DialogPortal.displayName = "DialogPortal";
+
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
-}
+} 
+
+DialogClose.displayName = "DialogClose";
 
 function DialogOverlay({
   className,
   dimmed = false,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay> & {
-  dimmed?: boolean
-}) {
+}: DialogOverlayProps) {
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
@@ -46,18 +61,18 @@ function DialogOverlay({
       {...props}
     />
   )
-}
+} 
+
+DialogOverlay.displayName = "DialogOverlay";
 
 function DialogContent({
   className,
   children,
   showCloseButton = true,
   dimmed = false,
+  title,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-  dimmed?: boolean
-}) {
+}: DialogContentProps) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay dimmed={dimmed} />
@@ -73,7 +88,7 @@ function DialogContent({
         {...props}
       >
         <div className="flex items-center justify-between bg-muted-light-blue1 p-4">
-          <DialogTitle className="text-subtitle text-black">도면 수정</DialogTitle>
+          {title && <DialogTitle className="text-subtitle text-black">{title}</DialogTitle>}
           {showCloseButton && (
             <DialogPrimitive.Close className="text-black">
               <XIcon />
@@ -89,7 +104,9 @@ function DialogContent({
   )
 }
 
-function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+DialogContent.displayName = "DialogContent";
+
+function DialogHeader({ className, ...props }: DialogHeaderProps) {
   return (
     <div
       data-slot="dialog-header"
@@ -99,7 +116,9 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+DialogHeader.displayName = "DialogHeader";
+
+function DialogFooter({ className, ...props }: DialogFooterProps) {
   return (
     <div
       data-slot="dialog-footer"
@@ -109,10 +128,12 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+DialogFooter.displayName = "DialogFooter";
+
 function DialogTitle({
   className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+}: DialogTitleProps) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
@@ -122,10 +143,12 @@ function DialogTitle({
   )
 }
 
+DialogTitle.displayName = "DialogTitle";
+
 function DialogDescription({
   className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+}: DialogDescriptionProps) {
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
@@ -134,6 +157,8 @@ function DialogDescription({
     />
   )
 }
+
+DialogDescription.displayName = "DialogDescription";
 
 export {
   Dialog,

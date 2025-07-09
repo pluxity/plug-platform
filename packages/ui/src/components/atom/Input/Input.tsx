@@ -1,12 +1,6 @@
-import React, { forwardRef, useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { cn } from "../../../utils/utils";
-
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  error?: boolean;
-  icon?: 'info' | 'none';
-  type?: string;
-  ariaLabel?: string;
-}
+import { InputProps } from "./Input.types";
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, error, disabled, icon, type = 'text', ariaLabel, ...props }, ref) => {

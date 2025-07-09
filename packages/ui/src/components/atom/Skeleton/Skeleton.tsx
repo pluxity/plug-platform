@@ -1,14 +1,16 @@
-import * as React from "react"
 import { cn } from "../../../utils/utils";
+import { SkeletonProps } from "./Skeleton.types";
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+function Skeleton({ className, ...props }: SkeletonProps) {
   return (
-    <div
+    <div  
       data-slot="skeleton"
       className={cn("bg-accent animate-pulse rounded-md", className)}
       {...props}
     />
   )
 }
+
+Skeleton.displayName = "Skeleton";
 
 export { Skeleton }

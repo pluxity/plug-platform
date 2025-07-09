@@ -1,25 +1,15 @@
-import React from "react";
 import { cn } from "../../../utils/utils";
 import { Button } from '../../atom/Button/Button';
 import { Input } from '../../atom/Input/Input';
-
-interface SearchInputProps {
-    buttonClassName?: string;
-    className?: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onSubmit: () => void;
-    placeholder?: string;
-}
-
-const SearchInput: React.FC<SearchInputProps> = ({ 
+import { SearchInputProps } from './SearchInput.types';
+function SearchInput ({ 
     buttonClassName,
     className,
     value,
     onChange,
     onSubmit,
     placeholder
- }) => {
+ }: SearchInputProps){
     return(
         <div className={cn('flex gap-0.5', className)}>
             <Input 

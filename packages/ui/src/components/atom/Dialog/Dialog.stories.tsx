@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 import { 
   Dialog,
   DialogTrigger,
@@ -40,7 +40,7 @@ export const Default: Story = {
     render: (args) => (
         <Dialog {...args}>
           <DialogTrigger>Open</DialogTrigger>
-          <DialogContent>
+          <DialogContent title="도면 수정">
             <DialogHeader>
               <DialogTitle>Are you absolutely sure?</DialogTitle>
               <DialogDescription>
@@ -61,7 +61,7 @@ export const OverlayDimmed: Story = {
   render: () => (
       <Dialog>
         <DialogTrigger>Open</DialogTrigger>
-        <DialogContent dimmed>
+        <DialogContent title="도면 수정" dimmed>
           <DialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>

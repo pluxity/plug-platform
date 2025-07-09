@@ -1,8 +1,8 @@
-import * as React from "react"
-import * as ProgressPrimitive from "@radix-ui/react-progress"
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "../../../utils/utils";
+import { ProgressProps } from "./Progress.types";
 
-function Progress({ className, value, ...props }: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+function Progress({ className, value, ...props }: ProgressProps) {
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
@@ -21,4 +21,6 @@ function Progress({ className, value, ...props }: React.ComponentProps<typeof Pr
   )
 }
 
-export default Progress;
+Progress.displayName = "Progress";
+
+export { Progress };

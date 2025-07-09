@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Badge } from "./Badge"
-import { CheckIcon } from "lucide-react"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Badge } from "./Badge";
+import { CheckIcon } from "lucide-react";
 
 const meta: Meta<typeof Badge> = {
     title: 'ATOM/Badge',

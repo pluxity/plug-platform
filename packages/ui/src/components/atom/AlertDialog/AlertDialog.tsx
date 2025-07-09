@@ -1,35 +1,40 @@
-import * as React from "react"
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
-
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import { AlertDialogProps, AlertDialogTriggerProps, AlertDialogPortalProps, AlertDialogOverlayProps, AlertDialogContentProps, AlertDialogHeaderProps, AlertDialogFooterProps, AlertDialogTitleProps, AlertDialogDescriptionProps, AlertDialogActionProps, AlertDialogCancelProps } from "./AlertDialog.types";
 import { cn } from "../../../utils/utils";
 import { buttonVariants } from "../Button/Button";
 
 function AlertDialog({
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
+}: AlertDialogProps) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
 }
 
+AlertDialog.displayName = "AlertDialog";
+
 function AlertDialogTrigger({
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {
+}: AlertDialogTriggerProps) {
   return (
     <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" className="w-auto" {...props} />
   )
 }
 
+AlertDialogTrigger.displayName = "AlertDialogTrigger";
+
 function AlertDialogPortal({
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
+}: AlertDialogPortalProps) {
   return (
     <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
   )
 }
 
+AlertDialogPortal.displayName = "AlertDialogPortal";
+
 function AlertDialogOverlay({
   className,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) {
+}: AlertDialogOverlayProps) {
   return (
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
@@ -42,10 +47,12 @@ function AlertDialogOverlay({
   )
 }
 
+AlertDialogOverlay.displayName = "AlertDialogOverlay";
+
 function AlertDialogContent({
   className,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
+}: AlertDialogContentProps) {
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
@@ -61,10 +68,12 @@ function AlertDialogContent({
   )
 }
 
+AlertDialogContent.displayName = "AlertDialogContent";
+
 function AlertDialogHeader({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: AlertDialogHeaderProps) {
   return (
     <div
       data-slot="alert-dialog-header"
@@ -74,10 +83,12 @@ function AlertDialogHeader({
   )
 }
 
+AlertDialogHeader.displayName = "AlertDialogHeader";
+
 function AlertDialogFooter({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: AlertDialogFooterProps) {
   return (
     <div
       data-slot="alert-dialog-footer"
@@ -90,10 +101,12 @@ function AlertDialogFooter({
   )
 }
 
+AlertDialogFooter.displayName = "AlertDialogFooter";
+
 function AlertDialogTitle({
   className,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Title>) {
+}: AlertDialogTitleProps) {
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
@@ -103,10 +116,12 @@ function AlertDialogTitle({
   )
 }
 
+AlertDialogTitle.displayName = "AlertDialogTitle";
+
 function AlertDialogDescription({
   className,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Description>) {
+}: AlertDialogDescriptionProps) {
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
@@ -116,10 +131,12 @@ function AlertDialogDescription({
   )
 }
 
+AlertDialogDescription.displayName = "AlertDialogDescription";
+
 function AlertDialogAction({
   className,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
+}: AlertDialogActionProps) {
   return (
     <AlertDialogPrimitive.Action
       className={cn(buttonVariants(), className)}
@@ -128,10 +145,12 @@ function AlertDialogAction({
   )
 }
 
+AlertDialogAction.displayName = "AlertDialogAction";
+
 function AlertDialogCancel({
   className,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) {
+}: AlertDialogCancelProps) {
   return (
     <AlertDialogPrimitive.Cancel
       className={cn(buttonVariants({ variant: "secondary" }), className)}
@@ -139,6 +158,8 @@ function AlertDialogCancel({
     />
   )
 }
+
+AlertDialogCancel.displayName = "AlertDialogCancel";
 
 export {
   AlertDialog,

@@ -64,7 +64,7 @@ type MenubarProps = {
   theme?: "light" | "dark" | "system";
   customMenus?: Array<{
     label: string;
-    items: Array<any>;
+    items: Array<unknown>;
   }>;
 };
 
@@ -175,17 +175,12 @@ type Story = StoryObj<typeof meta>;
 
 // 모든 옵션을 제어할 수 있는 기본 예제
 export const AllOptions: Story = {
-  render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render(args) {
     const [activeMenu, setActiveMenu] = useState(args.defaultValue || "");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [viewMode, setViewMode] = useState("grid");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [theme, setTheme] = useState(args.theme || "light");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [fontSize, setFontSize] = useState("medium");
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       if (args.value) {
         setActiveMenu(args.value);
@@ -1283,14 +1278,10 @@ export const RealWorldExamples: Story = {
 
 // 상호작용 예제
 export const Interactive: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [selectedTheme, setSelectedTheme] = useState("light");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isBold, setIsBold] = useState(false);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isItalic, setIsItalic] = useState(false);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [alignment, setAlignment] = useState("left");
 
     const themeClass = selectedTheme === "dark"

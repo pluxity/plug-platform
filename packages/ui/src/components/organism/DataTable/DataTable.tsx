@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   ColumnDef,
   flexRender,
@@ -14,22 +13,11 @@ import {
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "../../atom/Table/Table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../atom/Pagination/Pagination";
 import { FilterBar } from "../../molecule/FilterBar/FilterBar";
-import type { FilterSelect } from "../../molecule/FilterBar/FilterBar";
 import { Checkbox } from "../../atom/Checkbox/Checkbox";
+import { DataTableProps } from "./DataTable.types";
+import { useState } from "react";
 
-type DataTableProps<TData> = {
-  columns: ColumnDef<TData, any>[];
-  data: TData[];
-  pageSize?: number;
-  filterColumnKey?: string;
-  filterPlaceholder?: string;
-  showFilter?: boolean;
-  selects?: FilterSelect[];
-  buttons?: React.ReactNode;
-  rowSelection?: boolean;
-};
-
-export function DataTable<TData>({
+function DataTable<TData>({
   columns,
   data,
   pageSize = 10,
@@ -40,12 +28,12 @@ export function DataTable<TData>({
   buttons,
   rowSelection,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [rowSelectionState, setRowSelection] = React.useState({});
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelectionState, setRowSelection] = useState({});
 
-  const selectionColumn: ColumnDef<TData, any> = {
+  const selectionColumn: ColumnDef<TData, unknown> = {
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -179,3 +167,7 @@ export function DataTable<TData>({
     </div>
   );
 }
+
+DataTable.displayName = "DataTable";
+
+export { DataTable };

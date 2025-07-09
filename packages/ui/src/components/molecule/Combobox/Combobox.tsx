@@ -1,6 +1,6 @@
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { Button } from "../../atom/Button/Button"
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Button } from "../../atom/Button/Button";
+import { useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -8,35 +8,23 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../../atom/Command/Command"
+} from "../../atom/Command/Command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../atom/Popover/Popover"
-import { cn } from "../../../utils/utils"
+} from "../../atom/Popover/Popover";
+import { cn } from "../../../utils/utils";
+import { ComboboxProps } from "./Combobox.types";
 
-export type ComboboxOption = {
-  value: string
-  label: string
-}
-
-type ComboboxProps = {
-  options: ComboboxOption[]
-  placeholder?: string
-  value: string
-  onChange: (value: string) => void
-  className?: string
-}
-
-export const Combobox: React.FC<ComboboxProps> = ({
+function Combobox({
   options,
   placeholder = "Select...",
   value,
   onChange,
   className,
-}) => {
-  const [open, setOpen] = React.useState(false)
+}: ComboboxProps) {
+  const [open, setOpen] = useState(false)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -84,3 +72,7 @@ export const Combobox: React.FC<ComboboxProps> = ({
     </Popover>
   )
 }
+
+Combobox.displayName = "Combobox";
+
+export { Combobox };

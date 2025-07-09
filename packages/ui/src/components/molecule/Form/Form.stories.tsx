@@ -37,8 +37,7 @@ const formSchema = z.object({
 });
 
 export const BasicForm: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
@@ -86,7 +85,7 @@ export const BasicForm: Story = {
               </FormItem>
             )}
           />
-          <Button type="submit">제출</Button>
+          <Button type="submit" className="w-full">제출</Button>
         </form>
       </Form>
     );
@@ -94,8 +93,7 @@ export const BasicForm: Story = {
 };
 
 export const WithErrors: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
@@ -147,7 +145,7 @@ export const WithErrors: Story = {
               </FormItem>
             )}
           />
-          <Button type="submit">제출</Button>
+          <Button type="submit" className="w-full">제출</Button>
         </form>
       </Form>
     );

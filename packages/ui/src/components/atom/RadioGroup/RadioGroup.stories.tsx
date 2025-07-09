@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { RadioGroup, RadioGroupItem } from "./RadioGroup"
+import type { Meta, StoryObj } from "@storybook/react";
+import { RadioGroup, RadioGroupItem } from "./RadioGroup";
 import { useState } from "react";
 
 const meta: Meta = {
@@ -12,8 +12,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [value, setValue] = useState("apple")
 
     return (
