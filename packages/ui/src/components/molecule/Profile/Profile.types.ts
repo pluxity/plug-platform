@@ -6,6 +6,7 @@ export interface ProfileProps {
     profileButton?: {
         title: string;
         onClick?: () => void;
+        variant?: "default" | "destructive";
     };
     profileItems?: {
         title: string;

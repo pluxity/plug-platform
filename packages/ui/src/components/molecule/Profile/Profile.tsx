@@ -27,8 +27,8 @@ function Profile({
                         <AvatarImage src={profileImage} />
                     </Avatar>
                     <div className="flex flex-col items-start text-sm">
-                        <span className="text-gray-600">{profileDescription}</span>
-                        <span>{profileTitle}</span>
+                        <p className="text-gray-600">{profileDescription}</p>
+                        <p>{profileTitle}</p>
                     </div>
                 </div>
             </DropdownMenuTrigger>
@@ -45,7 +45,7 @@ function Profile({
                     <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem 
-                            variant="destructive"
+                            variant={profileButton.variant || "destructive"}
                             onClick={profileButton.onClick}
                         >
                                 {profileButton.title}
