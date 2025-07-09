@@ -13,7 +13,7 @@ const Asset: React.FC = () => {
           <div className="text-center py-12">
             <div className="text-6xl mb-4">⚙️</div>
             <h3 className="text-xl font-semibold mb-2">System Asset</h3>
-            <p className="text-gray-600">System settings functionality will be implemented here.</p>
+            <p className="text-gray-600">Asset Contents</p>
           </div>
         </CardContent>
       </Card>

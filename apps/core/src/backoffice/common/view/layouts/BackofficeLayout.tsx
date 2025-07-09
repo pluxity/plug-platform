@@ -1,24 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from '@plug/ui'
 import { BackofficeHeader } from '../components'
-import { useState } from 'react'
+import { AsideMenuItemProps } from '../../services/layout'
 
-interface MenuItem {
-  id: string;
-  label: string;
-  icon?: string;
-  to?: string;
-  depth: 1 | 2;
-  parentId?: string;
-  showToggle?: boolean;
-}
-
-const menuItems: MenuItem[] = [
+const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'dashboard', label: 'Dashboard', to: '/admin', depth: 1, showToggle: true},
   { id: 'Asset', label: 'Asset', to: '/admin/asset', depth: 1, showToggle: true},
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
-  { id: 'users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
+  { id: 'Users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
 ]
 
 const BackofficeLayout: React.FC = () => {
@@ -38,7 +28,7 @@ const BackofficeLayout: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
         <Sidebar
-          items={menuItems}
+          items={AsideMenuItems}
           activeItemId={activeItem}
           expandedItemIds={expandedItems}
           onItemClick={handleClick}
