@@ -70,13 +70,10 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const AllOptions: Story = {
-  render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render(args) {
     const [sizes, setSizes] = useState(args.defaultSizes);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [collapsed, setCollapsed] = useState<{[key: number]: boolean}>({});
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       setSizes(args.defaultSizes);
     }, [args.defaultSizes]);
@@ -92,7 +89,7 @@ export const AllOptions: Story = {
       setCollapsed(prev => ({...prev, [index]: isCollapsed}));
     };
 
-    const effectiveSizes = sizes.map((size, index) => 
+    const effectiveSizes = sizes.map((size: number, index: number) => 
       collapsed[index] ? (args.collapsible ? args.collapsedSize || 0 : size) : size
     );
 
@@ -107,7 +104,7 @@ export const AllOptions: Story = {
             id={args.id}
             style={args.style}
           >
-            {sizes.map((size, index) => (
+            {sizes.map((size: number, index: number) => (
               <React.Fragment key={index}>
                 {index > 0 && (
                   <ResizableHandle
@@ -127,7 +124,7 @@ export const AllOptions: Story = {
                   className={`${args.panelColors[index]} p-4 flex flex-col`}
                   style={args.style}
                   order={index}
-                  onCollapse={(isCollapsed) => handleCollapse(index, isCollapsed)}
+                  onCollapse={() => handleCollapse(index, true)}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">패널 {index + 1}</h3>
@@ -167,7 +164,7 @@ export const AllOptions: Story = {
             </div>
             <div className="col-span-2">
               <span className="font-medium">패널 크기:</span>{" "}
-              {effectiveSizes.map((size, i) => `패널${i+1}(${Math.round(size)}%)`).join(" / ")}
+              {effectiveSizes.map((size: number, i: number) => `패널${i+1}(${Math.round(size)}%)`).join(" / ")}
             </div>
             <div className="col-span-2">
               <span className="font-medium">접힌 패널:</span>{" "}
@@ -311,7 +308,7 @@ export const CollapsiblePanels: Story = {
               defaultSize={25} 
               collapsible={true}
               collapsedSize={0}
-              onCollapse={setLeftCollapsed}
+              onCollapse={() => setLeftCollapsed(true)}
               className={`bg-blue-100 p-4 transition-all duration-300 ${leftCollapsed ? 'p-0' : ''}`}
             >
               {!leftCollapsed ? (
@@ -378,7 +375,7 @@ export const CollapsiblePanels: Story = {
               defaultSize={25} 
               collapsible={true}
               collapsedSize={0}
-              onCollapse={setRightCollapsed}
+              onCollapse={() => setRightCollapsed(true)}
               className={`bg-purple-100 p-4 transition-all duration-300 ${rightCollapsed ? 'p-0' : ''}`}
             >
               {!rightCollapsed ? (

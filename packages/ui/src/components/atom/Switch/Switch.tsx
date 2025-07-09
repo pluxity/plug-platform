@@ -1,11 +1,11 @@
-import * as React from "react"
-import * as SwitchPrimitive from "@radix-ui/react-switch"
+import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { cn } from "../../../utils/utils";
+import { SwitchProps } from "./Switch.types";
 
 function Switch({
   className,
   ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+}: SwitchProps) {
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
@@ -33,5 +33,7 @@ function Switch({
     </SwitchPrimitive.Root>
   )
 }
+
+Switch.displayName = "Switch";
 
 export { Switch }

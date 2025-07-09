@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import {Button} from "./Button"
-import { PlusIcon } from "lucide-react"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Button } from "./Button";
+import { PlusIcon } from "lucide-react";
 
 const meta: Meta<typeof Button> = {
     title: 'ATOM/Button',
@@ -17,7 +17,7 @@ const meta: Meta<typeof Button> = {
         },
         size: {
             control: 'select',
-            options: ['default', 'sm', 'lg'],
+            options: ['default', 'sm', 'lg', 'icon'],
             description: '버튼 크기',
         },
         disabled: {

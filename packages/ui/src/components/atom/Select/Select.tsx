@@ -1,7 +1,7 @@
-import * as React from "react"
-import * as SelectPrimitive from "@radix-ui/react-select"
+import * as SelectPrimitive from "@radix-ui/react-select";
 import { ChevronUpIcon } from "lucide-react";
 import { cn } from "../../../utils/utils";
+import { SelectProps, SelectGroupProps, SelectValueProps, SelectTriggerProps, SelectContentProps, SelectLabelProps, SelectItemProps, SelectSeparatorProps, SelectScrollUpButtonProps, SelectScrollDownButtonProps } from "./Select.types";
 
 const ChevronDownArrow = ({ className }: { className?: string }) => (
   <svg 
@@ -19,21 +19,25 @@ const ChevronDownArrow = ({ className }: { className?: string }) => (
   </svg>
 );
 
-function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
+function Select({ ...props }: SelectProps) {
   return <SelectPrimitive.Root data-slot="select" {...props} />
 }
 
-function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
+Select.displayName = "Select";
+
+function SelectGroup({ ...props }: SelectGroupProps) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />
 }
 
-function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
+SelectGroup.displayName = "SelectGroup";
+
+function SelectValue({ ...props }: SelectValueProps) {
   return <SelectPrimitive.Value data-slot="select-value" className="text-neutral-300 text-sm font-medium " placeholder="선택하세요" {...props} />
 }
 
-function SelectTrigger({ className, size = "default", children, ...props }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: "sm" | "default"
-}) {
+SelectValue.displayName = "SelectValue";
+
+function SelectTrigger({ className, size = "default", children, ...props }: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
@@ -61,7 +65,9 @@ function SelectTrigger({ className, size = "default", children, ...props }: Reac
   )
 }
 
-function SelectContent({ className, children, position = "popper", ...props }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+SelectTrigger.displayName = "SelectTrigger";
+
+function SelectContent({ className, children, position = "popper", ...props }: SelectContentProps) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -86,7 +92,9 @@ function SelectContent({ className, children, position = "popper", ...props }: R
   )
 }
 
-function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
+SelectContent.displayName = "SelectContent";
+
+function SelectLabel({ className, ...props }: SelectLabelProps) {
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
@@ -96,7 +104,9 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
   )
 }
 
-function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>) {
+SelectLabel.displayName = "SelectLabel";
+
+function SelectItem({ className, children, ...props }: SelectItemProps){
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -114,7 +124,9 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
   )
 }
 
-function SelectSeparator({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Separator>) {
+SelectItem.displayName = "SelectItem";
+
+function SelectSeparator({ className, ...props }: SelectSeparatorProps) {
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
@@ -124,7 +136,9 @@ function SelectSeparator({ className, ...props }: React.ComponentProps<typeof Se
   )
 }
 
-function SelectScrollUpButton({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
+SelectSeparator.displayName = "SelectSeparator";
+
+function SelectScrollUpButton({ className, ...props }: SelectScrollUpButtonProps) {
   return (
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
@@ -139,7 +153,9 @@ function SelectScrollUpButton({ className, ...props }: React.ComponentProps<type
   )
 }
 
-function SelectScrollDownButton({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
+SelectScrollUpButton.displayName = "SelectScrollUpButton";
+
+function SelectScrollDownButton({ className, ...props }: SelectScrollDownButtonProps) {
   return (
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
@@ -153,6 +169,8 @@ function SelectScrollDownButton({ className, ...props }: React.ComponentProps<ty
     </SelectPrimitive.ScrollDownButton>
   )
 }
+
+SelectScrollDownButton.displayName = "SelectScrollDownButton";
 
 export {
   Select,

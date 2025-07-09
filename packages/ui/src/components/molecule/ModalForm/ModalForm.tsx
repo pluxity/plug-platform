@@ -1,42 +1,32 @@
 import { cn } from "../../../utils/utils";
+import { ModalFormProps, ModalFormItemProps } from "./ModalForm.types";
 
-type ModalFormProps = {
-    children: React.ReactNode;
-    className?: string;
-};
-
-type ModalFormItemProps = {
-    label: string;
-    children: React.ReactNode;
-    className?: string;
-};
-
-const ModalForm = ({ 
+function ModalForm({ 
                     children,
                     className
-}: ModalFormProps) => {
+}: ModalFormProps) {
     return(
         <div className={cn("divide-y divide-gray-200", className)}>
             {children}
         </div>
     )
-};
+}
 
 ModalForm.displayName = "ModalForm";
 
-export { ModalForm };
-
-const ModalFormItem = ({ 
+function ModalFormItem({ 
                         label, 
                         children, 
                         className 
-}: ModalFormItemProps) => (
-  <div className={cn(`flex ${className ?? ""}`)}>
-    <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">{label}</div>
-    <div className="flex-1 px-3 py-2 bg-white">{children}</div>
-  </div>
-);
+}: ModalFormItemProps) {
+  return (
+    <div className={cn(`flex ${className ?? ""}`)}>
+      <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">{label}</div>
+      <div className="flex-1 px-3 py-2 bg-white">{children}</div>
+    </div>
+  )
+}
 
 ModalFormItem.displayName = "ModalFormItem";
 
-export { ModalFormItem };
+export { ModalForm, ModalFormItem };

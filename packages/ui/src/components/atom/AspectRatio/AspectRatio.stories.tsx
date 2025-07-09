@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import {AspectRatio} from "./AspectRatio"
+import type { Meta, StoryObj } from "@storybook/react";
+import {AspectRatio} from "./AspectRatio";
 
 const meta: Meta<typeof AspectRatio> = {
     title: 'ATOM/AspectRatio',

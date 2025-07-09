@@ -62,10 +62,8 @@ export const Basic: Story = {
 };
 
 export const WithCheckboxItems: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [bookmarksChecked, setBookmarksChecked] = useState(true);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [urlsChecked, setUrlsChecked] = useState(false);
     
     return (
@@ -95,8 +93,7 @@ export const WithCheckboxItems: Story = {
 };
 
 export const WithRadioItems: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [position, setPosition] = useState("bottom");
     
     return (

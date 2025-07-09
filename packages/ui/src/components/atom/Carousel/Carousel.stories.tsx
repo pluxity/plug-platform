@@ -1,18 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import React from "react"
-
+import type { Meta, StoryObj } from "@storybook/react";
+import { useState, useEffect } from "react";
 import { 
-    type CarouselApi,
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselPrevious,
-    CarouselNext,
-    CarouselIndicator,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselIndicator,
 } from "./Carousel"
-
+import { CarouselApi } from "./Carousel.types";
 import { Card, CardContent } from "../Card/Card";
-
 
 const meta: Meta<typeof Carousel> = {
     title: 'ATOM/Carousel',
@@ -177,12 +174,12 @@ export const Loop: Story = {
 }
 
 export const Api: Story = {
-    render: () => {
-      const [api, setApi] = React.useState<CarouselApi>();
-      const [current, setCurrent] = React.useState(0);
-      const [count, setCount] = React.useState(0);
+  render: function Render() {
+      const [api, setApi] = useState<CarouselApi>();
+      const [current, setCurrent] = useState(0);
+      const [count, setCount] = useState(0);
   
-      React.useEffect(() => {
+      useEffect(() => {
         if (!api) return;
   
         setCount(api.scrollSnapList().length);

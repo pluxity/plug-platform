@@ -1,10 +1,5 @@
-import * as React from "react"
-import { cn } from "../../../utils/utils"
-
-interface TextareaProps extends React.ComponentProps<"textarea"> {
-  error?: boolean;
-  placeholder?: string;
-}
+import { cn } from "../../../utils/utils";
+import { TextareaProps } from "./Textarea.types";
 
 function Textarea({ className, error, placeholder = "텍스트를 입력하세요", ...props }: TextareaProps) {
   return (
@@ -30,4 +25,5 @@ function Textarea({ className, error, placeholder = "텍스트를 입력하세�
   )
 }
 
+Textarea.displayName = "Textarea";
 export { Textarea }

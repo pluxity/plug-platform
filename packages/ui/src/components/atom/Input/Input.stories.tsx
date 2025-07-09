@@ -96,10 +96,8 @@ export const WithLabel: Story = {
 };
 
 export const WithValidation: Story = {
-  render: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  render: function Render() {
     const [value, setValue] = useState("");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isValid, setIsValid] = useState(true);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

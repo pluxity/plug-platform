@@ -1,15 +1,21 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
-} from "./Popover"
+} from "./Popover";
 
 const meta: Meta<typeof Popover> = {
   title: "ATOM/Popover",
   component: Popover,
   tags: ["autodocs"],
+  argTypes: {
+    open: { control: "boolean" },
+    defaultOpen: { control: "boolean" },
+    onOpenChange: { control: false },
+    modal: { control: "boolean" },
+  },
 }
 
 export default meta

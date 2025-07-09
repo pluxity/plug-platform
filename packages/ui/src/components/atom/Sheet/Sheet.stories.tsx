@@ -88,7 +88,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const AllOptions: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [isOpen, setIsOpen] = useState(args.defaultOpen || false);
     
     useEffect(() => {
@@ -560,7 +560,7 @@ export const NestedSheets: Story = {
 };
 
 export const ControlledSheet: Story = {
-  render: () => {
+  render: function Render() {
     const [isOpen, setIsOpen] = useState(false);
     const [history, setHistory] = useState<string[]>([]);
     

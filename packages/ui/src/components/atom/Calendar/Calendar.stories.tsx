@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Calendar } from "./Calendar"
-import { useState } from "react"
-import type { DateRange } from "react-day-picker"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Calendar } from "./Calendar";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
 
 const meta: Meta<typeof Calendar> = {
     title: 'ATOM/Calendar',
@@ -37,21 +37,23 @@ export default meta
 
 type Story = StoryObj<typeof Calendar>
 
-export const Default: Story = {
-    render: (args) => (
-        <Calendar
-            mode="single"
-            captionLayout={args.captionLayout}
-            showOutsideDays={args.showOutsideDays}
-            buttonVariant={args.buttonVariant}
-            language={args.language}
-            className="rounded-lg border"
-        />
-    )
+export const Defult : Story = {
+    render: function Render(args) {
+        return (
+            <Calendar
+                mode="single"
+                captionLayout={args.captionLayout}
+                showOutsideDays={args.showOutsideDays}
+                buttonVariant={args.buttonVariant}
+                language={args.language}
+                className="rounded-lg border"
+            />
+        )
+    }
 }
 
 export const MonthAndYear: Story = {
-    render: (args) => {
+    render: function Render(args) {
         const [date, setDate] = useState<Date | undefined>(new Date())
         
         return (
@@ -74,13 +76,11 @@ export const MonthAndYear: Story = {
 }
 
 export const WithDateSelection: Story = {
-    render: (args) => {
+    render: function Render(args) {
         const [date, setDate] = useState<Date>()
-        
         return (
             <div className="flex flex-col gap-4">
                 <Calendar
-                    {...args}
                     mode="single"
                     selected={date}
                     onSelect={setDate}
@@ -90,16 +90,16 @@ export const WithDateSelection: Story = {
                 <p className="text-sm text-muted-foreground">
                     선택된 날짜: {date ? date.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR') : '없음'}
                 </p>
-            </div>
+            </div>  
         )
     }
 }
 
+
 export const UseDateRange: Story = {
-    render: (args) => {
+    render: function Render(args) {
         const [date, setDate] = useState<DateRange>()
-        
-        return (
+        return(
             <div className="flex flex-col gap-4">
                 <Calendar
                     {...args}
@@ -119,10 +119,9 @@ export const UseDateRange: Story = {
 }
 
 export const MultipleSelection: Story = {
-    render: (args) => {
+    render: function Render(args) {
         const [dates, setDates] = useState<Date[]>()
-        
-        return (
+        return(
             <div className="flex flex-col gap-4">
                 <Calendar
                     {...args}
@@ -141,22 +140,17 @@ export const MultipleSelection: Story = {
 }
 
 export const LanguageSwitchExample: Story = {
-    args: { language: 'ko' },
-    render: (args) => {
+    render: function Render(args) {
         const [date, setDate] = useState<Date | undefined>(new Date())
-        return (
-            <div className="flex flex-col gap-4">
-                <Calendar
-                    {...args}
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-lg border"
-                />
-                <p className="text-sm text-muted-foreground">
-                    {args.language === 'en' ? 'Selected date:' : '선택된 날짜:'} {date ? date.toLocaleDateString(args.language === 'en' ? 'en-US' : 'ko-KR') : (args.language === 'en' ? 'None' : '없음')}
-                </p>
-            </div>
+        return(
+            <Calendar
+                {...args}
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-lg border"
+                language="en"
+            />
         )
     }
 }

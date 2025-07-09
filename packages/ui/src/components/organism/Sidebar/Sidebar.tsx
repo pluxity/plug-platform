@@ -3,29 +3,12 @@ import { cn } from "../../../utils/utils";
 import FoldIcon from "../../../assets/icons/sidebar/fold.svg";
 import UnfoldIcon from "../../../assets/icons/sidebar/unfold.svg";
 import DepthIcon from "../../../assets/icons/sidebar/2depth.svg";
+import { SidebarItem, SidebarProps } from "./Sidebar.types";
 
 const activeColor = 'invert(23%) sepia(98%) saturate(6209%) hue-rotate(212deg) brightness(97%) contrast(101%)';
 const inactiveColor = 'invert(47%) sepia(16%) saturate(268%) hue-rotate(174deg) brightness(94%) contrast(87%)';
 
-export interface SidebarItem {
-  id: string;
-  label: string;
-  icon?: string;
-  to?: string;
-  depth: 1 | 2;
-  parentId?: string;
-  showToggle?: boolean;
-}
-
-interface SidebarProps {
-  items: SidebarItem[];
-  activeItemId: string | null;
-  expandedItemIds: string[];
-  onItemClick: (id: string) => void;
-  onToggleExpand: (id: string) => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ items, activeItemId, expandedItemIds, onItemClick, onToggleExpand }) => {
+function Sidebar({ items, activeItemId, expandedItemIds, onItemClick, onToggleExpand }: SidebarProps) {
   const navigate = useNavigate();
 
   const getItemById = (id: string) => items.find(item => item.id === id);
@@ -100,6 +83,8 @@ const Sidebar: React.FC<SidebarProps> = ({ items, activeItemId, expandedItemIds,
       </div>
     </div>
   );
-};
+}
 
-export default Sidebar;
+Sidebar.displayName = "Sidebar";
+
+export { Sidebar };

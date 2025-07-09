@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 import { 
   Command,
   CommandInput,
@@ -20,6 +20,26 @@ const meta: Meta<typeof Command> = {
       className: {
         control: 'text',
         description: 'className',
+      },
+      value: {
+        control: 'text',
+        description: 'value',
+      },
+      onValueChange: {
+        control: 'text',
+        description: 'onValueChange',
+      },
+      defaultValue: {
+        control: 'text',
+        description: 'defaultValue',
+      },  
+      label: {
+        control: 'text',
+        description: 'label',
+      },
+      asChild: {
+        control: 'boolean',
+        description: 'asChild',
       },
     },
   }

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { cn } from "../../../utils/utils";
 import { 
     Command,
@@ -9,22 +8,9 @@ import {
 import { X } from "lucide-react";
 import { Button } from "../../atom/Button/Button";
 import { debounce } from "lodash";
-
-interface SearchFormProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSelect: (item: string) => void;
-  placeholder?: string;
-  className?: string;
-  inputClassName?: string;
-  listClassName?: string;
-  itemClassName?: string;
-  clearButtonClassName?: string;
-  onSearch?: (search: string) => void;
-  searchResult?: string[];
-}
-
-const SearchForm = ({ 
+import { SearchFormProps } from "./SearchForm.types";
+import { useState, useRef, useMemo } from "react";
+function SearchForm({ 
     value, 
     onChange, 
     onSelect, 
@@ -36,12 +22,12 @@ const SearchForm = ({
     clearButtonClassName,
     onSearch,
     searchResult,
-}: SearchFormProps) => {
+}: SearchFormProps) {
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [open, setOpen] = React.useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
 
-  const searchDebounce = React.useMemo(
+  const searchDebounce = useMemo(
     () => debounce((search: string) => {
       if (onSearch) {
         onSearch(search);
@@ -120,4 +106,5 @@ const SearchForm = ({
 }
 
 SearchForm.displayName = "SearchForm";
+
 export { SearchForm }

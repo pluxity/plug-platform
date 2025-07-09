@@ -1,15 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react"
-
+import type { Meta, StoryObj } from "@storybook/react";
 import { Bar, BarChart, CartesianGrid, XAxis, Line, LineChart, YAxis }  from "recharts";
 
 import { 
-    type ChartConfig,
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
     ChartLegend,
     ChartLegendContent
-} from "./Chart"
+} from "./Chart";
+import { ChartConfig } from "./Chart.types";
 
 const meta: Meta<typeof ChartContainer> = {
     title: 'ATOM/ChartContainer',

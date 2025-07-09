@@ -1,5 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
-
+import type { Meta, StoryObj } from "@storybook/react";
 import { 
     Card,
     CardHeader, 
@@ -7,8 +6,7 @@ import {
     CardDescription, 
     CardContent, 
     CardFooter
-} from "./Card"
-
+} from "./Card";
 import { Button } from "../Button/Button";
 import { AspectRatio } from "../AspectRatio/AspectRatio";
 

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs"
-import { useState, useEffect } from "react"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
+import { useState, useEffect } from "react";
 import {
   Flame,
   Cloud,
@@ -64,16 +64,6 @@ const meta = {
       description: "탭 활성화 모드",
       defaultValue: "automatic",
     },
-    unstyled: {
-      control: "boolean",
-      description: "기본 스타일 사용 여부",
-      defaultValue: false,
-    },
-    loop: {
-      control: "boolean",
-      description: "탭 간 순환 이동 활성화 여부",
-      defaultValue: true,
-    },
     className: {
       control: "text",
       description: "커스텀 CSS 클래스",
@@ -85,7 +75,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const AllOptions: Story = {
-  render: (args) => {
+  render: function Render(args) {
     const [activeTab, setActiveTab] = useState(args.defaultValue || "tab1");
 
     useEffect(() => {
@@ -133,19 +123,15 @@ export const AllOptions: Story = {
           orientation={args.orientation}
           dir={args.dir}
           activationMode={args.activationMode}
-          unstyled={args.unstyled}
           className={`${args.className || ""} ${args.orientation === "vertical" ? "w-72" : "w-full max-w-3xl"}`}
-          loop={args.loop}
         >
           <TabsList 
-            className={`${args.unstyled ? "bg-transparent" : ""} ${args.orientation === "vertical" ? "flex-col space-x-0 space-y-1" : ""}`}
+            className={`${args.orientation === "vertical" ? "flex-col space-x-0 space-y-1" : ""}`}
           >
             {Object.entries(tabContents).map(([key, { title, icon }]) => (
               <TabsTrigger 
                 key={key} 
                 value={key}
-                unstyled={args.unstyled}
-                className={args.unstyled ? "px-3 py-2 text-sm rounded hover:bg-gray-100 data-[state=active]:bg-gray-200" : ""}
               >
                 {icon}
                 {title}
@@ -157,7 +143,6 @@ export const AllOptions: Story = {
             <TabsContent 
               key={key} 
               value={key}
-              className={args.unstyled ? "mt-2 p-4 border rounded-md" : ""}
             >
               <div className="p-4 border rounded-md bg-white">
                 <p>{content}</p>
@@ -173,8 +158,6 @@ export const AllOptions: Story = {
             <div>방향: <span className="font-mono">{args.orientation || "horizontal"}</span></div>
             <div>텍스트 방향: <span className="font-mono">{args.dir || "ltr"}</span></div>
             <div>활성화 모드: <span className="font-mono">{args.activationMode || "automatic"}</span></div>
-            <div>스타일 없음: <span className="font-mono">{args.unstyled ? "true" : "false"}</span></div>
-            <div>탭 순환: <span className="font-mono">{args.loop ? "true" : "false"}</span></div>
           </div>
         </div>
       </div>
@@ -185,8 +168,6 @@ export const AllOptions: Story = {
     orientation: "horizontal",
     dir: "ltr",
     activationMode: "automatic",
-    unstyled: false,
-    loop: true,
   },
 };
 
@@ -549,7 +530,7 @@ export const NestedTabs: Story = {
 };
 
 export const CustomStyledTabs: Story = {
-  render: () => {
+  render: function Render() {
     const [activeTab, setActiveTab] = useState("tab1");
     
     return (
@@ -559,7 +540,6 @@ export const CustomStyledTabs: Story = {
           <Tabs 
             defaultValue="tab1" 
             className="w-full"
-            unstyled
           >
             <TabsList className="flex p-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
               <TabsTrigger 
@@ -601,7 +581,6 @@ export const CustomStyledTabs: Story = {
           <Tabs 
             defaultValue="tab1" 
             className="w-full"
-            unstyled
           >
             <TabsList className="flex justify-center gap-6 bg-transparent">
               <TabsTrigger 
@@ -662,7 +641,6 @@ export const CustomStyledTabs: Story = {
           <Tabs 
             defaultValue="tab1" 
             className="w-full"
-            unstyled
           >
             <TabsList className="flex flex-col space-y-1 bg-transparent">
               {[
@@ -702,7 +680,7 @@ export const CustomStyledTabs: Story = {
 };
 
 export const ControlledTabs: Story = {
-  render: () => {
+  render: function Render() {
     const [activeTab, setActiveTab] = useState("tab1");
     const handleTabChange = (value: string) => {
       console.log(`탭 변경: ${value}`);
