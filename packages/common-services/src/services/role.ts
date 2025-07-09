@@ -1,8 +1,8 @@
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
-import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
+import type { BaseResponseBody } from '@plug/api-hooks';
 import type { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@plug/common-services';
 
-const ROLE_API = `/roles`;
+const ROLE_API = `roles`;
 
 export const useRoles = () => {
   return useGet<RoleResponse[]>(ROLE_API, { requireAuth: true });
@@ -13,7 +13,7 @@ export const useRoleDetail = (roleId: number) => {
 };
 
 export const useCreateRole = () => {
-  return usePost<CreatedResponseBody, RoleCreateRequest>(ROLE_API, { requireAuth: true });
+  return usePost<BaseResponseBody, RoleCreateRequest>(ROLE_API, { requireAuth: true });
 };
 
 export const useUpdateRole = (roleId: number) => {

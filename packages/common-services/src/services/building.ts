@@ -1,8 +1,8 @@
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
-import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
+import type { BaseResponseBody } from '@plug/api-hooks';
 import type { BuildingResponse, BuildingCreateRequest, BuildingUpdateRequest } from '@plug/common-services';
 
-const BUILDINGS_API = `/buildings`;
+const BUILDINGS_API = `buildings`;
 
 export const useBuildings = () => {
   return useGet<BuildingResponse[]>(BUILDINGS_API, { requireAuth: true });
@@ -13,7 +13,7 @@ export const useBuildingDetail = (buildingId: number) => {
 };
 
 export const useCreateBuilding = () => {
-  return usePost<CreatedResponseBody, BuildingCreateRequest>(BUILDINGS_API, { requireAuth: true });
+  return usePost<BaseResponseBody, BuildingCreateRequest>(BUILDINGS_API, { requireAuth: true });
 };
 
 export const useUpdateBuilding = (buildingId: number) => {

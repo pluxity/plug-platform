@@ -1,36 +1,44 @@
 import ky, {Options} from 'ky';
-import { ResponseTypes, RequestOptions } from '../types';
+import { RequestOptions, DataResponseBody, ErrorResponseBody } from "../types";
 
 export const baseKy = ky.create({
   credentials: 'include',
+  prefixUrl: '/api',
   headers: {
     'Content-Type': 'application/json'
   },
   hooks: {
     afterResponse: [
-      async (_request, _options, response) => {
+      async (_request, options, response) => {
+        const requestOptions = options as unknown as RequestOptions;
+
         if (!response.ok) {
-          let errorData: any = {};
+          let errorData: ErrorResponseBody | any = {};
           try {
             errorData = await response.json();
           } catch (_) {}
+
           const message = errorData?.message || errorData?.error || `HTTP ${response.status}`;
-          throw new Error(message);
+          const error = new Error(message);
+
+          if (requestOptions.onError) {
+            requestOptions.onError(errorData);
+          }
+
+          throw error;
+        } else {
+          if (requestOptions.onSuccess && response.status !== 204) {
+            const data = await response.clone().json();
+            requestOptions.onSuccess(data);
+          }
         }
       }
     ]
   }
 });
 
-export const externalApiClient = ky.create({
-  credentials: 'include',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 const buildKy = (
-    options: RequestOptions & Options = {}
+  options: RequestOptions & Options = {}
 ) => {
   const { requireAuth = true, ...restOptions } = options;
   const baseOptions: Options = {
@@ -46,23 +54,23 @@ const buildKy = (
 };
 
 export const api = {
-  get: async <T>(endpoint: string, options: RequestOptions = {}): Promise<ResponseTypes<T>['GET']> => {
+  get: async <T>(endpoint: string, options: RequestOptions = {}): Promise<DataResponseBody<T>> => {
     return buildKy(options).get(endpoint).json();
   },
 
-  post: (endpoint: string, data: unknown, options: RequestOptions = {}): Promise<Response> => {
-    return buildKy(options).post(endpoint, { json: data });
+  post: async <T>(endpoint: string, data: unknown, options: RequestOptions = {}): Promise<T> => {
+    return buildKy(options).post(endpoint, { json: data }).json();
   },
 
-  put: (endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<Response> => {
-    return buildKy(options).put(endpoint, { json: data });
+  put: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
+    return buildKy(options).put(endpoint, { json: data }).json();
   },
 
-  patch: (endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<Response> => {
-    return buildKy(options).patch(endpoint, { json: data });
+  patch: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
+    return buildKy(options).patch(endpoint, { json: data }).json();
   },
 
-  delete: (endpoint: string, options: RequestOptions = {}): Promise<Response> => {
-    return buildKy(options).delete(endpoint);
+  delete: async <T>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
+    return buildKy(options).delete(endpoint).json();
   }
 };
