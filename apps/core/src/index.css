@@ -1,2 +1,4 @@
 @import 'tailwindcss';
 @import '@plug/ui/styles';
+/* TailwindCSS v4 source directive for UI package components */
+@source "../../packages/ui";
