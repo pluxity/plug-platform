@@ -1,64 +1,52 @@
 import React from 'react'
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Button, Badge } from '@plug/ui'
+import { Outlet } from 'react-router-dom'
+import { Sidebar } from '@plug/ui'
 import { BackofficeHeader } from '../components'
+import { useState } from 'react'
 
 interface MenuItem {
-  id: string
-  label: string
-  icon: string
-  path: string
+  id: string;
+  label: string;
+  icon?: string;
+  to?: string;
+  depth: 1 | 2;
+  parentId?: string;
+  showToggle?: boolean;
 }
 
 const menuItems: MenuItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: '📊', path: '/admin' },
-  { id: 'users', label: 'Users', icon: '👥', path: '/admin/users' },
-  { id: 'settings', label: 'Settings', icon: '⚙️', path: '/admin/settings' },
+  { id: 'dashboard', label: 'Dashboard', to: '/admin', depth: 1, showToggle: true},
+  { id: 'Asset', label: 'Asset', to: '/admin/asset', depth: 1, showToggle: true},
+  { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
+  { id: 'users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
 ]
 
 const BackofficeLayout: React.FC = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const [activeItem, setActiveItem] = useState<string | null>(null);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  const handleClick = (id: string) => {setActiveItem(id);};
+
+  const handleToggle = (id: string) => setExpandedItems((prev) => (prev.includes(id) ? [] : [id]));
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-sm border-r border-gray-200">
-        {/* Sidebar Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
-            <span className="text-point-blue">Pluxity</span> Admin
-          </h2>
-          <Badge variant="secondary" className="text-xs mt-2">
-            Administrator
-          </Badge>
-        </div>
-
-        {/* Navigation Menu */}
-        <nav className="p-4">
-          <ul className="space-y-2">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                <Button
-                  variant={location.pathname === item.path ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => navigate(item.path)}
-                >
-                  <span className="mr-3">{item.icon}</span>
-                  {item.label}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
-
+    <div className="h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <BackofficeHeader />
+  
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <BackofficeHeader />
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar
+          items={menuItems}
+          activeItemId={activeItem}
+          expandedItemIds={expandedItems}
+          onItemClick={handleClick}
+          onToggleExpand={handleToggle}
+        />
 
         {/* Page Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-auto">
           <Outlet />
         </main>
       </div>
