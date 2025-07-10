@@ -25,6 +25,7 @@ export function useApi<T, P extends any[] = any[]>(
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<ErrorResponseBody | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [response, setResponse] = useState<Response | null>(null);
 
   const isMounted = useRef(true);
@@ -41,6 +42,7 @@ export function useApi<T, P extends any[] = any[]>(
       setData(null);
       setError(null);
       setIsLoading(false);
+      setIsSuccess(false);
       setResponse(null);
     }
   }, []);
@@ -50,6 +52,7 @@ export function useApi<T, P extends any[] = any[]>(
 
     setIsLoading(true);
     setError(null);
+    setIsSuccess(false);
     setData(null);
     setResponse(null);
 
@@ -57,6 +60,8 @@ export function useApi<T, P extends any[] = any[]>(
       const result = await apiMethod(...args);
 
       if (!isMounted.current) return { data: null, response: null };
+
+      setIsSuccess(true);
 
       if (typeof Response !== 'undefined' && result instanceof Response) {
         setResponse(result);
@@ -88,6 +93,8 @@ export function useApi<T, P extends any[] = any[]>(
     } catch (err) {
       if (!isMounted.current) return { data: null, response: null };
       console.error("API 요청 오류:", err);
+
+      setIsSuccess(false);
 
       let processedError: ErrorResponseBody;
 
@@ -126,7 +133,7 @@ export function useApi<T, P extends any[] = any[]>(
     return location ? location.split('/').filter(Boolean).pop() ?? null : null;
   }, [response]);
 
-  return { data, error, isLoading, execute, reset, response, getLocationId };
+  return { data, error, isLoading, isSuccess, execute, reset, response, getLocationId };
 }
 
 export const useGet = <T>(url: string, options?: RequestOptions): UseApiResponse<T, []> => {

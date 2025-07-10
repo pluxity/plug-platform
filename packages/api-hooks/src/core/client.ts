@@ -58,19 +58,27 @@ export const api = {
     return buildKy(options).get(endpoint).json();
   },
 
-  post: async <T>(endpoint: string, data: unknown, options: RequestOptions = {}): Promise<T> => {
-    return buildKy(options).post(endpoint, { json: data }).json();
+  post: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
+    const response = await buildKy(options).post(endpoint, data ? { json: data } : undefined);
+    if (response.status === 201) return null as T;
+    return await response.json();
   },
 
   put: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
-    return buildKy(options).put(endpoint, { json: data }).json();
+    const response = await buildKy(options).post(endpoint, data ? { json: data } : undefined);
+    if (response.status === 204) return null as T;
+    return await response.json();
   },
 
   patch: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
-    return buildKy(options).patch(endpoint, { json: data }).json();
+    const response = await buildKy(options).post(endpoint, data ? { json: data } : undefined);
+    if (response.status === 204) return null as T;
+    return await response.json();
   },
 
-  delete: async <T>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
-    return buildKy(options).delete(endpoint).json();
-  }
+  delete: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
+    const response = await buildKy(options).post(endpoint, data ? { json: data } : undefined);
+    if (response.status === 204) return null as T;
+    return await response.json();
+  },
 };
