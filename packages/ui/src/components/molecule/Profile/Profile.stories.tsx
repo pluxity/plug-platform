@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Profile } from "./Profile";
+import { Button } from "../../atom/Button/Button";
 
 const meta: Meta<typeof Profile> = {
     title: "Molecule/Profile",  
@@ -21,8 +22,15 @@ const meta: Meta<typeof Profile> = {
                 type: "text",
             },
         },
+        type: {
+            description: "프로필 타입 - list: 리스트 방식, custom: 커스텀 레이아웃",
+            control: {
+                type: "select",
+                options: ["list", "custom"],
+            },
+        },
         profileItems: {
-            description: "프로필 리스트",
+            description: "프로필 리스트 (type='list'일 때만 사용)",
             control: {
                 type: "object",
             },
@@ -44,6 +52,10 @@ const meta: Meta<typeof Profile> = {
             control: {
                 type: "text",
             },
+        },
+        children: {
+            description: "커스텀 컨텐츠",
+            control: false,
         },
     }
 };
@@ -71,6 +83,7 @@ export const Default: Story = {
 
         return (
             <Profile 
+                type="list"
                 profileTitle="김철수"
                 profileDescription="admin@pluxity.com"
                 profileItems={[
@@ -107,6 +120,7 @@ export const CustomStyle: Story = {
 
         return (
             <Profile 
+                type="list"
                 profileTitle="김철수"
                 profileDescription="admin@pluxity.com"
                 profileImage="https://github.com/shadcn.png"
@@ -125,3 +139,85 @@ export const CustomStyle: Story = {
     },
 };
 
+export const CustomLayout: Story = {
+    render: function Render() {
+        const handleLogout = () => {
+            alert("로그아웃 되었습니다.");
+        };
+
+        const handleShortcut1 = () => {
+            alert("바로가기 1 클릭");
+        };
+
+        const handleShortcut2 = () => {
+            alert("바로가기 2 클릭");
+        };
+
+        const handleShortcut3 = () => {
+            alert("바로가기 3 클릭");
+        };
+
+        const handleSystemSettings = () => {
+            alert("시스템 설정으로 이동");
+        };
+
+        return (
+            <Profile 
+                type="custom"
+                profileTitle="관리자"
+                profileDescription="admin@pluxity.com"
+            >
+                <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-2">
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex flex-col h-16 p-2"
+                            onClick={handleShortcut1}
+                        >
+                            <div className="w-6 h-6 bg-blue-500 rounded-full mb-1"></div>
+                            <span className="text-xs">바로가기1</span>
+                        </Button>
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex flex-col h-16 p-2"
+                            onClick={handleShortcut2}
+                        >
+                            <div className="w-6 h-6 bg-green-500 rounded-full mb-1"></div>
+                            <span className="text-xs">바로가기2</span>
+                        </Button>
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex flex-col h-16 p-2"
+                            onClick={handleShortcut3}
+                        >
+                            <div className="w-6 h-6 bg-purple-500 rounded-full mb-1"></div>
+                            <span className="text-xs">바로가기3</span>
+                        </Button>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={handleSystemSettings}
+                        >
+                            시스템 설정
+                        </Button>
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={handleLogout}
+                        >
+                            로그아웃
+                        </Button>
+                    </div>
+                </div>
+            </Profile>
+        )
+    },
+};

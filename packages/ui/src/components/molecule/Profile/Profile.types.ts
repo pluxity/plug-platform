@@ -12,4 +12,6 @@ export interface ProfileProps {
         title: string;
         onClick?: () => void;
     }[];
+    type?: "list" | "custom";
+    children?: React.ReactNode;
 }

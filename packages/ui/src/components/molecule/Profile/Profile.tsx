@@ -15,7 +15,9 @@ function Profile({
     profileDescription,
     profileButton,
     profileImage,
+    type = "list",
     profileItems = [],
+    children,
     className
  }: ProfileProps) {
 
@@ -33,23 +35,30 @@ function Profile({
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                {profileItems.map((item, index) => (
-                    <DropdownMenuItem 
-                        key={index}
-                        onClick={item.onClick}
-                    >
-                        <span>{item.title}</span>
-                    </DropdownMenuItem>
-                ))}
-                {profileButton && (
+                {type === "custom" ? (
+                    children
+                ) : (
                     <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                            variant={profileButton.variant || "destructive"}
-                            onClick={profileButton.onClick}
-                        >
-                                {profileButton.title}
-                        </DropdownMenuItem>
+                        {profileItems.map((item, index) => (
+                            <DropdownMenuItem 
+                                key={index}
+                                onClick={item.onClick}
+                            >
+                                <span>{item.title}</span>
+                            </DropdownMenuItem>
+                        ))}
+                        
+                        {profileButton && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                    variant={profileButton.variant || "destructive"}
+                                    onClick={profileButton.onClick}
+                                >
+                                    {profileButton.title}
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </>
                 )}
             </DropdownMenuContent>
