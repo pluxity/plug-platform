@@ -1,6 +1,6 @@
 import { ErrorResponseBody } from './response';
 
-export interface UseApiResponse<T, P extends any[] = any[]> {
+export interface UseApiResponse<T = any, P extends any[] = any[]> {
   data: T | null;
   error: ErrorResponseBody | null;
   isLoading: boolean;

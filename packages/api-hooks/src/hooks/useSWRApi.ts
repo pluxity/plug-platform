@@ -1,6 +1,7 @@
 import useSWR, { SWRConfiguration } from 'swr';
 import { api } from '../core';
 import type { AllowedMethod, RequestOptions, DataResponseBody, UseSWRApiReturn } from '../types';
+import { createErrorFromResponse } from "../util/apiUtils";
 
 export function useSWRApi<T>(
   url: string,
@@ -11,16 +12,21 @@ export function useSWRApi<T>(
 ): UseSWRApiReturn<T> {
 
   const fetcher = async (): Promise<DataResponseBody<T> | null> => {
-    switch (method) {
-      case 'GET': {
-        return await api.get<T>(url, options);
+    try {
+      switch (method) {
+        case 'GET': {
+          return await api.get<T>(url, options);
+        }
+        case 'DELETE': {
+          await api.delete(url, options);
+          return null;
+        }
+        default:
+          throw new Error(`지원되지 않는 메서드: ${method}`);
       }
-      case 'DELETE': {
-        await api.delete(url, options);
-        return null;
-      }
-      default:
-        throw new Error(`Unsupported method: ${method}`);
+    } catch (err) {
+      const processedError = createErrorFromResponse(err);
+      throw processedError;
     }
   };
 

@@ -1,5 +1,6 @@
 import ky, {Options} from 'ky';
 import { RequestOptions, DataResponseBody, ErrorResponseBody } from "../types";
+import { createErrorFromResponse } from "../util/apiUtils";
 
 export const baseKy = ky.create({
   credentials: 'include',
@@ -18,12 +19,18 @@ export const baseKy = ky.create({
             errorData = await response.json();
           } catch (_) {}
 
-          const message = errorData?.message || errorData?.error || `HTTP ${response.status}`;
-          const error = new Error(message);
+          const processedError = createErrorFromResponse({
+            ...errorData,
+            status: response.status,
+            message: errorData?.message || errorData?.error || `HTTP ${response.status}`
+          });
 
           if (requestOptions.onError) {
-            requestOptions.onError(errorData);
+            requestOptions.onError(processedError);
           }
+
+          const error = new Error(processedError.message);
+          Object.assign(error, processedError);
 
           throw error;
         } else {

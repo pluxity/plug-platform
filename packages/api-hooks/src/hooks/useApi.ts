@@ -1,32 +1,22 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import {
-  DataResponseBody,
-  ErrorResponseBody,
-  RequestOptions,
-  UseApiResponse,
-} from "../types";
+import { useCallback, useRef, useEffect } from 'react';
+import { DataResponseBody, RequestOptions, UseApiResponse } from "../types";
+import { useReducer } from 'react';
+import { apiReducer } from './useReducer';
+import { createErrorFromResponse } from "../util/apiUtils";
 import { api, fileApi } from "../core";
 
-const parseResponse = async <T>(res: Response): Promise<T | null> => {
-    const contentType = res.headers.get('content-type');
-    if (contentType?.includes('application/json') && res.status !== 204) {
-      const jsonData = await res.clone().json();
-      if (jsonData && typeof jsonData === 'object' && 'data' in jsonData) {
-        return jsonData.data as T;
-      }
-      return jsonData as T;
-    }
-  return null;
-};
-
-export function useApi<T, P extends any[] = any[]>(
+export function useApi<T = any, P extends any[] = any[]>(
   apiMethod: (...args: P) => Promise<unknown>,
 ): UseApiResponse<T, P> {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<ErrorResponseBody | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [response, setResponse] = useState<Response | null>(null);
+  const [state, dispatch] = useReducer(apiReducer<T>, {
+    data: null,
+    error: null,
+    isLoading: false,
+    isSuccess: false,
+    response: null
+  });
+  
+  const { data, error, isLoading, isSuccess, response } = state;
 
   const isMounted = useRef(true);
 
@@ -39,91 +29,61 @@ export function useApi<T, P extends any[] = any[]>(
 
   const reset = useCallback(() => {
     if (isMounted.current) {
-      setData(null);
-      setError(null);
-      setIsLoading(false);
-      setIsSuccess(false);
-      setResponse(null);
+      dispatch({ type: 'RESET' });
     }
   }, []);
 
   const execute = useCallback(async (...args: P): Promise<{ data: T | null; response: Response | null }> => {
     if (!isMounted.current) return { data: null, response: null };
 
-    setIsLoading(true);
-    setError(null);
-    setIsSuccess(false);
-    setData(null);
-    setResponse(null);
+    dispatch({ type: 'LOADING' });
 
     try {
       const result = await apiMethod(...args);
 
       if (!isMounted.current) return { data: null, response: null };
 
-      setIsSuccess(true);
+      let parsedData: T | null = null;
+      let responseObj: Response | null = null;
 
-      if (typeof Response !== 'undefined' && result instanceof Response) {
-        setResponse(result);
+      if (result instanceof Response) {
+        responseObj = result;
 
         if (result.status === 204) {
-          setData(null);
-          return { data: null, response: result };
+          parsedData = null;
+        } else {
+          const contentType = result.headers.get('content-type');
+          if (contentType?.includes('application/json')) {
+            const jsonData = await result.clone().json();
+            parsedData = (jsonData && typeof jsonData === 'object' && 'data' in jsonData)
+              ? jsonData.data as T
+              : jsonData as T;
+          }
         }
-
-        const parsed = await parseResponse<T>(result);
-        setData(parsed);
-        return { data: parsed, response: result };
+      } else if (result === undefined || result === null) {
+        parsedData = null;
+      } else if (typeof result === 'object' && 'data' in result) {
+        parsedData = (result as DataResponseBody<T>).data;
+      } else {
+        parsedData = result as T;
       }
 
-      if (result === undefined || result === null) {
-        setData(null);
-        return { data: null, response: null };
-      }
+      dispatch({
+        type: 'SUCCESS',
+        data: parsedData,
+        response: responseObj
+      });
 
-      if (typeof result === 'object' && 'data' in result) {
-        const responseData = (result as DataResponseBody<T>).data;
-        setData(responseData);
-        return { data: responseData, response: null };
-      }
-
-      setData(result as T);
-      return { data: result as T, response: null };
+      return { data: parsedData, response: responseObj };
 
     } catch (err) {
       if (!isMounted.current) return { data: null, response: null };
       console.error("API 요청 오류:", err);
 
-      setIsSuccess(false);
-
-      let processedError: ErrorResponseBody;
-
-      if (typeof err === 'object' && err !== null && 'status' in err && 'message' in err) {
-        processedError = err as ErrorResponseBody;
-      } else if (err instanceof Error) {
-        processedError = {
-          status: (err as any).status || 500,
-          message: err.message,
-          timestamp: new Date().toISOString(),
-          code: (err as any).code || 'CLIENT_ERROR',
-          error: err.message || 'UNKNOWN_ERROR',
-        };
-      } else {
-        processedError = {
-          status: 500,
-          message: '알 수 없는 오류가 발생했습니다.',
-          timestamp: new Date().toISOString(),
-          code: 'UNKNOWN_ERROR',
-          error: 'UNKNOWN_ERROR',
-        };
-      }
-
-      setError(processedError);
+      const processedError = createErrorFromResponse(err);
+      dispatch({ type: 'ERROR', error: processedError });
+      
       return { data: null, response: null };
-    } finally {
-      if (isMounted.current) {
-        setIsLoading(false);
-      }
     }
   }, [apiMethod]);
 

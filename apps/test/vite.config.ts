@@ -6,11 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['app.plug-platform.com'],
-    port: 8080,
+    allowedHosts: ['app.pluxity.com'],
     proxy: {
       '/api': {
-        target: 'http://api.plug-platform.com:8080',
+        target: 'http://api.pluxity.com:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
