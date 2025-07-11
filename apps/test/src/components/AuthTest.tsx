@@ -85,8 +85,10 @@ const AuthTest = () => {
           </div>
           <button
             onClick={async () => {
-              await signin(signInData);
-              getprofile();
+              const { response } = await signin(signInData);
+              if (response?.ok) {
+                getprofile();
+              }
             }}
             disabled={signinLoading}
             style={{
