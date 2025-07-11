@@ -1,8 +1,8 @@
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
-import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
+import type { BaseResponseBody } from '@plug/api-hooks';
 import type { UserResponse, UserCreateRequest, UserUpdateRequest } from '@plug/common-services';
 
-const USER_API = `/admin/users`;
+const USER_API = `admin/users`;
 
 export const useUsers = () => {
   return useGet<UserResponse[]>(USER_API, { requireAuth: true });
@@ -13,7 +13,7 @@ export const useUserDetail = (userId: number) => {
 };
 
 export const useCreateUser = () => {
-  return usePost<CreatedResponseBody, UserCreateRequest>(USER_API, { requireAuth: true });
+  return usePost<BaseResponseBody, UserCreateRequest>(USER_API, { requireAuth: true });
 };
 
 export const useUpdateUser = (userId: number) => {
