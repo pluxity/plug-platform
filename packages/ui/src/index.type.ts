@@ -53,6 +53,7 @@ export * from "./components/molecule/LabeledInput/LabeldInput.types";
 export * from "./components/molecule/ModalForm/ModalForm.types";
 export * from "./components/molecule/SearchForm/SearchForm.types";
 export * from "./components/molecule/ToggleGroup/ToggleGroup.types";
+export * from "./components/molecule/Profile/Profile.types";
 // Organism
 export * from "./components/organism/DataTable/DataTable.types";
 export * from "./components/organism/Sidebar/Sidebar.types";
