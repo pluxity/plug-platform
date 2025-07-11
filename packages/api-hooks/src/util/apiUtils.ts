@@ -12,19 +12,6 @@ export const isErrorResponseBody = (err: unknown): err is ErrorResponseBody => {
   );
 };
 
-export const logErrorDetails = (err: unknown): void => {
-  if (isErrorResponseBody(err)) {
-    console.error(`API 에러 [${err.code}]: ${err.message} (${err.status})`);
-  } else if (err instanceof Error) {
-    console.error(`예외 발생: ${err.message}`);
-    if (err.stack) {
-      console.debug(err.stack);
-    }
-  } else {
-    console.error('알 수 없는 에러:', err);
-  }
-};
-
 export const createErrorFromResponse = (err: unknown): ErrorResponseBody => {
   if (isErrorResponseBody(err)) {
     return err;

@@ -1,6 +1,6 @@
 import useSWR, { SWRConfiguration } from 'swr';
-import { api } from '../core';
-import type { AllowedMethod, RequestOptions, DataResponseBody, UseSWRApiReturn } from '../types';
+import { api } from "../core";
+import type { AllowedMethod, DataResponseBody, RequestOptions, UseSWRApiReturn, } from "../types";
 import { createErrorFromResponse } from "../util/apiUtils";
 
 export function useSWRApi<T>(
@@ -10,7 +10,6 @@ export function useSWRApi<T>(
   options?: RequestOptions,
   config?: SWRConfiguration
 ): UseSWRApiReturn<T> {
-
   const fetcher = async (): Promise<DataResponseBody<T> | null> => {
     try {
       switch (method) {
@@ -25,26 +24,21 @@ export function useSWRApi<T>(
           throw new Error(`지원되지 않는 메서드: ${method}`);
       }
     } catch (err) {
-      const processedError = createErrorFromResponse(err);
-      throw processedError;
+      throw createErrorFromResponse(err);
     }
   };
 
-  const cacheKey = params 
+  const cacheKey = params
     ? `${url}::${method}::${JSON.stringify(params)}`
-    : method === 'GET' 
-      ? url 
+    : method === 'GET'
+      ? url
       : `${method}::${url}`;
 
-  const { data: rawData, error, isLoading, mutate } = useSWR<DataResponseBody<T> | null>(
-    cacheKey, 
-    fetcher, 
-    {
-      revalidateOnFocus: method === 'GET',
-      shouldRetryOnError: method === 'GET',
-      ...config,
-    }
-  );
+  const { data: rawData, error, isLoading, mutate, } = useSWR<DataResponseBody<T> | null>(cacheKey, fetcher, {
+    revalidateOnFocus: method === 'GET',
+    shouldRetryOnError: method === 'GET',
+    ...config,
+  });
 
   const data = rawData?.data ?? null;
 
