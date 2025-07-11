@@ -25,36 +25,12 @@ const AuthTest = () => {
       <h2>인증 API 테스트</h2>
 
       {(signinError || signUpError || signOutError || getprofileError) && (
-        <div
-          style={{
-            padding: "10px",
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            borderRadius: "4px",
-            marginBottom: "20px",
-          }}
-        >
-          {signinError?.message ||
-            signUpError?.message ||
-            signOutError?.message ||
-            getprofileError?.message ||
-            "오류가 발생했습니다."}
+        <div style={{ padding: "10px", backgroundColor: "#f8d7da", color: "#721c24", borderRadius: "4px", marginBottom: "20px" }}>
+          {signinError?.message || signUpError?.message || signOutError?.message || getprofileError?.message || "오류가 발생했습니다."}
         </div>
       )}
-
-      {(signinSuccess ||
-        signUpSuccess ||
-        signOutSuccess ||
-        getprofileSuccess) && (
-        <div
-          style={{
-            padding: "10px",
-            backgroundColor: "#d4edda",
-            color: "#155724",
-            borderRadius: "4px",
-            marginBottom: "20px",
-          }}
-        >
+      {(signinSuccess || signUpSuccess || signOutSuccess || getprofileSuccess) && (
+        <div style={{ padding: "10px", backgroundColor: "#d4edda", color: "#155724", borderRadius: "4px", marginBottom: "20px" }}>
           성공적으로 처리되었습니다.
         </div>
       )}
@@ -138,7 +114,7 @@ const AuthTest = () => {
           <h3>회원가입</h3>
           <div style={{ marginBottom: "10px" }}>
             <label style={{ display: "block", marginBottom: "5px" }}>
-              이메일:
+              아이디:
             </label>
             <input
               type="text"
@@ -213,7 +189,9 @@ const AuthTest = () => {
             />
           </div>
           <button
-            onClick={signup}
+            onClick={()=> {
+              signup(signUpData);
+            }}
             disabled={signUpLoading}
             style={{
               padding: "8px 16px",
