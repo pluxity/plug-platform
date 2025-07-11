@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from '@plug/ui'
-import { BackofficeHeader } from '.'
+import { BackofficeHeader } from '@/backoffice/common/view/layouts'
 import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
 const AsideMenuItems: AsideMenuItemProps[] = [
@@ -9,6 +9,7 @@ const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'Asset', label: 'Asset', to: '/admin/asset', depth: 1, showToggle: true},
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
+  { id: 'Categories', label: 'Categories', to: '/admin/categories', depth: 1, showToggle: true}
 ]
 
 const BackofficeLayout: React.FC = () => {
