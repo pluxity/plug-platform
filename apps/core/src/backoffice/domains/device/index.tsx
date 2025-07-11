@@ -1,19 +1,19 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@plug/ui'
-import { PageContainer } from '@/backoffice/common/view/components'
+import { PageContainer } from '../../common/view/components'
 
-const Asset: React.FC = () => {
+const Device: React.FC = () => {
   return (
-    <PageContainer title="Asset">
+    <PageContainer title="Device">
       <Card>
         <CardHeader>
-          <CardTitle>Asset</CardTitle>
+          <CardTitle>Device</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
             <div className="text-6xl mb-4">⚙️</div>
-            <h3 className="text-xl font-semibold mb-2">System Asset</h3>
-            <p className="text-gray-600">Asset Contents</p>
+            <h3 className="text-xl font-semibold mb-2">System Device</h3>
+            <p className="text-gray-600">Device Contents</p>
           </div>
         </CardContent>
       </Card>
@@ -21,4 +21,4 @@ const Asset: React.FC = () => {
   )
 }
 
-export default Asset
+export default Device

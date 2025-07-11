@@ -33,28 +33,17 @@ function Sidebar({ items, activeItemId, expandedItemIds, onItemClick, onToggleEx
           isActive ? "bg-blue-50" : "bg-white",
           "rounded-[3px] hover:bg-blue-50"
         )}
-        onClick={() => { onItemClick(id); if (to) navigate(to);}}
+          onClick={() => {
+            onItemClick(id);
+            if (showToggle) onToggleExpand(id); 
+            if (to) navigate(to);
+          }}
       >
-        <div
-          className="rounded-sm flex justify-center items-center gap-2.5"
-          {...(showToggle && {
-            onClick: (e) => {
-              e.stopPropagation();
-              onToggleExpand(id);
-            },
-          })}
-        >
+        <div className="rounded-sm flex justify-center items-center gap-2.5">
           {showToggle ? (
-            isExpanded ? (
-              <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
-                <UnfoldIcon />
-              </div>
-
-            ) : (
-              <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
-                <FoldIcon  />
-              </div>
-            )
+            <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
+              {isExpanded ? <UnfoldIcon /> : <FoldIcon />}
+            </div>
           ) : depth === 2 ? (
             <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
               <DepthIcon />

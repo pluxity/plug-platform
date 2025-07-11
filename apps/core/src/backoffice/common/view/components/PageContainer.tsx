@@ -1,9 +1,5 @@
 import React from 'react'
-
-interface PageContainerProps {
-  title: string
-  children: React.ReactNode
-}
+import { PageContainerProps } from '../../services/layout'
 
 const PageContainer: React.FC<PageContainerProps> = ({ title, children }) => {
   return (
