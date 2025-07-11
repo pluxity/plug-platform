@@ -2,9 +2,9 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import BackofficeLayout from '@/backoffice/common/view/layouts/BackofficeLayout'
-import Dashboard from '@/backoffice/pages/dashboard'
-import Users from '@/backoffice/pages/users'
-import Settings from '@/backoffice/pages/settings'
+import Dashboard from '@/backoffice/domains/dashboard'
+import Users from '@/backoffice/domains/users'
+import Settings from '@/backoffice/domains/settings'
 
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
