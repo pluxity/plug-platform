@@ -1,44 +1,13 @@
 {
+  "extends": "./tsconfig.base.json", 
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "module": "esnext",
-    "incremental": true,
-    "sourceMap": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true, // Enable JSON imports
-    "esModuleInterop": true, // Enable CJS/ESM interop
-    "isolatedModules": true, // Ensure each file is independent
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "noEmit": true,
-    "jsx": "preserve",
-
-    /* Linting */
-    "strict": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "forceConsistentCasingInFileNames": true,
-
-    "declaration": false,
-
-    /* Alias */
-    "baseUrl": ".",
-    "paths": {
-      "@plug/ui": ["packages/ui/src"],
-      "@plug/engine": ["packages/engine/src"],
-      "@plug/api-hooks": ["packages/api-hooks/src"],
-      "@plug/common-services": ["packages/common-services/src"],
-      "@plug/v1/*": ["apps/v1/src/*"]
-    }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "**/*.d.ts"]
+  "files": [], // 루트 프로젝트 자체는 컴파일할 파일이 없음
+  "include": [], // files와 유사하게 비워둠
+  "references": [ // 모노레포 내의 모든 패키지 및 앱을 참조로 추가
+    { "path": "./packages/ui" },
+    { "path": "./packages/engine" },
+    { "path": "./packages/api-hooks" },
+    { "path": "./packages/common-services" }
+  ]
 }

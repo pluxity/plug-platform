@@ -12,7 +12,8 @@
     "common-services": "pnpm --filter @plug/common-services",
     "prepare": "husky install",
     "sample" : "pnpm --filter @plug/sample",
-    "project:busan": "pnpm --filter @plug/busan-subway"
+    "project:busan": "pnpm --filter @plug/busan-subway",
+    "core": "pnpm --filter @plug/core"
   },
   "keywords": [],
   "author": "",
