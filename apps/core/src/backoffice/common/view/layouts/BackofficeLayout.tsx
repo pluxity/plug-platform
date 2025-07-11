@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from '@plug/ui'
-import { BackofficeHeader } from '../components'
-import { AsideMenuItemProps } from '../../services/layout'
+import { BackofficeHeader } from '.'
+import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
 const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'dashboard', label: 'Dashboard', to: '/admin', depth: 1, showToggle: true},
