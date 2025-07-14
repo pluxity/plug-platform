@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import CategoryComponent, { CategoryItem } from '@/backoffice/common/view/components/Category'
+import { CategoryComponent, CategoryItem } from '@/backoffice/common/view/components/category'
 import { 
   useAssetCategoryTree,
   useCreateAssetCategory
@@ -198,10 +198,12 @@ const AssetCategory: React.FC = () => {
           <CategoryComponent
             items={categories}
             maxDepth={maxDepth}
-            onCategoryAdd={handleCategoryAdd}
-            onCategoryUpdate={handleCategoryUpdate}
-            onCategoryDelete={handleCategoryDelete}
-            onCategoryMove={handleCategoryMove}
+            title="자산 카테고리 관리"
+            emptyMessage="등록된 자산 카테고리가 없습니다."
+            onAdd={handleCategoryAdd}
+            onUpdate={handleCategoryUpdate}
+            onDelete={handleCategoryDelete}
+            onMove={handleCategoryMove}
             onThumbnailUpload={handleThumbnailUpload}
             enableDragDrop={true}
             disabled={createAssetCategory.isLoading}
