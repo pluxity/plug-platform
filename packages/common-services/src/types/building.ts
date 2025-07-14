@@ -1,26 +1,12 @@
-import { FileResponse } from "./file";
+import { FacilityCreateRequest, FacilityResponse } from "./facility";
+import { Floors } from "./floors";
   
 export interface BuildingResponse {
-  id: number;
-  name: string;
-  description?: string;
-  file: FileResponse;
-  thumbnail: FileResponse;
-  createdAt: string;
-  updatedAt: string;
+  facility: FacilityResponse;
+  floors: Floors[];
 }
 
 export interface BuildingCreateRequest {
-  name: string;
-  description?: string;
-  fileId?: File;
-  thumbnailId?: File;
-}
-
-// 건물 수정 요청 타입
-export interface BuildingUpdateRequest {
-  name: string;
-  description?: string;
-  fileId?: File;
-  thumbnailId?: File;
+  facility: FacilityCreateRequest;
+  floors: Floors[];
 }

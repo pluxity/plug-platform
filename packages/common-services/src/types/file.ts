@@ -6,7 +6,6 @@ export interface FileResponse {
     id: number;
     url: string;
     originalFileName: string;
-    fileType: string;
     contentType: string;
     fileStatus: string;
 }

@@ -1,6 +1,6 @@
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
 import type { BaseResponseBody } from '@plug/api-hooks';
-import type { BuildingResponse, BuildingCreateRequest, BuildingUpdateRequest } from '@plug/common-services';
+import type { BuildingResponse, BuildingCreateRequest, FacilityUpdateRequest } from '@plug/common-services';
 
 const BUILDINGS_API = `buildings`;
 
@@ -17,11 +17,15 @@ export const useCreateBuilding = () => {
 };
 
 export const useUpdateBuilding = (buildingId: number) => {
-  return usePut<BaseResponseBody, BuildingUpdateRequest>(`${BUILDINGS_API}/${buildingId}`, { requireAuth: true });
+  return usePut<BaseResponseBody, FacilityUpdateRequest>(`${BUILDINGS_API}/${buildingId}`, { requireAuth: true });
 };
 
 export const useDeleteBuilding = (buildingId: number) => {
   return useDelete(`${BUILDINGS_API}/${buildingId}`, { requireAuth: true });
+};
+
+export const useBuildingHistory = (buildingId: number) => {
+  return useGet<BuildingResponse[]>(`${BUILDINGS_API}/${buildingId}/history`, { requireAuth: true });
 };
 
 // SWR 기반 훅
