@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: ['app.plug-platform.com'],
-    port: 3000,
+    port: 4000,
     proxy: {
         '/api': {
             target: 'http://api.pluxity.com:8080',

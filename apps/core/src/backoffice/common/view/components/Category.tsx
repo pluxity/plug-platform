@@ -1,39 +1,145 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { Button, Input, Card, CardContent, Badge } from '@plug/ui'
 
+interface ThumbnailUploaderProps {
+  currentThumbnailUrl?: string
+  onThumbnailChange: (fileId: number | undefined) => void
+  onUpload?: (file: File) => Promise<number>
+  disabled?: boolean
+  size?: 'small' | 'medium' | 'large'
+}
+
+const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
+  currentThumbnailUrl,
+  onThumbnailChange,
+  onUpload,
+  disabled = false,
+  size = 'small'
+}) => {
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const sizeClasses = {
+    small: 'w-8 h-8',
+    medium: 'w-12 h-12',
+    large: 'w-16 h-16'
+  }
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !onUpload) return
+
+    setUploading(true)
+    try {
+      const fileId = await onUpload(file)
+      onThumbnailChange(fileId)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleRemoveThumbnail = () => {
+    onThumbnailChange(undefined)
+  }
+
+  const handleClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  return (
+    <div className={`relative ${sizeClasses[size]} flex-shrink-0`}>
+      {currentThumbnailUrl ? (
+        <div className="relative group">
+          <img
+            src={currentThumbnailUrl}
+            alt="썸네일"
+            className={`${sizeClasses[size]} object-cover rounded border cursor-pointer`}
+            onClick={!disabled ? handleClick : undefined}
+          />
+          {/* Hover Preview - 이미지에만 hover 적용 */}
+          <div className="absolute left-full top-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+            <div className="bg-white border border-gray-300 rounded-lg shadow-xl p-2">
+              <img
+                src={currentThumbnailUrl}
+                alt="썸네일 미리보기"
+                className="w-40 h-40 object-cover rounded"
+              />
+            </div>
+          </div>
+          {!disabled && (
+            <button
+              type="button"
+              onClick={handleRemoveThumbnail}
+              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={!disabled ? handleClick : undefined}
+          disabled={disabled || uploading}
+          className={`${sizeClasses[size]} border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors ${
+            disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+          }`}
+        >
+          {uploading ? '⏳' : '📷'}
+        </button>
+      )}
+      
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+        disabled={disabled}
+      />
+    </div>
+  )
+}
+
 export interface CategoryItem {
   id: string
   name: string
+  code?: string
   children?: CategoryItem[]
   depth: number
   parentId?: string
+  thumbnailUrl?: string
+  thumbnailFileId?: number
 }
 
 export interface CategoryComponentProps {
   items?: CategoryItem[]
   maxDepth?: number
-  onCategoryAdd?: (name: string, parentId?: string) => Promise<string> | string // 서버에서 발행한 ID 반환
-  onCategoryUpdate?: (id: string, name: string) => Promise<void> | void
+  onCategoryAdd?: (name: string, parentId?: string, thumbnailFileId?: number, code?: string) => Promise<string> | string
+  onCategoryUpdate?: (id: string, name: string, thumbnailFileId?: number, code?: string) => Promise<void> | void
   onCategoryDelete?: (id: string) => Promise<void> | void
   onCategoryMove?: (draggedId: string, targetId: string, position: 'before' | 'after' | 'inside') => Promise<void> | void
-  onCategoryIdUpdate?: (tempId: string, newId: string) => void // 임시 ID를 서버 ID로 업데이트
+  onCategoryIdUpdate?: (tempId: string, newId: string) => void
+  onThumbnailUpload?: (file: File) => Promise<number>
   className?: string
   disabled?: boolean
   enableDragDrop?: boolean
+  thumbnailSize?: 'small' | 'medium' | 'large'
 }
 
 interface CategoryNodeProps {
   item: CategoryItem
   maxDepth: number
-  onAdd: (name: string, parentId?: string) => void
-  onUpdate: (id: string, name: string) => void
+  onAdd: (name: string, parentId?: string, thumbnailFileId?: number, code?: string) => void
+  onUpdate: (id: string, name: string, thumbnailFileId?: number, code?: string) => void
   onDelete: (id: string) => void
   onMove?: (draggedId: string, targetId: string, position: 'before' | 'after' | 'inside') => void
+  onThumbnailUpload?: (file: File) => Promise<number>
   disabled?: boolean
   enableDragDrop?: boolean
+  thumbnailSize?: 'small' | 'medium' | 'large'
 }
 
-// 유틸리티 함수들
 const findNodeById = (nodes: CategoryItem[], id: string): CategoryItem | null => {
   for (const node of nodes) {
     if (node.id === id) return node
@@ -52,13 +158,11 @@ const getMaxDepthOfTree = (node: CategoryItem): number => {
   return Math.max(...node.children.map(child => getMaxDepthOfTree(child)))
 }
 
-// 자식 노드 개수를 계산하는 함수 (직접 자식만)
 const getChildrenCount = (node: CategoryItem): number => {
   if (!node.children || node.children.length === 0) return 0
   return node.children.length
 }
 
-// 전체 하위 노드 개수를 계산하는 함수 (재귀적)
 const getTotalChildrenCount = (node: CategoryItem): number => {
   if (!node.children || node.children.length === 0) return 0
   let total = node.children.length
@@ -68,7 +172,6 @@ const getTotalChildrenCount = (node: CategoryItem): number => {
   return total
 }
 
-// UUID v4 생성 함수
 const generateUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = Math.random() * 16 | 0
@@ -77,7 +180,6 @@ const generateUUID = (): string => {
   })
 }
 
-// depth를 재계산하는 함수
 const recalculateDepths = (items: CategoryItem[]): CategoryItem[] => {
   const calculateDepthRecursively = (nodes: CategoryItem[], currentDepth: number): CategoryItem[] => {
     return nodes.map(node => ({
@@ -97,16 +199,28 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
   onUpdate,
   onDelete,
   onMove,
+  onThumbnailUpload,
   disabled = false,
-  enableDragDrop = true
+  enableDragDrop = true,
+  thumbnailSize = 'small'
 }) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
   const [editValue, setEditValue] = useState(item.name)
+  const [editCode, setEditCode] = useState(item.code || '')
   const [addValue, setAddValue] = useState('')
+  const [addCode, setAddCode] = useState('')
   const [dragOver, setDragOver] = useState<'none' | 'top' | 'bottom' | 'inside'>('none')
   const [isDragging, setIsDragging] = useState(false)
+  const [editThumbnailFileId, setEditThumbnailFileId] = useState<number | undefined>(item.thumbnailFileId)
+  const [addThumbnailFileId, setAddThumbnailFileId] = useState<number | undefined>()
+
+  const sizeClasses = {
+    small: 'w-6 h-6',
+    medium: 'w-8 h-8', 
+    large: 'w-12 h-12'
+  }
 
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded)
@@ -114,26 +228,32 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
 
   const handleEditSubmit = () => {
     if (editValue.trim()) {
-      onUpdate(item.id, editValue.trim())
+      onUpdate(item.id, editValue.trim(), editThumbnailFileId, editCode.trim() || undefined)
       setIsEditing(false)
     }
   }
 
   const handleEditCancel = () => {
     setEditValue(item.name)
+    setEditCode(item.code || '')
+    setEditThumbnailFileId(item.thumbnailFileId)
     setIsEditing(false)
   }
 
   const handleAddSubmit = () => {
     if (addValue.trim()) {
-      onAdd(addValue.trim(), item.id)
+      onAdd(addValue.trim(), item.id, addThumbnailFileId, addCode.trim() || undefined)
       setAddValue('')
+      setAddCode('')
+      setAddThumbnailFileId(undefined)
       setIsAdding(false)
     }
   }
 
   const handleAddCancel = () => {
     setAddValue('')
+    setAddCode('')
+    setAddThumbnailFileId(undefined)
     setIsAdding(false)
   }
 
@@ -210,17 +330,15 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
   const canAddChildren = item.depth < maxDepth
 
   return (
-    <div className="relative">
-      {/* Drag indicators */}
-      {enableDragDrop && dragOver === 'top' && (
+    <div className="relative"      >
+        {/* Drag indicators */}
+        {enableDragDrop && dragOver === 'top' && (
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 z-10" />
       )}
       {enableDragDrop && dragOver === 'bottom' && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 z-10" />
-      )}
-      
-      {/* Category Item */}
-      <div 
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 z-10" />        )}
+        
+        <div 
         className={`flex items-center gap-2 p-2 hover:bg-gray-50 rounded-md group relative transition-colors ${
           isDragging ? 'opacity-50' : ''
         } ${
@@ -234,13 +352,11 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        {/* Drag Handle */}
         {enableDragDrop && !disabled && (
           <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-move text-gray-400 hover:text-gray-600">
             ⋮⋮
           </div>
         )}
-        {/* Expand/Collapse Button */}
         {hasChildren ? (
           <Button
             variant="ghost"
@@ -257,54 +373,99 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
           <div className="w-5 h-5" />
         )}
 
-        {/* Category Name */}
         <div className="flex-1 flex items-center gap-2">
           {isEditing ? (
-            <div className="flex items-center gap-1 flex-1">
-              <Input
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, 'edit')}
-                className="h-7 text-sm"
-                autoFocus
-                disabled={disabled}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0 text-green-600 hover:text-green-700"
-                onClick={handleEditSubmit}
-                disabled={disabled}
-                title="확인"
-              >
-                ✓
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
-                onClick={handleEditCancel}
-                disabled={disabled}
-                title="취소"
-              >
-                ✕
-              </Button>
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-1">
+                <Input
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, 'edit')}
+                  className="h-7 text-sm"
+                  placeholder="카테고리 이름"
+                  autoFocus
+                  disabled={disabled}
+                />
+                <Input
+                  value={editCode}
+                  onChange={(e) => setEditCode(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, 'edit')}
+                  className="h-6 text-xs"
+                  disabled={disabled}
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <ThumbnailUploader
+                  currentThumbnailUrl={item.thumbnailUrl}
+                  onThumbnailChange={setEditThumbnailFileId}
+                  onUpload={onThumbnailUpload}
+                  disabled={disabled}
+                  size={thumbnailSize}
+                />
+                <div className="flex-1" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0 text-green-600 hover:text-green-700"
+                  onClick={handleEditSubmit}
+                  disabled={disabled}
+                  title="확인"
+                >
+                  ✓
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
+                  onClick={handleEditCancel}
+                  disabled={disabled}
+                  title="취소"
+                >
+                  ✕
+                </Button>
+              </div>
             </div>
           ) : (
             <>
-              <span className="text-sm font-medium text-gray-900">
-                {item.name}
-              </span>
+              <div className="flex items-center gap-2">
+                {item.thumbnailUrl && (
+                  <div className="relative group/thumbnail">
+                    <img
+                      src={item.thumbnailUrl}
+                      alt={`${item.name} thumbnail`}
+                      className={`${sizeClasses[thumbnailSize]} object-cover rounded border`}
+                    />
+                    <div className="absolute left-full top-0 ml-2 opacity-0 group-hover/thumbnail:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+                      <div className="bg-white border border-gray-300 rounded-lg shadow-xl p-2 w-44">
+                        <img
+                          src={item.thumbnailUrl}
+                          alt={`${item.name} 썸네일 미리보기`}
+                          className="w-40 h-40 object-cover rounded"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">
+                    {item.name}
+                  </span>
+                  {item.code && (
+                    <span className="text-xs text-gray-500">
+                      {item.code}
+                    </span>
+                  )}
+                </div>
+              </div>
               {getChildrenCount(item) > 0 && (
                 <Badge variant="secondary" className="text-xs">
-                  {getChildrenCount(item)}개 하위
+                  {getChildrenCount(item)}개의 하위 카테고리
                 </Badge>
               )}
             </>
           )}
         </div>
 
-        {/* Action Buttons */}
         {!isEditing && !disabled && (
           <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
             {canAddChildren && (
@@ -330,12 +491,25 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
+              className={`w-6 h-6 p-0 ${
+                item.children && item.children.length > 0 
+                  ? 'text-gray-400 cursor-not-allowed' 
+                  : 'text-red-600 hover:text-red-700'
+              }`}
               onClick={() => {
-                console.log('삭제 버튼 클릭:', { id: item.id, name: item.name, depth: item.depth })
+                const hasChildren = item.children && item.children.length > 0
+                if (hasChildren) {
+                  alert(`"${item.name}" 카테고리에 ${item.children!.length}개의 하위 카테고리가 있습니다.\n하위 카테고리를 먼저 삭제한 후 다시 시도해주세요.`)
+                  return
+                }
+                
                 onDelete(item.id)
               }}
-              title="카테고리 삭제"
+              title={
+                item.children && item.children.length > 0 
+                  ? `하위 카테고리 ${item.children.length}개가 있어 삭제할 수 없습니다` 
+                  : "카테고리 삭제"
+              }
             >
               🗑
             </Button>
@@ -343,46 +517,62 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
         )}
       </div>
 
-      {/* Add New Child Form */}
       {isAdding && (
         <div 
-          className="flex items-center gap-1 p-2 bg-blue-50 rounded-md ml-2"
+          className="flex flex-col gap-2 p-3 bg-blue-50 rounded-md ml-2"
           style={{ paddingLeft: `${(item.depth + 1) * 20 + 8}px` }}
         >
-          <div className="w-5 h-5" />
-          <Input
-            value={addValue}
-            onChange={(e) => setAddValue(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, 'add')}
-            placeholder="새 카테고리 이름"
-            className="h-7 text-sm flex-1"
-            autoFocus
-            disabled={disabled}
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-6 h-6 p-0 text-green-600 hover:text-green-700"
-            onClick={handleAddSubmit}
-            disabled={disabled}
-            title="확인"
-          >
-            ✓
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
-            onClick={handleAddCancel}
-            disabled={disabled}
-            title="취소"
-          >
-            ✕
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Input
+              value={addValue}
+              onChange={(e) => setAddValue(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, 'add')}
+              placeholder="새 카테고리 이름"
+              className="h-7 text-sm"
+              autoFocus
+              disabled={disabled}
+            />
+            <Input
+              value={addCode}
+              onChange={(e) => setAddCode(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, 'add')}
+              placeholder="새 카테고리 코드"
+              className="h-6 text-xs"
+              disabled={disabled}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <ThumbnailUploader
+              onThumbnailChange={setAddThumbnailFileId}
+              onUpload={onThumbnailUpload}
+              disabled={disabled}
+              size={thumbnailSize}
+            />
+            <div className="flex-1" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-6 h-6 p-0 text-green-600 hover:text-green-700"
+              onClick={handleAddSubmit}
+              disabled={disabled}
+              title="확인"
+            >
+              ✓
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
+              onClick={handleAddCancel}
+              disabled={disabled}
+              title="취소"
+            >
+              ✕
+            </Button>
+          </div>
         </div>
       )}
 
-      {/* Children */}
       {hasChildren && isExpanded && (
         <div className="ml-2">
           {item.children!.map((child) => (
@@ -394,8 +584,10 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({
               onUpdate={onUpdate}
               onDelete={onDelete}
               onMove={onMove}
+              onThumbnailUpload={onThumbnailUpload}
               disabled={disabled}
               enableDragDrop={enableDragDrop}
+              thumbnailSize={thumbnailSize}
             />
           ))}
         </div>
@@ -412,161 +604,130 @@ const CategoryComponent: React.FC<CategoryComponentProps> = ({
   onCategoryDelete,
   onCategoryMove,
   onCategoryIdUpdate,
+  onThumbnailUpload,
   className,
   disabled = false,
-  enableDragDrop = true
+  enableDragDrop = true,
+  thumbnailSize = 'small'
 }) => {
   const [isAddingRoot, setIsAddingRoot] = useState(false)
   const [rootAddValue, setRootAddValue] = useState('')
+  const [rootAddCode, setRootAddCode] = useState('')
+  const [rootThumbnailFileId, setRootThumbnailFileId] = useState<number | undefined>()
   
-  // depth가 재계산된 items 생성
   const itemsWithCorrectDepths = recalculateDepths(items)
 
-  const handleCategoryAdd = useCallback(async (name: string, parentId?: string) => {
-    try {
-      // 임시 UUID 생성
-      const tempId = generateUUID()
+  const handleCategoryAdd = useCallback(async (name: string, parentId?: string, thumbnailFileId?: number, code?: string) => {
+    const tempId = generateUUID()
+    
+    if (onCategoryAdd) {
+      const serverId = await onCategoryAdd(name, parentId, thumbnailFileId, code)
       
-      if (onCategoryAdd) {
-        // 서버에서 실제 ID를 받아옴
-        const serverId = await onCategoryAdd(name, parentId)
-        
-        // 임시 ID를 서버 ID로 업데이트
-        if (onCategoryIdUpdate && serverId && serverId !== tempId) {
-          onCategoryIdUpdate(tempId, serverId)
-        }
-        
-        return serverId || tempId
+      if (onCategoryIdUpdate && serverId && serverId !== tempId) {
+        onCategoryIdUpdate(tempId, serverId)
       }
       
-      return tempId
-    } catch (error) {
-      console.error('카테고리 추가 실패:', error)
-      throw error
+      return serverId || tempId
     }
+    
+    return tempId
   }, [onCategoryAdd, onCategoryIdUpdate])
 
-  const handleCategoryUpdate = useCallback(async (id: string, name: string) => {
-    try {
-      if (onCategoryUpdate) {
-        await onCategoryUpdate(id, name)
-      }
-    } catch (error) {
-      console.error('카테고리 수정 실패:', error)
-      // 에러 처리 로직 추가 가능
+  const handleCategoryUpdate = useCallback(async (id: string, name: string, thumbnailFileId?: number) => {
+    if (onCategoryUpdate) {
+      await onCategoryUpdate(id, name, thumbnailFileId)
     }
   }, [onCategoryUpdate])
 
   const handleCategoryDelete = useCallback(async (id: string) => {
-    try {
-      // 삭제할 노드 찾기 (재계산된 depth 기준으로)
-      const nodeToDelete = findNodeById(itemsWithCorrectDepths, id)
-      if (!nodeToDelete) {
-        console.error('삭제할 카테고리를 찾을 수 없습니다. ID:', id)
-        alert('삭제할 카테고리를 찾을 수 없습니다.')
-        return
-      }
+    const nodeToDelete = findNodeById(itemsWithCorrectDepths, id)
+    if (!nodeToDelete) {
+      alert('삭제할 카테고리를 찾을 수 없습니다.')
+      return
+    }
 
-      // 디버깅을 위한 로그
-      console.log('삭제하려는 카테고리:', { id, name: nodeToDelete.name, depth: nodeToDelete.depth })
+    const hasChildren = nodeToDelete.children && nodeToDelete.children.length > 0
+    if (hasChildren) {
+      return
+    }
 
-      // 하위 카테고리가 있는지 확인
-      const hasChildren = nodeToDelete.children && nodeToDelete.children.length > 0
-      const childrenCount = hasChildren ? nodeToDelete.children!.length : 0
-
-      // 확인 메시지 생성 - 카테고리 ID도 포함해서 명확하게 표시
-      let confirmMessage = `"${nodeToDelete.name}" (ID: ${nodeToDelete.id}) 카테고리를 삭제하시겠습니까?`
-      if (hasChildren) {
-        const childrenNames = nodeToDelete.children!.map(child => child.name).join(', ')
-        confirmMessage += `\n\n⚠️ 주의: 이 카테고리에는 ${childrenCount}개의 하위 카테고리가 있습니다.\n하위 카테고리: ${childrenNames}\n모든 하위 카테고리도 함께 삭제됩니다.`
-      }
-
-      // 사용자 확인
-      if (!confirm(confirmMessage)) {
-        return
-      }
-
-      if (onCategoryDelete) {
-        await onCategoryDelete(id)
-      }
-    } catch (error) {
-      console.error('카테고리 삭제 실패:', error)
-      alert('카테고리 삭제 중 오류가 발생했습니다.')
+    const confirmMessage = `"${nodeToDelete.name}" 카테고리를 삭제하시겠습니까?`
+    
+    if (!confirm(confirmMessage)) {
+      return
+    }
+    
+    if (onCategoryDelete) {
+      await onCategoryDelete(id)
     }
   }, [onCategoryDelete, itemsWithCorrectDepths])
 
   const handleCategoryMove = useCallback(async (draggedId: string, targetId: string, position: 'before' | 'after' | 'inside') => {
-    try {
-      // 이동 전 depth 검증 (재계산된 depth 기준으로)
-      const draggedNode = findNodeById(itemsWithCorrectDepths, draggedId)
-      const targetNode = findNodeById(itemsWithCorrectDepths, targetId)
+    const draggedNode = findNodeById(itemsWithCorrectDepths, draggedId)
+    const targetNode = findNodeById(itemsWithCorrectDepths, targetId)
+    
+    if (!draggedNode || !targetNode) {
+      return
+    }
+
+    const isDescendant = (parent: CategoryItem, childId: string): boolean => {
+      if (parent.id === childId) return true
+      if (parent.children) {
+        return parent.children.some(child => isDescendant(child, childId))
+      }
+      return false
+    }
+
+    if (isDescendant(draggedNode, targetId)) {
+      alert('자기 자신이나 하위 카테고리로는 이동할 수 없습니다.')
+      return
+    }
+
+    if (position === 'inside') {
+      const draggedMaxDepth = getMaxDepthOfTree(draggedNode)
+      const draggedDepthSpan = draggedMaxDepth - draggedNode.depth
+      const newBaseDepth = targetNode.depth + 1
+      const newMaxDepth = newBaseDepth + draggedDepthSpan
       
-      if (!draggedNode || !targetNode) {
-        console.error('이동할 카테고리 또는 대상 카테고리를 찾을 수 없습니다.')
+      if (newMaxDepth > maxDepth) {
+        const currentStructure = draggedNode.children && draggedNode.children.length > 0 
+          ? `\n\n현재 "${draggedNode.name}" 카테고리는 ${draggedDepthSpan + 1}단계의 하위 구조를 가지고 있습니다.`
+          : ''
+        
+        alert(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n"${targetNode.name}" 카테고리 밑으로 이동하면:\n- "${draggedNode.name}"이 Depth ${newBaseDepth}가 됩니다.\n- 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.${currentStructure}`)
         return
       }
-
-      // 자기 자신이나 자기 하위 노드로 이동하는 것 방지
-      const isDescendant = (parent: CategoryItem, childId: string): boolean => {
-        if (parent.id === childId) return true
-        if (parent.children) {
-          return parent.children.some(child => isDescendant(child, childId))
-        }
-        return false
-      }
-
-      if (isDescendant(draggedNode, targetId)) {
-        alert('자기 자신이나 하위 카테고리로는 이동할 수 없습니다.')
+    } else {
+      const draggedMaxDepth = getMaxDepthOfTree(draggedNode)
+      const draggedDepthSpan = draggedMaxDepth - draggedNode.depth
+      const newBaseDepth = targetNode.depth
+      const newMaxDepth = newBaseDepth + draggedDepthSpan
+      
+      if (newMaxDepth > maxDepth) {
+        alert(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n같은 레벨(Depth ${newBaseDepth})로 이동하면 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.`)
         return
       }
-
-      if (position === 'inside') {
-        // inside로 이동할 때의 새로운 depth 계산
-        const draggedMaxDepth = getMaxDepthOfTree(draggedNode)
-        const draggedDepthSpan = draggedMaxDepth - draggedNode.depth
-        const newBaseDepth = targetNode.depth + 1
-        const newMaxDepth = newBaseDepth + draggedDepthSpan
-        
-        if (newMaxDepth > maxDepth) {
-          const currentStructure = draggedNode.children && draggedNode.children.length > 0 
-            ? `\n\n현재 "${draggedNode.name}" 카테고리는 ${draggedDepthSpan + 1}단계의 하위 구조를 가지고 있습니다.`
-            : ''
-          
-          alert(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n"${targetNode.name}" 카테고리 밑으로 이동하면:\n- "${draggedNode.name}"이 Depth ${newBaseDepth}가 됩니다.\n- 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.${currentStructure}`)
-          return
-        }
-      } else {
-        // before/after로 이동할 때의 새로운 depth 계산
-        const draggedMaxDepth = getMaxDepthOfTree(draggedNode)
-        const draggedDepthSpan = draggedMaxDepth - draggedNode.depth
-        const newBaseDepth = targetNode.depth
-        const newMaxDepth = newBaseDepth + draggedDepthSpan
-        
-        if (newMaxDepth > maxDepth) {
-          alert(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n같은 레벨(Depth ${newBaseDepth})로 이동하면 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.`)
-          return
-        }
-      }
-      
-      if (onCategoryMove) {
-        await onCategoryMove(draggedId, targetId, position)
-      }
-    } catch (error) {
-      console.error('카테고리 이동 실패:', error)
-      alert('카테고리 이동 중 오류가 발생했습니다.')
+    }
+    
+    if (onCategoryMove) {
+      await onCategoryMove(draggedId, targetId, position)
     }
   }, [onCategoryMove, itemsWithCorrectDepths, maxDepth])
 
   const handleRootAddSubmit = () => {
     if (rootAddValue.trim()) {
-      handleCategoryAdd(rootAddValue.trim())
+      handleCategoryAdd(rootAddValue.trim(), undefined, rootThumbnailFileId, rootAddCode.trim() || undefined)
       setRootAddValue('')
+      setRootAddCode('')
+      setRootThumbnailFileId(undefined)
       setIsAddingRoot(false)
     }
   }
 
   const handleRootAddCancel = () => {
     setRootAddValue('')
+    setRootAddCode('')
+    setRootThumbnailFileId(undefined)
     setIsAddingRoot(false)
   }
 
@@ -580,55 +741,15 @@ const CategoryComponent: React.FC<CategoryComponentProps> = ({
     }
   }
 
-  // 카테고리 상태 변경 감지 및 로깅
   useEffect(() => {
-    if (items && items.length > 0) {
-      const getAllIds = (nodes: CategoryItem[]): string[] => {
-        let allIds: string[] = []
-        nodes.forEach(node => {
-          allIds.push(node.id)
-          if (node.children) {
-            allIds = allIds.concat(getAllIds(node.children))
-          }
-        })
-        return allIds
-      }
-      
-      const currentIds = getAllIds(items)
-      const totalCount = itemsWithCorrectDepths.reduce((count, item) => {
-        return count + getTotalChildrenCount(item) + 1
-      }, 0)
-      
-      console.log('=== 카테고리 상태 변경 감지 ===')
-      console.log('현재 카테고리 ID들:', currentIds)
-      console.log('전체 카테고리 개수:', totalCount)
-      console.log('루트 카테고리 개수:', itemsWithCorrectDepths.length)
-      
-      // 새로 추가된 카테고리 찾기 (이전 상태와 비교)
-      const prevIds = prevItemsRef.current ? getAllIds(prevItemsRef.current) : []
-      const newIds = currentIds.filter(id => !prevIds.includes(id))
-      if (newIds.length > 0) {
-        console.log('새로 추가된 카테고리 ID들:', newIds)
-        newIds.forEach(id => {
-          const newNode = findNodeById(items, id)
-          if (newNode) {
-            console.log(`새 카테고리 [${id}]: ${newNode.name}`)
-          }
-        })
-      }
-      
-      // 이전 상태 저장
-      prevItemsRef.current = items
-    }
-  }, [items, itemsWithCorrectDepths])
+    prevItemsRef.current = items
+  }, [items])
 
-  // 이전 상태 저장용 ref
   const prevItemsRef = useRef<CategoryItem[]>([])
 
   return (
     <Card className={className}>
       <CardContent className="p-4">
-        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold text-gray-900">카테고리 관리</h3>
@@ -648,38 +769,56 @@ const CategoryComponent: React.FC<CategoryComponentProps> = ({
           )}
         </div>
 
-        {/* Add Root Category Form */}
         {isAddingRoot && (
-          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-md mb-4">
-            <Input
-              value={rootAddValue}
-              onChange={(e) => setRootAddValue(e.target.value)}
-              onKeyDown={handleRootKeyDown}
-              placeholder="루트 카테고리 이름"
-              className="h-8 text-sm flex-1"
-              autoFocus
-              disabled={disabled}
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-7 h-7 p-0 text-green-600 hover:text-green-700"
-              onClick={handleRootAddSubmit}
-              disabled={disabled}
-              title="확인"
-            >
-              ✓
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-7 h-7 p-0 text-red-600 hover:text-red-700"
-              onClick={handleRootAddCancel}
-              disabled={disabled}
-              title="취소"
-            >
-              ✕
-            </Button>
+          <div className="flex flex-col gap-3 p-4 bg-blue-50 rounded-md mb-4">
+            <div className="flex flex-col gap-2">
+              <Input
+                value={rootAddValue}
+                onChange={(e) => setRootAddValue(e.target.value)}
+                onKeyDown={handleRootKeyDown}
+                placeholder="루트 카테고리 이름"
+                className="h-8 text-sm"
+                autoFocus
+                disabled={disabled}
+              />
+              <Input
+                value={rootAddCode}
+                onChange={(e) => setRootAddCode(e.target.value)}
+                onKeyDown={handleRootKeyDown}
+                placeholder="루트 카테고리 코드"
+                className="h-7 text-xs"
+                disabled={disabled}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <ThumbnailUploader
+                onThumbnailChange={setRootThumbnailFileId}
+                onUpload={onThumbnailUpload}
+                disabled={disabled}
+                size={thumbnailSize}
+              />
+              <div className="flex-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-7 h-7 p-0 text-green-600 hover:text-green-700"
+                onClick={handleRootAddSubmit}
+                disabled={disabled}
+                title="확인"
+              >
+                ✓
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-7 h-7 p-0 text-red-600 hover:text-red-700"
+                onClick={handleRootAddCancel}
+                disabled={disabled}
+                title="취소"
+              >
+                ✕
+              </Button>
+            </div>
           </div>
         )}
 
@@ -703,8 +842,10 @@ const CategoryComponent: React.FC<CategoryComponentProps> = ({
                 onUpdate={handleCategoryUpdate}
                 onDelete={handleCategoryDelete}
                 onMove={handleCategoryMove}
+                onThumbnailUpload={onThumbnailUpload}
                 disabled={disabled}
                 enableDragDrop={enableDragDrop}
+                thumbnailSize={thumbnailSize}
               />
             ))
           )}
