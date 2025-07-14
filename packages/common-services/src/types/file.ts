@@ -1,6 +1,7 @@
 export interface FileRequest {
     file: File;
 }
+
 export interface FileResponse {
     id: number;
     url: string;
@@ -8,38 +9,25 @@ export interface FileResponse {
     fileType: string;
     contentType: string;
     fileStatus: string;
-    createdAt: string;
-    updatedAt: string;
 }
 
-export interface FileUploadResponse {
-    id: number;
-    originalFileName: string;
-    contentType: string;
-    createdAt: string;
+export interface FileError {
+    type: 'UPLOAD_ERROR' | 'FETCH_INFO_ERROR' | 'NETWORK_ERROR';
+    message: string;
+    originalError?: Error;
 }
 
-/** SBM 파일 업로드 응답 */
-export interface SbmFileUploadResponse {
-    id: number;
-    originalFileName: string;
-    contentType: string;
-    createdAt: string;
-    floorList: SbmFloorGroup[];
+export interface UseFileUploadWithInfoReturn {
+    execute: (file: File) => Promise<{ data: any; response: Response | null }>;
+    fileInfo: FileResponse | null;
+    isLoadingFileInfo: boolean;
+    fileInfoError: Error | null;
+    clearFileInfo: () => void;
+    isLoading: boolean;
+    error: any;
+    isSuccess: boolean;
+    data: any;
+    response: Response | null;
+    reset: () => void;
+    getLocationId: () => string | null;
 }
-
-export interface SbmFloorGroup {
-    groupId: string;
-    mainFloorInfo: SbmFloorInfo;
-    floorInfoList: SbmFloorInfo[];
-}
-
-export interface SbmFloorInfo {
-    floorId: string;
-    floorName: string;
-    fileName: string;
-    floorBase: string;
-    floorGroup: string;
-    isMain: boolean;
-}
-

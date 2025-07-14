@@ -3,7 +3,7 @@ import { DataResponseBody, RequestOptions, UseApiResponse } from "../types";
 import { useReducer } from 'react';
 import { apiReducer } from './useReducer';
 import { createErrorFromResponse } from "../util/apiUtils";
-import { api, fileApi } from "../core";
+import { api } from "../core";
 
 export function useApi<T = any, P extends any[] = any[]>(
   apiMethod: (...args: P) => Promise<unknown>,
@@ -114,8 +114,4 @@ export const usePatch = <T, ReqData = any>(url: string, options?: RequestOptions
 
 export const useDelete = (url: string, options?: RequestOptions): UseApiResponse<null, []> => {
   return useApi<null, []>(() => api.delete(url, options));
-};
-
-export const useFileApi = <T = any>(url: string = "/files/upload", options?: RequestOptions): UseApiResponse<T, [FormData]> => {
-  return useApi<T, [FormData]>((formData) => fileApi.upload(url, formData, options));
 };

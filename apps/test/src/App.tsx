@@ -3,6 +3,7 @@ import RoleTest from './components/RoleTest';
 import BuildingTest from "./components/BuildingTest.tsx";
 import UserTest from "./components/UserTest.tsx";
 import AuthTest from "./components/AuthTest.tsx";
+import FileTest from "./components/FileTest.tsx";
 
 function App() {
   const [activeTab, setActiveTab] = useState<string>('auth');
@@ -68,12 +69,27 @@ function App() {
         >
           역할 API
         </button>
+        <button 
+          onClick={() => setActiveTab('file')}
+          style={{ 
+            padding: '8px 16px', 
+            backgroundColor: activeTab === 'file' ? '#4CAF50' : '#f1f1f1',
+            color: activeTab === 'file' ? 'white' : 'black',
+            border: 'none',
+            marginRight: '10px',
+            cursor: 'pointer',
+            borderRadius: '4px'
+          }}
+        >
+          파일 API
+        </button>
       </div>
       <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
         {activeTab === 'auth' && <AuthTest />}
         {activeTab === 'role' && <RoleTest />}
         {activeTab === 'user' && <UserTest />}
         {activeTab === 'building' && <BuildingTest />}
+        {activeTab === 'file' && <FileTest />}
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ const AuthTest = () => {
 
   return (
     <div>
-      <h2>인증 API 테스트</h2>
+      <h2>🔐 인증 API 테스트</h2>
 
       {(signinError || signUpError || signOutError || getprofileError) && (
         <div style={{ padding: "10px", backgroundColor: "#f8d7da", color: "#721c24", borderRadius: "4px", marginBottom: "20px" }}>
@@ -85,10 +85,8 @@ const AuthTest = () => {
           </div>
           <button
             onClick={async () => {
-              const { response } = await signin(signInData);
-              if (response?.ok) {
+              signin(signInData);
                 getprofile();
-              }
             }}
             disabled={signinLoading}
             style={{
