@@ -1,58 +1,79 @@
-import { useFileApi } from '@plug/api-hooks';
+import { useCallback, useState } from 'react';
+import { useGet, usePost } from '@plug/api-hooks';
+import { api } from '@plug/api-hooks/core';
 import type { RequestOptions } from '@plug/api-hooks';
+import type { FileResponse, UseFileUploadWithInfoReturn } from '../types/file';
 
 const FILE_API = `files`;
 
-/**
- * 파일 업로드 응답 타입 (Location 헤더 기반)
- */
-export interface FileUploadResponse {
-  fileId?: number;
-  location?: string;
-  fileName?: string;
-  success?: boolean;
-  status?: number;
-}
-
-/**
- * 파일 업로드 전용 API 훅
- * Location 헤더에서 fileId를 추출하는 로직을 포함함
- * @template T - 업로드 응답 데이터 타입 (기본값: FileUploadResponse)
- * @param options - 요청 옵션
- * @returns 파일 업로드 API 훅 객체
- */
-export const useFileUpload = <T = FileUploadResponse>(options?: RequestOptions) => {
-  return useFileApi<T>(`${FILE_API}/upload`, {
+export const useFileInfo = (fileId?: number | string, options?: RequestOptions) => {
+  return useGet<FileResponse>(`${FILE_API}/${fileId}`, {
     requireAuth: true,
     ...options
   });
 };
 
-// FormData를 이용한 파일 업로드 헬퍼 함수 (MIME 타입 지정 기능 추가)
-export const createFileFormData = (file: File, mimeTypeOverride?: string): FormData => {
-  const formData = new FormData();
-  
-  // 파일의 MIME 타입을 재정의해야 하는 경우
-  if (mimeTypeOverride) {
-    // 파일 이름과 MIME 타입을 명시적으로 설정한 새 File 객체 생성
-    const fileWithCorrectType = new File([file], file.name, { 
-      type: mimeTypeOverride 
-    });
-    formData.append('file', fileWithCorrectType);
-  } else {
-    formData.append('file', file);
-  }
-  
-  return formData;
+export const useFileUpload = (options?: RequestOptions) => {
+  return usePost<any, FormData>(`${FILE_API}/upload`, {
+    requireAuth: true,
+    ...options
+  });
 };
 
-// 다중 파일 업로드를 위한 헬퍼 함수(나중이 필요할 수도?)
-export const createMultipleFileFormData = (files: File[], fieldName: string = 'files'): FormData => {
-  const formData = new FormData();
+export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWithInfoReturn => {
+  const [fileInfo, setFileInfo] = useState<FileResponse | null>(null);
+  const [isLoadingFileInfo, setIsLoadingFileInfo] = useState(false);
+  const [fileInfoError, setFileInfoError] = useState<Error | null>(null);
+  
+  const uploadMutation = useFileUpload(options);
+  const { execute: executeUpload, ...uploadState } = uploadMutation;
+  
+  const executeUploadWithAutoFetch = useCallback(async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const uploadResult = await executeUpload(formData);
+      
+      // Location 헤더에서 파일 ID 추출
+      const location = uploadResult.response?.headers.get('Location');
+      const extractedFileId = location?.split('/').pop() || null;
 
-  files.forEach(file => {
-    formData.append(fieldName, file);
-  });
+      if (extractedFileId) {
+        setIsLoadingFileInfo(true);
+        setFileInfoError(null);
 
-  return formData;
+        try {
+          const fileInfoResult = await api.get<FileResponse>(`${FILE_API}/${extractedFileId}`, {
+            requireAuth: true,
+            ...options
+          });
+
+          setFileInfo(fileInfoResult.data);
+
+        } catch (error) {
+          setFileInfoError(error instanceof Error ? error : new Error('파일 정보 조회 중 오류 발생'));
+        } finally {
+          setIsLoadingFileInfo(false);
+        }
+      }
+      
+      return uploadResult;
+    } catch (error) {
+      setFileInfoError(error instanceof Error ? error : new Error('업로드 중 오류 발생'));
+      throw error;
+    }
+  }, [executeUpload, options]);
+  
+  return {
+    ...uploadState,
+    execute: executeUploadWithAutoFetch,
+    fileInfo,
+    isLoadingFileInfo,
+    fileInfoError,
+    clearFileInfo: () => {
+      setFileInfo(null);
+      setFileInfoError(null);
+    }
+  };
 };
