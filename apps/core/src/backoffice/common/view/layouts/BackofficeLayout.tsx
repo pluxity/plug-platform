@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Sidebar } from '@plug/ui'
+import { Sidebar, Toast } from '@plug/ui'
 import { BackofficeHeader } from '@/backoffice/common/view/layouts'
 import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
@@ -42,6 +42,9 @@ const BackofficeLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Toast Notifications */}
+      <Toast />
     </div>
   )
 }

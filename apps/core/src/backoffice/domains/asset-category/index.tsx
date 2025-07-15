@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { PageContainer } from '@/backoffice/common/view/layouts'
 import { CategoryComponent, CategoryItem } from '@/backoffice/common/view/components/category'
+import { findNodeById, isDescendant } from '@/backoffice/common/services/hooks/useCategory'
 import { 
   useAssetCategoryTree,
-  useCreateAssetCategory
+  useCreateAssetCategory,
+  updateAssetCategory,
+  deleteAssetCategory,
+  useFileUploadWithInfo
 } from '@plug/common-services'
-import type { AssetCategoryResponse } from '@plug/common-services'
-import { api } from '@plug/api-hooks'
-import { useFileUploadWithInfo } from '@plug/common-services'
-import { findNodeById, isDescendant } from '@/backoffice/common/services/hooks/useCategory'
+import type { AssetCategoryResponse, FileResponse } from '@plug/common-services'
+import { toast } from '@plug/ui'
 
 const convertToCategoryItems = (apiData: AssetCategoryResponse[]): CategoryItem[] => {
   return apiData.map(item => ({
@@ -67,11 +69,11 @@ const AssetCategory: React.FC = () => {
   const handleCategoryUpdate = async (id: string, name: string, thumbnailFileId?: number, code?: string): Promise<void> => {
     try {
       const categoryId = parseInt(id)
-      await api.put(`asset-categories/${categoryId}`, {
+      await updateAssetCategory(categoryId, {
         name,
         code: code || name.toLowerCase().replace(/\s+/g, '-'), 
         thumbnailFileId
-      }, { requireAuth: true })
+      })
       await mutate()
     } catch (error) {
       console.error('카테고리 수정 실패:', error)
@@ -83,16 +85,22 @@ const AssetCategory: React.FC = () => {
     try {
       const categoryId = parseInt(id)
       
-      await api.delete(`asset-categories/${categoryId}`, undefined, { requireAuth: true })
+      await deleteAssetCategory(categoryId)
       await mutate()
     } catch (error: unknown) {
       const errorObj = error as { status?: number; message?: string }
       if (errorObj?.status === 400 || errorObj?.message?.includes('하위') || errorObj?.message?.includes('children')) {
-        alert('하위 카테고리가 있는 카테고리는 삭제할 수 없습니다.\n하위 카테고리를 먼저 삭제해주세요.')
+        toast.error('하위 카테고리가 있는 카테고리는 삭제할 수 없습니다', {
+          description: '하위 카테고리를 먼저 삭제해주세요.'
+        })
       } else if (errorObj?.status === 409) {
-        alert('다른 데이터에서 사용 중인 카테고리는 삭제할 수 없습니다.')
+        toast.error('카테고리를 삭제할 수 없습니다', {
+          description: '다른 데이터에서 사용 중인 카테고리입니다.'
+        })
       } else {
-        alert('카테고리 삭제에 실패했습니다.\n' + (errorObj?.message || '알 수 없는 오류가 발생했습니다.'))
+        toast.error('카테고리 삭제에 실패했습니다', {
+          description: errorObj?.message || '알 수 없는 오류가 발생했습니다.'
+        })
       }
       
       throw error
@@ -121,29 +129,35 @@ const AssetCategory: React.FC = () => {
       }
       
       if (newParentId && targetCategory && isDescendant(draggedCategory, targetId)) {
-        alert('카테고리를 자기 자신이나 하위 카테고리로 이동할 수 없습니다.')
+        toast.error('카테고리를 이동할 수 없습니다', {
+          description: '자기 자신이나 하위 카테고리로는 이동할 수 없습니다.'
+        })
         return
       }
       
       const categoryId = parseInt(draggedId)
       
-      await api.put(`asset-categories/${categoryId}`, {
+      await updateAssetCategory(categoryId, {
         name: draggedCategory.name,
         code: draggedCategory.code || draggedCategory.name.toLowerCase().replace(/\s+/g, '-'),
         parentId: newParentId,
         thumbnailFileId: draggedCategory.thumbnailFileId
-      }, { requireAuth: true })
+      })
 
       await mutate()
       
     } catch (error) {
       const errorObj = error as { status?: number; message?: string }
       if (errorObj?.status === 400) {
-        alert('카테고리 이동에 실패했습니다.\n' + (errorObj?.message || '잘못된 요청입니다.'))
+        toast.error('카테고리 이동에 실패했습니다', {
+          description: errorObj?.message || '잘못된 요청입니다.'
+        })
       } else if (errorObj?.status === 404) {
-        alert('이동할 카테고리를 찾을 수 없습니다.')
+        toast.error('이동할 카테고리를 찾을 수 없습니다')
       } else {
-        alert('카테고리 이동에 실패했습니다.\n' + (errorObj?.message || '알 수 없는 오류가 발생했습니다.'))
+        toast.error('카테고리 이동에 실패했습니다', {
+          description: errorObj?.message || '알 수 없는 오류가 발생했습니다.'
+        })
       }
       
       throw error
@@ -152,18 +166,21 @@ const AssetCategory: React.FC = () => {
 
   const handleThumbnailUpload = async (file: File): Promise<number> => {
     try {
-      const uploadResult = await fileUpload.execute(file)
-      
-      const location = uploadResult.response?.headers.get('Location')
-      const fileId = location?.split('/').pop()
-      
-      if (!fileId) {
-        throw new Error('파일 업로드 후 파일 ID를 가져올 수 없습니다.')
+      const fileInfo: FileResponse = await fileUpload.execute(file);
+
+      if (!fileInfo?.id) {
+        toast.error('파일 업로드 실패', {
+          description: '파일 정보를 가져올 수 없습니다.'
+        })
+        throw new Error('파일 업로드 후 파일 정보를 가져올 수 없습니다.')
       }
-      
-      return parseInt(fileId)
+
+      return fileInfo.id
     } catch (error) {
       console.error('썸네일 업로드 실패:', error)
+      toast.error('썸네일 업로드 실패', {
+        description: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+      })
       throw error
     }
   }

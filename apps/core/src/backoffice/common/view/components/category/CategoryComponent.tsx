@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
-import { Card, CardContent, Badge, Button, Input } from '@plug/ui'
-import { CategoryItem, CategoryOperations, CategoryConfig } from '../../../services/types/category'
-import { useCategory, recalculateDepths, getTotalChildrenCount, getMaxDepthOfTree, findNodeById } from '../../../services/hooks/useCategory'
+import { Card, CardContent, Badge, Button, Input, toast } from '@plug/ui'
+import { CategoryItem, CategoryOperations, CategoryConfig } from '@/backoffice/common/services/types/category'
+import { useCategory, recalculateDepths, getTotalChildrenCount, getMaxDepthOfTree, findNodeById } from '@/backoffice/common/services/hooks/useCategory'
 import { ThumbnailUploader } from './ThumbnailUploader'
 import { CategoryNode } from './CategoryNode'
 
@@ -71,7 +71,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
     }
 
     if (isDescendant(draggedNode, targetId)) {
-      alert('자기 자신이나 하위 카테고리로는 이동할 수 없습니다.')
+      toast.error('자기 자신이나 하위 카테고리로는 이동할 수 없습니다.')
       return
     }
 
@@ -86,7 +86,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
           ? `\n\n현재 "${draggedNode.name}" 카테고리는 ${draggedDepthSpan + 1}단계의 하위 구조를 가지고 있습니다.`
           : ''
         
-        alert(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n"${targetNode.name}" 카테고리 밑으로 이동하면:\n- "${draggedNode.name}"이 Depth ${newBaseDepth}가 됩니다.\n- 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.${currentStructure}`)
+        toast.error(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n"${targetNode.name}" 카테고리 밑으로 이동하면:\n- "${draggedNode.name}"이 Depth ${newBaseDepth}가 됩니다.\n- 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.${currentStructure}`)
         return
       }
     } else {
@@ -96,7 +96,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
       const newMaxDepth = newBaseDepth + draggedDepthSpan
       
       if (newMaxDepth > maxDepth) {
-        alert(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n같은 레벨(Depth ${newBaseDepth})로 이동하면 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.`)
+        toast.error(`이동 불가: 최대 깊이 ${maxDepth}를 초과합니다.\n\n같은 레벨(Depth ${newBaseDepth})로 이동하면 최하위 카테고리가 Depth ${newMaxDepth}가 됩니다.`)
         return
       }
     }

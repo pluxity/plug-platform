@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Input, Badge } from '@plug/ui'
+import { Button, Input, Badge, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@plug/ui'
 import { CategoryItem, DragState } from '@/backoffice/common/services/types/category'
 import { ThumbnailUploader } from './ThumbnailUploader'
 import { getChildrenCount } from '@/backoffice/common/services/hooks/useCategory'
@@ -319,31 +319,46 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
             >
               ✎
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`w-6 h-6 p-0 ${
-                item.children && item.children.length > 0 
-                  ? 'text-gray-400 cursor-not-allowed' 
-                  : 'text-red-600 hover:text-red-700'
-              }`}
-              onClick={() => {
-                const hasChildren = item.children && item.children.length > 0
-                if (hasChildren) {
-                  alert(`"${item.name}" 카테고리에 ${item.children!.length}개의 하위 카테고리가 있습니다.\n하위 카테고리를 먼저 삭제한 후 다시 시도해주세요.`)
-                  return
-                }
-                
-                onDelete(item.id)
-              }}
-              title={
-                item.children && item.children.length > 0 
-                  ? `하위 카테고리 ${item.children.length}개가 있어 삭제할 수 없습니다` 
-                  : "카테고리 삭제"
-              }
-            >
-              🗑
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`w-6 h-6 p-0 ${
+                    hasChildren
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-red-600 hover:text-red-700'
+                  }`}
+                  disabled={hasChildren}
+                  title={
+                    hasChildren
+                      ? `하위 카테고리 ${item.children!.length}개가 있어 삭제할 수 없습니다`
+                      : '카테고리 삭제'
+                  }
+                >
+                  🗑
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="sm:max-w-md">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>카테고리 삭제</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <strong>"{item.name}"</strong> 카테고리를 삭제하시겠습니까?
+                    <br />
+                    이 작업은 되돌릴 수 없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(item.id)}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    삭제
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
       </div>

@@ -1,10 +1,9 @@
 import { 
   useGet, 
   usePost, 
-  usePut, 
-  useDelete, 
   useSWRApi
 } from '@plug/api-hooks';
+import { api } from '@plug/api-hooks/core';
 import type { 
   AssetCategoryResponse, 
   AssetCategoryAllResponse,
@@ -35,13 +34,13 @@ export const useCreateAssetCategory = () => {
 };
 
 // 에셋 카테고리 수정 (204 No Content 응답)
-export const useUpdateAssetCategory = (categoryId: number) => {
-  return usePut<null, AssetCategoryUpdateRequest>(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
+export const updateAssetCategory = async (categoryId: number, data: AssetCategoryUpdateRequest) => {
+  return api.put(`${ASSET_CATEGORY_API}/${categoryId}`, data, { requireAuth: true });
 };
 
 // 에셋 카테고리 삭제 (204 No Content 응답)
-export const useDeleteAssetCategory = (categoryId: number) => {
-  return useDelete(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
+export const deleteAssetCategory = async (categoryId: number) => {
+  return api.delete(`${ASSET_CATEGORY_API}/${categoryId}`, undefined, { requireAuth: true });
 };
 
 // SWR 기반 훅들
@@ -87,30 +86,5 @@ export const useAssetCategoryTree = () => {
     isLoading,
     mutate, // mutate 함수 반환
     refresh: () => mutate(), // 호환성을 위한 refresh 함수
-  };
-};
-
-export const useAssetCategoryPath = (categoryId: number) => {
-  const { data: allCategories } = useAssetCategoriesSWR();
-  
-  const getCategoryPath = (targetId: number, categories: AssetCategoryResponse[]): AssetCategoryResponse[] => {
-    for (const category of categories) {
-      if (category.id === targetId) {
-        return [category];
-      }
-      
-      const childPath = getCategoryPath(targetId, category.children);
-      if (childPath.length > 0) {
-        return [category, ...childPath];
-      }
-    }
-    return [];
-  };
-  
-  const path = allCategories?.list ? getCategoryPath(categoryId, allCategories.list) : [];
-  
-  return {
-    path,
-    breadcrumbs: path.map(cat => ({ id: cat.id, name: cat.name })),
   };
 };
