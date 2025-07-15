@@ -9,7 +9,7 @@ import { useBuildingDetailSWR, useUpdateBuilding } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import type { FacilityUpdateRequest, Floors } from "@plug/common-services";
 
-const BuildingEdit: React.FC = () => {
+const BuildingEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const buildingId = parseInt(id || "0");
@@ -185,4 +185,4 @@ const BuildingEdit: React.FC = () => {
   );
 };
 
-export default BuildingEdit;
+export default BuildingEditPage;

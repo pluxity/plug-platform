@@ -6,7 +6,7 @@ import { PageContainer } from "@/backoffice/common/view/layouts";
 import { useBuildingDetailSWR } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 
-const BuildingDetail: React.FC = () => {
+const BuildingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const buildingId = parseInt(id || "0");
@@ -114,4 +114,4 @@ const BuildingDetail: React.FC = () => {
   );
 };
 
-export default BuildingDetail;
+export default BuildingDetailPage;

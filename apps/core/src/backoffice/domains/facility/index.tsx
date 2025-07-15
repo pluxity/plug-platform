@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import Buildings from "@/backoffice/domains/buildings";
-import Stations from "@/backoffice/domains/station";
-import Factories from "@/backoffice/domains/factory";
+import { Buildings } from "@/backoffice/domains/facility/buildings/page/BuildingList";
+import Stations from "@/backoffice/domains/facility/station";
+import Factories from "@/backoffice/domains/facility/factory";
 import { Button } from "@plug/ui";
 import { useNavigate } from "react-router-dom";
 
@@ -29,7 +29,7 @@ const FacilityManagement: React.FC = () => {
   const getAddButtonConfig = () => {
     const config = {
       buildings: {
-        path: "/admin/buildings/add",
+        path: "/admin/building/add",
         text: "건물 추가"
       },
       stations: {
@@ -120,7 +120,7 @@ const FacilityManagement: React.FC = () => {
   return (
     <PageContainer title="시설 관리">
       <div className="flex flex-row items-center justify-between mb-6">
-        <div style={{ marginBottom: '20px', display: 'flex' }}>
+        <div style={{ display: 'flex' }}>
           <button
             onClick={() => setActiveTab('buildings')}
             style={getButtonStyle('buildings')}

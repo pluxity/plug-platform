@@ -9,10 +9,7 @@ const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'Asset', label: 'Asset', to: '/admin/asset', depth: 1, showToggle: true},
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
-  { id: 'Facility', label: 'Facility', to: '/admin/buildings', depth: 1, showToggle: true},
-  { id: 'Building', label: 'Building', to: '/admin/buildings', depth: 2, showToggle: false},
-  { id: 'Factory', label: 'Factory', to: '/admin/factories', depth: 2, showToggle: false},
-  { id: 'Station', label: 'Station', to: '/admin/stations', depth: 2, showToggle: false},
+  { id: 'Facility', label: 'Facility', to: '/admin/facility', depth: 1, showToggle: true},
 ]
 
 const BackofficeLayout: React.FC = () => {

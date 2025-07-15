@@ -10,7 +10,7 @@ import { useCreateBuilding } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import type { BuildingCreateRequest, Floors } from "@plug/common-services";
 
-const BuildingCreate: React.FC = () => {
+const BuildingCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -183,4 +183,4 @@ const BuildingCreate: React.FC = () => {
   );
 };
 
-export default BuildingCreate;
+export default BuildingCreatePage;
