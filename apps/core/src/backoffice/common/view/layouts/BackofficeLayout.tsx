@@ -5,12 +5,12 @@ import { BackofficeHeader } from '@/backoffice/common/view/layouts'
 import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
 const AsideMenuItems: AsideMenuItemProps[] = [
-  { id: 'dashboard', label: 'Dashboard', to: '/admin', depth: 1, showToggle: true},
-  { id: 'Asset', label: 'Asset', to: '/admin/asset', depth: 1, showToggle: true},
-  { id: 'AssetCategory', label: 'Asset Category', to: '/admin/asset-category', depth: 1, showToggle: true},
+  { id: 'Dashboard', label: 'Dashboard', to: '/admin', depth: 1, showToggle: true},
+  { id: 'Asset', label: 'Asset', depth: 1, showToggle: true},
+  { id: 'AssetList', label: 'AssetList', to: '/admin/assetList', depth: 2, showToggle: false, parentId: 'Asset'},
+  { id: 'AssetCategory', label: 'AssetCategory', to: '/admin/assetCategory', depth: 2, showToggle: false, parentId: 'Asset'},
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
-  { id: 'Categories', label: 'Categories', to: '/admin/categories', depth: 1, showToggle: true}
 ]
 
 const BackofficeLayout: React.FC = () => {
@@ -42,7 +42,7 @@ const BackofficeLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
-
+      
       {/* Toast Notifications */}
       <Toast />
     </div>

@@ -1,12 +1,13 @@
+import { api } from '@plug/api-hooks';
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
-import type { CreatedResponseBody, BaseResponseBody } from '@plug/api-hooks';
+import type { BaseResponseBody } from '@plug/api-hooks';
 import type { 
   AssetResponse, 
   AssetCreateRequest, 
   AssetUpdateRequest 
 } from '@plug/common-services';
 
-const ASSET_API = `/assets`;
+const ASSET_API = `assets`;
 
 // 에셋 목록 조회
 export const useAssets = () => {
@@ -20,7 +21,7 @@ export const useAssetDetail = (assetId: number) => {
 
 // 에셋 생성
 export const useCreateAsset = () => {
-  return usePost<CreatedResponseBody, AssetCreateRequest>(ASSET_API, { requireAuth: true });
+  return usePost<BaseResponseBody, AssetCreateRequest>(ASSET_API, { requireAuth: true });
 };
 
 // 에셋 수정
@@ -29,8 +30,8 @@ export const useUpdateAsset = (assetId: number) => {
 };
 
 // 에셋 삭제
-export const useDeleteAsset = (assetId: number) => {
-  return useDelete(`${ASSET_API}/${assetId}`, { requireAuth: true });
+export const deleteAsset = (assetId: number) => {
+  return api.delete(`${ASSET_API}/${assetId}`, { requireAuth: true });
 };
 
 // 에셋에 카테고리 할당
@@ -49,5 +50,6 @@ export const useAssetsSWR = () => {
 };
 
 export const useAssetDetailSWR = (assetId: number) => {
-  return useSWRApi<AssetResponse>(`${ASSET_API}/${assetId}`, 'GET', { requireAuth: true });
+  const key = assetId ? `${ASSET_API}/${assetId}` : '';
+  return useSWRApi<AssetResponse>(key, 'GET', { requireAuth: true });
 };
