@@ -9,13 +9,7 @@ function Toast ({ ...props }: ToastProps) {
     <Toaster
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-        } as React.CSSProperties
-      }
+      richColors
       {...props}
     />
   )
