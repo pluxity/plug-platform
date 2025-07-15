@@ -14,7 +14,6 @@ const BuildingCreatePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 파일 업로드 훅 사용
   const thumbnailUploader = useFileUploadWithInfo();
   const drawingUploader = useFileUploadWithInfo();
 
@@ -64,7 +63,6 @@ const BuildingCreatePage: React.FC = () => {
     if (files && files.length > 0) {
       try {
         const result = await thumbnailUploader.execute(files[0]);
-        // 파일 업로드 후 fileInfo에 자동으로 파일 정보가 설정됨
       } catch (err) {
         console.error("썸네일 업로드 오류:", err);
         setError("썸네일 업로드 중 오류가 발생했습니다.");
@@ -77,7 +75,6 @@ const BuildingCreatePage: React.FC = () => {
     if (files && files.length > 0) {
       try {
         const result = await drawingUploader.execute(files[0]);
-        // 파일 업로드 후 fileInfo에 자동으로 파일 정보가 설정됨
       } catch (err) {
         console.error("도면 업로드 오류:", err);
         setError("도면 업로드 중 오류가 발생했습니다.");
@@ -95,26 +92,22 @@ const BuildingCreatePage: React.FC = () => {
     setError(null);
 
     try {
-      // 업로드된 파일 ID를 요청에 포함
       const requestData: BuildingCreateRequest = {
         ...buildingData,
         facility: {
           ...buildingData.facility,
         }
       };
-
-      // 썸네일 ID 추가 (있는 경우)
       if (thumbnailUploader.fileInfo?.id) {
         requestData.facility.thumbnailFileId = thumbnailUploader.fileInfo.id;
       }
 
-      // 도면 ID 추가 (있는 경우)
       if (drawingUploader.fileInfo?.id) {
         requestData.facility.drawingFileId = drawingUploader.fileInfo.id;
       }
 
       await execute(requestData);
-      navigate("/admin/building");
+      navigate("/admin/facility");
     } catch (err) {
       console.error("건물 생성 오류:", err);
       setError("건물을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.");

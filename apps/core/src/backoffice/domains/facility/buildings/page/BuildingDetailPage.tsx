@@ -5,6 +5,7 @@ import { Button } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import { useBuildingDetailSWR } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
+import { api } from "@plug/api-hooks";
 
 const BuildingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,17 @@ const BuildingDetailPage: React.FC = () => {
   
   const { data: building, isLoading, error } = useBuildingDetailSWR(buildingId);
 
+  const handleDelete = async () => {
+    if (confirm("해당 빌딩을 삭제하시겠습니까?")) {
+      try {
+        await api.delete(`buildings/${buildingId}`);
+        navigate("/admin/facility");
+      } catch (err) {
+        console.error("빌딩 삭제 오류:", err);
+        alert("빌딩을 삭제하는 중 오류가 발생했습니다.");
+      }
+    }
+  };
   const handleBack = () => {
     navigate(-1);
   };
@@ -132,7 +144,10 @@ const BuildingDetailPage: React.FC = () => {
       ) : (
         <div className="text-center p-8">빌딩 정보가 없습니다.</div>
       )}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-end gap-2 mb-6">
+        <Button variant="outline" onClick={handleDelete}>
+          삭제
+        </Button>
         <Button variant="outline" onClick={handleBack}>
           돌아가기
         </Button>
