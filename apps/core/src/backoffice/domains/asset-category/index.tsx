@@ -8,6 +8,7 @@ import {
 import type { AssetCategoryResponse } from '@plug/common-services'
 import { api } from '@plug/api-hooks'
 import { useFileUploadWithInfo } from '@plug/common-services'
+import { findNodeById, isDescendant } from '@/backoffice/common/services/hooks/useCategory'
 
 const convertToCategoryItems = (apiData: AssetCategoryResponse[]): CategoryItem[] => {
   return apiData.map(item => ({
@@ -104,20 +105,8 @@ const AssetCategory: React.FC = () => {
     position: 'before' | 'after' | 'inside'
   ): Promise<void> => {
     try {
-
-      const findCategory = (items: CategoryItem[], id: string): CategoryItem | null => {
-        for (const item of items) {
-          if (item.id === id) return item
-          if (item.children) {
-            const found = findCategory(item.children, id)
-            if (found) return found
-          }
-        }
-        return null
-      }
-      
-      const draggedCategory = findCategory(categories, draggedId)
-      const targetCategory = findCategory(categories, targetId)
+      const draggedCategory = findNodeById(categories, draggedId)
+      const targetCategory = findNodeById(categories, targetId)
       
       if (!draggedCategory) {
         throw new Error('이동할 카테고리를 찾을 수 없습니다.')
@@ -129,14 +118,6 @@ const AssetCategory: React.FC = () => {
         newParentId = targetCategory ? parseInt(targetId) : undefined
       } else {
         newParentId = targetCategory?.parentId ? parseInt(targetCategory.parentId) : undefined
-      }
-      
-      const isDescendant = (parent: CategoryItem, childId: string): boolean => {
-        if (parent.id === childId) return true
-        if (parent.children) {
-          return parent.children.some(child => isDescendant(child, childId))
-        }
-        return false
       }
       
       if (newParentId && targetCategory && isDescendant(draggedCategory, targetId)) {

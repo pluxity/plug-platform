@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Card, CardContent, Badge, Button, Input } from '@plug/ui'
 import { CategoryItem, CategoryOperations, CategoryConfig } from '../../../services/types/category'
 import { useCategory, recalculateDepths, getTotalChildrenCount, getMaxDepthOfTree, findNodeById } from '../../../services/hooks/useCategory'
@@ -39,7 +39,20 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
     handleRootAdd
   } = useCategory(operations)
   
-  const itemsWithCorrectDepths = recalculateDepths(items)
+  const itemsWithCorrectDepths = React.useMemo(() => recalculateDepths(items), [items])
+
+  const totalCategoryCount = React.useMemo(() => {
+    return itemsWithCorrectDepths.reduce((count, item) => {
+      return count + getTotalChildrenCount(item) + 1
+    }, 0)
+  }, [itemsWithCorrectDepths])
+
+  const resetRootAddForm = useCallback(() => {
+    setIsAddingRoot(false)
+    setRootAddValue('')
+    setRootAddCode('')
+    setRootThumbnailFileId(undefined)
+  }, [setIsAddingRoot, setRootAddValue, setRootAddCode, setRootThumbnailFileId])
 
   const handleCategoryMove = async (draggedId: string, targetId: string, position: 'before' | 'after' | 'inside') => {
     const draggedNode = findNodeById(itemsWithCorrectDepths, draggedId)
@@ -99,10 +112,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
       handleRootAdd()
     }
     if (e.key === 'Escape') {
-      setIsAddingRoot(false)
-      setRootAddValue('')
-      setRootAddCode('')
-      setRootThumbnailFileId(undefined)
+      resetRootAddForm()
     }
   }
 
@@ -174,12 +184,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
                 variant="ghost"
                 size="sm"
                 className="w-7 h-7 p-0 text-red-600 hover:text-red-700"
-                onClick={() => {
-                  setIsAddingRoot(false)
-                  setRootAddValue('')
-                  setRootAddCode('')
-                  setRootThumbnailFileId(undefined)
-                }}
+                onClick={resetRootAddForm}
                 disabled={disabled}
                 title="취소"
               >
@@ -222,9 +227,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
         {/* Footer Info */}
         {itemsWithCorrectDepths.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500 flex justify-end">
-            총 {itemsWithCorrectDepths.reduce((count, item) => {
-              return count + getTotalChildrenCount(item) + 1
-            }, 0)}개의 카테고리가 등록되어 있습니다.
+            총 {totalCategoryCount}개의 카테고리가 등록되어 있습니다.
           </div>
         )}
       </CardContent>

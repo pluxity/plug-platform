@@ -6,9 +6,12 @@ export interface FileResponse {
     id: number;
     url: string;
     originalFileName: string;
-    fileType: string;
     contentType: string;
     fileStatus: string;
+    createdAt: string;
+    createdBy: string;
+    updatedAt: string;
+    updatedBy: string;
 }
 
 export interface FileError {

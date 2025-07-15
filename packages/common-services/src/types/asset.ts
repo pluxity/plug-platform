@@ -1,3 +1,5 @@
+import { FileResponse } from './file'
+
 export interface AssetCreateRequest {
   name: string;
   code: string;
@@ -23,18 +25,6 @@ export interface AssetResponse {
   categoryCode?: string;
   file?: FileResponse;
   thumbnailFile?: FileResponse;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  updatedBy: string;
-}
-
-interface FileResponse {
-  id: number;
-  url: string;
-  originalFileName: string;
-  contentType: string;
-  fileStatus: string;
   createdAt: string;
   createdBy: string;
   updatedAt: string;

@@ -1,6 +1,11 @@
 import { useState, useCallback } from 'react'
 import { CategoryItem, CategoryOperations } from '../types/category'
 
+// 삭제 결과 타입 정의
+export type DeleteResult = 
+  | { success: true }
+  | { success: false, error: 'NOT_FOUND' | 'HAS_CHILDREN' | 'USER_CANCELLED' }
+
 export const useCategory = (operations: CategoryOperations) => {
   const [isAddingRoot, setIsAddingRoot] = useState(false)
   const [rootAddValue, setRootAddValue] = useState('')
@@ -21,27 +26,34 @@ export const useCategory = (operations: CategoryOperations) => {
     }
   }, [operations])
 
-  const handleCategoryDelete = useCallback(async (id: string, items: CategoryItem[]) => {
+  const handleCategoryDelete = useCallback(async (
+    id: string, 
+    items: CategoryItem[],
+    onConfirm?: (categoryName: string) => Promise<boolean>
+  ): Promise<DeleteResult> => {
     const nodeToDelete = findNodeById(items, id)
     if (!nodeToDelete) {
-      alert('삭제할 카테고리를 찾을 수 없습니다.')
-      return
+      return { success: false, error: 'NOT_FOUND' }
     }
 
     const hasChildren = nodeToDelete.children && nodeToDelete.children.length > 0
     if (hasChildren) {
-      return
+      return { success: false, error: 'HAS_CHILDREN' }
     }
 
-    const confirmMessage = `"${nodeToDelete.name}" 카테고리를 삭제하시겠습니까?`
-    
-    if (!confirm(confirmMessage)) {
-      return
+    // 확인 콜백이 제공된 경우 사용, 아니면 기본적으로 진행
+    if (onConfirm) {
+      const confirmed = await onConfirm(nodeToDelete.name)
+      if (!confirmed) {
+        return { success: false, error: 'USER_CANCELLED' }
+      }
     }
     
     if (operations.onDelete) {
       await operations.onDelete(id)
     }
+    
+    return { success: true }
   }, [operations])
 
   const handleRootAdd = useCallback(() => {
@@ -106,11 +118,7 @@ export const getChildrenCount = (node: CategoryItem): number => {
 
 export const getTotalChildrenCount = (node: CategoryItem): number => {
   if (!node.children || node.children.length === 0) return 0
-  let total = node.children.length
-  node.children.forEach(child => {
-    total += getTotalChildrenCount(child)
-  })
-  return total
+  return node.children.reduce((count, child) => count + 1 + getTotalChildrenCount(child), 0)
 }
 
 export const getMaxDepthOfTree = (node: CategoryItem): number => {
@@ -118,4 +126,12 @@ export const getMaxDepthOfTree = (node: CategoryItem): number => {
     return node.depth
   }
   return Math.max(...node.children.map(child => getMaxDepthOfTree(child)))
+}
+
+export const isDescendant = (parent: CategoryItem, childId: string): boolean => {
+  if (parent.id === childId) return true
+  if (parent.children) {
+    return parent.children.some(child => isDescendant(child, childId))
+  }
+  return false
 }
