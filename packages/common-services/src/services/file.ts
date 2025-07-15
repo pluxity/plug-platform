@@ -6,6 +6,13 @@ import type { FileResponse, UseFileUploadWithInfoReturn } from '../types/file';
 
 const FILE_API = `files`;
 
+const extractFileIdFromLocation = (location: string | null): number | null => {
+  if (!location) return null;
+  
+  const id = parseInt(location.split('/').pop() || '');
+  return isNaN(id) ? null : id;
+};
+
 export const useFileInfo = (fileId?: number | string, options?: RequestOptions) => {
   return useGet<FileResponse>(`${FILE_API}/${fileId}`, {
     requireAuth: true,
@@ -28,16 +35,15 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
   const uploadMutation = useFileUpload(options);
   const { execute: executeUpload, ...uploadState } = uploadMutation;
   
-  const executeUploadWithAutoFetch = useCallback(async (file: File) => {
+  const executeUploadWithAutoFetch = useCallback(async (file: File): Promise<FileResponse> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
       
       const uploadResult = await executeUpload(formData);
       
-      // Location 헤더에서 파일 ID 추출
-      const location = uploadResult.response?.headers.get('Location');
-      const extractedFileId = location?.split('/').pop() || null;
+      const location = uploadResult.response?.headers.get('Location') || null;
+      const extractedFileId = extractFileIdFromLocation(location);
 
       if (extractedFileId) {
         setIsLoadingFileInfo(true);
@@ -50,15 +56,21 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
           });
 
           setFileInfo(fileInfoResult.data);
+          return fileInfoResult.data; // FileResponse 반환
 
         } catch (error) {
           setFileInfoError(error instanceof Error ? error : new Error('파일 정보 조회 중 오류 발생'));
+          throw error;
         } finally {
           setIsLoadingFileInfo(false);
         }
+      } else {
+        const errorMsg = `Location 헤더에서 유효한 파일 ID를 추출할 수 없습니다: ${location || 'null'}`;
+        console.warn(errorMsg);
+        const error = new Error(errorMsg);
+        setFileInfoError(error);
+        throw error;
       }
-      
-      return uploadResult;
     } catch (error) {
       setFileInfoError(error instanceof Error ? error : new Error('업로드 중 오류 발생'));
       throw error;

@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Sidebar } from '@plug/ui'
-import { BackofficeHeader } from '.'
+import { Sidebar, Toast } from '@plug/ui'
+import { BackofficeHeader } from '@/backoffice/common/view/layouts'
 import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
 const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'dashboard', label: 'Dashboard', to: '/admin', depth: 1, showToggle: true},
   { id: 'Asset', label: 'Asset', to: '/admin/asset', depth: 1, showToggle: true},
+  { id: 'AssetCategory', label: 'Asset Category', to: '/admin/asset-category', depth: 1, showToggle: true},
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', to: '/admin/users', depth: 1, showToggle: true},
+  { id: 'Categories', label: 'Categories', to: '/admin/categories', depth: 1, showToggle: true}
 ]
 
 const BackofficeLayout: React.FC = () => {
@@ -40,6 +42,9 @@ const BackofficeLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Toast Notifications */}
+      <Toast />
     </div>
   )
 }

@@ -6,6 +6,7 @@ import Dashboard from '@/backoffice/domains/dashboard'
 import Users from '@/backoffice/domains/users'
 import Device from '@/backoffice/domains/device'
 import Asset from '@/backoffice/domains/asset'
+import AssetCategory from '@/backoffice/domains/asset-category'
 
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
@@ -23,6 +24,7 @@ const AppRouter: React.FC = () => {
           <Route path="users" element={<Users />} />
           <Route path="device" element={<Device />} />
           <Route path="asset" element={<Asset />} />
+          <Route path="asset-category" element={<AssetCategory />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

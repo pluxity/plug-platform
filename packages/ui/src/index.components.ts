@@ -57,17 +57,3 @@ export * from "./components/molecule/Profile/Profile";
 //Organism
 export * from "./components/organism/DataTable/DataTable";
 export * from "./components/organism/Sidebar/Sidebar";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
