@@ -61,7 +61,7 @@ export const OverlayDimmed: Story = {
   render: () => (
       <Dialog>
         <DialogTrigger>Open</DialogTrigger>
-        <DialogContent title="도면 수정" dimmed>
+        <DialogContent title="도면 수정" dimmed disableBackground={true}>
           <DialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
