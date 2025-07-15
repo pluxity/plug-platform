@@ -38,7 +38,7 @@ export const BuildingCardList: React.FC = () => {
   const handleDeleteBuilding = async (item: FacilityItem) => {
     if (confirm("해당 빌딩을 삭제하시겠습니까?")) {
       try {
-        await api.delete(`building/${item.id}`);
+        await api.delete(`buildings/${item.id}`);
         await buildingsResponse.mutate();
       } catch (err) {
         console.error("빌딩 삭제 오류:", err);

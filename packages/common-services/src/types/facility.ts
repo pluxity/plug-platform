@@ -23,8 +23,8 @@ export interface FacilityCreateRequest {
   name: string;
   code: string;
   description?: string;
-  drawingFieldId?: number;
-  thumbnailFieldId?: number;
+  drawingFileId?: number;
+  thumbnailFileId?: number;
 }
 
 export interface FacilityUpdateRequest {

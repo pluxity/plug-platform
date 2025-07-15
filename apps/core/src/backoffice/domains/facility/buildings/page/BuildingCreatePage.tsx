@@ -1,12 +1,11 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@plug/ui";
+import { Card, CardContent } from "@plug/ui";
 import { Button } from "@plug/ui";
 import { Input } from "@plug/ui";
 import { Label } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import { useCreateBuilding } from "@plug/common-services";
+import { useCreateBuilding, useFileUploadWithInfo } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import type { BuildingCreateRequest, Floors } from "@plug/common-services";
 
@@ -14,6 +13,10 @@ const BuildingCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 파일 업로드 훅 사용
+  const thumbnailUploader = useFileUploadWithInfo();
+  const drawingUploader = useFileUploadWithInfo();
 
   const [buildingData, setBuildingData] = useState<BuildingCreateRequest>({
     facility: {
@@ -56,6 +59,32 @@ const BuildingCreatePage: React.FC = () => {
     }));
   };
 
+  const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      try {
+        const result = await thumbnailUploader.execute(files[0]);
+        // 파일 업로드 후 fileInfo에 자동으로 파일 정보가 설정됨
+      } catch (err) {
+        console.error("썸네일 업로드 오류:", err);
+        setError("썸네일 업로드 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
+  const handleDrawingChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      try {
+        const result = await drawingUploader.execute(files[0]);
+        // 파일 업로드 후 fileInfo에 자동으로 파일 정보가 설정됨
+      } catch (err) {
+        console.error("도면 업로드 오류:", err);
+        setError("도면 업로드 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
   const handleBack = () => {
     navigate("/admin/building");
   };
@@ -66,7 +95,25 @@ const BuildingCreatePage: React.FC = () => {
     setError(null);
 
     try {
-      await execute(buildingData);
+      // 업로드된 파일 ID를 요청에 포함
+      const requestData: BuildingCreateRequest = {
+        ...buildingData,
+        facility: {
+          ...buildingData.facility,
+        }
+      };
+
+      // 썸네일 ID 추가 (있는 경우)
+      if (thumbnailUploader.fileInfo?.id) {
+        requestData.facility.thumbnailFileId = thumbnailUploader.fileInfo.id;
+      }
+
+      // 도면 ID 추가 (있는 경우)
+      if (drawingUploader.fileInfo?.id) {
+        requestData.facility.drawingFileId = drawingUploader.fileInfo.id;
+      }
+
+      await execute(requestData);
       navigate("/admin/building");
     } catch (err) {
       console.error("건물 생성 오류:", err);
@@ -78,22 +125,10 @@ const BuildingCreatePage: React.FC = () => {
 
   return (
     <PageContainer title="새 건물 추가">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleBack}>
-            목록으로
-          </Button>
-          <h1 className="text-2xl font-bold">새 건물 추가</h1>
-        </div>
-      </div>
-
       <form onSubmit={handleSubmit}>
         <Card>
-          <CardHeader>
-            <CardTitle>새 건물 정보 입력</CardTitle>
-          </CardHeader>
           <CardContent>
-            <ModalForm>
+            <ModalForm className="grid grid-cols-2 py-5">
               <ModalFormItem label="건물명">
                 <Input
                   type="text"
@@ -114,13 +149,55 @@ const BuildingCreatePage: React.FC = () => {
                 />
               </ModalFormItem>
 
-              <ModalFormItem label="설명">
+              <ModalFormItem label="설명" className="col-span-2">
                 <Input
                   type="text"
                   value={buildingData.facility.description || ""}
                   onChange={(e) => handleInputChange("description", e.target.value)}
                   placeholder="건물에 대한 설명을 입력하세요"
                 />
+              </ModalFormItem>
+
+              <ModalFormItem label="썸네일">
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailChange}
+                    className="mb-2"
+                  />
+                  {thumbnailUploader.isLoadingFileInfo && <p>썸네일 업로드 중...</p>}
+                  {thumbnailUploader.fileInfo && (
+                    <div className="mt-2">
+                      <div className="w-32 h-32 relative border border-gray-200 rounded-md overflow-hidden">
+                        <img 
+                          src={thumbnailUploader.fileInfo.url} 
+                          alt="썸네일 미리보기" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ModalFormItem>
+
+              <ModalFormItem label="도면">
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*, application/pdf"
+                    onChange={handleDrawingChange}
+                    className="mb-2"
+                  />
+                  {drawingUploader.isLoadingFileInfo && <p>도면 업로드 중...</p>}
+                  {drawingUploader.fileInfo && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        업로드된 파일: {drawingUploader.fileInfo.originalFileName}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </ModalFormItem>
 
               <ModalFormItem label="층 수">
@@ -161,23 +238,26 @@ const BuildingCreatePage: React.FC = () => {
               <div className="text-red-500 mt-4 text-center">{error}</div>
             )}
           </CardContent>
-          <CardFooter className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "처리 중..." : "저장"}
-            </Button>
-          </CardFooter>
         </Card>
+        <div className="flex items-center justify-end mt-6 gap-2">
+          <Button variant="outline" onClick={handleBack}>
+            목록으로
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+            disabled={isSubmitting}
+          >
+            취소
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting || thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo}
+          >
+            {isSubmitting ? "처리 중..." : "저장"}
+          </Button>
+        </div>
       </form>
     </PageContainer>
   );

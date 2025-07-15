@@ -18,7 +18,7 @@ const BuildingDetailPage: React.FC = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/admin/buildings/${buildingId}/edit`);
+    navigate(`/admin/building/${buildingId}/edit`);
   };
 
   return (
@@ -32,7 +32,7 @@ const BuildingDetailPage: React.FC = () => {
       ) : building ? (
         <Card>
           <CardContent>
-            <ModalForm className='grid grid-cols-2 py-5'>
+            <ModalForm className="grid grid-cols-2 py-5">
               <ModalFormItem label="ID">
                 <div className="py-2">{building.facility.id}</div>
               </ModalFormItem>
@@ -80,29 +80,35 @@ const BuildingDetailPage: React.FC = () => {
               </ModalFormItem>
 
               <ModalFormItem label="층 정보" className="col-span-2">
-                <div className="py-2">
-                  {building.floors && building.floors.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-2">
-                      {building.floors.map((floor, index) => (
-                        <div key={index} className="p-2 border rounded">
-                          <div>
-                            <strong>ID:</strong> {floor.floorId}
-                          </div>
-                          <div>
-                            <strong>이름:</strong> {floor.name}
-                          </div>
+                {building.floors && building.floors.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {building.floors.map((floor, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                      >
+                        <div>
+                          <span className="text-gray-500 mr-1">ID</span>
+                          <span className="font-medium text-gray-800">{floor.floorId}</span>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    "등록된 층 정보가 없습니다."
-                  )}
-                </div>
+                        <div className="mt-1">
+                          <span className="text-gray-500 mr-1">이름</span>
+                          <span className="font-medium text-gray-800">{floor.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">등록된 층 정보가 없습니다.</div>
+                )}
               </ModalFormItem>
               <ModalFormItem label="썸네일 이미지">
                 <div className="py-2">
                   {building.facility.thumbnail.url ? (
-                    <img src={building.facility.thumbnail.url} alt="썸네일 이미지" />
+                    <img
+                      src={building.facility.thumbnail.url}
+                      alt="썸네일 이미지"
+                    />
                   ) : (
                     "썸네일 이미지가 없습니다."
                   )}
@@ -111,7 +117,10 @@ const BuildingDetailPage: React.FC = () => {
               <ModalFormItem label="드로잉 이미지">
                 <div className="py-2">
                   {building.facility.drawing.url ? (
-                    <img src={building.facility.drawing.url} alt="드로잉 이미지" />
+                    <img
+                      src={building.facility.drawing.url}
+                      alt="드로잉 이미지"
+                    />
                   ) : (
                     "드로잉 이미지가 없습니다."
                   )}
