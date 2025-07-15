@@ -8,6 +8,16 @@ export interface FacilityItem {
   thumbnail?: {
     url?: string;
   };
+  type?: string;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export interface SortOptions {
+  field: keyof FacilityItem;
+  direction: 'asc' | 'desc';
 }
 
 export interface StandardizedResponse<T extends FacilityItem> {
@@ -34,8 +44,12 @@ export interface FacilityCardRenderOptions<T extends FacilityItem> {
 export interface FacilityFilterOptions {
   searchPlaceholder?: string;
   searchFields?: string[];
-  onSearchChange?: (value: string) => void;
   searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  sortOptions?: SortOptions;
+  onSortChange?: (options: SortOptions) => void;
+  typeFilter?: string;
+  onTypeFilterChange?: (type: string) => void;
   additionalFilters?: Array<{
     key: string;
     placeholder: string;

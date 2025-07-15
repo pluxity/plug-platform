@@ -16,9 +16,9 @@ import {
 import {
   FacilityCardListProps,
   FacilityItem
-} from "@/backoffice/domains/facility/components/FacilityCardListType";
+} from "@/backoffice/domains/facility/components/CardListType";
 
-export function FacilityCardList<T extends FacilityItem>({
+export function CardList<T extends FacilityItem>({
                                                            dataResponse,
                                                            filterData,
                                                            renderOptions,
@@ -30,7 +30,7 @@ export function FacilityCardList<T extends FacilityItem>({
   const { data, isLoading, error } = dataResponse;
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = parseInt(searchParams.get("page") || "1", 8);
   const searchQuery = filterOptions?.searchValue || searchParams.get("query") || "";
 
   useEffect(() => {
@@ -198,15 +198,35 @@ export function FacilityCardList<T extends FacilityItem>({
       return renderOptions.getCardImage(item);
     }
 
+    const typeColorClass = item.type === 'building' ? 'bg-blue-700' :
+      item.type === 'panorama' ? 'bg-purple-700' :
+        item.type === 'station' ? 'bg-emerald-700' : 'bg-gray-700';
+
     return item.thumbnail?.url ? (
-      <img
-        src={item.thumbnail.url}
-        alt={item.name}
-        className="w-full h-full object-cover"
-      />
+      <div className="relative w-full h-full">
+        <img
+          src={item.thumbnail.url}
+          alt={item.name}
+          className="w-full h-full object-cover"
+        />
+        {item.type && (
+          <div className="absolute top-2 right-2 px-2 py-1 text-white text-xs rounded-full bg-black/50 backdrop-blur-sm">
+            {item.type === 'building' ? '건물' :
+              item.type === 'panorama' ? '파노라마' :
+                item.type === 'station' ? '역사' : '시설'}
+          </div>
+        )}
+      </div>
     ) : (
-      <div className="w-full h-full flex items-center justify-center text-white text-6xl font-bold">
+      <div className={`w-full h-full flex items-center justify-center text-white text-6xl font-bold ${typeColorClass}`}>
         {getInitial(item)}
+        {item.type && (
+          <div className="absolute top-2 right-2 px-2 py-1 text-white text-xs rounded-full bg-black/50 backdrop-blur-sm">
+            {item.type === 'building' ? '건물' :
+              item.type === 'panorama' ? '파노라마' :
+                item.type === 'station' ? '역사' : '시설'}
+          </div>
+        )}
       </div>
     );
   };
@@ -272,7 +292,7 @@ export function FacilityCardList<T extends FacilityItem>({
                         <span>상세 보기</span>
                       </Button>
                     </div>
-                    <div className="absolute top-0 right-0 px-4 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="absolute bottom-0 right-0 px-4 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <div className="flex gap-2">
                         <Button
                           variant="outline"

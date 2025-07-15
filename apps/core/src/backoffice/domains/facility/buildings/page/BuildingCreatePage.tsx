@@ -57,7 +57,7 @@ const BuildingCreatePage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate("/admin/buildings");
+    navigate("/admin/building");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,7 +67,7 @@ const BuildingCreatePage: React.FC = () => {
 
     try {
       await execute(buildingData);
-      navigate("/admin/buildings");
+      navigate("/admin/building");
     } catch (err) {
       console.error("건물 생성 오류:", err);
       setError("건물을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.");

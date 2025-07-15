@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@plug/api-hooks";
 import { useBuildingsSWR } from "@plug/common-services";
-import { FacilityCardList } from "@/backoffice/domains/facility/components/FacilityCardList";
-import { FacilityItem } from "@/backoffice/domains/facility/components/FacilityCardListType";
+import { CardList } from "@/backoffice/domains/facility/components/CardList";
+import { FacilityItem } from "@/backoffice/domains/facility/components/CardListType";
 
 export const BuildingCardList: React.FC = () => {
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ export const BuildingCardList: React.FC = () => {
   };
   
   return (
-    <FacilityCardList<FacilityItem>
+    <CardList<FacilityItem>
       dataResponse={standardizedData}
       filterData={filterBuildings}
       actions={{

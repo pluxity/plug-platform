@@ -1,5 +1,11 @@
 import { FileResponse } from "./file";
 
+export interface FacilitiesAllResponse {
+  building: FacilityResponse[];
+  station: FacilityResponse[];
+  panorama: FacilityResponse[];
+}
+
 export interface FacilityResponse {
   id: number;
   name: string;

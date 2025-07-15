@@ -4,9 +4,10 @@ import { Button } from "@plug/ui";
 import { useNavigate } from "react-router-dom";
 import { Building, TrainFront, Warehouse, Factory } from "lucide-react";
 import { BuildingCardList } from "@/backoffice/domains/facility/buildings";
+import { FacilityCardList } from "@/backoffice/domains/facility/components/variants/FacilityCardList";
 
 const FacilityManagement: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>("buildings");
+  const [activeTab, setActiveTab] = useState<string>("facilities");
   const navigate = useNavigate();
 
   const getButtonStyle = (tabName: string) => {
@@ -26,6 +27,10 @@ const FacilityManagement: React.FC = () => {
 
   const getAddButtonConfig = () => {
     const config = {
+      facilities: {
+        path: "/admin/facility/add",
+        text: "시설 추가"
+      },
       buildings: {
         path: "/admin/building/add",
         text: "건물 추가"
@@ -53,8 +58,8 @@ const FacilityManagement: React.FC = () => {
       <div className="flex flex-row items-center justify-between mb-6">
         <div style={{ display: 'flex' }}>
           <button
-            onClick={() => setActiveTab('facility')}
-            style={getButtonStyle('facility')}
+            onClick={() => setActiveTab('facilities')}
+            style={getButtonStyle('facilities')}
           >
             <Warehouse size={20} /> 시설 전체
           </button>
@@ -90,7 +95,7 @@ const FacilityManagement: React.FC = () => {
       </div>
 
       <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#fff' }}>
-        {activeTab === 'facility' && <BuildingCardList />}
+        {activeTab === 'facilities' && <FacilityCardList />}
         {activeTab === 'buildings' && <BuildingCardList />}
         {activeTab === 'stations' && <BuildingCardList />}
         {activeTab === 'factories' && <BuildingCardList />}

@@ -1,5 +1,6 @@
 export * from './auth';
 export * from './building';
+export * from './facility';
 export * from './facilityCategory';
 export * from './file';
 export * from './role';
