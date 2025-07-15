@@ -3,9 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@plug/ui";
 import { Button } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import { useBuildingDetailSWR } from "@plug/common-services";
+import { useBuildingDetailSWR, useDeleteBuilding } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import { api } from "@plug/api-hooks";
+// import { api } from "@plug/api-hooks";
 
 const BuildingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,11 +13,13 @@ const BuildingDetailPage: React.FC = () => {
   const buildingId = parseInt(id || "0");
   
   const { data: building, isLoading, error } = useBuildingDetailSWR(buildingId);
+  const { execute: deleteBuilding } = useDeleteBuilding(buildingId);
 
   const handleDelete = async () => {
     if (confirm("해당 빌딩을 삭제하시겠습니까?")) {
       try {
-        await api.delete(`buildings/${buildingId}`);
+        await deleteBuilding();
+        // await api.delete(`buildings/${buildingId}`);
         navigate("/admin/facility");
       } catch (err) {
         console.error("빌딩 삭제 오류:", err);
