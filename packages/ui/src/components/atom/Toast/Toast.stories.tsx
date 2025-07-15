@@ -1,13 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Toast } from "./Toast";
-import { 
-  toast,
-  showSuccess,
-  showError,
-  showInfo,
-  showWarning,
-  showMessage,
-} from "./toast-functions";
+import { toast } from "./toast-functions";
 import { 
   useState, 
   useEffect, 
@@ -143,16 +136,16 @@ export const Default: Story = {
 
       switch (type) {
         case "success":
-          showSuccess(title, { description, ...toastOptions });
+          toast.success(title, { description, ...toastOptions });
           break;
         case "error":
-          showError(title, { description, ...toastOptions });
+          toast.error(title, { description, ...toastOptions });
           break;
         case "warning":
-          showWarning(title, { description, ...toastOptions });
+          toast.warning(title, { description, ...toastOptions });
           break;
         case "info":
-          showInfo(title, { description, ...toastOptions });
+          toast.info(title, { description, ...toastOptions });
           break;
         case "action":
           toast(title, { 
@@ -489,7 +482,7 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">직접 디자인한 토스트를 표시합니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.custom}`}
-              onClick={() => toast.custom((id) => (
+              onClick={() => toast.custom((id: string | number) => (
                 <div
                   className={`animate-enter bg-white shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
                 >
@@ -536,7 +529,7 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">카드 형태의 커스텀 토스트입니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.custom}`}
-              onClick={() => toast.custom((id) => (
+              onClick={() => toast.custom((id: string | number) => (
                 <div
                   className={`animate-enter max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex flex-col`}
                 >
@@ -587,7 +580,7 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">알림 형태의 커스텀 토스트입니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.info}`}
-              onClick={() => toast.custom((id) => (
+              onClick={() => toast.custom((id: string | number) => (
                 <div
                   className={`animate-enter max-w-md w-full bg-blue-50 border-l-4 border-blue-500 shadow-md rounded-r-lg pointer-events-auto flex p-4`}
                 >
@@ -801,33 +794,33 @@ export const WrappedFunctions: Story = {
               <div className="space-y-2">
                 <button
                   className={`${buttonStyles.base} ${buttonStyles.success} w-full`}
-                  onClick={() => showSuccess("성공!", { description: "작업이 성공적으로 완료되었습니다." })}
+                  onClick={() => toast.success("성공!", { description: "작업이 성공적으로 완료되었습니다." })}
                 >
-                  showSuccess()
+                  toast.success()
                 </button>
                 <button
                   className={`${buttonStyles.base} ${buttonStyles.error} w-full`}
-                  onClick={() => showError("오류!", { description: "작업 중 오류가 발생했습니다." })}
+                  onClick={() => toast.error("오류!", { description: "작업 중 오류가 발생했습니다." })}
                 >
-                  showError()
+                  toast.error()
                 </button>
                 <button
                   className={`${buttonStyles.base} ${buttonStyles.info} w-full`}
-                  onClick={() => showInfo("정보", { description: "새로운 업데이트가 있습니다." })}
+                  onClick={() => toast.info("정보", { description: "새로운 업데이트가 있습니다." })}
                 >
-                  showInfo()
+                  toast.info()
                 </button>
                 <button
                   className={`${buttonStyles.base} ${buttonStyles.warning} w-full`}
-                  onClick={() => showWarning("주의", { description: "이 작업은 되돌릴 수 없습니다." })}
+                  onClick={() => toast.warning("주의", { description: "이 작업은 되돌릴 수 없습니다." })}
                 >
-                  showWarning()
+                  toast.warning()
                 </button>
                 <button
                   className={`${buttonStyles.base} ${buttonStyles.default} w-full`}
-                  onClick={() => showMessage("메시지", { description: "일반적인 알림 메시지입니다." })}
+                  onClick={() => toast("메시지", { description: "일반적인 알림 메시지입니다." })}
                 >
-                  showMessage()
+                  toast()
                 </button>
               </div>
             </div>
@@ -837,8 +830,8 @@ export const WrappedFunctions: Story = {
           <div className="mt-8 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-semibold mb-3">사용법 예제</h3>
             <div className="space-y-2 text-sm">
-              <p><code className="bg-gray-200 px-2 py-1 rounded">import &#123; showSuccess, showError, toast &#125; from '@plug/ui';</code></p>
-              <p><code className="bg-gray-200 px-2 py-1 rounded">showSuccess("성공!", "작업이 완료되었습니다.");</code></p>
+              <p><code className="bg-gray-200 px-2 py-1 rounded">import &#123; toast &#125; from '@plug/ui';</code></p>
+              <p><code className="bg-gray-200 px-2 py-1 rounded">toast.success("성공!", &#123; description: "작업이 완료되었습니다." &#125;);</code></p>
               <p><code className="bg-gray-200 px-2 py-1 rounded">toast("기본 메시지", &#123; duration: 5000 &#125;);</code></p>
             </div>
           </div>
