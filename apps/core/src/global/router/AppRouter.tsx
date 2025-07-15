@@ -8,10 +8,10 @@ import Asset from '@/backoffice/domains/asset'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import FacilityManagement from "@/backoffice/domains/facility";
-import {Buildings} from "@/backoffice/domains/facility/buildings";
 import BuildingCreatePage from "@/backoffice/domains/facility/buildings/page/BuildingCreatePage";
 import BuildingDetailPage from "@/backoffice/domains/facility/buildings/page/BuildingDetailPage";
 import BuildingEditPage from "@/backoffice/domains/facility/buildings/page/BuildingEditPage";
+import {BuildingCardList} from "@/backoffice/domains/facility/buildings";
 
 const AppRouter: React.FC = () => {
   return (
@@ -28,7 +28,7 @@ const AppRouter: React.FC = () => {
           <Route path="asset" element={<Asset />} />
           <Route path="facility" element={<FacilityManagement />}/>
           <Route path="building" >
-            <Route index element={<Buildings />} />
+            <Route index element={<BuildingCardList />} />
             <Route path="add" element={<BuildingCreatePage />} />
             <Route path=":id" element={<BuildingDetailPage />} />
             <Route path=":id/edit" element={<BuildingEditPage /> } />
