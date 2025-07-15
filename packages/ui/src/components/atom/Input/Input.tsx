@@ -13,7 +13,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div
         className={cn(
-          "w-44 h-9 min-w-12 px-2.5 bg-white rounded-[2px]",
+          "w-full h-9 min-w-12 px-2.5 bg-white rounded-[2px]",
           "outline outline-1 outline-offset-[-1px] outline-slate-400",
           "inline-flex items-center",
           icon ? "justify-start gap-[5px]" : "justify-between",

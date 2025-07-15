@@ -25,6 +25,7 @@ export interface DialogContentProps extends React.ComponentProps<typeof DialogPr
   showCloseButton?: boolean;
   dimmed?: boolean;
   title?: string;
+  disableBackground?: boolean;
 }
 
 export interface DialogHeaderProps extends React.ComponentProps<"div"> {

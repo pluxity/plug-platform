@@ -71,6 +71,7 @@ function DialogContent({
   showCloseButton = true,
   dimmed = false,
   title,
+  disableBackground = false,
   ...props
 }: DialogContentProps) {
   return (
@@ -85,6 +86,7 @@ function DialogContent({
           focus:outline-none`,
           className
         )}
+        onInteractOutside={disableBackground ? (e) => e.preventDefault() : undefined}
         {...props}
       >
         <div className="flex items-center justify-between bg-muted-light-blue1 p-4">
