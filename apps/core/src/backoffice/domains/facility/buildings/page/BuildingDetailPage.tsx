@@ -364,7 +364,7 @@ export const BuildingDetailPage: React.FC = () => {
               <ModalFormItem label="생성">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4">생성일</span>
+                    <span className="text-gray-500 mr-4 text-sm">생성일</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.createdAt
                         ? new Date(
@@ -374,7 +374,7 @@ export const BuildingDetailPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4">생성인</span>
+                    <span className="text-gray-500 mr-4 text-sm">생성인</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.createdBy || "-"}
                     </span>
@@ -382,10 +382,10 @@ export const BuildingDetailPage: React.FC = () => {
                 </div>
               </ModalFormItem>
 
-              <ModalFormItem label="수정">
+              <ModalFormItem label="수정" className="border-b">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4">마지막 수정일</span>
+                    <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.updatedAt
                         ? new Date(
@@ -395,7 +395,7 @@ export const BuildingDetailPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4">수정인</span>
+                    <span className="text-gray-500 mr-4 text-sm">수정인</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.updatedBy || "-"}
                     </span>
