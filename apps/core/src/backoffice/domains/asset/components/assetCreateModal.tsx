@@ -71,7 +71,10 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         return;
         }
         try {
-        await uploadModel(file);
+        const fileInfo = await uploadModel(file);
+        if (fileInfo?.id) {
+            setModelFileId(fileInfo.id);
+        }
             toast.success('3D 모델 업로드 성공');
         } catch (error) {
             console.error('3D 모델 업로드 실패:', error);
@@ -89,7 +92,10 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         return;
         }
         try {
-        await uploadThumbnail(file);
+        const fileInfo = await uploadThumbnail(file);
+        if (fileInfo?.id) {
+            setThumbnailFileId(fileInfo.id);
+        }
         toast.success('썸네일 업로드 성공');
         } catch (error) {
             console.error('썸네일 업로드 실패:', error);
