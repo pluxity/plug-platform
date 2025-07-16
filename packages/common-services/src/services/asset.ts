@@ -49,6 +49,7 @@ export const useAssetsSWR = () => {
   return useSWRApi<AssetResponse[]>(ASSET_API, 'GET', { requireAuth: true });
 };
 
-export const useAssetDetailSWR = (assetId: number) => {
-  return useSWRApi<AssetResponse>(`${ASSET_API}/${assetId}`, 'GET', { requireAuth: true });
+export const useAssetDetailSWR = (assetId: number | null) => {
+  const url = assetId && assetId > 0 ? `${ASSET_API}/${assetId}` : '';
+  return useSWRApi<AssetResponse>(url, 'GET', undefined, { requireAuth: true });
 };

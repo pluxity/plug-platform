@@ -108,6 +108,7 @@ const AssetList: React.FC = () => {
     try {
       await deleteAsset(Number(deleteAssetData.id));
       toast.success('삭제가 완료되었습니다.');
+      mutate();
     } catch (error){
       console.error('에셋 삭제 실패:', error);
       toast.error('삭제에 실패했습니다.');

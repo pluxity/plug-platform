@@ -16,7 +16,7 @@ import {
 import { toast } from '@plug/ui'
 import { useAssetDetailSWR, useUpdateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
 import { AssetEditModalProps } from '@/backoffice/domains/asset/types/asset';
-import { useAssetCategoryTree } from '@plug/common-services'; 
+import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 
 export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   isOpen,
@@ -24,8 +24,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   onSuccess,
   assetId,
 }) => {
-  // 기존 에셋 정보 조회
-  const { mutate, data } = useAssetDetailSWR(assetId ?? 0);
+
+  const { mutate, data } = useAssetDetailSWR(isOpen && assetId ? assetId : null);
 
    // 에셋 카테고리 목록 
    const { categories } = useAssetCategoryTree();
@@ -56,7 +56,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   } = useFileUploadWithInfo();
 
   // 에셋 수정
-  const { execute: updateAsset, isLoading: isAssetUpdating, error: updateError } = useUpdateAsset(assetId ?? 0);
+  const { execute: updateAsset, isLoading: isAssetUpdating } = useUpdateAsset(assetId ?? 0);
 
   // 기존 에셋 정보 조회
   useEffect(() => {
@@ -153,7 +153,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.error((error as Error).message || '에셋 수정에 실패했습니다.');
       }
     },
-    [ name, code, modelInfo?.id, thumbnailInfo?.id, categoryId, updateAsset, onSuccess, resetForm, updateError ]
+    [ name, code, modelInfo?.id, thumbnailInfo?.id, categoryId, updateAsset, onSuccess, resetForm ]
   );
 
   const isProcessing = isModelUploading || isThumbnailUploading || isAssetUpdating;
@@ -172,7 +172,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
                         <SelectValue placeholder="에셋 카테고리를 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
-                        {categories.map((category: { id: number; name: string }) => (
+                        {categories.map((category: AssetCategoryResponse) => (
                             <SelectItem key={category.id} value={category.id.toString()}>
                                 {category.name}
                             </SelectItem>

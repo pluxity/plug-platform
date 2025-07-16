@@ -16,7 +16,7 @@ import {
 import { toast } from '@plug/ui'
 import { useCreateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
 import { AssetCreateModalProps } from '@/backoffice/domains/asset/types/asset';
-import { useAssetCategoryTree } from '@plug/common-services'; 
+import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 
 export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
     // 에셋 정보
@@ -146,7 +146,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                             <SelectValue placeholder="에셋 카테고리를 선택하세요" />
                         </SelectTrigger>
                         <SelectContent>
-                            {categories.map((category: { id: number; name: string }) => (
+                            {categories.map((category: AssetCategoryResponse) => (
                                 <SelectItem key={category.id} value={category.id.toString()}>
                                     {category.name}
                                 </SelectItem>
@@ -188,7 +188,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                     <Button type="button" onClick={resetForm} disabled={isProcessing} variant="outline">
                     취소
                     </Button>
-                    <Button type="submit" disabled={isProcessing}>등록</Button>
+                    <Button type="submit" disabled={isProcessing || !name || !code || !categoryId || !modelInfo}>등록</Button>
                 </DialogFooter>
                 </form>
             </DialogContent>
