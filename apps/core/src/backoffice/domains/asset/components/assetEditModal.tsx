@@ -34,9 +34,9 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   const [categoryId, setCategoryId] = useState<number>();
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const [modelFile, setModelFile] = useState<File | null>(null);
+  const [modelFileId, setModelFileId] = useState<number | null>(null);
   const modelInputRef = useRef<HTMLInputElement>(null);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailFileId, setThumbnailFileId] = useState<number | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   // 3D 모델 파일 업로드
@@ -66,11 +66,10 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
       setCode(data.code ?? '');
       clearModelInfo();
       clearThumbnailInfo();
-      setModelFile(null);
-      setThumbnailFile(null);
+      setModelFileId(data.file?.id || null);
+      setThumbnailFileId(data.thumbnailFile?.id || null);
     }
   }, [isOpen, assetId, data]);
-
 
   const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -88,7 +87,6 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.warning('GLB, GLTF 파일만 업로드 가능합니다.');
         return;
       }
-      setModelFile(file);
       try {
         await uploadModel(file);
         toast.success('3D 모델 업로드 성공');
@@ -96,6 +94,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         console.error('3D 모델 업로드 실패:', error);
         toast.error((error as Error).message || '3D 모델 업로드에 실패했습니다.');
         clearModelInfo();
+        setModelFileId(null);
       }
     },
     [uploadModel, clearModelInfo]
@@ -109,7 +108,6 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.warning('이미지 파일만 업로드 가능합니다.');
         return;
       }
-      setThumbnailFile(file);
       try {
         await uploadThumbnail(file);
         toast.success('썸네일 업로드 성공');
@@ -117,18 +115,18 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         console.error('썸네일 업로드 실패:', error);
         toast.error((error as Error).message || '썸네일 업로드에 실패했습니다.');
         clearThumbnailInfo();
+        setThumbnailFileId(null);
       }
     },
     [uploadThumbnail, clearThumbnailInfo]
   );
-
   const resetForm = useCallback(() => {
     setCategoryId(data?.categoryId);
     setName(data?.name ?? '');
     setCode(data?.code ?? '');
-    setModelFile(null);
+    setModelFileId(data?.file?.id || null);
     clearModelInfo();
-    setThumbnailFile(null);
+    setThumbnailFileId(data?.thumbnailFile?.id || null);
     clearThumbnailInfo();
     onClose();
     mutate();
@@ -142,8 +140,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
             name,
             code,
             categoryId:categoryId,
-            fileId: modelInfo?.id,
-            thumbnailFileId:thumbnailInfo?.id,
+            fileId: modelFileId || undefined, 
+            thumbnailFileId: thumbnailFileId || undefined, 
         });
           toast.success('에셋 수정 완료');
           onSuccess?.();
@@ -153,7 +151,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.error((error as Error).message || '에셋 수정에 실패했습니다.');
       }
     },
-    [ name, code, modelInfo?.id, thumbnailInfo?.id, categoryId, updateAsset, onSuccess, resetForm ]
+    [ name, code, modelFileId, thumbnailFileId, categoryId, updateAsset, onSuccess, resetForm ]
   );
 
   const isProcessing = isModelUploading || isThumbnailUploading || isAssetUpdating;
@@ -190,7 +188,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
                 <Input type="file" ref={thumbnailInputRef} className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                 <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
                   <span className="flex-1 text-sm text-gray-700">
-                    { thumbnailFile? thumbnailFile.name : data?.thumbnailFile?.originalFileName }
+                    {thumbnailInfo?.originalFileName || data?.thumbnailFile?.originalFileName || '선택된 파일 없음'}
                   </span>
                   <Button type="button" onClick={() => thumbnailInputRef.current?.click()}>
                     변경
@@ -202,7 +200,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
                 <Input type="file" ref={modelInputRef} className="hidden" accept=".glb,.gltf" onChange={handleModelChange} />
                 <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
                   <span className="flex-1 text-sm text-gray-700">
-                    {modelFile ? modelFile.name : data?.file?.originalFileName}
+                    {modelInfo?.originalFileName || data?.file?.originalFileName || '선택된 파일 없음'}
                   </span>
                   <Button type="button" onClick={() => modelInputRef.current?.click()}>
                     변경
