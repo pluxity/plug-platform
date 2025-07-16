@@ -48,5 +48,5 @@ export interface FacilityUpdateRequest {
 
 export interface FacilityDrawingUpdateRequest {
   drawingFileId: number;
-  comments: string;
+  comment: string;
 }

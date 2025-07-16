@@ -32,7 +32,7 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
     }
     await onUpdate({
       drawingFileId: drawingUploader.fileInfo.id,
-      comments: drawingComment
+      comment: drawingComment
     });
     setDrawingComment("");
     drawingUploader.reset();
