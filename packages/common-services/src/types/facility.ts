@@ -1,4 +1,5 @@
 import { FileResponse } from "./file";
+import { Floors } from "./floors";
 
 export interface FacilitiesAllResponse {
   building: FacilityResponse[];
@@ -8,11 +9,9 @@ export interface FacilitiesAllResponse {
 
 export interface FacilityHistoryResponse {
   id: number;
-  description: string;
+  comment: string;
   createdAt: string;
   createdBy: string;
-  updatedAt: string;
-  updatedBy: string;
   file: FileResponse;
 }
 
@@ -38,8 +37,16 @@ export interface FacilityCreateRequest {
 }
 
 export interface FacilityUpdateRequest {
-    name: string;
+  facility: {
+    name?: string;
     description?: string;
-    drawingFieldId?: number;
+    code?: string;
     thumbnailFieldId?: number;
+  }
+  floors?: Floors[];
+}
+
+export interface FacilityDrawingUpdateRequest {
+  drawingFileId: number;
+  comments: string;
 }

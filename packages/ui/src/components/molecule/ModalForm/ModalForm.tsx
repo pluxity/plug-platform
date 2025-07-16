@@ -22,7 +22,7 @@ function ModalFormItem({
   return (
     <div className={cn(`flex ${className ?? ""}`)}>
       <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">{label}</div>
-      <div className="flex-1 px-3 py-2 bg-white">{children}</div>
+      <div className="flex items-center flex-1 px-3 py-2 bg-white">{children}</div>
     </div>
   )
 }
