@@ -37,7 +37,6 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         execute: uploadModel,
         fileInfo: modelInfo,
         isLoadingFileInfo: isModelUploading,
-        fileInfoError: modelUploadError,
         clearFileInfo: clearModelInfo,
     } = useFileUploadWithInfo();
 
@@ -46,7 +45,6 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         execute: uploadThumbnail,
         fileInfo: thumbnailInfo,
         isLoadingFileInfo: isThumbnailUploading,
-        fileInfoError: thumbnailUploadError,
         clearFileInfo: clearThumbnailInfo,
     } = useFileUploadWithInfo();
 
@@ -54,7 +52,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
     const { categories } = useAssetCategoryTree();
 
     // 에셋 생성
-    const { execute: createAsset, isLoading: isAssetCreating, error: createError } = useCreateAsset();
+    const { execute: createAsset, isLoading: isAssetCreating } = useCreateAsset();
 
     
     const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +75,8 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         await uploadModel(file);
             toast.success('3D 모델 업로드 성공');
         } catch (error) {
-            modelUploadError && toast.error(modelUploadError.message || '3D 모델 업로드 실패');
+            console.error('3D 모델 업로드 실패:', error);
+            toast.error((error as Error).message || '3D 모델 업로드에 실패했습니다.');
         clearModelInfo();
         }
     }, [uploadModel, clearModelInfo]);
@@ -93,8 +92,9 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         try {
         await uploadThumbnail(file);
         toast.success('썸네일 업로드 성공');
-        } catch {
-            thumbnailUploadError && toast.error(thumbnailUploadError.message || '썸네일 업로드 실패');
+        } catch (error) {
+            console.error('썸네일 업로드 실패:', error);
+            toast.error((error as Error).message || '썸네일 업로드에 실패했습니다.');
         clearThumbnailInfo();
         }
     }, [uploadThumbnail, clearThumbnailInfo]);
@@ -124,13 +124,11 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
             toast.success('에셋 등록 완료');
             onSuccess?.();
             resetForm();
-        } catch (error: unknown) {
+        } catch (error) {
             console.error('에셋 등록 실패:', error);
-            toast.error('에셋 등록 실패', {
-                description: createError?.message || '에셋 등록에 실패했습니다.'
-            })
+            toast.error((error as Error).message || '에셋 등록에 실패했습니다.');
         }
-    }, [name, code, categoryId, modelInfo?.id, thumbnailInfo?.id, createAsset, onSuccess, resetForm, createError]);
+    }, [name, code, categoryId, modelInfo?.id, thumbnailInfo?.id, createAsset, onSuccess, resetForm]);
 
     const isProcessing = isModelUploading || isThumbnailUploading || isAssetCreating;
 

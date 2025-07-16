@@ -44,7 +44,6 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     execute: uploadModel,
     fileInfo: modelInfo,
     isLoadingFileInfo: isModelUploading,
-    fileInfoError: modelUploadError,
     clearFileInfo: clearModelInfo,
   } = useFileUploadWithInfo();
 
@@ -53,7 +52,6 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     execute: uploadThumbnail,
     fileInfo: thumbnailInfo,
     isLoadingFileInfo: isThumbnailUploading,
-    fileInfoError: thumbnailUploadError,
     clearFileInfo: clearThumbnailInfo,
   } = useFileUploadWithInfo();
 
@@ -95,9 +93,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         await uploadModel(file);
         toast.success('3D 모델 업로드 성공');
       } catch (error: unknown) {
-        toast.error('3D 모델 업로드 실패', {
-          description: modelUploadError?.message || '3D 모델 업로드에 실패했습니다.'
-        });
+        console.error('3D 모델 업로드 실패:', error);
+        toast.error((error as Error).message || '3D 모델 업로드에 실패했습니다.');
         clearModelInfo();
       }
     },
@@ -118,9 +115,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.success('썸네일 업로드 성공');
       } catch (error: unknown) {
         console.error('썸네일 업로드 실패:', error);
-        toast.error('썸네일 업로드 실패', {
-          description: thumbnailUploadError?.message || '썸네일 업로드에 실패했습니다.'
-        });
+        toast.error((error as Error).message || '썸네일 업로드에 실패했습니다.');
         clearThumbnailInfo();
       }
     },
@@ -137,7 +132,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     clearThumbnailInfo();
     onClose();
     mutate();
-  }, [data, onClose, clearModelInfo, clearThumbnailInfo]);
+  }, [data, onClose, clearModelInfo, clearThumbnailInfo, mutate]);
 
   const handleSubmit = useCallback( async (event: React.FormEvent) => {
       event.preventDefault();
@@ -155,9 +150,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
           resetForm();
       } catch (error: unknown) {
         console.error('에셋 수정 실패:', error);
-        toast.error('에셋 수정 실패', {
-            description: updateError?.message || '에셋 수정에 실패했습니다.'
-        })
+        toast.error((error as Error).message || '에셋 수정에 실패했습니다.');
       }
     },
     [ name, code, modelInfo?.id, thumbnailInfo?.id, categoryId, updateAsset, onSuccess, resetForm, updateError ]
