@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@plug/api-hooks";
 import { useBuildingsSWR } from "@plug/common-services";
-import { CardList } from "@/backoffice/domains/facility/components/CardList";
-import { FacilityItem } from "@/backoffice/domains/facility/components/CardListType";
+import { CardList } from "@/backoffice/domains/facility/components/cardList/CardList";
+import { FacilityItem } from "@/backoffice/domains/facility/components/cardList/CardListType";
 
 export const BuildingCardList: React.FC = () => {
   const navigate = useNavigate();

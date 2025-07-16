@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@plug/api-hooks";
 import { useFacilitiesAllSWR } from "@plug/common-services";
-import { CardList } from "@/backoffice/domains/facility/components/CardList";
-import { FacilityItem, SortOptions } from "@/backoffice/domains/facility/components/CardListType";
+import { CardList } from "@/backoffice/domains/facility/components/cardList/CardList";
+import { FacilityItem, SortOptions } from "@/backoffice/domains/facility/components/cardList/CardListType";
 
 export const FacilityCardList: React.FC = () => {
   const navigate = useNavigate();
@@ -162,7 +162,7 @@ export const FacilityCardList: React.FC = () => {
     if (confirm(confirmMessage)) {
       try {
         await api.delete(endpoint);
-        facilitiesResponse.mutate();
+        await facilitiesResponse.mutate();
       } catch (err) {
         console.error(`${item.type} 삭제 오류:`, err);
         alert(`${item.type} 삭제 중 오류가 발생했습니다.`);

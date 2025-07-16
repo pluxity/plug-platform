@@ -6,6 +6,16 @@ export interface FacilitiesAllResponse {
   panorama: FacilityResponse[];
 }
 
+export interface FacilityHistoryResponse {
+  id: number;
+  description: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+  file: FileResponse;
+}
+
 export interface FacilityResponse {
   id: number;
   name: string;

@@ -16,7 +16,7 @@ import {
 import {
   FacilityCardListProps,
   FacilityItem
-} from "@/backoffice/domains/facility/components/CardListType";
+} from "@/backoffice/domains/facility/components/cardList/CardListType";
 
 export function CardList<T extends FacilityItem>({
                                                            dataResponse,
@@ -233,7 +233,7 @@ export function CardList<T extends FacilityItem>({
 
   return (
     <div className="space-y-6">
-      <div className="w-full">
+      <div className="w-full mb-4">
         <FilterBar
           selects={filterOptions?.additionalFilters || []}
           showSearchInput={true}
@@ -242,7 +242,6 @@ export function CardList<T extends FacilityItem>({
           searchPlaceholder={
             filterOptions?.searchPlaceholder || "이름, 코드 또는 설명으로 검색"
           }
-          className="mb-6"
         />
       </div>
 
