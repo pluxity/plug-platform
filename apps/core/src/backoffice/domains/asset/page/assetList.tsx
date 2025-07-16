@@ -6,7 +6,7 @@ import { AssetData } from '@/backoffice/domains/asset/types/asset';
 import { AssetMapper } from '@/backoffice/domains/asset/mapper/assetMapper';
 import { AssetCreateModal } from '@/backoffice/domains/asset/components/assetCreateModal';
 import { AssetEditModal } from '@/backoffice/domains/asset/components/assetEditModal';
-import { useAssetCategoryTree } from '@plug/common-services'; 
+import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 import { toast } from '@plug/ui';
 
 const AssetList: React.FC = () => { 
@@ -77,7 +77,7 @@ const AssetList: React.FC = () => {
   // 에셋 카테고리 옵션
   const categoryOptions = [
       { label: '전체', value: 'all' },
-    ...categories.map((category: { id: number; name: string }) => ({
+    ...categories.map((category: AssetCategoryResponse) => ({
       label: category.name,
       value: category.id.toString(),
     })),

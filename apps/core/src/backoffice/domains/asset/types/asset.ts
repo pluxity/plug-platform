@@ -1,5 +1,5 @@
 export interface AssetData {
-    categoryId: number
+    categoryId: number | undefined
     categoryName: string
     id: string
     code: string

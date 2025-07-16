@@ -61,7 +61,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   // 기존 에셋 정보 조회
   useEffect(() => {
     if (isOpen && data) {
-      setCategoryId(data.categoryId ?? undefined);
+      setCategoryId(data.categoryId);
       setName(data.name ?? '');
       setCode(data.code ?? '');
       clearModelInfo();
@@ -123,7 +123,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   );
 
   const resetForm = useCallback(() => {
-    setCategoryId(data?.categoryId ?? undefined);
+    setCategoryId(data?.categoryId);
     setName(data?.name ?? '');
     setCode(data?.code ?? '');
     setModelFile(null);
