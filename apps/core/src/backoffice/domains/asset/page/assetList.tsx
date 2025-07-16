@@ -22,7 +22,7 @@ const AssetList: React.FC = () => {
   const { categories } = useAssetCategoryTree();
 
   // 에셋 목록 매핑
-  const assetData: AssetData[] = data ? data.map(AssetMapper) : [];
+  const assetData = data ? data.map(AssetMapper) : [];
 
   // 에셋 카테고리 선택
   const [category, setCategory] = useState("all");
@@ -76,7 +76,7 @@ const AssetList: React.FC = () => {
   // 에셋 카테고리 옵션
   const categoryOptions = [
       { label: '전체', value: 'all' },
-    ...(categories ?? []).map((category: { id: number; name: string }) => ({
+    ...categories.map((category: { id: number; name: string }) => ({
       label: category.name,
       value: category.id.toString(),
     })),
@@ -166,19 +166,21 @@ const AssetList: React.FC = () => {
         onSuccess={handleCreateSuccess}
       />
 
-      <AssetEditModal
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onSuccess={handleEditSuccess}
-        assetId={selectedAssetId}
-      />
+      {editModalOpen && selectedAssetId !== null && (
+        <AssetEditModal
+          isOpen={true}
+          onClose={() => setEditModalOpen(false)}
+          onSuccess={handleEditSuccess}
+          assetId={selectedAssetId}
+        />
+      )}
 
       <AlertDialog open={!!deleteAssetData} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleteAssetData ? `${deleteAssetData.name} 에셋을 삭제하시겠습니까? ` : ''}
+              {deleteAssetData && `${deleteAssetData.name} 에셋을 삭제하시겠습니까?`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

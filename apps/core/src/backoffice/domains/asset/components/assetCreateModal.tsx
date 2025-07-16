@@ -49,7 +49,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
     } = useFileUploadWithInfo();
 
     // 에셋 카테고리 목록 
-    const { categories: apiCategories } = useAssetCategoryTree();
+    const { categories } = useAssetCategoryTree();
 
     // 에셋 생성
     const { execute: createAsset, isLoading: isAssetCreating, error: createError } = useCreateAsset();
@@ -143,7 +143,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                             <SelectValue placeholder="에셋 카테고리를 선택하세요" />
                         </SelectTrigger>
                         <SelectContent>
-                            {(apiCategories ?? []).map((category: { id: number; name: string }) => (
+                            {categories.map((category: { id: number; name: string }) => (
                                 <SelectItem key={category.id} value={category.id.toString()}>
                                     {category.name}
                                 </SelectItem>
@@ -161,10 +161,10 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                         <Input type="file" id="thumb-upload" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                         <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
                             <span className="flex-1 text-sm text-gray-700">
-                            {thumbnailFile ? thumbnailFile.name : '선택된 파일 없음'}
+                                {thumbnailFile ? thumbnailFile.name : '선택된 파일 없음'}
                             </span>
                             <Button type="button" onClick={() => document.getElementById('thumb-upload')?.click()}>
-                            {thumbnailFile ? '변경' : '파일 선택'}
+                                {thumbnailFile ? '변경' : '파일 선택'}
                             </Button>
                         </div>
                         {thumbnailUploadError && <div className="text-red-500 text-sm">{thumbnailUploadError.message}</div>}
@@ -174,10 +174,10 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                         <Input type="file" id="model-upload" className="hidden" accept=".glb,.gltf" onChange={handleModelChange} />
                         <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
                             <span className="flex-1 text-sm text-gray-700">
-                            {modelFile ? modelFile.name : '선택된 파일 없음'}
+                                {modelFile ? modelFile.name : '선택된 파일 없음'}
                             </span>
                             <Button type="button" onClick={() => document.getElementById('model-upload')?.click()}>
-                            {modelFile ? '변경' : '파일 선택'}
+                                {modelFile ? '변경' : '파일 선택'}
                             </Button>
                         </div>
                         {modelUploadError && <div className="text-red-500 text-sm">{modelUploadError.message}</div>}

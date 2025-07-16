@@ -50,6 +50,5 @@ export const useAssetsSWR = () => {
 };
 
 export const useAssetDetailSWR = (assetId: number) => {
-  const key = assetId ? `${ASSET_API}/${assetId}` : '';
-  return useSWRApi<AssetResponse>(key, 'GET', { requireAuth: true });
+  return useSWRApi<AssetResponse>(`${ASSET_API}/${assetId}`, 'GET', { requireAuth: true });
 };

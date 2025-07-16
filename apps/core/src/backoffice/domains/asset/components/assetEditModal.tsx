@@ -25,7 +25,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   assetId,
 }) => {
   // 기존 에셋 정보 조회
-   const { mutate, data } = useAssetDetailSWR(assetId ? Number(assetId) : 0);
+  const { mutate, data } = useAssetDetailSWR(assetId ?? 0);
 
    // 에셋 카테고리 목록 
    const { categories } = useAssetCategoryTree();
@@ -169,7 +169,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
                         <SelectValue placeholder="에셋 카테고리를 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
-                        {(categories ?? []).map((category: { id: number; name: string }) => (
+                        {categories.map((category: { id: number; name: string }) => (
                             <SelectItem key={category.id} value={category.id.toString()}>
                                 {category.name}
                             </SelectItem>
