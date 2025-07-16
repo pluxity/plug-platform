@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -26,9 +26,11 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
 
     // 3D 모델 파일
     const [modelFile, setModelFile] = useState<File | null>(null);
+    const modelInputRef = useRef<HTMLInputElement>(null);
     
     // 썸네일 파일
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+    const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
     // 3D 모델 파일 업로드
     const {
@@ -73,9 +75,9 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         setModelFile(file);
         try {
         await uploadModel(file);
-        toast.success('3D 모델 업로드 성공');
-        } catch {
-        toast.error('3D 모델 업로드 실패');
+            toast.success('3D 모델 업로드 성공');
+        } catch (error) {
+            modelUploadError && toast.error(modelUploadError.message || '3D 모델 업로드 실패');
         clearModelInfo();
         }
     }, [uploadModel, clearModelInfo]);
@@ -92,7 +94,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         await uploadThumbnail(file);
         toast.success('썸네일 업로드 성공');
         } catch {
-        toast.error('썸네일 업로드 실패');
+            thumbnailUploadError && toast.error(thumbnailUploadError.message || '썸네일 업로드 실패');
         clearThumbnailInfo();
         }
     }, [uploadThumbnail, clearThumbnailInfo]);
@@ -122,10 +124,13 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
             toast.success('에셋 등록 완료');
             onSuccess?.();
             resetForm();
-        } catch {
-            createError && toast.error(createError.message || '에셋 등록에 실패했습니다.');
+        } catch (error: unknown) {
+            console.error('에셋 등록 실패:', error);
+            toast.error('에셋 등록 실패', {
+                description: createError?.message || '에셋 등록에 실패했습니다.'
+            })
         }
-    }, [name, code, categoryId, modelInfo?.id, thumbnailInfo?.id, categoryId, createAsset, onSuccess, resetForm, createError]);
+    }, [name, code, categoryId, modelInfo?.id, thumbnailInfo?.id, createAsset, onSuccess, resetForm, createError]);
 
     const isProcessing = isModelUploading || isThumbnailUploading || isAssetCreating;
 
@@ -158,29 +163,27 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                         <Input value={code} onChange={handleCodeChange} placeholder="에셋 코드를 입력해주세요." required />
                     </ModalFormItem>
                     <ModalFormItem label="썸네일 업로드">
-                        <Input type="file" id="thumb-upload" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
+                        <Input type="file" ref={thumbnailInputRef} className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                         <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
                             <span className="flex-1 text-sm text-gray-700">
                                 {thumbnailFile ? thumbnailFile.name : '선택된 파일 없음'}
                             </span>
-                            <Button type="button" onClick={() => document.getElementById('thumb-upload')?.click()}>
+                            <Button type="button" onClick={() => thumbnailInputRef.current?.click()}>
                                 {thumbnailFile ? '변경' : '파일 선택'}
                             </Button>
                         </div>
-                        {thumbnailUploadError && <div className="text-red-500 text-sm">{thumbnailUploadError.message}</div>}
                     </ModalFormItem>
 
                     <ModalFormItem label="3D 모델 파일 업로드">
-                        <Input type="file" id="model-upload" className="hidden" accept=".glb,.gltf" onChange={handleModelChange} />
+                        <Input type="file" ref={modelInputRef} className="hidden" accept=".glb,.gltf" onChange={handleModelChange} />
                         <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
                             <span className="flex-1 text-sm text-gray-700">
                                 {modelFile ? modelFile.name : '선택된 파일 없음'}
                             </span>
-                            <Button type="button" onClick={() => document.getElementById('model-upload')?.click()}>
+                            <Button type="button" onClick={() => modelInputRef.current?.click()}>
                                 {modelFile ? '변경' : '파일 선택'}
                             </Button>
                         </div>
-                        {modelUploadError && <div className="text-red-500 text-sm">{modelUploadError.message}</div>}
                     </ModalFormItem>
                 </ModalForm>
                 <DialogFooter>

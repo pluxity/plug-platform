@@ -7,6 +7,7 @@ import { AssetMapper } from '@/backoffice/domains/asset/mapper/assetMapper';
 import { AssetCreateModal } from '@/backoffice/domains/asset/components/assetCreateModal';
 import { AssetEditModal } from '@/backoffice/domains/asset/components/assetEditModal';
 import { useAssetCategoryTree } from '@plug/common-services'; 
+import { toast } from '@plug/ui';
 
 const AssetList: React.FC = () => { 
   // 모달 상태 관리
@@ -52,12 +53,12 @@ const AssetList: React.FC = () => {
     {
       id: 'actions',
       header: '관리',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: { original: AssetData } }) => (
         <div className="flex space-x-2">
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => handleEdit(row.original.id)}
+            onClick={() => handleEdit(Number(row.original.id))}
           >
             수정
           </Button>
@@ -65,7 +66,7 @@ const AssetList: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => handleDelete(row.original)}
-          >
+          > 
             삭제
           </Button>
         </div>
@@ -106,10 +107,10 @@ const AssetList: React.FC = () => {
     if (!deleteAssetData) return;
     try {
       await deleteAsset(Number(deleteAssetData.id));
-      alert('삭제가 완료되었습니다.');
-      mutate();
-    } catch {
-      alert('삭제에 실패했습니다.');
+      toast.success('삭제가 완료되었습니다.');
+    } catch (error){
+      console.error('에셋 삭제 실패:', error);
+      toast.error('삭제에 실패했습니다.');
     } finally{
       setDeleteAssetData(null);
     }
