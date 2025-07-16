@@ -1,7 +1,8 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@plug/ui";
-import { Button, Input } from "@plug/ui";
+import { Button, Input, Label } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import {
   useBuildingDetailSWR,
@@ -11,7 +12,7 @@ import {
   useUpdateFacilitiesDrawing
 } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest } from "@plug/common-services";
+import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest, Floors } from "@plug/common-services";
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
 
 export const BuildingDetailPage: React.FC = () => {
@@ -82,6 +83,17 @@ export const BuildingDetailPage: React.FC = () => {
         [field]: value
       }
     }));
+  };
+
+  const handleFloorChange = (index: number, field: keyof Floors, value: string) => {
+    setFormData(prev => {
+      const newFloors = [...(prev.floors ?? [])];
+      newFloors[index] = { ...newFloors[index], [field]: value };
+      return {
+        ...prev,
+        floors: newFloors
+      };
+    });
   };
 
   const handleSave = async () => {
@@ -203,32 +215,59 @@ export const BuildingDetailPage: React.FC = () => {
                   )}
                 </ModalFormItem>
                 <ModalFormItem label="층 정보" className="col-span-2">
-                  {building.floors && building.floors.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {building.floors.map((floor, index) => (
-                        <div
-                          key={index}
-                          className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
-                        >
-                          <div>
-                            <span className="text-gray-500 mr-1">ID</span>
-                            <span className="font-medium text-gray-800">
-                              {floor.floorId}
-                            </span>
+                  {isEditMode ? (
+                    <div className="grid grid-cols-2 gap-3">
+                      {formData?.floors?.map((floor, index) => (
+                        <div key={index} className="flex flex-col gap-2 border border-gray-200 rounded-sm p-3">
+                          <div className="flex items-center gap-2">
+                            <Label className="min-w-16">층 ID:</Label>
+                            <Input
+                              type="text"
+                              value={floor.floorId}
+                              onChange={(e) => handleFloorChange(index, "floorId", e.target.value)}
+                              placeholder="층 ID를 입력하세요"
+                            />
                           </div>
-                          <div className="mt-1">
-                            <span className="text-gray-500 mr-1">이름</span>
-                            <span className="font-medium text-gray-800">
-                              {floor.name}
-                            </span>
+                          <div className="flex items-center gap-2">
+                            <Label className="min-w-16">층 이름:</Label>
+                            <Input
+                              type="text"
+                              value={floor.name}
+                              onChange={(e) => handleFloorChange(index, "name", e.target.value)}
+                              placeholder="층 이름을 입력하세요"
+                            />
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-sm text-gray-500">
-                      등록된 층 정보가 없습니다.
-                    </div>
+                    building.floors && building.floors.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {building.floors.map((floor, index) => (
+                          <div
+                            key={index}
+                            className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                          >
+                            <div>
+                              <span className="text-gray-500 mr-1">ID</span>
+                              <span className="font-medium text-gray-800">
+                                {floor.floorId}
+                              </span>
+                            </div>
+                            <div className="mt-1">
+                              <span className="text-gray-500 mr-1">이름</span>
+                              <span className="font-medium text-gray-800">
+                                {floor.name}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        등록된 층 정보가 없습니다.
+                      </div>
+                    )
                   )}
                 </ModalFormItem>
 
@@ -325,7 +364,7 @@ export const BuildingDetailPage: React.FC = () => {
               <ModalFormItem label="생성">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-5 text-sm">생성일</span>
+                    <span className="text-gray-500 mr-4">생성일</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.createdAt
                         ? new Date(
@@ -335,7 +374,7 @@ export const BuildingDetailPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-5 text-sm">생성인</span>
+                    <span className="text-gray-500 mr-4">생성인</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.createdBy || "-"}
                     </span>
@@ -346,7 +385,7 @@ export const BuildingDetailPage: React.FC = () => {
               <ModalFormItem label="수정">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-5 text-sm">마지막 수정일</span>
+                    <span className="text-gray-500 mr-4">마지막 수정일</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.updatedAt
                         ? new Date(
@@ -356,7 +395,7 @@ export const BuildingDetailPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-5 text-sm">수정인</span>
+                    <span className="text-gray-500 mr-4">수정인</span>
                     <span className="font-medium text-gray-800">
                       {building.facility.updatedBy || "-"}
                     </span>

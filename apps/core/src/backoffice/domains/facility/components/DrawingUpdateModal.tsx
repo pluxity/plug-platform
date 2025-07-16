@@ -61,7 +61,7 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent title="도면 업데이트" showCloseButton={true} dimmed={true}>
-        <ModalFormItem label="도면 파일">
+        <ModalFormItem label="도면 파일" className='border-t divide-y'>
           <div className="flex flex-col">
             <Input
               type="file"
@@ -82,7 +82,7 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
           </div>
         </ModalFormItem>
 
-        <ModalFormItem label="코멘트">
+        <ModalFormItem label="코멘트" className='border-t border-b'>
           <Input
             type="text"
             value={drawingComment}
