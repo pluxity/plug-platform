@@ -24,22 +24,103 @@ src/
 - **FormData 지원**: 파일 업로드를 위한 FormData 자동 처리
 
 ### 2. React 훅들
+- **useApi**: 범용적인 API 호출 훅 - 다양한 API 클라이언트와 비동기 함수 지원
+- **HTTP 메서드별 전용 훅**: useGet, usePost, usePut, usePatch, useDelete
+- **useSWRApi**: SWR 기반의 데이터 페칭 훅 (캐싱, 재검증)
 
-#### `useApi<T>`
-기본적인 API 호출을 위한 훅입니다.
+### 3. 범용성과 확장성
+- **다양한 API 연동**: REST, GraphQL, 외부 서비스 등 어떤 Promise 기반 함수든 지원
+- **일관된 인터페이스**: 모든 API 호출이 동일한 상태 관리 패턴 (`data`, `error`, `isLoading`, `execute`)
+- **타입 안전성**: 제네릭을 통한 완전한 타입 추론 지원
+
+#### `useApi<T, P>`
+범용적인 API 호출을 위한 훅입니다. 다양한 API 클라이언트와 비동기 함수를 지원합니다.
 
 ```typescript
-const { data, error, isLoading, execute } = useApi<UserData>();
+const { data, error, isLoading, execute, reset, response } = useApi<T, P>(
+  apiMethod: (...args: P) => Promise<unknown>,
+  method: HttpMethod
+);
+```
 
-// GET 요청
-await execute('/users', 'GET');
+**제네릭 타입:**
+- `T`: API 응답 데이터의 타입
+- `P`: API 메서드에 전달될 매개변수들의 타입 배열
 
-// POST 요청 (데이터 포함)
-await execute('/users', 'POST', { name: 'John', email: 'john@example.com' });
+**기본 사용법:**
+```typescript
+// 매개변수가 없는 GET 요청
+const getUserList = useApi<User[], []>(
+  () => api.get('/users'),
+  'GET'
+);
 
-// PUT/PATCH/DELETE 요청
-await execute('/users/1', 'PUT', { name: 'Jane' });
-await execute('/users/1', 'DELETE');
+// 매개변수가 있는 POST 요청
+const createUser = useApi<User, [UserCreateData]>(
+  (userData) => api.post('/users', userData),
+  'POST'
+);
+
+// 사용
+await getUserList.execute();
+await createUser.execute({ name: 'John', email: 'john@example.com' });
+```
+
+**다양한 API 클라이언트 지원:**
+```typescript
+// 기본 fetch API 사용
+const fetchApi = useApi<ApiResponse, [string]>(
+  async (url) => {
+    const response = await fetch(url);
+    return response.json();
+  },
+  'GET'
+);
+
+// axios 사용
+const axiosApi = useApi<UserData, [string]>(
+  async (userId) => {
+    const response = await axios.get(`/users/${userId}`);
+    return response.data;
+  },
+  'GET'
+);
+
+// 외부 API 서비스
+const externalApi = useApi<PaymentResult, [PaymentData]>(
+  (paymentData) => externalPaymentService.processPayment(paymentData),
+  'POST'
+);
+
+// GraphQL 클라이언트
+const graphqlApi = useApi<GraphQLResponse, [string, object]>(
+  (query, variables) => graphqlClient.request(query, variables),
+  'POST'
+);
+```
+
+#### HTTP 메서드별 전용 훅들
+각 HTTP 메서드에 특화된 편의 훅들도 제공됩니다:
+
+```typescript
+// GET 요청 전용
+const { data, error, isLoading } = useGet<User[]>('/users');
+
+// POST 요청 전용  
+const { execute: createUser } = usePost<UserCreateData>('/users');
+await createUser.execute(userData);
+
+// PUT 요청 전용
+const { execute: updateUser } = usePut<UserUpdateData>('/users/1');
+await updateUser.execute(updateData);
+
+// PATCH 요청 전용
+const { execute: patchUser } = usePatch<Partial<User>>('/users/1');
+await patchUser.execute({ name: 'New Name' });
+
+// DELETE 요청 전용
+const { execute: deleteUser } = useDelete('/users/1');
+await deleteUser.execute();
 ```
 
 #### `useSWRApi<T>`
@@ -116,19 +197,20 @@ enum HttpStatus {
 ### 기본 사용법
 
 ```typescript
-import { useApi, useSWRApi, api } from '@plug/api-hooks';
+import { useApi, useGet, usePost, useSWRApi, api } from '@plug/api-hooks';
 
 // 컴포넌트에서 사용
 function UserProfile({ userId }: { userId: string }) {
   // SWR을 사용한 데이터 페칭 (자동 캐싱, 재검증)
   const { data: user, error, isLoading } = useSWRApi<User>(`/users/${userId}`);
   
-  // 수동 API 호출을 위한 훅
-  const { execute: updateUser, isLoading: isUpdating } = useApi<User>();
+  // HTTP 메서드별 전용 훅 사용
+  const updateUser = usePut<UserUpdateData>(`/users/${userId}`);
+  const deleteUser = useDelete(`/users/${userId}`);
   
-  const handleUpdate = async (userData: Partial<User>) => {
+  const handleUpdate = async (userData: UserUpdateData) => {
     try {
-      await updateUser(`/users/${userId}`, 'PUT', userData);
+      await updateUser.execute(userData);
       // 성공적으로 업데이트됨
     } catch (error) {
       // 에러 처리
@@ -142,10 +224,44 @@ function UserProfile({ userId }: { userId: string }) {
     <div>
       <h1>{user?.name}</h1>
       <button onClick={() => handleUpdate({ name: 'New Name' })}>
-        {isUpdating ? 'Updating...' : 'Update'}
+        {updateUser.isLoading ? 'Updating...' : 'Update'}
       </button>
     </div>
   );
+}
+```
+
+### 다양한 API 연동
+
+```typescript
+// 여러 다른 API 서비스를 동일한 인터페이스로 사용
+function MultiApiComponent() {
+  // 기본 REST API
+  const userApi = useGet<User[]>('/api/users');
+  
+  // 외부 결제 API
+  const paymentApi = useApi<PaymentResult, [PaymentData]>(
+    (data) => paymentService.processPayment(data),
+    'POST'
+  );
+  
+  // GraphQL API
+  const graphqlApi = useApi<GraphQLResponse, [string]>(
+    (query) => graphqlClient.request(query),
+    'POST'
+  );
+  
+  // 파일 업로드 API
+  const uploadApi = useApi<UploadResult, [File]>(
+    async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return api.post('/upload', formData);
+    },
+    'POST'
+  );
+  
+  // 모든 API가 동일한 인터페이스: { data, error, isLoading, execute }
 }
 ```
 
@@ -170,6 +286,47 @@ await api.post('/upload', formData);
 await api.put('/users/1', { name: 'Jane' });
 await api.delete('/users/1');
 ```
+
+### 커스텀 API 함수와 useApi 조합
+
+```typescript
+// 커스텀 API 함수들
+const customApiMethods = {
+  // 복잡한 검색 API
+  searchUsers: async (filters: UserFilters) => {
+    return await api.post('/users/search', filters);
+  },
+  
+  // 배치 처리 API
+  batchUpdateUsers: async (updates: UserUpdate[]) => {
+    return await api.patch('/users/batch', { updates });
+  },
+  
+  // 외부 서비스 호출
+  validateEmail: async (email: string) => {
+    return await externalValidator.checkEmail(email);
+  }
+};
+
+// useApi로 래핑하여 상태 관리 추가
+function useCustomApis() {
+  const searchUsers = useApi<User[], [UserFilters]>(
+    customApiMethods.searchUsers,
+    'POST'
+  );
+  
+  const batchUpdate = useApi<BatchResult, [UserUpdate[]]>(
+    customApiMethods.batchUpdateUsers,
+    'PATCH'
+  );
+  
+  const validateEmail = useApi<ValidationResult, [string]>(
+    customApiMethods.validateEmail,
+    'GET'
+  );
+  
+  return { searchUsers, batchUpdate, validateEmail };
+}
 
 ### 에러 처리
 
