@@ -68,6 +68,7 @@ function DataTable<TData>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    autoResetPageIndex: false, 
     initialState: {
       pagination: {
         pageSize,
