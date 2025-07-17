@@ -2,19 +2,15 @@ export interface FileRequest {
     file: File;
 }
 
-
 export interface FileResponse {
     id: number;
     url: string;
     originalFileName: string;
+    fileType: string;
     contentType: string;
     fileStatus: string;
 }
 
-export interface FileError {
-    type: 'UPLOAD_ERROR' | 'FETCH_INFO_ERROR' | 'NETWORK_ERROR';
-    message: string;
-    originalError?: Error;
 export interface FileError {
     type: 'UPLOAD_ERROR' | 'FETCH_INFO_ERROR' | 'NETWORK_ERROR';
     message: string;

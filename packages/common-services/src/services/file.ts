@@ -1,9 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useGet, usePost } from '@plug/api-hooks';
 import { api } from '@plug/api-hooks/core';
-import { useCallback, useState } from 'react';
-import { useGet, usePost } from '@plug/api-hooks';
-import { api } from '@plug/api-hooks/core';
 import type { RequestOptions } from '@plug/api-hooks';
 import type { FileResponse, UseFileUploadWithInfoReturn } from '../types/file';
 

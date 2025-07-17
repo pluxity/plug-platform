@@ -4,5 +4,3 @@ export * from './role';
 export * from './user';
 export * from './user_admin';
 export * from './file';
-export * from './asset-category';
-export * from './asset';
