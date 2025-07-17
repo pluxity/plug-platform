@@ -8,6 +8,10 @@ export interface FileResponse {
     originalFileName: string;
     contentType: string;
     fileStatus: string;
+    createdAt: string;
+    createdBy: string;
+    updatedAt: string;
+    updatedBy: string;
 }
 
 export interface FileError {
@@ -17,7 +21,7 @@ export interface FileError {
 }
 
 export interface UseFileUploadWithInfoReturn {
-    execute: (file: File) => Promise<{ data: any; response: Response | null }>;
+    execute: (file: File) => Promise<FileResponse>;
     fileInfo: FileResponse | null;
     isLoadingFileInfo: boolean;
     fileInfoError: Error | null;
@@ -28,5 +32,4 @@ export interface UseFileUploadWithInfoReturn {
     data: any;
     response: Response | null;
     reset: () => void;
-    getLocationId: () => string | null;
 }

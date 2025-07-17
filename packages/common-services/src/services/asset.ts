@@ -1,6 +1,5 @@
 import { api } from '@plug/api-hooks';
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
-import type { BaseResponseBody } from '@plug/api-hooks';
 import type { 
   AssetResponse, 
   AssetCreateRequest, 
@@ -21,12 +20,12 @@ export const useAssetDetail = (assetId: number) => {
 
 // 에셋 생성
 export const useCreateAsset = () => {
-  return usePost<BaseResponseBody, AssetCreateRequest>(ASSET_API, { requireAuth: true });
+  return usePost<AssetCreateRequest>(ASSET_API, { requireAuth: true });
 };
 
 // 에셋 수정
 export const useUpdateAsset = (assetId: number) => {
-  return usePut<BaseResponseBody, AssetUpdateRequest>(`${ASSET_API}/${assetId}`, { requireAuth: true });
+  return usePut<AssetUpdateRequest>(`${ASSET_API}/${assetId}`, { requireAuth: true });
 };
 
 // 에셋 삭제
@@ -36,7 +35,7 @@ export const deleteAsset = (assetId: number) => {
 
 // 에셋에 카테고리 할당
 export const useAssignAssetCategory = (assetId: number, categoryId: number) => {
-  return usePut<BaseResponseBody, {}>(`${ASSET_API}/${assetId}/category/${categoryId}`, { requireAuth: true });
+  return usePut<null>(`${ASSET_API}/${assetId}/category/${categoryId}`, { requireAuth: true });
 };
 
 // 에셋에서 카테고리 제거

@@ -1,3 +1,5 @@
+export * from './asset';
+export * from './asset-category';
 export * from './auth';
 export * from './building';
 export * from './facility';
