@@ -1,5 +1,4 @@
-import React from 'react'
-import { Button, Avatar, AvatarImage } from '@plug/ui'
+import { Profile } from '@plug/ui'
 
 const BackofficeHeader: React.FC = () => {
   return (
@@ -12,17 +11,16 @@ const BackofficeHeader: React.FC = () => {
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="hover:bg-transparent">
-              <div className="flex items-center space-x-2">
-                <Avatar>
-                  <AvatarImage />
-                </Avatar>
-                <div className="flex flex-col items-start text-sm">
-                  <span className="text-gray-600">시설 관리팀</span>
-                  <span>홍길동</span>
-                </div>
-              </div>
-            </Button>
+            <Profile 
+              profileTitle="홍길동"
+              profileDescription="dong@pluxity.com"
+              profileItems={[
+                { title: '내 정보' },
+            ]}
+            profileButton={{ 
+                title: "로그아웃", 
+            }}
+            />
           </div>
         </div>
       </div>
