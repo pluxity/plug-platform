@@ -177,79 +177,32 @@ export const BuildingDetailPage: React.FC = () => {
                   <div className="flex flex-col gap-2 w-full">
                     {isEditMode ? (
                       <div className="flex flex-col">
-                        {building.facility.thumbnail.url &&
-                          !thumbnailUploader.fileInfo && (
+                        {building.facility.thumbnail.url && !thumbnailUploader.fileInfo && (
                             <div className="mt-2 flex flex-col gap-2">
-                              <img
-                                src={building.facility.thumbnail.url}
-                                alt="현재 썸네일"
-                                className="h-32 object-contain"
-                              />
+                              <img src={building.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
                               <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
-                                <div className="font-medium text-gray-800 text-xs break-normal">
-                                  {building.facility.thumbnail.originalFileName}
-                                </div>
-                                <Button
-                                  className="w-16"
-                                  onClick={() =>
-                                    document
-                                      ?.getElementById("thumbnail-input")
-                                      ?.click()
-                                  }
-                                >
-                                  파일 선택
-                                </Button>
-                                <Input
-                                  type="file"
-                                  id="thumbnail-input"
-                                  className="hidden"
-                                  accept="image/*"
-                                  onChange={handleThumbnailChange}
-                                />
+                                <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
+                                <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+                                <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                               </div>
                             </div>
                           )}
                         {thumbnailUploader.fileInfo &&
                           thumbnailUploader.fileInfo.url && (
                             <div className="flex flex-col gap-2">
-                              <img
-                                src={thumbnailUploader.fileInfo.url}
-                                alt="새 썸네일 미리보기"
-                                className="h-32 object-contain"
-                              />
+                              <img src={thumbnailUploader.fileInfo.url} alt="새 썸네일 미리보기" className="h-32 object-contain" />
                               <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
                                 <div className="text-gray-500">새 썸네일</div>
-                                <div className="font-medium text-gray-800 text-xs break-normal">
-                                  {thumbnailUploader.fileInfo.originalFileName}
-                                </div>
-                                <Button
-                                  className="w-16"
-                                  onClick={() =>
-                                    document
-                                      ?.getElementById("thumbnail-input")
-                                      ?.click()
-                                  }
-                                >
-                                  파일 선택
-                                </Button>
-                                <Input
-                                  type="file"
-                                  id="thumbnail-input"
-                                  className="hidden"
-                                  accept="image/*"
-                                  onChange={handleThumbnailChange}
-                                />
+                                <div className="font-medium text-gray-800 text-xs break-normal">{thumbnailUploader.fileInfo.originalFileName}</div>
+                                <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+                                <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                               </div>
                             </div>
                           )}
                       </div>
                     ) : building.facility.thumbnail.url ? (
                       <>
-                        <img
-                          src={building.facility.thumbnail.url}
-                          alt="썸네일 이미지"
-                          className="h-32 object-contain"
-                        />
+                        <img src={building.facility.thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
                         <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
                           <div className="text-gray-500">파일명</div>
                           <div className="font-medium text-gray-800 text-xs break-normal">
