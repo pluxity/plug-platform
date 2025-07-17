@@ -56,10 +56,15 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
           setFileInfo(fileInfoResult.data);
 
         } catch (error) {
-          setFileInfoError(error instanceof Error ? error : new Error('파일 정보 조회 중 오류 발생'));
+          const fileInfoError = error instanceof Error ? error : new Error('파일 정보 조회 중 오류 발생');
+          setFileInfoError(fileInfoError);
+          throw fileInfoError;
         } finally {
           setIsLoadingFileInfo(false);
         }
+      } else {
+        // Location 헤더에서 파일 ID를 추출할 수 없는 경우 경고 로그만 남기고 계속 진행
+        console.warn('Location 헤더에서 파일 ID를 추출할 수 없습니다:', location);
       }
       
       return uploadResult;
@@ -78,6 +83,11 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
     clearFileInfo: () => {
       setFileInfo(null);
       setFileInfoError(null);
+    },
+    getLocationId: () => {
+      if (!uploadState.response) return null;
+      const location = uploadState.response.headers.get('Location');
+      return location ? location.split('/').filter(Boolean).pop() ?? null : null;
     }
   };
 };
