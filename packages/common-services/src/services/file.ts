@@ -4,17 +4,17 @@ import { api } from '@plug/api-hooks/core';
 import type { RequestOptions } from '@plug/api-hooks';
 import type { FileResponse, UseFileUploadWithInfoReturn } from '../types/file';
 
-const FILE_API = `files`;
+const END_POINT = `files`;
 
-export const useFileInfo = (fileId?: number | string, options?: RequestOptions) => {
-  return useGet<FileResponse>(`${FILE_API}/${fileId}`, {
+export const useFileInfo = (fileId: number | string, options?: RequestOptions) => {
+  return useGet<FileResponse>(`${END_POINT}/${fileId}`, {
     requireAuth: true,
     ...options
   });
 };
 
 export const useFileUpload = (options?: RequestOptions) => {
-  return usePost<any, FormData>(`${FILE_API}/upload`, {
+  return usePost<FormData>(`${END_POINT}/upload`, {
     requireAuth: true,
     ...options
   });
@@ -28,12 +28,16 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
   const uploadMutation = useFileUpload(options);
   const { execute: executeUpload, ...uploadState } = uploadMutation;
   
-  const executeUploadWithAutoFetch = useCallback(async (file: File) => {
+  const executeUploadWithAutoFetch = useCallback(async (file: File): Promise<{ data: any; response: Response | null }> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
       
       const uploadResult = await executeUpload(formData);
+      
+      if (!uploadResult) {
+        return { data: null, response: null };
+      }
       
       // Location 헤더에서 파일 ID 추출
       const location = uploadResult.response?.headers.get('Location');
@@ -44,7 +48,7 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
         setFileInfoError(null);
 
         try {
-          const fileInfoResult = await api.get<FileResponse>(`${FILE_API}/${extractedFileId}`, {
+          const fileInfoResult = await api.get<FileResponse>(`${END_POINT}/${extractedFileId}`, {
             requireAuth: true,
             ...options
           });

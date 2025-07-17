@@ -5,8 +5,63 @@ import { apiReducer } from './useReducer';
 import { createErrorFromResponse } from "../util/apiUtils";
 import { api } from "../core";
 
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+// Response 처리 유틸리티 함수
+const parseResponseData = async <T>(
+  result: unknown, 
+  method: HttpMethod
+): Promise<{ data: T | null; response: Response | null }> => {
+  // Response 객체가 아닌 경우
+  if (!(result instanceof Response)) {
+    if (result === undefined || result === null) {
+      return { data: null, response: null };
+    }
+    
+    const data = (typeof result === 'object' && result && 'data' in result) 
+      ? (result as DataResponseBody<T>).data 
+      : result as T;
+    
+    return { data, response: null };
+  }
+
+  const response = result;
+  
+  // POST의 경우 Response 객체 자체를 반환
+  if (method === 'POST') {
+    return { data: response as T, response };
+  }
+
+  // PUT, PATCH, DELETE의 경우 204 No Content
+  if (['PUT', 'PATCH', 'DELETE'].includes(method) && response.status === 204) {
+    return { data: null, response };
+  }
+
+  // GET의 경우 JSON 파싱
+  if (method === 'GET') {
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      return { data: null, response };
+    }
+
+    try {
+      const jsonData = await response.clone().json();
+      const data = (jsonData && typeof jsonData === 'object' && 'data' in jsonData)
+        ? jsonData.data as T
+        : jsonData as T;
+      
+      return { data, response };
+    } catch {
+      return { data: null, response };
+    }
+  }
+
+  return { data: null, response };
+};
+
 export function useApi<T = any, P extends any[] = any[]>(
   apiMethod: (...args: P) => Promise<unknown>,
+  method: HttpMethod
 ): UseApiResponse<T, P> {
   const [state, dispatch] = useReducer(apiReducer<T>, {
     data: null,
@@ -43,30 +98,7 @@ export function useApi<T = any, P extends any[] = any[]>(
 
       if (!isMounted.current) return { data: null, response: null };
 
-      let parsedData: T | null = null;
-      let responseObj: Response | null = null;
-
-      if (result instanceof Response) {
-        responseObj = result;
-
-        if (result.status === 204) {
-          parsedData = null;
-        } else {
-          const contentType = result.headers.get('content-type');
-          if (contentType?.includes('application/json')) {
-            const jsonData = await result.clone().json();
-            parsedData = (jsonData && typeof jsonData === 'object' && 'data' in jsonData)
-              ? jsonData.data as T
-              : jsonData as T;
-          }
-        }
-      } else if (result === undefined || result === null) {
-        parsedData = null;
-      } else if (typeof result === 'object' && 'data' in result) {
-        parsedData = (result as DataResponseBody<T>).data;
-      } else {
-        parsedData = result as T;
-      }
+      const { data: parsedData, response: responseObj } = await parseResponseData<T>(result, method);
 
       dispatch({
         type: 'SUCCESS',
@@ -78,14 +110,14 @@ export function useApi<T = any, P extends any[] = any[]>(
 
     } catch (err) {
       if (!isMounted.current) return { data: null, response: null };
-      console.error("API 요청 오류:", err);
+      console.error(`${method} 요청 오류:`, err);
 
       const processedError = createErrorFromResponse(err);
       dispatch({ type: 'ERROR', error: processedError });
       
       return { data: null, response: null };
     }
-  }, [apiMethod]);
+  }, [apiMethod, method]);
 
   const getLocationId = useCallback(() => {
     if (!response) return null;
@@ -96,22 +128,23 @@ export function useApi<T = any, P extends any[] = any[]>(
   return { data, error, isLoading, isSuccess, execute, reset, response, getLocationId };
 }
 
+// HTTP 메서드별 hook들
 export const useGet = <T>(url: string, options?: RequestOptions): UseApiResponse<T, []> => {
-  return useApi<T, []>(() => api.get<T>(url, options));
+  return useApi<T, []>(() => api.get<T>(url, options), 'GET');
 };
 
-export const usePost = <T, ReqData = any>(url: string, options?: RequestOptions): UseApiResponse<T, [ReqData]> => {
-  return useApi<T, [ReqData]>((requestData) => api.post(url, requestData, options));
+export const usePost = <ReqData = any>(url: string, options?: RequestOptions): UseApiResponse<Response, [ReqData?]> => {
+  return useApi<Response, [ReqData?]>((requestData) => api.post(url, requestData, options), 'POST');
 };
 
-export const usePut = <T, ReqData = any>(url: string, options?: RequestOptions): UseApiResponse<T, [ReqData]> => {
-  return useApi<T, [ReqData]>((requestData) => api.put(url, requestData, options));
+export const usePut = <ReqData = any>(url: string, options?: RequestOptions): UseApiResponse<null, [ReqData?]> => {
+  return useApi<null, [ReqData?]>((requestData) => api.put(url, requestData, options), 'PUT');
 };
 
-export const usePatch = <T, ReqData = any>(url: string, options?: RequestOptions): UseApiResponse<T, [ReqData]> => {
-  return useApi<T, [ReqData]>((requestData) => api.patch(url, requestData, options));
+export const usePatch = <ReqData = any>(url: string, options?: RequestOptions): UseApiResponse<null, [ReqData?]> => {
+  return useApi<null, [ReqData?]>((requestData) => api.patch(url, requestData, options), 'PATCH');
 };
 
 export const useDelete = (url: string, options?: RequestOptions): UseApiResponse<null, []> => {
-  return useApi<null, []>(() => api.delete(url, options));
+  return useApi<null, []>(() => api.delete(url, undefined, options), 'DELETE');
 };
