@@ -41,7 +41,7 @@ export interface FacilityUpdateRequest {
     name?: string;
     description?: string;
     code?: string;
-    thumbnailFieldId?: number;
+    thumbnailFileId?: number;
   }
   floors?: Floors[];
 }

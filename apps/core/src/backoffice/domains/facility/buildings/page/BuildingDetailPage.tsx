@@ -1,18 +1,17 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@plug/ui";
-import { Button, Input, Label } from "@plug/ui";
+import { Card, CardContent, Separator } from "@plug/ui";
+import { Button, Input } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import {
   useBuildingDetailSWR,
   useBuildingHistory,
-  useDeleteBuilding,
+  useDeleteBuilding, useFileUploadWithInfo,
   useUpdateBuilding,
   useUpdateFacilitiesDrawing
 } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest, Floors } from "@plug/common-services";
+import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest } from "@plug/common-services";
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
 
 export const BuildingDetailPage: React.FC = () => {
@@ -25,11 +24,12 @@ export const BuildingDetailPage: React.FC = () => {
   const { execute: deleteBuilding } = useDeleteBuilding(buildingId);
   const { execute: updateBuilding } = useUpdateBuilding(buildingId);
   const { execute: updateDrawing } = useUpdateFacilitiesDrawing(buildingId);
+  const thumbnailUploader = useFileUploadWithInfo();
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-
+  const [, setIsUploadingThumbnail] = useState(false);
   const [isDrawingUpdateModalOpen, setIsDrawingUpdateModalOpen] = useState(false);
   const [isDrawingSubmitting, setIsDrawingSubmitting] = useState(false);
 
@@ -37,7 +37,7 @@ export const BuildingDetailPage: React.FC = () => {
     facility: {
       name: "",
       description: "",
-      code: ""
+      code: "",
     },
     floors: []
   });
@@ -65,6 +65,7 @@ export const BuildingDetailPage: React.FC = () => {
           name: building.facility.name,
           description: building.facility.description || "",
           code: building.facility.code,
+          thumbnailFileId: building.facility.thumbnail.id,
         },
         floors: building.floors ? [...building.floors] : []
       });
@@ -85,20 +86,44 @@ export const BuildingDetailPage: React.FC = () => {
     }));
   };
 
-  const handleFloorChange = (index: number, field: keyof Floors, value: string) => {
-    setFormData(prev => {
-      const newFloors = [...(prev.floors ?? [])];
-      newFloors[index] = { ...newFloors[index], [field]: value };
-      return {
-        ...prev,
-        floors: newFloors
-      };
-    });
+  const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setIsUploadingThumbnail(true);
+      try {
+        await thumbnailUploader.execute(files[0]);
+        if (thumbnailUploader.fileInfo && thumbnailUploader.fileInfo.id) {
+          console.log("새 썸네일 ID:", thumbnailUploader.fileInfo.id);
+          setFormData(prev => {
+            const updated = {
+              ...prev,
+              facility: {
+                ...prev.facility,
+                thumbnailFileId: thumbnailUploader?.fileInfo?.id
+              }
+            };
+            console.log("업데이트된 formData:", updated);
+            return updated;
+          });
+        } else {
+          console.error("썸네일 파일 ID를 받지 못했습니다");
+        }
+      } catch (err) {
+        console.error("썸네일 업로드 오류:", err);
+        setFormError("썸네일 업로드 중 오류가 발생했습니다.");
+      } finally {
+        setIsUploadingThumbnail(false);
+      }
+    }
   };
 
   const handleSave = async () => {
     setIsSubmitting(true);
     setFormError(null);
+
+    if (thumbnailUploader.fileInfo?.id) {
+      formData.facility.thumbnailFileId = thumbnailUploader.fileInfo.id;
+    }
 
     try {
       await updateBuilding(formData);
@@ -148,23 +173,47 @@ export const BuildingDetailPage: React.FC = () => {
             <ModalForm className="grid grid-cols-2 py-5">
               <div className="grid grid-cols-3 col-span-2 border-t divide-y divide-gray-200 border-b-0">
                 <ModalFormItem label="썸네일 이미지" className="row-span-4">
-                  <div className="flex flex-col gap-2 max-w-md">
-                    {building.facility.thumbnail.url ? (
-                      <>
-                        <img
-                          src={building.facility.thumbnail.url}
-                          alt="썸네일 이미지"
-                          className="w-full object-contain"
-                        />
-                        <div className="flex flex-col gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
-                          <div className="text-gray-500">파일명</div>
-                          <div className="font-medium text-gray-800 text-xs break-normal">
-                            {building.facility.thumbnail.originalFileName}
+                  <div className="flex flex-col gap-2 w-full">
+                    {isEditMode ? (
+                      <div className="flex flex-col">
+                        {building.facility.thumbnail.url && !thumbnailUploader.fileInfo && (
+                          <div className="mt-2 flex flex-col gap-2">
+                            <img src={building.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
+                            <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
+                              <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
+                              <Button className="w-16"
+                                      onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+                              <Input type="file" id="thumbnail-input" className="hidden" accept="image/*"
+                                     onChange={handleThumbnailChange} />
+                            </div>
                           </div>
-                        </div>
-                      </>
+                        )}
+                        {thumbnailUploader.fileInfo && thumbnailUploader.fileInfo.url && (
+                          <div className="flex flex-col gap-2">
+                            <img src={thumbnailUploader.fileInfo.url} alt="새 썸네일 미리보기" className="h-32 object-contain" />
+                            <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
+                              <div className="text-gray-500">새 썸네일</div>
+                              <div className="font-medium text-gray-800 text-xs break-normal">{thumbnailUploader.fileInfo.originalFileName}</div>
+                              <Button className="w-16"
+                                      onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+                              <Input type="file" id="thumbnail-input" className="hidden" accept="image/*"
+                                     onChange={handleThumbnailChange} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : (
-                      "썸네일 이미지가 없습니다."
+                      building.facility.thumbnail.url ? (
+                        <>
+                          <img src={building.facility.thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
+                          <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
+                            <div className="text-gray-500">파일명</div>
+                            <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
+                          </div>
+                        </>
+                      ) : (
+                        "썸네일 이미지가 없습니다."
+                      )
                     )}
                   </div>
                 </ModalFormItem>
@@ -215,67 +264,51 @@ export const BuildingDetailPage: React.FC = () => {
                   )}
                 </ModalFormItem>
 
-                <ModalFormItem label="층 정보" className="col-span-2">
-                  {isEditMode ? (
-                    <div className="grid grid-cols-2 gap-3">
-                      {formData?.floors?.map((floor, index) => (
-                        <div key={index} className="flex flex-col gap-2 border border-gray-200 rounded-sm p-3">
-                          <div className="flex items-center gap-2">
-                            <Label className="min-w-16">층 ID:</Label>
-                            <Input
-                              type="text"
-                              value={floor.floorId}
-                              onChange={(e) => handleFloorChange(index, "floorId", e.target.value)}
-                              placeholder="층 ID를 입력하세요"
-                            />
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Label className="min-w-16">층 이름:</Label>
-                            <Input
-                              type="text"
-                              value={floor.name}
-                              onChange={(e) => handleFloorChange(index, "name", e.target.value)}
-                              placeholder="층 이름을 입력하세요"
-                            />
-                          </div>
-                        </div>
-                      ))}
+
+                <ModalFormItem label="생성" className='col-span-2'>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
+                      <span className="text-gray-500 mr-6 text-sm">최초 생성일</span>
+                      <span className="font-medium text-gray-800">
+                      {building.facility.createdAt
+                        ? new Date(
+                          building.facility.createdAt,
+                        ).toLocaleDateString("ko-KR")
+                        : "-"}
+                    </span>
                     </div>
-                  ) : (
-                    building.floors && building.floors.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {building.floors.map((floor, index) => (
-                          <div
-                            key={index}
-                            className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
-                          >
-                            <div>
-                              <span className="text-gray-500 mr-1">ID</span>
-                              <span className="font-medium text-gray-800">
-                                {floor.floorId}
-                              </span>
-                            </div>
-                            <div className="mt-1">
-                              <span className="text-gray-500 mr-1">이름</span>
-                              <span className="font-medium text-gray-800">
-                                {floor.name}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-500">
-                        등록된 층 정보가 없습니다.
-                      </div>
-                    )
-                  )}
+                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
+                      <span className="text-gray-500 mr-4 text-sm">생성인</span>
+                      <span className="font-medium text-gray-800">
+                      {building.facility.createdBy || "-"}
+                    </span>
+                    </div>
+                  </div>
                 </ModalFormItem>
 
-                <ModalFormItem
-                  label="도면 이미지"
-                  className="col-span-2 border-b"
-                >
+                <ModalFormItem label="수정" className="col-span-2 border-b">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
+                      <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
+                      <span className="font-medium text-gray-800">
+                      {building.facility.updatedAt
+                        ? new Date(
+                          building.facility.updatedAt,
+                        ).toLocaleDateString("ko-KR")
+                        : "-"}
+                    </span>
+                    </div>
+                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
+                      <span className="text-gray-500 mr-4 text-sm">수정인</span>
+                      <span className="font-medium text-gray-800">
+                      {building.facility.updatedBy || "-"}
+                    </span>
+                    </div>
+                  </div>
+                </ModalFormItem>
+              </div>
+
+                <ModalFormItem label="도면 이미지" className='col-span-2'>
                   {building.facility.drawing.url ? (
                     <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded p-3 gap-5">
                       <div className="flex items-center gap-4">
@@ -305,27 +338,64 @@ export const BuildingDetailPage: React.FC = () => {
                     </div>
                   )}
                 </ModalFormItem>
-              </div>
 
-              <ModalFormItem
-                label="도면 변경 이력"
-                className="col-span-2 border-b"
-              >
+              <ModalFormItem label="층 정보" className="col-span-2">
+                {building.floors && building.floors.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {building.floors.map((floor, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                      >
+                        <div>
+                          <span className="text-gray-500 mr-1">ID</span>
+                          <span className="font-medium text-gray-800">
+                                {floor.floorId}
+                              </span>
+                        </div>
+                        <div className="mt-1">
+                          <span className="text-gray-500 mr-1">이름</span>
+                          <span className="font-medium text-gray-800">
+                                {floor.name}
+                              </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">
+                    등록된 층 정보가 없습니다.
+                  </div>
+                )
+                }
+              </ModalFormItem>
+
+              <ModalFormItem label="도면 변경 이력" className="col-span-2 border-b">
                 <div className="py-2">
                   {!buildingHistory ? (
                     <p>데이터를 불러오는 중...</p>
                   ) : buildingHistory.length === 0 ? (
                     <p>변경 이력이 없습니다.</p>
                   ) : (
-                    <ul className="grid grid-cols-4 gap-2">
+                    <ul className="grid gap-2">
                       {buildingHistory?.map((history, index) => (
                         <div
                           key={index}
-                          className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px] flex flex-col gap-1"
+                          className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px] flex gap-1"
                         >
                           <div className="flex justify-between items-center gap-2">
+
+                            <div className="flex">
+                              <span className="text-gray-500 mr-3">파일명</span>
+                              <a href={history.file.url}>
+                                <p className="font-bold text-gray-800">
+                                  {history.file.originalFileName}
+                                </p>
+                              </a>
+                            </div>
+                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
                             <div>
-                              <span className="text-gray-500 mr-1">날짜</span>
+                              <span className="text-gray-500 mr-3">날짜</span>
                               <span className="font-medium text-gray-800">
                                 {history.createdAt
                                   ? new Date(history.createdAt).toLocaleString(
@@ -334,73 +404,29 @@ export const BuildingDetailPage: React.FC = () => {
                                   : "-"}
                               </span>
                             </div>
+                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
                             <div>
-                              <span className="text-gray-500 mr-1">수정자</span>
+                              <span className="text-gray-500 mr-3">수정자</span>
                               <span className="font-medium text-gray-800">
                                 {history.createdBy || "-"}
                               </span>
                             </div>
-                          </div>
-                          <div className="col-span-2 flex">
-                            <span className="text-gray-500 mr-1">파일명</span>
-                            <a href={history.file.url}>
-                              <p className="font-bold text-blue-600">
-                                {history.file.originalFileName}
-                              </p>
+                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
+                            <div>
+                              <span className="text-gray-500 mr-3">설명</span>
+                              <span className="font-medium text-gray-800">
+                                {history.comment || "-"}
+                              </span>
+                            </div>
+                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
+                            <a href={building.facility.drawing.url}>
+                              <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">다운로드</p>
                             </a>
-                          </div>
-                          <div className="col-span-2">
-                            <span className="text-gray-500 mr-1">설명</span>
-                            <span className="font-medium text-gray-800">
-                              {history.comment || "-"}
-                            </span>
                           </div>
                         </div>
                       ))}
                     </ul>
                   )}
-                </div>
-              </ModalFormItem>
-
-              <ModalFormItem label="생성">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4 text-sm">생성일</span>
-                    <span className="font-medium text-gray-800">
-                      {building.facility.createdAt
-                        ? new Date(
-                          building.facility.createdAt,
-                        ).toLocaleDateString("ko-KR")
-                        : "-"}
-                    </span>
-                  </div>
-                  <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4 text-sm">생성인</span>
-                    <span className="font-medium text-gray-800">
-                      {building.facility.createdBy || "-"}
-                    </span>
-                  </div>
-                </div>
-              </ModalFormItem>
-
-              <ModalFormItem label="수정" className="border-b">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
-                    <span className="font-medium text-gray-800">
-                      {building.facility.updatedAt
-                        ? new Date(
-                          building.facility.updatedAt,
-                        ).toLocaleDateString("ko-KR")
-                        : "-"}
-                    </span>
-                  </div>
-                  <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                    <span className="text-gray-500 mr-4 text-sm">수정인</span>
-                    <span className="font-medium text-gray-800">
-                      {building.facility.updatedBy || "-"}
-                    </span>
-                  </div>
                 </div>
               </ModalFormItem>
             </ModalForm>
