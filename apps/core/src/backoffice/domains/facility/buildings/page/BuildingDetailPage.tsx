@@ -214,6 +214,7 @@ export const BuildingDetailPage: React.FC = () => {
                     <div>{building.facility.description || "-"}</div>
                   )}
                 </ModalFormItem>
+
                 <ModalFormItem label="층 정보" className="col-span-2">
                   {isEditMode ? (
                     <div className="grid grid-cols-2 gap-3">

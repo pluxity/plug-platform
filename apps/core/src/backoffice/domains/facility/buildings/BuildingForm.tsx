@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@plug/ui";
 import { Button } from "@plug/ui";
 import { Input } from "@plug/ui";
-import { Label } from "@plug/ui";
 import { useCreateBuilding, useFileUploadWithInfo } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { BuildingCreateRequest, Floors } from "@plug/common-services";
+import type { BuildingCreateRequest } from "@plug/common-services";
+import * as Px from "@plug/engine/src"
+import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 
 interface BuildingFormProps {
   onSaveSuccess?: () => void;
@@ -27,8 +28,6 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
     floors: []
   });
 
-  const [floorCount, setFloorCount] = useState(1);
-
   const { execute } = useCreateBuilding();
 
   const handleInputChange = (field: string, value: string) => {
@@ -38,24 +37,6 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
         ...prev.facility,
         [field]: value
       }
-    }));
-  };
-
-  const handleFloorCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const count = parseInt(e.target.value) || 0;
-    setFloorCount(Math.max(1, count));
-
-    const newFloors: Floors[] = [];
-    for (let i = 0; i < count; i++) {
-      newFloors.push({
-        name: `${i + 1}층`,
-        floorId: i + 1
-      });
-    }
-
-    setBuildingData(prev => ({
-      ...prev,
-      floors: newFloors
     }));
   };
 
@@ -76,12 +57,37 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
     if (files && files.length > 0) {
       try {
         await drawingUploader.execute(files[0]);
+        console.log("파일 업로드 정보:", drawingUploader.fileInfo);
+        const fileUrl = URL.createObjectURL(files[0]);
+        console.log("파일 URL:", fileUrl);
+        if (fileUrl) {
+          console.log("도면 파일 URL:", fileUrl);
+          Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
+            console.log("모델 계층 구조:", modelInfos);
+            if (Array.isArray(modelInfos) && modelInfos.length > 0) {
+              const floors = modelInfos.map(info => ({
+                name: info.displayName,
+                floorId: info.floorId
+              }));
+              console.log("변환된 층 정보:", floors);
+              setBuildingData(prev => ({
+                ...prev,
+                floors: floors
+              }));
+            } else {
+              console.error("모델 정보가 없거나 유효하지 않습니다.");
+            }
+          });
+        } else {
+          console.error("업로드된 파일의 URL을 가져올 수 없습니다.");
+        }
       } catch (err) {
         console.error("도면 업로드 오류:", err);
         setError("도면 업로드 중 오류가 발생했습니다.");
       }
     }
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,7 +149,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
               />
             </ModalFormItem>
 
-            <ModalFormItem label="설명" className="col-span-2">
+            <ModalFormItem label="설명">
               <Input
                 type="text"
                 value={buildingData.facility.description || ""}
@@ -198,37 +204,33 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
               </div>
             </ModalFormItem>
 
-            <ModalFormItem label="층 수">
-              <Input
-                type="number"
-                min={1}
-                value={floorCount}
-                onChange={handleFloorCountChange}
-                placeholder="층 수를 입력하세요"
-                required
-              />
-            </ModalFormItem>
-
             <ModalFormItem label="층 정보" className="border-b">
-              <div className="grid grid-cols-2 gap-2">
-                {buildingData.floors.map((floor, index) => (
-                  <div className='flex items-center gap-2' key={index} >
-                    <Label>{index === 0 ? "1층" : `${index + 1}층`}: </Label>
-                    <Input
-                      type="text"
-                      value={floor.name}
-                      onChange={(e) => {
-                        const newFloors = [...buildingData.floors];
-                        newFloors[index] = { ...floor, name: e.target.value };
-                        setBuildingData((prev) => ({
-                          ...prev,
-                          floors: newFloors,
-                        }));
-                      }}
-                      placeholder={`${index + 1}층 이름`}
-                    />
+              <div className="flex flex-wrap gap-2">
+                {buildingData.floors && buildingData.floors.length > 0 ? (
+                  buildingData.floors.map((floor, index) => (
+                    <div
+                      key={index}
+                      className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                    >
+                      <div>
+                        <span className="text-gray-500 mr-1">ID</span>
+                        <span className="font-medium text-gray-800">
+              {floor.floorId}
+            </span>
+                      </div>
+                      <div className="mt-1">
+                        <span className="text-gray-500 mr-1">이름</span>
+                        <span className="font-medium text-gray-800">
+              {floor.name}
+            </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-gray-500">
+                    등록된 층 정보가 없습니다. 도면 파일을 업로드하면 자동으로 층 정보가 추출됩니다.
                   </div>
-                ))}
+                )}
               </div>
             </ModalFormItem>
           </ModalForm>
