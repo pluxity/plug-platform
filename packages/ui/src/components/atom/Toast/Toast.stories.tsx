@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Toast } from "./Toast";
-import { toast } from "sonner";
+import { toast } from "./toast-functions";
 import { 
   useState, 
   useEffect, 
@@ -12,7 +12,6 @@ import {
   AlertCircleIcon, 
   InfoIcon, 
   BellIcon,
-  ClockIcon,
   StarIcon
 } from "lucide-react";
 
@@ -157,43 +156,7 @@ export const Default: Story = {
             },
             ...toastOptions 
           });
-          break;
-        case "promise":
-          toast.promise(
-            new Promise((resolve) => setTimeout(resolve, 2000)),
-            {
-              loading: '처리 중...',
-              success: '작업이 완료되었습니다.',
-              error: '오류가 발생했습니다.',
-              ...toastOptions
-            }
-          );
-          break;
-        case "custom":
-          toast.custom((id) => (
-            <div
-              className={`animate-enter bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
-            >
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {title}
-                </p>
-                {description && (
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {description}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => toast.dismiss(id)}
-                className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500"
-              >
-                <span className="sr-only">닫기</span>
-                <XCircleIcon className="h-5 w-5" />
-              </button>
-            </div>
-          ), toastOptions);
-          break;
+          break;        
         default:
           toast(title, { description, ...toastOptions });
       }
@@ -253,32 +216,11 @@ export const Default: Story = {
             액션
           </button>
           <button
-            className={`${buttonStyles.base} ${buttonStyles.info}`}
-            onClick={() => showToast("promise", "", "")}
-          >
-            프로미스
-          </button>
-          <button
             className={`${buttonStyles.base} ${buttonStyles.custom}`}
             onClick={() => showToast("custom", "커스텀 토스트", "나만의 디자인으로 토스트를 만들 수 있습니다.")}
           >
             커스텀
           </button>
-        </div>
-        
-        <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded">
-          <h3 className="text-lg font-medium mb-2">현재 설정</h3>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div>위치: <span className="font-mono">{args.position}</span></div>
-            <div>닫기 버튼: <span className="font-mono">{args.closeButton ? 'true' : 'false'}</span></div>
-            <div>지속 시간: <span className="font-mono">{args.duration}ms</span></div>
-            <div>최대 표시 개수: <span className="font-mono">{args.visibleToasts}</span></div>
-            <div>풍부한 색상: <span className="font-mono">{args.richColors ? 'true' : 'false'}</span></div>
-            <div>확장 표시: <span className="font-mono">{args.expand ? 'true' : 'false'}</span></div>
-            <div>색상 반전: <span className="font-mono">{args.invert ? 'true' : 'false'}</span></div>
-            <div>간격: <span className="font-mono">{args.gap}px</span></div>
-            <div>테마: <span className="font-mono">{args.theme}</span></div>
-          </div>
         </div>
       </div>
     );
@@ -426,27 +368,6 @@ export const ToastTypes: Story = {
               표시
             </button>
           </div>
-          
-          <div className="p-4 border rounded-lg">
-            <h3 className="text-lg font-medium mb-2 flex items-center">
-              <ClockIcon className="mr-2 h-5 w-5 text-blue-500" />
-              프로미스 토스트
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">비동기 작업 상태를 표시합니다.</p>
-            <button
-              className={`${buttonStyles.base} ${buttonStyles.info} w-full`}
-              onClick={() => toast.promise(
-                new Promise((resolve) => setTimeout(resolve, 2000)),
-                {
-                  loading: '데이터를 불러오는 중...',
-                  success: '데이터를 성공적으로 불러왔습니다.',
-                  error: '데이터를 불러오는 중 오류가 발생했습니다.',
-                }
-              )}
-            >
-              표시
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -561,7 +482,7 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">직접 디자인한 토스트를 표시합니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.custom}`}
-              onClick={() => toast.custom((id) => (
+              onClick={() => toast.custom((id: string | number) => (
                 <div
                   className={`animate-enter bg-white shadow-lg rounded-lg pointer-events-auto flex p-4 border-l-4 border-purple-500`}
                 >
@@ -608,7 +529,7 @@ export const CustomToasts: Story = {
             <p className="text-sm text-gray-500 mb-4">카드 형태의 커스텀 토스트입니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.custom}`}
-              onClick={() => toast.custom((id) => (
+              onClick={() => toast.custom((id: string | number) => (
                 <div
                   className={`animate-enter max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex flex-col`}
                 >
@@ -652,11 +573,14 @@ export const CustomToasts: Story = {
           </div>
           
           <div className="p-4 border rounded-lg">
-            <h3 className="text-lg font-medium mb-2">알림 토스트</h3>
+            <h3 className="text-lg font-medium mb-2 flex items-center">
+              <BellIcon className="mr-2 h-5 w-5 text-blue-500" />
+              알림 토스트
+            </h3>
             <p className="text-sm text-gray-500 mb-4">알림 형태의 커스텀 토스트입니다.</p>
             <button
               className={`${buttonStyles.base} ${buttonStyles.info}`}
-              onClick={() => toast.custom((id) => (
+              onClick={() => toast.custom((id: string | number) => (
                 <div
                   className={`animate-enter max-w-md w-full bg-blue-50 border-l-4 border-blue-500 shadow-md rounded-r-lg pointer-events-auto flex p-4`}
                 >
@@ -842,6 +766,75 @@ export const MultipleToasts: Story = {
         
         <div className="mt-4 text-sm text-gray-500">
           한 번에 여러 토스트를 표시하면 설정된 최대 표시 개수에 따라 토스트가 관리됩니다.
+        </div>
+      </div>
+    );
+  },
+};
+
+// @plug/ui의 Wrapper 함수들을 보여주는 스토리
+export const WrappedFunctions: Story = {
+  render: () => {
+    return (
+      <div className="p-6 space-y-6">
+        <Toast />
+        
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-xl font-bold mb-4">@plug/ui Toast Wrapper Functions</h2>
+            <p className="text-gray-600 mb-6">
+              이제 다른 프로젝트에서 sonner를 별도로 설치할 필요 없이 @plug/ui만으로 toast 기능을 사용할 수 있습니다.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 기본 함수들 */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">기본 Toast 함수들</h3>
+              <div className="space-y-2">
+                <button
+                  className={`${buttonStyles.base} ${buttonStyles.success} w-full`}
+                  onClick={() => toast.success("성공!", { description: "작업이 성공적으로 완료되었습니다." })}
+                >
+                  toast.success()
+                </button>
+                <button
+                  className={`${buttonStyles.base} ${buttonStyles.error} w-full`}
+                  onClick={() => toast.error("오류!", { description: "작업 중 오류가 발생했습니다." })}
+                >
+                  toast.error()
+                </button>
+                <button
+                  className={`${buttonStyles.base} ${buttonStyles.info} w-full`}
+                  onClick={() => toast.info("정보", { description: "새로운 업데이트가 있습니다." })}
+                >
+                  toast.info()
+                </button>
+                <button
+                  className={`${buttonStyles.base} ${buttonStyles.warning} w-full`}
+                  onClick={() => toast.warning("주의", { description: "이 작업은 되돌릴 수 없습니다." })}
+                >
+                  toast.warning()
+                </button>
+                <button
+                  className={`${buttonStyles.base} ${buttonStyles.default} w-full`}
+                  onClick={() => toast("메시지", { description: "일반적인 알림 메시지입니다." })}
+                >
+                  toast()
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 사용법 예제 */}
+          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-lg font-semibold mb-3">사용법 예제</h3>
+            <div className="space-y-2 text-sm">
+              <p><code className="bg-gray-200 px-2 py-1 rounded">import &#123; toast &#125; from '@plug/ui';</code></p>
+              <p><code className="bg-gray-200 px-2 py-1 rounded">toast.success("성공!", &#123; description: "작업이 완료되었습니다." &#125;);</code></p>
+              <p><code className="bg-gray-200 px-2 py-1 rounded">toast("기본 메시지", &#123; duration: 5000 &#125;);</code></p>
+            </div>
+          </div>
         </div>
       </div>
     );

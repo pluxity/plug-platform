@@ -1,33 +1,31 @@
-import { useGet, usePost, useDelete, useSWRApi, usePatch } from "@plug/api-hooks";
-import type { BaseResponseBody } from '@plug/api-hooks';
-import type { BuildingResponse, BuildingCreateRequest, FacilityUpdateRequest } from '@plug/common-services';
-import { FacilityHistoryResponse } from "../types";
+import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
+import type { BuildingResponse, BuildingCreateRequest, BuildingUpdateRequest } from '@plug/common-services';
 
-const BUILDINGS_API = `buildings`;
+const END_POINT = 'buildings';
 
 export const useBuildings = () => {
-  return useGet<BuildingResponse[]>(BUILDINGS_API, { requireAuth: true });
+  return useGet<BuildingResponse[]>(END_POINT, { requireAuth: true });
 };
 
 export const useBuildingDetail = (buildingId: number) => {
-  return useGet<BuildingResponse>(`${BUILDINGS_API}/${buildingId}`, { requireAuth: true } );
+  return useGet<BuildingResponse>(`${END_POINT}/${buildingId}`, { requireAuth: true });
 };
 
 export const useCreateBuilding = () => {
-  return usePost<BaseResponseBody, BuildingCreateRequest>(BUILDINGS_API, { requireAuth: true });
+  return usePost<BuildingCreateRequest>(END_POINT, { requireAuth: true });
 };
 
 export const useUpdateBuilding = (buildingId: number) => {
-  return usePatch<BaseResponseBody, FacilityUpdateRequest>(`${BUILDINGS_API}/${buildingId}`, { requireAuth: true });
+  return usePut<BuildingUpdateRequest>(`${END_POINT}/${buildingId}`, { requireAuth: true });
 };
 
 export const useDeleteBuilding = (buildingId: number) => {
-  return useDelete(`${BUILDINGS_API}/${buildingId}`, { requireAuth: true });
+  return useDelete(`${END_POINT}/${buildingId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅
 export const useBuildingsSWR = () => {
-  return useSWRApi<BuildingResponse[]>(BUILDINGS_API, 'GET', { requireAuth: true });
+  return useSWRApi<BuildingResponse[]>(END_POINT, 'GET', { requireAuth: true });
 };
 
 export const useBuildingDetailSWR = (buildingId: number) => {
