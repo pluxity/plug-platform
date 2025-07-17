@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, Separator } from "@plug/ui";
 import { Button, Input } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
@@ -13,11 +13,15 @@ import {
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest } from "@plug/common-services";
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
+import { parseInt } from "lodash";
 
 export const BuildingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const buildingId = parseInt(id || "0");
+  const searchParams = new URLSearchParams(location.search);
+  const urlMode = searchParams.get('mode');
 
   const { data: building, isLoading, error, mutate } = useBuildingDetailSWR(buildingId);
   const { data: buildingHistory, mutate: historyMutate } = useBuildingHistory(buildingId);
@@ -26,7 +30,7 @@ export const BuildingDetailPage: React.FC = () => {
   const { execute: updateDrawing } = useUpdateFacilitiesDrawing(buildingId);
   const thumbnailUploader = useFileUploadWithInfo();
 
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(urlMode === 'edit');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [, setIsUploadingThumbnail] = useState(false);
@@ -41,6 +45,11 @@ export const BuildingDetailPage: React.FC = () => {
     },
     floors: []
   });
+
+  const clearModeParam = () => {
+    searchParams.delete('mode');
+    navigate(`/admin/building/${buildingId}?${searchParams.toString()}`, { replace: true });
+  };
 
   const handleDrawingUpdateSubmit = async (data: FacilityDrawingUpdateRequest) => {
     setIsDrawingSubmitting(true);
@@ -72,6 +81,7 @@ export const BuildingDetailPage: React.FC = () => {
       });
     }
     setIsEditMode(!isEditMode);
+    if (isEditMode) clearModeParam();
     setFormError(null);
   };
 
@@ -130,6 +140,7 @@ export const BuildingDetailPage: React.FC = () => {
       await updateBuilding(formData);
       await mutate();
       setIsEditMode(false);
+      clearModeParam();
     } catch (err) {
       console.error("빌딩 정보 업데이트 오류:", err);
       setFormError("빌딩 정보를 업데이트하는 중 오류가 발생했습니다.");

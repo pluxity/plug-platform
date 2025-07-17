@@ -124,16 +124,16 @@ export const FacilityCardList: React.FC = () => {
   const handleEditFacility = (item: FacilityItem) => {
     switch (item.type) {
       case 'building':
-        navigate(`/admin/building/${item.id}/edit`);
+        navigate(`/admin/building/${item.id}?mode=edit`);
         break;
       case 'panorama':
-        navigate(`/admin/panorama/${item.id}/edit`);
+        navigate(`/admin/panorama/${item.id}?mode=edit`);
         break;
       case 'station':
-        navigate(`/admin/station/${item.id}/edit`);
+        navigate(`/admin/station/${item.id}?mode=edit`);
         break;
       default:
-        navigate(`/admin/facility/${item.id}/edit`);
+        navigate(`/admin/facility/${item.id}?mode=edit`);
     }
   };
 

@@ -5,5 +5,6 @@ export * from './facilityCategory';
 export * from './file';
 export * from './floors';
 export * from './role';
+export * from './station';
 export * from './user';
 

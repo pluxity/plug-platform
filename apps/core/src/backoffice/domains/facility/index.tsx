@@ -1,13 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import { FacilityLayout, FacilityTabLayout } from "./components/FacilityTabLayout";
 import { FacilityCardList } from "@/backoffice/domains/facility/components/cardList/variants/FacilityCardList";
 import { BuildingCardList } from "@/backoffice/domains/facility/components/cardList/variants/BuildingCardList";
 import { BuildingForm } from "./buildings/BuildingForm";
+import { useLocation } from "react-router-dom";
+import { StationCardList } from "@/backoffice/domains/facility/components/cardList/variants/StationCardList";
+import { StationForm } from "@/backoffice/domains/facility/station/StationForm";
 
 const FacilityManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState<FacilityTabLayout>("facilities");
   const [isCreateMode, setIsCreateMode] = useState(false);
+  const location = useLocation();
+  const previousPathRef = React.useRef<string | null>(null);
+
+  useEffect(() => {
+    if (previousPathRef.current !== location.pathname && location.pathname === '/admin/facility') {
+      setActiveTab('facilities');
+      setIsCreateMode(false);
+    }
+
+    previousPathRef.current = location.pathname;
+  }, [location.pathname]);
+
 
   const handleTabChange = (tab: FacilityTabLayout) => {
     setActiveTab(tab);
@@ -38,15 +53,13 @@ const FacilityManagement: React.FC = () => {
   const renderCreateForm = () => {
     switch (activeTab) {
       case 'facilities':
-        return (setActiveTab("buildings"))
+        setActiveTab("buildings");
+        return <BuildingForm onSaveSuccess={() => setIsCreateMode(false)} />;
       case 'buildings':
         return <BuildingForm onSaveSuccess={() => setIsCreateMode(false)} />;
       case 'stations':
         return (
-          <div className="p-6 bg-white rounded-md border border-gray-200">
-            <h3 className="text-lg font-medium mb-4">역사 추가 양식</h3>
-            <p>역사 추가 양식은 현재 개발 중입니다.</p>
-          </div>
+          <StationForm onSaveSuccess={() => setIsCreateMode(false)} />
         );
       case 'factories':
         return (
@@ -67,7 +80,7 @@ const FacilityManagement: React.FC = () => {
       case 'buildings':
         return <BuildingCardList />;
       case 'stations':
-        return <BuildingCardList />;
+        return <StationCardList />;
       case 'factories':
         return <BuildingCardList />;
       default:

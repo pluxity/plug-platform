@@ -32,7 +32,7 @@ export const BuildingCardList: React.FC = () => {
   };
 
   const handleEditBuilding = (item: FacilityItem) => {
-    navigate(`/admin/building/${item.id}/edit`);
+    navigate(`/admin/building/${item.id}?mode=edit`);
   };
 
   const handleDeleteBuilding = async (item: FacilityItem) => {

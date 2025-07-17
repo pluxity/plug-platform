@@ -18,15 +18,7 @@ import {
   FacilityItem
 } from "@/backoffice/domains/facility/components/cardList/CardListType";
 
-export function CardList<T extends FacilityItem>({
-                                                           dataResponse,
-                                                           filterData,
-                                                           renderOptions,
-                                                           pageSize = 8,
-                                                           actions,
-                                                           filterOptions,
-                                                           emptyStateAction,
-                                                         }: FacilityCardListProps<T>) {
+export function CardList<T extends FacilityItem>({ dataResponse, filterData, renderOptions, pageSize = 8, actions, filterOptions, emptyStateAction, }: FacilityCardListProps<T>) {
   const { data, isLoading, error } = dataResponse;
   const [searchParams, setSearchParams] = useSearchParams();
 
