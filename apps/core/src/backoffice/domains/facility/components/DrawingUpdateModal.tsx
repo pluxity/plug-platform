@@ -1,51 +1,60 @@
+
 import React, { useState } from "react";
 import { Button, Input } from "@plug/ui";
 import { ModalFormItem } from "@plug/ui";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter
-} from "@plug/ui";
-import { useFileUploadWithInfo } from "@plug/common-services";
+import { Dialog, DialogContent, DialogFooter } from "@plug/ui";
+import { Floors, useFileUploadWithInfo } from "@plug/common-services";
 import type { FacilityDrawingUpdateRequest } from "@plug/common-services";
+import * as Px from "@plug/engine/dist/src";
+import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 
 interface DrawingUpdateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (data: FacilityDrawingUpdateRequest) => Promise<void>;
+  onUpdate: (data: FacilityDrawingUpdateRequest, floors: Floors[]) => Promise<void>;
   isSubmitting?: boolean;
 }
 
-export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
-                                                                        isOpen,
-                                                                        onClose,
-                                                                        onUpdate,
-                                                                        isSubmitting = false,
-                                                                      }) => {
+export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({ isOpen, onClose, onUpdate, isSubmitting = false, }) => {
   const [drawingComment, setDrawingComment] = useState("");
   const drawingUploader = useFileUploadWithInfo();
+  const [floors, setFloors] = useState<Floors[]>([]);
 
   const handleDrawingUpdate = async () => {
     if (!drawingUploader.fileInfo?.id) {
       alert("업로드할 도면 파일을 선택해주세요.");
       return;
     }
+
     await onUpdate({
       drawingFileId: drawingUploader.fileInfo.id,
-      comment: drawingComment
-    });
+      comment: drawingComment,
+    }, floors);
+
     setDrawingComment("");
+    setFloors([]);
     drawingUploader.reset();
   };
 
-  const handleDrawingFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDrawingChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       try {
         await drawingUploader.execute(files[0]);
+        const fileUrl = URL.createObjectURL(files[0]);
+        if (fileUrl) {
+          Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
+            if (Array.isArray(modelInfos) && modelInfos.length > 0) {
+              const extractedFloors = modelInfos.map(info => ({
+                name: info.displayName,
+                floorId: info.floorId
+              }));
+              setFloors(extractedFloors);
+            }
+          });
+        }
       } catch (err) {
-        alert("도면 파일 업로드 중 오류가 발생했습니다.");
-        console.error("도면 파일 업로드 오류:", err);
+        console.error("도면 업로드 오류:", err);
       }
     }
   };
@@ -53,6 +62,7 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
   const handleClose = () => {
     if (!isSubmitting) {
       setDrawingComment("");
+      setFloors([]);
       drawingUploader.reset();
       onClose();
     }
@@ -66,7 +76,7 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
             <Button className="w-16"
                     onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
             <Input type="file" id="thumbnail-input" className="hidden w-full" accept="image/*, application/pdf"
-                   onChange={handleDrawingFileChange} disabled={isSubmitting} required/>
+                   onChange={handleDrawingChange} disabled={isSubmitting} required/>
             {drawingUploader.isLoadingFileInfo && <p>파일 업로드 중...</p>}
             {drawingUploader.fileInfo && (
               <div className="mt-2">
@@ -78,7 +88,7 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
           </div>
         </ModalFormItem>
 
-        <ModalFormItem label="코멘트" className='border-t border-b'>
+        <ModalFormItem label="코멘트" className='border-t'>
           <Input
             type="text"
             value={drawingComment}
@@ -88,6 +98,37 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
             className="w-full"
             required
           />
+        </ModalFormItem>
+
+        {/* 층 정보 표시 영역 추가 */}
+        <ModalFormItem label='층 정보' className='border-t border-b'>
+          <div className="flex flex-wrap gap-2">
+            {floors && floors.length > 0 ? (
+              floors.map((floor, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                >
+                  <div>
+                    <span className="text-gray-500 mr-1">ID</span>
+                    <span className="font-medium text-gray-800">
+                      {floor.floorId}
+                    </span>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-gray-500 mr-1">이름</span>
+                    <span className="font-medium text-gray-800">
+                      {floor.name}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500">
+                도면 파일을 업로드하면 층 정보가 자동으로 추출됩니다.
+              </div>
+            )}
+          </div>
         </ModalFormItem>
 
         <DialogFooter className="flex justify-end gap-2 pt-6">

@@ -1,5 +1,6 @@
-import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
-import type { BuildingResponse, BuildingCreateRequest, BuildingUpdateRequest } from '@plug/common-services';
+import { useGet, usePost, useDelete, useSWRApi, usePatch } from "@plug/api-hooks";
+import type { BuildingResponse, BuildingCreateRequest } from '@plug/common-services';
+import { BuildingUpdateRequest, FacilityHistoryResponse } from "../types";
 
 const END_POINT = 'buildings';
 
@@ -16,7 +17,7 @@ export const useCreateBuilding = () => {
 };
 
 export const useUpdateBuilding = (buildingId: number) => {
-  return usePut<BuildingUpdateRequest>(`${END_POINT}/${buildingId}`, { requireAuth: true });
+  return usePatch<BuildingUpdateRequest>(`${END_POINT}/${buildingId}`, { requireAuth: true });
 };
 
 export const useDeleteBuilding = (buildingId: number) => {
@@ -29,9 +30,9 @@ export const useBuildingsSWR = () => {
 };
 
 export const useBuildingDetailSWR = (buildingId: number) => {
-  return useSWRApi<BuildingResponse>(`${BUILDINGS_API}/${buildingId}`, 'GET', { requireAuth: true });
+  return useSWRApi<BuildingResponse>(`${END_POINT}/${buildingId}`, 'GET', { requireAuth: true });
 };
 
 export const useBuildingHistory = (buildingId: number) => {
-  return useSWRApi<FacilityHistoryResponse[]>(`${BUILDINGS_API}/${buildingId}/history`, 'GET', { requireAuth: true });
+  return useSWRApi<FacilityHistoryResponse[]>(`${END_POINT}/${buildingId}/history`, 'GET', { requireAuth: true });
 };

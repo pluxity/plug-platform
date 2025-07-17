@@ -1,4 +1,4 @@
-import { FacilityCreateRequest, FacilityResponse } from "./facility";
+import { FacilityCreateRequest, FacilityResponse, FacilityUpdateRequest } from "./facility";
 import { Floors } from "./floors";
   
 export interface BuildingResponse {
@@ -9,4 +9,8 @@ export interface BuildingResponse {
 export interface BuildingCreateRequest {
   facility: FacilityCreateRequest;
   floors: Floors[];
+}
+
+export interface BuildingUpdateRequest extends FacilityUpdateRequest{
+  floors?: Floors[];
 }

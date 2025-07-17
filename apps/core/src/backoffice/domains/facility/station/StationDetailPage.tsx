@@ -4,30 +4,31 @@ import { Card, CardContent, Separator } from "@plug/ui";
 import { Button, Input } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import {
-  useBuildingDetailSWR,
-  useBuildingHistory,
-  useDeleteBuilding, useFileUploadWithInfo,
-  useUpdateBuilding,
+  StationUpdateRequest,
+  useStationDetailSWR,
+  useStationHistorySWR,
+  useDeleteStation, useFileUploadWithInfo,
+  useUpdateStation,
   useUpdateFacilitiesDrawing
 } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest } from "@plug/common-services";
+import type { FacilityDrawingUpdateRequest } from "@plug/common-services";
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
 import { parseInt } from "lodash";
 
-export const BuildingDetailPage: React.FC = () => {
+export const StationDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const buildingId = parseInt(id || "0");
+  const stationId = parseInt(id || "0");
   const searchParams = new URLSearchParams(location.search);
   const urlMode = searchParams.get('mode');
 
-  const { data: building, isLoading, error, mutate } = useBuildingDetailSWR(buildingId);
-  const { data: buildingHistory, mutate: historyMutate } = useBuildingHistory(buildingId);
-  const { execute: deleteBuilding } = useDeleteBuilding(buildingId);
-  const { execute: updateBuilding } = useUpdateBuilding(buildingId);
-  const { execute: updateDrawing } = useUpdateFacilitiesDrawing(buildingId);
+  const { data: station, isLoading, error, mutate } = useStationDetailSWR(stationId);
+  const { data: stationHistory, mutate: historyMutate } = useStationHistorySWR(stationId);
+  const { execute: deleteStation } = useDeleteStation(stationId);
+  const { execute: updateStation } = useUpdateStation(stationId);
+  const { execute: updateDrawing } = useUpdateFacilitiesDrawing(stationId);
   const thumbnailUploader = useFileUploadWithInfo();
 
   const [isEditMode, setIsEditMode] = useState(urlMode === 'edit');
@@ -37,18 +38,19 @@ export const BuildingDetailPage: React.FC = () => {
   const [isDrawingUpdateModalOpen, setIsDrawingUpdateModalOpen] = useState(false);
   const [isDrawingSubmitting, setIsDrawingSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState<FacilityUpdateRequest>({
+  const [formData, setFormData] = useState<StationUpdateRequest>({
     facility: {
       name: "",
       description: "",
       code: "",
     },
-    floors: []
+    floors: [],
+    lineIds: [],
   });
 
   const clearModeParam = () => {
     searchParams.delete('mode');
-    navigate(`/admin/building/${buildingId}?${searchParams.toString()}`, { replace: true });
+    navigate(`/admin/station/${stationId}?${searchParams.toString()}`, { replace: true });
   };
 
   const handleDrawingUpdateSubmit = async (data: FacilityDrawingUpdateRequest) => {
@@ -69,15 +71,16 @@ export const BuildingDetailPage: React.FC = () => {
   };
 
   const handleEditToggle = () => {
-    if (!isEditMode && building) {
+    if (!isEditMode && station) {
       setFormData({
         facility: {
-          name: building.facility.name,
-          description: building.facility.description || "",
-          code: building.facility.code,
-          thumbnailFileId: building.facility.thumbnail.id,
+          name: station.facility.name,
+          description: station.facility.description || "",
+          code: station.facility.code,
+          thumbnailFileId: station.facility.thumbnail.id,
         },
-        floors: building.floors ? [...building.floors] : []
+        floors: station.floors ? [...station.floors] : [],
+        lineIds: station.lineIds ? [...station.lineIds] : [],
       });
     }
     setIsEditMode(!isEditMode);
@@ -85,7 +88,7 @@ export const BuildingDetailPage: React.FC = () => {
     setFormError(null);
   };
 
-  type FacilityField = keyof FacilityUpdateRequest["facility"];
+  type FacilityField = keyof StationUpdateRequest["facility"];
 
   const handleInputChange = (field: FacilityField, value: string) => {
     setFormData(prev => ({
@@ -137,7 +140,7 @@ export const BuildingDetailPage: React.FC = () => {
     }
 
     try {
-      await updateBuilding(formData);
+      await updateStation(formData);
       await mutate();
       setIsEditMode(false);
       clearModeParam();
@@ -152,7 +155,7 @@ export const BuildingDetailPage: React.FC = () => {
   const handleDelete = async () => {
     if (confirm("해당 빌딩을 삭제하시겠습니까?")) {
       try {
-        await deleteBuilding();
+        await deleteStation();
         navigate("/admin/facility");
       } catch (err) {
         console.error("빌딩 삭제 오류:", err);
@@ -172,14 +175,14 @@ export const BuildingDetailPage: React.FC = () => {
   };
 
   return (
-    <PageContainer title={`${building?.facility.name} 상세 정보`}>
+    <PageContainer title={`${station?.facility.name} 상세 정보`}>
       {isLoading ? (
         <div className="flex justify-center p-8">데이터를 불러오는 중...</div>
       ) : error ? (
         <div className="text-center text-red-500 p-8">
           데이터를 불러오는 중 오류가 발생했습니다.
         </div>
-      ) : building ? (
+      ) : station ? (
         <Card>
           <CardContent>
             <ModalForm className="grid grid-cols-2 py-5">
@@ -188,11 +191,11 @@ export const BuildingDetailPage: React.FC = () => {
                   <div className="flex flex-col gap-2 w-full">
                     {isEditMode ? (
                       <div className="flex flex-col">
-                        {building.facility.thumbnail.url && !thumbnailUploader.fileInfo && (
+                        {station.facility.thumbnail.url && !thumbnailUploader.fileInfo && (
                             <div className="mt-2 flex flex-col gap-2">
-                              <img src={building.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
+                              <img src={station.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
                               <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
-                                <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
+                                <div className="font-medium text-gray-800 text-xs break-normal">{station.facility.thumbnail.originalFileName}</div>
                                 <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
                                 <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                               </div>
@@ -211,13 +214,13 @@ export const BuildingDetailPage: React.FC = () => {
                             </div>
                           )}
                       </div>
-                    ) : building.facility.thumbnail.url ? (
+                    ) : station.facility.thumbnail.url ? (
                       <>
-                        <img src={building.facility.thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
+                        <img src={station.facility.thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
                         <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
                           <div className="text-gray-500">파일명</div>
                           <div className="font-medium text-gray-800 text-xs break-normal">
-                            {building.facility.thumbnail.originalFileName}
+                            {station.facility.thumbnail.originalFileName}
                           </div>
                         </div>
                       </>
@@ -227,7 +230,7 @@ export const BuildingDetailPage: React.FC = () => {
                   </div>
                 </ModalFormItem>
 
-                <ModalFormItem label="ID">{building.facility.id}</ModalFormItem>
+                <ModalFormItem label="ID">{station.facility.id}</ModalFormItem>
 
                 <ModalFormItem label="코드">
                   {isEditMode ? (
@@ -240,7 +243,7 @@ export const BuildingDetailPage: React.FC = () => {
                       placeholder="코드를 입력하세요"
                     />
                   ) : (
-                    <div>{building.facility.code}</div>
+                    <div>{station.facility.code}</div>
                   )}
                 </ModalFormItem>
                 <ModalFormItem label="건물명">
@@ -255,7 +258,7 @@ export const BuildingDetailPage: React.FC = () => {
                       required
                     />
                   ) : (
-                    <div className="py-2">{building.facility.name}</div>
+                    <div className="py-2">{station.facility.name}</div>
                   )}
                 </ModalFormItem>
                 <ModalFormItem label="설명">
@@ -269,7 +272,7 @@ export const BuildingDetailPage: React.FC = () => {
                       placeholder="설명을 입력하세요"
                     />
                   ) : (
-                    <div>{building.facility.description || "-"}</div>
+                    <div>{station.facility.description || "-"}</div>
                   )}
                 </ModalFormItem>
 
@@ -280,9 +283,9 @@ export const BuildingDetailPage: React.FC = () => {
                         최초 생성일
                       </span>
                       <span className="font-medium text-gray-800">
-                        {building.facility.createdAt
+                        {station.facility.createdAt
                           ? new Date(
-                              building.facility.createdAt,
+                              station.facility.createdAt,
                             ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
@@ -294,7 +297,7 @@ export const BuildingDetailPage: React.FC = () => {
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">생성인</span>
                       <span className="font-medium text-gray-800">
-                        {building.facility.createdBy || "-"}
+                        {station.facility.createdBy || "-"}
                       </span>
                     </div>
                   </div>
@@ -307,9 +310,9 @@ export const BuildingDetailPage: React.FC = () => {
                         마지막 수정일
                       </span>
                       <span className="font-medium text-gray-800">
-                        {building.facility.updatedAt
+                        {station.facility.updatedAt
                           ? new Date(
-                              building.facility.updatedAt,
+                              station.facility.updatedAt,
                             ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
@@ -321,7 +324,7 @@ export const BuildingDetailPage: React.FC = () => {
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">수정인</span>
                       <span className="font-medium text-gray-800">
-                        {building.facility.updatedBy || "-"}
+                        {station.facility.updatedBy || "-"}
                       </span>
                     </div>
                   </div>
@@ -329,17 +332,17 @@ export const BuildingDetailPage: React.FC = () => {
               </div>
 
               <ModalFormItem label="도면 이미지" className="col-span-3">
-                {building.facility.drawing.url ? (
+                {station.facility.drawing.url ? (
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <span className="text-gray-600 text-sm">파일명</span>
                       <p className="font-medium text-gray-800">
-                        {building.facility.drawing.originalFileName}
+                        {station.facility.drawing.originalFileName}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <a
-                        href={building.facility.drawing.url}
+                        href={station.facility.drawing.url}
                         className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100"
                       >
                         다운로드
@@ -368,9 +371,9 @@ export const BuildingDetailPage: React.FC = () => {
               </ModalFormItem>
 
               <ModalFormItem label="층 정보" className="col-span-2">
-                {building.floors && building.floors.length > 0 ? (
+                {station.floors && station.floors.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {building.floors.map((floor, index) => (
+                    {station.floors.map((floor, index) => (
                       <div
                         key={index}
                         className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
@@ -402,13 +405,13 @@ export const BuildingDetailPage: React.FC = () => {
                 className="col-span-2 border-b"
               >
                 <div className="py-2 w-full">
-                  {!buildingHistory ? (
+                  {!stationHistory ? (
                     <p>데이터를 불러오는 중...</p>
-                  ) : buildingHistory.length === 0 ? (
+                  ) : stationHistory.length === 0 ? (
                     <p>변경 이력이 없습니다.</p>
                   ) : (
                     <ul className="grid gap-2">
-                      {buildingHistory?.map((history, index) => (
+                      {stationHistory?.map((history, index) => (
                         <li
                           key={index}
                           className="text-sm text-gray-700 min-w-[120px] w-full flex justify-around items-center gap-1"
@@ -440,7 +443,7 @@ export const BuildingDetailPage: React.FC = () => {
                             </a>
                           </div>
                           <div>
-                            <a href={building.facility.drawing.url}>
+                            <a href={station.facility.drawing.url}>
                               <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">
                                 다운로드
                               </p>

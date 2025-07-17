@@ -1,4 +1,4 @@
-import { FacilityCreateRequest, FacilityResponse } from "./facility";
+import { FacilityCreateRequest, FacilityResponse, FacilityUpdateRequest } from "./facility";
 import { Floors } from "./floors";
 
 export interface StationResponse {
@@ -12,6 +12,11 @@ export interface StationResponse {
 
 export interface StationCreateRequest {
   facility: FacilityCreateRequest;
+  floors: Floors[];
+  lineIds: number[];
+}
+
+export interface StationUpdateRequest extends FacilityUpdateRequest{
   floors: Floors[];
   lineIds: number[];
 }

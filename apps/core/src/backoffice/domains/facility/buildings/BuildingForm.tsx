@@ -56,29 +56,20 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
     if (files && files.length > 0) {
       try {
         await drawingUploader.execute(files[0]);
-        console.log("파일 업로드 정보:", drawingUploader.fileInfo);
         const fileUrl = URL.createObjectURL(files[0]);
-        console.log("파일 URL:", fileUrl);
         if (fileUrl) {
-          console.log("도면 파일 URL:", fileUrl);
           Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
-            console.log("모델 계층 구조:", modelInfos);
             if (Array.isArray(modelInfos) && modelInfos.length > 0) {
               const floors = modelInfos.map(info => ({
                 name: info.displayName,
                 floorId: info.floorId
               }));
-              console.log("변환된 층 정보:", floors);
               setBuildingData(prev => ({
                 ...prev,
                 floors: floors
               }));
-            } else {
-              console.error("모델 정보가 없거나 유효하지 않습니다.");
             }
           });
-        } else {
-          console.error("업로드된 파일의 URL을 가져올 수 없습니다.");
         }
       } catch (err) {
         console.error("도면 업로드 오류:", err);

@@ -1,5 +1,4 @@
 import { FileResponse } from "./file";
-import { Floors } from "./floors";
 
 export interface FacilitiesAllResponse {
   building: FacilityResponse[];
@@ -37,13 +36,12 @@ export interface FacilityCreateRequest {
 }
 
 export interface FacilityUpdateRequest {
-  facility: {
+  facility?: {
     name?: string;
     description?: string;
     code?: string;
     thumbnailFileId?: number;
   }
-  floors?: Floors[];
 }
 
 export interface FacilityDrawingUpdateRequest {

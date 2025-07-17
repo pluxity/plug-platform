@@ -9,7 +9,8 @@ import AssetCategory from '@/backoffice/domains/asset/page/assetCategory'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import FacilityManagement from "@/backoffice/domains/facility";
-import { BuildingDetailPage } from "@/backoffice/domains/facility/buildings/BuildingDetailPage";
+import BuildingDetailPage from "@/backoffice/domains/facility/buildings/BuildingDetailPage";
+import { StationDetailPage } from "@/backoffice/domains/facility/station/StationDetailPage";
 
 const AppRouter: React.FC = () => {
   return (
@@ -27,6 +28,7 @@ const AppRouter: React.FC = () => {
           <Route path="assetCategory" element={<AssetCategory />} />
           <Route path="facility"  index element={<FacilityManagement />} />
           <Route path="building/:id" element={<BuildingDetailPage />} />
+          <Route path="station/:id" element={<StationDetailPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

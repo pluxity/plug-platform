@@ -4,6 +4,7 @@ import { Card, CardContent, Separator } from "@plug/ui";
 import { Button, Input } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import {
+  BuildingUpdateRequest, Floors,
   useBuildingDetailSWR,
   useBuildingHistory,
   useDeleteBuilding, useFileUploadWithInfo,
@@ -11,11 +12,11 @@ import {
   useUpdateFacilitiesDrawing
 } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { FacilityUpdateRequest, FacilityDrawingUpdateRequest } from "@plug/common-services";
+import type { FacilityDrawingUpdateRequest } from "@plug/common-services";
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
 import { parseInt } from "lodash";
 
-export const BuildingDetailPage: React.FC = () => {
+const BuildingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,7 +38,7 @@ export const BuildingDetailPage: React.FC = () => {
   const [isDrawingUpdateModalOpen, setIsDrawingUpdateModalOpen] = useState(false);
   const [isDrawingSubmitting, setIsDrawingSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState<FacilityUpdateRequest>({
+  const [formData, setFormData] = useState<BuildingUpdateRequest>({
     facility: {
       name: "",
       description: "",
@@ -51,11 +52,24 @@ export const BuildingDetailPage: React.FC = () => {
     navigate(`/admin/building/${buildingId}?${searchParams.toString()}`, { replace: true });
   };
 
-  const handleDrawingUpdateSubmit = async (data: FacilityDrawingUpdateRequest) => {
+  const handleDrawingUpdateSubmit = async (data: FacilityDrawingUpdateRequest, floors: Floors[]) => {
     setIsDrawingSubmitting(true);
 
     try {
       await updateDrawing(data);
+      if (floors && floors.length > 0) {
+        // facility 속성은 반드시 포함
+        const buildingUpdateData: BuildingUpdateRequest = {
+          facility: {
+            name: building?.facility.name || "",
+            description: building?.facility.description || "",
+            code: building?.facility.code || "",
+          },
+          floors: floors
+        };
+        await updateBuilding(buildingUpdateData);
+      }
+
       await mutate();
       await historyMutate();
       setIsDrawingUpdateModalOpen(false);
@@ -85,7 +99,7 @@ export const BuildingDetailPage: React.FC = () => {
     setFormError(null);
   };
 
-  type FacilityField = keyof FacilityUpdateRequest["facility"];
+  type FacilityField = "name" | "code" | "description" | "thumbnailFileId";
 
   const handleInputChange = (field: FacilityField, value: string) => {
     setFormData(prev => ({
@@ -132,7 +146,8 @@ export const BuildingDetailPage: React.FC = () => {
     setIsSubmitting(true);
     setFormError(null);
 
-    if (thumbnailUploader.fileInfo?.id) {
+    // 안전하게 접근
+    if (thumbnailUploader.fileInfo?.id && formData.facility) {
       formData.facility.thumbnailFileId = thumbnailUploader.fileInfo.id;
     }
 
@@ -189,15 +204,15 @@ export const BuildingDetailPage: React.FC = () => {
                     {isEditMode ? (
                       <div className="flex flex-col">
                         {building.facility.thumbnail.url && !thumbnailUploader.fileInfo && (
-                            <div className="mt-2 flex flex-col gap-2">
-                              <img src={building.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
-                              <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
-                                <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
-                                <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
-                                <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
-                              </div>
+                          <div className="mt-2 flex flex-col gap-2">
+                            <img src={building.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
+                            <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
+                              <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
+                              <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+                              <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                             </div>
-                          )}
+                          </div>
+                        )}
                         {thumbnailUploader.fileInfo &&
                           thumbnailUploader.fileInfo.url && (
                             <div className="flex flex-col gap-2">
@@ -233,7 +248,7 @@ export const BuildingDetailPage: React.FC = () => {
                   {isEditMode ? (
                     <Input
                       type="text"
-                      value={formData.facility.code}
+                      value={formData.facility?.code || ""}
                       onChange={(e) =>
                         handleInputChange("code", e.target.value)
                       }
@@ -247,7 +262,7 @@ export const BuildingDetailPage: React.FC = () => {
                   {isEditMode ? (
                     <Input
                       type="text"
-                      value={formData.facility.name}
+                      value={formData.facility?.name || ""}
                       onChange={(e) =>
                         handleInputChange("name", e.target.value)
                       }
@@ -262,7 +277,7 @@ export const BuildingDetailPage: React.FC = () => {
                   {isEditMode ? (
                     <Input
                       type="text"
-                      value={formData.facility.description || ""}
+                      value={formData.facility?.description || ""}
                       onChange={(e) =>
                         handleInputChange("description", e.target.value)
                       }
@@ -282,8 +297,8 @@ export const BuildingDetailPage: React.FC = () => {
                       <span className="font-medium text-gray-800">
                         {building.facility.createdAt
                           ? new Date(
-                              building.facility.createdAt,
-                            ).toLocaleDateString("ko-KR")
+                            building.facility.createdAt,
+                          ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
                     </div>
@@ -309,8 +324,8 @@ export const BuildingDetailPage: React.FC = () => {
                       <span className="font-medium text-gray-800">
                         {building.facility.updatedAt
                           ? new Date(
-                              building.facility.updatedAt,
-                            ).toLocaleDateString("ko-KR")
+                            building.facility.updatedAt,
+                          ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
                     </div>
@@ -509,3 +524,5 @@ export const BuildingDetailPage: React.FC = () => {
     </PageContainer>
   );
 };
+
+export default BuildingDetailPage;
