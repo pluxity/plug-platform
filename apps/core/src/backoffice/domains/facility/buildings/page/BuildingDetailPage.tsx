@@ -318,10 +318,7 @@ export const BuildingDetailPage: React.FC = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <a
-                          href={building.facility.drawing.url}
-                          className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100"
-                        >
+                        <a href={building.facility.drawing.url} className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">
                           다운로드
                         </a>
                         <button
@@ -333,8 +330,14 @@ export const BuildingDetailPage: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-gray-500 p-3">
-                      도면 이미지가 없습니다.
+                    <div className='flex items-center justify-center rounded p-3 gap-5'>
+                      <p className="text-sm text-gray-500">현재 도면 이미지가 없습니다.</p>
+                      <button
+                        onClick={() => setIsDrawingUpdateModalOpen(true)}
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100"
+                      >
+                        도면 추가
+                      </button>
                     </div>
                   )}
                 </ModalFormItem>
@@ -343,10 +346,7 @@ export const BuildingDetailPage: React.FC = () => {
                 {building.floors && building.floors.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {building.floors.map((floor, index) => (
-                      <div
-                        key={index}
-                        className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
-                      >
+                      <div key={index} className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]">
                         <div>
                           <span className="text-gray-500 mr-1">ID</span>
                           <span className="font-medium text-gray-800">
