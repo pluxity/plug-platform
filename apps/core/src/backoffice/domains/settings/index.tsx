@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@plug/ui'
-import { PageContainer } from '@/backoffice/common/view/components'
+import { PageContainer } from '@/backoffice/common/view/layouts'
 
 const Asset: React.FC = () => {
   return (

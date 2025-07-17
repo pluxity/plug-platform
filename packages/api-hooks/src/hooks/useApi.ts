@@ -72,8 +72,18 @@ export function useApi<T = any, P extends any[] = any[]>(
   });
   
   const { data, error, isLoading, isSuccess, response } = state;
+  const [state, dispatch] = useReducer(apiReducer<T>, {
+    data: null,
+    error: null,
+    isLoading: false,
+    isSuccess: false,
+    response: null
+  });
+  
+  const { data, error, isLoading, isSuccess, response } = state;
 
   const isMounted = useRef(true);
+
 
   useEffect(() => {
     isMounted.current = true;
@@ -85,9 +95,17 @@ export function useApi<T = any, P extends any[] = any[]>(
   const reset = useCallback(() => {
     if (isMounted.current) {
       dispatch({ type: 'RESET' });
+      dispatch({ type: 'RESET' });
     }
   }, []);
 
+  const execute = useCallback(async (...args: P): Promise<{ data: T | null; response: Response | null }> => {
+    if (!isMounted.current) return { data: null, response: null };
+
+    dispatch({ type: 'LOADING' });
+
+    try {
+      const result = await apiMethod(...args);
   const execute = useCallback(async (...args: P): Promise<{ data: T | null; response: Response | null }> => {
     if (!isMounted.current) return { data: null, response: null };
 

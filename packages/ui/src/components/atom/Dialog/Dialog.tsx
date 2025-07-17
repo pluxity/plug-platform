@@ -71,12 +71,14 @@ function DialogContent({
   showCloseButton = true,
   dimmed = false,
   title,
+  disableBackground = false,
   ...props
 }: DialogContentProps) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay dimmed={dimmed} />
       <DialogPrimitive.Content
+        aria-describedby={undefined}
         data-slot="dialog-content"
         className={cn(
           `bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95
@@ -85,6 +87,7 @@ function DialogContent({
           focus:outline-none`,
           className
         )}
+        onInteractOutside={disableBackground ? (e) => e.preventDefault() : undefined}
         {...props}
       >
         <div className="flex items-center justify-between bg-muted-light-blue1 p-4">
