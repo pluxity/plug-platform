@@ -31,7 +31,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
    const { categories } = useAssetCategoryTree();
 
   // 폼 상태
-  const [categoryId, setCategoryId] = useState<number>();
+  const [categoryId, setCategoryId] = useState<string>('');
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [modelFileId, setModelFileId] = useState<number | null>(null);
@@ -61,7 +61,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   // 기존 에셋 정보 조회
   useEffect(() => {
     if (isOpen && data) {
-      setCategoryId(data.categoryId);
+      setCategoryId(data.categoryId?.toString() ?? '');
       setName(data.name ?? '');
       setCode(data.code ?? '');
       clearModelInfo();
@@ -128,7 +128,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     [uploadThumbnail, clearThumbnailInfo]
   );
   const resetForm = useCallback(() => {
-    setCategoryId(data?.categoryId);
+    setCategoryId(data?.categoryId?.toString() ?? '');
     setName(data?.name ?? '');
     setCode(data?.code ?? '');
     setModelFileId(data?.file?.id || null);
@@ -146,7 +146,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         await updateAsset({
             name,
             code,
-            categoryId:categoryId,
+            categoryId: Number(categoryId),
             fileId: modelFileId || undefined, 
             thumbnailFileId: thumbnailFileId || undefined, 
         });
@@ -170,8 +170,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
           <ModalForm>
           <ModalFormItem label="에셋 카테고리">
                 <Select     
-                    value={categoryId?.toString()} 
-                    onValueChange={value => setCategoryId(Number(value))}
+                    value={categoryId} 
+                    onValueChange={value => setCategoryId(value)}
                     >
                     <SelectTrigger>
                         <SelectValue placeholder="에셋 카테고리를 선택하세요" />

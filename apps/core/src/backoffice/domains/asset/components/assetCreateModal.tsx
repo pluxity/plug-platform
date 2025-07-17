@@ -20,7 +20,7 @@ import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-servic
 
 export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
     // 에셋 정보
-    const [categoryId, setCategoryId] = useState<number>();
+    const [categoryId, setCategoryId] = useState<string>('');
     const [name, setName] = useState('');
     const [code, setCode] = useState('');
 
@@ -106,7 +106,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
     }, [uploadThumbnail, clearThumbnailInfo]);
 
     const resetForm = useCallback(() => {
-        setCategoryId(undefined);
+        setCategoryId('');
         setName('');
         setCode('');
         setModelFileId(null);
@@ -123,7 +123,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
             await createAsset({
                 name,
                 code,
-                categoryId:categoryId,
+                categoryId: Number(categoryId),
                 fileId: modelFileId || undefined, 
                 thumbnailFileId: thumbnailFileId || undefined, 
             });
@@ -145,8 +145,8 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                 <ModalForm>
                     <ModalFormItem label="에셋 카테고리" >
                     <Select     
-                        value={categoryId?.toString()} 
-                        onValueChange={value => setCategoryId(Number(value))}
+                        value={categoryId} 
+                        onValueChange={value => setCategoryId(value)}
                         >
                         <SelectTrigger>
                             <SelectValue placeholder="에셋 카테고리를 선택하세요" />
