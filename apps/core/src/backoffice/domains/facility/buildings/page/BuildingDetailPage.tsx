@@ -20,7 +20,7 @@ export const BuildingDetailPage: React.FC = () => {
   const buildingId = parseInt(id || "0");
 
   const { data: building, isLoading, error, mutate } = useBuildingDetailSWR(buildingId);
-  const { data: buildingHistory } = useBuildingHistory(buildingId);
+  const { data: buildingHistory, mutate: historyMutate } = useBuildingHistory(buildingId);
   const { execute: deleteBuilding } = useDeleteBuilding(buildingId);
   const { execute: updateBuilding } = useUpdateBuilding(buildingId);
   const { execute: updateDrawing } = useUpdateFacilitiesDrawing(buildingId);
@@ -48,6 +48,7 @@ export const BuildingDetailPage: React.FC = () => {
     try {
       await updateDrawing(data);
       await mutate();
+      await historyMutate();
       setIsDrawingUpdateModalOpen(false);
     } catch (err) {
       console.error("도면 업데이트 오류:", err);
@@ -176,44 +177,88 @@ export const BuildingDetailPage: React.FC = () => {
                   <div className="flex flex-col gap-2 w-full">
                     {isEditMode ? (
                       <div className="flex flex-col">
-                        {building.facility.thumbnail.url && !thumbnailUploader.fileInfo && (
-                          <div className="mt-2 flex flex-col gap-2">
-                            <img src={building.facility.thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
-                            <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
-                              <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
-                              <Button className="w-16"
-                                      onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
-                              <Input type="file" id="thumbnail-input" className="hidden" accept="image/*"
-                                     onChange={handleThumbnailChange} />
+                        {building.facility.thumbnail.url &&
+                          !thumbnailUploader.fileInfo && (
+                            <div className="mt-2 flex flex-col gap-2">
+                              <img
+                                src={building.facility.thumbnail.url}
+                                alt="현재 썸네일"
+                                className="h-32 object-contain"
+                              />
+                              <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
+                                <div className="font-medium text-gray-800 text-xs break-normal">
+                                  {building.facility.thumbnail.originalFileName}
+                                </div>
+                                <Button
+                                  className="w-16"
+                                  onClick={() =>
+                                    document
+                                      ?.getElementById("thumbnail-input")
+                                      ?.click()
+                                  }
+                                >
+                                  파일 선택
+                                </Button>
+                                <Input
+                                  type="file"
+                                  id="thumbnail-input"
+                                  className="hidden"
+                                  accept="image/*"
+                                  onChange={handleThumbnailChange}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        {thumbnailUploader.fileInfo && thumbnailUploader.fileInfo.url && (
-                          <div className="flex flex-col gap-2">
-                            <img src={thumbnailUploader.fileInfo.url} alt="새 썸네일 미리보기" className="h-32 object-contain" />
-                            <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
-                              <div className="text-gray-500">새 썸네일</div>
-                              <div className="font-medium text-gray-800 text-xs break-normal">{thumbnailUploader.fileInfo.originalFileName}</div>
-                              <Button className="w-16"
-                                      onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
-                              <Input type="file" id="thumbnail-input" className="hidden" accept="image/*"
-                                     onChange={handleThumbnailChange} />
+                          )}
+                        {thumbnailUploader.fileInfo &&
+                          thumbnailUploader.fileInfo.url && (
+                            <div className="flex flex-col gap-2">
+                              <img
+                                src={thumbnailUploader.fileInfo.url}
+                                alt="새 썸네일 미리보기"
+                                className="h-32 object-contain"
+                              />
+                              <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
+                                <div className="text-gray-500">새 썸네일</div>
+                                <div className="font-medium text-gray-800 text-xs break-normal">
+                                  {thumbnailUploader.fileInfo.originalFileName}
+                                </div>
+                                <Button
+                                  className="w-16"
+                                  onClick={() =>
+                                    document
+                                      ?.getElementById("thumbnail-input")
+                                      ?.click()
+                                  }
+                                >
+                                  파일 선택
+                                </Button>
+                                <Input
+                                  type="file"
+                                  id="thumbnail-input"
+                                  className="hidden"
+                                  accept="image/*"
+                                  onChange={handleThumbnailChange}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
-                    ) : (
-                      building.facility.thumbnail.url ? (
-                        <>
-                          <img src={building.facility.thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
-                          <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
-                            <div className="text-gray-500">파일명</div>
-                            <div className="font-medium text-gray-800 text-xs break-normal">{building.facility.thumbnail.originalFileName}</div>
+                    ) : building.facility.thumbnail.url ? (
+                      <>
+                        <img
+                          src={building.facility.thumbnail.url}
+                          alt="썸네일 이미지"
+                          className="h-32 object-contain"
+                        />
+                        <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
+                          <div className="text-gray-500">파일명</div>
+                          <div className="font-medium text-gray-800 text-xs break-normal">
+                            {building.facility.thumbnail.originalFileName}
                           </div>
-                        </>
-                      ) : (
-                        "썸네일 이미지가 없습니다."
-                      )
+                        </div>
+                      </>
+                    ) : (
+                      "썸네일 이미지가 없습니다."
                     )}
                   </div>
                 </ModalFormItem>
@@ -264,100 +309,119 @@ export const BuildingDetailPage: React.FC = () => {
                   )}
                 </ModalFormItem>
 
-
-                <ModalFormItem label="생성" className='col-span-2'>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                      <span className="text-gray-500 mr-6 text-sm">최초 생성일</span>
+                <ModalFormItem label="생성" className="col-span-2">
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="text-gray-500 mr-7 text-sm">
+                        최초 생성일
+                      </span>
                       <span className="font-medium text-gray-800">
-                      {building.facility.createdAt
-                        ? new Date(
-                          building.facility.createdAt,
-                        ).toLocaleDateString("ko-KR")
-                        : "-"}
-                    </span>
+                        {building.facility.createdAt
+                          ? new Date(
+                              building.facility.createdAt,
+                            ).toLocaleDateString("ko-KR")
+                          : "-"}
+                      </span>
                     </div>
-                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
+                    <Separator
+                      orientation="vertical"
+                      className="bg-gray-300 !h-5"
+                    />
+                    <div>
                       <span className="text-gray-500 mr-4 text-sm">생성인</span>
                       <span className="font-medium text-gray-800">
-                      {building.facility.createdBy || "-"}
-                    </span>
+                        {building.facility.createdBy || "-"}
+                      </span>
                     </div>
                   </div>
                 </ModalFormItem>
 
                 <ModalFormItem label="수정" className="col-span-2 border-b">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
-                      <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="text-gray-500 mr-4 text-sm">
+                        마지막 수정일
+                      </span>
                       <span className="font-medium text-gray-800">
-                      {building.facility.updatedAt
-                        ? new Date(
-                          building.facility.updatedAt,
-                        ).toLocaleDateString("ko-KR")
-                        : "-"}
-                    </span>
+                        {building.facility.updatedAt
+                          ? new Date(
+                              building.facility.updatedAt,
+                            ).toLocaleDateString("ko-KR")
+                          : "-"}
+                      </span>
                     </div>
-                    <div className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2">
+                    <Separator
+                      orientation="vertical"
+                      className="bg-gray-300 !h-5"
+                    />
+                    <div>
                       <span className="text-gray-500 mr-4 text-sm">수정인</span>
                       <span className="font-medium text-gray-800">
-                      {building.facility.updatedBy || "-"}
-                    </span>
+                        {building.facility.updatedBy || "-"}
+                      </span>
                     </div>
                   </div>
                 </ModalFormItem>
               </div>
 
-                <ModalFormItem label="도면 이미지" className='col-span-2'>
-                  {building.facility.drawing.url ? (
-                    <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded p-3 gap-5">
-                      <div className="flex items-center gap-4">
-                        <span className="text-gray-600 text-sm">파일명</span>
-                        <p className="font-medium text-gray-800">
-                          {building.facility.drawing.originalFileName}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <a href={building.facility.drawing.url} className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">
-                          다운로드
-                        </a>
-                        <button
-                          onClick={() => setIsDrawingUpdateModalOpen(true)}
-                          className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100"
-                        >
-                          도면 업데이트
-                        </button>
-                      </div>
+              <ModalFormItem label="도면 이미지" className="col-span-3">
+                {building.facility.drawing.url ? (
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <span className="text-gray-600 text-sm">파일명</span>
+                      <p className="font-medium text-gray-800">
+                        {building.facility.drawing.originalFileName}
+                      </p>
                     </div>
-                  ) : (
-                    <div className='flex items-center justify-center rounded p-3 gap-5'>
-                      <p className="text-sm text-gray-500">현재 도면 이미지가 없습니다.</p>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={building.facility.drawing.url}
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100"
+                      >
+                        다운로드
+                      </a>
                       <button
                         onClick={() => setIsDrawingUpdateModalOpen(true)}
                         className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100"
                       >
-                        도면 추가
+                        도면 업데이트
                       </button>
                     </div>
-                  )}
-                </ModalFormItem>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center rounded p-3 gap-5">
+                    <p className="text-sm text-gray-500">
+                      현재 도면 이미지가 없습니다.
+                    </p>
+                    <button
+                      onClick={() => setIsDrawingUpdateModalOpen(true)}
+                      className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100"
+                    >
+                      도면 추가
+                    </button>
+                  </div>
+                )}
+              </ModalFormItem>
 
               <ModalFormItem label="층 정보" className="col-span-2">
                 {building.floors && building.floors.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {building.floors.map((floor, index) => (
-                      <div key={index} className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]">
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                      >
                         <div>
                           <span className="text-gray-500 mr-1">ID</span>
                           <span className="font-medium text-gray-800">
-                                {floor.floorId}
-                              </span>
+                            {floor.floorId}
+                          </span>
                         </div>
                         <div className="mt-1">
                           <span className="text-gray-500 mr-1">이름</span>
                           <span className="font-medium text-gray-800">
-                                {floor.name}
-                              </span>
+                            {floor.name}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -366,12 +430,14 @@ export const BuildingDetailPage: React.FC = () => {
                   <div className="text-sm text-gray-500">
                     등록된 층 정보가 없습니다.
                   </div>
-                )
-                }
+                )}
               </ModalFormItem>
 
-              <ModalFormItem label="도면 변경 이력" className="col-span-2 border-b">
-                <div className="py-2">
+              <ModalFormItem
+                label="도면 변경 이력"
+                className="col-span-2 border-b"
+              >
+                <div className="py-2 w-full">
                   {!buildingHistory ? (
                     <p>데이터를 불러오는 중...</p>
                   ) : buildingHistory.length === 0 ? (
@@ -379,51 +445,44 @@ export const BuildingDetailPage: React.FC = () => {
                   ) : (
                     <ul className="grid gap-2">
                       {buildingHistory?.map((history, index) => (
-                        <div
+                        <li
                           key={index}
-                          className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px] flex gap-1"
+                          className="text-sm text-gray-700 min-w-[120px] w-full flex justify-around items-center gap-1"
                         >
-                          <div className="flex justify-between items-center gap-2">
-
-                            <div className="flex">
-                              <span className="text-gray-500 mr-3">파일명</span>
-                              <a href={history.file.url}>
-                                <p className="font-bold text-gray-800">
-                                  {history.file.originalFileName}
-                                </p>
-                              </a>
-                            </div>
-                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
-                            <div>
-                              <span className="text-gray-500 mr-3">날짜</span>
-                              <span className="font-medium text-gray-800">
-                                {history.createdAt
-                                  ? new Date(history.createdAt).toLocaleString(
-                                    "ko-KR",
-                                  )
-                                  : "-"}
-                              </span>
-                            </div>
-                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
-                            <div>
-                              <span className="text-gray-500 mr-3">수정자</span>
-                              <span className="font-medium text-gray-800">
+                          <div className='flex-1'>
+                            <span className="text-gray-500 mr-3">설명</span>
+                            <span className="font-medium text-gray-800">
+                              {history.comment || "-"}
+                            </span>
+                          </div>
+                          <div className='w-52'>
+                            <span className="text-gray-500 mr-3">날짜</span>
+                            <span className="font-medium text-gray-800">
+                              {history.createdAt ? new Date(history.createdAt).toLocaleString("ko-KR",) : "-"}
+                            </span>
+                          </div>
+                          <div className='w-36'>
+                            <span className="text-gray-500 mr-3">수정자</span>
+                            <span className="font-medium text-gray-800">
                                 {history.createdBy || "-"}
                               </span>
-                            </div>
-                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
-                            <div>
-                              <span className="text-gray-500 mr-3">설명</span>
-                              <span className="font-medium text-gray-800">
-                                {history.comment || "-"}
-                              </span>
-                            </div>
-                            <Separator orientation='vertical' className="bg-gray-300 mx-1"/>
-                            <a href={building.facility.drawing.url}>
-                              <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">다운로드</p>
+                          </div>
+                          <div className="flex w-40">
+                            <span className="text-gray-500 mr-3">파일명</span>
+                            <a href={history.file.url}>
+                              <p className="font-bold text-gray-800">
+                                {history.file.originalFileName}
+                              </p>
                             </a>
                           </div>
-                        </div>
+                          <div>
+                            <a href={building.facility.drawing.url}>
+                              <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">
+                                다운로드
+                              </p>
+                            </a>
+                          </div>
+                        </li>
                       ))}
                     </ul>
                   )}
@@ -474,7 +533,12 @@ export const BuildingDetailPage: React.FC = () => {
       </div>
       <DrawingUpdateModal
         isOpen={isDrawingUpdateModalOpen}
-        onClose={() => setIsDrawingUpdateModalOpen(false)}
+        onClose={() => {
+          setIsDrawingUpdateModalOpen(false);
+          setIsEditMode(false);
+          mutate();
+          historyMutate();
+        }}
         onUpdate={handleDrawingUpdateSubmit}
         isSubmitting={isDrawingSubmitting}
       />

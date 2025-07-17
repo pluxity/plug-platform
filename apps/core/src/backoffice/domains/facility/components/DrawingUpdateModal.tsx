@@ -63,14 +63,10 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({
       <DialogContent title="도면 업데이트" showCloseButton={true} dimmed={true}>
         <ModalFormItem label="도면 파일" className='border-t divide-y'>
           <div className="flex flex-col">
-            <Input
-              type="file"
-              accept="image/*, application/pdf"
-              onChange={handleDrawingFileChange}
-              disabled={isSubmitting}
-              className="w-full"
-              required
-            />
+            <Button className="w-16"
+                    onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+            <Input type="file" id="thumbnail-input" className="hidden w-full" accept="image/*, application/pdf"
+                   onChange={handleDrawingFileChange} disabled={isSubmitting} required/>
             {drawingUploader.isLoadingFileInfo && <p>파일 업로드 중...</p>}
             {drawingUploader.fileInfo && (
               <div className="mt-2">
