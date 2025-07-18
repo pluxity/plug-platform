@@ -54,7 +54,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
     // 에셋 생성
     const { execute: createAsset, isLoading: isAssetCreating } = useCreateAsset();
 
-    
+    // 에셋 정보 변경 핸들러
     const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setName(event.target.value);
     }, []);

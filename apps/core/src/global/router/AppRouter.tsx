@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import BackofficeLayout from '@/backoffice/common/view/layouts/BackofficeLayout'
 import Dashboard from '@/backoffice/domains/dashboard'
-import Users from '@/backoffice/domains/users'
+import UsersRole from '@/backoffice/domains/users/page/usersRole'
 import Device from '@/backoffice/domains/device'
 import AssetList from '@/backoffice/domains/asset/page/assetList'
 import AssetCategory from '@/backoffice/domains/asset/page/assetCategory'
@@ -20,7 +20,7 @@ const AppRouter: React.FC = () => {
 
         <Route path="/admin" element={<BackofficeLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
+          <Route path="usersRole" element={<UsersRole />} />
           <Route path="device" element={<Device />} />
           <Route path="assetList" element={<AssetList />} />
           <Route path="assetCategory" element={<AssetCategory />} />
