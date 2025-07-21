@@ -1,5 +1,5 @@
 import { usePost } from "@plug/api-hooks";
-import {SignInRequest, SignUpRequest } from "@plug/common-services/types";
+import { SignInRequest, SignUpRequest } from "@plug/common-services/types";
 
 export const useSignUp = () => {
   return usePost<SignUpRequest>("auth/sign-up", { requireAuth: false });

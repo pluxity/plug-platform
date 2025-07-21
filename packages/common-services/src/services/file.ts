@@ -6,7 +6,14 @@ import type { FileResponse, UseFileUploadWithInfoReturn } from '../types/file';
 
 const END_POINT = `files`;
 
-export const useFileInfo = (fileId: number | string, options?: RequestOptions) => {
+const extractFileIdFromLocation = (location: string | null): number | null => {
+  if (!location) return null;
+  
+  const id = parseInt(location.split('/').pop() || '');
+  return isNaN(id) ? null : id;
+};
+
+export const useFileInfo = (fileId?: number | string, options?: RequestOptions) => {
   return useGet<FileResponse>(`${END_POINT}/${fileId}`, {
     requireAuth: true,
     ...options

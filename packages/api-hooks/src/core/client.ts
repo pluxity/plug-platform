@@ -61,21 +61,21 @@ const buildKy = (
 };
 
 export const api = {
-  get: async <T>(endpoint: string, options: RequestOptions = {}): Promise<DataResponseBody<T>> => {
-    return buildKy(options).get(endpoint).json();
+  get: async <T>(url: string, options: RequestOptions = {}): Promise<DataResponseBody<T>> => {
+    return buildKy(options).get(url).json();
   },
 
   post: async (endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<KyResponse> => {
     let requestOptions: any;
     
     if (data instanceof FormData) {
-      // FormData인 경우 Content-Type을 제거하여 브라우저가 자동으로 설정하도록 함
       const { headers, ...otherOptions } = options;
       requestOptions = {
         ...otherOptions,
         headers: {
           ...headers,
-          'Content-Type': undefined // FormData는 Content-Type을 자동으로 설정
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'
         }
       };
       const response = await buildKy(requestOptions).post(endpoint, { body: data });
@@ -101,8 +101,8 @@ export const api = {
     throw new Error(`Unexpected response status: ${response.status}`);
   },
   
-  delete: async <T>(endpoint: string, data?: unknown, options: RequestOptions = {}): Promise<T> => {
-    const response = await buildKy(options).delete(endpoint, data ? { json: data } : undefined);
+  delete: async <T>(url: string, options: RequestOptions = {}): Promise<T> => {
+    const response = await buildKy(options).delete(url);
     if (response.status === 204) return null as T;
     throw new Error(`Unexpected response status: ${response.status}`);
   },
