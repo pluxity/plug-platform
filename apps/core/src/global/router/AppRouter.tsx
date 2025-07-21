@@ -3,10 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import BackofficeLayout from '@/backoffice/common/view/layouts/BackofficeLayout'
 import Dashboard from '@/backoffice/domains/dashboard'
-import Users from '@/backoffice/domains/users'
+import Role from '@/backoffice/domains/users/page/Role'
 import Device from '@/backoffice/domains/device'
-import AssetList from '@/backoffice/domains/asset/page/assetList'
-import AssetCategory from '@/backoffice/domains/asset/page/assetCategory'
+import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 
@@ -14,13 +13,13 @@ const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<MapView />} />
-        </Route>
+          <Route path="/" element={<AppLayout />}>
+            <Route index element={<MapView />} />
+          </Route>
 
-        <Route path="/admin" element={<BackofficeLayout />}>
+          <Route path="/admin" element={<BackofficeLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
+          <Route path="role" element={<Role />} />
           <Route path="device" element={<Device />} />
           <Route path="assetList" element={<AssetList />} />
           <Route path="assetCategory" element={<AssetCategory />} />

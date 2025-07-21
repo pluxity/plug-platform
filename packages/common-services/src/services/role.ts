@@ -1,4 +1,5 @@
-import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
+import { api } from '@plug/api-hooks/core';
+import { useGet, usePost, usePut, useSWRApi } from '@plug/api-hooks';
 import type { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@plug/common-services';
 
 const END_POINT = `roles`;
@@ -19,8 +20,8 @@ export const useUpdateRole = (roleId: number) => {
   return usePut<RoleUpdateRequest>(`${END_POINT}/${roleId}`, { requireAuth: true });
 };
 
-export const useDeleteRole = (roleId: number) => {
-  return useDelete(`${END_POINT}/${roleId}`, { requireAuth: true });
+export const deleteRole = async (roleId: number) => {
+  return api.delete(`${END_POINT}/${roleId}`, undefined, { requireAuth: true });
 };
 
 // SWR 기반 훅
@@ -28,6 +29,9 @@ export const useRolesSWR = () => {
   return useSWRApi<RoleResponse[]>(END_POINT, 'GET', { requireAuth: true });
 };
 
-export const useRoleDetailSWR = (roleId: number) => {
-  return useSWRApi<RoleResponse>(`${END_POINT}/${roleId}`, 'GET', { requireAuth: true });
+export const useRoleDetailSWR = (roleId: number | undefined) => {
+  const url = roleId ? `${END_POINT}/${roleId}` : '';
+  return useSWRApi<RoleResponse>(url, 'GET', undefined, { requireAuth: true }, {
+    isPaused: () => !roleId, // roleId가 없으면 요청 중단
+  });
 };

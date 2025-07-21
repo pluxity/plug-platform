@@ -17,5 +17,5 @@ export interface AssetEditModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
-    assetId: number | null;
+    assetId: number ;
 }
