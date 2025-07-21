@@ -56,7 +56,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   } = useFileUploadWithInfo();
 
   // 에셋 수정
-  const { execute: updateAsset, isLoading: isAssetUpdating } = useUpdateAsset(assetId ?? 0);
+  const { execute: updateAsset, isLoading: isAssetUpdating } = useUpdateAsset(assetId);
 
   // 기존 에셋 정보 조회
   useEffect(() => {

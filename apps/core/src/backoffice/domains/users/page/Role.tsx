@@ -4,11 +4,11 @@ import { PageContainer } from '@/backoffice/common/view/layouts'
 import { RoleData } from '@/backoffice/domains/users/types/role';
 import { RoleMapper } from '@/backoffice/domains/users/mapper/roleMapper';
 import { useRolesSWR, deleteRole } from '@plug/common-services/services'
-import { RoleCreateModal } from '@/backoffice/domains/users/components/roleCreateModal'
-import { RoleEditModal } from '@/backoffice/domains/users/components/roleEditModal'
+import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal'
+import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal'
 import { toast } from '@plug/ui'
 
-const UsersRole: React.FC = () => {
+const Role: React.FC = () => {
   // 역할 상태 관리
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -141,4 +141,4 @@ const UsersRole: React.FC = () => {
   )
 }
 
-export default UsersRole
+export default Role;

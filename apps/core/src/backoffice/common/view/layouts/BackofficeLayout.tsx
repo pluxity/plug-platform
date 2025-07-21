@@ -11,7 +11,7 @@ const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'AssetCategory', label: 'AssetCategory', to: '/admin/assetCategory', depth: 2, showToggle: false, parentId: 'Asset'},
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', depth: 1, showToggle: true},
-  { id: 'UsersRole', label: 'UsersRole', to: '/admin/usersRole', depth: 2, showToggle: false, parentId: 'Users'},
+  { id: 'Role', label: 'Role', to: '/admin/role', depth: 2, showToggle: false, parentId: 'Users'},
 ]
 
 const BackofficeLayout: React.FC = () => {

@@ -4,8 +4,8 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 import { useAssetsSWR, deleteAsset } from '@plug/common-services/services';
 import { AssetData } from '@/backoffice/domains/asset/types/asset';
 import { AssetMapper } from '@/backoffice/domains/asset/mapper/assetMapper';
-import { AssetCreateModal } from '@/backoffice/domains/asset/components/assetCreateModal';
-import { AssetEditModal } from '@/backoffice/domains/asset/components/assetEditModal';
+import { AssetCreateModal } from '@/backoffice/domains/asset/components/AssetCreateModal';
+import { AssetEditModal } from '@/backoffice/domains/asset/components/AssetEditModal';
 import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 import { toast } from '@plug/ui';
 

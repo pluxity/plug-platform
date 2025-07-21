@@ -25,7 +25,7 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
     // 역할 상세 목록 조회
     const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : undefined);
 
-    const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId ?? 0);
+    const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId);
 
     useEffect(() => {
         if (isOpen && data) {
@@ -67,7 +67,7 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={resetForm}>
-            <DialogContent title="역할 등록" className="max-w-xl" dimmed disableBackground>
+            <DialogContent title="역할 수정" className="max-w-xl" dimmed disableBackground>
                 <form onSubmit={handleSubmit}>
                 <ModalForm>
                     <ModalFormItem label="역할 이름">
