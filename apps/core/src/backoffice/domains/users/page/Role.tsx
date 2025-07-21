@@ -4,8 +4,8 @@ import { PageContainer } from '@/backoffice/common/view/layouts'
 import { RoleData } from '@/backoffice/domains/users/types/role';
 import { RoleMapper } from '@/backoffice/domains/users/mapper/roleMapper';
 import { useRolesSWR, deleteRole } from '@plug/common-services/services'
-import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal'
-import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal'
+import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal';
+import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal';
 import { toast } from '@plug/ui'
 
 const Role: React.FC = () => {

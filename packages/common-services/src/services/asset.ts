@@ -1,4 +1,5 @@
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
+import { api } from '@plug/api-hooks/core';
 import type { 
   AssetResponse, 
   AssetCreateRequest, 
@@ -28,8 +29,8 @@ export const useUpdateAsset = (assetId: number) => {
 };
 
 // 에셋 삭제
-export const useDeleteAsset = (assetId: number) => {
-  return useDelete(`${ASSET_API}/${assetId}`, { requireAuth: true });
+export const deleteAsset = async (assetId: number) => {
+  return api.delete(`${ASSET_API}/${assetId}`, { requireAuth: true });
 };
 
 // 에셋에 카테고리 할당
