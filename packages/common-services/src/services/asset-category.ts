@@ -12,54 +12,54 @@ import type {
   AssetCategoryUpdateRequest 
 } from '@plug/common-services';
 
-const ASSET_CATEGORY_API = `asset-categories`;
+const END_POINT = `asset-categories`;
 
 // 에셋 카테고리 목록 조회
 export const useAssetCategories = () => {
-  return useGet<AssetCategoryAllResponse>(ASSET_CATEGORY_API, { requireAuth: true });
+  return useGet<AssetCategoryAllResponse>(END_POINT, { requireAuth: true });
 };
 
 // 에셋 카테고리 상세 조회
 export const useAssetCategoryDetail = (categoryId: number) => {
-  return useGet<AssetCategoryResponse>(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
+  return useGet<AssetCategoryResponse>(`${END_POINT}/${categoryId}`, { requireAuth: true });
 };
 
 // 하위 에셋 카테고리 목록 조회
 export const useAssetCategoryChildren = (categoryId: number) => {
-  return useGet<AssetCategoryResponse[]>(`${ASSET_CATEGORY_API}/${categoryId}/children`, { requireAuth: true });
+  return useGet<AssetCategoryResponse[]>(`${END_POINT}/${categoryId}/children`, { requireAuth: true });
 };
 
 // 에셋 카테고리 생성 (201 응답, 생성된 카테고리 전체 반환)
 export const useCreateAssetCategory = () => {
-  return usePost<AssetCategoryCreateRequest>(ASSET_CATEGORY_API, { requireAuth: true });
+  return usePost<AssetCategoryCreateRequest>(END_POINT, { requireAuth: true });
 };
 
 // 에셋 카테고리 수정 (204 No Content 응답)
 export const useUpdateAssetCategory = (categoryId: number) => {
-  return usePut<AssetCategoryUpdateRequest>(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
+  return usePut<AssetCategoryUpdateRequest>(`${END_POINT}/${categoryId}`, { requireAuth: true });
 };
 
 // 에셋 카테고리 삭제 (204 No Content 응답)
 export const useDeleteAssetCategory = (categoryId: number) => {
-  return useDelete(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
+  return useDelete(`${END_POINT}/${categoryId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅들
 export const useAssetCategoriesSWR = () => {
-  return useSWRApi<AssetCategoryAllResponse>(ASSET_CATEGORY_API, 'GET', { requireAuth: true });
+  return useSWRApi<AssetCategoryAllResponse>(END_POINT, 'GET', { requireAuth: true });
 };
 
 export const useAssetCategoryDetailSWR = (categoryId: number) => {
-  return useSWRApi<AssetCategoryResponse>(`${ASSET_CATEGORY_API}/${categoryId}`, 'GET', { requireAuth: true });
+  return useSWRApi<AssetCategoryResponse>(`${END_POINT}/${categoryId}`, 'GET', { requireAuth: true });
 };
 
 export const useAssetCategoryChildrenSWR = (categoryId: number) => {
-  return useSWRApi<AssetCategoryResponse[]>(`${ASSET_CATEGORY_API}/${categoryId}/children`, 'GET', { requireAuth: true });
+  return useSWRApi<AssetCategoryResponse[]>(`${END_POINT}/${categoryId}/children`, 'GET', { requireAuth: true });
 };
 
 // 조건부 훅들 (categoryId가 있을 때만 요청)
 export const useAssetCategoryDetailSWRConditional = (categoryId?: number) => {
-  const url = categoryId ? `${ASSET_CATEGORY_API}/${categoryId}` : '';
+  const url = categoryId ? `${END_POINT}/${categoryId}` : '';
   return useSWRApi<AssetCategoryResponse>(url, 'GET', { requireAuth: true }, {
     fallbackData: null,
     shouldRetryOnError: false,
@@ -68,7 +68,7 @@ export const useAssetCategoryDetailSWRConditional = (categoryId?: number) => {
 };
 
 export const useAssetCategoryChildrenSWRConditional = (categoryId?: number) => {
-  const url = categoryId ? `${ASSET_CATEGORY_API}/${categoryId}/children` : '';
+  const url = categoryId ? `${END_POINT}/${categoryId}/children` : '';
   return useSWRApi<AssetCategoryResponse[]>(url, 'GET', { requireAuth: true }, {
     fallbackData: [],
     shouldRetryOnError: false,

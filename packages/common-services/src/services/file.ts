@@ -4,7 +4,7 @@ import { api } from '@plug/api-hooks/core';
 import type { RequestOptions } from '@plug/api-hooks';
 import type { FileResponse, UseFileUploadWithInfoReturn } from '../types/file';
 
-const FILE_API = `files`;
+const END_POINT = `files`;
 
 const extractFileIdFromLocation = (location: string | null): number | null => {
   if (!location) return null;
@@ -14,14 +14,14 @@ const extractFileIdFromLocation = (location: string | null): number | null => {
 };
 
 export const useFileInfo = (fileId?: number | string, options?: RequestOptions) => {
-  return useGet<FileResponse>(`${FILE_API}/${fileId}`, {
+  return useGet<FileResponse>(`${END_POINT}/${fileId}`, {
     requireAuth: true,
     ...options
   });
 };
 
 export const useFileUpload = (options?: RequestOptions) => {
-  return usePost<FormData>(`${FILE_API}/upload`, {
+  return usePost<FormData>(`${END_POINT}/upload`, {
     requireAuth: true,
     ...options
   });
@@ -50,7 +50,7 @@ export const useFileUploadWithInfo = (options?: RequestOptions): UseFileUploadWi
         setFileInfoError(null);
 
         try {
-          const fileInfoResult = await api.get<FileResponse>(`${FILE_API}/${extractedFileId}`, {
+          const fileInfoResult = await api.get<FileResponse>(`${END_POINT}/${extractedFileId}`, {
             requireAuth: true,
             ...options
           });

@@ -21,7 +21,7 @@ export const useUpdateRole = (roleId: number) => {
 };
 
 export const deleteRole = async (roleId: number) => {
-  return api.delete(`${END_POINT}/${roleId}`, undefined, { requireAuth: true });
+  return api.delete(`${END_POINT}/${roleId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅
@@ -31,7 +31,7 @@ export const useRolesSWR = () => {
 
 export const useRoleDetailSWR = (roleId: number | undefined) => {
   const url = roleId ? `${END_POINT}/${roleId}` : '';
-  return useSWRApi<RoleResponse>(url, 'GET', undefined, { requireAuth: true }, {
+  return useSWRApi<RoleResponse>(url, 'GET', { requireAuth: true }, {
     isPaused: () => !roleId, // roleId가 없으면 요청 중단
   });
 };
