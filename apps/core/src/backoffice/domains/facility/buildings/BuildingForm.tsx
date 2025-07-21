@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@plug/ui";
+import { Button, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
 import { useCreateBuilding, useFileUploadWithInfo } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
@@ -138,8 +138,8 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
             </ModalFormItem>
 
             <ModalFormItem label="설명" className='col-span-2'>
-              <Input
-                type="text"
+              <Textarea
+                className='w-full h-32'
                 value={buildingData.facility.description || ""}
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)

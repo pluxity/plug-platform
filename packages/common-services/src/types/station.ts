@@ -4,18 +4,18 @@ import { Floors } from "./floors";
 export interface StationResponse extends FacilityResponse {
   floors: Floors[];
   lineIds: number[];
-  featureIds: string[];
-  route: string;
-  subway: string;
+  stationCodes: string[];
 }
 
 export interface StationCreateRequest {
   facility: FacilityCreateRequest;
   floors: Floors[];
   lineIds: number[];
+  stationCodes: string[];
 }
 
 export interface StationUpdateRequest extends FacilityUpdateRequest{
   floors: Floors[];
   lineIds: number[];
+  stationCodes: string[];
 }

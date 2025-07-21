@@ -87,7 +87,7 @@ const BuildingDetailPage: React.FC = () => {
       history={buildingHistory}
       detailUrl="/admin/building"
     >
-      <ModalFormItem label="층 정보" className="col-span-2">
+      <ModalFormItem label="층 정보" className="col-span-2 border-b">
         {building?.floors && building.floors.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {building.floors.map((floor, index) => (

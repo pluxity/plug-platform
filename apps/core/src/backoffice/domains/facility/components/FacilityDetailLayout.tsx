@@ -364,7 +364,7 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
               </ModalFormItem>
 
               {/* 층 정보와 기타 특정 콘텐츠를 위한 children 영역 */}
-              {children}
+
 
               <ModalFormItem
                 label="도면 변경 이력"
@@ -421,6 +421,7 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                   )}
                 </div>
               </ModalFormItem>
+              {children}
             </ModalForm>
 
             {formError && (

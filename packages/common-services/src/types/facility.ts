@@ -1,8 +1,33 @@
 import { FileResponse } from "./file";
 
+export interface Facility {
+  id: number;
+  name: string;
+  code: string;
+  description: string;
+  drawing: FileResponse;
+  thumbnail: FileResponse;
+  path: Path[];
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export interface Path {
+  id: number;
+  name: string;
+  type: string;
+  path: string;
+}
+
+export interface FacilityResponse {
+  facility: Facility;
+}
+
 export interface FacilitiesAllResponse {
-  building: FacilityResponse[];
-  station: FacilityResponse[];
+  building: Facility[];
+  station: Facility[];
 }
 
 export interface FacilityHistoryResponse {
@@ -11,21 +36,6 @@ export interface FacilityHistoryResponse {
   createdAt: string;
   createdBy: string;
   file: FileResponse;
-}
-
-export interface FacilityResponse {
-  facility:{
-    id: number;
-    name: string;
-    code: string;
-    description: string;
-    drawing: FileResponse;
-    thumbnail: FileResponse;
-    createdAt: string;
-    createdBy: string;
-    updatedAt: string;
-    updatedBy: string;
-  }
 }
 
 export interface FacilityCreateRequest {

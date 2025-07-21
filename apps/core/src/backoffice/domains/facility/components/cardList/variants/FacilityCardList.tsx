@@ -29,32 +29,32 @@ export const FacilityCardList: React.FC = () => {
 
     if (facilitiesResponse.data.building) {
       const buildingItems = facilitiesResponse.data.building.map(facility => ({
-        id: facility.facility.id,
-        name: facility.facility.name,
-        code: facility.facility.code,
-        description: facility.facility.description,
-        thumbnail: facility.facility.thumbnail,
+        id: facility.id,
+        name: facility.name,
+        code: facility.code,
+        description: facility.description,
+        thumbnail: facility.thumbnail,
         type: 'building',
-        createdAt: facility.facility.createdAt,
-        createdBy: facility.facility.createdBy,
-        updatedAt: facility.facility.updatedAt,
-        updatedBy: facility.facility.updatedBy
+        createdAt: facility.createdAt,
+        createdBy: facility.createdBy,
+        updatedAt: facility.updatedAt,
+        updatedBy: facility.updatedBy
       }));
       allFacilities = [...allFacilities, ...buildingItems];
     }
 
     if (facilitiesResponse.data.station) {
       const stationItems = facilitiesResponse.data.station.map(facility => ({
-        id: facility.facility.id,
-        name: facility.facility.name,
-        code: facility.facility.code,
-        description: facility.facility.description,
-        thumbnail: facility.facility.thumbnail,
+        id: facility.id,
+        name: facility.name,
+        code: facility.code,
+        description: facility.description,
+        thumbnail: facility.thumbnail,
         type: 'station',
-        createdAt: facility.facility.createdAt,
-        createdBy: facility.facility.createdBy,
-        updatedAt: facility.facility.updatedAt,
-        updatedBy: facility.facility.updatedBy
+        createdAt: facility.createdAt,
+        createdBy: facility.createdBy,
+        updatedAt: facility.updatedAt,
+        updatedBy: facility.updatedBy
       }));
       allFacilities = [...allFacilities, ...stationItems];
     }

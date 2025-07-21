@@ -34,6 +34,7 @@ export const StationDetailPage: React.FC = () => {
     },
     floors: [],
     lineIds: [],
+    stationCodes: [],
   });
 
   const handleSetFormData = (data: FacilityUpdateRequest) => {
@@ -53,7 +54,8 @@ export const StationDetailPage: React.FC = () => {
     const stationData: StationUpdateRequest = {
       ...data,
       floors: formData.floors,
-      lineIds: formData.lineIds
+      lineIds: formData.lineIds,
+      stationCodes: formData.stationCodes
     };
     await updateStation(stationData);
   };
