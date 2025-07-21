@@ -213,4 +213,4 @@ const AssetCategory: React.FC = () => {
   )
 }
 
-export default AssetCategory
+export default AssetCategory;

@@ -69,7 +69,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
       setModelFileId(data.file?.id || null);
       setThumbnailFileId(data.thumbnailFile?.id || null);
     }
-  }, [isOpen, assetId, data]);
+  }, [isOpen, assetId, data, clearModelInfo, clearThumbnailInfo]);
 
   const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);

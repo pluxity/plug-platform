@@ -1,10 +1,9 @@
 import { 
   useGet, 
   usePost, 
-  usePut,
-  useDelete,
   useSWRApi
 } from '@plug/api-hooks';
+import { api } from '@plug/api-hooks/core';
 import type { 
   AssetCategoryResponse, 
   AssetCategoryAllResponse,
@@ -35,13 +34,13 @@ export const useCreateAssetCategory = () => {
 };
 
 // 에셋 카테고리 수정 (204 No Content 응답)
-export const useUpdateAssetCategory = (categoryId: number) => {
-  return usePut<AssetCategoryUpdateRequest>(`${END_POINT}/${categoryId}`, { requireAuth: true });
+export const updateAssetCategory = async (categoryId: number, data: AssetCategoryUpdateRequest) => {
+  return api.put(`${END_POINT}/${categoryId}`, data, { requireAuth: true });
 };
 
 // 에셋 카테고리 삭제 (204 No Content 응답)
-export const useDeleteAssetCategory = (categoryId: number) => {
-  return useDelete(`${END_POINT}/${categoryId}`, { requireAuth: true });
+export const deleteAssetCategory = async (categoryId: number) => {
+  return api.delete(`${END_POINT}/${categoryId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅들

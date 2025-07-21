@@ -146,5 +146,5 @@ export const usePatch = <ReqData = any>(url: string, options?: RequestOptions): 
 };
 
 export const useDelete = (url: string, options?: RequestOptions): UseApiResponse<null, []> => {
-  return useApi<null, []>(() => api.delete(url, undefined, options), 'DELETE');
+  return useApi<null, []>(() => api.delete(url, options), 'DELETE');
 };
