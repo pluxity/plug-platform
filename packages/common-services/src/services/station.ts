@@ -1,4 +1,4 @@
-import { useGet, usePost, useSWRApi } from "@plug/api-hooks";
+import { useDelete, useGet, usePatch, usePost, useSWRApi } from "@plug/api-hooks";
 import { FacilityHistoryResponse, StationCreateRequest, StationResponse, StationUpdateRequest } from "../types";
 
 const STATIONS_API = `stations`;
@@ -16,11 +16,11 @@ export const useCreateStation = () => {
 }
 
 export const useUpdateStation = (stationsId: number) => {
-  return usePost<StationUpdateRequest>(`${STATIONS_API}/${stationsId}`, { requireAuth: true });
+  return usePatch<StationUpdateRequest>(`${STATIONS_API}/${stationsId}`, { requireAuth: true });
 }
 
 export const useDeleteStation = (stationsId: number) => {
-  return usePost(`${STATIONS_API}/${stationsId}`, { requireAuth: true });
+  return useDelete(`${STATIONS_API}/${stationsId}`, { requireAuth: true });
 }
 
 export const useStationHistory = (stationsId: number) => {
@@ -36,7 +36,7 @@ export const useCreateStationLines = (stationsId: number, lineId: number) => {
 }
 
 export const useDeleteStationLines = (stationsId: number, lineId: number) => {
-  return usePost(`${STATIONS_API}/${stationsId}/lines/${lineId}`, { requireAuth: true });
+  return useDelete(`${STATIONS_API}/${stationsId}/lines/${lineId}`, { requireAuth: true });
 }
 
 // swr 기반 훅
