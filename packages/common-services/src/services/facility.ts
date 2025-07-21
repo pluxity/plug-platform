@@ -2,7 +2,7 @@ import { FacilitiesAllResponse, FacilityDrawingUpdateRequest } from "../types";
 import { usePatch, useSWRApi } from "@plug/api-hooks";
 
 export const useUpdateFacilitiesDrawing = (facilityId: number) => {
-  return usePatch<FacilityDrawingUpdateRequest>(`facilities/drawing/${facilityId}`, { requireAuth: true });
+  return usePatch<FacilityDrawingUpdateRequest>(`facilities/${facilityId}/drawing`, { requireAuth: true });
 }
 
 export const useFacilitiesAllSWR = () => {

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { ModalFormItem } from "@plug/ui";
+import { ModalFormItem, Button, MultiSelect, Input } from "@plug/ui";
 import {
   StationUpdateRequest,
   useStationDetailSWR,
@@ -8,7 +9,9 @@ import {
   useDeleteStation,
   useUpdateStation,
   useUpdateFacilitiesDrawing,
-  FacilityUpdateRequest, FacilityDrawingUpdateRequest
+  FacilityUpdateRequest,
+  FacilityDrawingUpdateRequest,
+  useLinesSWR
 } from "@plug/common-services";
 import { parseInt } from "lodash";
 import { FacilityDetailLayout } from "../components/FacilityDetailLayout";
@@ -25,7 +28,9 @@ export const StationDetailPage: React.FC = () => {
   const { execute: deleteStation } = useDeleteStation(stationId);
   const { execute: updateStation } = useUpdateStation(stationId);
   const { execute: updateDrawing } = useUpdateFacilitiesDrawing(stationId);
+  const { data: lines } = useLinesSWR();
 
+  // 초기 formData 상태 설정
   const [formData, setFormData] = useState<StationUpdateRequest>({
     facility: {
       name: "",
@@ -37,13 +42,31 @@ export const StationDetailPage: React.FC = () => {
     stationCodes: [],
   });
 
+  // 데이터 로드 시 formData 업데이트
+  useEffect(() => {
+    if (station) {
+      setFormData(() => ({
+        facility: {
+          name: station.facility.name,
+          description: station.facility.description || "",
+          code: station.facility.code,
+          thumbnailFileId: station.facility.thumbnail.id,
+        },
+        floors: station.floors || [],
+        lineIds: station.lineIds || [],
+        stationCodes: station.stationCodes || [],
+      }));
+    }
+  }, [station]);
+
   const handleSetFormData = (data: FacilityUpdateRequest) => {
-    setFormData({
-      ...formData,
-      ...data,
-      floors: formData.floors,
-      lineIds: formData.lineIds
-    });
+    setFormData(prev => ({
+      ...prev,
+      facility: {
+        ...prev.facility,
+        ...data.facility
+      },
+    }));
   };
 
   const handleDelete = async (): Promise<void> => {
@@ -52,10 +75,11 @@ export const StationDetailPage: React.FC = () => {
 
   const handleUpdate = async (data: FacilityUpdateRequest): Promise<void> => {
     const stationData: StationUpdateRequest = {
-      ...data,
-      floors: formData.floors,
-      lineIds: formData.lineIds,
-      stationCodes: formData.stationCodes
+      ...formData,
+      facility: {
+        ...formData.facility,
+        ...data.facility
+      }
     };
     await updateStation(stationData);
   };
@@ -90,7 +114,7 @@ export const StationDetailPage: React.FC = () => {
       history={stationHistory}
       detailUrl="/admin/station"
     >
-      <ModalFormItem label="층 정보" className="col-span-2">
+      <ModalFormItem label="층 정보" className="col-span-3">
         {station?.floors && station.floors.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {station.floors.map((floor, index) => (
@@ -117,6 +141,109 @@ export const StationDetailPage: React.FC = () => {
           <div className="text-sm text-gray-500">
             등록된 층 정보가 없습니다.
           </div>
+        )}
+      </ModalFormItem>
+
+      <ModalFormItem label="선 정보" className="">
+        {urlMode === 'edit' ? (
+          <MultiSelect
+            options={lines?.map((line) => ({
+              label: line.name,
+              value: String(line.id),
+            })) || []}
+            value={formData.lineIds.map(id => String(id))}
+            onChange={(value: string[]) => {
+              setFormData(prev => ({
+                ...prev,
+                lineIds: value.map(v => parseInt(v)),
+              }));
+            }}
+          />
+        ) : (
+          station?.lineIds && station.lineIds.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {station.lineIds.map((lineId, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                >
+                  {lineId}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">
+              등록된 선 정보가 없습니다.
+            </div>
+          )
+        )}
+      </ModalFormItem>
+
+      <ModalFormItem label="역사 코드" className="border-b">
+        {urlMode === 'edit' ? (
+          <div className="space-y-2">
+            {formData.stationCodes?.map((code, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={code}
+                  onChange={(e) => {
+                    const newCodes = [...(formData.stationCodes || [])];
+                    newCodes[index] = e.target.value;
+                    setFormData(prev => ({
+                      ...prev,
+                      stationCodes: newCodes
+                    }));
+                  }}
+                  placeholder={`역사 코드 ${index + 1}`}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const newCodes = [...(formData.stationCodes || [])];
+                    newCodes.splice(index, 1);
+                    setFormData(prev => ({
+                      ...prev,
+                      stationCodes: newCodes
+                    }));
+                  }}
+                  className="px-2 py-1"
+                >
+                  삭제
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={() => {
+                setFormData(prev => ({
+                  ...prev,
+                  stationCodes: [...(prev.stationCodes || []), '']
+                }));
+              }}
+              className="mt-2"
+            >
+              코드 추가
+            </Button>
+          </div>
+        ) : (
+          station?.stationCodes && station.stationCodes.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {station.stationCodes.map((stationCode, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                >
+                  {stationCode}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">
+              등록된 역사 코드가 없습니다.
+            </div>
+          )
         )}
       </ModalFormItem>
     </FacilityDetailLayout>

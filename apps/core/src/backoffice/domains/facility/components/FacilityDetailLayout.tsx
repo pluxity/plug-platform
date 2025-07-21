@@ -77,9 +77,13 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
           thumbnailFileId: data.facility.thumbnail.id,
         }
       });
+      searchParams.set('mode', 'edit');
+      navigate(`${detailUrl}/${itemId}?${searchParams.toString()}`, { replace: true });
+    } else {
+      clearModeParam();
     }
+
     setIsEditMode(!isEditMode);
-    if (isEditMode) clearModeParam();
     setFormError(null);
   };
 
@@ -276,17 +280,10 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                         최초 생성일
                       </span>
                       <span className="font-medium text-gray-800">
-                        {data.facility.createdAt
-                          ? new Date(
-                            data.facility.createdAt,
-                          ).toLocaleDateString("ko-KR")
-                          : "-"}
+                        {data.facility.createdAt ? new Date(data.facility.createdAt,).toLocaleDateString("ko-KR") : "-"}
                       </span>
                     </div>
-                    <Separator
-                      orientation="vertical"
-                      className="bg-gray-300 !h-5"
-                    />
+                    <Separator orientation="vertical" className="bg-gray-300 !h-5" />
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">생성인</span>
                       <span className="font-medium text-gray-800">
@@ -363,9 +360,6 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                 )}
               </ModalFormItem>
 
-              {/* 층 정보와 기타 특정 콘텐츠를 위한 children 영역 */}
-
-
               <ModalFormItem
                 label="도면 변경 이력"
                 className="col-span-2 border-b"
@@ -410,9 +404,7 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                           </div>
                           <div>
                             <a href={data.facility.drawing.url}>
-                              <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">
-                                다운로드
-                              </p>
+                              <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">다운로드</p>
                             </a>
                           </div>
                         </li>
