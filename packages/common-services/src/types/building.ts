@@ -1,13 +1,21 @@
 import { FileResponse } from "./file";
-  
-export interface BuildingResponse {
+export interface Facility {
   id: number;
   name: string;
   description?: string;
-  file: FileResponse;
+  drawing: FileResponse;
   thumbnail: FileResponse;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Floor {
+  floorId: number;
+  name: string;
+}
+export interface BuildingResponse {
+  facility: Facility;
+  floors: Floor[];
 }
 
 export interface BuildingCreateRequest {

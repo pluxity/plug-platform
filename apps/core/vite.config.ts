@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite';
 import svgr from 'vite-plugin-svgr'
+import cesium from 'vite-plugin-cesium'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
     svgr({
       include: "**/*.svg",
     }),
+    cesium(),
   ],
   resolve: {
     alias: {

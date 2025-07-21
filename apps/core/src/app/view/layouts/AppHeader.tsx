@@ -1,9 +1,16 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Badge } from '@plug/ui'
+import React, { useState } from 'react'
+import { Profile, Badge, SearchForm } from '@plug/ui'
 
 const AppHeader: React.FC = () => {
-  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const handleSearch = (query: string) => {
+    console.log('검색:', query)
+  }
+
+  const handleSelect = (selectedItem: string) => {
+    console.log('선택됨:', selectedItem)
+  }
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 z-10">
@@ -18,15 +25,18 @@ const AppHeader: React.FC = () => {
             </Badge>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm">
-              🔍 Search
-            </Button>
-            <Button className="w-full">
-              📍 My Location 2312312323
-            </Button>
-            <Button size="sm" onClick={() => navigate('/admin')}>
+            <div className="w-64">
+              <SearchForm
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSelect={handleSelect}
+                onSearch={handleSearch}
+                placeholder="전체 검색..."
+              />
+            </div>
+            <Profile>
               🏢 Admin
-            </Button>
+            </Profile>
           </div>
         </div>
       </div>

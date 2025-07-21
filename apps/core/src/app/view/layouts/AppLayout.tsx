@@ -1,25 +1,21 @@
 import React from 'react'
+import AppHeader from './AppHeader'
 import { Outlet } from 'react-router-dom'
-import { AppHeader } from '@/app/view/components'
 
 const AppLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="h-screen flex flex-col bg-gray-100">
       <AppHeader />
 
-      {/* Main Content */}
-      <main className="flex-1 relative">
+      {/* Main Content - 전체 화면 사용 */}
+      <main className="flex-1 relative overflow-hidden">
         <Outlet />
       </main>
 
-      {/* Fixed Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-90 backdrop-blur-sm border-t border-gray-200 z-10">
-        <div className="container mx-auto px-6 py-2">
-          <div className="text-center text-sm text-gray-600">
-            © 2025 Pluxity. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      {/* Copyright - 절대 위치로 하단에 고정, 영역 차지하지 않음 */}
+      <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 px-2 py-1 rounded shadow-sm z-10">
+        © 2025 Pluxity. All rights reserved.
+      </span>
     </div>
   )
 }
