@@ -29,48 +29,32 @@ export const FacilityCardList: React.FC = () => {
 
     if (facilitiesResponse.data.building) {
       const buildingItems = facilitiesResponse.data.building.map(facility => ({
-        id: facility.id,
-        name: facility.name,
-        code: facility.code,
-        description: facility.description,
-        thumbnail: facility.thumbnail,
+        id: facility.facility.id,
+        name: facility.facility.name,
+        code: facility.facility.code,
+        description: facility.facility.description,
+        thumbnail: facility.facility.thumbnail,
         type: 'building',
-        createdAt: facility.createdAt,
-        createdBy: facility.createdBy,
-        updatedAt: facility.updatedAt,
-        updatedBy: facility.updatedBy
+        createdAt: facility.facility.createdAt,
+        createdBy: facility.facility.createdBy,
+        updatedAt: facility.facility.updatedAt,
+        updatedBy: facility.facility.updatedBy
       }));
       allFacilities = [...allFacilities, ...buildingItems];
     }
 
-    if (facilitiesResponse.data.panorama) {
-      const panoramaItems = facilitiesResponse.data.panorama.map(facility => ({
-        id: facility.id,
-        name: facility.name,
-        code: facility.code,
-        description: facility.description,
-        thumbnail: facility.thumbnail,
-        type: 'panorama',
-        createdAt: facility.createdAt,
-        createdBy: facility.createdBy,
-        updatedAt: facility.updatedAt,
-        updatedBy: facility.updatedBy
-      }));
-      allFacilities = [...allFacilities, ...panoramaItems];
-    }
-
     if (facilitiesResponse.data.station) {
       const stationItems = facilitiesResponse.data.station.map(facility => ({
-        id: facility.id,
-        name: facility.name,
-        code: facility.code,
-        description: facility.description,
-        thumbnail: facility.thumbnail,
+        id: facility.facility.id,
+        name: facility.facility.name,
+        code: facility.facility.code,
+        description: facility.facility.description,
+        thumbnail: facility.facility.thumbnail,
         type: 'station',
-        createdAt: facility.createdAt,
-        createdBy: facility.createdBy,
-        updatedAt: facility.updatedAt,
-        updatedBy: facility.updatedBy
+        createdAt: facility.facility.createdAt,
+        createdBy: facility.facility.createdBy,
+        updatedAt: facility.facility.updatedAt,
+        updatedBy: facility.facility.updatedBy
       }));
       allFacilities = [...allFacilities, ...stationItems];
     }
@@ -143,7 +127,7 @@ export const FacilityCardList: React.FC = () => {
     
     switch (item.type) {
       case 'building':
-        endpoint = `building/${item.id}`;
+        endpoint = `buildings/${item.id}`;
         confirmMessage = "해당 빌딩을 삭제하시겠습니까?";
         break;
       case 'panorama':

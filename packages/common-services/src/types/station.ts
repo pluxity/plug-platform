@@ -1,8 +1,7 @@
 import { FacilityCreateRequest, FacilityResponse, FacilityUpdateRequest } from "./facility";
 import { Floors } from "./floors";
 
-export interface StationResponse {
-  facility: FacilityResponse;
+export interface StationResponse extends FacilityResponse {
   floors: Floors[];
   lineIds: number[];
   featureIds: string[];
