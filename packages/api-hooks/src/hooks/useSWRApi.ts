@@ -6,7 +6,6 @@ import { createErrorFromResponse } from "../util/apiUtils";
 export function useSWRApi<T>(
   url: string,
   method: AllowedMethod = 'GET',
-  params?: unknown,
   options?: RequestOptions,
   config?: SWRConfiguration
 ): UseSWRApiReturn<T> {
@@ -28,11 +27,7 @@ export function useSWRApi<T>(
     }
   };
 
-  const cacheKey = params
-    ? `${url}::${method}::${JSON.stringify(params)}`
-    : method === 'GET'
-      ? url
-      : `${method}::${url}`;
+  const cacheKey = method === 'GET' ? url : `${method}::${url}`;
 
   const { data: rawData, error, isLoading, mutate, } = useSWR<DataResponseBody<T> | null>(cacheKey, fetcher, {
     revalidateOnFocus: method === 'GET',

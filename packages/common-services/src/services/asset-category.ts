@@ -1,9 +1,10 @@
 import { 
   useGet, 
   usePost, 
+  usePut,
+  useDelete,
   useSWRApi
 } from '@plug/api-hooks';
-import { api } from '@plug/api-hooks/core';
 import type { 
   AssetCategoryResponse, 
   AssetCategoryAllResponse,
@@ -30,36 +31,36 @@ export const useAssetCategoryChildren = (categoryId: number) => {
 
 // 에셋 카테고리 생성 (201 응답, 생성된 카테고리 전체 반환)
 export const useCreateAssetCategory = () => {
-  return usePost<AssetCategoryResponse, AssetCategoryCreateRequest>(ASSET_CATEGORY_API, { requireAuth: true });
+  return usePost<AssetCategoryCreateRequest>(ASSET_CATEGORY_API, { requireAuth: true });
 };
 
 // 에셋 카테고리 수정 (204 No Content 응답)
-export const updateAssetCategory = async (categoryId: number, data: AssetCategoryUpdateRequest) => {
-  return api.put(`${ASSET_CATEGORY_API}/${categoryId}`, data, { requireAuth: true });
+export const useUpdateAssetCategory = (categoryId: number) => {
+  return usePut<AssetCategoryUpdateRequest>(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
 };
 
 // 에셋 카테고리 삭제 (204 No Content 응답)
-export const deleteAssetCategory = async (categoryId: number) => {
-  return api.delete(`${ASSET_CATEGORY_API}/${categoryId}`, undefined, { requireAuth: true });
+export const useDeleteAssetCategory = (categoryId: number) => {
+  return useDelete(`${ASSET_CATEGORY_API}/${categoryId}`, { requireAuth: true });
 };
 
 // SWR 기반 훅들
 export const useAssetCategoriesSWR = () => {
-  return useSWRApi<AssetCategoryAllResponse>(ASSET_CATEGORY_API, 'GET', undefined, { requireAuth: true });
+  return useSWRApi<AssetCategoryAllResponse>(ASSET_CATEGORY_API, 'GET', { requireAuth: true });
 };
 
 export const useAssetCategoryDetailSWR = (categoryId: number) => {
-  return useSWRApi<AssetCategoryResponse>(`${ASSET_CATEGORY_API}/${categoryId}`, 'GET', undefined, { requireAuth: true });
+  return useSWRApi<AssetCategoryResponse>(`${ASSET_CATEGORY_API}/${categoryId}`, 'GET', { requireAuth: true });
 };
 
 export const useAssetCategoryChildrenSWR = (categoryId: number) => {
-  return useSWRApi<AssetCategoryResponse[]>(`${ASSET_CATEGORY_API}/${categoryId}/children`, 'GET', undefined, { requireAuth: true });
+  return useSWRApi<AssetCategoryResponse[]>(`${ASSET_CATEGORY_API}/${categoryId}/children`, 'GET', { requireAuth: true });
 };
 
 // 조건부 훅들 (categoryId가 있을 때만 요청)
 export const useAssetCategoryDetailSWRConditional = (categoryId?: number) => {
   const url = categoryId ? `${ASSET_CATEGORY_API}/${categoryId}` : '';
-  return useSWRApi<AssetCategoryResponse>(url, 'GET', undefined, { requireAuth: true }, {
+  return useSWRApi<AssetCategoryResponse>(url, 'GET', { requireAuth: true }, {
     fallbackData: null,
     shouldRetryOnError: false,
     isPaused: () => !categoryId, // categoryId가 없으면 요청 중단
@@ -68,7 +69,7 @@ export const useAssetCategoryDetailSWRConditional = (categoryId?: number) => {
 
 export const useAssetCategoryChildrenSWRConditional = (categoryId?: number) => {
   const url = categoryId ? `${ASSET_CATEGORY_API}/${categoryId}/children` : '';
-  return useSWRApi<AssetCategoryResponse[]>(url, 'GET', undefined, { requireAuth: true }, {
+  return useSWRApi<AssetCategoryResponse[]>(url, 'GET', { requireAuth: true }, {
     fallbackData: [],
     shouldRetryOnError: false,
     isPaused: () => !categoryId, // categoryId가 없으면 요청 중단

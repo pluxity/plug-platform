@@ -1,4 +1,3 @@
-import { api } from '@plug/api-hooks';
 import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
 import type { 
   AssetResponse, 
@@ -29,8 +28,8 @@ export const useUpdateAsset = (assetId: number) => {
 };
 
 // 에셋 삭제
-export const deleteAsset = (assetId: number) => {
-  return api.delete(`${ASSET_API}/${assetId}`, { requireAuth: true });
+export const useDeleteAsset = (assetId: number) => {
+  return useDelete(`${ASSET_API}/${assetId}`, { requireAuth: true });
 };
 
 // 에셋에 카테고리 할당
@@ -50,7 +49,7 @@ export const useAssetsSWR = () => {
 
 export const useAssetDetailSWR = (assetId: number | undefined) => {
   const url = assetId ? `${ASSET_API}/${assetId}` : '';
-  return useSWRApi<AssetResponse>(url, 'GET', undefined, { requireAuth: true }, {
+  return useSWRApi<AssetResponse>(url, 'GET', { requireAuth: true }, {
     isPaused: () => !assetId, // assetId가 없으면 요청 중단
   });
 };
