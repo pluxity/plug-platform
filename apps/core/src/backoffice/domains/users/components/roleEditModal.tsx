@@ -23,7 +23,7 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
     const [description, setDescription] = useState('');
 
     // 역할 상세 목록 조회
-    const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : null);
+    const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : undefined);
 
     const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId ?? 0);
 
@@ -43,6 +43,13 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
         setDescription(event.target.value);
     }, []);
 
+    const resetForm = useCallback(() => {
+        setName('');
+        setDescription('');
+        onClose();
+        mutate();
+    }, [onClose, mutate]);
+
     const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
         try {
@@ -56,14 +63,7 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
         } catch (error) {
             toast.error((error as Error).message || '역할 수정에 실패했습니다.');
         }
-    }, [name, description, updateRole]);
-
-    const resetForm = useCallback(() => {
-        setName('');
-        setDescription('');
-        onClose();
-        mutate();
-    }, [onClose]);
+    }, [name, description, updateRole, onSuccess, resetForm]);
 
     return (
         <Dialog open={isOpen} onOpenChange={resetForm}>

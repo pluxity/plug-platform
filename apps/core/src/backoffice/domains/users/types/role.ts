@@ -14,5 +14,5 @@ export interface RoleEditModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
-    roleId: number | undefined;
+    roleId: number;
 }

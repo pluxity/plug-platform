@@ -29,6 +29,12 @@ export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClos
         setDescription(event.target.value);
     }, []);
 
+    const resetForm = useCallback(() => {
+        setName('');
+        setDescription('');
+        onClose();
+    }, [onClose]);
+
     const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
         try {
@@ -42,13 +48,7 @@ export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClos
         } catch (error) {
             toast.error((error as Error).message || '역할 등록에 실패했습니다.');
         }
-    }, [name, description, createRole]);
-
-    const resetForm = useCallback(() => {
-        setName('');
-        setDescription('');
-        onClose();
-    }, [onClose]);
+    }, [name, description, createRole, onSuccess, resetForm]);
 
     return (
         <Dialog open={isOpen} onOpenChange={resetForm}>

@@ -29,7 +29,9 @@ export const useRolesSWR = () => {
   return useSWRApi<RoleResponse[]>(END_POINT, 'GET', { requireAuth: true });
 };
 
-export const useRoleDetailSWR = (roleId: number | null) => {
-  const url = roleId && roleId > 0 ? `${END_POINT}/${roleId}` : '';
-  return useSWRApi<RoleResponse>(url, 'GET', undefined, { requireAuth: true });
+export const useRoleDetailSWR = (roleId: number | undefined) => {
+  const url = roleId ? `${END_POINT}/${roleId}` : '';
+  return useSWRApi<RoleResponse>(url, 'GET', undefined, { requireAuth: true }, {
+    isPaused: () => !roleId, // roleId가 없으면 요청 중단
+  });
 };

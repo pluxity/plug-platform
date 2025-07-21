@@ -25,7 +25,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   assetId,
 }) => {
 
-  const { mutate, data } = useAssetDetailSWR(isOpen && assetId ? assetId : null);
+  const { mutate, data } = useAssetDetailSWR(isOpen && assetId ? assetId : undefined);
 
    // 에셋 카테고리 목록 
    const { categories } = useAssetCategoryTree();

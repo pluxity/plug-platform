@@ -47,7 +47,7 @@ const UsersRole: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if(!deleteRoleData) return;
     try {
-      await deleteRole(Number(deleteRoleData.id));
+      await deleteRole(deleteRoleData.id);
       toast.success('역할 삭제 완료');
       mutate();
     } catch (error) {
@@ -114,7 +114,7 @@ const UsersRole: React.FC = () => {
         onSuccess={handleCreateSuccess}
       />
 
-      {editModalOpen && selectedRoleId !== null && (
+      {editModalOpen && selectedRoleId != null && (
         <RoleEditModal  
           isOpen={editModalOpen}
           onClose={() => setEditModalOpen(false)}
