@@ -15,26 +15,18 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ buildingId, buildingData }) => {
       if (containerRef.current) {
           new Engine3D(containerRef.current);
           
-          // 선택된 빌딩 데이터가 있으면 해당 빌딩의 실내 지도 로드
           if (buildingData && buildingData.facility.drawing?.url) {
-            console.log(`Loading indoor map for building: ${buildingData.facility.name}`);
-            console.log('Building drawing URL:', buildingData.facility.drawing.url);
-            
             Loader.LoadGltf(buildingData.facility.drawing.url, 
               () => {
                 Camera.ExtendView(1);
-                console.log(`Indoor map loaded for ${buildingData.facility.name}`);
               });
           } else {
-            // 기본 실내 지도 로드 (빌딩 데이터가 없는 경우)
-            console.log('Loading default indoor map');
             Loader.LoadGltf('http://192.168.4.8/files/plug-platform/temp/971c9ce1-ea4d-4538-a1d7-dccbe1e02c5d/80c3c2d6.glb', 
               () => {
                 Camera.ExtendView(1);
               });
           }
       }
-      console.log('WebGL 초기화 호출.', { buildingId, buildingName: buildingData?.facility.name });
   }, [buildingId, buildingData]);
 
   return (

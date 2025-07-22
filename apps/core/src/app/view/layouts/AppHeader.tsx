@@ -14,14 +14,11 @@ const AppHeader: React.FC = () => {
   } = useBuildingStore()
 
   const handleSearch = (query: string) => {
-    console.log('검색:', query)
-    
     if (query.trim() === '') {
       setSearchResults([])
       return
     }
 
-    // Store의 searchBuildings 함수 사용
     const matchedBuildings = searchBuildings(query)
     const buildingNames = matchedBuildings.map(building => building.facility.name)
     
@@ -29,15 +26,10 @@ const AppHeader: React.FC = () => {
   }
 
   const handleSelect = (selectedItem: string) => {
-    console.log('선택됨:', selectedItem)
-    
-    // 선택된 빌딩 이름으로 빌딩 객체 찾기
     const selectedBuilding = buildings.find(building => building.facility.name === selectedItem)
     
     if (selectedBuilding) {
-      // Store에 검색으로 선택된 빌딩 저장 (카메라 이동용)
       setSearchSelectedBuilding(selectedBuilding)
-      console.log('Selected building for camera movement:', selectedBuilding.facility.name)
     }
     
     setSearchQuery(selectedItem)
