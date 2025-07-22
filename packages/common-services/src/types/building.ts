@@ -5,6 +5,9 @@ export interface Facility {
   description?: string;
   drawing: FileResponse;
   thumbnail: FileResponse;
+  lon: number;
+  lat: number;
+  locationMeta: string;
   createdAt: string;
   updatedAt: string;
 }
