@@ -1,15 +1,47 @@
 import React, { useState } from 'react'
 import { Profile, Badge, SearchForm } from '@plug/ui'
+import { useBuildingStore } from '../../store/buildingStore'
 
 const AppHeader: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<string[]>([])
+
+  // Store에서 빌딩 데이터와 액션 가져오기 (API 호출은 제거)
+  const { 
+    buildings, 
+    searchBuildings,
+    setSearchSelectedBuilding  // 검색 선택용 액션
+  } = useBuildingStore()
 
   const handleSearch = (query: string) => {
     console.log('검색:', query)
+    
+    if (query.trim() === '') {
+      setSearchResults([])
+      return
+    }
+
+    // Store의 searchBuildings 함수 사용
+    const matchedBuildings = searchBuildings(query)
+    const buildingNames = matchedBuildings.map(building => building.facility.name)
+    
+    setSearchResults(buildingNames)
   }
 
   const handleSelect = (selectedItem: string) => {
     console.log('선택됨:', selectedItem)
+    
+    // 선택된 빌딩 이름으로 빌딩 객체 찾기
+    const selectedBuilding = buildings.find(building => building.facility.name === selectedItem)
+    
+    if (selectedBuilding) {
+      // Store에 검색으로 선택된 빌딩 저장 (카메라 이동용)
+      setSearchSelectedBuilding(selectedBuilding)
+      console.log('Selected building for camera movement:', selectedBuilding.facility.name)
+    }
+    
+    setSearchQuery(selectedItem)
+    setSearchResults([])
   }
 
   return (
@@ -31,7 +63,8 @@ const AppHeader: React.FC = () => {
                 onChange={setSearchQuery}
                 onSelect={handleSelect}
                 onSearch={handleSearch}
-                placeholder="전체 검색..."
+                searchResult={searchResults}
+                placeholder="빌딩 검색..."
               />
             </div>
             <Profile>
