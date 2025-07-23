@@ -8,7 +8,7 @@ import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import FacilityManagement from "@/backoffice/domains/facility";
-import BuildingDetailPage from "@/backoffice/domains/facility/buildings/BuildingDetailPage";
+import BuildingDetailPage from "@/backoffice/domains/facility/FacilityDetailPage";
 
 const AppRouter: React.FC = () => {
   return (

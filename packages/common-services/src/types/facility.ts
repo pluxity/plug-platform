@@ -26,8 +26,8 @@ export interface FacilityResponse {
 }
 
 export interface FacilitiesAllResponse {
-  building: Facility[];
-  station: Facility[];
+  buildings: Facility[];
+  stations: Facility[];
 }
 
 export interface FacilityHistoryResponse {

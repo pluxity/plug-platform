@@ -1,91 +1,88 @@
-import React from "react";
-import { Building, TrainFront, Warehouse, Factory } from "lucide-react";
-import { Button } from "@plug/ui";
+import React, { useMemo } from "react";
+import { Building, TrainFront, Warehouse } from "lucide-react";
+import { Button, cn } from "@plug/ui";
+import { FacilityType } from "../store/FacilityListStore";
 
-export type FacilityTabLayout = 'facilities' | 'buildings' | 'stations' | 'factories';
+const TABS = [
+  {
+    id: 'facilities',
+    label: '시설 전체',
+    icon: Warehouse
+  },
+  {
+    id: 'buildings',
+    label: '건물',
+    icon: Building
+  },
+  {
+    id: 'stations',
+    label: '역사',
+    icon: TrainFront
+  }
+];
 
 interface FacilityLayoutProps {
   children: React.ReactNode;
-  activeTab: FacilityTabLayout;
-  setActiveTab: (tab: FacilityTabLayout) => void;
+  activeTab: FacilityType;
+  setActiveTab: (tab: FacilityType) => void;
   showButton?: boolean;
   buttonText?: string;
   onButtonClick?: () => void;
   hideFirstTab?: boolean;
 }
 
-export const FacilityLayout: React.FC<FacilityLayoutProps> = ({
-                                                                children,
-                                                                activeTab,
-                                                                setActiveTab,
-                                                                showButton = true,
-                                                                buttonText = "시설 추가",
-                                                                onButtonClick,
-                                                                hideFirstTab = false,
-                                                              }) => {
-  const getButtonStyle = (tabName: FacilityTabLayout) => {
-    return {
-      padding: '8px 16px',
-      backgroundColor: activeTab === tabName ? '#3b82f6' : '#dbeafe',
-      color: activeTab === tabName ? 'white' : 'black',
-      border: 'none',
-      marginRight: '10px',
-      cursor: 'pointer',
-      borderRadius: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
-    };
+export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, activeTab, setActiveTab, showButton = true, buttonText = "시설 추가", onButtonClick, hideFirstTab = false }) => {
+  const visibleTabs = useMemo(() => {
+    return TABS.filter((_, index) => !(hideFirstTab && index === 0));
+  }, [hideFirstTab]);
+
+  const getTabButtonClassName = (tabId: FacilityType) => {
+    return cn(
+      "flex items-center gap-2 px-4 py-2 rounded-md transition-colors",
+      "text-sm font-medium mr-2",
+      activeTab === tabId
+        ? "bg-blue-600 text-white"
+        : "bg-blue-50 text-gray-700 hover:bg-blue-100"
+    );
   };
 
   return (
-    <>
-      <div className="flex flex-row items-center justify-between mb-6">
-        <div style={{ display: 'flex' }}>
-          {!hideFirstTab && (
-            <button
-              onClick={() => setActiveTab('facilities')}
-              style={getButtonStyle('facilities')}
-            >
-              <Warehouse size={20} /> 시설 전체
-            </button>
-          )}
-          <button
-            onClick={() => setActiveTab('buildings')}
-            style={getButtonStyle('buildings')}
-          >
-            <Building size={20} /> 건물
-          </button>
-          <button
-            onClick={() => setActiveTab('stations')}
-            style={getButtonStyle('stations')}
-          >
-            <TrainFront size={20} /> 역사
-          </button>
-          <button
-            onClick={() => setActiveTab('factories')}
-            style={getButtonStyle('factories')}
-          >
-            <Factory size={20} /> 공장
-          </button>
+    <div className="space-y-6">
+      <div className="flex flex-row items-center justify-between">
+        <div className="flex">
+          {visibleTabs.map(tab => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(tab.id as FacilityType);
+                }}
+                className={getTabButtonClassName(tab.id as FacilityType)}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
+              >
+                <Icon size={18} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {showButton && (
-          <div className="flex gap-2">
-            <Button
-              variant="default"
-              onClick={onButtonClick}
-              className={`rounded-sm`}
-            >
-              {buttonText}
-            </Button>
-          </div>
+          <Button
+            variant="default"
+            onClick={onButtonClick}
+            className="rounded-sm"
+          >
+            {buttonText}
+          </Button>
         )}
       </div>
 
-      <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#fff' }}>
+      <div className="p-5 border border-gray-200 rounded-md bg-white shadow-sm">
         {children}
       </div>
-    </>
+    </div>
   );
 };

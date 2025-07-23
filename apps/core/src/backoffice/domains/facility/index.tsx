@@ -1,92 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import { FacilityLayout, FacilityTabLayout } from "./components/FacilityTabLayout";
-import { FacilityCardList } from "@/backoffice/domains/facility/components/cardList/variants/FacilityCardList";
-import { BuildingCardList } from "@/backoffice/domains/facility/components/cardList/variants/BuildingCardList";
+import { FacilityLayout } from "./components/FacilityTabLayout";
 import { BuildingForm } from "./buildings/BuildingForm";
 import { useLocation } from "react-router-dom";
-import { StationCardList } from "@/backoffice/domains/facility/components/cardList/variants/StationCardList";
-import { StationForm } from "@/backoffice/domains/facility/station/StationForm";
+import { StationForm } from "./station/StationForm";
+import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "./store/FacilityListStore";
+import { FacilityCardList } from "@/backoffice/domains/facility/components/FacilityCardList";
+import { CardList } from "@/backoffice/domains/facility/components/CardList";
 
 const FacilityManagement: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<FacilityTabLayout>("facilities");
+  const [activeTab, setActiveTab] = useState<FacilityType>("facilities");
   const [isCreateMode, setIsCreateMode] = useState(false);
   const location = useLocation();
   const previousPathRef = React.useRef<string | null>(null);
+  const { setSelectedType } = useFacilityListStore();
 
   useEffect(() => {
     if (previousPathRef.current !== location.pathname && location.pathname === '/admin/facility') {
       setActiveTab('facilities');
+      setSelectedType('facilities');
       setIsCreateMode(false);
     }
 
     previousPathRef.current = location.pathname;
-  }, [location.pathname]);
+  }, [location.pathname, setSelectedType]);
 
-
-  const handleTabChange = (tab: FacilityTabLayout) => {
-    setActiveTab(tab);
-    if (tab === 'facilities') {
-      setIsCreateMode(false);
+  useEffect(() => {
+    if (isCreateMode && activeTab === 'facilities') {
+      setActiveTab("buildings");
+      setSelectedType('buildings');
     }
-  };
+  }, [isCreateMode, activeTab, setActiveTab, setSelectedType]);
 
-  const handleButtonClick = () => {
+
+  const handleTabChange = useCallback((tab: FacilityType) => {
+    setActiveTab(tab);
+    setSelectedType(tab);
+
+    if (tab === 'facilities') setIsCreateMode(false);
+  }, [setSelectedType]);
+
+  const handleButtonClick = useCallback(() => {
     setIsCreateMode(!isCreateMode);
-  };
+  }, [isCreateMode]);
 
-  const getButtonText = () => {
+  const getButtonText = useCallback(() => {
     if (isCreateMode) {
       return "시설 목록";
     }
 
-    const buttonTexts = {
-      facilities: "시설 추가",
-      buildings: "건물 추가",
-      stations: "역사 추가",
-      factories: "공장 추가"
-    };
+    return FACILITY_BUTTON_LABELS[activeTab];
+  }, [isCreateMode, activeTab]);
 
-    return buttonTexts[activeTab];
-  };
-
-  const renderCreateForm = () => {
+  const renderCreateForm = useCallback(() => {
     switch (activeTab) {
       case 'facilities':
-        setActiveTab("buildings");
         return <BuildingForm onSaveSuccess={() => setIsCreateMode(false)} />;
       case 'buildings':
         return <BuildingForm onSaveSuccess={() => setIsCreateMode(false)} />;
       case 'stations':
-        return (
-          <StationForm onSaveSuccess={() => setIsCreateMode(false)} />
-        );
-      case 'factories':
+        return <StationForm onSaveSuccess={() => setIsCreateMode(false)} />;
+      default:
         return (
           <div className="p-6 bg-white rounded-md border border-gray-200">
-            <h3 className="text-lg font-medium mb-4">공장 추가 양식</h3>
-            <p>공장 추가 양식은 현재 개발 중입니다.</p>
+            <h3 className="text-lg font-medium mb-4">지원하지 않는 시설 유형</h3>
+            <p>선택한 시설 유형의 추가 양식이 구현되지 않았습니다.</p>
           </div>
         );
-      default:
-        return null;
     }
-  };
+  }, [activeTab, setSelectedType]);
 
-  const renderListComponent = () => {
-    switch (activeTab) {
-      case 'facilities':
-        return <FacilityCardList />;
-      case 'buildings':
-        return <BuildingCardList />;
-      case 'stations':
-        return <StationCardList />;
-      case 'factories':
-        return <BuildingCardList />;
-      default:
-        return <FacilityCardList />;
-    }
-  };
+  const renderListComponent = useCallback(() => {
+    return (
+      <FacilityCardList initialType={activeTab}>
+        {({ standardizedData, filterFacilities, actions, filterOptions, emptyStateAction, renderOptions }) => (
+          <CardList dataResponse={standardizedData} filterData={filterFacilities} actions={actions} filterOptions={filterOptions} emptyStateAction={emptyStateAction} pageSize={8} renderOptions={renderOptions} />
+        )}
+      </FacilityCardList>
+    );
+  }, [activeTab]);
 
   return (
     <PageContainer title={isCreateMode ? "시설 추가" : "시설 관리"}>
