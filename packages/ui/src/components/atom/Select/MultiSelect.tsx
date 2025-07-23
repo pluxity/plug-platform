@@ -65,7 +65,7 @@ function MultiSelect ({
           )}
           aria-label="Select multiple"
         >
-          <div className="flex flex-wrap gap-1 max-w-[180px]">
+          <div className="flex flex-wrap gap-1">
             {selectedOptions.length === 0 ? (
               <span className={cn(
                 "text-neutral-300 text-sm font-medium",
@@ -124,7 +124,7 @@ function MultiSelect ({
                 <span
                   onClick={() => toggleValue(option.value)}
                   className={cn(
-                  "text-gray-500 text-sm font-medium",
+                  "text-gray-500 text-sm font-medium w-full",
                   checked && "text-blue-600",
                   "data-[highlighted]:text-zinc-700"
                 )}>
