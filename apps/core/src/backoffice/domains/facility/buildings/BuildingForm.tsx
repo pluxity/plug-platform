@@ -150,7 +150,6 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
 
             <ModalFormItem label="썸네일">
               <div className="flex w-full items-center justify-between gap-2">
-
                 {thumbnailUploader.isLoadingFileInfo && (
                   <p>썸네일 업로드 중...</p>
                 )}
@@ -163,7 +162,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
                     </div>
                   </div>
                 )}
-                <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
+                <Button className="w-16" type='button' onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
                 <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
               </div>
             </ModalFormItem>
@@ -178,7 +177,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
                     </p>
                   </div>
                 )}
-                <Button className="w-16" onClick={() => document?.getElementById("drawing-input")?.click()}>파일 선택</Button>
+                <Button className="w-16" type='button' onClick={() => document?.getElementById("drawing-input")?.click()}>파일 선택</Button>
                 <Input type="file" id="drawing-input" className="hidden" accept="image/*" onChange={handleDrawingChange} />
               </div>
             </ModalFormItem>

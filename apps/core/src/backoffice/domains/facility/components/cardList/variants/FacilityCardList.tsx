@@ -124,7 +124,7 @@ export const FacilityCardList: React.FC = () => {
   const handleDeleteFacility = async (item: FacilityItem) => {
     let endpoint = '';
     let confirmMessage = '';
-    
+
     switch (item.type) {
       case 'building':
         endpoint = `buildings/${item.id}`;

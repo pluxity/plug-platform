@@ -15,7 +15,6 @@ export interface StationCreateRequest {
 }
 
 export interface StationUpdateRequest extends FacilityUpdateRequest{
-  floors: Floors[];
   lineIds: number[];
   stationCodes: string[];
 }

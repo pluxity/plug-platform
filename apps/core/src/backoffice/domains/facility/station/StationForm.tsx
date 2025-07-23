@@ -149,32 +149,17 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
             {thumbnailUploader.isLoadingFileInfo && <p>썸네일 업로드 중...</p>}
             {thumbnailUploader.fileInfo && (
               <div className="flex gap-2 items-center">
-                <img
-                  src={thumbnailUploader.fileInfo.url}
-                  alt="썸네일 미리보기"
-                  className="h-32 object-cover"
-                />
+                <img src={thumbnailUploader.fileInfo.url} alt="썸네일 미리보기" className="h-32 object-cover" />
                 <div className="text-sm text-gray-500">
                   <p>업로드된 파일: </p>
                   <p>{thumbnailUploader.fileInfo.originalFileName}</p>
                 </div>
               </div>
             )}
-            <Button
-              className="w-16"
-              onClick={() =>
-                document?.getElementById("thumbnail-input")?.click()
-              }
-            >
+            <Button className="w-16" type="button" onClick={() => document?.getElementById("thumbnail-input")?.click()}>
               파일 선택
             </Button>
-            <Input
-              type="file"
-              id="thumbnail-input"
-              className="hidden"
-              accept="image/*"
-              onChange={handleThumbnailChange}
-            />
+            <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
           </div>
         </ModalFormItem>
 
@@ -188,19 +173,10 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
                 </p>
               </div>
             )}
-            <Button
-              className="w-16"
-              onClick={() => document?.getElementById("drawing-input")?.click()}
-            >
+            <Button className="w-16" type="button" onClick={() => document?.getElementById("drawing-input")?.click()}>
               파일 선택
             </Button>
-            <Input
-              type="file"
-              id="drawing-input"
-              className="hidden"
-              accept="image/*"
-              onChange={handleDrawingChange}
-            />
+            <Input type="file" id="drawing-input" className="hidden" accept="image/*" onChange={handleDrawingChange} />
           </div>
         </ModalFormItem>
 

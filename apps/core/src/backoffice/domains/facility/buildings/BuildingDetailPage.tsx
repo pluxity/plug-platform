@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { ModalFormItem } from "@plug/ui";
 import {
-  BuildingUpdateRequest,
   useBuildingDetailSWR,
   useBuildingHistory,
   useDeleteBuilding,
@@ -27,20 +26,19 @@ const BuildingDetailPage: React.FC = () => {
   const { execute: updateBuilding } = useUpdateBuilding(buildingId);
   const { execute: updateDrawing } = useUpdateFacilitiesDrawing(buildingId);
 
-  const [formData, setFormData] = useState<BuildingUpdateRequest>({
+  const [formData, setFormData] = useState<FacilityUpdateRequest>({
     facility: {
       name: "",
       description: "",
       code: "",
-    },
-    floors: []
+    }
   });
 
   const handleSetFormData = (data: FacilityUpdateRequest) => {
     setFormData({
       ...formData,
       ...data,
-      floors: formData.floors
+
     });
   };
 
@@ -49,9 +47,8 @@ const BuildingDetailPage: React.FC = () => {
   };
 
   const handleUpdate = async (data: FacilityUpdateRequest): Promise<void> => {
-    const buildingData: BuildingUpdateRequest = {
+    const buildingData: FacilityUpdateRequest = {
       ...data,
-      floors: formData.floors
     };
     await updateBuilding(buildingData);
   };

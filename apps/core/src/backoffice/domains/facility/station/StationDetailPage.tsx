@@ -30,19 +30,16 @@ export const StationDetailPage: React.FC = () => {
   const { execute: updateDrawing } = useUpdateFacilitiesDrawing(stationId);
   const { data: lines } = useLinesSWR();
 
-  // 초기 formData 상태 설정
   const [formData, setFormData] = useState<StationUpdateRequest>({
     facility: {
       name: "",
       description: "",
       code: "",
     },
-    floors: [],
     lineIds: [],
     stationCodes: [],
   });
 
-  // 데이터 로드 시 formData 업데이트
   useEffect(() => {
     if (station) {
       setFormData(() => ({
@@ -52,7 +49,6 @@ export const StationDetailPage: React.FC = () => {
           code: station.facility.code,
           thumbnailFileId: station.facility.thumbnail.id,
         },
-        floors: station.floors || [],
         lineIds: station.lineIds || [],
         stationCodes: station.stationCodes || [],
       }));
@@ -144,7 +140,7 @@ export const StationDetailPage: React.FC = () => {
         )}
       </ModalFormItem>
 
-      <ModalFormItem label="선 정보" className="">
+      <ModalFormItem label="호선 정보">
         {urlMode === 'edit' ? (
           <MultiSelect
             options={lines?.map((line) => ({
@@ -167,7 +163,7 @@ export const StationDetailPage: React.FC = () => {
                   key={index}
                   className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
                 >
-                  {lineId}
+                  {lineId} 호선
                 </div>
               ))}
             </div>
@@ -181,12 +177,10 @@ export const StationDetailPage: React.FC = () => {
 
       <ModalFormItem label="역사 코드" className="border-b">
         {urlMode === 'edit' ? (
-          <div className="space-y-2">
+          <div className='w-full flex justify-between'>
             {formData.stationCodes?.map((code, index) => (
               <div key={index} className="flex items-center gap-2">
-                <Input
-                  type="text"
-                  value={code}
+                <Input type="text" value={code}
                   onChange={(e) => {
                     const newCodes = [...(formData.stationCodes || [])];
                     newCodes[index] = e.target.value;
@@ -196,7 +190,6 @@ export const StationDetailPage: React.FC = () => {
                     }));
                   }}
                   placeholder={`역사 코드 ${index + 1}`}
-                  className="flex-1"
                 />
                 <Button
                   type="button"
@@ -208,7 +201,7 @@ export const StationDetailPage: React.FC = () => {
                       stationCodes: newCodes
                     }));
                   }}
-                  className="px-2 py-1"
+                  className='w-12'
                 >
                   삭제
                 </Button>
@@ -222,9 +215,9 @@ export const StationDetailPage: React.FC = () => {
                   stationCodes: [...(prev.stationCodes || []), '']
                 }));
               }}
-              className="mt-2"
+              className='w-12'
             >
-              코드 추가
+              추가
             </Button>
           </div>
         ) : (
