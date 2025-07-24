@@ -75,7 +75,7 @@ export const api = {
         headers: {
           ...headers,
           'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': undefined
         }
       };
       const response = await buildKy(requestOptions).post(endpoint, { body: data });

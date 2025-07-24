@@ -6,7 +6,7 @@ import { RoleMapper } from '@/backoffice/domains/users/mapper/roleMapper';
 import { useRolesSWR, deleteRole } from '@plug/common-services/services'
 import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal';
 import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal';
-import { toast } from '@plug/ui'
+import { toast } from 'sonner';
 
 const Role: React.FC = () => {
   // 역할 상태 관리

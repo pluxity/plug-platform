@@ -13,7 +13,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@plug/ui';
-import { toast } from '@plug/ui'
+import { toast } from 'sonner'; 
 import { useAssetDetailSWR, useUpdateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
 import { AssetEditModalProps } from '@/backoffice/domains/asset/types/asset';
 import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
