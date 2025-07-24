@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import { FacilityLayout } from "./components/FacilityTabLayout";
+import { FacilityLayout } from "./components/FacilityLayout";
 import { useLocation } from "react-router-dom";
 import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "./store/FacilityListStore";
 import { FacilityCardList } from "@/backoffice/domains/facility/components/FacilityCardList";

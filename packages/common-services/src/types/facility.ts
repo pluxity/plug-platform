@@ -9,17 +9,19 @@ export interface Path {
 }
 
 export interface BaseFacility {
-  id: number;
-  name: string;
-  code: string;
-  description: string;
-  drawing: FileResponse;
-  thumbnail: FileResponse;
-  path: Path[];
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  updatedBy: string;
+  facility:{
+    id: number;
+    name: string;
+    code: string;
+    description: string;
+    drawing: FileResponse;
+    thumbnail: FileResponse;
+    path: Path[];
+    createdAt: string;
+    createdBy: string;
+    updatedAt: string;
+    updatedBy: string;
+  }
 }
 
 export interface FacilityWithFloorsBase extends BaseFacility {

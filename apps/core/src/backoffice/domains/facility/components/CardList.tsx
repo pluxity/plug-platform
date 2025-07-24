@@ -5,7 +5,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { FacilityCardListProps, FacilityItem } from "./CardListType";
 import { PaginationComponent } from "./PaginationComponent";
 
-export function CardList<T extends FacilityItem>({ dataResponse, filterData, renderOptions = {}, pageSize = 8, actions, filterOptions = {}, emptyStateAction }: FacilityCardListProps<T>) {
+export function CardList<T extends FacilityItem>({ dataResponse, filterData, renderOptions = {}, pageSize = 8, actions, filterOptions = {} }: FacilityCardListProps<T>) {
   const { data = [], isLoading, error } = dataResponse;
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = filterOptions?.searchValue || searchParams.get("query") || "";
@@ -190,11 +190,6 @@ export function CardList<T extends FacilityItem>({ dataResponse, filterData, ren
             <p className="mb-4 text-gray-500">
               {searchQuery ? "검색 결과가 없습니다." : "등록된 항목이 없습니다."}
             </p>
-            {emptyStateAction && (
-              <Button variant="default" onClick={emptyStateAction.onClick}>
-                {emptyStateAction.label}
-              </Button>
-            )}
           </CardContent>
         </Card>
       );

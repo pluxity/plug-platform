@@ -30,6 +30,7 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationCodes, l
                 }}
                 placeholder={`역사 코드 ${index + 1}`}
                 className="flex-1"
+                required
               />
               <Button
                 type="button"

@@ -1,16 +1,16 @@
 import React from "react";
 import { Button, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
-import { useFileUploadWithInfo } from "@plug/common-services";
+import { BaseFacility, useFileUploadWithInfo } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import * as Px from "@plug/engine/dist/src"
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 import { Floors } from "@plug/common-services";
-import { FacilityData, hasFloors } from "@/backoffice/domains/facility/types/facilityData";
+import { hasFloors } from "@/backoffice/domains/facility/types/facilityData";
 
 interface FacilityInfoSectionProps {
   title: string;
-  facilityData: FacilityData;
+  facilityData: BaseFacility;
   onChange: (field: string, value: string) => void;
   onFloorsChange?: (floors: Floors[]) => void;
   onThumbnailUpload: (file: File) => void;
@@ -65,7 +65,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
         <ModalFormItem label="시설명">
           <Input
             type="text"
-            value={facilityData.facility.name}
+            value={facilityData?.facility.name}
             onChange={(e) => onChange("name", e.target.value)}
             placeholder="시설명을 입력하세요"
             required
