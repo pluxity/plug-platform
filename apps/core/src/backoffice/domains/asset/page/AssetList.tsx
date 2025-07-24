@@ -111,7 +111,6 @@ const AssetList: React.FC = () => {
       header: '썸네일 파일',
     },
     {
-      id: 'actions',
       header: '관리',
       cell: ({ row }: { row: { original: AssetData } }) => (
         <div className="flex space-x-2">

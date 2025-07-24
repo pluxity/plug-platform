@@ -72,7 +72,6 @@ const Role: React.FC = () => {
       accessorKey: 'description',
     },
     {
-      id: 'actions',
       header: '관리',
       cell: ({row}: {row: { original: RoleData }}) => (
         <div className="flex space-x-2">
