@@ -7,7 +7,7 @@ function ModalForm({
                     className
 }: ModalFormProps) {
     return(
-        <div className={cn("min-w-lg divide-y divide-gray-200 border-y border-gray-200", className)}>
+        <div className={cn("min-w-lg divide-y divide-gray-300 border-y border-gray-300", className)}>
             {children}
         </div>
     )
