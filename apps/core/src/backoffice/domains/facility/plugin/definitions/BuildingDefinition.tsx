@@ -22,7 +22,6 @@ export const BuildingDefinition: FacilityDefinition<FacilityWithFloors> = {
   createServiceHook: 'useCreateBuilding',
   detailServiceHook: 'useBuildingDetail',
   updateServiceHook: 'useUpdateBuilding',
-  deleteServiceHook: 'useDeleteBuilding',
 
   sections: [
     {
