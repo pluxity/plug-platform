@@ -1,11 +1,11 @@
 import React from 'react'
-import AppHeader from './AppHeader'
+// import AppHeader from './AppHeader'
 import { Outlet } from 'react-router-dom'
 
 const AppLayout: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-gray-100">
-      <AppHeader />
+      {/* <AppHeader /> */}
 
       {/* Main Content - 전체 화면 사용 */}
       <main className="flex-1 relative overflow-hidden">

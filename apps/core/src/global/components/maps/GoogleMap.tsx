@@ -2,18 +2,8 @@ import React, { useEffect } from 'react';
 import * as Cesium from 'cesium';
 import { Viewer as ResiumViewer, Scene, Cesium3DTileset, useCesium } from 'resium';
 
-// 지도 설정
-export const VWORLD_MAP_URL = 'https://api.vworld.kr/req/wmts/1.0.0/';
-export const VWORLD_API_KEY = '39AE0FB0-78CC-3751-B102-8A8F21CF0FF3';
-
 // Google Maps API Key
 export const GOOGLE_MAPS_API_KEY = 'AIzaSyBn49Az8XCIk2zTj42aogqbf47y5D-E1ak';
-
-// Cesium Ion Token (Terrain 용)
-export const CESIUM_ION_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxNWY3MDk5My1jOGMxLTQ2ZGItYjY3ZC0zY2QyMDQ5MWI3ZWUiLCJpZCI6MzI0MDQ5LCJpYXQiOjE3NTMyMzMyODZ9.rsPTO0h1sxIpMx_QTOww9khmpjyQo9PW2n_9ij4jAes';
-
-Cesium.Ion.defaultAccessToken = CESIUM_ION_ACCESS_TOKEN;
-
 interface GoogleMapProps {
   className?: string;
   children?: React.ReactNode;
@@ -53,11 +43,13 @@ export default function GoogleMap({ className = "w-full h-full", children }: Goo
 
   return (
     <div className={`${className} relative`}>
+      {/* Hidden credit container to suppress Cesium credits */}
+      <div id="cesium-credit-container" style={{ display: 'none' }}></div>
+      
       <ResiumViewer 
         className="cesium-container w-full h-full"
         full
         sceneMode={Cesium.SceneMode.SCENE3D}
-        terrainProvider={new Cesium.EllipsoidTerrainProvider()}
         animation={false}
         timeline={false}
         baseLayerPicker={false}
@@ -70,6 +62,7 @@ export default function GoogleMap({ className = "w-full h-full", children }: Goo
         selectionIndicator={false}
         navigationHelpButton={false}
         navigationInstructionsInitiallyVisible={false}
+        creditContainer="cesium-credit-container"
       >
         <Scene />
         
@@ -79,8 +72,6 @@ export default function GoogleMap({ className = "w-full h-full", children }: Goo
         <Cesium3DTileset
           url={googleTilesUrl}
           onReady={(tileset) => {
-            console.log('Google 3D Tiles 로드 완료');
-            // 3D Tiles 성능 최적화 설정
             tileset.maximumScreenSpaceError = 16;
             tileset.skipLevelOfDetail = true;
             tileset.baseScreenSpaceError = 1024;
@@ -88,9 +79,6 @@ export default function GoogleMap({ className = "w-full h-full", children }: Goo
             tileset.skipLevels = 1;
             tileset.immediatelyLoadDesiredLevelOfDetail = false;
             tileset.loadSiblings = false;
-          }}
-          onAllTilesLoad={() => {
-            console.log('모든 Google 3D Tiles 로드 완료');
           }}
         />
         

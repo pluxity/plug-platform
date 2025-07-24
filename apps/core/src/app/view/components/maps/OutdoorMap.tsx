@@ -1,43 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import { Viewer, Cesium3DTileset, useCesium, Entity } from 'resium'
+import React, { useEffect } from 'react'
+import { Entity, useCesium } from 'resium'
 import * as Cesium from 'cesium'
-import { Button } from '@plug/ui'
-import { useBuildingStore } from '@/app/store/buildingStore'
-import { useBuildings } from '@plug/common-services'
-
-export const CESIUM_ION_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmNWJmZWEzOS1jMTJjLTQ0ZTYtOTFkNC1jZDMxMDlmYTRjMWEiLCJpZCI6MjgzMTA2LCJpYXQiOjE3NDE2NjE3OTR9.dZID1nZdOJeEv18BhwGwWlAjJQtWAFUDipJw7M4r0-w'
-
-Cesium.Ion.defaultAccessToken = CESIUM_ION_ACCESS_TOKEN
-
-// Building 위치 정보를 가져오는 함수
-const getBuildingLocationData = (building: { facility: { lon: number; lat: number; locationMeta?: string } }) => {
-  const facility = building.facility;
-  
-  // locationMeta JSON string을 파싱
-  let locationMeta = {
-    height: 0,
-    heading: 0,
-    pitch: 0,
-    roll: 0
-  };
-  
-  try {
-    if (facility.locationMeta) {
-      locationMeta = JSON.parse(facility.locationMeta);
-    }
-  } catch (error) {
-    console.warn('Failed to parse locationMeta:', error);
-  }
-  
-  return {
-    longitude: facility.lon,
-    latitude: facility.lat,
-    height: locationMeta.height || 0,
-    heading: locationMeta.heading || 0,
-    pitch: locationMeta.pitch || 0,
-    roll: locationMeta.roll || 0
-  };
-};
+import { Button, SearchForm } from '@plug/ui'
+import { useMapLoadingStore } from '@/app/store/mapLoadingStore'
+import { useFacilityStore, useFacilities } from '@/app/store/facilityStore'
+import type { Facility, LocationMeta } from '@plug/common-services'
+import GoogleMap from '@/global/components/maps/GoogleMap'
 
 // 지도 컨트롤 컴포넌트
 const MapControls: React.FC = () => {
@@ -106,7 +74,7 @@ const MapControls: React.FC = () => {
         onClick={fnFlyToHome}
         variant="ghost"
         size="icon"
-        title="용산구청으로"
+        title="홈 화면"
         className={btnClassName}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,86 +87,104 @@ const MapControls: React.FC = () => {
 }
 
 interface OutdoorMapProps {
-  onBuildingClick?: (buildingId: number, buildingName: string) => void;
+  onFacilityClick?: (facilityId: number) => void;
 }
 
-const OutdoorMap: React.FC<OutdoorMapProps> = ({ onBuildingClick }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
-  const [buildingEntitiesLoaded, setBuildingEntitiesLoaded] = useState<boolean>(false);
-  const [tilesetLoaded, setTilesetLoaded] = useState<boolean>(false);
-  const [cameraInitialized, setCameraInitialized] = useState<boolean>(false);
+const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
+  const { startTransition, endTransition } = useMapLoadingStore();
   
-  const { buildings, setBuildings, buildingsFetched, setBuildingsFetched, setSelectedBuilding } = useBuildingStore()
-  const { execute: fetchBuildings, data: buildingsData, error: buildingsError } = useBuildings();
+  // Facility store에서 검색 상태와 액션들 가져오기
+  const { 
+    facilitiesFetched,
+    searchQuery,
+    searchResults,
+    setFacilities,
+    setFacilitiesFetched,
+    performSearch,
+    selectSearchResult,
+    setSelectedFacility,
+    setSearchQuery,
+    getAllFacilities
+  } = useFacilityStore()
+  
+  const { execute: fetchFacilities, data: facilitiesData, isLoading: facilitiesLoading } = useFacilities()
 
   useEffect(() => {
-    if (!buildingsFetched && buildings.length === 0) {
-      fetchBuildings();
-      setBuildingsFetched(true);
+    if (!facilitiesFetched) {
+      fetchFacilities()
     }
-  }, [fetchBuildings, buildingsFetched, buildings.length, setBuildingsFetched]);
+  }, [facilitiesFetched, fetchFacilities])
 
   useEffect(() => {
-    if (buildingsData && buildingsData.length > 0) {
-      setBuildings(buildingsData);
+    if (facilitiesData && !facilitiesFetched) {
+      // API 응답이 FacilityAllResponse 형태로 buildings와 stations를 포함
+      setFacilities(facilitiesData)
+      setFacilitiesFetched(true)
     }
-  }, [buildingsData, setBuildings]);
+  }, [facilitiesData, facilitiesFetched, setFacilities, setFacilitiesFetched])
 
+  // 로딩 완료 처리
   useEffect(() => {
-    if (buildingsError) {
-      console.error('Buildings error:', buildingsError);
+    if (!facilitiesLoading && getAllFacilities().length > 0) {
+      const timer = setTimeout(() => {
+        endTransition();
+      }, 500); 
+      
+      return () => clearTimeout(timer);
     }
-  }, [buildingsError]);
+  }, [facilitiesLoading, getAllFacilities, endTransition]);
 
-  useEffect(() => {
-    if (buildings.length > 0 && !buildingEntitiesLoaded) {
-      setBuildingEntitiesLoaded(true);
-    } else if (buildings.length === 0 && buildingsFetched) {
-      setBuildingEntitiesLoaded(true);
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    performSearch(query); 
+  }
+
+  const handleSearchSelect = (facilityName: string) => {
+    const selectedFacility = searchResults.find(facility => facility.name === facilityName)
+    if (selectedFacility) {
+      selectSearchResult(selectedFacility)
     }
-  }, [buildings, buildingEntitiesLoaded, buildingsFetched]);
+  }
 
-  // 모든 로딩이 완료되었는지 체크
-  useEffect(() => {
-    if (tilesetLoaded && cameraInitialized && buildingEntitiesLoaded) {
-      setIsLoading(false);
-    }
-  }, [tilesetLoaded, cameraInitialized, buildingEntitiesLoaded]);
+  if (facilitiesLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-lg">지도를 준비중입니다...</div>
+      </div>
+    );
+  }
 
-  // 초기 카메라 이동을 처리하는 컴포넌트
-  const InitialCameraSetup: React.FC = () => {
+  // Camera movement for search selected facility
+  const CameraController: React.FC = () => {
     const { viewer } = useCesium();
+    const { searchSelectedFacility, setSearchSelectedFacility } = useFacilityStore();
 
-    React.useEffect(() => {
-      if (viewer && !isInitialized) {
-        const camera = viewer.scene.camera;
-        const cameraController = viewer.scene.screenSpaceCameraController;
-        
-        cameraController.tiltEventTypes = [Cesium.CameraEventType.LEFT_DRAG]; // 좌클릭으로 회전
-        cameraController.rotateEventTypes = [Cesium.CameraEventType.RIGHT_DRAG]; // 우클릭으로 패닝
-        cameraController.zoomEventTypes = [
-          Cesium.CameraEventType.WHEEL, // 마우스 휠로 줌
-          Cesium.CameraEventType.PINCH  // 핀치로 줌
-        ];
-        cameraController.translateEventTypes = [Cesium.CameraEventType.MIDDLE_DRAG]; // 휠클릭으로 틸트
-        
-        camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(126.990500, 37.532200, 500),
-          duration: 2.0,
-          complete: () => {
-            setCameraInitialized(true); 
-          }
-        });
-        
-        setIsInitialized(true);
+    useEffect(() => {
+      if (!viewer || !searchSelectedFacility) return;
+
+      const longitude = Number(searchSelectedFacility.lon)
+      const latitude = Number(searchSelectedFacility.lat)
+      
+      // 좌표 유효성 검사
+      if (isNaN(longitude) || isNaN(latitude)) {
+        setSearchSelectedFacility(null)
+        return
       }
-    }, [viewer]);
+
+      const camera = viewer.scene.camera;
+      camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(longitude, latitude, 200),
+        duration: 2.0,
+        complete: () => {
+          setSearchSelectedFacility(null);
+        }
+      });
+    }, [viewer, searchSelectedFacility, setSearchSelectedFacility]);
 
     return null;
   };
 
-  const BuildingInteractionHandler: React.FC = () => {
+  const FacilityInteractionHandler: React.FC = () => {
     const { viewer } = useCesium();
 
     React.useEffect(() => {
@@ -207,15 +193,15 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onBuildingClick }) => {
       const canvas = viewer.canvas;
       const screenSpaceEventHandler = new Cesium.ScreenSpaceEventHandler(canvas);
       let highlightedEntity: Cesium.Entity | null = null;
+      const facilitiesList = getAllFacilities();
 
-      // 간단한 마우스 이벤트
       const onMouseMove = (event: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
         const pickedObject = viewer.scene.pick(event.endPosition);
         
         if (pickedObject && pickedObject.id) {
-          const building = buildings.find(b => b.facility.name === pickedObject.id.name);
+          const facility = facilitiesList.find(f => f.name === pickedObject.id.name);
           
-          if (building) {
+          if (facility) {
             canvas.style.cursor = 'pointer';
             
             if (highlightedEntity !== pickedObject.id) {
@@ -228,7 +214,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onBuildingClick }) => {
               // 새로운 하이라이트 적용
               highlightedEntity = pickedObject.id;
               if (highlightedEntity && highlightedEntity.model) {
-                highlightedEntity.model.silhouetteSize = new Cesium.ConstantProperty(3.0);
+                highlightedEntity.model.silhouetteSize = new Cesium.ConstantProperty(4.0);
                 highlightedEntity.model.silhouetteColor = new Cesium.ConstantProperty(Cesium.Color.CYAN);
               }
             }
@@ -236,7 +222,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onBuildingClick }) => {
           }
         }
         
-        // 빌딩 밖으로 마우스가 나갔을 때
+        // 시설 밖으로 마우스가 나갔을 때
         canvas.style.cursor = 'default';
         
         if (highlightedEntity && highlightedEntity.model) {
@@ -250,12 +236,14 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onBuildingClick }) => {
       const onLeftClick = (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
         const pickedObject = viewer.scene.pick(event.position);
         if (pickedObject && pickedObject.id) {
-          const building = buildings.find(b => b.facility.name === pickedObject.id.name);
+          const facility = facilitiesList.find(f => f.name === pickedObject.id.name);
           
-          if (building) {
-            setSelectedBuilding(building);
-            if (onBuildingClick) {
-              onBuildingClick(building.facility.id, building.facility.name);
+          if (facility) {
+            startTransition('outdoor', 'indoor');
+            
+            setSelectedFacility(facility);
+            if (onFacilityClick) {
+              onFacilityClick(facility.id);
             }
           }
         }
@@ -265,116 +253,101 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onBuildingClick }) => {
       screenSpaceEventHandler.setInputAction(onMouseMove, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
       screenSpaceEventHandler.setInputAction(onLeftClick, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+      // 정리 함수
+      return () => {
+        if (highlightedEntity && highlightedEntity.model) {
+          highlightedEntity.model.silhouetteSize = new Cesium.ConstantProperty(0);
+          highlightedEntity.model.silhouetteColor = undefined;
+        }
+        screenSpaceEventHandler.destroy();
+      };
+
     }, [viewer]);
-
-    return null;
-  };
-
-  // 선택된 빌딩으로 카메라 이동을 처리하는 컴포넌트 (검색 결과 선택 시)
-  const CameraController: React.FC = () => {
-    const { viewer } = useCesium();
-    const searchSelectedBuilding = useBuildingStore(state => state.searchSelectedBuilding);
-
-    React.useEffect(() => {
-      if (!viewer || !searchSelectedBuilding) return;
-
-      const building = searchSelectedBuilding;
-      const buildingPosition = getBuildingLocationData(building);
-      
-      const camera = viewer.scene.camera;
-      const cameraHeight = buildingPosition.height + 400;
-      
-      const offsetLongitude = 0.005;
-      const offsetLatitude = 0.005;
-      
-      const cameraLongitude = buildingPosition.longitude + offsetLongitude;
-      const cameraLatitude = buildingPosition.latitude + offsetLatitude;
-      
-      camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(cameraLongitude, cameraLatitude, cameraHeight),
-        orientation: {
-          heading: Cesium.Math.toRadians(225),
-          pitch: Cesium.Math.toRadians(-45),
-          roll: 0.0
-        },
-        duration: 2.5 
-      });
-
-    }, [viewer, searchSelectedBuilding]);
 
     return null;
   };
 
   return (
     <div className="w-full h-full relative">
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <div className="text-gray-700">
-              <p className="text-lg font-semibold mb-2">⏳ 3D 지도 로딩 중...</p>
-            </div>
-          </div>
-        </div>
-      )}
-      <Viewer
-        full
-        timeline={false}
-        animation={false}
-        baseLayerPicker={false}
-        fullscreenButton={false}
-        vrButton={false}
-        geocoder={false}
-        homeButton={false}
-        infoBox={false}
-        sceneModePicker={false}
-        selectionIndicator={false}
-        navigationHelpButton={false}
-        navigationInstructionsInitiallyVisible={false}
-        sceneMode={Cesium.SceneMode.SCENE3D}
-        terrainProvider={new Cesium.EllipsoidTerrainProvider()}
-      >
-        <Cesium3DTileset
-          url={Cesium.IonResource.fromAssetId(2275207)}
-          onReady={() => {
-            setTilesetLoaded(true);
-          }}
-        />
+      <GoogleMap className="w-full h-full">
+        <CameraController />
+        <FacilityInteractionHandler />
         
-        {/* <Cesium3DTileset
-          url={Cesium.IonResource.fromAssetId(96188)}
-          onReady={(tileset) => {
-            const heightOffset = -10;
-            const translation = new Cesium.Cartesian3(0, 0, heightOffset);
-            tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
-          }}
-        /> */}
-        
-        {/* 동적으로 생성된 빌딩 Entity들 - drawing.url이 있는 것만 렌더링 */}
-        {buildings
-          .filter(building => building.facility.drawing?.url) // drawing.url이 있는 빌딩만 필터링
-          .slice(0, 5) // 처음 5개만 렌더링해서 테스트
-          .map((building) => {
-            const position = getBuildingLocationData(building);
+        {/* Facility Entities */}
+        {(() => {
+          const allFacilities = getAllFacilities();
+          if (allFacilities.length === 0) {
+            return null;
+          }
+          
+          const filteredFacilities = allFacilities.filter(facility => {
+            // 필수 데이터 검증
+            const hasDrawing = facility.drawing?.url;
+            const hasLon = typeof facility.lon === 'number' && !isNaN(facility.lon);
+            const hasLat = typeof facility.lat === 'number' && !isNaN(facility.lat);
+            
+            return hasDrawing && hasLon && hasLat;
+          });
+          
+          return filteredFacilities.map((facility) => {
+            const longitude = Number(facility.lon)
+            const latitude = Number(facility.lat)
+            
+            // locationMeta JSON 파싱
+            let locationMeta: LocationMeta = {};
+            try {
+              if (facility.locationMeta) {
+                locationMeta = JSON.parse(facility.locationMeta) as LocationMeta;
+              }
+            } catch {
+              // 파싱 실패 시 빈 객체 사용
+            }
+            
+            // 고도값 설정 - locationMeta.height 사용
+            const altitude = locationMeta.height || 0;
+            const modelHeight = altitude;
+            
+            // 방향 정보 추출 - locationMeta에서만 가져옴
+            const heading = locationMeta.heading || 0;
+            const pitch = locationMeta.pitch || 0;
+            const roll = locationMeta.roll || 0;
+            
             return (
               <Entity
-                key={building.facility.id}
-                name={building.facility.name}
-                position={Cesium.Cartesian3.fromDegrees(position.longitude, position.latitude, position.height)}
+                key={facility.id}
+                name={facility.name}
+                position={Cesium.Cartesian3.fromDegrees(longitude, latitude, modelHeight)}
+                orientation={Cesium.Transforms.headingPitchRollQuaternion(
+                  Cesium.Cartesian3.fromDegrees(longitude, latitude, modelHeight),
+                  Cesium.HeadingPitchRoll.fromDegrees(heading, pitch, roll)
+                )}
                 model={{
-                  uri: building.facility.drawing.url,
-                  scale: 1.0,
-                  heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
+                  uri: facility.drawing.url,
+                  scale: 2.0,
+                  heightReference: Cesium.HeightReference.NONE,
+                  show: true
+                  // minimumPixelSize와 maximumScale 제거하여 자연스러운 크기 변화 허용
                 }}
               />
             );
-          })}
+          });
+        })()}
         
-        <InitialCameraSetup />
-        <BuildingInteractionHandler />
-        <CameraController />
-        <MapControls />
-      </Viewer>      
+      </GoogleMap>
+      
+      {/* Search Form - 좌측 상단에 플로팅 */}
+      <div className="absolute top-4 left-4 w-80">
+        <SearchForm
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onSelect={handleSearchSelect}
+          searchResult={searchResults.map(facility => facility.name)}
+          placeholder="시설 검색..."
+          className="bg-white/90 backdrop-blur-sm shadow-lg"
+        />
+      </div>
+      
+      <MapControls />
     </div>
   )
 }
