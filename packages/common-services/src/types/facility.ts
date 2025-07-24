@@ -1,7 +1,14 @@
-import { FileResponse } from "./file";
 import { Floors } from "./floors";
+import { FileResponse } from "./file";
 
-export interface Facility {
+export interface Path {
+  id: number;
+  name: string;
+  type: string;
+  path: string;
+}
+
+export interface BaseFacility {
   id: number;
   name: string;
   code: string;
@@ -15,7 +22,11 @@ export interface Facility {
   updatedBy: string;
 }
 
-export interface FacilityBase {
+export interface FacilityWithFloorsBase extends BaseFacility {
+  floors: Floors[];
+}
+
+export interface BaseFacilityCreateRequest {
   facility: {
     name: string;
     code: string;
@@ -25,24 +36,23 @@ export interface FacilityBase {
   };
 }
 
-export interface FacilityWithFloors extends FacilityBase{
+export interface FacilityWithFloorsCreateRequest extends BaseFacilityCreateRequest {
   floors: Floors[];
 }
 
-export interface Path {
-  id: number;
-  name: string;
-  type: string;
-  path: string;
-}
-
-export interface FacilityResponse {
-  facility: Facility;
+export interface BaseFacilityUpdateRequest {
+  facility?: {
+    name?: string;
+    description?: string;
+    code?: string;
+    thumbnailFileId?: number;
+    drawingFileId?: number;
+  }
 }
 
 export interface FacilitiesAllResponse {
-  buildings: Facility[];
-  stations: Facility[];
+  buildings: BaseFacility[];
+  stations: BaseFacility[];
 }
 
 export interface FacilityHistoryResponse {
@@ -51,26 +61,4 @@ export interface FacilityHistoryResponse {
   createdAt: string;
   createdBy: string;
   file: FileResponse;
-}
-
-export interface FacilityCreateRequest {
-  name: string;
-  code: string;
-  description?: string;
-  drawingFileId?: number;
-  thumbnailFileId?: number;
-}
-
-export interface FacilityUpdateRequest {
-  facility?: {
-    name?: string;
-    description?: string;
-    code?: string;
-    thumbnailFileId?: number;
-  }
-}
-
-export interface FacilityDrawingUpdateRequest {
-  drawingFileId: number;
-  comment: string;
 }
