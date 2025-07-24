@@ -8,7 +8,7 @@ import {
   ModalForm,
   ModalFormItem,
 } from '@plug/ui';
-import { toast } from '@plug/ui'
+import { toast } from 'sonner'
 import { useCreateRole } from '@plug/common-services/services';
 import { RoleCreateModalProps } from '@/backoffice/domains/users/types/role';
 

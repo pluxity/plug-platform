@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Toast } from "./Toast";
-import { toast } from "./toast-functions";
+import { toast } from "sonner";
+
 import { 
   useState, 
   useEffect, 

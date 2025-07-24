@@ -11,7 +11,7 @@
     "api-hooks": "pnpm --filter @plug/api-hooks",
     "common-services": "pnpm --filter @plug/common-services",
     "prepare": "husky install",
-    "sample" : "pnpm --filter @plug/sample",
+    "sample": "pnpm --filter @plug/sample",
     "project:busan": "pnpm --filter @plug/busan-subway",
     "core": "pnpm --filter @plug/core"
   },
@@ -19,14 +19,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "@tailwindcss/vite": "^4",
     "clsx": "^2.1.1",
     "ky": "^1.8.1",
     "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.58.1",
+    "sonner": "^2.0.5",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",
