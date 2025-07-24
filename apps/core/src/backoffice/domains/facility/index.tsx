@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import { FacilityLayout } from "./components/FacilityTabLayout";
-import { BuildingForm } from "./buildings/BuildingForm";
 import { useLocation } from "react-router-dom";
-import { StationForm } from "./station/StationForm";
 import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "./store/FacilityListStore";
 import { FacilityCardList } from "@/backoffice/domains/facility/components/FacilityCardList";
 import { CardList } from "@/backoffice/domains/facility/components/CardList";
+import { FacilityForm } from "@/backoffice/domains/facility/create/FacilityForm";
 
 const FacilityManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState<FacilityType>("facilities");
@@ -55,11 +54,9 @@ const FacilityManagement: React.FC = () => {
   const renderCreateForm = useCallback(() => {
     switch (activeTab) {
       case 'facilities':
-        return <BuildingForm onSaveSuccess={() => setIsCreateMode(false)} />;
       case 'buildings':
-        return <BuildingForm onSaveSuccess={() => setIsCreateMode(false)} />;
       case 'stations':
-        return <StationForm onSaveSuccess={() => setIsCreateMode(false)} />;
+        return <FacilityForm facilityType={activeTab === 'facilities' ? 'buildings' : activeTab} onSaveSuccess={() => setIsCreateMode(false)} />;
       default:
         return (
           <div className="p-6 bg-white rounded-md border border-gray-200">
@@ -68,7 +65,8 @@ const FacilityManagement: React.FC = () => {
           </div>
         );
     }
-  }, [activeTab, setSelectedType]);
+  }, [activeTab, setIsCreateMode]);
+
 
   const renderListComponent = useCallback(() => {
     return (

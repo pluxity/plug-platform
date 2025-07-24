@@ -179,7 +179,10 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
             <Input type="file" id="drawing-input" className="hidden" accept="image/*" onChange={handleDrawingChange} />
           </div>
         </ModalFormItem>
-
+        <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+          <div className="w-1 h-6 bg-blue-500 rounded"></div>
+          <h3 className="text-lg font-medium"> 층 정보</h3>
+        </div>
         <ModalFormItem label="층 정보" className="border-b col-span-2">
           <div className="flex flex-wrap gap-2">
             {stationData.floors && stationData.floors.length > 0 ? (
@@ -211,6 +214,11 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
           </div>
         </ModalFormItem>
 
+        <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+          <div className="w-1 h-6 bg-blue-500 rounded"></div>
+          <h3 className="text-lg font-medium">역사 정보</h3>
+        </div>
+        
         <ModalFormItem label="역사 코드">
           <div className="space-y-2">
             {stationData.stationCodes?.map((code, index) => (

@@ -115,97 +115,140 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSaveSuccess }) => 
 
   return (
     <form onSubmit={handleSubmit}>
-      <h1 className="text-2xl font-bold mb-6">건물 정보 입력</h1>
-          <ModalForm className="grid grid-cols-2 border-t divide-y divide-gray-200 border-x">
-            <ModalFormItem label="건물명">
-              <Input
-                type="text"
-                value={buildingData.facility.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                placeholder="건물명을 입력하세요"
-                required
-              />
-            </ModalFormItem>
+      <h1 className="text-2xl font-bold mb-6">건물 등록</h1>
+      <ModalForm className="grid grid-cols-2 border-t divide-y divide-gray-200 border-x">
+        <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+          <div className="w-1 h-6 bg-blue-600"></div>
+          <h3 className="text-lg font-medium">시설 정보 입력</h3>
+        </div>
+        <ModalFormItem label="시설명">
+          <Input
+            type="text"
+            value={buildingData.facility.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            placeholder="시설명을 입력하세요"
+            required
+          />
+        </ModalFormItem>
 
-            <ModalFormItem label="건물 코드">
-              <Input
-                type="text"
-                value={buildingData.facility.code}
-                onChange={(e) => handleInputChange("code", e.target.value)}
-                placeholder="건물 코드를 입력하세요"
-                required
-              />
-            </ModalFormItem>
+        <ModalFormItem label="코드">
+          <Input
+            type="text"
+            value={buildingData.facility.code}
+            onChange={(e) => handleInputChange("code", e.target.value)}
+            placeholder="코드를 입력하세요"
+            required
+          />
+        </ModalFormItem>
 
-            <ModalFormItem label="설명" className='col-span-2'>
-              <Textarea
-                className='w-full h-32'
-                value={buildingData.facility.description || ""}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-                placeholder="건물에 대한 설명을 입력하세요"
-              />
-            </ModalFormItem>
+        <ModalFormItem label="설명" className="col-span-2">
+          <Textarea
+            className="w-full h-32"
+            value={buildingData.facility.description || ""}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="시설에 대한 설명을 입력하세요"
+          />
+        </ModalFormItem>
 
-            <ModalFormItem label="썸네일">
-              <div className="flex w-full items-center justify-between gap-2">
-                {thumbnailUploader.isLoadingFileInfo && (
-                  <p>썸네일 업로드 중...</p>
-                )}
-                {thumbnailUploader.fileInfo && (
-                  <div className="flex gap-2 items-center">
-                    <img src={thumbnailUploader.fileInfo.url} alt="썸네일 미리보기" className="h-32 object-cover" />
-                    <div className="text-sm text-gray-500">
-                      <p>업로드된 파일: </p>
-                      <p>{thumbnailUploader.fileInfo.originalFileName}</p>
-                    </div>
-                  </div>
-                )}
-                <Button className="w-16" type='button' onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
-                <Input type="file" id="thumbnail-input" className="hidden" accept="image/*" onChange={handleThumbnailChange} />
+        <ModalFormItem label="썸네일">
+          <div className="flex w-full items-center justify-between gap-2">
+            {thumbnailUploader.isLoadingFileInfo && <p>썸네일 업로드 중...</p>}
+            {thumbnailUploader.fileInfo && (
+              <div className="flex gap-2 items-center">
+                <img
+                  src={thumbnailUploader.fileInfo.url}
+                  alt="썸네일 미리보기"
+                  className="h-32 object-cover"
+                />
+                <div className="text-sm text-gray-500">
+                  <p>업로드된 파일: </p>
+                  <p>{thumbnailUploader.fileInfo.originalFileName}</p>
+                </div>
               </div>
-            </ModalFormItem>
+            )}
+            <Button
+              className="w-16"
+              type="button"
+              onClick={() =>
+                document?.getElementById("thumbnail-input")?.click()
+              }
+            >
+              파일 선택
+            </Button>
+            <Input
+              type="file"
+              id="thumbnail-input"
+              className="hidden"
+              accept="image/*"
+              onChange={handleThumbnailChange}
+            />
+          </div>
+        </ModalFormItem>
 
-            <ModalFormItem label="도면">
-              <div className="flex justify-between w-full gap-2">
-                {drawingUploader.isLoadingFileInfo && <p>도면 업로드 중...</p>}
-                {drawingUploader.fileInfo && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      업로드된 파일: {drawingUploader.fileInfo.originalFileName}
-                    </p>
-                  </div>
-                )}
-                <Button className="w-16" type='button' onClick={() => document?.getElementById("drawing-input")?.click()}>파일 선택</Button>
-                <Input type="file" id="drawing-input" className="hidden" accept="image/*" onChange={handleDrawingChange} />
+        <ModalFormItem label="도면">
+          <div className="flex justify-between w-full gap-2">
+            {drawingUploader.isLoadingFileInfo && <p>도면 업로드 중...</p>}
+            {drawingUploader.fileInfo && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">
+                  업로드된 파일: {drawingUploader.fileInfo.originalFileName}
+                </p>
               </div>
-            </ModalFormItem>
+            )}
+            <Button
+              className="w-16"
+              type="button"
+              onClick={() => document?.getElementById("drawing-input")?.click()}
+            >
+              파일 선택
+            </Button>
+            <Input
+              type="file"
+              id="drawing-input"
+              className="hidden"
+              accept="image/*"
+              onChange={handleDrawingChange}
+            />
+          </div>
+        </ModalFormItem>
 
-            <ModalFormItem label="층 정보" className="border-b col-span-2">
-              <div className="flex flex-wrap gap-2">
-                {buildingData.floors && buildingData.floors.length > 0 ? (
-                  buildingData.floors.map((floor, index) => (
-                    <div key={index} className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]">
-                      <div>
-                        <span className="text-gray-500 mr-1">ID</span>
-                        <span className="font-medium text-gray-800">{floor.floorId}</span>
-                      </div>
-                      <div className="mt-1">
-                        <span className="text-gray-500 mr-1">이름</span>
-                        <span className="font-medium text-gray-800">{floor.name}</span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-gray-500">
-                    등록된 층 정보가 없습니다. 도면 파일을 업로드하면 자동으로 층 정보가 추출됩니다.
+        <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+          <div className="w-1 h-6 bg-blue-500 rounded"></div>
+          <h3 className="text-lg font-medium">층 정보</h3>
+        </div>
+
+        <ModalFormItem label="층 정보" className="border-b col-span-2">
+          <div className="flex flex-wrap gap-2">
+            {buildingData.floors && buildingData.floors.length > 0 ? (
+              buildingData.floors.map((floor, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
+                >
+                  <div>
+                    <span className="text-gray-500 mr-1">ID</span>
+                    <span className="font-medium text-gray-800">
+                      {floor.floorId}
+                    </span>
                   </div>
-                )}
+                  <div className="mt-1">
+                    <span className="text-gray-500 mr-1">이름</span>
+                    <span className="font-medium text-gray-800">
+                      {floor.name}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500">
+                등록된 층 정보가 없습니다. 도면 파일을 업로드하면 자동으로 층
+                정보가 추출됩니다.
               </div>
-            </ModalFormItem>
-          </ModalForm>
-          {error && (<div className="text-red-500 mt-4 text-center">{error}</div>)}
+            )}
+          </div>
+        </ModalFormItem>
+      </ModalForm>
+      {error && <div className="text-red-500 mt-4 text-center">{error}</div>}
       <div className="flex items-center justify-end mt-6 gap-2">
         <Button
           type="submit"
