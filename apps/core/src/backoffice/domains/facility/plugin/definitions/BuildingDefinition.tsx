@@ -1,6 +1,6 @@
-import { FacilityDefinition, FacilityRegistry } from '../FacilityRegistry';
+import { FacilityDefinition, FacilityRegistry } from '../registry/FacilityRegistry';
 import { FacilityWithFloors } from "@plug/common-services";
-import { FloorInfoSection } from "../../create/FloorInfoSection";
+import { FloorInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/FloorInfoSection";
 import { Building } from "lucide-react";
 
 export const BuildingDefinition: FacilityDefinition<FacilityWithFloors> = {
@@ -22,6 +22,7 @@ export const BuildingDefinition: FacilityDefinition<FacilityWithFloors> = {
   createServiceHook: 'useCreateBuilding',
   detailServiceHook: 'useBuildingDetail',
   updateServiceHook: 'useUpdateBuilding',
+  deleteServiceHook: 'useDeleteBuilding',
 
   sections: [
     {

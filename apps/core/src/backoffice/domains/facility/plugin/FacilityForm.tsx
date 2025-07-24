@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@plug/ui";
 import { FacilityWithFloors, Floors, useFileUploadWithInfo } from "@plug/common-services";
 import { FacilityType } from "../store/FacilityListStore";
-import { FacilityInfoSection } from "./FacilityInfoSection";
+import { FacilityInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/FacilityInfoSection";
 import { FacilityManager } from "../services/FacilityManager";
-import { FacilityRegistry } from "@/backoffice/domains/facility/create/FacilityRegistry";
+import { FacilityRegistry } from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
 import "./definitions/BuildingDefinition";
 import "./definitions/StationDefinition";
 import { FacilityData, hasFloors, isStationFacility } from "@/backoffice/domains/facility/types/facilityData";
@@ -97,8 +97,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
       return;
     }
 
-    if (thumbnailSelected || drawingSelected ||
-      thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo) {
+    if (thumbnailSelected || drawingSelected || thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo) {
       setError("파일 업로드가 완료될 때까지 기다려주세요.");
       return;
     }
@@ -113,10 +112,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
     setError(null);
 
     try {
-      const requestData = {
-        ...facilityData,
-        facility: { ...facilityData.facility, }
-      };
+      const requestData = { ...facilityData, facility: { ...facilityData.facility, } };
 
       if (thumbnailFileId) {
         requestData.facility.thumbnailFileId = thumbnailFileId;
@@ -132,9 +128,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
 
       await createService.execute(requestData);
 
-      if (onSaveSuccess) {
-        onSaveSuccess();
-      }
+      if (onSaveSuccess) onSaveSuccess();
     } catch (err) {
       console.error(`${facilityType} 생성 오류:`, err);
       setError(`시설을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.`);
@@ -143,30 +137,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
     }
   };
 
-  const isSubmitDisabled = isSubmitting ||
-    thumbnailUploader.isLoadingFileInfo ||
-    drawingUploader.isLoadingFileInfo ||
-    thumbnailSelected ||
-    drawingSelected ||
-    !facilityData;
-
-  if (!facilityDefinition) {
-    return (
-      <div className="p-6 bg-white rounded-md border border-gray-200">
-        <h3 className="text-lg font-medium mb-4">지원하지 않는 시설 유형</h3>
-        <p>선택한 시설 유형({facilityType})은 등록되지 않은 유형입니다.</p>
-      </div>
-    );
-  }
-
-  if (!createService) {
-    return (
-      <div className="p-6 bg-white rounded-md border border-gray-200">
-        <h3 className="text-lg font-medium mb-4">지원하지 않는 기능</h3>
-        <p>선택한 시설 유형({facilityType})은 생성 기능을 지원하지 않습니다.</p>
-      </div>
-    );
-  }
+  const isSubmitDisabled = isSubmitting || thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo || thumbnailSelected || drawingSelected || !facilityData;
 
   if (!facilityData) {
     return (
@@ -177,7 +148,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
   }
 
   const infoSectionProps = {
-    title: `새 ${facilityDefinition.displayName} 등록`,
+    title: `새 ${facilityDefinition?.displayName} 등록`,
     facilityData: facilityData,
     onChange: handleInputChange,
     onThumbnailUpload: handleThumbnailUpload,
@@ -197,7 +168,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
   return (
     <form onSubmit={handleSubmit}>
       <FacilityInfoSection {...infoSectionProps}>
-        {facilityDefinition.sections.map((section) => (
+        {facilityDefinition?.sections.map((section) => (
           <React.Fragment key={section.id}>
             <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
               <div className="w-1 h-6 bg-blue-600"></div>
@@ -209,25 +180,16 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
               handlers: {
                 ...(hasFloors(facilityData) ? {
                   onFloorsChange: (floors: Floors[]) => {
-                    handleDataChange({
-                      ...facilityData,
-                      floors
-                    } as FacilityWithFloors);
+                    handleDataChange({ ...facilityData, floors } as FacilityWithFloors);
                   }
                 } : {}),
 
                 ...(isStationFacility(facilityData) ? {
                   onStationCodesChange: (codes: string[]) => {
-                    handleDataChange({
-                      ...facilityData,
-                      stationCodes: codes
-                    });
+                    handleDataChange({ ...facilityData, stationCodes: codes });
                   },
                   onLineIdsChange: (lineIds: number[]) => {
-                    handleDataChange({
-                      ...facilityData,
-                      lineIds
-                    });
+                    handleDataChange({ ...facilityData, lineIds });
                   }
                 } : {}),
               }

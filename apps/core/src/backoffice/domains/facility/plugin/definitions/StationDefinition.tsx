@@ -1,7 +1,7 @@
-import { FacilityDefinition, FacilityRegistry } from '../FacilityRegistry';
+import { FacilityDefinition, FacilityRegistry } from '../registry/FacilityRegistry';
 import { StationFacility } from "@plug/common-services";
-import { FloorInfoSection } from "../../create/FloorInfoSection";
-import { StationInfoSection } from "../../create/StationInfoSection";
+import { FloorInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/FloorInfoSection";
+import { StationInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/StationInfoSection";
 import { TrainFront } from "lucide-react";
 
 export const StationDefinition: FacilityDefinition<StationFacility> = {
@@ -25,6 +25,7 @@ export const StationDefinition: FacilityDefinition<StationFacility> = {
   createServiceHook: 'useCreateStation',
   detailServiceHook: 'useStationDetail',
   updateServiceHook: 'useUpdateStation',
+  deleteServiceHook: 'useDeleteStation',
 
   sections: [
     {

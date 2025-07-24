@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Button, cn } from "@plug/ui";
 import { FacilityType } from "../store/FacilityListStore";
-import { FacilityRegistry } from "@/backoffice/domains/facility/create/FacilityRegistry";
+import { FacilityRegistry } from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
 import { House } from 'lucide-react';
 
 interface FacilityLayoutProps {

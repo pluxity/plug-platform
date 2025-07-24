@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { FacilityType } from "../store/FacilityListStore";
+import { FacilityType } from "../../store/FacilityListStore";
 import { FacilityData } from "@/backoffice/domains/facility/types/facilityData";
 import { Floors } from "@plug/common-services";
 
@@ -12,6 +12,7 @@ export interface FacilityDefinition<T extends FacilityData = FacilityData> {
   createServiceHook: string;
   detailServiceHook: string;
   updateServiceHook: string;
+  deleteServiceHook: string;
   sections: SectionDefinition<T>[];
   is: (data: unknown) => data is T;
   getCardColor?: () => string;

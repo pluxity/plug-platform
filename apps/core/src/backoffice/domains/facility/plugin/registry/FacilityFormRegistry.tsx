@@ -1,7 +1,7 @@
-import { FacilityType } from "../store/FacilityListStore";
+import { FacilityType } from "../../store/FacilityListStore";
 import { ReactNode } from "react";
-import { FloorInfoSection } from "@/backoffice/domains/facility/create/FloorInfoSection";
-import { StationInfoSection } from "@/backoffice/domains/facility/create/StationInfoSection";
+import { FloorInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/FloorInfoSection";
+import { StationInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/StationInfoSection";
 import { FacilityWithFloors, StationFacility } from "@plug/common-services";
 
 export type FacilityData = FacilityWithFloors | StationFacility;

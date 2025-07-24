@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
-import { FacilityRegistry } from "@/backoffice/domains/facility/create/FacilityRegistry";
+import { FacilityRegistry } from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
 
 export type FacilityType = 'facilities' | 'buildings' | 'stations';
 
