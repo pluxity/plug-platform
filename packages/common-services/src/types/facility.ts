@@ -1,4 +1,5 @@
 import { FileResponse } from "./file";
+import { Floors } from "./floors";
 
 export interface Facility {
   id: number;
@@ -12,6 +13,20 @@ export interface Facility {
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
+}
+
+export interface FacilityBase {
+  facility: {
+    name: string;
+    code: string;
+    description: string;
+    thumbnailFileId?: number;
+    drawingFileId?: number;
+  };
+}
+
+export interface FacilityWithFloors extends FacilityBase{
+  floors: Floors[];
 }
 
 export interface Path {

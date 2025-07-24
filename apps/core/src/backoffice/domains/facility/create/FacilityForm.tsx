@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@plug/ui";
-import { BuildingCreateRequest, Floors, StationCreateRequest, useCreateBuilding, useCreateStation, useFileUploadWithInfo } from "@plug/common-services";
+import { FacilityWithFloors, Floors, useFileUploadWithInfo } from "@plug/common-services";
 import { FacilityType } from "../store/FacilityListStore";
 import { FacilityInfoSection } from "./FacilityInfoSection";
-import { StationInfoSection } from "./StationInfoSection";
-import { FloorInfoSection } from "./FloorInfoSection";
+import { FacilityManager } from "../services/FacilityManager";
+import { FacilityRegistry } from "@/backoffice/domains/facility/create/FacilityRegistry";
+import "./definitions/BuildingDefinition";
+import "./definitions/StationDefinition";
+import { FacilityData, hasFloors, isStationFacility } from "@/backoffice/domains/facility/types/facilityData";
 
 interface FacilityFormProps {
   facilityType: FacilityType;
@@ -14,20 +17,25 @@ interface FacilityFormProps {
 export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSaveSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [facilityData, setFacilityData] = useState<FacilityData | null>(null);
+
+  const thumbnailUploader = useFileUploadWithInfo();
+  const drawingUploader = useFileUploadWithInfo();
+
   const [thumbnailSelected, setThumbnailSelected] = useState(false);
   const [drawingSelected, setDrawingSelected] = useState(false);
   const [thumbnailFileId, setThumbnailFileId] = useState<number | null>(null);
   const [drawingFileId, setDrawingFileId] = useState<number | null>(null);
-  const [facilityData, setFacilityData] = useState<BuildingCreateRequest | StationCreateRequest>({
-    facility: { name: "", code: "", description: "", },
-    floors: [],
-    ...(facilityType === 'stations' ? { lineIds: [], stationCodes: [] } : {})
-  });
 
-  const thumbnailUploader = useFileUploadWithInfo();
-  const drawingUploader = useFileUploadWithInfo();
-  const createBuilding = useCreateBuilding();
-  const createStation = useCreateStation();
+  const facilityDefinition = FacilityRegistry.get(facilityType);
+  const CreateService = facilityDefinition ? FacilityManager.getCreateService(facilityType) : null;
+  const createService = CreateService ? CreateService() : null;
+
+  useEffect(() => {
+    if (facilityDefinition) {
+      setFacilityData(facilityDefinition.getInitialData());
+    }
+  }, [facilityType, facilityDefinition]);
 
   useEffect(() => {
     if (thumbnailUploader.fileInfo?.id) {
@@ -44,14 +52,19 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
   }, [drawingUploader.fileInfo?.id]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFacilityData(prev => ({
-      ...prev,
-      facility: { ...prev.facility, [field]: value }
-    }));
+    if (!facilityData) return;
+
+    setFacilityData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        facility: { ...prev.facility, [field]: value }
+      };
+    });
   };
 
-  const handleFloorsChange = (floors: Floors[]) => {
-    setFacilityData(prev => ({ ...prev, floors }));
+  const handleDataChange = (newData: FacilityData) => {
+    setFacilityData(newData);
   };
 
   const handleThumbnailUpload = async (file: File) => {
@@ -76,26 +89,23 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
     }
   };
 
-  const handleStationCodesChange = (codes: string[]) => {
-    if (facilityType === 'stations') {
-      setFacilityData(prev => ({
-        ...prev,
-        stationCodes: codes
-      } as StationCreateRequest));
-    }
-  };
-
-  const handleLineIdsChange = (lineIds: number[]) => {
-    if (facilityType === 'stations') {
-      setFacilityData(prev => ({ ...prev, lineIds } as StationCreateRequest));
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (thumbnailSelected || drawingSelected || thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo) {
+    if (!facilityData || !createService) {
+      setError("필수 데이터나 서비스가 없습니다.");
+      return;
+    }
+
+    if (thumbnailSelected || drawingSelected ||
+      thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo) {
       setError("파일 업로드가 완료될 때까지 기다려주세요.");
+      return;
+    }
+
+    const validationError = FacilityManager.validateData(facilityType, facilityData);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -103,7 +113,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
     setError(null);
 
     try {
-      const requestData: BuildingCreateRequest | StationCreateRequest = {
+      const requestData = {
         ...facilityData,
         facility: { ...facilityData.facility, }
       };
@@ -120,47 +130,110 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
         requestData.facility.drawingFileId = drawingUploader.fileInfo.id;
       }
 
-      if (facilityType === 'buildings') {
-        await createBuilding.execute(requestData as BuildingCreateRequest);
-      } else if (facilityType === 'stations') {
-        await createStation.execute(requestData as StationCreateRequest);
-      }
+      await createService.execute(requestData);
 
       if (onSaveSuccess) {
         onSaveSuccess();
       }
     } catch (err) {
-      console.error(`${facilityType === 'buildings' ? '건물' : '역사'} 생성 오류:`, err);
-      setError(`${facilityType === 'buildings' ? '건물' : '역사'}을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.`);
+      console.error(`${facilityType} 생성 오류:`, err);
+      setError(`시설을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const formTitle = facilityType === 'buildings' ? '새 건물 등록' : '새 역사 등록';
-  const isSubmitDisabled = isSubmitting || thumbnailUploader.isLoadingFileInfo || drawingUploader.isLoadingFileInfo || thumbnailSelected || drawingSelected;
+  const isSubmitDisabled = isSubmitting ||
+    thumbnailUploader.isLoadingFileInfo ||
+    drawingUploader.isLoadingFileInfo ||
+    thumbnailSelected ||
+    drawingSelected ||
+    !facilityData;
+
+  if (!facilityDefinition) {
+    return (
+      <div className="p-6 bg-white rounded-md border border-gray-200">
+        <h3 className="text-lg font-medium mb-4">지원하지 않는 시설 유형</h3>
+        <p>선택한 시설 유형({facilityType})은 등록되지 않은 유형입니다.</p>
+      </div>
+    );
+  }
+
+  if (!createService) {
+    return (
+      <div className="p-6 bg-white rounded-md border border-gray-200">
+        <h3 className="text-lg font-medium mb-4">지원하지 않는 기능</h3>
+        <p>선택한 시설 유형({facilityType})은 생성 기능을 지원하지 않습니다.</p>
+      </div>
+    );
+  }
+
+  if (!facilityData) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p>데이터 로딩 중...</p>
+      </div>
+    );
+  }
+
+  const infoSectionProps = {
+    title: `새 ${facilityDefinition.displayName} 등록`,
+    facilityData: facilityData,
+    onChange: handleInputChange,
+    onThumbnailUpload: handleThumbnailUpload,
+    onDrawingUpload: handleDrawingUpload,
+    thumbnailUploader,
+    drawingUploader,
+    ...(hasFloors(facilityData) ? {
+      onFloorsChange: (floors: Floors[]) => {
+        handleDataChange({
+          ...facilityData,
+          floors
+        } as FacilityWithFloors);
+      }
+    } : {})
+  };
 
   return (
     <form onSubmit={handleSubmit}>
-      <FacilityInfoSection
-        title={formTitle}
-        facilityData={facilityData}
-        onChange={handleInputChange}
-        onFloorsChange={handleFloorsChange}
-        onThumbnailUpload={handleThumbnailUpload}
-        onDrawingUpload={handleDrawingUpload}
-        thumbnailUploader={thumbnailUploader}
-        drawingUploader={drawingUploader}
-      >
-        <FloorInfoSection floors={facilityData.floors} />
-        {facilityType === 'stations' && (
-          <StationInfoSection
-            stationCodes={(facilityData as StationCreateRequest).stationCodes || []}
-            lineIds={(facilityData as StationCreateRequest).lineIds || []}
-            onStationCodesChange={handleStationCodesChange}
-            onLineIdsChange={handleLineIdsChange}
-          />
-        )}
+      <FacilityInfoSection {...infoSectionProps}>
+        {facilityDefinition.sections.map((section) => (
+          <React.Fragment key={section.id}>
+            <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+              <div className="w-1 h-6 bg-blue-600"></div>
+              <h3 className="text-lg font-medium">{section.title}</h3>
+            </div>
+            {section.render({
+              data: facilityData,
+              onChange: handleDataChange,
+              handlers: {
+                ...(hasFloors(facilityData) ? {
+                  onFloorsChange: (floors: Floors[]) => {
+                    handleDataChange({
+                      ...facilityData,
+                      floors
+                    } as FacilityWithFloors);
+                  }
+                } : {}),
+
+                ...(isStationFacility(facilityData) ? {
+                  onStationCodesChange: (codes: string[]) => {
+                    handleDataChange({
+                      ...facilityData,
+                      stationCodes: codes
+                    });
+                  },
+                  onLineIdsChange: (lineIds: number[]) => {
+                    handleDataChange({
+                      ...facilityData,
+                      lineIds
+                    });
+                  }
+                } : {}),
+              }
+            })}
+          </React.Fragment>
+        ))}
       </FacilityInfoSection>
 
       {error && <div className="text-red-500 mt-4 text-center">{error}</div>}

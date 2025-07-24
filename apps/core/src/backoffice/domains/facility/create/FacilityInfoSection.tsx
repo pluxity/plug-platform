@@ -1,34 +1,31 @@
 import React from "react";
 import { Button, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
-import { FacilityCreateRequest, useFileUploadWithInfo } from "@plug/common-services";
+import { useFileUploadWithInfo } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import * as Px from "@plug/engine/src"
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 import { Floors } from "@plug/common-services";
+import { FacilityData, hasFloors } from "@/backoffice/domains/facility/types/facilityData";
 
 interface FacilityInfoSectionProps {
   title: string;
-  facilityData: {
-    facility: FacilityCreateRequest;
-    floors: Floors[];
-  };
+  facilityData: FacilityData;
   onChange: (field: string, value: string) => void;
-  onFloorsChange: (floors: Floors[]) => void;
+  onFloorsChange?: (floors: Floors[]) => void;
   onThumbnailUpload: (file: File) => void;
   onDrawingUpload: (file: File) => void;
   thumbnailUploader: ReturnType<typeof useFileUploadWithInfo>;
   drawingUploader: ReturnType<typeof useFileUploadWithInfo>;
+  showFloorInfo?: boolean;
   children?: React.ReactNode;
 }
 
-export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title, facilityData, onChange, onFloorsChange, onThumbnailUpload, onDrawingUpload, thumbnailUploader, drawingUploader, children }) => {
+export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title, facilityData, onChange, onFloorsChange, onThumbnailUpload, onDrawingUpload, thumbnailUploader, drawingUploader, showFloorInfo = false, children }) => {
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      onThumbnailUpload(files[0]);
-    }
+    if (files && files.length > 0) onThumbnailUpload(files[0]);
   };
 
   const handleDrawingChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,20 +33,22 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
     if (files && files.length > 0) {
       onDrawingUpload(files[0]);
 
-      const fileUrl = URL.createObjectURL(files[0]);
-      if (fileUrl) {
-        try {
-          Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
-            if (Array.isArray(modelInfos) && modelInfos.length > 0) {
-              const floors = modelInfos.map(info => ({
-                name: info.displayName,
-                floorId: info.floorId
-              }));
-              onFloorsChange(floors);
-            }
-          });
-        } catch (err) {
-          console.error("도면 층 정보 추출 오류:", err);
+      if (onFloorsChange && showFloorInfo && hasFloors(facilityData)) {
+        const fileUrl = URL.createObjectURL(files[0]);
+        if (fileUrl) {
+          try {
+            Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
+              if (Array.isArray(modelInfos) && modelInfos.length > 0) {
+                const floors = modelInfos.map(info => ({
+                  name: info.displayName,
+                  floorId: info.floorId
+                }));
+                onFloorsChange(floors);
+              }
+            });
+          } catch (err) {
+            console.error("도면 층 정보 추출 오류:", err);
+          }
         }
       }
     }
@@ -133,7 +132,6 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
             <Input type="file" id="drawing-input" className="hidden" accept="image/*" onChange={handleDrawingChange} />
           </div>
         </ModalFormItem>
-
         {children}
       </ModalForm>
     </>

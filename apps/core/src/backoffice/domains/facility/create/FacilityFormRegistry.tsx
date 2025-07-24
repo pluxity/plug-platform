@@ -2,14 +2,11 @@ import { FacilityType } from "../store/FacilityListStore";
 import { ReactNode } from "react";
 import { FloorInfoSection } from "@/backoffice/domains/facility/create/FloorInfoSection";
 import { StationInfoSection } from "@/backoffice/domains/facility/create/StationInfoSection";
-import { BuildingCreateRequest, StationCreateRequest, Floors } from "@plug/common-services";
+import { FacilityWithFloors, StationFacility } from "@plug/common-services";
 
-export type FacilityData =
-  | BuildingCreateRequest
-  | StationCreateRequest;
+export type FacilityData = FacilityWithFloors | StationFacility;
 
 export interface DataHandlers {
-  onFloorsChange?: (floors: Floors[]) => void;
   onStationCodesChange?: (codes: string[]) => void;
   onLineIdsChange?: (lineIds: number[]) => void;
 }
@@ -77,13 +74,11 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
         title: "역사 정보",
         required: true,
         renderFunction: (data: FacilityData, handlers: DataHandlers) => {
-          // 타입 가드를 통해 StationCreateRequest 타입인지 확인
-          const isStation = 'stationCodes' in data && 'lineIds' in data;
-
+          const stationData = data as StationFacility;
           return (
             <StationInfoSection
-              stationCodes={isStation ? data.stationCodes || [] : []}
-              lineIds={isStation ? data.lineIds || [] : []}
+              stationCodes={stationData.stationCodes || []}
+              lineIds={stationData.lineIds || []}
               onStationCodesChange={handlers.onStationCodesChange || (() => {})}
               onLineIdsChange={handlers.onLineIdsChange || (() => {})}
             />
@@ -100,7 +95,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       floors: [],
       lineIds: [],
       stationCodes: [],
-    } as StationCreateRequest),
+    } as StationFacility),
     serviceHookName: "useCreateStation",
   },
 };

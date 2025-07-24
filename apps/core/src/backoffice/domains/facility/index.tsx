@@ -56,7 +56,12 @@ const FacilityManagement: React.FC = () => {
       case 'facilities':
       case 'buildings':
       case 'stations':
-        return <FacilityForm facilityType={activeTab === 'facilities' ? 'buildings' : activeTab} onSaveSuccess={() => setIsCreateMode(false)} />;
+        return (
+          <FacilityForm
+            facilityType={activeTab === 'facilities' ? 'buildings' : activeTab}
+            onSaveSuccess={() => setIsCreateMode(false)}
+          />
+        );
       default:
         return (
           <div className="p-6 bg-white rounded-md border border-gray-200">
@@ -66,6 +71,7 @@ const FacilityManagement: React.FC = () => {
         );
     }
   }, [activeTab, setIsCreateMode]);
+
 
 
   const renderListComponent = useCallback(() => {

@@ -1,5 +1,5 @@
 import { useDelete, useGet, usePut, usePost, useSWRApi } from "@plug/api-hooks";
-import { FacilityHistoryResponse, StationCreateRequest, StationResponse, StationUpdateRequest } from "../types";
+import { FacilityHistoryResponse, StationFacility, StationResponse, StationUpdateRequest } from "../types";
 
 const STATIONS_API = `stations`;
 
@@ -12,7 +12,7 @@ export const useStationDetail = (stationsId: number) => {
 };
 
 export const useCreateStation = () => {
-  return usePost<StationCreateRequest>(STATIONS_API, { requireAuth: true });
+  return usePost<StationFacility>(STATIONS_API, { requireAuth: true });
 }
 
 export const useUpdateStation = (stationsId: number) => {

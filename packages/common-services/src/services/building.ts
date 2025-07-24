@@ -1,5 +1,5 @@
 import { useGet, usePost, useDelete, useSWRApi, usePut } from "@plug/api-hooks";
-import type { BuildingResponse, BuildingCreateRequest } from '@plug/common-services';
+import type { BuildingResponse, FacilityWithFloors } from '@plug/common-services';
 import { FacilityHistoryResponse, FacilityUpdateRequest } from "../types";
 
 const END_POINT = 'buildings';
@@ -13,7 +13,7 @@ export const useBuildingDetail = (buildingId: number) => {
 };
 
 export const useCreateBuilding = () => {
-  return usePost<BuildingCreateRequest>(END_POINT, { requireAuth: true });
+  return usePost<FacilityWithFloors>(END_POINT, { requireAuth: true });
 };
 
 export const useUpdateBuilding = (buildingId: number) => {

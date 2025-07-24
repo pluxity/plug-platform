@@ -16,11 +16,6 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationCodes, l
 
   return (
     <>
-      <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
-        <div className="w-1 h-6 bg-blue-600"></div>
-        <h3 className="text-lg font-medium">역사 정보</h3>
-      </div>
-
       <ModalFormItem label="역사 코드">
         <div className="space-y-2">
           {stationCodes?.map((code, index) => (

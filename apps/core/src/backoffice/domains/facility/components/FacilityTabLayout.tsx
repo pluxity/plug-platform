@@ -1,25 +1,8 @@
 import React, { useMemo } from "react";
-import { Building, TrainFront, Warehouse } from "lucide-react";
 import { Button, cn } from "@plug/ui";
 import { FacilityType } from "../store/FacilityListStore";
-
-const TABS = [
-  {
-    id: 'facilities',
-    label: '시설 전체',
-    icon: Warehouse
-  },
-  {
-    id: 'buildings',
-    label: '건물',
-    icon: Building
-  },
-  {
-    id: 'stations',
-    label: '역사',
-    icon: TrainFront
-  }
-];
+import { FacilityRegistry } from "@/backoffice/domains/facility/create/FacilityRegistry";
+import { House } from 'lucide-react';
 
 interface FacilityLayoutProps {
   children: React.ReactNode;
@@ -32,9 +15,24 @@ interface FacilityLayoutProps {
 }
 
 export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, activeTab, setActiveTab, showButton = true, buttonText = "시설 추가", onButtonClick, hideFirstTab = false }) => {
+  const tabs = useMemo(() => {
+    const defaultTab = {
+      id: 'facilities',
+      label: '시설 전체',
+      icon: () => (<House/>)
+    };
+
+    const registeredTabs = FacilityRegistry.getAll().map(def => ({
+      id: def.type,
+      label: def.displayName,
+      icon: def.icon || defaultTab.icon
+    }));
+    return [defaultTab, ...registeredTabs];
+  }, []);
+
   const visibleTabs = useMemo(() => {
-    return TABS.filter((_, index) => !(hideFirstTab && index === 0));
-  }, [hideFirstTab]);
+    return tabs.filter((_, index) => !(hideFirstTab && index === 0));
+  }, [hideFirstTab, tabs]);
 
   const getTabButtonClassName = (tabId: FacilityType) => {
     return cn(
@@ -49,7 +47,7 @@ export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, active
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center justify-between">
-        <div className="flex">
+        <div className="flex flex-wrap">
           {visibleTabs.map(tab => {
             const Icon = tab.icon;
             return (
@@ -62,7 +60,7 @@ export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, active
                 className={getTabButtonClassName(tab.id as FacilityType)}
                 aria-current={activeTab === tab.id ? 'page' : undefined}
               >
-                <Icon size={18} />
+                <Icon />
                 <span>{tab.label}</span>
               </button>
             );
@@ -70,11 +68,7 @@ export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, active
         </div>
 
         {showButton && (
-          <Button
-            variant="default"
-            onClick={onButtonClick}
-            className="rounded-sm"
-          >
+          <Button variant="default" onClick={onButtonClick} className="rounded-sm">
             {buttonText}
           </Button>
         )}

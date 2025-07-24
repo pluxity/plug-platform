@@ -3,7 +3,7 @@ import { Button, MultiSelect, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
 import { useCreateStation, useFileUploadWithInfo, useLinesSWR } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { StationCreateRequest, } from "@plug/common-services";
+import type { StationFacility, } from "@plug/common-services";
 import * as Px from "@plug/engine/src"
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 
@@ -18,7 +18,7 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
   const thumbnailUploader = useFileUploadWithInfo();
   const drawingUploader = useFileUploadWithInfo();
 
-  const [stationData, setStationData] = useState<StationCreateRequest>({
+  const [stationData, setStationData] = useState<StationFacility>({
     facility: {
       name: "",
       code: "",
@@ -83,7 +83,7 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
     setError(null);
 
     try {
-      const requestData: StationCreateRequest = {
+      const requestData: StationFacility = {
         ...stationData,
         facility: {
           ...stationData.facility,
