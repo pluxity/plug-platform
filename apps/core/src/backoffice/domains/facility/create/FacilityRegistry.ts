@@ -33,7 +33,6 @@ export interface SectionRenderProps<T extends FacilityData = FacilityData> {
     onFloorsChange?: (floors: Floors[]) => void;
     onStationCodesChange?: (codes: string[]) => void;
     onLineIdsChange?: (lineIds: number[]) => void;
-    [key: string]: ((arg: any) => void) | undefined;
   };
   disabled?: boolean;
 }
@@ -47,6 +46,7 @@ class FacilityRegistryImpl {
         `시설 유형 "${definition.type}"이 이미 등록되어 있습니다. 덮어씁니다.`,
       );
     }
+
     this.definitions.set(
       definition.type,
       definition as unknown as FacilityDefinition<FacilityData>,
@@ -57,7 +57,7 @@ class FacilityRegistryImpl {
     return this.definitions.get(type) as FacilityDefinition<T> | undefined;
   }
 
-  getAll(): FacilityDefinition<FacilityData>[] {
+  getAll(): Array<FacilityDefinition<FacilityData>> {
     return Array.from(this.definitions.values());
   }
 

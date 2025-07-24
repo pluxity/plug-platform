@@ -34,8 +34,15 @@ export const BuildingDefinition: FacilityDefinition<FacilityWithFloors> = {
     }
   ],
 
-  is: (data): data is FacilityWithFloors => {
-    return 'facility' in data && 'floors' in data && !('lineIds' in data);
+  is: (data: unknown): data is FacilityWithFloors => {
+    if (!data || typeof data !== 'object') return false;
+    const obj = data as Record<string, unknown>;
+    return (
+      'facility' in obj &&
+      'floors' in obj &&
+      !('lineIds' in obj) &&
+      Array.isArray(obj.floors)
+    );
   },
 
   getCardColor: () => 'bg-blue-500',

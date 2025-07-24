@@ -44,24 +44,26 @@ export const StationDefinition: FacilityDefinition<StationFacility> = {
           stationCodes={data.stationCodes || []}
           lineIds={data.lineIds || []}
           onStationCodesChange={(stationCodes) => {
-            onChange({
-              ...data,
-              stationCodes
-            });
+            onChange({ ...data, stationCodes });
           }}
           onLineIdsChange={(lineIds) => {
-            onChange({
-              ...data,
-              lineIds
-            });
+            onChange({ ...data, lineIds })
           }}
         />
       )
     }
   ],
 
-  is: (data): data is StationFacility => {
-    return 'facility' in data && 'floors' in data && 'lineIds' in data;
+  is: (data: unknown): data is StationFacility => {
+    if (!data || typeof data !== 'object') return false;
+    const obj = data as Record<string, unknown>;
+    return (
+      'facility' in obj &&
+      'floors' in obj &&
+      'lineIds' in obj &&
+      Array.isArray(obj.floors) &&
+      Array.isArray(obj.lineIds)
+    );
   },
 
   getCardColor: () => 'bg-emerald-500',
