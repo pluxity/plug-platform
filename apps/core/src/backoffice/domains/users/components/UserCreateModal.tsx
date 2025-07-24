@@ -30,12 +30,10 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({ isOpen, onClos
 
     // 역할 옵션 
     const roleOptions = useMemo(() => {
-        return roleData?.map(function(role){
-            return {
-                label: role.name,
-                value: role.id.toString(),
-            }
-        }) || [];
+        return roleData?.map(role => ({
+            label: role.name,
+            value: role.id.toString(),
+        })) || [];
     }, [roleData]);
 
 
@@ -144,7 +142,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({ isOpen, onClos
                         <Button type="button" onClick={resetForm} disabled={isUserCreating} variant="outline">
                             취소
                         </Button>
-                        <Button type="submit" disabled={isUserCreating || !form.username || !form.password || !form.name || !form.phoneNumber || !form.department || !form.roleIds}>
+                        <Button type="submit" disabled={isUserCreating || !form.username || !form.password || !form.name || !form.phoneNumber || !form.department || !form.roleIds.length}>
                             {isUserCreating ? '처리 중...' : '등록'}
                         </Button>
                     </DialogFooter>

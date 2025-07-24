@@ -24,7 +24,7 @@ export const deleteUser = async (userId: number) => {
   return api.delete(`${END_POINT}/${userId}`, { requireAuth: true });
 };
 
-export const useUserPasswordInit = async (userId: number) => {
+export const initUserPassword = async (userId: number) => {
   return api.patch(`${END_POINT}/${userId}/password-init`, null, { requireAuth: true });
 };
 

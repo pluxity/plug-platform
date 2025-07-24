@@ -3,7 +3,7 @@ import { PageContainer } from '@/backoffice/common/view/layouts'
 import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, toast } from '@plug/ui'
 import { UserData } from '@/backoffice/domains/users/types/user'
 import { UserMapper } from '@/backoffice/domains/users/mapper/userMapper'
-import { useUsersSWR, deleteUser, useUserPasswordInit } from '@plug/common-services/services'
+import { useUsersSWR, deleteUser, initUserPassword } from '@plug/common-services/services'
 import { UserCreateModal } from '../components/UserCreateModal'
 import { UserEditModal } from '../components/UserEditModal'
 import { useRolesSWR } from '@plug/common-services/services';
@@ -11,7 +11,7 @@ import { useRolesSWR } from '@plug/common-services/services';
 const User: React.FC = () => {
 
     const { data, mutate } = useUsersSWR();
-    const UserData = data ? data.map(UserMapper) : [];
+    const userData = data ? data.map(UserMapper) : [];
     const { data: roleData } = useRolesSWR();
 
     const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -74,7 +74,7 @@ const User: React.FC = () => {
     const handlePasswordInitConfirm = async () => {
         if(!passwordInitUserId) return;
         try {
-            await useUserPasswordInit(passwordInitUserId);
+            await initUserPassword(passwordInitUserId);
             toast.success('비밀번호 초기화 완료');
             mutate();
         } catch (error) {
@@ -105,6 +105,7 @@ const User: React.FC = () => {
                 if (!roleData) return [];
                 const roleNames = row.original.roleIds
                 .map(id => roleData.find(role => role.id === id)?.name)
+                .filter(Boolean)
                 .sort()
                 .join(', ');
                 return roleNames || [];
@@ -112,6 +113,7 @@ const User: React.FC = () => {
 
         },
         {
+            id: 'actions',
             header: '관리',
             cell: ({row}: {row: { original: UserData }}) => (
               <div className="flex space-x-2">
@@ -147,7 +149,7 @@ const User: React.FC = () => {
                 <CardContent>
                     <DataTable 
                         columns={columns} 
-                        data={UserData} 
+                        data={userData} 
                         pageSize={12}
                         buttons={<Button onClick={handleCreate}>등록</Button>} 
                     />

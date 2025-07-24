@@ -29,21 +29,17 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
 
     // 역할 옵션 
     const roleOptions = useMemo(() => {
-        return roleData?.map(function(role){
-            return {
-                label: role.name,
-                value: role.id.toString(),
-            }
-        }) || [];
+        return roleData?.map(role => ({
+            label: role.name,
+            value: role.id.toString(),
+        })) || [];
     }, [roleData]);
 
     // 사용자 정보 조회
     useEffect(() => {
         if (isOpen && data) {
             setForm({
-                roleIds: Array.from(data.roles).map(function(role){
-                    return role.id;
-                }),
+                roleIds: Array.from(data.roles).map(role => role.id),
                 name: data.name,
                 phoneNumber: data.phoneNumber,
                 department: data.department,
@@ -70,9 +66,13 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
             phoneNumber: data?.phoneNumber ?? '',
             department: data?.department ?? '',
         });
+    }, [data]);
+
+    // 모달 닫기
+    const handleClose = useCallback(() => {
+        resetForm();
         onClose();
-        mutate();
-    }, [onClose, data, mutate]);
+    }, [resetForm, onClose]);
 
     // 사용자 수정
     const handleSubmit = useCallback(async (event: React.FormEvent) => {
@@ -86,15 +86,15 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
             });
             toast.success('사용자 수정 완료');
             onSuccess?.();
-            mutate();
-            resetForm();
+            mutate(); 
+            handleClose();
         } catch (error) {
             toast.error((error as Error).message || '사용자 수정에 실패했습니다.');
         }
-    }, [form, updateUser, onSuccess, resetForm, mutate]);
+    }, [form, updateUser, onSuccess, mutate, handleClose]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={resetForm}>
+        <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent title="사용자 수정" className="max-w-xl" dimmed disableBackground>
                 <form onSubmit={handleSubmit}>
                 <ModalForm>
@@ -135,10 +135,10 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
                     </ModalFormItem>
                 </ModalForm>
                 <DialogFooter>
-                    <Button type="button" onClick={resetForm} disabled={isUserUpdating} variant="outline">
+                    <Button type="button" onClick={handleClose} disabled={isUserUpdating} variant="outline">
                         취소
                     </Button>
-                    <Button type="submit" disabled={isUserUpdating || !form.name || !form.phoneNumber || !form.department || !form.roleIds}>
+                    <Button type="submit" disabled={isUserUpdating || !form.name || !form.phoneNumber || !form.department || !form.roleIds.length}>
                         {isUserUpdating ? '처리 중...' : '수정'}
                     </Button>
                 </DialogFooter>
