@@ -13,20 +13,23 @@ import { toast } from '@plug/ui'
 import { useCreateUser, useRolesSWR } from '@plug/common-services/services';
 import { UserCreateModalProps } from '@/backoffice/domains/users/types/user';
 
+const FORM_INITIAL_STATE = {
+    roleIds: [] as number[],
+    username: '',
+    password: '',
+    name: '',
+    phoneNumber: '',
+    department: '',
+}
+
 export const UserCreateModal: React.FC<UserCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
+
     // 사용자 생성
     const { execute: createUser, isLoading: isUserCreating } = useCreateUser();
     const { data: roleData } = useRolesSWR();
 
     // 역할 정보 
-    const [form, setForm] = useState({
-        roleIds: [] as number[],
-        username: '',
-        password: '',
-        name: '',
-        phoneNumber: '',
-        department: '',
-    });
+    const [form, setForm] = useState(FORM_INITIAL_STATE);
 
     // 역할 옵션 
     const roleOptions = useMemo(() => {
@@ -47,14 +50,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({ isOpen, onClos
 
     // 폼 초기화
     const resetForm = useCallback(() => {
-        setForm({
-            roleIds: [] as number[],
-            username: '',
-            password: '',
-            name: '',
-            phoneNumber: '',
-            department: '',
-        });
+        setForm(FORM_INITIAL_STATE);
         onClose();
     }, [onClose]);
 
