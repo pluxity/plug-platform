@@ -24,8 +24,10 @@ type HookParams = {
   'useHistorySWR': [id: number];
 };
 
-function createHookFunction<H extends HookName>(hookName: H) {
-  return function<T extends FacilityType>(...args: [facilityType: T, ...params: HookParams[H]]) {
+const exports = {} as Record<HookName, any>;
+
+hooks.forEach((hookName) => {
+  exports[hookName] = function<T extends FacilityType>(...args: [facilityType: T, ...params: HookParams[typeof hookName]]) {
     const [facilityType, ...params] = args;
 
     if (facilityType in facilityServices) {
@@ -34,16 +36,18 @@ function createHookFunction<H extends HookName>(hookName: H) {
 
     throw new Error(`Unknown facility type: ${facilityType}`);
   };
-}
+});
 
-export const useList = createHookFunction('useList');
-export const useDetail = createHookFunction('useDetail');
-export const useCreate = createHookFunction('useCreate');
-export const useUpdate = createHookFunction('useUpdate');
-export const useDelete = createHookFunction('useDelete');
-export const useListSWR = createHookFunction('useListSWR');
-export const useDetailSWR = createHookFunction('useDetailSWR');
-export const useHistorySWR = createHookFunction('useHistorySWR');
+export const {
+  useList,
+  useDetail,
+  useCreate,
+  useUpdate,
+  useDelete,
+  useListSWR,
+  useDetailSWR,
+  useHistorySWR
+} = exports;
 
 export function useFacilityService<T extends FacilityType>(facilityType: T) {
   if (facilityType in facilityServices) {
@@ -51,3 +55,4 @@ export function useFacilityService<T extends FacilityType>(facilityType: T) {
   }
   throw new Error(`Unknown facility type: ${facilityType}`);
 }
+// TODO: 사용 예시 import 후 const { data: building, isLoading } = useDetail('buildings', id);
