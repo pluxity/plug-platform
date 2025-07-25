@@ -1,64 +1,34 @@
 import { useGet, usePost, useDelete, useSWRApi, usePut } from "@plug/api-hooks";
-import {
-  BaseFacilityUpdateRequest,
-  BuildingResponse,
-  FacilityHistoryResponse,
-  FacilityWithFloorsCreateRequest,
-  StationFacility,
-  StationResponse,
-  StationUpdateRequest
-} from "../../types";
+import { FacilityInterfaces } from "../../types/facility";
 
-function createFacilityService<
-  TResponse,
-  TCreateRequest,
-  TUpdateRequest
->(endPoint: string) {
+export function createFacilityService<F extends FacilityInterfaces<any, any, any>>(endPoint: string) {
+
+  type C_REQ = F['CREATE_REQUEST'];
+  type U_REQ = F['UPDATE_REQUEST'];
+  type RES = F['RESPONSE'];
+
   return {
     useList: () =>
-      useGet<TResponse[]>(endPoint, { requireAuth: true }),
+      useGet<RES[]>(endPoint, { requireAuth: true }),
 
     useDetail: (id: number) =>
-      useGet<TResponse>(`${endPoint}/${id}`, { requireAuth: true }),
+      useGet<RES>(`${endPoint}/${id}`, { requireAuth: true }),
 
     useCreate: () =>
-      usePost<TCreateRequest>(endPoint, { requireAuth: true }),
+      usePost<C_REQ>(endPoint, { requireAuth: true }),
 
     useUpdate: (id: number) =>
-      usePut<TUpdateRequest>(`${endPoint}/${id}`, { requireAuth: true }),
+      usePut<U_REQ>(`${endPoint}/${id}`, { requireAuth: true }),
 
     useDelete: (id: number) =>
       useDelete(`${endPoint}/${id}`, { requireAuth: true }),
 
     useListSWR: () =>
-      useSWRApi<TResponse[]>(endPoint, 'GET', { requireAuth: true }),
+      useSWRApi<RES[]>(endPoint, 'GET', { requireAuth: true }),
 
     useDetailSWR: (id: number) =>
-      useSWRApi<TResponse>(`${endPoint}/${id}`, 'GET', { requireAuth: true }),
+      useSWRApi<RES>(`${endPoint}/${id}`, 'GET', { requireAuth: true }),
 
-    useHistorySWR: (id: number) =>
-      useSWRApi<FacilityHistoryResponse[]>(
-        `${endPoint}/${id}/history`,
-        'GET',
-        { requireAuth: true }
-      ),
   };
 }
 
-export const facilityServices = {
-  buildings: createFacilityService<
-    BuildingResponse,
-    FacilityWithFloorsCreateRequest,
-    BaseFacilityUpdateRequest
-  >('buildings'),
-
-  stations: createFacilityService<
-    StationResponse,
-    StationFacility,
-    StationUpdateRequest
-  >('stations')
-
-  // TODO: 새로운 시설은 여기에 추가하기만 하면 됨
-};
-
-export type FacilityType = keyof typeof facilityServices;
