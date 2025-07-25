@@ -1,4 +1,3 @@
-import { StationUpdateRequest } from "src";
 import { FileResponse } from "./file";
 
 export interface Floor {
@@ -24,11 +23,6 @@ export interface BaseFacilityResponse {
   updatedBy: string;
 }
 
-export interface FacilityResponse {
-  facility : BaseFacilityResponse;
-  floors: Floor[];
-  stationInfo: StationInfo;
-}
 
 
 export interface BaseFacilityRequest {
@@ -46,9 +40,17 @@ export interface FacilityRequest {
   stationInfo?: StationInfo;
 }
 
+export interface FacilityResponse {
+  facility : BaseFacilityResponse;
+  floors: Floor[];
+  stationInfo: StationInfo;
+}
+  
+// 확장 가능한 FacilityType 정의
 export type FacilityType = 'buildings' | 'stations';
 export type FacilityOptions = 'floors' | 'stationInfo';
 
+// FacilityType별로 사용 가능한 옵션을 매핑
 export interface FacilityTypeOptionsMap {
   buildings: 'floors';
   stations: 'floors' | 'stationInfo';
@@ -62,28 +64,17 @@ export interface FacilityInterfaces<CREQ, UREQ, RES> {
 }
 
 // 유틸리티 타입: 특정 FacilityType에 대한 옵션들을 기반으로 Request/Response 타입 생성
-type CreateFacilityRequest<T extends FacilityType> = Pick<FacilityRequest, 'facility' | FacilityTypeOptionsMap[T]>;
-type CreateFacilityResponse<T extends FacilityType> = Pick<FacilityResponse, 'facility' | FacilityTypeOptionsMap[T]>;
+type CreateRequest<T extends FacilityType> = Pick<FacilityRequest, 'facility' | FacilityTypeOptionsMap[T]>;
+type UpdateRequest<T extends FacilityType> = Pick<FacilityRequest, 'facility' | FacilityTypeOptionsMap[T]>;
+type Response<T extends FacilityType> = Pick<FacilityResponse, 'facility' | FacilityTypeOptionsMap[T]>;
 
 // 타입별 인터페이스를 자동으로 생성하는 유틸리티 타입
 export type FacilityTypeInterfaces<T extends FacilityType> = FacilityInterfaces<
-  CreateFacilityRequest<T>,
-  CreateFacilityRequest<T>,
-  CreateFacilityResponse<T>
+  CreateRequest<T>,
+  UpdateRequest<T>,
+  Response<T>
 >;
 
 // 기존 타입들을 새로운 시스템으로 정의
-export type BuildingInterfaces = FacilityTypeInterfaces<'buildings'>;
-export type StationInterfaces = FacilityTypeInterfaces<'stations'>;
-
-// 새로운 FacilityType을 추가할 때 사용할 수 있는 헬퍼 타입
-export type CreateFacilityTypeInterface<
-  T extends string,
-  Options extends FacilityOptions
-> = {
-  [K in T]: FacilityInterfaces<
-    Pick<FacilityRequest, 'facility' | Options>,
-    Pick<FacilityRequest, 'facility' | Options>,
-    Pick<FacilityResponse, 'facility' | Options>
-  >;
-};
+export type BuildingDtos = FacilityTypeInterfaces<'buildings'>;
+export type StationDtos = FacilityTypeInterfaces<'stations'>;
