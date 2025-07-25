@@ -23,9 +23,9 @@ export const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:text-point-blue underline active:text-black disabled:text-gray2",
       },
       size: {
-        default: "h-9 w-25 has-[>svg]:px-3 text-[14px]",
-        sm: "h-6 w-12 has-[>svg]:px-2 text-[12px]",
-        lg: "h-12 w-38 has-[>svg]:px-4 text-[20px]",
+        default: "h-9 min-w-25 has-[>svg]:px-3 text-[14px]",
+        sm: "h-6 min-w-12 has-[>svg]:px-2 text-[12px]",
+        lg: "h-12 min-w-38 has-[>svg]:px-4 text-[20px]",
         icon: "w-[var(--cell-size)] h-[var(--cell-size)] p-0",
       },
       onBackground: {

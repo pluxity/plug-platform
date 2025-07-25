@@ -9,7 +9,7 @@ import { X } from "lucide-react";
 import { Button } from "../../atom/Button/Button";
 import { debounce } from "lodash";
 import { SearchFormProps } from "./SearchForm.types";
-import { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 function SearchForm({ 
     value, 
     onChange, 
@@ -27,22 +27,20 @@ function SearchForm({
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
 
+  // onSearch가 있을 때만 디바운스 적용
   const searchDebounce = useMemo(
     () => debounce((search: string) => {
       if (onSearch) {
         onSearch(search);
-        if (search.trim()) {
-          setOpen(true);
-        } else {
-          setOpen(false);
-        }
-      } 
-    }, 300),
+      }
+    }, onSearch ? 300 : 0),
     [onSearch]
   );
 
   const handleChange = (search: string) => {
     onChange(search);
+    
+    // 디바운스된 검색 실행
     searchDebounce(search);
   };
 
@@ -52,11 +50,24 @@ function SearchForm({
     setOpen(false);
   }
 
-  const suggestions = onSearch ? (searchResult || []) : [];
+  // searchResult 변경시 드롭다운 상태 업데이트
+  useEffect(() => {
+    if (value.trim().length > 0 && searchResult && searchResult.length > 0) {
+      setOpen(true);
+    } else if (value.trim().length === 0) {
+      setOpen(false);
+    } else if (value.trim().length > 0 && searchResult && searchResult.length === 0) {
+      setOpen(true); // 결과 없음 메시지도 표시
+    }
+  }, [searchResult, value]);
+
+  const suggestions = searchResult || [];
 
   return (
-    <div className={cn("relative")}>
-      <Command className={cn("rounded-sm border border-gray-200 bg-white text-black border-b-0", className)}>
+    <div className={cn("relative")} >
+      <Command 
+        className={cn("rounded-sm border border-gray-200 bg-white text-black border-b-0", className)}
+      >
         <div className="relative flex items-center">
           <CommandInput
             ref={inputRef}
@@ -80,7 +91,9 @@ function SearchForm({
         </div>
 
         {open && (
-          <CommandList className={cn("absolute top-full left-0 right-0 mt-1 max-h-60 overflow-auto rounded-sm border border-gray-200 bg-white z-50", listClassName)}>
+          <CommandList 
+            className={cn("absolute top-full left-0 right-0 mt-1 max-h-60 overflow-auto rounded-sm border border-gray-200 bg-white shadow-lg", listClassName)} 
+          >
             {suggestions.length > 0 ? (
               suggestions.map((item, idx) => (
                 <CommandItem

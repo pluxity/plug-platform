@@ -10,7 +10,7 @@ import {
   useFileUploadWithInfo
 } from '@plug/common-services'
 import type { AssetCategoryResponse, FileResponse } from '@plug/common-services'
-import { toast } from '@plug/ui'
+import { toast } from 'sonner'; 
 
 const convertToCategoryItems = (apiData: AssetCategoryResponse[]): CategoryItem[] => {
   return apiData.map(item => ({
