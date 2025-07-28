@@ -1,8 +1,8 @@
 import React from "react";
-import { Floors } from "@plug/common-services";
+import { Floor } from "@plug/common-services";
 
 interface FloorInfoSectionProps {
-  floors: Floors[];
+  floors: Floor[];
 }
 
 export const FloorInfoSection: React.FC<FloorInfoSectionProps> = ({ floors }) => {

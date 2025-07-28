@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Button } from "@plug/ui";
-import { FacilityType } from "../store/FacilityListStore";
+import { FacilityType } from "../../store/FacilityListStore";
 import { FacilityRegistry } from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
 import { House } from "lucide-react";
 import { twMerge } from "tailwind-merge";

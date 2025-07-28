@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFacilitiesAllSWR, useDeletion } from "@plug/common-services";
-import { FacilityItem, SortOptions } from "../types/CardListType";
+import { FacilityItem, SortOptions } from "./CardListType";
 import { FacilityType, useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { filterFacilities, getCardContentUtils, mapFacilityData, sortFacilities, } from "@/backoffice/domains/facility/facilitiesUtil";
 import { FacilityCardListProps } from "@/backoffice/domains/facility/types/facilities";
