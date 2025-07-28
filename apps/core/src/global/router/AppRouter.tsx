@@ -26,7 +26,7 @@ const AppRouter: React.FC = () => {
           </Route>
 
           <Route path="/admin" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole="ADMIN">
               <BackofficeLayout />
             </ProtectedRoute>
           }>

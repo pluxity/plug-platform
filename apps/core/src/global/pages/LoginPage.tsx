@@ -12,11 +12,11 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate()
 
   const { execute: signInWithInfo, isLoading: isSigningIn, error: signInError } = useSignInWithInfo()
-  const { isAuthenticated, setAuthenticated, setUser, user } = useAuthStore()
+  const { isAuthenticated, setAuthenticated, setUser, user, hasRole } = useAuthStore()
   const { execute: changePassword, isLoading: isChangingPassword } = useChangePassword()
   
   if (isAuthenticated && user && !user.shouldChangePassword) {
-    const hasAdminRole = user.roles.some(role => role.name === 'ADMIN')
+    const hasAdminRole = hasRole('ADMIN')
     return <Navigate to={hasAdminRole ? "/admin" : "/"} replace />
   }
 
@@ -33,7 +33,8 @@ const LoginPage: React.FC = () => {
       setAuthenticated(true);
       setUser(result.userInfo);
       
-      const hasAdminRole = result.userInfo.roles.some(role => role.name === 'ADMIN')
+      // 사용자 정보를 설정한 후 store의 hasRole 사용
+      const hasAdminRole = result.userInfo.roles ? Array.from(result.userInfo.roles).some(role => role.name === 'ADMIN') : false
       
       if (hasAdminRole) {
         navigate('/admin')
@@ -68,7 +69,7 @@ const LoginPage: React.FC = () => {
       setNewPassword('')
       setConfirmPassword('')
       
-      const hasAdminRole = user?.roles.some(role => role.name === 'ADMIN')
+      const hasAdminRole = hasRole('ADMIN')
       navigate(hasAdminRole ? '/admin' : '/')
       
     } catch (error) {
