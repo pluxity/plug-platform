@@ -9,13 +9,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 const loginFormSchema = z.object({
   username: z.string()
     .min(1, '아이디를 입력해주세요.')
-    .min(3, '아이디는 최소 3글자 이상이어야 합니다.')
     .max(20, '아이디는 20글자를 초과할 수 없습니다.')
     .regex(/^[a-zA-Z0-9_]+$/, '아이디는 영문, 숫자, 언더스코어만 사용할 수 있습니다.'),
   password: z.string()
     .min(1, '비밀번호를 입력해주세요.')
     .min(6, '비밀번호는 최소 6글자 이상이어야 합니다.')
-    .max(50, '비밀번호는 50글자를 초과할 수 없습니다.'),
+    .max(20, '비밀번호는 20글자를 초과할 수 없습니다.'),
 })
 
 export type LoginFormData = z.infer<typeof loginFormSchema>
