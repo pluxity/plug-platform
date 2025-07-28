@@ -34,8 +34,8 @@ export const useUsersSWR = () => {
 };
 
 export const useUserDetailSWR = (userId: number | undefined) => {
-  const url = userId ? `${END_POINT}/${userId}` : '';
+  const url = userId !== undefined ? `${END_POINT}/${userId}` : '';
   return useSWRApi<UserResponse>(url, 'GET', { requireAuth: true }, {
-    isPaused: () => !userId, // userId가 없으면 요청 중단
+    isPaused: () => userId === undefined, // userId가 없으면 요청 중단
   });
 };

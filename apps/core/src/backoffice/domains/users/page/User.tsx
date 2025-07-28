@@ -103,15 +103,14 @@ const User: React.FC = () => {
             header: '역할',
             accessorKey: 'roles',
             cell: ({ row }: { row: { original: UserData }}) => {
-                if (!roleData) return [];
+                if (!roleData) return null;
                 const roleNames = row.original.roleIds
                 .map(id => roleData.find(role => role.id === id)?.name)
                 .filter(Boolean)
                 .sort()
                 .join(', ');
-                return roleNames || [];
+                return roleNames;
             }
-
         },
         {
             id: 'actions',
