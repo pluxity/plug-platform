@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
-import { Button, cn } from "@plug/ui";
+import { Button } from "@plug/ui";
 import { FacilityType } from "../store/FacilityListStore";
 import { FacilityRegistry } from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
-import { House } from 'lucide-react';
+import { House } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 interface FacilityLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, active
   }, [hideFirstTab, tabs]);
 
   const getTabButtonClassName = (tabId: FacilityType) => {
-    return cn(
+    return twMerge(
       "flex items-center gap-2 px-4 py-2 rounded-md transition-colors",
       "text-sm font-medium mr-2",
       activeTab === tabId

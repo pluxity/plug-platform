@@ -1,4 +1,4 @@
-import { FacilityResponse, FacilityUpdateRequest, FacilityWithFloors } from "./facility";
+import { FacilityResponse, FacilityUpdateRequest, FacilityWithFloors } from "./facilityFactory";
 import { Floors } from "./floors";
 
 export interface StationResponse extends FacilityResponse {

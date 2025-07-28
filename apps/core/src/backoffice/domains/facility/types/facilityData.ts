@@ -1,4 +1,4 @@
-import { BaseFacility, FacilityWithFloorsBase, StationFacility } from "@plug/common-services";
+import {  StationFacility } from "@plug/common-services";
 
 export type FacilityData = BaseFacility | FacilityWithFloorsBase | StationFacility
 

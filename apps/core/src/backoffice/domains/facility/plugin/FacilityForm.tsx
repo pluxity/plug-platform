@@ -48,7 +48,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
               <React.Fragment key={section.id}>
                 <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
                   <div className="w-1 h-6 bg-blue-600"></div>
-                  <h3 className="text-lg font-medium">{section.title}</h3>
+                  <h3 className="text-lg font-medium">{section.render.name}</h3>
                 </div>
                 {section.render({
                   data,

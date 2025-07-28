@@ -1,7 +1,7 @@
-import { FacilitiesAllResponse, FacilityDrawingUpdateRequest } from "../types";
 import { usePatch, useSWRApi } from "@plug/api-hooks";
+import {FacilitiesAllResponse, FacilityDrawingUpdateRequest} from "../types";
 
-const END_POINT = 'facilities';
+const END_POINT = 'facilityFactory';
 
 // path
 export const useCreateFacilitiesPath = () => {

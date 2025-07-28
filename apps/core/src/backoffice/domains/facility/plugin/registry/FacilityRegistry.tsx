@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { FacilityType } from "../../store/FacilityListStore";
 import { FacilityData } from "../../types/facilityData";
-import { Floors, StationFacility } from "@plug/common-services";
+import { Floor, StationFacility } from "@plug/common-services";
 import { StationInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/StationInfoSection";
 import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
 
@@ -9,7 +9,7 @@ export interface SectionRenderProps<T extends FacilityData = FacilityData> {
   data: T;
   onChange: (newData: T) => void;
   handlers: {
-    onFloorsChange?: (floors: Floors[]) => void;
+    onFloorsChange?: (floors: Floor[]) => void;
     onStationCodesChange?: (codes: string[]) => void;
     onLineIdsChange?: (lineIds: number[]) => void;
   };
@@ -59,6 +59,9 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
   facilities: {
     sections: [],
     serviceHookName: "",
+    getInitialData: function () {
+      throw new Error("Function not implemented.");
+    },
   },
 
   buildings: {
@@ -68,9 +71,14 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
         renderFunction: (data: FacilityData) => (
           <FloorInfoSection floors={data.floors} />
         ),
+        title: "",
+        required: false,
       },
     ],
     serviceHookName: "useCreateBuilding",
+    getInitialData: function () {
+      throw new Error("Function not implemented.");
+    },
   },
 
   stations: {
@@ -80,6 +88,8 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
         renderFunction: (data: FacilityData) => (
           <FloorInfoSection floors={data.floors} />
         ),
+        title: "",
+        required: false,
       },
       {
         name: "stationInfo",
@@ -94,18 +104,21 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
             />
           );
         },
+        title: "",
+        required: false,
       },
     ],
-    getInitialData: () => ({
-      facility: {
-        name: "",
-        code: "",
-        description: "",
-      },
-      floors: [],
-      lineIds: [],
-      stationCodes: [],
-    } as StationFacility),
+    getInitialData: () =>
+      ({
+        facility: {
+          name: "",
+          code: "",
+          description: "",
+        },
+        floors: [],
+        lineIds: [],
+        stationCodes: [],
+      }) as StationFacility,
     serviceHookName: "useCreateStation",
   },
 };

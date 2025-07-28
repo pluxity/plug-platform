@@ -11,7 +11,7 @@ src/
 ├── hooks/             # React 훅들
 ├── types/             # TypeScript 타입 정의
 ├── util/              # 유틸리티 함수들
-└── index.ts           # 메인 export 파일
+└── facilityFactory.ts           # 메인 export 파일
 ```
 
 ## 🚀 주요 기능
