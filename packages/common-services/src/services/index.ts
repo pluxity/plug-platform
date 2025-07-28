@@ -7,5 +7,5 @@ export * from './facilityCategory';
 export * from './file';
 export * from './line';
 export * from './role';
+export * from './user-admin';
 export * from './user';
-export * from './user_admin';

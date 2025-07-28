@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ModalForm, ModalFormItem } from "./ModalForm";
+import { ModalForm, ModalFormItem, ModalFormField, ModalFormContainer } from "./ModalForm";
 import { Input } from "../../atom/Input/Input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../atom/Select/Select';
+import { MultiSelect } from "../../atom/Select/MultiSelect";
 import { Button } from '../../atom/Button/Button';
-import { Form } from '../Form/Form';
 
 const meta: Meta<typeof ModalForm> = {
   title: "MOLECULE/ModalForm",
@@ -34,6 +34,9 @@ const userFormSchema = z.object({
   userGroup: z.string().min(1, {
     message: '사용자 그룹을 선택해주세요.'
   }),
+  skills: z.array(z.string()).min(1, {
+    message: '최소 1개 이상의 기술을 선택해주세요.'
+  }),
   phone: z.string().regex(/^[0-9-]+$/, {
     message: '올바른 전화번호 형식을 입력해주세요.'
   }),
@@ -51,6 +54,7 @@ export const Default: Story = {
         name: '',
         password: '',
         userGroup: '',
+        skills: [],
         phone: '',
         department: ''
       },
@@ -62,96 +66,132 @@ export const Default: Story = {
     };
 
     return (
-      <Form {...form}>
+      <ModalForm {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl">
-          <ModalForm>
-            <ModalFormItem 
-              label="아이디" 
+          <ModalFormContainer>
+            <ModalFormField
+              control={form.control}
               name="username"
-              message={form.formState.errors.username?.message}
-              description="6~12자의 영문 소문자로 시작하는 영문, 숫자 조합으로 입력"
-            >
-              <Input 
-                {...form.register("username")}
-                placeholder="아이디를 입력하세요"  
-              />
-            </ModalFormItem>
+              render={({ field }) => (
+                <ModalFormItem label="아이디" description="아이디 상세 설명이 들어갑니다." message={form.formState.errors.username?.message}>
+                    <Input 
+                      {...field}
+                      placeholder="아이디를 입력하세요"  
+                    />
+
+                </ModalFormItem>
+              )}
+            />
             
-            <ModalFormItem 
-              label="사용자명" 
+            <ModalFormField
+              control={form.control}
               name="name"
-              message={form.formState.errors.name?.message}
-            >
-              <Input 
-                {...form.register("name")}
-                placeholder="사용자명을 입력하세요" 
-              />
-            </ModalFormItem>
+              render={({ field }) => (
+                <ModalFormItem label="사용자명" message={form.formState.errors.name?.message}>
+                  <Input 
+                    {...field}
+                    placeholder="사용자명을 입력하세요" 
+                  />
+                </ModalFormItem>
+              )}
+            />
             
-            <ModalFormItem 
-              label="비밀번호" 
+            <ModalFormField
+              control={form.control}
               name="password"
-              message={form.formState.errors.password?.message}
-              description="8~15자의 영문, 숫자, 특수문자 조합으로 입력"
-            >
-              <Input 
-                {...form.register("password")}
-                placeholder="비밀번호를 입력하세요" 
-                type="password" 
-              />
-            </ModalFormItem>
+              render={({ field }) => (
+                <ModalFormItem label="비밀번호" message={form.formState.errors.password?.message}>
+                  <Input 
+                    {...field}
+                    placeholder="비밀번호를 입력하세요" 
+                    type="password" 
+                  />
+                </ModalFormItem>
+              )}
+            />
             
-            <ModalFormItem 
-              label="사용자 그룹" 
+            <ModalFormField
+              control={form.control}
               name="userGroup"
-              message={form.formState.errors.userGroup?.message}
-            >
-              <Select onValueChange={(value) => form.setValue('userGroup', value)}>
-                <SelectTrigger aria-label="사용자 그룹">
-                  <SelectValue placeholder="그룹 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">관리자</SelectItem>
-                  <SelectItem value="user">일반</SelectItem>
-                </SelectContent>
-              </Select>
-            </ModalFormItem>
+              render={({ field }) => (
+                <ModalFormItem label="사용자 그룹" message={form.formState.errors.userGroup?.message}>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger aria-label="사용자 그룹">
+                      <SelectValue placeholder="그룹 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">관리자</SelectItem>
+                      <SelectItem value="user">일반</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </ModalFormItem>
+              )}
+            />
             
-            <ModalFormItem 
-              label="연락처" 
+            <ModalFormField
+              control={form.control}
+              name="skills"
+              render={({ field }) => (
+                <ModalFormItem 
+                  label="보유 기술" 
+                  description="보유하고 있는 기술을 여러 개 선택하세요"
+                  message={form.formState.errors.skills?.message}
+                >
+                  <MultiSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="기술을 선택하세요"
+                    options={[
+                      { value: "react", label: "React" },
+                      { value: "vue", label: "Vue.js" },
+                      { value: "angular", label: "Angular" },
+                      { value: "typescript", label: "TypeScript" },
+                      { value: "javascript", label: "JavaScript" },
+                      { value: "nodejs", label: "Node.js" },
+                      { value: "python", label: "Python" },
+                      { value: "java", label: "Java" },
+                      { value: "csharp", label: "C#" },
+                      { value: "docker", label: "Docker" },
+                    ]}
+                  />
+                </ModalFormItem>
+              )}
+            />
+            
+            <ModalFormField
+              control={form.control}
               name="phone"
-              message={form.formState.errors.phone?.message}
-              description="010-1234-5678 형식으로 입력"
-            >
-              <Input 
-                {...form.register("phone")}
-                placeholder="전화번호를 입력하세요" 
-              />
-            </ModalFormItem>
+              render={({ field }) => (
+                <ModalFormItem label="연락처" message={form.formState.errors.phone?.message}>
+                  <Input 
+                    {...field}
+                    placeholder="전화번호를 입력하세요" 
+                  />
+                </ModalFormItem>
+              )}
+            />
             
-            <ModalFormItem 
-              label="부서명" 
+            <ModalFormField
+              control={form.control}
               name="department"
-              message={form.formState.errors.department?.message}
-            >
-              <Input 
-                {...form.register("department")}
-                placeholder="부서명을 입력하세요"
-              />
-            </ModalFormItem>
-          </ModalForm>
-          
+              render={({ field }) => (
+                <ModalFormItem label="부서명" message={form.formState.errors.department?.message}>
+                  <Input 
+                    {...field}
+                    placeholder="부서명을 입력하세요"
+                  />
+                </ModalFormItem>
+              )}
+            />
+          </ModalFormContainer>
+            
           <div className="mt-6 flex justify-center">
             <Button type="submit">
                 등록
             </Button>
           </div>
         </form>
-      </Form>
+      </ModalForm>
     );
   }
 };
-
-
-
-

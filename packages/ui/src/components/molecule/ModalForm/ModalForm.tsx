@@ -1,45 +1,55 @@
-import { cn } from "../../../utils/utils";
-import { ModalFormProps, ModalFormItemProps } from "./ModalForm.types";
-import { FormLabel, FormDescription, FormMessage } from "../Form/Form";
 
-function ModalForm({ 
-                    children,
-                    className
-}: ModalFormProps) {
-    return(
-        <div className={cn("min-w-lg divide-y divide-gray-300 border-y border-gray-300", className)}>
-            {children}
-        </div>
-    )
-}
+import { FormProvider} from "react-hook-form";
+import { cn } from "../../../utils/utils"; 
+import { ModalFormContainerProps, ModalFormItemProps } from "./ModalForm.types";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "../Form/Form";
 
-ModalForm.displayName = "ModalForm";
-
-function ModalFormItem({ 
-  label,
+const ModalForm = FormProvider
+const ModalFormField = FormField
+function ModalFormContainer({ 
   children,
-  className,
-  message,
-  description,
-}: ModalFormItemProps) {
+  className
+}: ModalFormContainerProps) {
   return (
-    <div className={cn(`flex flex-col ${className ?? ""}`)}>
-      <div className="flex h-full">
-        <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">
-          <FormLabel>
-            {label}
-          </FormLabel>
-        </div>
-        <div className={cn("flex-1 px-3 py-3")}>
-          {children}
-          {message && (<FormMessage  className="pt-1">{message}</FormMessage>)}
-          {description && !message && (<FormDescription className="pt-1">{description}</FormDescription>)}
-        </div>
-      </div>
+    <div className={cn("min-w-lg divide-y divide-gray-300 border-y border-gray-300", className)}>
+      {children}
     </div>
   )
 }
 
-ModalFormItem.displayName = "ModalFormItem";
+function ModalFormItem({ 
+  label, 
+  children, 
+  className,
+  description,
+  message,
+}: ModalFormItemProps) {
+  return (
+    <FormItem className={cn(`flex flex-col ${className ?? ""}`)}>
+      <div className="flex">
+        <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">
+          <FormLabel className="text-foreground data-[error=true]:text-foreground">
+            {label}
+          </FormLabel>
+        </div>
+        <div className={cn("flex-1 px-3 py-3")}>
+          <FormControl>
+            {children}
+          </FormControl>
+          {message && (<FormMessage className="pt-1">{message}</FormMessage>)}
+          {description && !message && (<FormDescription className="pt-1">{description}</FormDescription>)}
+        </div>
+      </div>
+    </FormItem>
+  )
+}
 
-export { ModalForm, ModalFormItem };
+ModalFormItem.displayName = "ModalFormItem";
+ModalFormContainer.displayName = "ModalFormContainer";
+
+export {
+  ModalForm,
+  ModalFormItem,
+  ModalFormField,
+  ModalFormContainer,
+};

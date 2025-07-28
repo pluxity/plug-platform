@@ -90,9 +90,6 @@ importers:
       '@plug/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      lucide-react:
-        specifier: ^0.516.0
-        version: 0.516.0(react@19.1.0)
       react-hook-form:
         specifier: ^7.58.1
         version: 7.58.1(react@19.1.0)
