@@ -79,12 +79,12 @@ export const api = {
         }
       };
       const response = await buildKy(requestOptions).post(endpoint, { body: data });
-      if (response.status === 201) return response;
+      if (response.ok) return response;
       throw new Error(`Unexpected response status: ${response.status}`);
     } else {
       // 일반 JSON 데이터인 경우
       const response = await buildKy(options).post(endpoint, data ? { json: data } : undefined);
-      if (response.status === 201) return response;
+      if (response.ok) return response;
       throw new Error(`Unexpected response status: ${response.status}`);
     }
   },
