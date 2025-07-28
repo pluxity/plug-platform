@@ -4,8 +4,10 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 import { useAssetsSWR, deleteAsset } from '@plug/common-services/services';
 import { AssetData } from '@/backoffice/domains/asset/types/asset';
 import { AssetMapper } from '@/backoffice/domains/asset/mapper/assetMapper';
-import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
-import { toast } from '@plug/ui';
+import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services';
+import AssetCreateModal from "../components/AssetCreateModal";
+import { toast } from "sonner";
+import AssetEditModal from "@/backoffice/domains/asset/components/AssetEditModal";
 
 const AssetList: React.FC = () => { 
   // 모달 상태 관리

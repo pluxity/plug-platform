@@ -103,11 +103,11 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       {
         name: "stationInfo",
         renderFunction: (data: FacilityData, handlers: DataHandlers) => {
-          const stationData = data as StationDtos["RESPONSE"];
+          const stationData = data as StationDtos["CREATE_REQUEST"];
           return (
             <StationInfoSection
-              stationCodes={stationData.stationInfo.stationCodes || []}
-              lineIds={stationData.stationInfo.lineIds || []}
+              stationCodes={stationData.stationInfo?.stationCodes || []}
+              lineIds={stationData.stationInfo?.lineIds || []}
               onStationCodesChange={handlers.onStationCodesChange || (() => {})}
               onLineIdsChange={handlers.onLineIdsChange || (() => {})}
             />
@@ -120,32 +120,11 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
     getInitialData: () =>
       ({
         facility: {
-          id: 0,
           name: "",
           code: "",
+          drawingFileId: 0,
+          thumbnailFileId: 0,
           description: "",
-          drawing: {
-            id: null,
-            url: null,
-            originalFileName: null,
-            contentType: null,
-            fileStatus: null,
-          },
-          thumbnail: {
-            id: null,
-            url: null,
-            originalFileName: null,
-            contentType: null,
-            fileStatus: null,
-          },
-          paths: [],
-          lon: null,
-          lat: null,
-          locationMeta: null,
-          createdAt: "",
-          createdBy: "",
-          updatedAt: "",
-          updatedBy: "",
         },
         floors: [],
         stationInfo: {

@@ -5,7 +5,7 @@ import { Train } from "lucide-react";
 import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
 import { StationInfoSection } from "../createFormSections/StationInfoSection";
 
-export const StationDefinition: FacilityDefinition<StationDtos['RESPONSE']> = {
+export const StationDefinition: FacilityDefinition<StationDtos['CREATE_REQUEST']> = {
   type: "stations",
   displayName: "역사",
   description: "역사 시설을 관리합니다",
@@ -16,33 +16,8 @@ export const StationDefinition: FacilityDefinition<StationDtos['RESPONSE']> = {
       name: "",
       code: "",
       description: "",
-      drawing: {
-        id: 0,
-        url: "",
-        originalFileName: "",
-        contentType: "",
-        fileStatus: "",
-        createdAt: "",
-        createdBy: "",
-        updatedAt: "",
-        updatedBy: "",
-      },
-      thumbnail: {
-        id: 0,
-        url: "",
-        originalFileName: "",
-        contentType: "",
-        fileStatus: "",
-        createdAt: "",
-        createdBy: "",
-        updatedAt: "",
-        updatedBy: "",
-      },
-      path: "",
-      createdAt: "",
-      createdBy: "",
-      updatedAt: "",
-      updatedBy: ""
+      thumbnailFileId: 0,
+      drawingFileId: 0,
     },
     floors: [],
     stationInfo: {
@@ -50,10 +25,10 @@ export const StationDefinition: FacilityDefinition<StationDtos['RESPONSE']> = {
       stationCodes: []
     }
   }),
-  createServiceHook: "useCreateStation",
-  detailServiceHook: "useDetailStation",
-  updateServiceHook: "useUpdateStation",
-  deleteServiceHook: "useDeleteStation",
+  createServiceHook: "useCreate",
+  detailServiceHook: "useDetail",
+  updateServiceHook: "useUpdate",
+  deleteServiceHook: "useDelete",
   sections: [
     {
       id: "floorInfo",

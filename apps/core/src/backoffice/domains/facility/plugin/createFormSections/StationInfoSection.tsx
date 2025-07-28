@@ -1,18 +1,21 @@
 import React from "react";
-import { Button, MultiSelect } from "@plug/ui";
+import { MultiSelect } from "@plug/ui";
 import { Input } from "@plug/ui";
 import { ModalFormItem } from "@plug/ui";
-import { useLinesSWR } from "@plug/common-services";
+import { StationInfo, useLinesSWR } from "@plug/common-services";
 
 interface StationInfoProps {
-  stationCodes: string[];
-  lineIds: number[];
-  onStationCodesChange: (codes: string[]) => void;
-  onLineIdsChange: (lineIds: number[]) => void;
+  stationInfo?: Partial<StationInfo>;
+  onStationCodesChange?: (codes: string[]) => void;
+  onLineIdsChange?: (lineIds: number[]) => void;
 }
 
-export const StationInfoSection: React.FC<StationInfoProps> = ({ stationCodes, lineIds, onStationCodesChange, onLineIdsChange }) => {
+export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = { stationCodes: [], lineIds: [] }, onStationCodesChange, onLineIdsChange
+}) => {
   const { data: lines } = useLinesSWR();
+
+  const stationCodes = stationInfo?.stationCodes || [];
+  const lineIds = stationInfo?.lineIds || [];
 
   return (
     <>
@@ -22,54 +25,38 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationCodes, l
       </div>
       <ModalFormItem label="역사 코드">
         <div className="space-y-2">
-          {stationCodes?.map((code, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  const newCodes = [...stationCodes];
-                  newCodes[index] = e.target.value;
-                  onStationCodesChange(newCodes);
-                }}
-                placeholder={`역사 코드 ${index + 1}`}
-                className="flex-1"
-                required
-              />
-              <Button
-                type="button"
-                onClick={() => {
-                  const newCodes = [...stationCodes];
-                  newCodes.splice(index, 1);
-                  onStationCodesChange(newCodes);
-                }}
-                className="px-2 py-1"
-              >
-                삭제
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            onClick={() => {
-              onStationCodesChange([...stationCodes, '']);
+          <Input
+            type="text"
+            value={stationCodes.join(",")}
+            onChange={(e) => {
+              const newCodes = e.target.value
+                .split(",")
+                .map((code) => code.trim())
+                .filter(code => code !== ""); // 빈 코드 제거
+              if (onStationCodesChange) {
+                onStationCodesChange(newCodes);
+              }
             }}
-            className="mt-2"
-          >
-            코드 추가
-          </Button>
+            placeholder="역사 코드를 입력하세요 (쉼표로 구분)"
+            className="flex-1"
+            required
+          />
         </div>
       </ModalFormItem>
 
       <ModalFormItem label="호선 정보" className="border-b h-full">
         <MultiSelect
-          options={lines?.map((line) => ({
-            label: line.name,
-            value: String(line.id),
-          })) || []}
-          value={lineIds.map(id => String(id))}
+          options={
+            lines?.map((line) => ({
+              label: line.name,
+              value: String(line.id),
+            })) || []
+          }
+          value={lineIds.map((id) => String(id))}
           onChange={(value: string[]) => {
-            onLineIdsChange(value.map((v) => parseInt(v)));
+            if (onLineIdsChange) {
+              onLineIdsChange(value.map((v) => parseInt(v)));
+            }
           }}
         />
       </ModalFormItem>

@@ -34,7 +34,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
         {({ data, handlers, state }) => (
           <form onSubmit={handlers.handleSubmit}>
             <FacilityInfoSection
-              title={`${mode === 'create' ? '새 ' : ''}${facilityDefinition?.displayName || '시설'} ${mode === 'create' ? '등록' : '수정'}`}
+              title={`${mode === "create" ? "새 " : ""}${facilityDefinition?.displayName || "시설"} ${mode === "create" ? "등록" : "수정"}`}
               facilityData={data as FacilityRequest}
               onChange={handlers.handleInputChange}
               onThumbnailUpload={handlers.handleThumbnailUpload}
@@ -42,12 +42,16 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
               thumbnailUploader={state.thumbnailUploader}
               drawingUploader={state.drawingUploader}
               showFloorInfo={isBuildingFacility(data)}
-              onFloorsChange={isBuildingFacility(data) ? (floors) => {
-                handlers.handleDataChange({
-                  ...data,
-                  floors
-                });
-              } : undefined}
+              onFloorsChange={
+                isBuildingFacility(data)
+                  ? (floors) => {
+                      handlers.handleDataChange({
+                        ...data,
+                        floors,
+                      });
+                    }
+                  : undefined
+              }
             >
               {facilityDefinition?.sections.map((section) => (
                 <React.Fragment key={section.id}>
@@ -55,30 +59,37 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
                     data,
                     onChange: handlers.handleDataChange,
                     handlers: {
-                      onFloorsChange: isBuildingFacility(data) ? (floors) => {
-                        handlers.handleDataChange({ ...data, floors });
-                      } : undefined,
-
-                      onStationCodesChange: isStationFacility(data) ? (codes) => {
-                        handlers.handleDataChange({
-                          ...data,
-                          stationInfo: {
-                            ...data.stationInfo,
-                            stationCodes: codes
+                      onFloorsChange: isBuildingFacility(data)
+                        ? (floors) => {
+                            handlers.handleDataChange({ ...data, floors });
                           }
-                        });
-                      } : undefined,
+                        : undefined,
 
-                      onLineIdsChange: isStationFacility(data) ? (lineIds) => {
-                        handlers.handleDataChange({
-                          ...data,
-                          stationInfo: {
-                            ...data.stationInfo,
-                            lineIds
-                          }
-                        });
-                      } : undefined,
-                    }
+                      onStationCodesChange: isStationFacility(data)
+                        ? (codes) => {
+                          handlers.handleDataChange({
+                            ...data,
+                            stationInfo: {
+                              ...(data.stationInfo || { lineIds: [], stationCodes: [] }),
+                              stationCodes: codes,
+                            },
+                          });
+                        }
+                        : undefined,
+
+                      onLineIdsChange: isStationFacility(data)
+                        ? (lineIds) => {
+                          handlers.handleDataChange({
+                            ...data,
+                            stationInfo: {
+                              ...(data.stationInfo || { lineIds: [], stationCodes: [] }),
+                              lineIds,
+                            },
+                          });
+                        }
+                        : undefined,
+
+                    },
                   })}
                 </React.Fragment>
               ))}
@@ -92,9 +103,11 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
               <Button type="submit" disabled={state.isSubmitDisabled}>
                 {state.isSubmitting
                   ? "처리 중..."
-                  : (state.isSubmitDisabled && !state.isSubmitting
+                  : state.isSubmitDisabled && !state.isSubmitting
                     ? "파일 업로드 완료 대기 중..."
-                    : mode === 'create' ? "저장" : "수정")}
+                    : mode === "create"
+                      ? "저장"
+                      : "수정"}
               </Button>
             </div>
           </form>
