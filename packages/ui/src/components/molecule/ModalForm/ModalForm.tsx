@@ -1,45 +1,55 @@
-import { cn } from "../../../utils/utils";
-import { ModalFormProps, ModalFormItemProps } from "./ModalForm.types";
-import { FormLabel, FormDescription, FormMessage } from "../Form/Form";
 
-function ModalForm({ 
-                    children,
-                    className
-}: ModalFormProps) {
-    return(
-        <div className={cn("min-w-lg divide-y divide-gray-300 border-y border-gray-300", className)}>
-            {children}
-        </div>
-    )
+import { FormProvider} from "react-hook-form";
+import { cn } from "../../../utils/utils"; 
+import { ModalFormContainerProps, ModalFormItemProps } from "./ModalForm.types";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "../Form/Form";
+
+const ModalForm = FormProvider
+const ModalFormField = FormField
+function ModalFormContainer({ 
+  children,
+  className
+}: ModalFormContainerProps) {
+  return (
+    <div className={cn("min-w-lg divide-y divide-gray-300 border-y border-gray-300", className)}>
+      {children}
+    </div>
+  )
 }
-
-ModalForm.displayName = "ModalForm";
 
 function ModalFormItem({ 
   label, 
   children, 
   className,
-  message,
   description,
+  message,
 }: ModalFormItemProps) {
   return (
-    <div className={cn(`flex flex-col ${className ?? ""}`)}>
+    <FormItem className={cn(`flex flex-col ${className ?? ""}`)}>
       <div className="flex">
         <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">
-          <FormLabel>
+          <FormLabel className="text-foreground data-[error=true]:text-foreground">
             {label}
           </FormLabel>
         </div>
         <div className={cn("flex-1 px-3 py-3")}>
-          {children}
-          {message && (<FormMessage  className="pt-1">{message}</FormMessage>)}
+          <FormControl>
+            {children}
+          </FormControl>
+          {message && (<FormMessage className="pt-1">{message}</FormMessage>)}
           {description && !message && (<FormDescription className="pt-1">{description}</FormDescription>)}
         </div>
       </div>
-    </div>
+    </FormItem>
   )
 }
 
 ModalFormItem.displayName = "ModalFormItem";
+ModalFormContainer.displayName = "ModalFormContainer";
 
-export { ModalForm, ModalFormItem };
+export {
+  ModalForm,
+  ModalFormItem,
+  ModalFormField,
+  ModalFormContainer,
+};
