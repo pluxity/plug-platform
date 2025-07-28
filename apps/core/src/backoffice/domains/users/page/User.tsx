@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, toast } from '@plug/ui'
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
+import { toast } from 'sonner';
 import { UserData } from '@/backoffice/domains/users/types/user'
 import { UserMapper } from '@/backoffice/domains/users/mapper/userMapper'
 import { useUsersSWR, deleteUser, initUserPassword } from '@plug/common-services/services'
