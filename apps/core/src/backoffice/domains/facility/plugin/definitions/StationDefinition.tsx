@@ -60,32 +60,25 @@ export const StationDefinition: FacilityDefinition<StationDtos['RESPONSE']> = {
       render: (props) => {
         const { data } = props;
         return (
-          <div className="py-4">
-            <h3 className="text-lg font-medium mb-4">층 정보</h3>
             <FloorInfoSection floors={data.floors || []} />
-          </div>
         );
       }
     },
     {
       id: "stationInfo",
       render: (props) => {
-        const { data, handlers } = props;
+        const { data } = props;
         return (
-          <div className="py-4">
-            <h3 className="text-lg font-medium mb-4">역사 정보</h3>
             <StationInfoSection
-              stationCodes={data.stationInfo.stationCodes || []}
-              lineIds={data.stationInfo.lineIds || []}
-              onStationCodesChange={(value: number[]) =>
-                handlers.onStationCodesChange(value)
-              }
-              onLineIdsChange={(value: number[]) =>
-                handlers.onLineIdsChange(value)
-              }
-              disabled={props.disabled}
+              stationCodes={data.stationInfo?.stationCodes || []}
+              lineIds={data.stationInfo?.lineIds || []}
+              onStationCodesChange={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+              onLineIdsChange={function (): void {
+                throw new Error("Function not implemented.");
+              }}
             />
-          </div>
         );
       }
     }

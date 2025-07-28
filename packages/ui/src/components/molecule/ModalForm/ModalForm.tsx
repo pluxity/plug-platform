@@ -24,7 +24,7 @@ function ModalFormItem({
 }: ModalFormItemProps) {
   return (
     <div className={cn(`flex flex-col ${className ?? ""}`)}>
-      <div className="flex">
+      <div className="flex h-full">
         <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">
           <FormLabel>
             {label}

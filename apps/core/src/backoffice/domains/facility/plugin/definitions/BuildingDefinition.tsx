@@ -4,7 +4,7 @@ import { isBuildingFacility } from "../../types/facilityTypeGuard";
 import { Building } from "lucide-react";
 import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
 
-export const BuildingDefinition: FacilityDefinition<BuildingDtos["RESPONSE"]> = {
+export const BuildingDefinition: FacilityDefinition<BuildingDtos["CREATE_REQUEST"]> = {
   type: "buildings",
   displayName: "건물",
   description: "건물 시설을 관리합니다",
@@ -15,52 +15,22 @@ export const BuildingDefinition: FacilityDefinition<BuildingDtos["RESPONSE"]> = 
       name: "",
       code: "",
       description: "",
-      drawing: {
-        id: 0,
-        url: "",
-        originalFileName: "",
-        contentType: "",
-        fileStatus: "",
-        createdAt: "",
-        createdBy: "",
-        updatedAt: "",
-        updatedBy: "",
-      },
-      thumbnail: {
-        id: 0,
-        url: "",
-        originalFileName: "",
-        contentType: "",
-        fileStatus: "",
-        createdAt: "",
-        createdBy: "",
-        updatedAt: "",
-        updatedBy: "",
-      },
-      path: "",
-      createdAt: "",
-      createdBy: "",
-      updatedAt: "",
-      updatedBy: "",
+      thumbnailFileId: 0,
+      drawingFileId: 0,
     },
     floors: [],
   }),
-  createServiceHook: "useCreateBuilding",
-  detailServiceHook: "useDetailBuilding",
-  updateServiceHook: "useUpdateBuilding",
-  deleteServiceHook: "useDeleteBuilding",
+  createServiceHook: "useCreate",
+  detailServiceHook: "useDetail",
+  updateServiceHook: "useUpdate",
+  deleteServiceHook: "useDeletion",
   sections: [
     {
       id: "floorInfo",
       render: (props) => {
-        const { data} = props;
+        const { data } = props;
         return (
-          <div className="py-4">
-            <h3 className="text-lg font-medium mb-4">층 정보</h3>
-            <FloorInfoSection
-              floors={data.floors || []}
-            />
-          </div>
+          <FloorInfoSection floors={data.floors || []} />
         );
       },
     },

@@ -69,7 +69,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       {
         name: "floorInfo",
         renderFunction: (data: FacilityData) => {
-          const buildingData = data as BuildingDtos['RESPONSE'];
+          const buildingData = data as BuildingDtos["CREATE_REQUEST"];
           return <FloorInfoSection floors={buildingData.floors || []} />;
         },
         title: "",
@@ -77,9 +77,16 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       },
     ],
     serviceHookName: "useCreateBuilding",
-    getInitialData: function () {
-      throw new Error("Function not implemented.");
-    },
+    getInitialData: () => ({
+      facility: {
+        name: "",
+        code: "",
+        drawingFileId: 0,
+        thumbnailFileId: 0,
+        description: "",
+      },
+      floors: [],
+    }),
   },
 
   stations: {
@@ -87,7 +94,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       {
         name: "floorInfo",
         renderFunction: (data: FacilityData) => {
-          const buildingData = data as BuildingDtos['RESPONSE'];
+          const buildingData = data as BuildingDtos["RESPONSE"];
           return <FloorInfoSection floors={buildingData.floors || []} />;
         },
         title: "",
@@ -96,7 +103,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       {
         name: "stationInfo",
         renderFunction: (data: FacilityData, handlers: DataHandlers) => {
-          const stationData = data as StationDtos['RESPONSE'] ;
+          const stationData = data as StationDtos["RESPONSE"];
           return (
             <StationInfoSection
               stationCodes={stationData.stationInfo.stationCodes || []}
@@ -110,41 +117,42 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
         required: false,
       },
     ],
-    getInitialData: () => ({
-      facility: {
-        id: 0,
-        name: "",
-        code: "",
-        description: "",
-        drawing: {
-          id: null,
-          url: null,
-          originalFileName: null,
-          contentType: null,
-          fileStatus: null
+    getInitialData: () =>
+      ({
+        facility: {
+          id: 0,
+          name: "",
+          code: "",
+          description: "",
+          drawing: {
+            id: null,
+            url: null,
+            originalFileName: null,
+            contentType: null,
+            fileStatus: null,
+          },
+          thumbnail: {
+            id: null,
+            url: null,
+            originalFileName: null,
+            contentType: null,
+            fileStatus: null,
+          },
+          paths: [],
+          lon: null,
+          lat: null,
+          locationMeta: null,
+          createdAt: "",
+          createdBy: "",
+          updatedAt: "",
+          updatedBy: "",
         },
-        thumbnail: {
-          id: null,
-          url: null,
-          originalFileName: null,
-          contentType: null,
-          fileStatus: null
+        floors: [],
+        stationInfo: {
+          lineIds: [],
+          stationCodes: [],
         },
-        paths: [],
-        lon: null,
-        lat: null,
-        locationMeta: null,
-        createdAt: "",
-        createdBy: "",
-        updatedAt: "",
-        updatedBy: ""
-      },
-      floors: [],
-      stationInfo: {
-        lineIds: [],
-        stationCodes: []
-      }
-    }) as unknown as StationDtos['RESPONSE'],
+      }) as unknown as StationDtos["RESPONSE"],
     serviceHookName: "useCreateStation",
   },
 };

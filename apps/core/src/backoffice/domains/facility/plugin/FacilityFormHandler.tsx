@@ -49,8 +49,8 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
     ? FacilityManager.getCreateService(facilityType)
     : FacilityManager.getUpdateService(facilityType);
 
-  const service = serviceHook ? serviceHook(facilityId) : null;
-  
+  const service = serviceHook ? serviceHook(facilityType, facilityId) : null;
+
   useEffect(() => {
     if (initialData) {
       setFacilityData(initialData);
@@ -92,15 +92,26 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
       setDrawingSelected(false);
     }
   }, [drawingUploader.fileInfo?.id]);
-  
+
   const handleInputChange = (field: string, value: string) => {
     if (!facilityData) return;
 
     setFacilityData((prev) => {
       if (!prev) return prev;
+      if (field.includes('.')) {
+        const [parent, child] = field.split('.');
+        return {
+          ...prev,
+          [parent]: {
+            ...((prev as any)[parent] || {}),
+            [child]: value
+          }
+        } as T;
+      }
+
       return {
         ...prev,
-        facility: { ...prev, [field]: value }
+        [field]: value
       } as T;
     });
   };
@@ -130,12 +141,12 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
       setDrawingSelected(false);
     }
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!facilityData || !service) {
-      setError("필수 데이터나 서비스가 없습니다.");
+    if (!facilityData) {
+      setError("필수 데이터가 없습니다.");
       return;
     }
 
@@ -145,7 +156,18 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
       setError("파일 업로드가 완료될 때까지 기다려주세요.");
       return;
     }
-    
+
+    if (!serviceHook) {
+      console.error("서비스 훅을 찾을 수 없습니다.", { facilityType, mode });
+      setError("서비스 설정이 올바르지 않습니다.");
+      return;
+    }
+    if (!service) {
+      console.error("서비스를 초기화할 수 없습니다.", { facilityType, mode });
+      setError("서비스를 초기화할 수 없습니다.");
+      return;
+    }
+
     const validationError = FacilityManager.validateData(facilityType, facilityData);
     if (validationError) {
       setError(validationError);
@@ -156,28 +178,41 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
     setError(null);
 
     try {
-      const requestData = { ...facilityData };
-
+      const requestData = JSON.parse(JSON.stringify(facilityData));
       if (thumbnailFileId || thumbnailUploader.fileInfo?.id) {
-        if ("thumbnail" in requestData) {
-          const fileId = thumbnailFileId || thumbnailUploader.fileInfo?.id;
-          if (fileId !== undefined) {
-            requestData.thumbnail.id = fileId;
+        const fileId = thumbnailFileId || thumbnailUploader.fileInfo?.id;
+        if (fileId) {
+          if (typeof requestData.thumbnailFileId !== 'undefined') {
+            requestData.thumbnailFileId = fileId;
+          } else if (requestData.facility && typeof requestData.facility.thumbnailFileId !== 'undefined') {
+            requestData.facility.thumbnailFileId = fileId;
+          } else if (requestData.thumbnail) {
+            if (typeof requestData.thumbnail === 'object') {
+              requestData.thumbnail.id = fileId;
+            } else {
+              requestData.thumbnail = fileId;
+            }
           }
         }
       }
 
       if (drawingFileId || drawingUploader.fileInfo?.id) {
-        if ("drawing" in requestData) {
-          const fileId = drawingFileId || drawingUploader.fileInfo?.id;
-          if (fileId !== undefined) {
-            requestData.drawing.id = fileId;
+        const fileId = drawingFileId || drawingUploader.fileInfo?.id;
+        if (fileId) {
+          if (typeof requestData.drawingFileId !== 'undefined') {
+            requestData.drawingFileId = fileId;
+          } else if (requestData.facility && typeof requestData.facility.drawingFileId !== 'undefined') {
+            requestData.facility.drawingFileId = fileId;
+          } else if (requestData.drawing) {
+            if (typeof requestData.drawing === 'object') {
+              requestData.drawing.id = fileId;
+            } else {
+              requestData.drawing = fileId;
+            }
           }
         }
       }
-
       await service.execute(requestData);
-
       if (onSaveSuccess) onSaveSuccess();
     } catch (err) {
       console.error(`${facilityType} ${mode === 'create' ? '생성' : '업데이트'} 오류:`, err);

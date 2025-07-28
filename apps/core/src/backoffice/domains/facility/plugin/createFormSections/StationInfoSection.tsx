@@ -16,6 +16,10 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationCodes, l
 
   return (
     <>
+      <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+        <div className="w-1 h-6 bg-blue-600"></div>
+        <h3 className="text-lg font-medium">역사 코드 입력</h3>
+      </div>
       <ModalFormItem label="역사 코드">
         <div className="space-y-2">
           {stationCodes?.map((code, index) => (
@@ -57,7 +61,7 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationCodes, l
         </div>
       </ModalFormItem>
 
-      <ModalFormItem label="호선 정보" className="border-b">
+      <ModalFormItem label="호선 정보" className="border-b h-full">
         <MultiSelect
           options={lines?.map((line) => ({
             label: line.name,

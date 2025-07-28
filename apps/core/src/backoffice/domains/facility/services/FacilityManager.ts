@@ -1,7 +1,7 @@
 import { FacilityRegistry } from "../plugin/registry/FacilityRegistry";
 import { FacilityType } from "../store/FacilityListStore";
 import * as services from "@plug/common-services";
-import { FacilityTypeGuard } from "../types/facilityTypeGuard";
+import { FacilityData } from "../types/facilityTypeGuard";
 
 export type ServiceHook<TRequest = unknown, TResponse = unknown> = (...args: unknown[]) => {
   execute: (data: TRequest) => Promise<TResponse>;
@@ -11,54 +11,32 @@ export type ServiceHook<TRequest = unknown, TResponse = unknown> = (...args: unk
 };
 
 export class FacilityManager {
-  static getCreateService(type: FacilityType): ServiceHook | null {
-    const definition = FacilityRegistry.get(type);
-    if (!definition) return null;
-
-    const hookName = definition.createServiceHook;
-    return hookName && hookName in services
-        ? (services[hookName as keyof typeof services] as ServiceHook)
-        : null;
+  static getCreateService(_type:FacilityType): ServiceHook | null {
+    return services.useCreate as ServiceHook;
   }
 
-  static getDetailService(type: FacilityType): ServiceHook | null {
-    const definition = FacilityRegistry.get(type);
-    if (!definition) return null;
-
-    const hookName = definition.detailServiceHook;
-    return hookName && hookName in services
-        ? (services[hookName as keyof typeof services] as ServiceHook)
-        : null;
+  static getUpdateService(_type:FacilityType): ServiceHook | null {
+    return services.useUpdate as ServiceHook;
   }
 
-  static getUpdateService(type: FacilityType): ServiceHook | null {
-    const definition = FacilityRegistry.get(type);
-    if (!definition) return null;
-
-    const hookName = definition.updateServiceHook;
-    return hookName && hookName in services
-        ? (services[hookName as keyof typeof services] as ServiceHook)
-        : null;
+  static getDetailService(_type: FacilityType): ServiceHook | null {
+    return services.useDetail as ServiceHook;
   }
 
-  static getDeleteService(type: FacilityType): ServiceHook | null {
-    const definition = FacilityRegistry.get(type);
-    if (!definition) return null;
-
-    const hookName = definition.deleteServiceHook;
-    return hookName && hookName in services
-        ? (services[hookName as keyof typeof services] as ServiceHook)
-        : null;
+  static getDeleteService(_type: FacilityType): ServiceHook | null {
+    return services.useDeletion as ServiceHook;
   }
 
-  static validateData(type: FacilityType, data: FacilityTypeGuard): string | null {
+  static validateData(type: FacilityType, data: FacilityData): string | null {
     const definition = FacilityRegistry.get(type);
-    if (!definition) return '지원되지 않는 시설 유형입니다';
+    if (!definition) return "지원되지 않는 시설 유형입니다";
 
     return definition.validateData ? definition.validateData(data) : null;
   }
 
-  static getService<K extends keyof typeof services>(serviceName: K): typeof services[K] | null {
+  static getService<K extends keyof typeof services>(
+    serviceName: K,
+  ): (typeof services)[K] | null {
     if (serviceName in services) {
       return services[serviceName];
     }
@@ -70,11 +48,14 @@ export class FacilityManager {
       create: this.getCreateService(type),
       detail: this.getDetailService(type),
       update: this.getUpdateService(type),
-      delete: this.getDeleteService(type)
+      delete: this.getDeleteService(type),
     };
   }
 
-  static async fetchFacilityDetail<T extends FacilityTypeGuard>(type: FacilityType, id: number): Promise<T | null> {
+  static async fetchFacilityDetail<T extends FacilityData>(
+    type: FacilityType,
+    id: number,
+  ): Promise<T | null> {
     const detailService = this.getDetailService(type);
     if (!detailService) return null;
 
@@ -87,7 +68,11 @@ export class FacilityManager {
     }
   }
 
-  static async updateFacility<T extends FacilityTypeGuard>(type: FacilityType, id: number, data: Partial<T>): Promise<boolean> {
+  static async updateFacility<T extends FacilityData>(
+    type: FacilityType,
+    id: number,
+    data: Partial<T>,
+  ): Promise<boolean> {
     const updateService = this.getUpdateService(type);
     if (!updateService) return false;
 
@@ -100,7 +85,10 @@ export class FacilityManager {
     }
   }
 
-  static async deleteFacility(type: FacilityType, id: number): Promise<boolean> {
+  static async deleteFacility(
+    type: FacilityType,
+    id: number,
+  ): Promise<boolean> {
     const deleteService = this.getDeleteService(type);
     if (!deleteService) return false;
 

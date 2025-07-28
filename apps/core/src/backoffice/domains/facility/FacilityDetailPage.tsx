@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { PageContainer } from '@/backoffice/common/view/layouts';
-import { StationForm } from './station/StationForm';
 import { useFacilityListStore, } from './store/FacilityListStore';
 import { useDetail } from "@plug/common-services";
+import { FacilityForm } from "@/backoffice/domains/facility/plugin/FacilityForm";
 
 const FacilityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -118,14 +118,16 @@ const FacilityDetailPage: React.FC = () => {
     switch (selectedType) {
       case 'buildings':
         return (
-          <StationForm
+          <FacilityForm
             onSaveSuccess={handleSaveSuccess}
+            facilityType={"buildings"}
           />
         );
       case 'stations':
         return (
-          <StationForm
+          <FacilityForm
             onSaveSuccess={handleSaveSuccess}
+            facilityType={"stations"}
           />
         );
       default:
