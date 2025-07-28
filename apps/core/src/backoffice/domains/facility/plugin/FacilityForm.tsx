@@ -4,7 +4,8 @@ import { FacilityType } from "../store/FacilityListStore";
 import { FacilityInfoSection } from "./createFormSections/FacilityInfoSection";
 import { FacilityRegistry } from "./registry/FacilityRegistry";
 import { FacilityFormHandler } from "./FacilityFormHandler";
-import { FacilityData, hasFloors, isStationFacility } from "../types/facilityData";
+import { FacilityData, isBuildingFacility, isStationFacility } from "../types/facilityTypeGuard";
+import { StationDtos } from "@plug/common-services";
 import "./definitions/BuildingDefinition";
 import "./definitions/StationDefinition";
 
@@ -31,13 +32,13 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
         <form onSubmit={handlers.handleSubmit}>
           <FacilityInfoSection
             title={`${mode === 'create' ? '새 ' : ''}${facilityDefinition?.displayName} ${mode === 'create' ? '등록' : '수정'}`}
-            facilityData={data}
+            facilityData={data as any}
             onChange={handlers.handleInputChange}
             onThumbnailUpload={handlers.handleThumbnailUpload}
             onDrawingUpload={handlers.handleDrawingUpload}
             thumbnailUploader={state.thumbnailUploader}
             drawingUploader={state.drawingUploader}
-            onFloorsChange={hasFloors(data) ? (floors) => {
+            onFloorsChange={isBuildingFacility(data) ? (floors) => {
               handlers.handleDataChange({
                 ...data,
                 floors
@@ -54,16 +55,22 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
                   data,
                   onChange: handlers.handleDataChange,
                   handlers: {
-                    onFloorsChange: hasFloors(data) ? (floors) => {
+                    onFloorsChange: isBuildingFacility(data) ? (floors) => {
                       handlers.handleDataChange({ ...data, floors });
                     } : undefined,
 
                     onStationCodesChange: isStationFacility(data) ? (codes) => {
-                      handlers.handleDataChange({ ...data, stationCodes: codes });
+                      handlers.handleDataChange({
+                        ...data,
+                        stationCodes: codes
+                      } as StationDtos['RESPONSE']);
                     } : undefined,
 
                     onLineIdsChange: isStationFacility(data) ? (lineIds) => {
-                      handlers.handleDataChange({ ...data, lineIds });
+                      handlers.handleDataChange({
+                        ...data,
+                        lineIds
+                      } as StationDtos['RESPONSE']);
                     } : undefined,
                   }
                 })}

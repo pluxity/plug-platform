@@ -2,7 +2,7 @@ import { FileResponse } from "./file";
 
 // facility options
 export interface Floor {
-  id: number;
+  floorId: number;
   name: string;
 }
 export interface StationInfo {
@@ -29,8 +29,8 @@ export interface BaseFacilityRequest {
   name: string;
   code: string;
   description: string;
-  drawing?: FileResponse;
-  thumbnail?: FileResponse;
+  drawingFileId?: number;
+  thumbnailFileId?: number;
   path?: string;
 }
 
@@ -75,3 +75,8 @@ export type FacilityTypeInterfaces<T extends FacilityFactory> = FacilityInterfac
 
 export type BuildingDtos = FacilityTypeInterfaces<'buildings'>;
 export type StationDtos = FacilityTypeInterfaces<'stations'>;
+
+export interface FacilitiesAllResponse {
+  buildings?: BuildingDtos['RESPONSE']['facility'][];
+  stations?: StationDtos['RESPONSE']['facility'][];
+}

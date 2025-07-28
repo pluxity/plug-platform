@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Input } from "@plug/ui";
 import { ModalFormItem } from "@plug/ui";
 import { Dialog, DialogContent, DialogFooter } from "@plug/ui";
-import { Floors, useFileUploadWithInfo } from "@plug/common-services";
+import { Floor, useFileUploadWithInfo } from "@plug/common-services";
 import type { FacilityDrawingUpdateRequest } from "@plug/common-services";
 import * as Px from "@plug/engine/dist/src";
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
@@ -10,14 +10,14 @@ import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 interface DrawingUpdateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (data: FacilityDrawingUpdateRequest, floors: Floors[]) => Promise<void>;
+  onUpdate: (data: FacilityDrawingUpdateRequest, floors: Floor[]) => Promise<void>;
   isSubmitting?: boolean;
 }
 
 export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({ isOpen, onClose, onUpdate, isSubmitting = false, }) => {
   const [drawingComment, setDrawingComment] = useState("");
   const drawingUploader = useFileUploadWithInfo();
-  const [floors, setFloors] = useState<Floors[]>([]);
+  const [floors, setFloors] = useState<Floor[]>([]);
 
   const handleDrawingUpdate = async () => {
     if (!drawingUploader.fileInfo?.id) {
@@ -99,7 +99,6 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({ isOpen, 
           />
         </ModalFormItem>
 
-        {/* 층 정보 표시 영역 추가 */}
         <ModalFormItem label='층 정보' className='border-t border-b'>
           <div className="flex flex-wrap gap-2">
             {floors && floors.length > 0 ? (

@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { StationForm } from './station/StationForm';
-import {
-  useFacilityListStore,
-} from './store/FacilityListStore';
-import { useBuildingDetail, useStationDetail } from "@plug/common-services";
-import { StationDetailPage } from "@/backoffice/domains/facility/station/StationDetailPage";
+import { useFacilityListStore, } from './store/FacilityListStore';
+import { useDetail } from "@plug/common-services";
 
 const FacilityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,13 +25,13 @@ const FacilityDetailPage: React.FC = () => {
     data: buildingData,
     isLoading: isBuildingLoading,
     error: buildingError
-  } = useBuildingDetail(Number(id));
+  } = useDetail('buildings',Number(id));
 
   const {
     data: stationData,
     isLoading: isStationLoading,
     error: stationError
-  } = useStationDetail(Number(id));
+  } = useDetail('buildings', Number(id));
 
   useEffect(() => {
     if (!id) return;
@@ -77,9 +74,6 @@ const FacilityDetailPage: React.FC = () => {
   const handleBack = () => {
     if (previousRoute) {
       navigate(previousRoute.path);
-      setTimeout(() => {
-        window.scrollTo(0, previousRoute.scrollPosition);
-      }, 100);
     } else {
       navigate('/admin/facility');
     }
@@ -124,7 +118,9 @@ const FacilityDetailPage: React.FC = () => {
     switch (selectedType) {
       case 'buildings':
         return (
-          <StationDetailPage />
+          <StationForm
+            onSaveSuccess={handleSaveSuccess}
+          />
         );
       case 'stations':
         return (

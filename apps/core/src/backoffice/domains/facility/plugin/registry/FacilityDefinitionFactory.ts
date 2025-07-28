@@ -1,13 +1,17 @@
-import { FacilityDefinition, SectionDefinition, facilityTypeConfigs } from "./FacilityRegistry";
-import { FacilityData } from "../../types/facilityData";
+
 import { FacilityType } from "../../store/FacilityListStore";
+import {
+  FacilityDefinition,
+  facilityTypeConfigs, SectionDefinition
+} from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
+import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 
 export interface FacilityDefinitionOptions<T extends FacilityData> {
   type: FacilityType;
   displayName: string;
   description?: string;
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  isTypeGuard: hasFloor | isStationFacility;
+  isTypeGuard: (data: unknown) => data is T;
   getCardColor?: () => string;
   validateData?: (data: T) => string | null;
 }
@@ -25,7 +29,7 @@ export function createFacilityDefinition<T extends FacilityData>(
     id: section.name,
     title: section.title,
     required: section.required,
-    render: (props: any) => section.renderFunction(props.data, props.handlers)
+    render: (props: { data: T; handlers: unknown }) => section.renderFunction(props.data, props.handlers)
   }));
 
   return {
@@ -42,6 +46,6 @@ export function createFacilityDefinition<T extends FacilityData>(
     is: options.isTypeGuard,
     getCardColor: options.getCardColor,
     validateData: options.validateData,
-    showFloorInfo: true, // 또는 옵션에서 가져오기
+    showFloorInfo: true,
   };
 }

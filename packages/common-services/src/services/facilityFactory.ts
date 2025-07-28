@@ -20,7 +20,7 @@ export function createFacilityService<F extends FacilityInterfaces<any, any, any
     useUpdate: (id: number) =>
       usePut<U_REQ>(`${endPoint}/${id}`, { requireAuth: true }),
 
-    useDeletee: (id: number) =>
+    useDeletion: (id: number) =>
       useDelete(`${endPoint}/${id}`, { requireAuth: true }),
 
     useListSWR: () =>
@@ -44,7 +44,7 @@ const hooks = [
   'useDetail',
   'useCreate',
   'useUpdate',
-  'useDeletee',
+  'useDeletion',
   'useListSWR',
   'useDetailSWR',
   'useHistorySWR'
@@ -57,7 +57,7 @@ type HookParams = {
   'useDetail': [id: number];
   'useCreate': [];
   'useUpdate': [id: number];
-  'useDeletee': [id: number];
+  'useDeletion': [id: number];
   'useListSWR': [];
   'useDetailSWR': [id: number];
   'useHistorySWR': [id: number];
@@ -82,7 +82,7 @@ export const {
   useDetail,
   useCreate,
   useUpdate,
-  useDeletee,
+  useDeletion,
   useListSWR,
   useDetailSWR,
   useHistorySWR

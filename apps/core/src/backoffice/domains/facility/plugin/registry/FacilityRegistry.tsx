@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { FacilityType } from "../../store/FacilityListStore";
-import { FacilityData } from "../../types/facilityData";
+import { FacilityTypeGuard } from "../../types/facilityTypeGuard";
 import { Floor, StationFacility } from "@plug/common-services";
 import { StationInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/StationInfoSection";
 import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
 
-export interface SectionRenderProps<T extends FacilityData = FacilityData> {
+export interface SectionRenderProps<T extends FacilityTypeGuard = FacilityTypeGuard> {
   data: T;
   onChange: (newData: T) => void;
   handlers: {
@@ -16,12 +16,12 @@ export interface SectionRenderProps<T extends FacilityData = FacilityData> {
   disabled?: boolean;
 }
 
-export interface SectionDefinition<T extends FacilityData = FacilityData> {
+export interface SectionDefinition<T extends FacilityTypeGuard = FacilityTypeGuard> {
   id: string;
   render: (props: SectionRenderProps<T>) => ReactNode;
 }
 
-export interface FacilityDefinition<T extends FacilityData = FacilityData> {
+export interface FacilityDefinition<T extends FacilityTypeGuard = FacilityTypeGuard> {
   type: FacilityType;
   displayName: string;
   description?: string;
@@ -48,10 +48,10 @@ export interface FacilityTypeConfig {
     name: string;
     title: string;
     required: boolean;
-    renderFunction: (data: FacilityData, handlers: DataHandlers) => ReactNode;
+    renderFunction: (data: FacilityTypeGuard, handlers: unknown) => ReactNode;
   }[];
 
-  getInitialData: () => FacilityData;
+  getInitialData: () => FacilityTypeGuard;
   serviceHookName: string;
 }
 
@@ -68,7 +68,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
     sections: [
       {
         name: "floorInfo",
-        renderFunction: (data: FacilityData) => (
+        renderFunction: (data: FacilityTypeGuard) => (
           <FloorInfoSection floors={data.floors} />
         ),
         title: "",
@@ -85,7 +85,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
     sections: [
       {
         name: "floorInfo",
-        renderFunction: (data: FacilityData) => (
+        renderFunction: (data: FacilityTypeGuard) => (
           <FloorInfoSection floors={data.floors} />
         ),
         title: "",
@@ -93,7 +93,7 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
       },
       {
         name: "stationInfo",
-        renderFunction: (data: FacilityData, handlers: DataHandlers) => {
+        renderFunction: (data: FacilityTypeGuard, handlers: DataHandlers) => {
           const stationData = data as StationFacility;
           return (
             <StationInfoSection
@@ -124,9 +124,9 @@ export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
 };
 
 class FacilityRegistryImpl {
-  private definitions = new Map<FacilityType, FacilityDefinition<FacilityData>>();
+  private definitions = new Map<FacilityType, FacilityDefinition<FacilityTypeGuard>>();
 
-  register<T extends FacilityData>(definition: FacilityDefinition<T>): void {
+  register<T extends FacilityTypeGuard>(definition: FacilityDefinition<T>): void {
     if (this.definitions.has(definition.type)) {
       console.warn(
         `시설 유형 "${definition.type}"이 이미 등록되어 있습니다. 덮어씁니다.`,
@@ -135,19 +135,19 @@ class FacilityRegistryImpl {
 
     this.definitions.set(
       definition.type,
-      definition as unknown as FacilityDefinition<FacilityData>,
+      definition as unknown as FacilityDefinition<FacilityTypeGuard>,
     );
   }
 
-  get<T extends FacilityData = FacilityData>(type: FacilityType): FacilityDefinition<T> | undefined {
+  get<T extends FacilityTypeGuard = FacilityTypeGuard>(type: FacilityType): FacilityDefinition<T> | undefined {
     return this.definitions.get(type) as FacilityDefinition<T> | undefined;
   }
 
-  getAll(): Array<FacilityDefinition<FacilityData>> {
+  getAll(): Array<FacilityDefinition<FacilityTypeGuard>> {
     return Array.from(this.definitions.values());
   }
 
-  getByName(name: string): FacilityDefinition<FacilityData> | undefined {
+  getByName(name: string): FacilityDefinition<FacilityTypeGuard> | undefined {
     return this.getAll().find(def => def.type === name);
   }
 }

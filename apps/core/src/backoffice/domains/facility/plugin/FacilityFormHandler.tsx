@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useFileUploadWithInfo } from "@plug/common-services";
-import { FacilityData } from "../types/facilityData";
+import { FacilityTypeGuard } from "../types/facilityTypeGuard";
 import { FacilityManager } from "../services/FacilityManager";
 import { FacilityType } from "../store/FacilityListStore";
 import { FacilityRegistry } from "./registry/FacilityRegistry";
 
-interface FacilityFormHandlerProps<T extends FacilityData> {
+interface FacilityFormHandlerProps<T extends FacilityTypeGuard> {
   facilityType: FacilityType;
   initialData?: T;
   children: (props: {
@@ -30,7 +30,7 @@ interface FacilityFormHandlerProps<T extends FacilityData> {
   facilityId?: number;
 }
 
-export function FacilityFormHandler<T extends FacilityData>({ facilityType, initialData, children, onSaveSuccess, mode = 'create', facilityId }: FacilityFormHandlerProps<T>) {
+export function FacilityFormHandler<T extends FacilityTypeGuard>({ facilityType, initialData, children, onSaveSuccess, mode = 'create', facilityId }: FacilityFormHandlerProps<T>) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [facilityData, setFacilityData] = useState<T | null>(null);

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDeleteBuilding, useDeleteStation, useFacilitiesAllSWR } from "@plug/common-services";
+import { useFacilitiesAllSWR, useDeletion } from "@plug/common-services";
 import { FacilityItem, SortOptions } from "./CardListType";
 import { FACILITY_TYPE_LABELS, FacilityType, useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { filterFacilities, getCardContentUtils, mapFacilityData, sortFacilities, } from "@/backoffice/domains/facility/facilitiesUtil";
@@ -17,8 +17,8 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
 
   const { selectedType, setSelectedType, setSelected, setPreviousRoute } = useFacilityListStore();
 
-  const deleteBuildingHook = useDeleteBuilding(facilityToDelete?.type === "buildings" ? facilityToDelete.id : 0);
-  const deleteStationHook = useDeleteStation(facilityToDelete?.type === "stations" ? facilityToDelete.id : 0);
+  const deleteBuildingHook = useDeletion("buildings", facilityToDelete?.type === "buildings" ? facilityToDelete.id : 0);
+  const deleteStationHook = useDeletion("stations", facilityToDelete?.type === "stations" ? facilityToDelete.id : 0);
 
   useEffect(() => {
     setTypeFilter(initialType);
@@ -32,12 +32,17 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
   useEffect(() => {
     const performDelete = async () => {
       if (!facilityToDelete) return;
+
       try {
         if (facilityToDelete.type === "buildings") {
           await deleteBuildingHook.execute();
         } else if (facilityToDelete.type === "stations") {
           await deleteStationHook.execute();
+        } else {
+          console.error(`알 수 없는 시설 타입입니다: ${facilityToDelete.type}`);
+          return;
         }
+
         await facilitiesResponse.mutate();
       } catch (err) {
         console.error(`${facilityToDelete.type} 삭제 오류:`, err);
@@ -114,10 +119,21 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
 
   const handleDeleteFacility = useCallback(
     async (item: FacilityItem) => {
-      if (!item.type) return;
+      if (!item.type) {
+        console.error("시설 타입이 정의되지 않았습니다.");
+        return;
+      }
+
       const facilityType = item.type as FacilityType;
-      const confirmMessage = CONFIRMATION_MESSAGES[facilityType];
-      if (confirm(confirmMessage)) setFacilityToDelete({ id: item.id, type: facilityType });
+      if (facilityType !== "buildings" && facilityType !== "stations") {
+        console.error(`지원하지 않는 시설 타입입니다: ${facilityType}`);
+        return;
+      }
+
+      const confirmMessage = CONFIRMATION_MESSAGES[facilityType] || "이 시설을 삭제하시겠습니까?";
+      if (confirm(confirmMessage)) {
+        setFacilityToDelete({ id: item.id, type: facilityType });
+      }
     },
     [],
   );

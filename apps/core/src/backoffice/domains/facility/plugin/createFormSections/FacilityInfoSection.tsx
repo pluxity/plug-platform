@@ -1,18 +1,18 @@
 import React from "react";
 import { Button, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
-import { BaseFacility, useFileUploadWithInfo } from "@plug/common-services";
+import { BaseFacilityRequest, Floor, useFileUploadWithInfo } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
 import * as Px from "@plug/engine/dist/src"
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
-import { Floors } from "@plug/common-services";
-import { hasFloors } from "@/backoffice/domains/facility/types/facilityData";
+import { isBuildingFacility } from "@/backoffice/domains/facility/types/facilityTypeGuard";
+
 
 interface FacilityInfoSectionProps {
   title: string;
-  facilityData: BaseFacility;
+  facilityData: BaseFacilityRequest;
   onChange: (field: string, value: string) => void;
-  onFloorsChange?: (floors: Floors[]) => void;
+  onFloorsChange?: (floors: Floor[]) => void;
   onThumbnailUpload: (file: File) => void;
   onDrawingUpload: (file: File) => void;
   thumbnailUploader: ReturnType<typeof useFileUploadWithInfo>;
@@ -33,7 +33,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
     if (files && files.length > 0) {
       onDrawingUpload(files[0]);
 
-      if (onFloorsChange && showFloorInfo && hasFloors(facilityData)) {
+      if (onFloorsChange && showFloorInfo && isBuildingFacility(facilityData)) {
         const fileUrl = URL.createObjectURL(files[0]);
         if (fileUrl) {
           try {
@@ -65,7 +65,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
         <ModalFormItem label="시설명">
           <Input
             type="text"
-            value={facilityData?.facility.name}
+            value={facilityData?.name}
             onChange={(e) => onChange("name", e.target.value)}
             placeholder="시설명을 입력하세요"
             required
@@ -75,7 +75,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
         <ModalFormItem label="코드">
           <Input
             type="text"
-            value={facilityData.facility.code}
+            value={facilityData.code}
             onChange={(e) => onChange("code", e.target.value)}
             placeholder="코드를 입력하세요"
             required
@@ -85,7 +85,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ title,
         <ModalFormItem label="설명" className="col-span-2">
           <Textarea
             className="w-full h-32"
-            value={facilityData.facility.description || ""}
+            value={facilityData.description || ""}
             onChange={(e) => onChange("description", e.target.value)}
             placeholder="시설에 대한 설명을 입력하세요"
           />

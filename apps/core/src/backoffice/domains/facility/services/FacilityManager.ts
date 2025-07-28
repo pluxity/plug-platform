@@ -1,7 +1,7 @@
 import { FacilityRegistry } from "../plugin/registry/FacilityRegistry";
 import { FacilityType } from "../store/FacilityListStore";
 import * as services from "@plug/common-services";
-import { FacilityData } from "../types/facilityData";
+import { FacilityTypeGuard } from "../types/facilityTypeGuard";
 
 export type ServiceHook<TRequest = unknown, TResponse = unknown> = (...args: unknown[]) => {
   execute: (data: TRequest) => Promise<TResponse>;
@@ -51,7 +51,7 @@ export class FacilityManager {
         : null;
   }
 
-  static validateData(type: FacilityType, data: FacilityData): string | null {
+  static validateData(type: FacilityType, data: FacilityTypeGuard): string | null {
     const definition = FacilityRegistry.get(type);
     if (!definition) return '지원되지 않는 시설 유형입니다';
 
@@ -74,7 +74,7 @@ export class FacilityManager {
     };
   }
 
-  static async fetchFacilityDetail<T extends FacilityData>(type: FacilityType, id: number): Promise<T | null> {
+  static async fetchFacilityDetail<T extends FacilityTypeGuard>(type: FacilityType, id: number): Promise<T | null> {
     const detailService = this.getDetailService(type);
     if (!detailService) return null;
 
@@ -87,7 +87,7 @@ export class FacilityManager {
     }
   }
 
-  static async updateFacility<T extends FacilityData>(type: FacilityType, id: number, data: Partial<T>): Promise<boolean> {
+  static async updateFacility<T extends FacilityTypeGuard>(type: FacilityType, id: number, data: Partial<T>): Promise<boolean> {
     const updateService = this.getUpdateService(type);
     if (!updateService) return false;
 

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Button, MultiSelect, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
-import { useCreateStation, useFileUploadWithInfo, useLinesSWR } from "@plug/common-services";
+import { Floor, useCreate, useFileUploadWithInfo, useLinesSWR } from "@plug/common-services";
 import { ModalForm, ModalFormItem } from "@plug/ui";
-import type { StationFacility, } from "@plug/common-services";
+import { StationDtos } from "@plug/common-services";
 import * as Px from "@plug/engine/src"
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
+
+type StationFacility = StationDtos['CREATE_REQUEST'];
 
 interface StationFormProps {
   onSaveSuccess?: () => void;
@@ -23,17 +25,20 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
       name: "",
       code: "",
       description: "",
+      path: "",
     },
     floors: [],
-    lineIds: [],
-    stationCodes: [],
+    stationInfo: {
+      lineIds: [],
+      stationCodes: [],
+    }
   });
 
-  const { execute } = useCreateStation();
+  const { execute } = useCreate('stations');
   const { data: lines } = useLinesSWR();
 
   const handleInputChange = (field: string, value: string) => {
-    setStationData(prev => ({
+    setStationData((prev: StationFacility) => ({
       ...prev,
       facility: {
         ...prev.facility,
@@ -66,7 +71,7 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
               name: info.displayName,
               floorId: info.floorId
             }));
-            setStationData(prev => ({
+            setStationData((prev: StationFacility) => ({
               ...prev,
               floors: floors
             }));
@@ -186,7 +191,7 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
         <ModalFormItem label="층 정보" className="border-b col-span-2">
           <div className="flex flex-wrap gap-2">
             {stationData.floors && stationData.floors.length > 0 ? (
-              stationData.floors.map((floor, index) => (
+              stationData.floors.map((floor: Floor, index: number) => (
                 <div
                   key={index}
                   className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
@@ -218,18 +223,18 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
           <div className="w-1 h-6 bg-blue-500 rounded"></div>
           <h3 className="text-lg font-medium">역사 정보</h3>
         </div>
-        
+
         <ModalFormItem label="역사 코드">
           <div className="space-y-2">
-            {stationData.stationCodes?.map((code, index) => (
+            {stationData.stationInfo?.stationCodes?.map((code: string, index: number) => (
               <div key={index} className="flex items-center gap-2">
                 <Input
                   type="text"
                   value={code}
                   onChange={(e) => {
-                    const newCodes = [...(stationData.stationCodes || [])];
+                    const newCodes = [...(stationData.stationInfo?.stationCodes || [])];
                     newCodes[index] = e.target.value;
-                    setStationData(prev => ({
+                    setStationData((prev: StationFacility) => ({
                       ...prev,
                       stationCodes: newCodes
                     }));
@@ -240,9 +245,9 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
                 <Button
                   type="button"
                   onClick={() => {
-                    const newCodes = [...(stationData.stationCodes || [])];
+                    const newCodes = [...(stationData.stationInfo?.stationCodes || [])];
                     newCodes.splice(index, 1);
-                    setStationData(prev => ({
+                    setStationData((prev: StationFacility) => ({
                       ...prev,
                       stationCodes: newCodes
                     }));
@@ -256,9 +261,9 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
             <Button
               type="button"
               onClick={() => {
-                setStationData(prev => ({
+                setStationData((prev: StationFacility) => ({
                   ...prev,
-                  stationCodes: [...(prev.stationCodes || []), '']
+                  stationCodes: [...(prev.stationInfo?.stationCodes || []), '']
                 }));
               }}
               className="mt-2"
@@ -274,9 +279,9 @@ export const StationForm: React.FC<StationFormProps> = ({ onSaveSuccess }) => {
               label: line.name,
               value: String(line.id),
             })) || []}
-            value={stationData.lineIds.map(id => String(id))}
+            value={stationData.stationInfo?.lineIds.map((id: number) => String(id))}
             onChange={(value: string[]) => {
-              setStationData((prev) => ({
+              setStationData((prev: StationFacility) => ({
                 ...prev,
                 lineIds: value.map((v) => parseInt(v)),
               }));

@@ -35,11 +35,11 @@ export const FACILITY_BUTTON_LABELS = getFacilityButtonLabels();
 interface FacilityListState {
   selectedType: FacilityType;
   selectedId: string | null;
-  previousRoute: { path: string; scrollPosition: number } | null;
+  previousRoute: { path: string;} | null;
   setSelectedType: (type: FacilityType) => void;
   setSelectedId: (id: string | null) => void;
   setSelected: (type: FacilityType, id: string | null) => void;
-  setPreviousRoute: (path: string, scrollPosition: number) => void;
+  setPreviousRoute: (path: string) => void;
   reset: () => void;
 }
 
@@ -53,8 +53,8 @@ export const useFacilityListStore = create<FacilityListState>()(
         setSelectedType: (type) => set({ selectedType: type }, false, 'setSelectedType'),
         setSelectedId: (id) => set({ selectedId: id }, false, 'setSelectedId'),
         setSelected: (type, id) => set({ selectedType: type, selectedId: id }, false, 'setSelected'),
-        setPreviousRoute: (path, scrollPosition = 0) =>
-          set({ previousRoute: { path, scrollPosition } }, false, 'setPreviousRoute'),
+        setPreviousRoute: (path) =>
+          set({ previousRoute: { path } }, false, 'setPreviousRoute'),
         reset: () => set({
           selectedType: 'facilities',
           selectedId: null,
