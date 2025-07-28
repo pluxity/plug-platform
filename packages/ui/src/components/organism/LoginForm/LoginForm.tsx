@@ -1,12 +1,11 @@
 import React from 'react'
-import { useForm, type ControllerRenderProps } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../../atom/Button/Button'
 import { Input } from '../../atom/Input/Input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../molecule/Form/Form'
 
-// Form schema 정의
 const loginFormSchema = z.object({
   username: z.string()
     .min(1, '아이디를 입력해주세요.')
@@ -36,16 +35,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginFormSchema),
-    mode: 'onChange', // 입력할 때마다 실시간 검사
+    mode: 'onChange',
     defaultValues: {
       username: '',
       password: '',
     },
   })
-
-  const handleSubmit = async (data: LoginFormData) => {
-    await onSubmit(data)
-  }
 
   return (
     <div className={`max-w-md w-full space-y-8 ${className}`}>
@@ -56,12 +51,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </div>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-8 space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}
               name="username"
-              render={({ field }: { field: ControllerRenderProps<LoginFormData, 'username'> }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>아이디</FormLabel>
                   <FormControl>
@@ -80,7 +75,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <FormField
               control={form.control}
               name="password"
-              render={({ field }: { field: ControllerRenderProps<LoginFormData, 'password'> }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>비밀번호</FormLabel>
                   <FormControl>
@@ -99,7 +94,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           {error && (
             <div className="text-red-600 text-sm text-center">
-              로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.
+              {error}
             </div>
           )}
 
