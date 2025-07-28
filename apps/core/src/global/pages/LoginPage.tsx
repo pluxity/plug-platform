@@ -4,6 +4,7 @@ import { Button, Input, Toast, Dialog, DialogContent, DialogFooter, LoginForm, t
 import { useSignInWithInfo, useChangePassword } from '@plug/common-services/services'
 import type { SignInRequest } from '@plug/common-services'
 import { useAuthStore } from '@/global/store'
+import { toast } from 'sonner'
 
 const LoginPage: React.FC = () => {
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false)
@@ -42,18 +43,19 @@ const LoginPage: React.FC = () => {
         navigate('/')
       }
     } else {
+      toast.error('로그인에 실패했습니다.')
       console.error('로그인 실패:', result.error?.message)
     }
   }
 
   const handlePasswordChange = async () => {
     if (!newPassword || !confirmPassword) {
-      console.error('새 비밀번호를 입력해주세요.')
+      toast.error('새 비밀번호와 비밀번호 확인을 모두 입력해주세요.')
       return
     }
 
     if (newPassword !== confirmPassword) {
-      console.error('비밀번호가 일치하지 않습니다.')
+      toast.error('비밀번호가 일치하지 않습니다.')
       return
     }
 
@@ -73,6 +75,7 @@ const LoginPage: React.FC = () => {
       navigate(hasAdminRole ? '/admin' : '/')
       
     } catch (error) {
+      toast.error('비밀번호 변경에 실패했습니다. 다시 시도해주세요.')
       console.error('비밀번호 변경 실패:', error)
     }
   }
