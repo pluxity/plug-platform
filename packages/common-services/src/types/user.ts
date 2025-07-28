@@ -18,7 +18,7 @@ export interface UserUpdateRequest {
     roleIds?: number[];
 }
 
-export interface UserResponse {
+export interface UserProfile {
     id: number;
     username: string;
     name: string;
