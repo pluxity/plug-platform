@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFacilitiesAllSWR, useDeletion } from "@plug/common-services";
-import { FacilityItem, SortOptions } from "./CardListType";
-import { FACILITY_TYPE_LABELS, FacilityType, useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
+import { FacilityItem, SortOptions } from "../types/CardListType";
+import { FacilityType, useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { filterFacilities, getCardContentUtils, mapFacilityData, sortFacilities, } from "@/backoffice/domains/facility/facilitiesUtil";
 import { FacilityCardListProps } from "@/backoffice/domains/facility/types/facilities";
 import { BUTTON_LABELS, CONFIRMATION_MESSAGES, SEARCH_FIELDS } from "@/backoffice/domains/facility/constants/facilities";
@@ -12,7 +12,7 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
   const facilitiesResponse = useFacilitiesAllSWR();
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [sortOptions, setSortOptions] = useState<SortOptions>({ field: "createdBy", direction: "asc" });
-  const [typeFilter, setTypeFilter] = useState<FacilityType>(initialType);
+  const [typeFilter, setTypeFilter] = useState<FacilityType>(initialType || "facilities");
   const [facilityToDelete, setFacilityToDelete] = useState<{id: number, type: FacilityType} | null>(null);
 
   const { selectedType, setSelectedType, setSelected, setPreviousRoute } = useFacilityListStore();
@@ -21,13 +21,22 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
   const deleteStationHook = useDeletion("stations", facilityToDelete?.type === "stations" ? facilityToDelete.id : 0);
 
   useEffect(() => {
-    setTypeFilter(initialType);
-    setSelectedType(initialType);
-  }, [initialType, setSelectedType]);
+    const validType = initialType && ["facilities", "buildings", "stations"].includes(initialType)
+      ? initialType
+      : "facilities";
+
+    setTypeFilter(validType);
+    setSelectedType(validType);
+  }, []);
 
   useEffect(() => {
-    if (selectedType !== typeFilter) setTypeFilter(selectedType);
-  }, [selectedType, typeFilter]);
+    if (selectedType && selectedType !== typeFilter) {
+      const validType = ["facilities", "buildings", "stations"].includes(selectedType)
+        ? selectedType
+        : "facilities";
+      setTypeFilter(validType);
+    }
+  }, [selectedType]);
 
   useEffect(() => {
     const performDelete = async () => {
@@ -55,15 +64,6 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
     if (facilityToDelete) performDelete();
   }, [facilityToDelete, deleteBuildingHook, deleteStationHook, facilitiesResponse]);
 
-  const handleTypeFilterChange = useCallback(
-    (value: string) => {
-      const type = value as FacilityType;
-      setTypeFilter(type);
-      setSelectedType(type);
-    },
-    [setSelectedType],
-  );
-
   const standardizedData = useMemo(() => {
     if (!facilitiesResponse.data) {
       return {
@@ -80,8 +80,12 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
     const stationItems = mapFacilityData(
       facilitiesResponse.data.stations || [], "stations",
     );
+
     let filteredData = [...buildingItems, ...stationItems];
-    if (typeFilter !== "facilities") filteredData = filteredData.filter((item) => item.type === typeFilter);
+
+    if (typeFilter && typeFilter !== "facilities") {
+      filteredData = filteredData.filter((item) => item.type === typeFilter);
+    }
 
     const sortedData = sortFacilities(filteredData, sortOptions);
 
@@ -156,10 +160,6 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
     });
   }, []);
 
-  const typeFilterOptions = useMemo(() => {
-    return Object.entries(FACILITY_TYPE_LABELS).map(([value, label]) => ({ label, value}));
-  }, []);
-
   const sortOptionsList = useMemo(
     () => [
       { label: "생성자 (오름차순)", value: "createdBy_asc" },
@@ -173,7 +173,7 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
   );
 
   const getAddButtonLabel = useCallback((): string => {
-    return BUTTON_LABELS[typeFilter];
+    return BUTTON_LABELS[typeFilter] || "새 시설 추가";
   }, [typeFilter]);
 
   const getCardColor = useCallback(getCardContentUtils.getCardColor, []);
@@ -194,13 +194,6 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
       onSearchChange: handleSearchChange,
       searchValue: localSearchQuery || "",
       additionalFilters: [
-        {
-          key: "facilityType",
-          placeholder: "시설 유형",
-          value: typeFilter,
-          onChange: handleTypeFilterChange,
-          options: typeFilterOptions,
-        },
         {
           key: "sortOption",
           placeholder: "정렬 방식",

@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Card, CardContent, Button, FilterBar } from "@plug/ui";
 import { useSearchParams } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
-import { FacilityCardListProps, FacilityItem } from "./CardListType";
+import { FacilityCardListProps, FacilityItem } from "../types/CardListType";
 import { PaginationComponent } from "./PaginationComponent";
 
 export function CardList<T extends FacilityItem>({ dataResponse, filterData, renderOptions = {}, pageSize = 8, actions, filterOptions = {} }: FacilityCardListProps<T>) {

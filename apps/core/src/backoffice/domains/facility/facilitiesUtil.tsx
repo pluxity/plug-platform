@@ -1,5 +1,5 @@
 import { FacilityType, FACILITY_TYPE_LABELS } from "@/backoffice/domains/facility/store/FacilityListStore";
-import { FacilityItem, SortOptions } from "@/backoffice/domains/facility/components/CardListType";
+import { FacilityItem, SortOptions } from "@/backoffice/domains/facility/types/CardListType";
 
 const FACILITY_COLORS: Record<string, string> = {
   'buildings': 'bg-blue-700',

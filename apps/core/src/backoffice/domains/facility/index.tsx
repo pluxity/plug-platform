@@ -3,7 +3,7 @@ import { PageContainer } from "@/backoffice/common/view/layouts";
 import { FacilityLayout } from "./components/FacilityLayout";
 import { useLocation } from "react-router-dom";
 import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "./store/FacilityListStore";
-import { FacilityCardList } from "@/backoffice/domains/facility/components/FacilityCardList";
+import { FacilityCardList } from "@/backoffice/domains/facility/components/FacilityCardListRenderer";
 import { CardList } from "@/backoffice/domains/facility/components/CardList";
 import { FacilityForm } from "@/backoffice/domains/facility/plugin/FacilityForm";
 
