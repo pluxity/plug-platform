@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react'
 import { Card, CardContent, Badge, Button, Input } from '@plug/ui'
+import { toast } from 'sonner';
 import { CategoryItem, CategoryOperations, CategoryConfig } from '@/backoffice/common/services/types/category'
 import { useCategory, recalculateDepths, getTotalChildrenCount, getMaxDepthOfTree, findNodeById } from '@/backoffice/common/services/hooks/useCategory'
 import { ThumbnailUploader } from './ThumbnailUploader'
 import { CategoryNode } from './CategoryNode'
-import { toast } from 'sonner'
 
 export interface CategoryComponentProps extends CategoryOperations, CategoryConfig {
   items?: CategoryItem[]

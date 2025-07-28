@@ -9,7 +9,6 @@ import { AssetEditModal } from '@/backoffice/domains/asset/components/AssetEditM
 import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 import { toast } from 'sonner';
 
-
 const AssetList: React.FC = () => { 
   // 모달 상태 관리
   const [createModalOpen, setCreateModalOpen] = useState(false);

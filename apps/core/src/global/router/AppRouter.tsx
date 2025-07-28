@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import { BackofficeLayout, ViewLayout, DashboardLayout } from '@/backoffice/common/view/layouts'
 import Dashboard from '@/backoffice/domains/dashboard'
-import Role from '@/backoffice/domains/users/page/Role'
 import Device from '@/backoffice/domains/device'
+import { Role , User } from '@/backoffice/domains/users'
 import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
 import { ViewMain } from '@/backoffice/domains/view'
 import AppLayout from '@/app/view/layouts/AppLayout'
@@ -25,7 +25,6 @@ const AppRouter: React.FC = () => {
             <Route index element={<MapView />} />
           </Route>
 
-          {/* 백오피스 (인증 필요) */}
           <Route path="/admin" element={
             <ProtectedRoute>
               <BackofficeLayout />
@@ -35,6 +34,7 @@ const AppRouter: React.FC = () => {
             <Route element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="role" element={<Role />} />
+              <Route path="user" element={<User />} />
               <Route path="device" element={<Device />} />
               <Route path="assetList" element={<AssetList />} />
               <Route path="assetCategory" element={<AssetCategory />} />

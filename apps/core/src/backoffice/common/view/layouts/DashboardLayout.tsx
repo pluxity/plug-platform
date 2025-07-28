@@ -10,6 +10,7 @@ const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'Device', label: 'Device', to: '/admin/device', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', depth: 1, showToggle: true},
   { id: 'Role', label: 'Role', to: '/admin/role', depth: 2, showToggle: false, parentId: 'Users'},
+  { id: 'User', label: 'User', to: '/admin/user', depth: 2, showToggle: false, parentId: 'Users'},
 ]
 
 const DashboardLayout: React.FC = () => {

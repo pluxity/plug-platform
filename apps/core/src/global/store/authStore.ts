@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthStore>()(
       isUserLoggedIn: () => get().isAuthenticated && get().user !== null,
       getUserId: () => get().user?.id,
       getUsername: () => get().user?.username,
-      getUserRoles: () => get().user?.roles?.map(role => role.name) || [],
+      getUserRoles: () => Array.from(get().user?.roles || []).map(role => role.name) || [],
       hasRole: (roleName: string) => {
         const roles = get().getUserRoles()
         return roles.includes(roleName)

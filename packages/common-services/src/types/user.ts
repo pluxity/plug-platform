@@ -4,7 +4,7 @@ export interface UserCreateRequest {
     username: string;
     password: string;
     name: string;
-    code: string;
+    code?: string;
     phoneNumber?: string;
     department?: string;
     roleIds?: number[];
@@ -23,14 +23,16 @@ export interface UserProfile {
     username: string;
     name: string;
     code: string;
-    phoneNumber?: string;
-    department?: string;
+    phoneNumber: string;
+    department: string;
     shouldChangePassword: boolean;
-    roles: RoleResponse[];
+    roles: Set<RoleResponse>;
 }
 
-// Alias for backward compatibility
-export interface UserResponse extends UserProfile {}
+export interface UserPasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+}
 
 
 
