@@ -35,7 +35,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginFormSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
     defaultValues: {
       username: '',
       password: '',

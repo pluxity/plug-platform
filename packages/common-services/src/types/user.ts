@@ -5,22 +5,32 @@ export interface UserCreateRequest {
     password: string;
     name: string;
     code: string;
+    phoneNumber?: string;
+    department?: string;
+    roleIds?: number[];
 }
 
 export interface UserUpdateRequest {
-    username: string;
-    password: string;
-    name: string;
-    code: string;
+    name?: string;
+    code?: string;
+    phoneNumber?: string;
+    department?: string;
+    roleIds?: number[];
 }
 
-export interface UserResponse {
+export interface UserProfile {
     id: number;
     username: string;
     name: string;
     code: string;
-    roles: Set<RoleResponse>;
+    phoneNumber?: string;
+    department?: string;
+    shouldChangePassword: boolean;
+    roles: RoleResponse[];
 }
+
+// Alias for backward compatibility
+export interface UserResponse extends UserProfile {}
 
 
 
