@@ -1,13 +1,14 @@
-export interface ModalFormProps {
+export interface ModalFormContainerProps {
   children?: React.ReactNode
   className?: string
 }
 
 export interface ModalFormItemProps {
-  label: string
+  label?: string
   children: React.ReactNode
   className?: string
-  name?: string
   message?: string
   description?: string
 }
+
+
