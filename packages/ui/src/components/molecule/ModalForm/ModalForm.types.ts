@@ -4,7 +4,7 @@ export interface ModalFormContainerProps {
 }
 
 export interface ModalFormItemProps {
-  label?: string
+  label: string
   children: React.ReactNode
   className?: string
   message?: string
