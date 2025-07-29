@@ -13,22 +13,16 @@ function FacilityFormContainer({ children, className }: ModalFormContainerProps)
   )
 }
 
-function FacilityFormItem({
-                         label,
-                         children,
-                         className,
-                         description,
-                         message,
-                       }: ModalFormItemProps) {
+function FacilityFormItem({ label, children, className, description, message, }: ModalFormItemProps) {
   return (
     <FormItem className={twMerge(`flex flex-col ${className ?? ""}`)}>
-      <div className="flex">
+      <div className="flex h-full">
         <div className="flex items-center justify-center w-40 px-3 py-2 bg-muted-light-gray">
           <FormLabel className="text-foreground data-[error=true]:text-foreground">
             {label}
           </FormLabel>
         </div>
-        <div className={twMerge("flex-1 px-3 py-3")}>
+        <div className={twMerge("flex-1 px-3 py-2 flex items-center")}>
           <FormControl>
             {children}
           </FormControl>

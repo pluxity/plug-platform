@@ -8,6 +8,7 @@ import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/Dra
 import { FacilityForm, FacilityFormItem } from "../FacilityFormComponent";
 import { useForm } from "react-hook-form";
 import { FacilityUpdateRequest } from "@/backoffice/domains/facility/types/facilityTypeGuard";
+import * as console from "node:console";
 
 interface FacilityDetailLayoutProps {
   title: string;
@@ -45,7 +46,8 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
 
   const clearModeParam = () => {
     searchParams.delete('mode');
-    navigate(`${detailUrl}/${itemId}?${searchParams.toString()}`, { replace: true });
+    navigate(`facility/${detailUrl}/${itemId}?${searchParams.toString()}`, { replace: true });
+    console.log(searchParams)
   };
 
   const handleDrawingUpdateSubmit = async (data: FacilityDrawingUpdateRequest) => {
@@ -75,8 +77,11 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
           thumbnailFileId: data.facility.thumbnail.id,
         }
       });
-      searchParams.set('mode', 'edit');
-      navigate(`${detailUrl}/${itemId}?${searchParams.toString()}`, { replace: true });
+      console.log("mode:", searchParams.get("mode"));
+      searchParams.set("mode", "edit");
+      navigate(`facility/${detailUrl}/${itemId}?${searchParams.toString()}`, {
+        replace: true,
+      });
     } else {
       clearModeParam();
     }
@@ -215,7 +220,7 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                   </div>
                 </FacilityFormItem>
 
-                <FacilityFormItem label="ID">{data.facility.id}</FacilityFormItem>
+                <FacilityFormItem label="ID"><div>{data.facility.id}</div></FacilityFormItem>
 
                 <FacilityFormItem label="코드">
                   {isEditMode ? (
@@ -286,9 +291,9 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                 </FacilityFormItem>
               </div>
 
-              <FacilityFormItem label="도면 이미지" className="col-span-3">
+              <FacilityFormItem label="도면 이미지" className="col-span-3 border-b">
                 {data.facility.drawing.url ? (
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-between gap-4 w-full">
                     <div className="flex items-center gap-4">
                       <span className="text-gray-600 text-sm">파일명</span>
                       <p className="font-medium text-gray-800">{data.facility.drawing.originalFileName}</p>
