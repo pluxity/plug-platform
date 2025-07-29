@@ -119,7 +119,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         setModelFileId(null);
       }
     },
-    [uploadModel]
+    [uploadModel, clearModelInfo]
   );
 
   const handleThumbnailChange = useCallback(
@@ -143,7 +143,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         setThumbnailFileId(null);
       }
     },
-    [uploadThumbnail]
+    [uploadThumbnail, clearThumbnailInfo]
   );
 
   const resetForm = useCallback(() => {

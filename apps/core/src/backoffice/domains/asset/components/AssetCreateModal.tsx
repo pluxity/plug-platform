@@ -133,8 +133,14 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
     }, [modalForm, onClose, clearModelInfo, clearThumbnailInfo]);
 
     const handleSubmit = useCallback(async (data: z.infer<typeof assetFormSchema>) => {
-        if (!modelFileId) {return;}
-        if (!thumbnailFileId) {return;}
+        if (!modelFileId) {
+            toast.error('3D 모델 파일을 선택해주세요.');
+            return;
+        }
+        if (!thumbnailFileId) {
+            toast.error('썸네일 파일을 선택해주세요.');
+            return;
+        }
 
         try {
             await createAsset({
@@ -210,9 +216,6 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                                             {modelInfo?.originalFileName ? '변경' : '파일 선택'}
                                         </Button>
                                     </div>
-                                    {isModelUploading && (
-                                        <p className="text-sm text-orange-600 mt-1">파일 업로드 중입니다...</p>
-                                    )}
                                 </div>
                             </ModalFormItem>
                             <ModalFormItem label="썸네일 파일">
@@ -226,9 +229,6 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
                                             {thumbnailInfo?.originalFileName ? '변경' : '파일 선택'}
                                         </Button>
                                     </div>
-                                    {isThumbnailUploading && (
-                                        <p className="text-sm text-orange-600 mt-1">파일 업로드 중입니다...</p>
-                                    )}
                                 </div>
                             </ModalFormItem>
                         </ModalFormContainer>
