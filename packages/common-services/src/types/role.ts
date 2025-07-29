@@ -1,12 +1,4 @@
-export interface PermissionResponse {
-    id: number;
-    resourceName: string;
-    resourceId: string;
-    createdAt: string;
-    createdBy: string;
-    updatedAt: string;
-    updatedBy: string;
-}
+import { PermissionResponse } from "./permission";
 
 export interface RoleCreateRequest {
     name: string;
@@ -22,5 +14,5 @@ export interface RoleResponse {
     id: number;
     name: string;
     description: string;
-    permissions: PermissionResponse[];
+    permissions: Set<PermissionResponse>;
 }
