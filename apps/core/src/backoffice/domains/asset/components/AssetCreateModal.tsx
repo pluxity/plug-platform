@@ -6,6 +6,8 @@ import {
   Button,
   Input,
   ModalForm,
+  ModalFormField,
+  ModalFormContainer,
   ModalFormItem,
   Select,
   SelectValue,
@@ -14,15 +16,36 @@ import {
   SelectItem,
 } from '@plug/ui';
 import { toast } from 'sonner'; 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useCreateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
 import { AssetCreateModalProps } from '@/backoffice/domains/asset/types/asset';
 import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 
 export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
-    // 에셋 정보
-    const [categoryId, setCategoryId] = useState<string>('');
-    const [name, setName] = useState('');
-    const [code, setCode] = useState('');
+
+    const assetFormSchema = z.object({
+        categoryId: z.string().min(1, {
+            message: '에셋 카테고리를 선택해주세요.'
+        }),
+        name: z.string().min(1, {
+            message: '에셋 이름을 입력해주세요.'
+        }),
+        code: z.string().min(1, {
+            message: '에셋 코드를 입력해주세요.'
+        }),
+    });
+
+    const modalForm = useForm<z.infer<typeof assetFormSchema>>({
+        resolver: zodResolver(assetFormSchema),
+        defaultValues: {
+            categoryId: '',
+            name: '',
+            code: '',
+        },
+        mode: 'onChange',
+    });
 
     // 3D 모델 파일
     const [modelFileId, setModelFileId] = useState<number | null>(null);
@@ -53,15 +76,6 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
 
     // 에셋 생성
     const { execute: createAsset, isLoading: isAssetCreating } = useCreateAsset();
-
-    // 에셋 정보 변경 핸들러
-    const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value);
-    }, []);
-
-    const handleCodeChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setCode(event.target.value);
-    }, []);
 
     const handleModelChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -106,26 +120,35 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
     }, [uploadThumbnail, clearThumbnailInfo]);
 
     const resetForm = useCallback(() => {
-        setCategoryId('');
-        setName('');
-        setCode('');
+        modalForm.reset({
+            categoryId: '',
+            name: '',
+            code: '',
+        });
         setModelFileId(null);
         clearModelInfo();
         setThumbnailFileId(null);
         clearThumbnailInfo();
         onClose();
-    }, [onClose, clearModelInfo, clearThumbnailInfo]);
+    }, [modalForm, onClose, clearModelInfo, clearThumbnailInfo]);
 
-    const handleSubmit = useCallback(async (event: React.FormEvent) => {
-        event.preventDefault();
+    const handleSubmit = useCallback(async (data: z.infer<typeof assetFormSchema>) => {
+        if (!modelFileId) {
+            toast.error('3D 모델 파일을 선택해주세요.');
+            return;
+        }
+        if (!thumbnailFileId) {
+            toast.error('썸네일 파일을 선택해주세요.');
+            return;
+        }
 
         try {
             await createAsset({
-                name,
-                code,
-                categoryId: Number(categoryId),
-                fileId: modelFileId || undefined, 
-                thumbnailFileId: thumbnailFileId || undefined, 
+                name: data.name,
+                code: data.code,
+                categoryId: Number(data.categoryId),
+                fileId: modelFileId, 
+                thumbnailFileId: thumbnailFileId, 
             });
             toast.success('에셋 등록 완료');
             onSuccess?.();
@@ -134,77 +157,91 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
             console.error('에셋 등록 실패:', error);
             toast.error((error as Error).message || '에셋 등록에 실패했습니다.');
         }
-    }, [name, code, categoryId, modelFileId, thumbnailFileId, createAsset, onSuccess, resetForm]);
+    }, [createAsset, onSuccess, resetForm, modelFileId, thumbnailFileId]);
 
     const isProcessing = isModelUploading || isThumbnailUploading || isAssetCreating;
 
     return (
         <Dialog open={isOpen} onOpenChange={resetForm}>
             <DialogContent title="에셋 등록" className="max-w-xl" dimmed disableBackground>
-                <form onSubmit={handleSubmit}>
-                <ModalForm>
-                    <ModalFormItem label="에셋 카테고리" >
-                    <Select     
-                        value={categoryId} 
-                        onValueChange={value => setCategoryId(value)}
-                        >
-                        <SelectTrigger>
-                            <SelectValue placeholder="에셋 카테고리를 선택하세요" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {categories.map((category: AssetCategoryResponse) => (
-                                <SelectItem key={category.id} value={category.id.toString()}>
-                                    {category.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    </ModalFormItem>
-                    <ModalFormItem label="에셋 이름">
-                        <Input value={name} onChange={handleNameChange} placeholder="에셋 이름을 입력해주세요." required />
-                    </ModalFormItem>
-                    <ModalFormItem label="에셋 코드">
-                        <Input value={code} onChange={handleCodeChange} placeholder="에셋 코드를 입력해주세요." required />
-                    </ModalFormItem>
-                    <ModalFormItem label="썸네일 업로드">
-                        <Input type="file" ref={thumbnailInputRef} className="hidden" accept="image/*" onChange={handleThumbnailChange} />
-                        <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
-                            <span className="flex-1 text-sm text-gray-700">
-                                {thumbnailInfo?.originalFileName || '선택된 파일 없음'}
-                            </span>
-                            <Button type="button" onClick={() => thumbnailInputRef.current?.click()}>
-                                {thumbnailInfo?.originalFileName ? '변경' : '파일 선택'}
+                <ModalForm {...modalForm}>
+                    <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
+                        <ModalFormContainer>
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="categoryId"
+                                render={({ field }) => (
+                                    <ModalFormItem label="에셋 카테고리" message={modalForm.formState.errors.categoryId?.message}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="에셋 카테고리를 선택하세요" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {categories.map((category: AssetCategoryResponse) => (
+                                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                                        {category.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </ModalFormItem>
+                                )}
+                            />
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="code"
+                                render={({ field }) => (
+                                    <ModalFormItem label="에셋 코드" message={modalForm.formState.errors.code?.message}>
+                                        <Input {...field} placeholder="에셋 코드를 입력해주세요." />
+                                    </ModalFormItem>
+                                )}
+                            />
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <ModalFormItem label="에셋 이름" message={modalForm.formState.errors.name?.message}>
+                                        <Input {...field} placeholder="에셋 이름을 입력해주세요." />
+                                    </ModalFormItem>
+                                )}
+                            />
+                            <ModalFormItem label="3D 모델 파일">
+                                <div data-slot="content">
+                                    <Input type="file" ref={modelInputRef} className="hidden" accept=".glb,.gltf" onChange={handleModelChange} />
+                                    <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
+                                        <span className="flex-1 text-sm text-gray-700">
+                                            {modelInfo?.originalFileName || '선택된 파일 없음'}
+                                        </span>
+                                        <Button type="button" onClick={() => modelInputRef.current?.click()}>
+                                            {modelInfo?.originalFileName ? '변경' : '파일 선택'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ModalFormItem>
+                            <ModalFormItem label="썸네일 파일">
+                                <div data-slot="content">
+                                    <Input type="file" ref={thumbnailInputRef} className="hidden" accept="image/*" onChange={handleThumbnailChange} />
+                                    <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
+                                        <span className="flex-1 text-sm text-gray-700">
+                                            {thumbnailInfo?.originalFileName || '선택된 파일 없음'}
+                                        </span>
+                                        <Button type="button" onClick={() => thumbnailInputRef.current?.click()}>
+                                            {thumbnailInfo?.originalFileName ? '변경' : '파일 선택'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ModalFormItem>
+                        </ModalFormContainer>
+                        <DialogFooter>
+                            <Button type="button" onClick={resetForm} disabled={isProcessing} variant="outline">
+                                취소
                             </Button>
-                        </div>
-                        {isThumbnailUploading && (
-                            <p className="text-sm text-orange-600 mt-1">파일 업로드 중입니다...</p>
-                        )}
-                    </ModalFormItem>
-
-                    <ModalFormItem label="3D 모델 파일 업로드">
-                        <Input type="file" ref={modelInputRef} className="hidden" accept=".glb,.gltf" onChange={handleModelChange} />
-                        <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
-                            <span className="flex-1 text-sm text-gray-700">
-                                {modelInfo?.originalFileName || '선택된 파일 없음'}
-                            </span>
-                            <Button type="button" onClick={() => modelInputRef.current?.click()}>
-                                {modelInfo?.originalFileName ? '변경' : '파일 선택'}
+                            <Button type="submit" disabled={isProcessing || !modalForm.formState.isValid || !modelFileId || !thumbnailFileId}>
+                                {isProcessing ? '처리 중...' : '등록'}
                             </Button>
-                        </div>
-                        {isModelUploading && (
-                            <p className="text-sm text-orange-600 mt-1">파일 업로드 중입니다...</p>
-                        )}
-                    </ModalFormItem>
+                        </DialogFooter>
+                    </form>
                 </ModalForm>
-                <DialogFooter>
-                    <Button type="button" onClick={resetForm} disabled={isProcessing} variant="outline">
-                    취소
-                    </Button>
-                    <Button type="submit" disabled={isProcessing || !name || !code || !categoryId || !modelInfo}>
-                        {isProcessing ? '처리 중...' : '등록'}
-                    </Button>
-                </DialogFooter>
-                </form>
             </DialogContent>
         </Dialog>
     );
