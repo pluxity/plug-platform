@@ -3,14 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, Separator } from "@plug/ui";
 import { Button, Input } from "@plug/ui";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import { ModalForm, ModalFormItem } from "@plug/ui";
-import {
-  FacilityDrawingUpdateRequest,
-  FacilityHistoryResponse,
-  FacilityResponse, FacilityUpdateRequest,
-  useFileUploadWithInfo
-} from "@plug/common-services";
+import { FacilityDrawingUpdateRequest, FacilityHistoryResponse, FacilityResponse, useFileUploadWithInfo } from "@plug/common-services";
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
+import { FacilityForm, FacilityFormItem } from "../FacilityFormComponent";
+import { useForm } from "react-hook-form";
+import { FacilityUpdateRequest } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 
 interface FacilityDetailLayoutProps {
   title: string;
@@ -19,7 +16,7 @@ interface FacilityDetailLayoutProps {
   isLoading: boolean;
   error: Error | null;
   urlMode?: string | null;
-  formData: FacilityUpdateRequest ;
+  formData: FacilityUpdateRequest;
   setFormData: (data: FacilityUpdateRequest) => void;
   onDelete: () => Promise<void>;
   onUpdate: (data: FacilityUpdateRequest) => Promise<void>;
@@ -33,6 +30,7 @@ interface FacilityDetailLayoutProps {
 
 export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ title, itemId, data, isLoading, error, urlMode, formData, setFormData, onDelete, onUpdate, onDrawingUpdate, onMutate, onHistoryMutate, history, detailUrl, children
 }) => {
+  const form = useForm()
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -130,9 +128,6 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
     setFormError(null);
 
     if (thumbnailUploader.fileInfo?.id) {
-      if (!formData.facility) {
-        formData.facility = {};
-      }
       formData.facility.thumbnailFileId = thumbnailUploader.fileInfo.id;
     }
 
@@ -173,18 +168,15 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
 
   return (
     <PageContainer title={title}>
-      {isLoading ? (
-        <div className="flex justify-center p-8">데이터를 불러오는 중...</div>
-      ) : error ? (
-        <div className="text-center text-red-500 p-8">
-          데이터를 불러오는 중 오류가 발생했습니다.
-        </div>
-      ) : data ? (
+      {isLoading ? (<div className="flex justify-center p-8">데이터를 불러오는 중...</div>)
+        : error ? (<div className="text-center text-red-500 p-8">데이터를 불러오는 중 오류가 발생했습니다.</div>)
+          : data ? (
         <Card>
           <CardContent>
-            <ModalForm className="grid grid-cols-2 py-5">
+            <div className="grid grid-cols-2 py-5">
+            <FacilityForm {...form}>
               <div className="grid grid-cols-3 col-span-2 border-t divide-y divide-gray-200 border-b-0">
-                <ModalFormItem label="썸네일 이미지" className="row-span-4">
+                <FacilityFormItem label="썸네일 이미지" className="row-span-4">
                   <div className="flex flex-col gap-2 w-full">
                     {isEditMode ? (
                       <div className="flex flex-col">
@@ -216,34 +208,26 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                         <img src={data.facility.thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
                         <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
                           <div className="text-gray-500">파일명</div>
-                          <div className="font-medium text-gray-800 text-xs break-normal">
-                            {data.facility.thumbnail.originalFileName}
-                          </div>
+                          <div className="font-medium text-gray-800 text-xs break-normal">{data.facility.thumbnail.originalFileName}</div>
                         </div>
                       </>
-                    ) : (
-                      "썸네일 이미지가 없습니다."
-                    )}
+                    ) : ("썸네일 이미지가 없습니다.")}
                   </div>
-                </ModalFormItem>
+                </FacilityFormItem>
 
-                <ModalFormItem label="ID">{data.facility.id}</ModalFormItem>
+                <FacilityFormItem label="ID">{data.facility.id}</FacilityFormItem>
 
-                <ModalFormItem label="코드">
+                <FacilityFormItem label="코드">
                   {isEditMode ? (
                     <Input
                       type="text"
                       value={formData.facility?.code || ""}
-                      onChange={(e) =>
-                        handleInputChange("code", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange("code", e.target.value)}
                       placeholder="코드를 입력하세요"
                     />
-                  ) : (
-                    <div>{data.facility.code}</div>
-                  )}
-                </ModalFormItem>
-                <ModalFormItem label="건물명">
+                  ) : (<div>{data.facility.code}</div>)}
+                </FacilityFormItem>
+                <FacilityFormItem label="건물명">
                   {isEditMode ? (
                     <Input
                       type="text"
@@ -254,11 +238,9 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                       placeholder="건물명을 입력하세요"
                       required
                     />
-                  ) : (
-                    <div className="py-2">{data.facility.name}</div>
-                  )}
-                </ModalFormItem>
-                <ModalFormItem label="설명">
+                  ) : (<div className="py-2">{data.facility.name}</div>)}
+                </FacilityFormItem>
+                <FacilityFormItem label="설명">
                   {isEditMode ? (
                     <Input
                       type="text"
@@ -268,17 +250,13 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                       }
                       placeholder="설명을 입력하세요"
                     />
-                  ) : (
-                    <div>{data.facility.description || "-"}</div>
-                  )}
-                </ModalFormItem>
+                  ) : (<div>{data.facility.description || "-"}</div>)}
+                </FacilityFormItem>
 
-                <ModalFormItem label="생성" className="col-span-2">
+                <FacilityFormItem label="생성" className="col-span-2">
                   <div className="flex gap-4">
                     <div>
-                      <span className="text-gray-500 mr-7 text-sm">
-                        최초 생성일
-                      </span>
+                      <span className="text-gray-500 mr-7 text-sm">최초 생성일</span>
                       <span className="font-medium text-gray-800">
                         {data.facility.createdAt ? new Date(data.facility.createdAt,).toLocaleDateString("ko-KR") : "-"}
                       </span>
@@ -286,96 +264,54 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                     <Separator orientation="vertical" className="bg-gray-300 !h-5" />
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">생성인</span>
-                      <span className="font-medium text-gray-800">
-                        {data.facility.createdBy || "-"}
-                      </span>
+                      <span className="font-medium text-gray-800">{data.facility.createdBy || "-"}</span>
                     </div>
                   </div>
-                </ModalFormItem>
+                </FacilityFormItem>
 
-                <ModalFormItem label="수정" className="col-span-2 border-b">
+                <FacilityFormItem label="수정" className="col-span-2 border-b">
                   <div className="flex gap-4">
                     <div>
-                      <span className="text-gray-500 mr-4 text-sm">
-                        마지막 수정일
-                      </span>
+                      <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
                       <span className="font-medium text-gray-800">
-                        {data.facility.updatedAt
-                          ? new Date(
-                            data.facility.updatedAt,
-                          ).toLocaleDateString("ko-KR")
-                          : "-"}
+                        {data.facility.updatedAt ? new Date(data.facility.updatedAt,).toLocaleDateString("ko-KR") : "-"}
                       </span>
                     </div>
-                    <Separator
-                      orientation="vertical"
-                      className="bg-gray-300 !h-5"
-                    />
+                    <Separator orientation="vertical" className="bg-gray-300 !h-5" />
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">수정인</span>
-                      <span className="font-medium text-gray-800">
-                        {data.facility.updatedBy || "-"}
-                      </span>
+                      <span className="font-medium text-gray-800">{data.facility.updatedBy || "-"}</span>
                     </div>
                   </div>
-                </ModalFormItem>
+                </FacilityFormItem>
               </div>
 
-              <ModalFormItem label="도면 이미지" className="col-span-3">
+              <FacilityFormItem label="도면 이미지" className="col-span-3">
                 {data.facility.drawing.url ? (
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <span className="text-gray-600 text-sm">파일명</span>
-                      <p className="font-medium text-gray-800">
-                        {data.facility.drawing.originalFileName}
-                      </p>
+                      <p className="font-medium text-gray-800">{data.facility.drawing.originalFileName}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <a
-                        href={data.facility.drawing.url}
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100"
-                      >
-                        다운로드
-                      </a>
-                      <button
-                        onClick={() => setIsDrawingUpdateModalOpen(true)}
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100"
-                      >
-                        도면 업데이트
-                      </button>
+                      <a href={data.facility.drawing.url} className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">다운로드</a>
+                      <button onClick={() => setIsDrawingUpdateModalOpen(true)} className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100">도면 업데이트</button>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center rounded p-3 gap-5">
-                    <p className="text-sm text-gray-500">
-                      현재 도면 이미지가 없습니다.
-                    </p>
-                    <button
-                      onClick={() => setIsDrawingUpdateModalOpen(true)}
-                      className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100"
-                    >
-                      도면 추가
-                    </button>
+                    <p className="text-sm text-gray-500">현재 도면 이미지가 없습니다.</p>
+                    <button onClick={() => setIsDrawingUpdateModalOpen(true)} className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-100">도면 추가</button>
                   </div>
                 )}
-              </ModalFormItem>
+              </FacilityFormItem>
 
-              <ModalFormItem
-                label="도면 변경 이력"
-                className="col-span-2 border-b"
-              >
+              <FacilityFormItem label="도면 변경 이력" className="col-span-2 border-b">
                 <div className="py-2 w-full">
-                  {!history ? (
-                    <p>데이터를 불러오는 중...</p>
-                  ) : history.length === 0 ? (
-                    <p>변경 이력이 없습니다.</p>
-                  ) : (
+                  {!history ? (<p>데이터를 불러오는 중...</p>) : history.length === 0 ? (<p>변경 이력이 없습니다.</p>) : (
                     <ul className="grid gap-2">
                       {history?.map((historyItem, index) => (
-                        <li
-                          key={index}
-                          className="text-sm text-gray-700 min-w-[120px] w-full flex justify-around items-center gap-1"
-                        >
+                        <li key={index} className="text-sm text-gray-700 min-w-[120px] w-full flex justify-around items-center gap-1">
                           <div className='flex-1'>
                             <span className="text-gray-500 mr-3">설명</span>
                             <span className="font-medium text-gray-800">
@@ -412,48 +348,25 @@ export const FacilityDetailLayout: React.FC<FacilityDetailLayoutProps> = ({ titl
                     </ul>
                   )}
                 </div>
-              </ModalFormItem>
+              </FacilityFormItem>
               {children}
-            </ModalForm>
-
-            {formError && (
-              <div className="text-red-500 mt-4 text-center">{formError}</div>
-            )}
+            </FacilityForm>
+            </div>
+            {formError && (<div className="text-red-500 mt-4 text-center">{formError}</div>)}
           </CardContent>
         </Card>
-      ) : (
-        <div className="text-center p-8">시설 정보가 없습니다.</div>
-      )}
+      ) : (<div className="text-center p-8">시설 정보가 없습니다.</div>)}
 
       <div className="flex items-center justify-end gap-2 mt-4 mb-6">
         {isEditMode ? (
           <>
-            <Button
-              variant="outline"
-              onClick={handleEditToggle}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              variant="default"
-              onClick={handleSave}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "저장 중..." : "저장"}
-            </Button>
+            <Button variant="outline" onClick={handleEditToggle} disabled={isSubmitting}>취소</Button>
+            <Button variant="default" onClick={handleSave} disabled={isSubmitting}>{isSubmitting ? "저장 중..." : "저장"}</Button>
           </>
         ) : (
           <>
-            <Button variant="outline" onClick={handleDelete}>
-              삭제
-            </Button>
-            <Button variant="outline" onClick={handleBack}>
-              돌아가기
-            </Button>
-            <Button variant="default" onClick={handleEditToggle}>
-              수정
-            </Button>
+            <Button variant="outline" onClick={handleDelete}>삭제</Button><Button variant="outline" onClick={handleBack}>돌아가기</Button>
+            <Button variant="default" onClick={handleEditToggle}>수정</Button>
           </>
         )}
       </div>

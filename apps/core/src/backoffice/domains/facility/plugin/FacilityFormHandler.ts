@@ -3,9 +3,9 @@ import { useFileUploadWithInfo } from "@plug/common-services";
 import { FacilityManager } from "../services/FacilityManager";
 import { FacilityType } from "../store/FacilityListStore";
 import { FacilityRegistry } from "./registry/FacilityRegistry";
-import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
+import { FacilityCreateRequest } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 
-interface FacilityFormHandlerProps<T extends FacilityData> {
+interface FacilityFormHandlerProps<T extends FacilityCreateRequest> {
   facilityType: FacilityType;
   initialData?: T;
   children: (props: {
@@ -30,7 +30,7 @@ interface FacilityFormHandlerProps<T extends FacilityData> {
   facilityId?: number;
 }
 
-export function FacilityFormHandler<T extends FacilityData>({ facilityType, initialData, children, onSaveSuccess, mode = 'create', facilityId }: FacilityFormHandlerProps<T>) {
+export function FacilityFormHandler<T extends FacilityCreateRequest>({ facilityType, initialData, children, onSaveSuccess, mode = 'create', facilityId }: FacilityFormHandlerProps<T>) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [facilityData, setFacilityData] = useState<T | null>(null);
@@ -44,7 +44,7 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
   const [drawingFileId, setDrawingFileId] = useState<number | null>(null);
 
   const facilityDefinition = FacilityRegistry.get<T>(facilityType);
-  
+
   const serviceHook = mode === 'create'
     ? FacilityManager.getCreateService(facilityType)
     : FacilityManager.getUpdateService(facilityType);
@@ -66,10 +66,10 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
         setError("초기 데이터를 가져오는데 실패했습니다.");
       }
     }
-    
+
     if (mode === 'update' && facilityId) {
       const fetchData = async () => {
-        const data = await FacilityManager.fetchFacilityDetail<T>(facilityType, facilityId);
+        const data = await FacilityManager.fetchFacilityDetail(facilityType, facilityId) as unknown as T;
         if (data) {
           setFacilityData(data);
         }
@@ -77,8 +77,8 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
 
       fetchData();
     }
-  }, [facilityType, facilityDefinition, initialData, mode, facilityId]);
-  
+  }, [facilityDefinition, facilityId, mode, facilityType, initialData]);
+
   useEffect(() => {
     if (thumbnailUploader.fileInfo?.id) {
       setThumbnailFileId(thumbnailUploader.fileInfo.id);
@@ -115,11 +115,11 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
       } as T;
     });
   };
-  
+
   const handleDataChange = (newData: T) => {
     setFacilityData(newData);
   };
-  
+
   const handleThumbnailUpload = async (file: File) => {
     try {
       setThumbnailSelected(true);
@@ -130,7 +130,7 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
       setThumbnailSelected(false);
     }
   };
-  
+
   const handleDrawingUpload = async (file: File) => {
     try {
       setDrawingSelected(true);
@@ -165,12 +165,6 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
     if (!service) {
       console.error("서비스를 초기화할 수 없습니다.", { facilityType, mode });
       setError("서비스를 초기화할 수 없습니다.");
-      return;
-    }
-
-    const validationError = FacilityManager.validateData(facilityType, facilityData);
-    if (validationError) {
-      setError(validationError);
       return;
     }
 
@@ -230,7 +224,7 @@ export function FacilityFormHandler<T extends FacilityData>({ facilityType, init
     !facilityData;
 
   if (!facilityData) return null;
-  
+
   return children({
     data: facilityData,
     handlers: {

@@ -101,7 +101,7 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
     (item: FacilityItem, queryParams?: string) => {
       setPreviousRoute("/admin/facility");
       setSelected(item.type as FacilityType, item.id.toString());
-      const path = `/admin/facility/${item.id}${queryParams || ""}`;
+      const path = `/admin/facility/${item.type}/${item.id}${queryParams || ""}`;
       navigate(path);
     },
     [navigate, setSelected, setPreviousRoute],

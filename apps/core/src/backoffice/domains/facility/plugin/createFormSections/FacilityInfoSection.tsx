@@ -2,10 +2,11 @@ import React from "react";
 import { Button, Textarea } from "@plug/ui";
 import { Input } from "@plug/ui";
 import { FacilityRequest, Floor, useFileUploadWithInfo } from "@plug/common-services";
-import { ModalForm, ModalFormItem } from "@plug/ui";
 import * as Px from "@plug/engine/dist/src"
 import { ModelInfo } from "@plug/engine/dist/src/interfaces";
 import { isBuildingFacility } from "@/backoffice/domains/facility/types/facilityTypeGuard";
+import { FacilityForm, FacilityFormItem } from "../../components/FacilityFormComponent";
+import { useForm } from "react-hook-form";
 
 
 interface FacilityInfoSectionProps {
@@ -22,6 +23,7 @@ interface FacilityInfoSectionProps {
 }
 
 export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facilityData, onChange, onFloorsChange, onThumbnailUpload, onDrawingUpload, thumbnailUploader, drawingUploader, showFloorInfo = false, children }) => {
+  const form = useForm()
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -33,28 +35,19 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
     if (files && files.length > 0) {
       onDrawingUpload(files[0]);
 
-      console.log("디버깅 - showFloorInfo:", showFloorInfo);
-      console.log("디버깅 - onFloorsChange 존재:", !!onFloorsChange);
-      console.log("디버깅 - isBuildingFacility:", isBuildingFacility(facilityData));
-
       if (onFloorsChange && showFloorInfo && isBuildingFacility(facilityData)) {
         const fileUrl = URL.createObjectURL(files[0]);
-        console.log("디버깅 - fileUrl 생성됨:", !!fileUrl);
 
         if (fileUrl) {
           try {
             console.log("디버깅 - GetModelHierarchyFromUrl 호출 전");
             Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
-              console.log("디버깅 - 콜백 호출됨, modelInfos:", modelInfos);
               if (Array.isArray(modelInfos) && modelInfos.length > 0) {
                 const floors = modelInfos.map(info => ({
                   name: info.displayName,
                   floorId: info.floorId
                 }));
-                console.log("디버깅 - 추출된 floors:", floors);
                 onFloorsChange(floors);
-              } else {
-                console.log("디버깅 - modelInfos가 배열이 아니거나 비어있음");
               }
             });
           } catch (err) {
@@ -68,13 +61,13 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
   };
 
   return (
-    <>
-      <ModalForm className="grid grid-cols-2 border-t divide-y divide-gray-200 border-x">
+    <div className="grid grid-cols-2 border-t divide-y divide-gray-200 border-x">
+      <FacilityForm {...form}>
         <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
           <div className="w-1 h-6 bg-blue-600"></div>
           <h3 className="text-lg font-medium">시설 정보 입력</h3>
         </div>
-        <ModalFormItem label="시설명">
+        <FacilityFormItem label="시설명">
           <Input
             type="text"
             value={facilityData.facility.name}
@@ -82,9 +75,9 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
             placeholder="시설명을 입력하세요"
             required
           />
-        </ModalFormItem>
+        </FacilityFormItem>
 
-        <ModalFormItem label="코드">
+        <FacilityFormItem label="코드">
           <Input
             type="text"
             value={facilityData.facility.code}
@@ -92,9 +85,9 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
             placeholder="코드를 입력하세요"
             required
           />
-        </ModalFormItem>
+        </FacilityFormItem>
 
-        <ModalFormItem label="설명" className="col-span-2">
+        <FacilityFormItem label="설명" className="col-span-2">
           <Textarea
             id="facility-description"
             className="w-full h-32"
@@ -102,9 +95,9 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
             onChange={(e) => onChange("facility.description", e.target.value)}
             placeholder="시설에 대한 설명을 입력하세요"
           />
-        </ModalFormItem>
+        </FacilityFormItem>
 
-        <ModalFormItem label="썸네일">
+        <FacilityFormItem label="썸네일">
           <div className="flex w-full items-center justify-between gap-2">
             {thumbnailUploader.isLoadingFileInfo && <p>썸네일 업로드 중...</p>}
             {thumbnailUploader.fileInfo && (
@@ -127,9 +120,9 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
               onChange={handleThumbnailChange}
             />
           </div>
-        </ModalFormItem>
+        </FacilityFormItem>
 
-        <ModalFormItem label="도면">
+        <FacilityFormItem label="도면">
           <div className="flex justify-between w-full gap-2">
             {drawingUploader.isLoadingFileInfo && <p>도면 업로드 중...</p>}
             {drawingUploader.fileInfo && (
@@ -154,9 +147,9 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
               onChange={handleDrawingChange}
             />
           </div>
-        </ModalFormItem>
+        </FacilityFormItem>
         {children}
-      </ModalForm>
-    </>
+      </FacilityForm>
+    </div>
   );
 };

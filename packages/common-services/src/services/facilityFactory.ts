@@ -1,6 +1,6 @@
 import { useGet, usePost, useDelete, useSWRApi, usePut } from "@plug/api-hooks";
 import { FacilityInterfaces, FacilityFactory } from "../types";
-import { FacilityHistoryResponse } from "../types/facility";
+import { FacilityHistoryResponse } from "../types";
 
 export function createFacilityService<F extends FacilityInterfaces<any, any, any>>(endPoint: string) {
   type C_REQ = F['CREATE_REQUEST'];
@@ -29,7 +29,7 @@ export function createFacilityService<F extends FacilityInterfaces<any, any, any
     useDetailSWR: (id: number) =>
       useSWRApi<RES>(`${endPoint}/${id}`, 'GET', { requireAuth: true }),
 
-    useHistorySWR: (id: number) =>
+    useHistory: (id: number) =>
       useSWRApi<FacilityHistoryResponse>(`${endPoint}/${id}/history`, 'GET', { requireAuth: true }),
   };
 }
@@ -47,7 +47,7 @@ const hooks = [
   'useDeletion',
   'useListSWR',
   'useDetailSWR',
-  'useHistorySWR'
+  'useHistory'
 ] as const;
 
 type HookName = typeof hooks[number];
@@ -60,7 +60,7 @@ type HookParams = {
   'useDeletion': [id: number];
   'useListSWR': [];
   'useDetailSWR': [id: number];
-  'useHistorySWR': [id: number];
+  'useHistory': [id: number];
 };
 
 const exports = {} as Record<HookName, any>;
@@ -85,7 +85,7 @@ export const {
   useDeletion,
   useListSWR,
   useDetailSWR,
-  useHistorySWR
+  useHistory
 } = exports;
 
 export function useFacilityService<T extends FacilityFactory>(facilityType: T) {

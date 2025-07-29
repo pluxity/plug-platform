@@ -42,17 +42,16 @@ export const StationDefinition: FacilityDefinition<StationDtos['CREATE_REQUEST']
     {
       id: "stationInfo",
       render: (props) => {
-        const { data } = props;
+        const { data, handlers } = props;
         return (
             <StationInfoSection
-              stationCodes={data.stationInfo?.stationCodes || []}
-              lineIds={data.stationInfo?.lineIds || []}
-              onStationCodesChange={function (): void {
-                throw new Error("Function not implemented.");
+              stationInfo={{
+                stationCodes: data.stationInfo?.stationCodes,
+                lineIds: data.stationInfo?.lineIds,
               }}
-              onLineIdsChange={function (): void {
-                throw new Error("Function not implemented.");
-              }}
+              onStationCodesChange={handlers.onStationCodesChange}
+              onLineIdsChange={handlers.onLineIdsChange}
+
             />
         );
       }

@@ -10,7 +10,7 @@ import { ViewMain } from '@/backoffice/domains/view'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import FacilityManagement from "@/backoffice/domains/facility";
-import BuildingDetailPage from "@/backoffice/domains/facility/FacilityDetailPage";
+import FacilityDetailPage from "@/backoffice/domains/facility/FacilityDetailPage";
 import LoginPage from '@/global/pages/LoginPage'
 import ProtectedRoute from '@/global/components/ProtectedRoute'
 
@@ -42,7 +42,8 @@ const AppRouter: React.FC = () => {
               <Route path="assetCategory" element={<AssetCategory />} />
               <Route path="facility" element={<Outlet />} >
                 <Route index element={<FacilityManagement />} />
-                <Route path=":id" element={<BuildingDetailPage />} />
+                <Route path="buildings/:id" element={<FacilityDetailPage />} />
+                <Route path="stations/:id" element={<FacilityDetailPage />} />
               </Route>
             </Route>
 

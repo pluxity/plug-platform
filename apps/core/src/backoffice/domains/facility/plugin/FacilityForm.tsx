@@ -4,21 +4,19 @@ import { FacilityType } from "../store/FacilityListStore";
 import { FacilityInfoSection } from "./createFormSections/FacilityInfoSection";
 import { FacilityRegistry } from "./registry/FacilityRegistry";
 import { FacilityFormHandler } from "./FacilityFormHandler";
-import { FacilityData, isBuildingFacility, isStationFacility } from "../types/facilityTypeGuard";
+import { FacilityCreateRequest, isBuildingFacility, isStationFacility } from "../types/facilityTypeGuard";
 import { FormProvider, useForm } from "react-hook-form";
 import "./definitions/BuildingDefinition";
 import "./definitions/StationDefinition";
-import { FacilityRequest } from "@plug/common-services";
 
 interface FacilityFormProps {
   facilityType: FacilityType;
   onSaveSuccess?: () => void;
-  initialData?: FacilityData;
-  mode?: 'create' | 'update';
+  initialData?: FacilityCreateRequest;
   facilityId?: number;
 }
 
-export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSaveSuccess, initialData, mode = 'create', facilityId }) => {
+export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSaveSuccess, initialData, facilityId }) => {
   const facilityDefinition = FacilityRegistry.get(facilityType);
   const methods = useForm();
 
@@ -28,14 +26,13 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
         facilityType={facilityType}
         initialData={initialData}
         onSaveSuccess={onSaveSuccess}
-        mode={mode}
         facilityId={facilityId}
       >
         {({ data, handlers, state }) => (
           <form onSubmit={handlers.handleSubmit}>
             <FacilityInfoSection
-              title={`${mode === "create" ? "새 " : ""}${facilityDefinition?.displayName || "시설"} ${mode === "create" ? "등록" : "수정"}`}
-              facilityData={data as FacilityRequest}
+              title={`새 ${facilityDefinition?.displayName || "시설"} 등록`}
+              facilityData={data as FacilityCreateRequest}
               onChange={handlers.handleInputChange}
               onThumbnailUpload={handlers.handleThumbnailUpload}
               onDrawingUpload={handlers.handleDrawingUpload}
@@ -105,9 +102,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
                   ? "처리 중..."
                   : state.isSubmitDisabled && !state.isSubmitting
                     ? "파일 업로드 완료 대기 중..."
-                    : mode === "create"
-                      ? "저장"
-                      : "수정"}
+                      : "저장"}
               </Button>
             </div>
           </form>
