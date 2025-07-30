@@ -6,8 +6,6 @@ import { FacilityRegistry } from "./registry/FacilityRegistry";
 import { FacilityFormHandler } from "./FacilityFormHandler";
 import {
   FacilityCreateRequest,
-  FacilityData,
-  FacilityUpdateRequest,
   isBuildingFacility,
   isStationFacility
 } from "../types/facilityTypeGuard";
@@ -38,7 +36,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
           <form onSubmit={handlers.handleSubmit}>
             <FacilityDetailLayout
               title={`새 ${facilityDefinition?.displayName || "시설"} 등록`}
-              facilityData={data as FacilityCreateRequest | FacilityData | FacilityUpdateRequest}
+              facilityData={data as FacilityCreateRequest}
               onChange={handlers.handleInputChange}
               onThumbnailUpload={handlers.handleThumbnailUpload}
               onDrawingUpload={handlers.handleDrawingUpload}

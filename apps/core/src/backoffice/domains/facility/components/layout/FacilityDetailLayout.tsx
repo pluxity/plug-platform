@@ -12,7 +12,7 @@ import {
 import { DrawingUpdateModal } from "@/backoffice/domains/facility/components/DrawingUpdateModal";
 import { FacilityForm, FacilityFormItem } from "../FacilityFormComponent";
 import { useForm } from "react-hook-form";
-import { FacilityUpdateRequest } from "@/backoffice/domains/facility/types/facilityTypeGuard";
+import { FacilityCreateRequest, FacilityUpdateRequest } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 import * as console from "node:console";
 import { PathInputModal } from "../../components/PathInputModal";
 
@@ -23,7 +23,7 @@ interface FacilityDetailLayoutProps {
   isLoading: boolean;
   error: Error | null;
   urlMode?: string | null;
-  formData: FacilityUpdateRequest;
+  formData: FacilityUpdateRequest | FacilityCreateRequest;
   setFormData: (data: FacilityUpdateRequest) => void;
   onDelete: () => Promise<void>;
   onUpdate: (data: FacilityUpdateRequest) => Promise<void>;
