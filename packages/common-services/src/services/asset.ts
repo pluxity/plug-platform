@@ -1,4 +1,4 @@
-import { useGet, usePost, usePut, useDelete, useSWRApi } from '@plug/api-hooks';
+import { useGet, usePost, usePatch, useDelete, useSWRApi } from '@plug/api-hooks';
 import { api } from '@plug/api-hooks/core';
 import type { 
   AssetResponse, 
@@ -25,7 +25,7 @@ export const useCreateAsset = () => {
 
 // 에셋 수정
 export const useUpdateAsset = (assetId: number) => {
-  return usePut<AssetUpdateRequest>(`${END_POINT}/${assetId}`, { requireAuth: true });
+  return usePatch<AssetUpdateRequest>(`${END_POINT}/${assetId}`, { requireAuth: true });
 };
 
 // 에셋 삭제
@@ -35,7 +35,7 @@ export const deleteAsset = async (assetId: number) => {
 
 // 에셋에 카테고리 할당
 export const useAssignAssetCategory = (assetId: number, categoryId: number) => {
-  return usePut<null>(`${END_POINT}/${assetId}/category/${categoryId}`, { requireAuth: true });
+  return usePatch<null>(`${END_POINT}/${assetId}/category/${categoryId}`, { requireAuth: true });
 };
 
 // 에셋에서 카테고리 제거
