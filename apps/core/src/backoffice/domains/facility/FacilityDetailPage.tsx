@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { PageContainer } from '@/backoffice/common/view/layouts';
@@ -39,7 +40,8 @@ const FacilityDetailPage: React.FC = () => {
       name: '',
       description: '',
       code: '',
-      thumbnailFileId: 0
+      thumbnailFileId: 0,
+      path: ''
     }
   });
 
@@ -50,23 +52,18 @@ const FacilityDetailPage: React.FC = () => {
       console.log('API 호출 중단: facilityType 또는 facilityId가 없음');
       return;
     }
-    
+
     try {
-      console.log(`API 호출 시작: /api/v1/${facilityType}/${facilityId}`);
       setIsLoading(true);
-      
       const response = await api.get(`${facilityType}/${facilityId}`, { requireAuth: true });
-      console.log('API 응답:', response);
-      
       if (response && 'data' in response) {
         setFacilityData(response.data);
       } else {
         setFacilityData(response);
       }
-      
+
       setFacilityError(null);
     } catch (error) {
-      console.error('시설 데이터 로드 오류:', error);
       setFacilityError(error);
       setFacilityData(null);
     } finally {
@@ -77,9 +74,8 @@ const FacilityDetailPage: React.FC = () => {
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
-      console.log('=== 컴포넌트 최초 마운트 ===');
     }
-    
+
     if (!id || !facilityType) {
       setIsLoading(false);
       if (!facilityType) {
@@ -87,8 +83,7 @@ const FacilityDetailPage: React.FC = () => {
       }
       return;
     }
-    
-    console.log(`데이터 로드 시작 - facilityType: ${facilityType}, id: ${id}`);
+
     fetchFacilityData();
     return () => {
       console.log('=== 컴포넌트 언마운트 ===');
@@ -98,7 +93,6 @@ const FacilityDetailPage: React.FC = () => {
   useEffect(() => {
     if (facilityData && selectedId !== id && id) {
       if (facilityType) {
-        console.log(`선택 상태 업데이트: ${facilityType}, ${id}`);
         setSelected(facilityType, id);
       }
     }
@@ -130,8 +124,7 @@ const FacilityDetailPage: React.FC = () => {
       if (!facilityType) {
         throw new Error('시설 유형이 정의되지 않았습니다.');
       }
-      console.log(`업데이트 API 호출: /api/v1/${facilityType}/${facilityId}`, data);
-      await api.put(`/api/v1/${facilityType}/${facilityId}`, data, { requireAuth: true });
+      await api.put(`${facilityType}/${facilityId}`, data, { requireAuth: true });
       return true;
     } catch (error) {
       console.error("시설 업데이트 오류:", error);
@@ -144,8 +137,7 @@ const FacilityDetailPage: React.FC = () => {
       if (!facilityType) {
         throw new Error('시설 유형이 정의되지 않았습니다.');
       }
-      console.log(`도면 업데이트 API 호출: /api/v1/${facilityType}/${facilityId}/drawing`, data);
-      await api.put(`/api/v1/${facilityType}/${facilityId}/drawing`, data, { requireAuth: true });
+      await api.put(`api/v1/${facilityType}/${facilityId}/drawing`, data, { requireAuth: true });
       return true;
     } catch (error) {
       console.error("도면 업데이트 오류:", error);
@@ -261,7 +253,7 @@ const FacilityDetailPage: React.FC = () => {
         onMutate={mutateFacilityData}
         onHistoryMutate={mutateHistoryData}
         history={historyData}
-        detailUrl="/admin/facility"
+        detailUrl={facilityType}
       />
     </>
   );

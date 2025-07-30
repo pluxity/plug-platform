@@ -1,14 +1,20 @@
 import React from "react";
 import { Button } from "@plug/ui";
 import { FacilityType } from "../store/FacilityListStore";
-import { FacilityInfoSection } from "./createFormSections/FacilityInfoSection";
+
 import { FacilityRegistry } from "./registry/FacilityRegistry";
 import { FacilityFormHandler } from "./FacilityFormHandler";
-import { FacilityCreateRequest, isBuildingFacility, isStationFacility } from "../types/facilityTypeGuard";
+import {
+  FacilityCreateRequest,
+  FacilityData,
+  FacilityUpdateRequest,
+  isBuildingFacility,
+  isStationFacility
+} from "../types/facilityTypeGuard";
 import { FormProvider, useForm } from "react-hook-form";
 import "./definitions/BuildingDefinition";
 import "./definitions/StationDefinition";
-
+import { FacilityDetailLayout } from "@/backoffice/domains/facility/components/layout/FacilityDetailLayout";
 interface FacilityFormProps {
   facilityType: FacilityType;
   onSaveSuccess?: () => void;
@@ -30,25 +36,16 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
       >
         {({ data, handlers, state }) => (
           <form onSubmit={handlers.handleSubmit}>
-            <FacilityInfoSection
+            <FacilityDetailLayout
               title={`새 ${facilityDefinition?.displayName || "시설"} 등록`}
-              facilityData={data as FacilityCreateRequest}
+              facilityData={data as FacilityCreateRequest | FacilityData | FacilityUpdateRequest}
               onChange={handlers.handleInputChange}
               onThumbnailUpload={handlers.handleThumbnailUpload}
               onDrawingUpload={handlers.handleDrawingUpload}
               thumbnailUploader={state.thumbnailUploader}
               drawingUploader={state.drawingUploader}
               showFloorInfo={isBuildingFacility(data)}
-              onFloorsChange={
-                isBuildingFacility(data)
-                  ? (floors) => {
-                      handlers.handleDataChange({
-                        ...data,
-                        floors,
-                      });
-                    }
-                  : undefined
-              }
+
             >
               {facilityDefinition?.sections.map((section) => (
                 <React.Fragment key={section.id}>
@@ -90,7 +87,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
                   })}
                 </React.Fragment>
               ))}
-            </FacilityInfoSection>
+            </FacilityDetailLayout>
 
             {state.error && (
               <div className="text-red-500 mt-4 text-center">{state.error}</div>

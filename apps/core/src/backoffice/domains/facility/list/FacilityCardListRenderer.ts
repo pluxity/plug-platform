@@ -42,17 +42,26 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
     const performDelete = async () => {
       if (!facilityToDelete) return;
 
-      try {
-        if (facilityToDelete.type === "buildings") {
-          await deleteBuildingHook.execute();
-        } else if (facilityToDelete.type === "stations") {
-          await deleteStationHook.execute();
-        } else {
-          console.error(`알 수 없는 시설 타입입니다: ${facilityToDelete.type}`);
-          return;
-        }
+      const hook =
+        facilityToDelete.type === "buildings"
+          ? deleteBuildingHook
+          : facilityToDelete.type === "stations"
+            ? deleteStationHook
+            : null;
 
-        await facilitiesResponse.mutate();
+      if (!hook) {
+        console.error(`알 수 없는 시설 타입입니다: ${facilityToDelete.type}`);
+        setFacilityToDelete(null);
+        return;
+      }
+
+      try {
+        await hook.execute();
+        navigate('/admin/facility');
+
+        facilitiesResponse.mutate().catch(e =>
+          console.log('시설 목록 업데이트 실패:', e)
+        );
       } catch (err) {
         console.error(`${facilityToDelete.type} 삭제 오류:`, err);
         alert(`시설 삭제 중 오류가 발생했습니다.`);
@@ -62,7 +71,13 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
     };
 
     if (facilityToDelete) performDelete();
-  }, [facilityToDelete, deleteBuildingHook, deleteStationHook, facilitiesResponse]);
+  }, [
+    facilityToDelete,
+    deleteBuildingHook,
+    deleteStationHook,
+    facilitiesResponse,
+    navigate,
+  ]);
 
   const standardizedData = useMemo(() => {
     if (!facilitiesResponse.data) {
