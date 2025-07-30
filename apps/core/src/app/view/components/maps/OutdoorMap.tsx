@@ -1,89 +1,18 @@
 import React, { useEffect } from 'react'
 import { Entity, useCesium } from 'resium'
 import * as Cesium from 'cesium'
-import { Button, SearchForm } from '@plug/ui'
+import { SearchForm } from '@plug/ui'
 import { useMapLoadingStore } from '@/app/store/mapLoadingStore'
 import { useFacilityStore, useFacilities } from '@/app/store/facilityStore'
-import type { Facility, LocationMeta } from '@plug/common-services'
-import GoogleMap from '@/global/components/maps/GoogleMap'
+import VWorldMap from '@/global/components/maps/VWorldMap'
+import MapControls from '@/global/components/maps/MapControls'
 
-// 지도 컨트롤 컴포넌트
-const MapControls: React.FC = () => {
-  const { viewer } = useCesium()
-
-  const fnZoomIn = () => {
-    if (viewer?.scene?.camera) {
-      const camera = viewer.scene.camera;
-      const direction = camera.direction;
-      const moveDistance = camera.positionCartographic.height * 0.1;
-      
-      camera.move(direction, moveDistance);
-    }
-  };
-
-  const fnZoomOut = () => {
-    if (viewer?.scene?.camera) {
-      const camera = viewer.scene.camera;
-      const direction = camera.direction;
-      const moveDistance = camera.positionCartographic.height * -0.1;
-      
-      camera.move(direction, moveDistance);
-    }
-  };
-
-  const fnFlyToHome = () => {
-    if (viewer?.scene?.camera) {
-      const camera = viewer.scene.camera;
-      
-      // 용산구청 좌표 (위도: 37.532200, 경도: 126.990500)
-      // 높이를 더 낮춰서 지면에 가깝게 설정
-      camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(126.990500, 37.532200, 500),
-        duration: 2.0
-      });
-    }
-  };
-
-  const btnClassName = 'hover:bg-transparent text-gray-100 hover:text-gray-800 cursor-pointer w-9 h-9 hover:scale-150 transition-transform duration-200 rounded-full flex items-center justify-center';
-
-  return (
-    <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-1.5 z-10 p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
-      <Button
-        onClick={fnZoomIn}
-        variant="ghost"
-        size="icon"
-        title="확대"
-        className={btnClassName}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-      </Button>
-      <Button
-        onClick={fnZoomOut}
-        variant="ghost"
-        size="icon"
-        title="축소"
-        className={btnClassName}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-        </svg>
-      </Button>
-      <Button
-        onClick={fnFlyToHome}
-        variant="ghost"
-        size="icon"
-        title="홈 화면"
-        className={btnClassName}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9,22 9,12 15,12 15,22" />
-        </svg>
-      </Button>
-    </div>
-  )
+// LocationMeta 타입 정의
+interface LocationMeta {
+  height?: number;
+  heading?: number;
+  pitch?: number;
+  roll?: number;
 }
 
 interface OutdoorMapProps {
@@ -93,7 +22,6 @@ interface OutdoorMapProps {
 const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
   const { startTransition, endTransition } = useMapLoadingStore();
   
-  // Facility store에서 검색 상태와 액션들 가져오기
   const { 
     facilitiesFetched,
     searchQuery,
@@ -102,8 +30,6 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
     setFacilitiesFetched,
     performSearch,
     selectSearchResult,
-    setSelectedFacility,
-    setSearchQuery,
     getAllFacilities
   } = useFacilityStore()
   
@@ -113,7 +39,8 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
     if (!facilitiesFetched) {
       fetchFacilities()
     }
-  }, [facilitiesFetched, fetchFacilities])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facilitiesFetched]) // fetchFacilities는 안정적이지 않으므로 의존성에서 제외
 
   useEffect(() => {
     if (facilitiesData && !facilitiesFetched) {
@@ -135,7 +62,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
   }, [facilitiesLoading, getAllFacilities, endTransition]);
 
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
+    // setSearchQuery(query);
     performSearch(query); 
   }
 
@@ -159,6 +86,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
     const { viewer } = useCesium();
     const { searchSelectedFacility, setSearchSelectedFacility } = useFacilityStore();
 
+    // 검색된 시설로 이동
     useEffect(() => {
       if (!viewer || !searchSelectedFacility) return;
 
@@ -241,7 +169,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
           if (facility) {
             startTransition('outdoor', 'indoor');
             
-            setSelectedFacility(facility);
+            // setSelectedFacility 호출 제거 - MainMap에서 처리
             if (onFacilityClick) {
               onFacilityClick(facility.id);
             }
@@ -268,8 +196,22 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
   };
 
   return (
-    <div className="w-full h-full relative">
-      <GoogleMap className="w-full h-full">
+    <>
+      <VWorldMap 
+        className="w-full h-full relative"
+      >
+        {/* Search Form - 좌측 상단에 플로팅 */}
+        <div className="absolute top-4 left-4 w-80 z-50">
+          <SearchForm
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onSelect={handleSearchSelect}
+            searchResult={searchResults.map(facility => facility.name)}
+            placeholder="시설 검색..."
+            className="bg-white/90 backdrop-blur-sm shadow-lg"
+          />
+        </div>
+        
         <CameraController />
         <FacilityInteractionHandler />
         
@@ -332,23 +274,10 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilityClick }) => {
             );
           });
         })()}
-        
-      </GoogleMap>
-      
-      {/* Search Form - 좌측 상단에 플로팅 */}
-      <div className="absolute top-4 left-4 w-80">
-        <SearchForm
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onSelect={handleSearchSelect}
-          searchResult={searchResults.map(facility => facility.name)}
-          placeholder="시설 검색..."
-          className="bg-white/90 backdrop-blur-sm shadow-lg"
-        />
-      </div>
+      </VWorldMap>
       
       <MapControls />
-    </div>
+    </>
   )
 }
 

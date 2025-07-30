@@ -12,30 +12,46 @@ const MainMap: React.FC = () => {
 
   const [mapMode, setMapMode] = useState<MapMode>(MapMode.OUTDOOR)
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
+  const [facilityCoords, setFacilityCoords] = useState<{ lon: number; lat: number } | null>(null)
 
   const { startTransition } = useMapLoadingStore();
-  const { selectedFacility } = useFacilityStore();
+  const { selectedFacility, setSelectedFacility, getFacilityById } = useFacilityStore();
 
   const toggleMapMode = () => {
     if (mapMode === MapMode.INDOOR) {
-      startTransition('indoor', 'outdoor');
+      startTransition('indoor', 'outdoor', '실외로 나가는 중...');
+      
+      // 현재 선택된 시설의 좌표 저장
+      if (selectedFacility && selectedFacility.lon !== undefined && selectedFacility.lat !== undefined) {
+        setFacilityCoords({ lon: selectedFacility.lon, lat: selectedFacility.lat })
+      }
+      
       setMapMode(MapMode.OUTDOOR)
       setSelectedFacilityId(null)
+      setSelectedFacility(null) // selectedFacility도 초기화
     } 
   }
 
   const handleFacilityClick = (facilityId: number) => {
-    setSelectedFacilityId(facilityId)
-    setMapMode(MapMode.INDOOR)
-  }
-
-  // selectedFacility가 변경되면 실내 지도로 전환
-  React.useEffect(() => {
-    if (selectedFacility && mapMode === MapMode.OUTDOOR) {
-      setSelectedFacilityId(selectedFacility.id)
+    const facility = getFacilityById(facilityId)
+    if (facility) {
+      startTransition('outdoor', 'indoor', '실내로 들어가는 중...');
+      setSelectedFacilityId(facilityId)
+      setSelectedFacility(facility)
       setMapMode(MapMode.INDOOR)
     }
-  }, [selectedFacility, mapMode])
+  }
+
+  // 실외 지도로 전환된 후 facilityCoords 초기화
+  React.useEffect(() => {
+    if (mapMode === MapMode.OUTDOOR && facilityCoords) {
+      const timer = setTimeout(() => {
+        setFacilityCoords(null)
+      }, 2500) // 카메라 이동 완료 후 초기화
+      
+      return () => clearTimeout(timer)
+    }
+  }, [mapMode, facilityCoords])
 
   return (
     <div className="w-full h-full relative">
@@ -52,15 +68,20 @@ const MainMap: React.FC = () => {
         </Button>
       ) : null}
 
-      <div className={`w-full h-full ${mapMode === MapMode.OUTDOOR ? 'block' : 'hidden'}`}>
-        <OutdoorMap onFacilityClick={handleFacilityClick} />
-      </div>
+      {mapMode === MapMode.OUTDOOR && (
+        <div className="w-full h-full">
+          <OutdoorMap 
+            onFacilityClick={handleFacilityClick} 
+            initialFacility={facilityCoords}
+            key={facilityCoords ? `${facilityCoords.lon}-${facilityCoords.lat}` : 'outdoor-map'}
+          />
+        </div>
+      )}
       
-      {mapMode === MapMode.INDOOR && (
+      {mapMode === MapMode.INDOOR && selectedFacilityId && (
         <div className="w-full h-full">
           <IndoorMap 
-            key="indoor-map" 
-            facilityId={selectedFacilityId} 
+            key="indoor-map"
             facilityData={selectedFacility ? { facility: selectedFacility } as FacilityResponse : null} 
           />
         </div>

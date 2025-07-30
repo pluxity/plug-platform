@@ -1,33 +1,33 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { useGet } from '@plug/api-hooks'
-import type { Facility, FacilityAllResponse } from '@plug/common-services'
+import type { BaseFacilityResponse, FacilitiesAllResponse } from '@plug/common-services'
 
 interface FacilityState {
-  facilities: FacilityAllResponse
+  facilities: FacilitiesAllResponse
   isLoading: boolean
   error: string | null
-  selectedFacility: Facility | null
-  searchSelectedFacility: Facility | null
+  selectedFacility: BaseFacilityResponse | null
+  searchSelectedFacility: BaseFacilityResponse | null
   facilitiesFetched: boolean
   
   searchQuery: string
-  searchResults: Facility[]
+  searchResults: BaseFacilityResponse[]
   
-  setFacilities: (facilities: FacilityAllResponse) => void
+  setFacilities: (facilities: FacilitiesAllResponse) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
-  setSelectedFacility: (facility: Facility | null) => void
-  setSearchSelectedFacility: (facility: Facility | null) => void
+  setSelectedFacility: (facility: BaseFacilityResponse | null) => void
+  setSearchSelectedFacility: (facility: BaseFacilityResponse | null) => void
   setFacilitiesFetched: (fetched: boolean) => void
   
   setSearchQuery: (query: string) => void
   performSearch: (query: string) => void
   clearSearch: () => void
-  selectSearchResult: (facility: Facility) => void
+  selectSearchResult: (facility: BaseFacilityResponse) => void
   
-  getAllFacilities: () => Facility[]
-  getFacilityById: (id: number) => Facility | undefined
+  getAllFacilities: () => BaseFacilityResponse[]
+  getFacilityById: (id: number) => BaseFacilityResponse | undefined
 }
 
 export const useFacilityStore = create<FacilityState>()(
@@ -54,7 +54,7 @@ export const useFacilityStore = create<FacilityState>()(
       
       performSearch: (query) => {
         const { facilities } = get()
-        
+
         if (!query.trim()) {
           set({ searchResults: [], searchQuery: query })
           return
@@ -62,7 +62,12 @@ export const useFacilityStore = create<FacilityState>()(
         
         const searchQuery = query.toLowerCase()
         
-        const searchResults = Object.values(facilities).flat().filter(facility =>
+        const allFacilities = [
+          ...(facilities.buildings || []),
+          ...(facilities.stations || [])
+        ]
+        
+        const searchResults = allFacilities.filter((facility: BaseFacilityResponse) =>
           facility.name.toLowerCase().includes(searchQuery)
         )
         
@@ -81,18 +86,17 @@ export const useFacilityStore = create<FacilityState>()(
 
       getAllFacilities: () => {
         const { facilities } = get()
-        // buildings와 stations의 facility 배열을 합치기
         return [
-          ...facilities.buildings.map(item => item.facility),
-          ...facilities.stations.map(item => item.facility)
+          ...(facilities.buildings || []),
+          ...(facilities.stations || [])
         ]
       },
 
       getFacilityById: (id) => {
         const { facilities } = get()
         const allFacilities = [
-          ...facilities.buildings.map(item => item.facility),
-          ...facilities.stations.map(item => item.facility)
+          ...(facilities.buildings || []),
+          ...(facilities.stations || [])
         ]
         return allFacilities.find(facility => facility.id === id)
       }
@@ -104,5 +108,5 @@ export const useFacilityStore = create<FacilityState>()(
 )
 
 export const useFacilities = () => {
-  return useGet<FacilityAllResponse>('facilities')
+  return useGet<FacilitiesAllResponse>('facilities')
 }
