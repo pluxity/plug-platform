@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +6,14 @@ import {
   Button,
   Input,
   ModalForm,
+  ModalFormField,
+  ModalFormContainer,
   ModalFormItem,
 } from '@plug/ui';
 import { toast } from 'sonner'; 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useRoleDetailSWR, useUpdateRole } from '@plug/common-services';
 import { RoleEditModalProps } from '@/backoffice/domains/users/types/role';
 
@@ -18,44 +23,53 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
   onSuccess,
   roleId,
 }) => {
-    // 역할 정보 
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-
     // 역할 상세 목록 조회
     const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : undefined);
-
     const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId);
+
+    const roleFormSchema = z.object({
+        name: z.string().min(1, {
+            message: '역할 이름을 입력해주세요.'
+        }),
+        description: z.string().min(1, {
+            message: '역할 설명을 입력해주세요.'
+        }),
+    });
+
+    const modalForm = useForm<z.infer<typeof roleFormSchema>>({
+        resolver: zodResolver(roleFormSchema),
+        defaultValues: {
+            name: '',
+            description: '',
+        },
+        mode: 'onChange',
+    });
 
     useEffect(() => {
         if (isOpen && data) {
-            setName(data.name ?? '');
-            setDescription(data.description ?? '');
+            modalForm.reset({
+                name: data.name,
+                description: data.description,
+            });
         }
-    }, [isOpen, data]);
-
-    // 역할 정보 변경 핸들러
-    const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value);
-    }, []);
-    
-    const handleDescriptionChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setDescription(event.target.value);
-    }, []);
+    }, [isOpen, data, modalForm]);
 
     const resetForm = useCallback(() => {
-        setName('');
-        setDescription('');
+        if (data) {
+            modalForm.reset({
+                name: data.name,
+                description: data.description,
+            });
+        }
         onClose();
         mutate();
-    }, [onClose, mutate]);
+    }, [data, modalForm, onClose, mutate]);
 
-    const handleSubmit = useCallback(async (event: React.FormEvent) => {
-        event.preventDefault();
+    const handleSubmit = useCallback(async (data: z.infer<typeof roleFormSchema>) => {
         try {
             await updateRole({ 
-                name, 
-                description 
+                name: data.name, 
+                description: data.description 
             });
             toast.success('역할 수정 완료');
             onSuccess?.();
@@ -63,29 +77,43 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
         } catch (error) {
             toast.error((error as Error).message || '역할 수정에 실패했습니다.');
         }
-    }, [name, description, updateRole, onSuccess, resetForm]);
+    }, [updateRole, onSuccess, resetForm]);
 
     return (
         <Dialog open={isOpen} onOpenChange={resetForm}>
             <DialogContent title="역할 수정" className="max-w-xl" dimmed disableBackground>
-                <form onSubmit={handleSubmit}>
-                <ModalForm>
-                    <ModalFormItem label="역할 이름">
-                        <Input value={name} onChange={handleNameChange} placeholder="역할을 입력해주세요." required />
-                    </ModalFormItem>
-                    <ModalFormItem label="역할 설명">
-                        <Input value={description} onChange={handleDescriptionChange} placeholder="역할을 설명해주세요." required />
-                    </ModalFormItem>
+                <ModalForm {...modalForm}>
+                    <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
+                        <ModalFormContainer>
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <ModalFormItem label="역할 이름" message={modalForm.formState.errors.name?.message}>
+                                        <Input {...field} placeholder="역할을 입력해주세요." required />
+                                    </ModalFormItem>
+                                )}
+                            />
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <ModalFormItem label="역할 설명" message={modalForm.formState.errors.description?.message}>
+                                        <Input {...field} placeholder="역할을 설명해주세요." required />
+                                    </ModalFormItem>
+                                )}
+                            />
+                        </ModalFormContainer>
+                        <DialogFooter>
+                            <Button type="button" onClick={resetForm} disabled={isRoleUpdating} variant="outline">
+                                취소
+                            </Button>
+                            <Button type="submit" disabled={isRoleUpdating || !modalForm.formState.isValid}>
+                                {isRoleUpdating ? '처리 중...' : '수정'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
                 </ModalForm>
-                <DialogFooter>
-                    <Button type="button" onClick={resetForm} disabled={isRoleUpdating} variant="outline">
-                        취소
-                    </Button>
-                    <Button type="submit" disabled={isRoleUpdating || !name || !description}>
-                        {isRoleUpdating ? '처리 중...' : '수정'}
-                    </Button>
-                </DialogFooter>
-                </form>
             </DialogContent>
         </Dialog>
     );
