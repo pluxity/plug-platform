@@ -18,6 +18,10 @@ export interface UserUpdateRequest {
     roleIds?: number[];
 }
 
+export interface UserRoleUpdateRequest {
+    roleIds?: number[];
+}
+
 export interface UserProfile {
     id: number;
     username: string;

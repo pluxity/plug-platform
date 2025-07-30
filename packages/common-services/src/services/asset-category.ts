@@ -35,7 +35,7 @@ export const useCreateAssetCategory = () => {
 
 // 에셋 카테고리 수정 (204 No Content 응답)
 export const updateAssetCategory = async (categoryId: number, data: AssetCategoryUpdateRequest) => {
-  return api.put(`${END_POINT}/${categoryId}`, data, { requireAuth: true });
+  return api.patch(`${END_POINT}/${categoryId}`, data, { requireAuth: true });
 };
 
 // 에셋 카테고리 삭제 (204 No Content 응답)
