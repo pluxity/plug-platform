@@ -4,6 +4,7 @@ import * as services from "@plug/common-services";
 import { FacilityData, FacilityFormData } from "../types/facilityTypeGuard";
 
 export type ServiceHook<TRequest = unknown, TResponse = unknown> = (
+  type: FacilityType,
   id?: number
 ) => {
   execute: (data: TRequest) => Promise<TResponse>;
@@ -74,7 +75,7 @@ export class FacilityManager {
     if (!createService) return false;
 
     try {
-      const service = createService();
+      const service = createService(type);
       await service.execute(data);
       return true;
     } catch (error) {
@@ -91,7 +92,7 @@ export class FacilityManager {
     if (!detailService) return null;
 
     try {
-      const service = detailService(id);
+      const service = detailService(type, id);
       const response = await service.execute({});
       return response as unknown as T;
     } catch (error) {
@@ -109,7 +110,7 @@ export class FacilityManager {
     if (!updateService) return false;
 
     try {
-      await updateService(id).execute(data);
+      await updateService(type, id).execute(data);
       return true;
     } catch (error) {
       console.error(`시설물 업데이트 실패 (${type}, ID: ${id}):`, error);
@@ -125,7 +126,7 @@ export class FacilityManager {
     if (!deleteService) return false;
 
     try {
-      await deleteService(id).execute({});
+      await deleteService(type, id).execute({});
       return true;
     } catch (error) {
       console.error(`시설물 삭제 실패 (${type}, ID: ${id}):`, error);
