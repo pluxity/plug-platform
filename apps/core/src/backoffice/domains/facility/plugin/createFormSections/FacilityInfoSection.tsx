@@ -114,9 +114,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
                 </div>
               </div>
             )}
-            <Button
-              className="w-16"
-              type="button"
+            <Button className="w-16" type="button"
               onClick={() =>
                 document?.getElementById("thumbnail-input")?.click()
               }
@@ -143,10 +141,7 @@ export const FacilityInfoSection: React.FC<FacilityInfoSectionProps> = ({ facili
                 </p>
               </div>
             )}
-            <Button
-              className="w-16"
-              type="button"
-              onClick={() => document?.getElementById("drawing-input")?.click()}
+            <Button className="w-16" type="button" onClick={() => document?.getElementById("drawing-input")?.click()}
             >
               파일 선택
             </Button>

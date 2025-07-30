@@ -19,6 +19,9 @@ export interface BaseFacilityResponse {
   drawing: FileResponse;
   thumbnail: FileResponse;
   path: string;
+  lon?: number;
+  lat?: number;
+  locationMeta: string;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -31,7 +34,9 @@ export interface BaseFacilityRequest {
   description: string;
   drawingFileId?: number;
   thumbnailFileId?: number;
-  path?: string;
+  lon?: number;
+  lat?: number;
+  locationMeta: string;
 }
 
 // 전체 확장 facility res/req -> 필요에 따라 Omit해 사용

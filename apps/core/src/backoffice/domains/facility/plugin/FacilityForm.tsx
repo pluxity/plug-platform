@@ -1,113 +1,46 @@
 import React from "react";
-import { Button } from "@plug/ui";
+import { Card, CardContent } from "@plug/ui";
 import { FacilityType } from "../store/FacilityListStore";
-import { FacilityInfoSection } from "./createFormSections/FacilityInfoSection";
-import { FacilityRegistry } from "./registry/FacilityRegistry";
-import { FacilityFormHandler } from "./FacilityFormHandler";
-import { FacilityCreateRequest, isBuildingFacility, isStationFacility } from "../types/facilityTypeGuard";
-import { FormProvider, useForm } from "react-hook-form";
-import "./definitions/BuildingDefinition";
-import "./definitions/StationDefinition";
+import { useNavigate } from "react-router-dom";
+import { FacilityFormLayout } from "../components/layout/FacilityFormLayout";
+import { useFacilityFormHandler } from "@/backoffice/domains/facility/plugin/FacilityFormHandler";
 
 interface FacilityFormProps {
   facilityType: FacilityType;
   onSaveSuccess?: () => void;
-  initialData?: FacilityCreateRequest;
+  initialData?: any;
   facilityId?: number;
 }
 
 export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSaveSuccess, initialData, facilityId }) => {
-  const facilityDefinition = FacilityRegistry.get(facilityType);
-  const methods = useForm();
+  const navigate = useNavigate();
+
+  const { data, handlers } = useFacilityFormHandler({
+    facilityType,
+    facilityId,
+    mode: facilityId ? 'edit' : 'create',
+    initialData,
+    onSaveSuccess
+  });
 
   return (
-    <FormProvider {...methods}>
-      <FacilityFormHandler
-        facilityType={facilityType}
-        initialData={initialData}
-        onSaveSuccess={onSaveSuccess}
-        facilityId={facilityId}
-      >
-        {({ data, handlers, state }) => (
-          <form onSubmit={handlers.handleSubmit}>
-            <FacilityInfoSection
-              title={`새 ${facilityDefinition?.displayName || "시설"} 등록`}
-              facilityData={data as FacilityCreateRequest}
-              onChange={handlers.handleInputChange}
-              onThumbnailUpload={handlers.handleThumbnailUpload}
-              onDrawingUpload={handlers.handleDrawingUpload}
-              thumbnailUploader={state.thumbnailUploader}
-              drawingUploader={state.drawingUploader}
-              showFloorInfo={isBuildingFacility(data)}
-              onFloorsChange={
-                isBuildingFacility(data)
-                  ? (floors) => {
-                      handlers.handleDataChange({
-                        ...data,
-                        floors,
-                      });
-                    }
-                  : undefined
-              }
-            >
-              {facilityDefinition?.sections.map((section) => (
-                <React.Fragment key={section.id}>
-                  {section.render({
-                    data,
-                    onChange: handlers.handleDataChange,
-                    handlers: {
-                      onFloorsChange: isBuildingFacility(data)
-                        ? (floors) => {
-                            handlers.handleDataChange({ ...data, floors });
-                          }
-                        : undefined,
-
-                      onStationCodesChange: isStationFacility(data)
-                        ? (codes) => {
-                          handlers.handleDataChange({
-                            ...data,
-                            stationInfo: {
-                              ...(data.stationInfo || { lineIds: [], stationCodes: [] }),
-                              stationCodes: codes,
-                            },
-                          });
-                        }
-                        : undefined,
-
-                      onLineIdsChange: isStationFacility(data)
-                        ? (lineIds) => {
-                          handlers.handleDataChange({
-                            ...data,
-                            stationInfo: {
-                              ...(data.stationInfo || { lineIds: [], stationCodes: [] }),
-                              lineIds,
-                            },
-                          });
-                        }
-                        : undefined,
-
-                    },
-                  })}
-                </React.Fragment>
-              ))}
-            </FacilityInfoSection>
-
-            {state.error && (
-              <div className="text-red-500 mt-4 text-center">{state.error}</div>
-            )}
-
-            <div className="flex items-center justify-end mt-6 gap-2">
-              <Button type="submit" disabled={state.isSubmitDisabled}>
-                {state.isSubmitting
-                  ? "처리 중..."
-                  : state.isSubmitDisabled && !state.isSubmitting
-                    ? "파일 업로드 완료 대기 중..."
-                      : "저장"}
-              </Button>
-            </div>
-          </form>
-        )}
-      </FacilityFormHandler>
-    </FormProvider>
+    <Card>
+      <CardContent>
+        <FacilityFormLayout
+          mode={facilityId ? 'edit' : 'create'}
+          facilityData={data.facilityData}
+          formData={data.formData}
+          isLoading={data.isLoading}
+          error={data.error}
+          onInputChange={handlers.handleInputChange}
+          onThumbnailUpload={handlers.handleThumbnailUpload}
+          onDrawingUpload={handlers.handleDrawingUpload}
+          onSave={handlers.handleSave}
+          onBack={() => navigate(-1)}
+          thumbnailUploader={data.thumbnailUploader}
+          drawingUploader={data.drawingUploader}
+        />
+      </CardContent>
+    </Card>
   );
 };

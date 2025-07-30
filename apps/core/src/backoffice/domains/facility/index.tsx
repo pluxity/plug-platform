@@ -9,13 +9,16 @@ import { FacilityForm } from "@/backoffice/domains/facility/plugin/FacilityForm"
 import { initializeFacilityDefinitions } from "@/backoffice/domains/facility/plugin/registry/FacilityDefinitionFactory";
 
 const FacilityManagement: React.FC = () => {
-  initializeFacilityDefinitions();
 
   const [activeTab, setActiveTab] = useState<FacilityType>("facilities");
   const [isCreateMode, setIsCreateMode] = useState(false);
   const location = useLocation();
   const previousPathRef = React.useRef<string | null>(null);
   const { setSelectedType } = useFacilityListStore();
+
+  useEffect(() => {
+    initializeFacilityDefinitions();
+  }, []);
 
   useEffect(() => {
     if (previousPathRef.current !== location.pathname && location.pathname === '/admin/facility') {

@@ -1,43 +1,101 @@
-import { BaseFacilityResponse, BuildingDtos, StationDtos } from "@plug/common-services";
+import { BuildingDtos, StationDtos } from "@plug/common-services";
+import { BaseFacilityResponse, BaseFacilityRequest } from "@plug/common-services";
 
-export type FacilityData = BaseFacilityResponse | BuildingDtos['RESPONSE'] | StationDtos['RESPONSE'];
+export type FacilityFormMode = 'create' | 'detail' | 'edit';
+
+export type FacilityResponse = BuildingDtos['RESPONSE'] | StationDtos['RESPONSE'];
 export type FacilityCreateRequest = BuildingDtos['CREATE_REQUEST'] | StationDtos['CREATE_REQUEST'];
 export type FacilityUpdateRequest = BuildingDtos['UPDATE_REQUEST'] | StationDtos['UPDATE_REQUEST'];
+export type FacilityData = FacilityResponse | FacilityCreateRequest | FacilityUpdateRequest;
+export type FacilityFormData = FacilityData;
+
+export const hasFacility = (data: unknown): data is { facility: Record<string, unknown> } => {
+  return data !== null && typeof data === 'object' && 'facility' in data;
+};
+
+export const getFacilityBase = (data: FacilityData): BaseFacilityResponse | BaseFacilityRequest => {
+  if (!hasFacility(data)) {
+    return { name: '', code: '' } as BaseFacilityRequest;
+  }
+  return data.facility as BaseFacilityResponse | BaseFacilityRequest;
+};
+
+export const getThumbnail = (data: FacilityData) => {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'thumbnail' in facility ? facility.thumbnail : undefined;
+};
+
+export const getFacilityId = (data: FacilityData): number | undefined => {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'id' in facility ? (facility.id as number) : undefined;
+};
+
+export const updateFacilityField = (
+  data: FacilityFormData, 
+  path: string, 
+  value: string | number | boolean
+): FacilityFormData => {
+  const result = { ...data };
+  const parts = path.split('.');
+
+  let current: Record<string, unknown> = result as Record<string, unknown>;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (!(part in current)) {
+      current[part] = {};
+    }
+    current = current[part] as Record<string, unknown>;
+  }
+  
+  current[parts[parts.length - 1]] = value;
+  return result;
+};
 
 export const isBuildingResponse = (data: unknown): data is BuildingDtos['RESPONSE'] => {
-  return data !== null &&
-      typeof data === 'object' &&
-      'facility' in data &&
-      'floors' in data &&
-      Array.isArray((data as any).floors);
+  if (!hasFacility(data)) return false;
+  return 'floors' in data && Array.isArray(data.floors);
 };
 
 export const isStationResponse = (data: unknown): data is StationDtos['RESPONSE'] => {
-  return data !== null &&
-      typeof data === 'object' &&
-      'facility' in data &&
-      'stationInfo' in data &&
-      typeof (data as any).stationInfo === 'object' &&
-      'lineIds' in (data as any).stationInfo &&
-      'stationCodes' in (data as any).stationInfo;
+  if (!hasFacility(data)) return false;
+  
+  if (!('stationInfo' in data)) return false;
+  const stationInfo = data.stationInfo;
+  
+  return (
+    typeof stationInfo === 'object' && 
+    stationInfo !== null && 
+    'lineIds' in stationInfo && 
+    'stationCodes' in stationInfo
+  );
 };
 
 export const isBuildingCreateRequest = (data: unknown): data is BuildingDtos['CREATE_REQUEST'] => {
-  return data !== null &&
-      typeof data === 'object' &&
-      'facility' in data &&
-      'floors' in data &&
-      Array.isArray((data as any).floors);
+  if (!hasFacility(data)) return false;
+  
+  return 'floors' in data && Array.isArray(data.floors);
 };
 
 export const isStationCreateRequest = (data: unknown): data is StationDtos['CREATE_REQUEST'] => {
-  return data !== null &&
-      typeof data === 'object' &&
-      'facility' in data &&
-      'stationInfo' in data &&
-      typeof (data as any).stationInfo === 'object' &&
-      'lineIds' in (data as any).stationInfo &&
-      'stationCodes' in (data as any).stationInfo;
+  if (!hasFacility(data)) return false;
+  
+  if (!('stationInfo' in data)) return false;
+  const stationInfo = data.stationInfo;
+  
+  return (
+    typeof stationInfo === 'object' && 
+    stationInfo !== null && 
+    'lineIds' in stationInfo && 
+    'stationCodes' in stationInfo
+  );
 };
 
 export const isBuildingFacility = (data: unknown): data is BuildingDtos['RESPONSE'] | BuildingDtos['CREATE_REQUEST'] => {
