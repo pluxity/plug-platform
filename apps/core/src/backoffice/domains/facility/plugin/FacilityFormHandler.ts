@@ -1,34 +1,41 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useFileUploadWithInfo } from '@plug/common-services';
+import { useFileUploadWithInfo, FacilityRequest } from "@plug/common-services";
 import { FacilityRegistry } from './registry/FacilityRegistry';
 import { FacilityType } from "../store/FacilityListStore";
 import { FacilityFormMode } from "../components/layout/FacilityFormLayout";
 import { FacilityManager } from "../services/FacilityManager";
+import {
+  FacilityData,
+  FacilityFormData,
+  FacilityUpdateRequest,
+  getFacilityBase,
+  getThumbnail
+} from "../types/facilityTypeGuard";
 
 export interface FacilityFormHandlerOptions {
   facilityType: FacilityType;
   facilityId?: number;
   mode: FacilityFormMode;
-  initialData?: any;
+  initialData?: FacilityFormData;
   onSaveSuccess?: () => void;
 }
 
 export function useFacilityFormHandler({
-                                         facilityType,
-                                         facilityId,
-                                         mode,
-                                         initialData,
-                                         onSaveSuccess
-                                       }: FacilityFormHandlerOptions) {
+  facilityType,
+  facilityId,
+  mode,
+  initialData,
+  onSaveSuccess
+}: FacilityFormHandlerOptions) {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [facilityData, setFacilityData] = useState<any>(null);
-  const [formData, setFormData] = useState<any>(null);
+  const [facilityData, setFacilityData] = useState<FacilityData | null>(null);
+  const [formData, setFormData] = useState<FacilityRequest | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(mode === 'edit');
@@ -43,12 +50,27 @@ export function useFacilityFormHandler({
       if (mode === 'create') {
         if (initialData) {
           setFacilityData(initialData);
-          setFormData(initialData);
+          const facility = getFacilityBase(initialData);
+          setFormData({
+            facility: {
+              name: facility.name || "",
+              description: 'description' in facility ? facility.description : "",
+              code: facility.code || "",
+              locationMeta: 'locationMeta' in facility ? facility.locationMeta : ""
+            }
+          });
         } else if (facilityDefinition) {
           try {
             const data = facilityDefinition.getInitialData();
             setFacilityData(data);
-            setFormData(data);
+            setFormData({
+              facility: {
+                name: "",
+                code: "",
+                description: "",
+                locationMeta: ""
+              }
+            });
           } catch (err) {
             console.error("Error getting initial data:", err);
             setError(new Error("초기 데이터를 가져오는데 실패했습니다."));
@@ -61,18 +83,27 @@ export function useFacilityFormHandler({
       if ((mode === 'detail' || mode === 'edit') && facilityId) {
         try {
           setIsLoading(true);
-          const data = await FacilityManager.fetchFacilityDetail(facilityType, facilityId);
+          const data = await FacilityManager.fetchFacilityDetail<FacilityUpdateRequest>(facilityType, facilityId);
           setFacilityData(data);
 
-          if (mode === 'edit' && data) {
+          if (mode === 'edit' && data && data.facility) {
+            const thumbnail = getThumbnail(facilityData as FacilityData);
+            const thumbnailId = thumbnail?.id;
+
             setFormData({
               facility: {
-                name: data.facility.name,
-                description: data.facility.description || "",
-                code: data.facility.code,
-                thumbnailFileId: data.facility.thumbnail.id,
-                path: data.facility.path || ""
-              }
+                name: data.facility.name || "",
+                description: 'description' in data.facility ? data.facility.description : "",
+                code: data.facility.code || "",
+                thumbnailFileId: thumbnailId,
+                locationMeta: 'locationMeta' in data.facility ? data.facility.locationMeta : ""
+              },
+              ...Object.keys(data)
+                .filter(key => key !== 'facility')
+                .reduce((obj, key) => {
+                  obj[key] = data[key as keyof FacilityData];
+                  return obj;
+                }, {} as Record<string, unknown>)
             });
           }
 
@@ -90,16 +121,16 @@ export function useFacilityFormHandler({
     fetchData();
   }, [facilityType, facilityId, mode, facilityDefinition, initialData]);
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData((prev: any) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
+    setFormData((prev) => {
       if (!prev) return prev;
 
       if (field.includes('.')) {
-        const [parent, child] = field.split('.');
+        const [, child] = field.split(".");
         return {
           ...prev,
-          [parent]: {
-            ...((prev)[parent] || {}),
+          facility: {
+            ...prev.facility,
             [child]: value
           }
         };
@@ -116,12 +147,15 @@ export function useFacilityFormHandler({
     try {
       await thumbnailUploader.execute(file);
       if (thumbnailUploader.fileInfo && thumbnailUploader.fileInfo.id) {
-        setFormData({
-          ...formData,
-          facility: {
-            ...formData.facility,
-            thumbnailFileId: thumbnailUploader.fileInfo.id
-          }
+        setFormData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            facility: {
+              ...(prev.facility || {}),
+              thumbnailFileId: thumbnailUploader.fileInfo?.id
+            }
+          };
         });
       }
     } catch (err) {
@@ -133,33 +167,49 @@ export function useFacilityFormHandler({
   const handleDrawingUpload = async (file: File) => {
     try {
       await drawingUploader.execute(file);
+      if (drawingUploader.fileInfo && drawingUploader.fileInfo.id) {
+        setFormData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            facility: {
+              ...(prev.facility || {}),
+              drawingFileId: drawingUploader.fileInfo?.id
+            }
+          };
+        });
+      }
     } catch (err) {
       console.error("도면 업로드 오류:", err);
       setFormError("도면 업로드 중 오류가 발생했습니다.");
     }
   };
 
-  // 저장 처리
   const handleSave = async () => {
+    if (!formData) {
+      setFormError("폼 데이터가 없습니다.");
+      return;
+    }
+
     setIsSubmitting(true);
     setFormError(null);
 
     try {
-      const requestData = { ...formData };
+      const requestData = { ...formData } as FacilityRequest;
 
-      if (thumbnailUploader.fileInfo?.id) {
+      if (thumbnailUploader.fileInfo?.id && requestData.facility) {
         requestData.facility.thumbnailFileId = thumbnailUploader.fileInfo.id;
       }
 
       if (mode === 'create') {
-        if (drawingUploader.fileInfo?.id) {
+        if (drawingUploader.fileInfo?.id && requestData.facility) {
           requestData.facility.drawingFileId = drawingUploader.fileInfo.id;
         }
 
-        await FacilityManager.createFacility(facilityType, requestData);
+        await FacilityManager.createFacility(facilityType, requestData as unknown as FacilityFormData);
         if (onSaveSuccess) onSaveSuccess();
       } else if (mode === 'edit' && facilityId) {
-        await FacilityManager.updateFacility(facilityType, facilityId, requestData);
+        await FacilityManager.updateFacility(facilityType, facilityId, requestData as unknown as FacilityFormData);
 
         searchParams.delete("mode");
         navigate(
@@ -169,7 +219,7 @@ export function useFacilityFormHandler({
 
         setIsEditMode(false);
 
-        const updatedData = await FacilityManager.fetchFacilityDetail(facilityType, facilityId);
+        const updatedData = await FacilityManager.fetchFacilityDetail<FacilityData>(facilityType, facilityId);
         setFacilityData(updatedData);
       }
     } catch (err) {
@@ -208,16 +258,26 @@ export function useFacilityFormHandler({
   }
 
   const handleEditToggle = () => {
-    if (!isEditMode && facilityData) {
+    if (!isEditMode && facilityData && facilityData.facility) {
+      const thumbnail = getThumbnail(facilityData);
+      const thumbnailId = thumbnail?.id;
+
       setFormData({
         facility: {
-          name: facilityData.facility.name,
-          description: facilityData.facility.description || "",
-          code: facilityData.facility.code,
-          thumbnailFileId: facilityData.facility.thumbnail.id,
-          path: facilityData.facility.path || ""
-        }
+          name: facilityData.facility.name || "",
+          description: 'description' in facilityData.facility ? facilityData.facility.description : "",
+          code: facilityData.facility.code || "",
+          thumbnailFileId: thumbnailId,
+          locationMeta: 'locationMeta' in facilityData.facility ? facilityData.facility.locationMeta : ""
+        },
+        ...Object.keys(facilityData)
+          .filter(key => key !== 'facility')
+          .reduce((obj, key) => {
+            obj[key] = facilityData[key as keyof FacilityData];
+            return obj;
+          }, {} as Record<string, unknown>)
       });
+
       searchParams.set("mode", "edit");
       navigate(`?${searchParams.toString()}`, { replace: true });
     } else {

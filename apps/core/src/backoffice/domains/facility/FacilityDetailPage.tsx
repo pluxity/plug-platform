@@ -5,18 +5,20 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 import { useHistory } from "@plug/common-services";
 import { FacilityFormLayout } from "./components/layout/FacilityFormLayout";
 import { useFacilityFormHandler } from "@/backoffice/domains/facility/plugin/FacilityFormHandler";
+import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
+import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 
 const FacilityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
 
-  const getFacilityTypeFromPath = () => {
+  const getFacilityTypeFromPath = (): FacilityType => {
     const pathSegments = location.pathname.split('/');
     const facilityIndex = pathSegments.findIndex(segment => segment === 'facility');
     if (facilityIndex >= 0 && facilityIndex + 1 < pathSegments.length) {
       const type = pathSegments[facilityIndex + 1];
       if (type === 'buildings' || type === 'stations') {
-        return type;
+        return type as FacilityType;
       }
     }
     return null;
@@ -24,14 +26,14 @@ const FacilityDetailPage: React.FC = () => {
 
   const facilityType = getFacilityTypeFromPath();
   const facilityId = id ? Number(id) : 0;
-
+  
   const { data: historyData } = useHistory(facilityType, facilityId);
 
   const { data, handlers } = useFacilityFormHandler({
-    facilityType,
+    facilityType: facilityType,
     facilityId,
-    mode: 'detail',
-    onSaveSuccess: () => console.log('저장 성공')
+    mode: "detail",
+    onSaveSuccess: () => console.log("저장 성공"),
   });
 
   const typeTitle = facilityType === 'buildings' ? '건물' : facilityType === 'stations' ? '역' : '시설';
@@ -47,7 +49,7 @@ const FacilityDetailPage: React.FC = () => {
             URL에서 시설 유형을 확인할 수 없습니다.
           </p>
           <button
-            onClick={handlers.handleBack}
+            onClick={() => window.history.back()}
             className="mt-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md"
           >
             목록으로 돌아가기
@@ -63,8 +65,8 @@ const FacilityDetailPage: React.FC = () => {
         <CardContent>
           <FacilityFormLayout
             mode={data.isEditMode ? 'edit' : 'detail'}
-            facilityData={data.facilityData}
-            formData={data.formData}
+            facilityData={data?.facilityData as FacilityData || undefined}
+            formData={data?.formData as FacilityData || undefined}
             isLoading={data.isLoading}
             error={data.error}
             onInputChange={handlers.handleInputChange}
@@ -74,8 +76,6 @@ const FacilityDetailPage: React.FC = () => {
             onDelete={handlers.handleDelete}
             onBack={handlers.handleBack}
             onEditToggle={handlers.handleEditToggle}
-            thumbnailUploader={data.thumbnailUploader}
-            drawingUploader={data.drawingUploader}
             history={historyData}
           />
         </CardContent>

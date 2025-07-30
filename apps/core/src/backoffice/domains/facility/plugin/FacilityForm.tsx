@@ -8,7 +8,7 @@ import { useFacilityFormHandler } from "@/backoffice/domains/facility/plugin/Fac
 interface FacilityFormProps {
   facilityType: FacilityType;
   onSaveSuccess?: () => void;
-  initialData?: any;
+  initialData?: unknown;
   facilityId?: number;
 }
 

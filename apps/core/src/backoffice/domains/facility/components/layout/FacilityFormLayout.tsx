@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Input, Textarea } from "@plug/ui";
+import { Button, Input, Separator, Textarea } from "@plug/ui";
 import { useFileUploadWithInfo } from "@plug/common-services";
 import { FacilityForm, FacilityFormItem } from "../FacilityFormComponent";
 import { PathInputModal } from "../PathInputModal";
@@ -17,8 +17,8 @@ export type FacilityFormMode = 'create' | 'detail' | 'edit';
 
 interface FacilityFormLayoutProps {
   mode: FacilityFormMode;
-  facilityData: FacilityData;
-  formData: FacilityData;
+  facilityData?: FacilityData;
+  formData?: FacilityData;
   isLoading?: boolean;
   error?: Error | null;
   onInputChange?: (field: string, value: string | number | boolean) => void;
@@ -224,7 +224,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
               )}
             </FacilityFormItem>
 
-            <FacilityFormItem label="위치정보" className="col-span-2">
+            <FacilityFormItem label="위치정보" className="col-span-3 border-b">
               {isCreateMode ? (
                 <div className="flex items-center gap-3">
                   <Button
@@ -236,27 +236,23 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                   </Button>
                 </div>
               ) : (
-                <div className="py-2">
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-gray-500 text-sm">위도</span>
-                      <span className="font-medium">{facilityData?.facility?.lon}</span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-gray-500 text-sm">경도</span>
-                      <span className="font-medium">{facilityData?.facility?.lat}</span>
-                    </div>
+                <div className="py-2 flex gap-4 items-center">
+                  <div className="flex gap-1">
+                    <span className="text-gray-500 text-sm">위도</span>
+                    <span className="font-medium">1{facilityData?.facility?.lon}</span>
                   </div>
-                  <div className="flex flex-col gap-1 mb-4">
+                  <Separator orientation='vertical' className='h-6 bg-gray-300' />
+                  <div className="flex gap-1">
+                    <span className="text-gray-500 text-sm">경도</span>
+                    <span className="font-medium">1{facilityData?.facility?.lat}</span>
+                  </div>
+                  <div className="flex gap-1">
                     <span className="text-gray-500 text-sm">위치정보</span>
                     <span className="font-medium">
-                      {facilityData?.facility.locationMeta}
+                      1{facilityData?.facility.locationMeta}
                     </span>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={() => setIsPathModalOpen(true)}
-                    className="whitespace-nowrap hover:bg-blue-700 text-white px-4 py-2 ">
+                  <Button type="button" onClick={() => setIsPathModalOpen(true)} className="whitespace-nowrap hover:bg-blue-700 text-white px-4 py-2 ">
                     경로 수정
                   </Button>
                 </div>

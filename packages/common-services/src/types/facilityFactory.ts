@@ -18,7 +18,6 @@ export interface BaseFacilityResponse {
   description: string;
   drawing: FileResponse;
   thumbnail: FileResponse;
-  path: string;
   lon?: number;
   lat?: number;
   locationMeta: string;
