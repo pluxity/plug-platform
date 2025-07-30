@@ -5,7 +5,13 @@ import { useFileUploadWithInfo } from "@plug/common-services";
 import { FacilityForm, FacilityFormItem } from "../FacilityFormComponent";
 import { PathInputModal } from "../PathInputModal";
 import { FacilityHistoryResponse } from "@plug/common-services";
-import { FacilityData, getThumbnail, getFacilityId } from "@/backoffice/domains/facility/types/facilityTypeGuard";
+import {
+  FacilityData,
+  getThumbnail,
+  getFacilityId,
+  getCreatedAt,
+  getCreatedBy, getUpdatedAt, getUpdatedBy
+} from "@/backoffice/domains/facility/types/facilityTypeGuard";
 
 export type FacilityFormMode = 'create' | 'detail' | 'edit';
 
@@ -83,25 +89,10 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                       thumbnail?.url &&
                       !actualThumbnailUploader.fileInfo && (
                         <div className="mt-2 flex flex-col gap-2">
-                          <img
-                            src={thumbnail.url}
-                            alt="현재 썸네일"
-                            className="h-32 object-contain"
-                          />
+                          <img src={thumbnail.url} alt="현재 썸네일" className="h-32 object-contain" />
                           <div className="flex flex-col items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
-                            <div className="font-medium text-gray-800 text-xs break-normal">
-                              {thumbnail.originalFileName}
-                            </div>
-                            <Button
-                              className="w-16"
-                              onClick={() =>
-                                document
-                                  ?.getElementById("thumbnail-input")
-                                  ?.click()
-                              }
-                            >
-                              파일 선택
-                            </Button>
+                            <div className="font-medium text-gray-800 text-xs break-normal">{thumbnail.originalFileName}</div>
+                            <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
                             <Input
                               type="file"
                               id="thumbnail-input"
@@ -121,16 +112,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                           <div className="text-gray-500">
                             썸네일 파일을 선택하세요
                           </div>
-                          <Button
-                            className="w-16"
-                            onClick={() =>
-                              document
-                                ?.getElementById("thumbnail-input")
-                                ?.click()
-                            }
-                          >
-                            파일 선택
-                          </Button>
+                          <Button className="w-16" onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 선택</Button>
                           <Input
                             type="file"
                             id="thumbnail-input"
@@ -159,13 +141,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                             </div>
                             <Button
                               className="w-16"
-                              onClick={() =>
-                                document
-                                  ?.getElementById("thumbnail-input")
-                                  ?.click()
-                              }
-                            >
-                              파일 변경
+                              onClick={() => document?.getElementById("thumbnail-input")?.click()}>파일 변경
                             </Button>
                             <Input
                               type="file"
@@ -180,16 +156,10 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                   </div>
                 ) : thumbnail?.url ? (
                   <>
-                    <img
-                      src={thumbnail.url}
-                      alt="썸네일 이미지"
-                      className="h-32 object-contain"
-                    />
+                    <img src={thumbnail.url} alt="썸네일 이미지" className="h-32 object-contain" />
                     <div className="flex gap-2 border-y border-gray-100 px-3 py-2 rounded-sm">
                       <div className="text-gray-500">파일명</div>
-                      <div className="font-medium text-gray-800 text-xs break-normal">
-                        {thumbnail.originalFileName}
-                      </div>
+                      <div className="font-medium text-gray-800 text-xs break-normal">{thumbnail.originalFileName}</div>
                     </div>
                   </>
                 ) : (
@@ -270,15 +240,11 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="flex flex-col gap-1">
                       <span className="text-gray-500 text-sm">위도</span>
-                      <span className="font-medium">
-                        {facilityData?.facility?.lon}
-                      </span>
+                      <span className="font-medium">{facilityData?.facility?.lon}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-gray-500 text-sm">경도</span>
-                      <span className="font-medium">
-                        {facilityData?.facility?.lat}
-                      </span>
+                      <span className="font-medium">{facilityData?.facility?.lat}</span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-1 mb-4">
@@ -290,8 +256,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                   <Button
                     type="button"
                     onClick={() => setIsPathModalOpen(true)}
-                    className="whitespace-nowrap hover:bg-blue-700 text-white px-4 py-2 "
-                  >
+                    className="whitespace-nowrap hover:bg-blue-700 text-white px-4 py-2 ">
                     경로 수정
                   </Button>
                 </div>
@@ -303,22 +268,14 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                 <FacilityFormItem label="생성" className="col-span-2">
                   <div className="flex gap-4">
                     <div>
-                      <span className="text-gray-500 mr-7 text-sm">
-                        최초 생성일
-                      </span>
+                      <span className="text-gray-500 mr-7 text-sm">최초 생성일</span>
                       <span className="font-medium text-gray-800">
-                        {(facilityData as any).facility?.createdAt
-                          ? new Date(
-                              (facilityData as any).facility.createdAt,
-                            ).toLocaleDateString("ko-KR")
-                          : "-"}
+                        {getCreatedAt(facilityData) ? new Date(getCreatedAt(facilityData) as string).toLocaleDateString("ko-KR") : "-"}
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">생성인</span>
-                      <span className="font-medium text-gray-800">
-                        {(facilityData as any).facility?.createdBy || "-"}
-                      </span>
+                      <span className="font-medium text-gray-800">{getCreatedBy(facilityData) || "-"}</span>
                     </div>
                   </div>
                 </FacilityFormItem>
@@ -326,21 +283,15 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                 <FacilityFormItem label="수정" className="col-span-2 border-b">
                   <div className="flex gap-4">
                     <div>
-                      <span className="text-gray-500 mr-4 text-sm">
-                        마지막 수정일
-                      </span>
+                      <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
                       <span className="font-medium text-gray-800">
-                        {(facilityData as any).facility?.updatedAt
-                          ? new Date(
-                              (facilityData as any).facility.updatedAt,
-                            ).toLocaleDateString("ko-KR")
-                          : "-"}
+                        {getUpdatedAt(facilityData) ? new Date(getUpdatedAt(facilityData) as string).toLocaleDateString("ko-KR") : "-"}
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-500 mr-4 text-sm">수정인</span>
                       <span className="font-medium text-gray-800">
-                        {(facilityData as any).facility?.updatedBy || "-"}
+                        {getUpdatedBy(facilityData) || "-"}
                       </span>
                     </div>
                   </div>
@@ -348,8 +299,9 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
               </>
             )}
 
+
             {isCreateMode && (
-              <FacilityFormItem label="도면" className="col-span-2">
+              <FacilityFormItem label="도면" className="col-span-2 border-b">
                 <div className="flex justify-between w-full gap-2">
                   {actualDrawingUploader.isLoadingFileInfo && (
                     <p>도면 업로드 중...</p>

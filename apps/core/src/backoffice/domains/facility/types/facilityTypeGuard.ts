@@ -1,4 +1,4 @@
-import { BuildingDtos, StationDtos } from "@plug/common-services";
+import { BuildingDtos, FileResponse, StationDtos } from "@plug/common-services";
 import { BaseFacilityResponse, BaseFacilityRequest } from "@plug/common-services";
 
 export type FacilityFormMode = 'create' | 'detail' | 'edit';
@@ -20,13 +20,13 @@ export const getFacilityBase = (data: FacilityData): BaseFacilityResponse | Base
   return data.facility as BaseFacilityResponse | BaseFacilityRequest;
 };
 
-export const getThumbnail = (data: FacilityData) => {
+export const getThumbnail = (data: FacilityData): FileResponse | undefined => {
   if (!hasFacility(data)) {
     return undefined;
   }
 
   const facility = data.facility;
-  return 'thumbnail' in facility ? facility.thumbnail : undefined;
+  return 'thumbnail' in facility ? facility.thumbnail as FileResponse : undefined;
 };
 
 export const getFacilityId = (data: FacilityData): number | undefined => {
@@ -36,6 +36,42 @@ export const getFacilityId = (data: FacilityData): number | undefined => {
 
   const facility = data.facility;
   return 'id' in facility ? (facility.id as number) : undefined;
+};
+
+export const getCreatedAt = (data: FacilityData): string | undefined => {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'createdAt' in facility ? facility.createdAt as string : undefined;
+};
+
+export const getCreatedBy = (data: FacilityData): string | undefined => {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'createdBy' in facility ? facility.createdBy as string : undefined;
+};
+
+export const getUpdatedAt = (data: FacilityData): string | undefined => {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'updatedAt' in facility ? facility.updatedAt as string : undefined;
+};
+
+export const getUpdatedBy = (data: FacilityData): string | undefined => {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'updatedBy' in facility ? facility.updatedBy as string : undefined;
 };
 
 export const updateFacilityField = (
