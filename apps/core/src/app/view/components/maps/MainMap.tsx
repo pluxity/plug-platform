@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
 import IndoorMap from './IndoorMap'
 import OutdoorMap from './OutdoorMap'
-import MapLoadingOverlay from '@/global/components/maps/MapLoadingOverlay'
 import { MapMode } from '@/app/model/types/MapTypes'
 import { Button } from '@plug/ui'
-import { useMapLoadingStore } from '@/app/store/mapLoadingStore'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import { FacilityResponse } from '@plug/common-services'
 
@@ -14,12 +12,11 @@ const MainMap: React.FC = () => {
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
   const [facilityCoords, setFacilityCoords] = useState<{ lon: number; lat: number } | null>(null)
 
-  const { startTransition } = useMapLoadingStore();
-  const { selectedFacility, setSelectedFacility, getFacilityById } = useFacilityStore();
+  const { selectedFacility, setSelectedFacility } = useFacilityStore();
 
   const toggleMapMode = () => {
     if (mapMode === MapMode.INDOOR) {
-      startTransition('indoor', 'outdoor', '실외로 나가는 중...');
+      // 실내→실외는 별도 로딩 없이 실외 지도의 로딩화면 사용
       
       // 현재 선택된 시설의 좌표 저장
       if (selectedFacility && selectedFacility.lon !== undefined && selectedFacility.lat !== undefined) {
@@ -30,16 +27,6 @@ const MainMap: React.FC = () => {
       setSelectedFacilityId(null)
       setSelectedFacility(null) // selectedFacility도 초기화
     } 
-  }
-
-  const handleFacilityClick = (facilityId: number) => {
-    const facility = getFacilityById(facilityId)
-    if (facility) {
-      startTransition('outdoor', 'indoor', '실내로 들어가는 중...');
-      setSelectedFacilityId(facilityId)
-      setSelectedFacility(facility)
-      setMapMode(MapMode.INDOOR)
-    }
   }
 
   // 실외 지도로 전환된 후 facilityCoords 초기화
@@ -55,9 +42,6 @@ const MainMap: React.FC = () => {
 
   return (
     <div className="w-full h-full relative">
-      {/* 로딩 오버레이 */}
-      <MapLoadingOverlay />
-      
       {mapMode === MapMode.INDOOR ? (
         <Button
           onClick={toggleMapMode}
@@ -71,8 +55,6 @@ const MainMap: React.FC = () => {
       {mapMode === MapMode.OUTDOOR && (
         <div className="w-full h-full">
           <OutdoorMap 
-            onFacilityClick={handleFacilityClick} 
-            initialFacility={facilityCoords}
             key={facilityCoords ? `${facilityCoords.lon}-${facilityCoords.lat}` : 'outdoor-map'}
           />
         </div>
