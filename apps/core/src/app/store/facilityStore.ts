@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { useGet } from '@plug/api-hooks'
+import { useEffect } from 'react'
+import { getFacilitiesAll } from '@plug/common-services'
 import type { BaseFacilityResponse, FacilitiesAllResponse } from '@plug/common-services'
 
 interface FacilityState {
@@ -28,6 +29,7 @@ interface FacilityState {
   
   getAllFacilities: () => BaseFacilityResponse[]
   getFacilityById: (id: number) => BaseFacilityResponse | undefined
+  loadFacilities: () => Promise<void>
 }
 
 export const useFacilityStore = create<FacilityState>()(
@@ -61,11 +63,7 @@ export const useFacilityStore = create<FacilityState>()(
         }
         
         const searchQuery = query.toLowerCase()
-        
-        const allFacilities = [
-          ...(facilities.buildings || []),
-          ...(facilities.stations || [])
-        ]
+        const allFacilities = Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
         
         const searchResults = allFacilities.filter((facility: BaseFacilityResponse) =>
           facility.name.toLowerCase().includes(searchQuery)
@@ -86,19 +84,38 @@ export const useFacilityStore = create<FacilityState>()(
 
       getAllFacilities: () => {
         const { facilities } = get()
-        return [
-          ...(facilities.buildings || []),
-          ...(facilities.stations || [])
-        ]
+        return Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
       },
 
       getFacilityById: (id) => {
         const { facilities } = get()
-        const allFacilities = [
-          ...(facilities.buildings || []),
-          ...(facilities.stations || [])
-        ]
+        const allFacilities = Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
         return allFacilities.find(facility => facility.id === id)
+      },
+
+      loadFacilities: async () => {
+        const { facilitiesFetched } = get()
+        
+        // 이미 로드된 경우 재로드하지 않음
+        if (facilitiesFetched) {
+          return
+        }
+
+        set({ isLoading: true, error: null })
+        
+        try {
+          const facilities = await getFacilitiesAll()
+          set({ 
+            facilities, 
+            facilitiesFetched: true, 
+            isLoading: false 
+          })
+        } catch (error) {
+          set({ 
+            error: error instanceof Error ? error.message : 'Failed to load facilities',
+            isLoading: false 
+          })
+        }
       }
     }),
     {
@@ -108,5 +125,19 @@ export const useFacilityStore = create<FacilityState>()(
 )
 
 export const useFacilities = () => {
-  return useGet<FacilitiesAllResponse>('facilities')
+  const { facilities, isLoading, error, facilitiesFetched, loadFacilities } = useFacilityStore()
+  
+  // 컴포넌트 마운트 시 한 번만 로드
+  useEffect(() => {
+    if (!facilitiesFetched && !isLoading) {
+      loadFacilities()
+    }
+  }, [facilitiesFetched, isLoading, loadFacilities])
+  
+  return {
+    data: facilities,
+    isLoading,
+    error,
+    mutate: loadFacilities // 수동으로 재로드가 필요한 경우
+  }
 }

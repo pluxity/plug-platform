@@ -5,7 +5,7 @@ import InitialCameraSetup from './CameraSetup';
 
 // VWorld API 정보
 export const VWORLD_MAP_URL = 'https://api.vworld.kr/req/wmts/1.0.0/';
-export const VWORLD_API_KEY = '39AE0FB0-78CC-3751-B102-8A8F21CF0FF3';
+export const VWORLD_API_KEY = '8017E982-68EB-3F80-A79F-2FEA16608C65';
 
 // 지도 제공자 타입 정의
 export type MapProvider = 'vworld' | 'google' | 'osm';

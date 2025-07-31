@@ -16,25 +16,21 @@ const MainMap: React.FC = () => {
 
   const toggleMapMode = () => {
     if (mapMode === MapMode.INDOOR) {
-      // 실내→실외는 별도 로딩 없이 실외 지도의 로딩화면 사용
-      
-      // 현재 선택된 시설의 좌표 저장
       if (selectedFacility && selectedFacility.lon !== undefined && selectedFacility.lat !== undefined) {
         setFacilityCoords({ lon: selectedFacility.lon, lat: selectedFacility.lat })
       }
       
       setMapMode(MapMode.OUTDOOR)
       setSelectedFacilityId(null)
-      setSelectedFacility(null) // selectedFacility도 초기화
+      setSelectedFacility(null)
     } 
   }
 
-  // 실외 지도로 전환된 후 facilityCoords 초기화
   React.useEffect(() => {
     if (mapMode === MapMode.OUTDOOR && facilityCoords) {
       const timer = setTimeout(() => {
         setFacilityCoords(null)
-      }, 2500) // 카메라 이동 완료 후 초기화
+      }, 2500)
       
       return () => clearTimeout(timer)
     }

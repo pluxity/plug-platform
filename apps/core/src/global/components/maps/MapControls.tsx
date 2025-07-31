@@ -1,10 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useCesium } from 'resium';
 import * as Cesium from 'cesium';
 import { Button } from '@plug/ui';
 
-const MapControls: React.FC = () => {
+interface MapControlsProps {
+  onInitialLoadComplete?: () => void;
+}
+
+const MapControls: React.FC<MapControlsProps> = ({ onInitialLoadComplete }) => {
   const { viewer } = useCesium();
+
+  const DEFAULT_COORDS = {
+    latitude: 37.459722, 
+    longitude: 127.023556,
+    altitude: 1000
+  };
+
+  // 초기 카메라 설정
+  useEffect(() => {
+    if (!viewer) return;
+
+    const camera = viewer.scene.camera;
+    camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(
+        DEFAULT_COORDS.longitude, 
+        DEFAULT_COORDS.latitude, 
+        DEFAULT_COORDS.altitude
+      ),
+      duration: 0,
+      complete: () => {
+        onInitialLoadComplete?.(); // 카메라 이동 완료 후 로딩 종료
+      }
+    });
+  }, [viewer, onInitialLoadComplete, DEFAULT_COORDS.longitude, DEFAULT_COORDS.latitude, DEFAULT_COORDS.altitude]);
 
   const fnZoomIn = () => {
     if (viewer?.scene?.camera) {
@@ -30,7 +58,11 @@ const MapControls: React.FC = () => {
     if (viewer?.scene?.camera) {
       const camera = viewer.scene.camera;
       camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(127.023596, 37.459806, 500),
+        destination: Cesium.Cartesian3.fromDegrees(
+          DEFAULT_COORDS.longitude, 
+          DEFAULT_COORDS.latitude, 
+          DEFAULT_COORDS.altitude
+        ),
         duration: 2.0
       });
     }
