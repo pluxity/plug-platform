@@ -38,6 +38,10 @@ const OutdoorMap: React.FC = () => {
         // 3D 모델 리소스 로드
         const resource = await Cesium.IonResource.fromAssetId(3589754)
 
+        // Cesium 시계 활성화 및 애니메이션 시작
+        viewer.clock.shouldAnimate = true
+        viewer.clock.multiplier = 1
+
         allFacilities.forEach((facility) => {
           if (facility.lat && facility.lon) {
             const position = Cesium.Cartesian3.fromDegrees(
@@ -46,13 +50,43 @@ const OutdoorMap: React.FC = () => {
               0 // 지면 높이
             )
 
+            // 회전 애니메이션을 위한 CallbackProperty
+            const rotationCallback = new Cesium.CallbackProperty(() => {
+              const time = Date.now() / 1000; // 현재 시간을 초 단위로
+              // 15초에 한 바퀴 회전 (더 천천히)
+              const angle = (time * Math.PI * 2) / 15;
+              return Cesium.Transforms.headingPitchRollQuaternion(
+                position,
+                new Cesium.HeadingPitchRoll(angle, 0, 0)
+              );
+            }, false);
+
+            // 거리 기반 스케일 CallbackProperty
+            const scaleCallback = new Cesium.CallbackProperty(() => {
+              const cameraPosition = viewer.camera.position
+              const distance = Cesium.Cartesian3.distance(cameraPosition, position)
+              
+              // 거리에 따른 스케일 조정
+              // 가까이: 10.0, 멀리: 최대 25.0
+              const baseScale = 10.0
+              const maxScale = 25.0
+              const scaleDistance = 5000 // 5km 거리를 기준
+              
+              const scaleFactor = Math.min(distance / scaleDistance, 2.5)
+              return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
+            }, false)
+
             viewer.entities.add({
               id: `facility-${facility.id}`,
               name: facility.name,
               position: position,
+              orientation: rotationCallback,
               model: {
                 uri: resource,
-                scale: 5.0, // 기본 1.0에서 5.0으로 증가
+                scale: scaleCallback, // 동적 스케일 적용
+                color: Cesium.Color.WHITE, // 기본 색상
+                silhouetteColor: Cesium.Color.YELLOW, // 실루엣 색상
+                silhouetteSize: new Cesium.ConstantProperty(0), // 기본적으로는 실루엣 없음
               },
               properties: {
                 facilityId: facility.id,
@@ -61,6 +95,58 @@ const OutdoorMap: React.FC = () => {
             })
           }
         })
+
+        // POI 생성 후 마우스 이벤트 핸들러 설정
+        console.log('Setting up mouse events...') // 디버깅 로그
+        let hoveredEntity: Cesium.Entity | null = null
+
+        // 더 간단한 마우스 이벤트 테스트
+        viewer.canvas.addEventListener('mousemove', (event: MouseEvent) => {
+          console.log('Canvas mouse move detected!', event) // 기본 이벤트 감지
+          
+          const canvasPosition = new Cesium.Cartesian2(event.clientX, event.clientY)
+          
+          try {
+            const pickedObject = viewer.scene.pick(canvasPosition)
+            console.log('Canvas pick result:', pickedObject) // pick 결과 확인
+            
+            // 이전에 호버된 entity의 실루엣 제거
+            if (hoveredEntity?.model) {
+              hoveredEntity.model.silhouetteSize = new Cesium.ConstantProperty(0)
+            }
+
+            if (pickedObject && pickedObject.id) {
+              console.log('Canvas picked object ID:', pickedObject.id.id) // 디버깅 로그
+              
+              // facility POI인지 확인
+              if (pickedObject.id.id && pickedObject.id.id.startsWith('facility-')) {
+                console.log('Canvas Facility POI detected!', pickedObject.id.id) // 디버깅 로그
+                
+                // 새로운 entity에 실루엣 추가
+                hoveredEntity = pickedObject.id
+                if (hoveredEntity?.model) {
+                  hoveredEntity.model.silhouetteSize = new Cesium.ConstantProperty(3.0)
+                }
+                // 커서를 포인터로 변경
+                viewer.canvas.style.cursor = 'pointer'
+              } else {
+                hoveredEntity = null
+                viewer.canvas.style.cursor = 'default'
+              }
+            } else {
+              hoveredEntity = null
+              // 커서를 기본값으로 변경
+              viewer.canvas.style.cursor = 'default'
+            }
+          } catch (error) {
+            console.warn('Canvas mouse move event error:', error)
+          }
+        })
+
+        // 추가로 Cesium의 기본 이벤트도 시도
+        viewer.screenSpaceEventHandler.setInputAction((movement: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
+          console.log('Cesium mouse movement detected!', movement) // 기본 마우스 움직임 감지 테스트
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
       }
 
       // POI 생성 실행
