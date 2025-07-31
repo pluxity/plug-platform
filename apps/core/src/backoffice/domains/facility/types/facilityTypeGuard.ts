@@ -30,6 +30,16 @@ export const getThumbnail = (data: FacilityData): FileResponse | undefined => {
   return 'thumbnail' in facility ? facility.thumbnail as FileResponse : undefined;
 };
 
+export function getDrawingInfo(data: FacilityData): FileResponse | undefined {
+  if (!hasFacility(data)) {
+    return undefined;
+  }
+
+  const facility = data.facility;
+  return 'drawing' in facility ? facility.drawing as FileResponse : undefined;
+}
+
+
 export const getFacilityId = (data: FacilityData): number | undefined => {
   if (!hasFacility(data)) {
     return undefined;

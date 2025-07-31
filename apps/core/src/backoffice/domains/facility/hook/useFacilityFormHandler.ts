@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import {  FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
-import { useFileUploadWithInfo } from "@plug/common-services";
+import { FacilityManager } from "../services/facilityManager";
+import { useFileUploadWithInfo, Floor, FacilityDrawingUpdateRequest, useUpdateFacilitiesDrawing } from "@plug/common-services";
 import { useFacilityDetail, useFacilityCreate, useFacilityUpdate } from "./useFacilityHooks";
 import { FacilityData, FacilityFormData, FacilityFormMode } from "../types/facilityTypeGuard";
-import { FacilityManager } from "@/backoffice/domains/facility/services/facilityManager";
+import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
 
 interface FacilityFormHandlerProps {
   facilityType: FacilityType;
@@ -13,7 +13,13 @@ interface FacilityFormHandlerProps {
   onSaveSuccess?: () => void;
 }
 
-export function useFacilityFormHandler({ facilityType, facilityId, mode, initialData, onSaveSuccess }: FacilityFormHandlerProps) {
+export function useFacilityFormHandler({
+  facilityType,
+  facilityId,
+  mode,
+  initialData,
+  onSaveSuccess
+}: FacilityFormHandlerProps) {
   const [formData, setFormData] = useState<FacilityFormData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -22,7 +28,8 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
 
   const thumbnailUploader = useFileUploadWithInfo();
   const drawingUploader = useFileUploadWithInfo();
-
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const drawingUpdateService = facilityId ? useUpdateFacilitiesDrawing(facilityId) : null;
   useFacilityDetail(facilityType, facilityId || 0);
   useFacilityCreate(facilityType);
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -31,12 +38,13 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
   useEffect(() => {
     const fetchData = async () => {
       if (!facilityType) return;
-
+      
       setIsLoading(true);
       setError(null);
-
+      
       try {
         if (facilityId) {
+
           const data = await FacilityManager.fetchFacilityDetail<FacilityData>(facilityType, facilityId);
           if (data) {
             setFacilityData(data);
@@ -66,7 +74,7 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
     try {
       const result = await thumbnailUploader.execute(file);
       if (result?.id) {
-        handleInputChange('thumbnailFileId', result.id);
+        handleInputChange('facility.thumbnailFileId', result.id);
       }
     } catch (err) {
       console.error("썸네일 업로드 실패:", err);
@@ -77,10 +85,32 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
     try {
       const result = await drawingUploader.execute(file);
       if (result?.id) {
-        handleInputChange('drawingFileId', result.id);
+        handleInputChange('facility.drawingFileId', result.id);
       }
     } catch (err) {
       console.error("도면 업로드 실패:", err);
+    }
+  };
+  const handleUpdateDrawing = async (data: FacilityDrawingUpdateRequest, floors: Floor[]) => {
+    if (!drawingUpdateService || !facilityId) {
+      console.error("도면 업데이트 서비스를 사용할 수 없습니다.");
+      return;
+    }
+
+    try {
+      await drawingUpdateService.execute({
+        ...data,
+        floors: floors
+      });
+
+      const updatedData = await FacilityManager.fetchFacilityDetail<FacilityData>(facilityType, facilityId);
+      if (updatedData) {
+        setFacilityData(updatedData);
+        setFormData(updatedData as unknown as FacilityFormData);
+      }
+    } catch (err) {
+      console.error("도면 업데이트 실패:", err);
+      throw err;
     }
   };
 
@@ -92,7 +122,7 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
 
     try {
       let success = false;
-
+      
       if (facilityId) {
         success = await FacilityManager.updateFacility(facilityType, facilityId, formData);
       } else {
@@ -109,6 +139,7 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
       setIsLoading(false);
     }
   };
+
   const handleEditToggle = () => {
     setIsEditMode(prev => !prev);
   };
@@ -150,6 +181,7 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
       handleInputChange,
       handleThumbnailUpload,
       handleDrawingUpload,
+      handleUpdateDrawing,
       handleSave,
       handleEditToggle,
       handleBack,

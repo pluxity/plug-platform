@@ -35,6 +35,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
           onInputChange={handlers.handleInputChange}
           onThumbnailUpload={handlers.handleThumbnailUpload}
           onDrawingUpload={handlers.handleDrawingUpload}
+          onUpdateDrawing={handlers.handleUpdateDrawing}
           onSave={handlers.handleSave}
           onBack={() => navigate(-1)}
           thumbnailUploader={data.thumbnailUploader}
