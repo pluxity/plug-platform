@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { MultiSelect } from "@plug/ui";
 import { Input, Button, Label } from "@plug/ui";
@@ -19,9 +18,17 @@ interface StationInfoProps {
   stationInfo?: Partial<StationInfo>;
   onStationCodesChange?: (codes: string[]) => void;
   onLineIdsChange?: (lineIds: number[]) => void;
+  disabled?: boolean;
+  mode?: 'create' | 'detail' | 'edit';
 }
 
-export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = { stationCodes: [], lineIds: [] }, onStationCodesChange, onLineIdsChange }) => {
+export const StationInfoSection: React.FC<StationInfoProps> = ({ 
+  stationInfo = { stationCodes: [], lineIds: [] }, 
+  onStationCodesChange, 
+  onLineIdsChange,
+  disabled = false,
+  mode = 'create'
+}) => {
   const { data: lines } = useLinesSWR();
   const [inputValue, setInputValue] = useState("");
   const [showInput, setShowInput] = useState(false);
@@ -30,9 +37,14 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
 
   const stationCodes = stationInfo?.stationCodes || [];
   const lineIds = stationInfo?.lineIds || [];
+  
+  const isViewMode = mode === 'detail';
+  const isEditMode = mode === 'edit';
+  const isCreateMode = mode === 'create';
+  const isInputEnabled = (isEditMode || isCreateMode) && !disabled;
 
   const handleAddCode = () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || !isInputEnabled) return;
 
     const newCode = inputValue.trim();
     if (!stationCodes.includes(newCode)) {
@@ -45,7 +57,7 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
   };
 
   const handleAddFormCode = () => {
-    if (!tempCode.trim()) return;
+    if (!tempCode.trim() || !isInputEnabled) return;
 
     const newCode = tempCode.trim();
     if (!stationCodes.includes(newCode)) {
@@ -54,7 +66,6 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
         onStationCodesChange(newCodes);
       }
     }
-    // 추가 후 폼 초기화
     setTempCode("");
     setTempName("");
     setShowInput(false);
@@ -68,6 +79,8 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
   };
 
   const handleRemoveCode = (codeToRemove: string) => {
+    if (!isInputEnabled) return;
+    
     const newCodes = stationCodes.filter(code => code !== codeToRemove);
     if (onStationCodesChange) {
       onStationCodesChange(newCodes);
@@ -75,6 +88,8 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
   };
 
   const toggleInputForm = () => {
+    if (!isInputEnabled) return;
+    
     setShowInput(!showInput);
     setTempCode("");
     setTempName("");
@@ -87,108 +102,151 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
         <h3 className="text-lg font-medium">역사 코드 입력</h3>
       </div>
       <FacilityFormItem label="역사 코드" className='border-b'>
-        <div className="space-y-2">
-          <div className="flex">
-            <Input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="역사 코드를 입력하고 엔터키를 누르세요"
-              className="flex-1"
-            />
-            <button type="button" onClick={handleAddCode} className="ml-2 px-3 py-1 bg-blue-600 text-white rounded-sm">
-              추가
-            </button>
+        {isViewMode ? (
+          <div className="space-y-2">
+            {stationCodes.length > 0 ? (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {stationCodes.map((code, index) => (
+                  <div key={index} className="px-3 py-1.5 bg-gray-100 rounded inline-flex items-center">
+                    <div className="text-zinc-700 text-sm">{code}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-500">등록된 역사 코드가 없습니다.</div>
+            )}
           </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex">
+              <Input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="역사 코드를 입력하고 엔터키를 누르세요"
+                className="flex-1"
+                disabled={!isInputEnabled}
+              />
+              <button 
+                type="button" 
+                onClick={handleAddCode} 
+                className={`ml-2 px-3 py-1 ${!isInputEnabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-sm`}
+                disabled={!isInputEnabled}
+              >
+                추가
+              </button>
+            </div>
 
-          {/* 입력 폼 버전 추가 버튼 */}
-          <div className="flex justify-end mt-2">
-            <Button
-              type="button"
-              onClick={toggleInputForm}
-              variant="outline"
-              className="text-sm"
-              size="sm"
-            >
-              {showInput ? "입력 폼 닫기" : "입력 폼으로 추가"}
-            </Button>
-          </div>
+            <div className="flex justify-end mt-2">
+              <Button
+                type="button"
+                onClick={toggleInputForm}
+                variant="outline"
+                className="text-sm"
+                size="sm"
+                disabled={!isInputEnabled}
+              >
+                {showInput ? "입력 폼 닫기" : "입력 폼으로 추가"}
+              </Button>
+            </div>
 
-          {/* 입력 폼 버전 */}
-          {showInput && (
-            <div className="p-4 border rounded-md mt-2 bg-gray-50">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="station-code" className="block mb-1 text-sm font-medium">
-                    역사 코드
-                  </Label>
-                  <Input
-                    id="station-code"
-                    type="text"
-                    value={tempCode}
-                    onChange={(e) => setTempCode(e.target.value)}
-                    placeholder="역사 코드"
-                  />
+            {showInput && (
+              <div className="p-4 border rounded-md mt-2 bg-gray-50">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="station-code" className="block mb-1 text-sm font-medium">
+                      역사 코드
+                    </Label>
+                    <Input
+                      id="station-code"
+                      type="text"
+                      value={tempCode}
+                      onChange={(e) => setTempCode(e.target.value)}
+                      placeholder="역사 코드"
+                      disabled={!isInputEnabled}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="station-name" className="block mb-1 text-sm font-medium">
+                      역사명
+                    </Label>
+                    <Input
+                      id="station-name"
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      placeholder="역사명 (선택사항)"
+                      disabled={!isInputEnabled}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="station-name" className="block mb-1 text-sm font-medium">
-                    역사명
-                  </Label>
-                  <Input
-                    id="station-name"
-                    type="text"
-                    value={tempName}
-                    onChange={(e) => setTempName(e.target.value)}
-                    placeholder="역사명 (선택사항)"
-                  />
+                <div className="flex justify-end mt-3">
+                  <Button
+                    type="button"
+                    onClick={handleAddFormCode}
+                    variant="default"
+                    size="sm"
+                    className="px-4"
+                    disabled={!tempCode.trim() || !isInputEnabled}
+                  >
+                    추가하기
+                  </Button>
                 </div>
               </div>
-              <div className="flex justify-end mt-3">
-                <Button
-                  type="button"
-                  onClick={handleAddFormCode}
-                  variant="default"
-                  size="sm"
-                  className="px-4"
-                  disabled={!tempCode.trim()}
-                >
-                  추가하기
-                </Button>
-              </div>
-            </div>
-          )}
+            )}
 
-          {stationCodes.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {stationCodes.map((code, index) => (
-                <div key={index} className="px-[5px] py-1 bg-blue-50 inline-flex justify-center items-center gap-[3px]">
-                  <div className="justify-start text-zinc-700 text-xs font-medium">{code}</div>
-                  <DeleteIcon onClick={() => handleRemoveCode(code)} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+            {stationCodes.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {stationCodes.map((code, index) => (
+                  <div key={index} className="px-[5px] py-1 bg-blue-50 inline-flex justify-center items-center gap-[3px]">
+                    <div className="justify-start text-zinc-700 text-xs font-medium">{code}</div>
+                    {isInputEnabled && <DeleteIcon onClick={() => handleRemoveCode(code)} />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </FacilityFormItem>
 
       <FacilityFormItem label="호선 정보" className="border-b">
-        <MultiSelect
-          options={
-            lines?.map((line) => ({
-              label: line.name,
-              value: String(line.id),
-            })) || []
-          }
-          value={lineIds.map((id) => String(id))}
-          onChange={(values) => {
-            if (onLineIdsChange) {
-              onLineIdsChange(values.map(v => parseInt(v)));
+        {isViewMode ? (
+          <div className="space-y-2">
+            {lineIds.length > 0 ? (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {lineIds.map((id, index) => {
+                  const lineName = lines?.find(line => line.id === id)?.name || `호선 ID: ${id}`;
+                  return (
+                    <div key={index} className="px-3 py-1.5 bg-gray-100 rounded inline-flex items-center">
+                      <div className="text-zinc-700 text-sm">{lineName}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-gray-500">등록된 호선 정보가 없습니다.</div>
+            )}
+          </div>
+        ) : (
+          <MultiSelect
+            options={
+              lines?.map((line) => ({
+                label: line.name,
+                value: String(line.id),
+              })) || []
             }
-          }}
-          placeholder="호선을 선택하세요"
-          className="flex-1"
-        />
+            value={lineIds.map((id) => String(id))}
+            onChange={(values) => {
+              if (onLineIdsChange && isInputEnabled) {
+                onLineIdsChange(values.map(v => parseInt(v)));
+              }
+            }}
+            placeholder="호선을 선택하세요"
+            className="flex-1"
+            disabled={!isInputEnabled}
+          />
+        )}
       </FacilityFormItem>
     </>
   );

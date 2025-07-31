@@ -169,7 +169,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
               console.log('섹션 데이터 변경됨:', newData);
             },
             handlers: sectionHandlers,
-            disabled: !(isEditMode || isCreateMode)
+            disabled: !(isEditMode || isCreateMode),
+            mode: mode
           })}
         </div>
       );

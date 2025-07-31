@@ -44,7 +44,7 @@ export const StationDefinition: FacilityDefinition<StationDtos['CREATE_REQUEST']
     {
       id: "stationInfo",
       render: (props) => {
-        const { data, handlers } = props;
+        const { data, handlers, disabled, mode } = props;
         return (
             <StationInfoSection
               stationInfo={{
@@ -53,7 +53,8 @@ export const StationDefinition: FacilityDefinition<StationDtos['CREATE_REQUEST']
               }}
               onStationCodesChange={handlers.onStationCodesChange}
               onLineIdsChange={handlers.onLineIdsChange}
-
+              disabled={disabled}
+              mode={mode}
             />
         );
       }
