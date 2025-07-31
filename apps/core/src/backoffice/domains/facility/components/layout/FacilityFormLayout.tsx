@@ -18,7 +18,7 @@ import {
   getUpdatedBy,
   getDrawingInfo,
   isBuildingFacility,
-  isStationFacility,
+  isStationFacility
 } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 
 export type FacilityFormMode = 'create' | 'detail' | 'edit';
@@ -84,7 +84,6 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
 
   const facilityDefinition = facilityType ? FacilityRegistry.get(facilityType) : undefined;
   const showFloorInfo = facilityDefinition?.showFloorInfo || false;
-  const showLineInfo = facilityDefinition?.type === 'stations';
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -340,8 +339,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                       <span className="font-medium text-gray-800">
                         {getCreatedAt(facilityData)
                           ? new Date(
-                            getCreatedAt(facilityData) as string,
-                          ).toLocaleDateString("ko-KR")
+                              getCreatedAt(facilityData) as string,
+                            ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
                     </div>
@@ -363,8 +362,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                       <span className="font-medium text-gray-800">
                         {getUpdatedAt(facilityData)
                           ? new Date(
-                            getUpdatedAt(facilityData) as string,
-                          ).toLocaleDateString("ko-KR")
+                              getUpdatedAt(facilityData) as string,
+                            ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
                     </div>
@@ -389,7 +388,9 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                   </div>
                   <Button
                     className="w-24"
-                    onClick={() => document?.getElementById("drawing-input")?.click()}
+                    onClick={() =>
+                      document?.getElementById("drawing-input")?.click()
+                    }
                   >
                     파일 선택
                   </Button>
@@ -407,7 +408,9 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                     {drawingInfo ? (
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500">현재 도면:</span>
-                        <span className="font-medium text-gray-800">{drawingInfo.originalFileName}</span>
+                        <span className="font-medium text-gray-800">
+                          {drawingInfo.originalFileName}
+                        </span>
                       </div>
                     ) : (
                       <span className="text-gray-500">도면 없음</span>
@@ -415,7 +418,9 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                   </div>
                   <Button
                     className="w-24"
-                    onClick={() => document?.getElementById("drawing-input")?.click()}
+                    onClick={() =>
+                      document?.getElementById("drawing-input")?.click()
+                    }
                   >
                     파일 변경
                   </Button>
@@ -477,45 +482,63 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                   </div>
 
                   {showHistory && history && history.length > 0 && (
-                    <div className="mt-4 border border-gray-200 rounded-md">
-                      <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 font-medium">
-                        도면 변경 이력
-                      </div>
-                      <div className="max-h-60 overflow-y-auto">
-                        {history.map((item, index) => (
-                          <div
-                            key={item.id}
-                            className={`px-4 py-3 ${index < history.length - 1 ? 'border-b border-gray-100' : ''}`}
-                          >
-                            <div className="flex justify-between items-start">
+                    <div className="py-2 w-full">
+                      {!history ? (
+                        <p>데이터를 불러오는 중...</p>
+                      ) : history.length === 0 ? (
+                        <p>변경 이력이 없습니다.</p>
+                      ) : (
+                        <ul className="grid gap-2">
+                          {history?.map((historyItem, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-700 min-w-[120px] w-full flex justify-around items-center gap-1"
+                            >
                               <div className="flex-1">
-                                <div className="font-medium text-sm">{item.file.originalFileName}</div>
-                                <div className="text-gray-600 text-sm mt-1">{item.comment}</div>
+                                <span className="text-gray-500 mr-3">설명</span>
+                                <span className="font-medium text-gray-800">
+                                  {historyItem.comment || "-"}
+                                </span>
                               </div>
-                              <div className="flex flex-col items-end">
-                                <div className="text-xs text-gray-500">
-                                  {new Date(item.createdAt).toLocaleDateString('ko-KR', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </div>
-                                <div className="text-xs text-gray-500 mt-1">{item.createdBy}</div>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="mt-2"
-                                  onClick={() => window.open(item.file.url, "_blank")}
-                                >
-                                  다운로드
-                                </Button>
+                              <div className="w-52">
+                                <span className="text-gray-500 mr-3">날짜</span>
+                                <span className="font-medium text-gray-800">
+                                  {historyItem.createdAt
+                                    ? new Date(
+                                        historyItem.createdAt,
+                                      ).toLocaleString("ko-KR")
+                                    : "-"}
+                                </span>
                               </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                              <div className="w-36">
+                                <span className="text-gray-500 mr-3">
+                                  수정자
+                                </span>
+                                <span className="font-medium text-gray-800">
+                                  {historyItem.createdBy || "-"}
+                                </span>
+                              </div>
+                              <div className="flex w-40">
+                                <span className="text-gray-500 mr-3">
+                                  파일명
+                                </span>
+                                <a href={historyItem.file.url}>
+                                  <p className="font-bold text-gray-800">
+                                    {historyItem.file.originalFileName}
+                                  </p>
+                                </a>
+                              </div>
+                              <div>
+                                <a href={historyItem.file.url}>
+                                  <p className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded bg-blue-50 hover:bg-blue-150 border border-blue-100">
+                                    다운로드
+                                  </p>
+                                </a>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   )}
                 </div>
@@ -535,26 +558,27 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                 </div>
               ) : (
                 <div className="py-2 flex gap-4 items-center">
-                  {facilityData?.facility?.lat && facilityData?.facility?.lon && (
-                    <>
-                      <div className="flex gap-1">
-                        <span className="text-gray-500 text-sm">위도</span>
-                        <span className="font-medium">
-                          {facilityData.facility.lat}
-                        </span>
-                      </div>
-                      <Separator
-                        orientation="vertical"
-                        className="h-6 bg-gray-300"
-                      />
-                      <div className="flex gap-1">
-                        <span className="text-gray-500 text-sm">경도</span>
-                        <span className="font-medium">
-                          {facilityData.facility.lon}
-                        </span>
-                      </div>
-                    </>
-                  )}
+                  {facilityData?.facility?.lat &&
+                    facilityData?.facility?.lon && (
+                      <>
+                        <div className="flex gap-1">
+                          <span className="text-gray-500 text-sm">위도</span>
+                          <span className="font-medium">
+                            {facilityData.facility.lat}
+                          </span>
+                        </div>
+                        <Separator
+                          orientation="vertical"
+                          className="h-6 bg-gray-300"
+                        />
+                        <div className="flex gap-1">
+                          <span className="text-gray-500 text-sm">경도</span>
+                          <span className="font-medium">
+                            {facilityData.facility.lon}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   {facilityData?.facility?.locationMeta && (
                     <div className="flex gap-1">
                       <span className="text-gray-500 text-sm">위치정보</span>
@@ -582,12 +606,12 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
               </div>
             )}
 
-            {showLineInfo && !isCreateMode && isStationFacility(facilityData) && facilityData.stationInfo && (
+            {!isCreateMode && isStationFacility(facilityData) && (
               <div className="col-span-3">
                 <StationInfoSection
                   stationInfo={{
-                    stationCodes: facilityData.stationInfo.stationCodes,
-                    lineIds: facilityData.stationInfo.lineIds
+                    stationCodes: facilityData.stationInfo?.stationCodes || [],
+                    lineIds: facilityData.stationInfo?.lineIds || []
                   }}
                   onStationCodesChange={isEditMode ? handleStationCodesChange : undefined}
                   onLineIdsChange={isEditMode ? handleLineIdsChange : undefined}

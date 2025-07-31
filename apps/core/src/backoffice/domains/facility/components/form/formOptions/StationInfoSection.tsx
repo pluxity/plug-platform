@@ -60,7 +60,7 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
         <div className="w-1 h-6 bg-blue-600"></div>
         <h3 className="text-lg font-medium">역사 코드 입력</h3>
       </div>
-      <FacilityFormItem label="역사 코드">
+      <FacilityFormItem label="역사 코드" className='border-b'>
         <div className="space-y-2">
           <div className="flex">
             <Input
@@ -89,7 +89,7 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({ stationInfo = {
         </div>
       </FacilityFormItem>
 
-      <FacilityFormItem label="호선 정보" className="border-b h-full">
+      <FacilityFormItem label="호선 정보" className="border-b">
         <MultiSelect
           options={
             lines?.map((line) => ({

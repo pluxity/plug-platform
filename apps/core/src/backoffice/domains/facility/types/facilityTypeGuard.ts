@@ -153,11 +153,9 @@ export const isStationFacility = (data: unknown): data is StationDtos['RESPONSE'
   return isStationResponse(data) || isStationCreateRequest(data);
 };
 
-// eslint-disable-next-line @typescript-eslint/any
 export function isApiHookResult<T = any, P = any>(result: any): result is UseApiResponse<T, P> {
   return result && typeof result.execute === 'function' && 'isSuccess' in result;
 }
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function isSWRHookResult<T = any>(result: any): result is UseSWRApiReturn<T> {
   return result && typeof result.mutate === 'function' && !('isSuccess' in result);
 }
