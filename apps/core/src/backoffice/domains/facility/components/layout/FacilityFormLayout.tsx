@@ -6,6 +6,8 @@ import { FacilityForm, FacilityFormItem } from "../form/FacilityFormComponent";
 import { PathInputModal } from "../modal/PathInputModal";
 import { DrawingUpdateModal } from "../modal/DrawingUpdateModal";
 import { FacilityRegistry } from "../../services/registry/FacilityRegistry";
+import { FloorInfoSection } from "../form/formOptions/FloorInfoSection";
+import { StationInfoSection } from "../form/formOptions/StationInfoSection";
 import {
   FacilityData,
   getThumbnail,
@@ -27,7 +29,7 @@ interface FacilityFormLayoutProps {
   formData?: FacilityData;
   isLoading?: boolean;
   error?: Error | null;
-  onInputChange?: (field: string, value: string | number | boolean) => void;
+  onInputChange?: (field: string, value: string | number | boolean | string[] | number[]) => void;
   onThumbnailUpload?: (file: File) => Promise<void>;
   onDrawingUpload?: (file: File) => Promise<void>;
   onUpdateDrawing?: (data: FacilityDrawingUpdateRequest, floors: Floor[]) => Promise<void>;
@@ -75,6 +77,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
   const thumbnail = facilityData ? getThumbnail(facilityData) : undefined;
   const drawingInfo = facilityData ? getDrawingInfo(facilityData) : undefined;
   const facilityId = facilityData ? getFacilityId(facilityData) : undefined;
+
   const facilityType =
     isBuildingFacility(facilityData) ? "buildings" :
       isStationFacility(facilityData) ? "stations" : undefined;
@@ -122,6 +125,18 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
     setShowHistory(!showHistory);
   };
 
+  const handleStationCodesChange = (codes: string[]) => {
+    if (onInputChange) {
+      onInputChange("stationInfo.stationCodes", codes);
+    }
+  };
+
+  const handleLineIdsChange = (lineIds: number[]) => {
+    if (onInputChange) {
+      onInputChange("stationInfo.lineIds", lineIds);
+    }
+  };
+
   if (isLoading) {
     return <div className="flex justify-center p-8">데이터를 불러오는 중...</div>;
   }
@@ -135,7 +150,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
       <div className="grid grid-cols-2 py-5">
         <FacilityForm {...methods}>
           <div className="grid grid-cols-3 col-span-2 border-t divide-y divide-gray-200 border-b-0">
-            <FacilityFormItem label="썸네일 이미지" className="row-span-4">
+            <FacilityFormItem label="썸네일 이미지" className="row-span-3">
               <div className="flex flex-col gap-2 w-full">
                 {isEditMode || isCreateMode ? (
                   <div className="flex flex-col">
@@ -316,7 +331,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
 
             {!isCreateMode && facilityData && "facility" in facilityData && (
               <>
-                <FacilityFormItem label="생성">
+                <FacilityFormItem label="생성" className="col-span-2">
                   <div className="flex gap-4">
                     <div>
                       <span className="text-gray-500 mr-7 text-sm">
@@ -461,7 +476,6 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                     )}
                   </div>
 
-                  {/* 도면 변경 이력 섹션 */}
                   {showHistory && history && history.length > 0 && (
                     <div className="mt-4 border border-gray-200 rounded-md">
                       <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 font-medium">
@@ -507,67 +521,6 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                 </div>
               )}
             </FacilityFormItem>
-
-            {showFloorInfo && !isCreateMode && facilityData?.floors && facilityData.floors.length > 0 && (
-              <FacilityFormItem label="층 정보" className="col-span-3 border-b">
-                <div className="flex flex-wrap gap-2">
-                  {facilityData.floors.map((floor, index) => (
-                    <div
-                      key={index}
-                      className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700 min-w-[120px]"
-                    >
-                      <div>
-                        <span className="text-gray-500 mr-1">층</span>
-                        <span className="font-medium text-gray-800">
-                          {floor.name}
-                        </span>
-                      </div>
-                      {floor.floorId && (
-                        <div className="mt-1">
-                          <span className="text-gray-500 mr-1">ID</span>
-                          <span className="font-medium text-gray-800">
-                            {floor.floorId}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </FacilityFormItem>
-            )}
-
-            {showLineInfo && !isCreateMode && isStationFacility(facilityData) && facilityData.stationInfo && (
-              <FacilityFormItem label="노선 정보" className="col-span-3 border-b">
-                <div className="flex flex-col gap-2">
-                  {facilityData.stationInfo.lineIds && facilityData.stationInfo.lineIds.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {facilityData.stationInfo.lineIds.map((lineId: number, index: number) => (
-                        <div
-                          key={index}
-                          className="border border-gray-200 rounded-sm bg-gray-50 px-3 py-2 text-sm text-gray-700"
-                        >
-                          <span className="text-gray-500 mr-1">노선 ID</span>
-                          <span className="font-medium text-gray-800">
-                            {lineId}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-gray-500">노선 정보 없음</div>
-                  )}
-
-                  {facilityData.stationInfo.stationCodes && facilityData.stationInfo.stationCodes.length > 0 && (
-                    <div className="mt-2">
-                      <span className="text-gray-500 mr-1">역 코드:</span>
-                      <span className="font-medium text-gray-800">
-                        {facilityData.stationInfo.stationCodes.join(', ')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </FacilityFormItem>
-            )}
 
             <FacilityFormItem label="위치정보" className="col-span-3 border-b">
               {isCreateMode ? (
@@ -620,8 +573,29 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                 </div>
               )}
             </FacilityFormItem>
+
+            {children}
+
+            {showFloorInfo && !isCreateMode && facilityData?.floors && (
+              <div className="col-span-3">
+                <FloorInfoSection floors={facilityData.floors || []} />
+              </div>
+            )}
+
+            {showLineInfo && !isCreateMode && isStationFacility(facilityData) && facilityData.stationInfo && (
+              <div className="col-span-3">
+                <StationInfoSection
+                  stationInfo={{
+                    stationCodes: facilityData.stationInfo.stationCodes,
+                    lineIds: facilityData.stationInfo.lineIds
+                  }}
+                  onStationCodesChange={isEditMode ? handleStationCodesChange : undefined}
+                  onLineIdsChange={isEditMode ? handleLineIdsChange : undefined}
+                />
+              </div>
+            )}
           </div>
-          {children}
+
           {formError && (
             <div className="text-red-500 mt-4 text-center">{formError}</div>
           )}
@@ -667,6 +641,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
         onClose={() => setIsPathModalOpen(false)}
         onSubmit={handlePathUpdate}
       />
+
       <DrawingUpdateModal
         isOpen={isDrawingModalOpen}
         onClose={() => setIsDrawingModalOpen(false)}

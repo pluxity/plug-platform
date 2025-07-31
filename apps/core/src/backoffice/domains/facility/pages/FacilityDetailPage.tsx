@@ -2,11 +2,11 @@ import React from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from "@plug/ui";
 import { PageContainer } from '@/backoffice/common/view/layouts';
+import { FacilityFormLayout } from "@/backoffice/domains/facility/components/layout/FacilityFormLayout";
 import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
 import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 import { useHistory } from "@plug/common-services";
-import { FacilityFormLayout } from "@/backoffice/domains/facility/components/layout/FacilityFormLayout";
 
 const FacilityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +20,7 @@ const FacilityDetailPage: React.FC = () => {
       if (type === 'buildings' || type === 'stations') {
         return type as FacilityType;
       }
-    };
+    }
     return 'facilities';
   };
 
@@ -28,7 +28,6 @@ const FacilityDetailPage: React.FC = () => {
   const facilityId = id ? Number(id) : 0;
 
   const { data: historyData, isLoading: historyLoading } = useHistory(facilityType, facilityId);
-
   const { data, handlers } = useFacilityFormHandler({
     facilityType: facilityType,
     facilityId,
