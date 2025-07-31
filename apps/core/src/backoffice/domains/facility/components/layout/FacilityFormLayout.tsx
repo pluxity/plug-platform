@@ -84,7 +84,10 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
     (isBuildingFacility(facilityData) ? "buildings" :
       isStationFacility(facilityData) ? "stations" : "buildings");
 
+  console.log('감지된 시설 유형:', detectedFacilityType, '전달된 facilityType:', facilityType);
+
   const facilityDefinition = detectedFacilityType ? FacilityRegistry.get(detectedFacilityType) : undefined;
+  console.log('facilityDefinition:', facilityDefinition?.type, '섹션 수:', facilityDefinition?.sections?.length);
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

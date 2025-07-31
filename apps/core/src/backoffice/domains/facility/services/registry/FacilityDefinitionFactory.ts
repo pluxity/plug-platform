@@ -6,5 +6,6 @@ FacilityRegistry.register(BuildingDefinition);
 FacilityRegistry.register(StationDefinition);
 
 export const initializeFacilityDefinitions = () => {
-  console.log('시설 정의가 등록되었습니다.');
+  FacilityRegistry.register(BuildingDefinition);
+  FacilityRegistry.register(StationDefinition);
 };

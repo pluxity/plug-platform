@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MultiSelect } from "@plug/ui";
-import { Input, Button, Label } from "@plug/ui";
+import { Input } from "@plug/ui";
 import { StationInfo, useLinesSWR } from "@plug/common-services";
 import { FacilityFormItem } from "../FacilityFormComponent";
 
@@ -31,9 +31,6 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({
 }) => {
   const { data: lines } = useLinesSWR();
   const [inputValue, setInputValue] = useState("");
-  const [showInput, setShowInput] = useState(false);
-  const [tempCode, setTempCode] = useState("");
-  const [tempName, setTempName] = useState("");
 
   const stationCodes = stationInfo?.stationCodes || [];
   const lineIds = stationInfo?.lineIds || [];
@@ -56,20 +53,6 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({
     setInputValue("");
   };
 
-  const handleAddFormCode = () => {
-    if (!tempCode.trim() || !isInputEnabled) return;
-
-    const newCode = tempCode.trim();
-    if (!stationCodes.includes(newCode)) {
-      const newCodes = [...stationCodes, newCode];
-      if (onStationCodesChange) {
-        onStationCodesChange(newCodes);
-      }
-    }
-    setTempCode("");
-    setTempName("");
-    setShowInput(false);
-  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -85,14 +68,6 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({
     if (onStationCodesChange) {
       onStationCodesChange(newCodes);
     }
-  };
-
-  const toggleInputForm = () => {
-    if (!isInputEnabled) return;
-    
-    setShowInput(!showInput);
-    setTempCode("");
-    setTempName("");
   };
 
   return (
@@ -131,70 +106,13 @@ export const StationInfoSection: React.FC<StationInfoProps> = ({
               <button 
                 type="button" 
                 onClick={handleAddCode} 
-                className={`ml-2 px-3 py-1 ${!isInputEnabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-sm`}
+                className={`ml-2 px-3 py-1 ${!isInputEnabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white `}
                 disabled={!isInputEnabled}
               >
                 추가
               </button>
             </div>
 
-            <div className="flex justify-end mt-2">
-              <Button
-                type="button"
-                onClick={toggleInputForm}
-                variant="outline"
-                className="text-sm"
-                size="sm"
-                disabled={!isInputEnabled}
-              >
-                {showInput ? "입력 폼 닫기" : "입력 폼으로 추가"}
-              </Button>
-            </div>
-
-            {showInput && (
-              <div className="p-4 border rounded-md mt-2 bg-gray-50">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="station-code" className="block mb-1 text-sm font-medium">
-                      역사 코드
-                    </Label>
-                    <Input
-                      id="station-code"
-                      type="text"
-                      value={tempCode}
-                      onChange={(e) => setTempCode(e.target.value)}
-                      placeholder="역사 코드"
-                      disabled={!isInputEnabled}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="station-name" className="block mb-1 text-sm font-medium">
-                      역사명
-                    </Label>
-                    <Input
-                      id="station-name"
-                      type="text"
-                      value={tempName}
-                      onChange={(e) => setTempName(e.target.value)}
-                      placeholder="역사명 (선택사항)"
-                      disabled={!isInputEnabled}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end mt-3">
-                  <Button
-                    type="button"
-                    onClick={handleAddFormCode}
-                    variant="default"
-                    size="sm"
-                    className="px-4"
-                    disabled={!tempCode.trim() || !isInputEnabled}
-                  >
-                    추가하기
-                  </Button>
-                </div>
-              </div>
-            )}
 
             {stationCodes.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent } from "@plug/ui";
 import { FacilityType } from "../../store/FacilityListStore";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +23,10 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
     onSaveSuccess
   });
 
+  useEffect(() => {
+    console.log('FacilityForm - facilityType:', facilityType);
+  }, [facilityType]);
+
   return (
     <Card>
       <CardContent>
@@ -40,6 +44,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
           onBack={() => navigate(-1)}
           thumbnailUploader={data.thumbnailUploader}
           drawingUploader={data.drawingUploader}
+          facilityType={facilityType}
         />
       </CardContent>
     </Card>
