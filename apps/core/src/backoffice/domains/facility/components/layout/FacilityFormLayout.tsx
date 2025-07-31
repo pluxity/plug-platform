@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Input, Separator, Textarea } from "@plug/ui";
 import { useFileUploadWithInfo } from "@plug/common-services";
-import { FacilityForm, FacilityFormItem } from "../FacilityFormComponent";
-import { PathInputModal } from "../PathInputModal";
+import { FacilityForm, FacilityFormItem } from "../form/FacilityFormComponent";
+import { PathInputModal } from "../modal/PathInputModal";
 import { FacilityHistoryResponse } from "@plug/common-services";
 import {
   FacilityData,
@@ -81,7 +81,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
       <div className="grid grid-cols-2 py-5">
         <FacilityForm {...methods}>
           <div className="grid grid-cols-3 col-span-2 border-t divide-y divide-gray-200 border-b-0">
-            <FacilityFormItem label="썸네일 이미지" className="row-span-5">
+            <FacilityFormItem label="썸네일 이미지" className="row-span-3">
               <div className="flex flex-col gap-2 w-full">
                 {isEditMode || isCreateMode ? (
                   <div className="flex flex-col">
@@ -224,7 +224,80 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
               )}
             </FacilityFormItem>
 
-            <FacilityFormItem label="위치정보" className="col-span-3 border-b">
+
+
+            {!isCreateMode && facilityData && "facility" in facilityData && (
+              <>
+                <FacilityFormItem label="생성" className="col-span-2">
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="text-gray-500 mr-7 text-sm">최초 생성일</span>
+                      <span className="font-medium text-gray-800">
+                        {getCreatedAt(facilityData) ? new Date(getCreatedAt(facilityData) as string).toLocaleDateString("ko-KR") : "-"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 mr-4 text-sm">생성인</span>
+                      <span className="font-medium text-gray-800">{getCreatedBy(facilityData) || "-"}</span>
+                    </div>
+                  </div>
+                </FacilityFormItem>
+
+                <FacilityFormItem label="수정" className="border-b">
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
+                      <span className="font-medium text-gray-800">
+                        {getUpdatedAt(facilityData) ? new Date(getUpdatedAt(facilityData) as string).toLocaleDateString("ko-KR") : "-"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 mr-4 text-sm">수정인</span>
+                      <span className="font-medium text-gray-800">
+                        {getUpdatedBy(facilityData) || "-"}
+                      </span>
+                    </div>
+                  </div>
+                </FacilityFormItem>
+              </>
+            )}
+
+
+            {isCreateMode && (
+              <FacilityFormItem label="도면" className="border-b">
+                <div className="flex justify-between w-full gap-2">
+                  {actualDrawingUploader.isLoadingFileInfo && (
+                    <p>도면 업로드 중...</p>
+                  )}
+                  {actualDrawingUploader.fileInfo && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        업로드된 파일:{" "}
+                        {actualDrawingUploader.fileInfo.originalFileName}
+                      </p>
+                    </div>
+                  )}
+                  <Button
+                    className="w-16"
+                    type="button"
+                    onClick={() =>
+                      document?.getElementById("drawing-input")?.click()
+                    }
+                  >
+                    파일 선택
+                  </Button>
+                  <Input
+                    type="file"
+                    id="drawing-input"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleDrawingChange}
+                  />
+                </div>
+              </FacilityFormItem>
+            )}
+
+            <FacilityFormItem label="위치정보" className="col-span-2 border-b">
               {isCreateMode ? (
                 <div className="flex items-center gap-3">
                   <Button
@@ -258,77 +331,6 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                 </div>
               )}
             </FacilityFormItem>
-
-            {!isCreateMode && facilityData && "facility" in facilityData && (
-              <>
-                <FacilityFormItem label="생성" className="col-span-2">
-                  <div className="flex gap-4">
-                    <div>
-                      <span className="text-gray-500 mr-7 text-sm">최초 생성일</span>
-                      <span className="font-medium text-gray-800">
-                        {getCreatedAt(facilityData) ? new Date(getCreatedAt(facilityData) as string).toLocaleDateString("ko-KR") : "-"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 mr-4 text-sm">생성인</span>
-                      <span className="font-medium text-gray-800">{getCreatedBy(facilityData) || "-"}</span>
-                    </div>
-                  </div>
-                </FacilityFormItem>
-
-                <FacilityFormItem label="수정" className="col-span-2 border-b">
-                  <div className="flex gap-4">
-                    <div>
-                      <span className="text-gray-500 mr-4 text-sm">마지막 수정일</span>
-                      <span className="font-medium text-gray-800">
-                        {getUpdatedAt(facilityData) ? new Date(getUpdatedAt(facilityData) as string).toLocaleDateString("ko-KR") : "-"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 mr-4 text-sm">수정인</span>
-                      <span className="font-medium text-gray-800">
-                        {getUpdatedBy(facilityData) || "-"}
-                      </span>
-                    </div>
-                  </div>
-                </FacilityFormItem>
-              </>
-            )}
-
-
-            {isCreateMode && (
-              <FacilityFormItem label="도면" className="col-span-2 border-b">
-                <div className="flex justify-between w-full gap-2">
-                  {actualDrawingUploader.isLoadingFileInfo && (
-                    <p>도면 업로드 중...</p>
-                  )}
-                  {actualDrawingUploader.fileInfo && (
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        업로드된 파일:{" "}
-                        {actualDrawingUploader.fileInfo.originalFileName}
-                      </p>
-                    </div>
-                  )}
-                  <Button
-                    className="w-16"
-                    type="button"
-                    onClick={() =>
-                      document?.getElementById("drawing-input")?.click()
-                    }
-                  >
-                    파일 선택
-                  </Button>
-                  <Input
-                    type="file"
-                    id="drawing-input"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleDrawingChange}
-                  />
-                </div>
-              </FacilityFormItem>
-            )}
           </div>
           {children}
           {formError && (

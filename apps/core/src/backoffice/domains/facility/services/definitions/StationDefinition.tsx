@@ -2,8 +2,8 @@ import { FacilityDefinition } from "../registry/FacilityRegistry";
 import { StationDtos } from "@plug/common-services";
 import { isStationFacility } from "../../types/facilityTypeGuard";
 import { Train } from "lucide-react";
-import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
-import { StationInfoSection } from "../createFormSections/StationInfoSection";
+import { FloorInfoSection } from "@/backoffice/domains/facility/components/form/formOptions/FloorInfoSection";
+import { StationInfoSection } from "@/backoffice/domains/facility/components/form/formOptions/StationInfoSection";
 
 export const StationDefinition: FacilityDefinition<StationDtos['CREATE_REQUEST']> = {
   type: "stations",
@@ -12,12 +12,14 @@ export const StationDefinition: FacilityDefinition<StationDtos['CREATE_REQUEST']
   icon: Train,
   getInitialData: () => ({
     facility: {
-      id: 0,
       name: "",
       code: "",
       description: "",
       thumbnailFileId: 0,
       drawingFileId: 0,
+      lon: 0,
+      lat: 0,
+      locationMeta: ""
     },
     floors: [],
     stationInfo: {

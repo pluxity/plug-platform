@@ -3,8 +3,8 @@ import { useParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from "@plug/ui";
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { useHistory } from "@plug/common-services";
-import { FacilityFormLayout } from "./components/layout/FacilityFormLayout";
-import { useFacilityFormHandler } from "@/backoffice/domains/facility/plugin/FacilityFormHandler";
+import { FacilityFormLayout } from "../components/layout/FacilityFormLayout";
+import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
 import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 

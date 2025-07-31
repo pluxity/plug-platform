@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MultiSelect } from "@plug/ui";
 import { Input } from "@plug/ui";
 import { StationInfo, useLinesSWR } from "@plug/common-services";
-import { FacilityFormItem } from "../../components/FacilityFormComponent";
+import { FacilityFormItem } from "../FacilityFormComponent";
 
 const DeleteIcon = ({ onClick }: { onClick?: (e: React.MouseEvent) => void }) => (
   <div data-property-1="delete" className="w-3.5 h-3.5 relative cursor-pointer" onClick={onClick}>

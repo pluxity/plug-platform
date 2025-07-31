@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Button } from "@plug/ui";
 import { FacilityType } from "../../store/FacilityListStore";
-import { FacilityRegistry } from "@/backoffice/domains/facility/plugin/registry/FacilityRegistry";
+import { FacilityRegistry } from "@/backoffice/domains/facility/services/registry/FacilityRegistry";
 import { House } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
@@ -15,7 +15,7 @@ interface FacilityLayoutProps {
   hideFirstTab?: boolean;
 }
 
-export const FacilityLayout: React.FC<FacilityLayoutProps> = ({ children, activeTab, setActiveTab, showButton = true, buttonText = "시설 추가", onButtonClick, hideFirstTab = false }) => {
+export const FacilityTabLayout: React.FC<FacilityLayoutProps> = ({ children, activeTab, setActiveTab, showButton = true, buttonText = "시설 추가", onButtonClick, hideFirstTab = false }) => {
   const tabs = useMemo(() => {
     const defaultTab = {
       id: 'facilities',

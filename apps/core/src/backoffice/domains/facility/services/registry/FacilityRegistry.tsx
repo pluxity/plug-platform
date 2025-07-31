@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 import { FacilityType } from "../../store/FacilityListStore";
 import { FacilityCreateRequest } from "../../types/facilityTypeGuard";
 import { Floor, BuildingDtos, StationDtos } from "@plug/common-services";
-import { StationInfoSection } from "@/backoffice/domains/facility/plugin/createFormSections/StationInfoSection";
-import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
+import { StationInfoSection } from "@/backoffice/domains/facility/components/form/formOptions/StationInfoSection";
+import { FloorInfoSection } from "@/backoffice/domains/facility/components/form/formOptions/FloorInfoSection";
 
 export interface SectionRenderProps<T extends FacilityCreateRequest = FacilityCreateRequest> {
   data: T;

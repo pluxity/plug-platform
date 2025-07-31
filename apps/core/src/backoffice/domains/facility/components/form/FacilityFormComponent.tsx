@@ -3,6 +3,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescripti
 import { twMerge } from "tailwind-merge";
 import { ModalFormContainerProps, ModalFormItemProps } from "@plug/ui";
 
+// 쓰던 모달폼 활용 버전
 const FacilityForm = FormProvider
 const FacilityFormField = FormField
 function FacilityFormContainer({ children, className }: ModalFormContainerProps) {

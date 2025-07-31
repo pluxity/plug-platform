@@ -2,7 +2,7 @@ import { FacilityDefinition } from "../registry/FacilityRegistry";
 import { BuildingDtos } from "@plug/common-services";
 import { isBuildingFacility } from "../../types/facilityTypeGuard";
 import { Building } from "lucide-react";
-import { FloorInfoSection } from "../createFormSections/FloorInfoSection";
+import { FloorInfoSection } from "@/backoffice/domains/facility/components/form/formOptions/FloorInfoSection";
 
 export const BuildingDefinition: FacilityDefinition<BuildingDtos["CREATE_REQUEST"]> = {
   type: "buildings",
@@ -11,12 +11,14 @@ export const BuildingDefinition: FacilityDefinition<BuildingDtos["CREATE_REQUEST
   icon: Building,
   getInitialData: () => ({
     facility: {
-      id: 0,
       name: "",
       code: "",
       description: "",
       thumbnailFileId: 0,
       drawingFileId: 0,
+      lon: 0,
+      lat: 0,
+      locationMeta: ""
     },
     floors: [],
   }),

@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, CardContent } from "@plug/ui";
-import { FacilityType } from "../store/FacilityListStore";
+import { FacilityType } from "../../store/FacilityListStore";
 import { useNavigate } from "react-router-dom";
-import { FacilityFormLayout } from "../components/layout/FacilityFormLayout";
-import { useFacilityFormHandler } from "@/backoffice/domains/facility/plugin/FacilityFormHandler";
+import { FacilityFormLayout } from "../layout/FacilityFormLayout";
+import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
 
 interface FacilityFormProps {
   facilityType: FacilityType;

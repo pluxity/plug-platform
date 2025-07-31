@@ -1,5 +1,5 @@
 import React from "react";
-import { FacilityItem, StandardizedResponse } from "@/backoffice/domains/facility/list/CardListType";
+import { FacilityItem, StandardizedResponse } from "@/backoffice/domains/facility/components/list/CardListType";
 import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
 
 export interface FacilityAction {

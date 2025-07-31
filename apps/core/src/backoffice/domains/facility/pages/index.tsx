@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
-import { FacilityLayout } from "./components/layout/FacilityLayout";
+import { FacilityTabLayout } from "../components/layout/FacilityTabLayout";
 import { useLocation } from "react-router-dom";
-import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "./store/FacilityListStore";
-import { FacilityCardList } from "@/backoffice/domains/facility/list/FacilityCardListRenderer";
-import { CardList } from "@/backoffice/domains/facility/list/CardList";
-import { FacilityForm } from "@/backoffice/domains/facility/plugin/FacilityForm";
-import { initializeFacilityDefinitions } from "@/backoffice/domains/facility/plugin/registry/FacilityDefinitionFactory";
+import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "../store/FacilityListStore";
+import { FacilityCardList } from "@/backoffice/domains/facility/components/list/FacilityCardListRenderer";
+import { CardList } from "@/backoffice/domains/facility/components/list/CardList";
+import { FacilityForm } from "@/backoffice/domains/facility/components/form/FacilityForm";
+import { initializeFacilityDefinitions } from "@/backoffice/domains/facility/services/registry/FacilityDefinitionFactory";
 
 const FacilityManagement: React.FC = () => {
 
@@ -92,7 +92,7 @@ const FacilityManagement: React.FC = () => {
 
   return (
     <PageContainer title={isCreateMode ? "시설 추가" : "시설 관리"}>
-      <FacilityLayout
+      <FacilityTabLayout
         activeTab={activeTab}
         setActiveTab={handleTabChange}
         showButton={activeTab !== 'facilities' || !isCreateMode}
@@ -101,7 +101,7 @@ const FacilityManagement: React.FC = () => {
         hideFirstTab={isCreateMode}
       >
         {isCreateMode ? renderCreateForm() : renderListComponent()}
-      </FacilityLayout>
+      </FacilityTabLayout>
     </PageContainer>
   );
 };
