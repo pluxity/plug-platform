@@ -16,7 +16,6 @@ const MapControls: React.FC<MapControlsProps> = ({ onInitialLoadComplete }) => {
     altitude: 1000
   };
 
-  // 초기 카메라 설정
   useEffect(() => {
     if (!viewer) return;
 
@@ -27,9 +26,14 @@ const MapControls: React.FC<MapControlsProps> = ({ onInitialLoadComplete }) => {
         DEFAULT_COORDS.latitude, 
         DEFAULT_COORDS.altitude
       ),
+      orientation: {
+        heading: Cesium.Math.toRadians(0),
+        pitch: Cesium.Math.toRadians(-5),
+        roll: 0
+      },
       duration: 0,
       complete: () => {
-        onInitialLoadComplete?.(); // 카메라 이동 완료 후 로딩 종료
+        onInitialLoadComplete?.();
       }
     });
   }, [viewer, onInitialLoadComplete, DEFAULT_COORDS.longitude, DEFAULT_COORDS.latitude, DEFAULT_COORDS.altitude]);
@@ -63,6 +67,11 @@ const MapControls: React.FC<MapControlsProps> = ({ onInitialLoadComplete }) => {
           DEFAULT_COORDS.latitude, 
           DEFAULT_COORDS.altitude
         ),
+        orientation: {
+          heading: Cesium.Math.toRadians(0),
+          pitch: Cesium.Math.toRadians(-15),
+          roll: 0
+        },
         duration: 2.0
       });
     }

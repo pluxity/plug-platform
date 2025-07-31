@@ -3,15 +3,12 @@ import * as Cesium from 'cesium';
 import { useCesium } from 'resium';
 
 interface CameraSetupProps {
-  // 초기 카메라 위치 설정용
   initialPosition?: {
     longitude: number
     latitude: number
     altitude: number
   }
-  // 초기화 완료 콜백
   onInitialSetupComplete?: () => void
-  // 초기화 여부 플래그
   hasInitialized?: boolean
 }
 
@@ -30,16 +27,14 @@ const InitialCameraSetup: React.FC<CameraSetupProps> = ({
     if (viewer) {
       const cameraController = viewer.scene.screenSpaceCameraController;
       
-      // 카메라 컨트롤 이벤트 설정
-      cameraController.tiltEventTypes = [Cesium.CameraEventType.LEFT_DRAG]; // 좌클릭으로 틸트
-      cameraController.rotateEventTypes = [Cesium.CameraEventType.RIGHT_DRAG]; // 우클릭으로 회전
+      cameraController.tiltEventTypes = [Cesium.CameraEventType.LEFT_DRAG];
+      cameraController.rotateEventTypes = [Cesium.CameraEventType.RIGHT_DRAG];
       cameraController.zoomEventTypes = [
-          Cesium.CameraEventType.WHEEL, // 마우스 휠로 줌
-          Cesium.CameraEventType.PINCH  // 핀치로 줌
+          Cesium.CameraEventType.WHEEL,
+          Cesium.CameraEventType.PINCH
       ];
-      cameraController.translateEventTypes = [Cesium.CameraEventType.MIDDLE_DRAG]; // 휠클릭으로 패닝
+      cameraController.translateEventTypes = [Cesium.CameraEventType.MIDDLE_DRAG];
 
-      // 초기 카메라 위치 설정 (아직 초기화되지 않은 경우만)
       if (!hasInitialized) {
         const camera = viewer.scene.camera;
         camera.flyTo({

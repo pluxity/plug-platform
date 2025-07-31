@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useCesium } from 'resium'
 import * as Cesium from 'cesium'
-import VWorldMap from '@/global/components/maps/VWorldMap'
 import MapControls from '@/global/components/maps/MapControls'
 import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { BaseFacilityResponse } from '@plug/common-services'
+import { GoogleMap } from '@/global/components/maps'
 
 const OutdoorMap: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -34,9 +34,17 @@ const OutdoorMap: React.FC = () => {
     useEffect(() => {
       if (!viewer || !facilitiesFetched) return
 
+      if (viewer.canvas.dataset.eventListenersAdded === 'true') {
+        return
+      }
+
       const allFacilities = Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
       
       Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmNWJmZWEzOS1jMTJjLTQ0ZTYtOTFkNC1jZDMxMDlmYTRjMWEiLCJpZCI6MjgzMTA2LCJpYXQiOjE3NDE2NjE3OTR9.dZID1nZdOJeEv18BhwGwWlAjJQtWAFUDipJw7M4r0-w'
+
+      let hoveredEntity: Cesium.Entity | null = null
+      let handleMouseMove: ((event: MouseEvent) => void) | null = null
+      let handleClick: ((event: MouseEvent) => void) | null = null
 
       const createPOIs = async () => {
         const resource = await Cesium.IonResource.fromAssetId(3589754)
@@ -93,9 +101,7 @@ const OutdoorMap: React.FC = () => {
           }
         })
 
-        let hoveredEntity: Cesium.Entity | null = null
-
-        viewer.canvas.addEventListener('mousemove', (event: MouseEvent) => {
+        handleMouseMove = (event: MouseEvent) => {
           const canvasPosition = new Cesium.Cartesian2(event.clientX, event.clientY)
           
           const pickedObject = viewer.scene.pick(canvasPosition)
@@ -119,7 +125,14 @@ const OutdoorMap: React.FC = () => {
             hoveredEntity = null
             viewer.canvas.style.cursor = 'default'
           }
-        })
+        }
+
+        handleClick = () => {}
+
+        viewer.canvas.addEventListener('mousemove', handleMouseMove)
+        viewer.canvas.addEventListener('click', handleClick)
+        
+        viewer.canvas.dataset.eventListenersAdded = 'true'
       }
 
       createPOIs()
@@ -131,6 +144,15 @@ const OutdoorMap: React.FC = () => {
             viewer.entities.remove(entity)
           }
         })
+        
+        if (handleMouseMove) {
+          viewer.canvas.removeEventListener('mousemove', handleMouseMove)
+        }
+        if (handleClick) {
+          viewer.canvas.removeEventListener('click', handleClick)
+        }
+        
+        delete viewer.canvas.dataset.eventListenersAdded
       }
     }, [viewer])
 
@@ -150,16 +172,15 @@ const OutdoorMap: React.FC = () => {
         </div>
       )}
       
-      {/* 검색 폼 */}
       <div className="absolute top-4 left-4 z-40">
         <FacilitySearchForm viewer={cesiumViewer} />
       </div>
       
       <div className="w-full h-full">
-        <VWorldMap className="w-full h-full relative">
+        <GoogleMap className="w-full h-full relative">
           <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
           <FacilityPOIs />
-        </VWorldMap>
+        </GoogleMap>
       </div>
     </>
   )

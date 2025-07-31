@@ -15,7 +15,6 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   
   const { facilities } = useFacilityStore()
 
-  // 검색 함수
   const performSearch = (query: string) => {
     if (!query.trim()) {
       setSearchResults([])
@@ -43,25 +42,21 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   }
 
   const handleSelectFacility = (facility: BaseFacilityResponse) => {
-    // 검색창 비우기
     setSearchQuery('')
     setSearchResults([])
     setIsOpen(false)
     
-    // 카메라 이동 - 시설을 바라보도록 위치 설정
     if (viewer && facility.lat && facility.lon) {
-      // 시설 위치
       const targetPosition = Cesium.Cartesian3.fromDegrees(facility.lon, facility.lat, 0)
       
-      // 카메라를 시설 위치로 향하도록 설정 (거리와 각도 지정)
       viewer.camera.flyToBoundingSphere(
-        new Cesium.BoundingSphere(targetPosition, 1000), // 목표 지점 중심으로 반경 1000m
+        new Cesium.BoundingSphere(targetPosition, 1000),
         {
           duration: 2.0,
           offset: new Cesium.HeadingPitchRange(
-            0, // heading: 북쪽 방향
-            Cesium.Math.toRadians(-30), // pitch: 30도 아래를 바라봄  
-            2000 // range: 2000m 거리
+            0,
+            Cesium.Math.toRadians(-15),
+            2000
           )
         }
       )
@@ -86,7 +81,6 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
     }
   }
 
-  // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -111,7 +105,6 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
           className="w-full px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
         
-        {/* 검색 아이콘 */}
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
           {searchQuery ? (
             <button
@@ -130,7 +123,6 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         </div>
       </div>
 
-      {/* 검색 결과 드롭다운 */}
       {isOpen && searchResults.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs text-gray-600">
@@ -159,7 +151,6 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         </div>
       )}
 
-      {/* 검색 결과가 없을 때 */}
       {isOpen && searchQuery && searchResults.length === 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
           <div className="px-4 py-3 text-gray-500 text-center">

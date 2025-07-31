@@ -3,7 +3,6 @@ import * as Cesium from 'cesium';
 import { Viewer as ResiumViewer, Scene, Cesium3DTileset } from 'resium';
 import InitialCameraSetup from './CameraSetup';
 
-// Google Maps API Key
 export const GOOGLE_MAPS_API_KEY = 'AIzaSyBn49Az8XCIk2zTj42aogqbf47y5D-E1ak';
 interface GoogleMapProps {
   className?: string;
@@ -16,7 +15,6 @@ export default function GoogleMap({ className, children}: GoogleMapProps) {
 
   return (
     <>
-      {/* Hidden credit container to suppress Cesium credits */}
       <div id="cesium-credit-container" style={{ display: 'none' }}></div>
       
       <ResiumViewer 
@@ -39,9 +37,6 @@ export default function GoogleMap({ className, children}: GoogleMapProps) {
       >
         <Scene />
         
-        {/* VWorld 위성 이미지 베이스 레이어 - 제거됨 */}
-        
-        {/* Google Maps Photorealistic 3D Tiles */}
         <Cesium3DTileset
           url={googleTilesUrl}
           onReady={(tileset) => {
