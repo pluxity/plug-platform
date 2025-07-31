@@ -25,7 +25,7 @@ interface FacilityState {
   setSearchQuery: (query: string) => void
   performSearch: (query: string) => void
   clearSearch: () => void
-  selectSearchResult: (facility: BaseFacilityResponse) => void
+  selectSearchResult: () => void
   
   getAllFacilities: () => BaseFacilityResponse[]
   getFacilityById: (id: number) => BaseFacilityResponse | undefined
@@ -66,17 +66,23 @@ export const useFacilityStore = create<FacilityState>()(
         const allFacilities = Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
         
         const searchResults = allFacilities.filter((facility: BaseFacilityResponse) =>
-          facility.name.toLowerCase().includes(searchQuery)
+          facility.name.toLowerCase().includes(searchQuery) ||
+          facility.code.toLowerCase().includes(searchQuery) ||
+          (facility.description && facility.description.toLowerCase().includes(searchQuery))
         )
         
         set({ searchResults, searchQuery: query })
       },
       
-      clearSearch: () => set({ searchQuery: '', searchResults: [] }),
+      clearSearch: () => set({ 
+        searchQuery: '', 
+        searchResults: [], 
+        searchSelectedFacility: null 
+      }),
       
-      selectSearchResult: (facility) => {
+      selectSearchResult: () => {
+        // 검색 결과만 정리
         set({ 
-          searchSelectedFacility: facility,
           searchQuery: '',
           searchResults: []
         })
