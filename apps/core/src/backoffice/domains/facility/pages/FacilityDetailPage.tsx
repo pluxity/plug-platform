@@ -79,6 +79,7 @@ const FacilityDetailPage: React.FC = () => {
             thumbnailUploader={data.thumbnailUploader}
             drawingUploader={data.drawingUploader}
             history={historyData}
+            facilityType={facilityType}
           />
         </CardContent>
       </Card>

@@ -55,93 +55,15 @@ export interface FacilityTypeConfig {
   serviceHookName: string;
 }
 
-export const facilityTypeConfigs: Record<FacilityType, FacilityTypeConfig> = {
-  facilities: {
-    sections: [],
-    serviceHookName: "",
-    getInitialData: function () {
-      throw new Error("Function not implemented.");
-    },
-  },
-
-  buildings: {
-    sections: [
-      {
-        name: "floorInfo",
-        renderFunction: (data: FacilityCreateRequest) => {
-          const buildingData = data as BuildingDtos["CREATE_REQUEST"];
-          return <FloorInfoSection floors={buildingData.floors || []} />;
-        },
-        title: "",
-        required: false,
-      },
-    ],
-    serviceHookName: "useCreateBuilding",
-    getInitialData: () => ({
-      facility: {
-        name: "",
-        code: "",
-        drawingFileId: 0,
-        thumbnailFileId: 0,
-        description: "",
-      },
-      floors: [],
-    }),
-  },
-
-  stations: {
-    sections: [
-      {
-        name: "floorInfo",
-        renderFunction: (data: FacilityCreateRequest) => {
-          const buildingData = data as BuildingDtos["RESPONSE"];
-          return <FloorInfoSection floors={buildingData.floors || []} />;
-        },
-        title: "",
-        required: false,
-      },
-      {
-        name: "stationInfo",
-        renderFunction: (data: FacilityCreateRequest, handlers: DataHandlers) => {
-          const stationData = data as StationDtos["CREATE_REQUEST"];
-          return (
-            <StationInfoSection
-              stationInfo={{
-                stationCodes: stationData.stationInfo?.stationCodes,
-                lineIds: stationData.stationInfo?.lineIds,
-              }}
-              onStationCodesChange={handlers.onStationCodesChange || (() => {})}
-              onLineIdsChange={handlers.onLineIdsChange || (() => {})}
-            />
-          );
-        },
-        title: "",
-        required: false,
-      },
-    ],
-    getInitialData: () =>
-      ({
-        facility: {
-          name: "",
-          code: "",
-          drawingFileId: 0,
-          thumbnailFileId: 0,
-          description: "",
-        },
-        floors: [],
-        stationInfo: {
-          lineIds: [],
-          stationCodes: [],
-        },
-      }) as unknown as StationDtos["RESPONSE"],
-    serviceHookName: "useCreateStation",
-  },
-};
-
 class FacilityRegistryImpl {
-  private definitions = new Map<FacilityType, FacilityDefinition<FacilityCreateRequest>>();
+  private definitions = new Map<
+    FacilityType,
+    FacilityDefinition<FacilityCreateRequest>
+  >();
 
-  register<T extends FacilityCreateRequest>(definition: FacilityDefinition<T>): void {
+  register<T extends FacilityCreateRequest>(
+    definition: FacilityDefinition<T>,
+  ): void {
     if (this.definitions.has(definition.type)) {
       console.warn(
         `시설 유형 "${definition.type}"이 이미 등록되어 있습니다. 덮어씁니다.`,
@@ -154,7 +76,9 @@ class FacilityRegistryImpl {
     );
   }
 
-  get<T extends FacilityCreateRequest = FacilityCreateRequest>(type: FacilityType): FacilityDefinition<T> | undefined {
+  get<T extends FacilityCreateRequest = FacilityCreateRequest>(
+    type: string,
+  ): FacilityDefinition<T> | undefined {
     return this.definitions.get(type) as FacilityDefinition<T> | undefined;
   }
 
@@ -162,8 +86,10 @@ class FacilityRegistryImpl {
     return Array.from(this.definitions.values());
   }
 
-  getByName(name: string): FacilityDefinition<FacilityCreateRequest> | undefined {
-    return this.getAll().find(def => def.type === name);
+  getByName(
+    name: string,
+  ): FacilityDefinition<FacilityCreateRequest> | undefined {
+    return this.getAll().find((def) => def.type === name);
   }
 }
 

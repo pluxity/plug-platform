@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Input, Separator, Textarea } from "@plug/ui";
@@ -6,8 +7,7 @@ import { FacilityForm, FacilityFormItem } from "../form/FacilityFormComponent";
 import { PathInputModal } from "../modal/PathInputModal";
 import { DrawingUpdateModal } from "../modal/DrawingUpdateModal";
 import { FacilityRegistry } from "../../services/registry/FacilityRegistry";
-import { FloorInfoSection } from "../form/formOptions/FloorInfoSection";
-import { StationInfoSection } from "../form/formOptions/StationInfoSection";
+
 import {
   FacilityData,
   getThumbnail,
@@ -41,6 +41,7 @@ interface FacilityFormLayoutProps {
   drawingUploader?: ReturnType<typeof useFileUploadWithInfo>;
   history?: FacilityHistoryResponse[] | null;
   children?: React.ReactNode;
+  facilityType?: string;
 }
 
 export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
@@ -60,7 +61,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                                                                         thumbnailUploader,
                                                                         drawingUploader,
                                                                         history,
-                                                                        children
+                                                                        children,
+                                                                        facilityType
                                                                       }) => {
   const methods = useForm();
   const [isPathModalOpen, setIsPathModalOpen] = useState<boolean>(false);
@@ -78,12 +80,11 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
   const drawingInfo = facilityData ? getDrawingInfo(facilityData) : undefined;
   const facilityId = facilityData ? getFacilityId(facilityData) : undefined;
 
-  const facilityType =
-    isBuildingFacility(facilityData) ? "buildings" :
-      isStationFacility(facilityData) ? "stations" : undefined;
+  const detectedFacilityType = facilityType ||
+    (isBuildingFacility(facilityData) ? "buildings" :
+      isStationFacility(facilityData) ? "stations" : "buildings");
 
-  const facilityDefinition = facilityType ? FacilityRegistry.get(facilityType) : undefined;
-  const showFloorInfo = facilityDefinition?.showFloorInfo || false;
+  const facilityDefinition = detectedFacilityType ? FacilityRegistry.get(detectedFacilityType) : undefined;
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -134,6 +135,45 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
     if (onInputChange) {
       onInputChange("stationInfo.lineIds", lineIds);
     }
+  };
+
+  const renderFacilitySections = () => {
+    console.log('renderFacilitySections 호출됨', { detectedFacilityType, facilityDefinition });
+
+    if (!facilityDefinition || !facilityDefinition.sections) {
+      console.log('facilityDefinition 없음 또는 sections 없음');
+      return null;
+    }
+
+    const dataToUse = formData || facilityData;
+    if (!dataToUse) {
+      console.log('사용할 데이터 없음');
+      return null;
+    }
+
+    const sectionHandlers = {
+      onStationCodesChange: (isEditMode || isCreateMode) ? handleStationCodesChange : undefined,
+      onLineIdsChange: (isEditMode || isCreateMode) ? handleLineIdsChange : undefined,
+      onFloorsChange: undefined,
+    };
+
+    console.log('섹션 렌더링:', facilityDefinition.sections);
+
+    return facilityDefinition.sections.map(section => {
+      console.log('섹션 ID:', section.id);
+      return (
+        <div key={section.id} className="col-span-3">
+          {section.render({
+            data: dataToUse,
+            onChange: (newData) => {
+              console.log('섹션 데이터 변경됨:', newData);
+            },
+            handlers: sectionHandlers,
+            disabled: !(isEditMode || isCreateMode)
+          })}
+        </div>
+      );
+    });
   };
 
   if (isLoading) {
@@ -339,8 +379,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                       <span className="font-medium text-gray-800">
                         {getCreatedAt(facilityData)
                           ? new Date(
-                              getCreatedAt(facilityData) as string,
-                            ).toLocaleDateString("ko-KR")
+                            getCreatedAt(facilityData) as string,
+                          ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
                     </div>
@@ -362,8 +402,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                       <span className="font-medium text-gray-800">
                         {getUpdatedAt(facilityData)
                           ? new Date(
-                              getUpdatedAt(facilityData) as string,
-                            ).toLocaleDateString("ko-KR")
+                            getUpdatedAt(facilityData) as string,
+                          ).toLocaleDateString("ko-KR")
                           : "-"}
                       </span>
                     </div>
@@ -380,7 +420,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
 
             <FacilityFormItem label="도면" className="border-b col-span-3">
               {isCreateMode ? (
-                <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm">
+                <div className="flex items-center justify-between gap-2 border-y border-gray-100 py-2 rounded-sm w-full">
                   <div className="text-gray-500">
                     {actualDrawingUploader.fileInfo
                       ? `선택된 도면: ${actualDrawingUploader.fileInfo.originalFileName}`
@@ -505,8 +545,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
                                 <span className="font-medium text-gray-800">
                                   {historyItem.createdAt
                                     ? new Date(
-                                        historyItem.createdAt,
-                                      ).toLocaleString("ko-KR")
+                                      historyItem.createdAt,
+                                    ).toLocaleString("ko-KR")
                                     : "-"}
                                 </span>
                               </div>
@@ -599,25 +639,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
             </FacilityFormItem>
 
             {children}
-
-            {showFloorInfo && !isCreateMode && facilityData?.floors && (
-              <div className="col-span-3">
-                <FloorInfoSection floors={facilityData.floors || []} />
-              </div>
-            )}
-
-            {!isCreateMode && isStationFacility(facilityData) && (
-              <div className="col-span-3">
-                <StationInfoSection
-                  stationInfo={{
-                    stationCodes: facilityData.stationInfo?.stationCodes || [],
-                    lineIds: facilityData.stationInfo?.lineIds || []
-                  }}
-                  onStationCodesChange={isEditMode ? handleStationCodesChange : undefined}
-                  onLineIdsChange={isEditMode ? handleLineIdsChange : undefined}
-                />
-              </div>
-            )}
+            {renderFacilitySections()}
           </div>
 
           {formError && (
