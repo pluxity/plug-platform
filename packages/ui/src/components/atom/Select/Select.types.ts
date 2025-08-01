@@ -11,6 +11,7 @@ export interface SelectProps extends React.ComponentProps<typeof SelectPrimitive
     disabled?: boolean;
     required?: boolean;
     name?: string;
+    className?: string;
 }
 
 export interface SelectGroupProps extends React.ComponentProps<typeof SelectPrimitive.Group> {

@@ -34,7 +34,7 @@ const FacilityDetailPage: React.FC = () => {
   const { data, handlers } = useFacilityFormHandler({
     facilityType: facilityType,
     facilityId,
-    mode: "detail",
+    mode: "edit",
     onSaveSuccess: () => console.log("저장 성공"),
   });
 
@@ -63,11 +63,11 @@ const FacilityDetailPage: React.FC = () => {
   }
 
   return (
-    <PageContainer title={data.isEditMode ? `${typeTitle} 편집` : `${typeTitle} 상세 정보`}>
+    <PageContainer title={`${typeTitle} 상세 정보`}>
       <Card>
         <CardContent>
           <FacilityFormLayout
-            mode={data.isEditMode ? 'edit' : 'detail'}
+            mode={'edit'}
             facilityData={data?.facilityData as FacilityData || undefined}
             formData={data?.formData as FacilityData || undefined}
             isLoading={data.isLoading || historyLoading}

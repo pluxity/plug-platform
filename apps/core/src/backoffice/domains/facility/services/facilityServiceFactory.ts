@@ -11,6 +11,8 @@ export interface IFacilityService {
   delete(id: number): Promise<boolean>;
   updateDrawing(id: number, data: DrawingUpdateOptions): Promise<boolean>;
   updateFloors(id: number, floors: Floor[]): Promise<boolean>;
+  registerHook: (type: FacilityType, serviceName: string, id: number | null, hook: unknown) => void;
+  clearHook: (type: FacilityType, serviceName: string, id: number | null) => void;
 }
 
 export class FacilityServiceFactory {

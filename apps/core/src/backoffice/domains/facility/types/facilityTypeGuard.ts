@@ -1,7 +1,7 @@
 import { BuildingDtos, FileResponse, StationDtos, StationInfo } from "@plug/common-services";
 import { BaseFacilityResponse, BaseFacilityRequest } from "@plug/common-services";
 
-export type FacilityFormMode = 'create' | 'detail' | 'edit';
+export type FacilityFormMode = 'create' | 'edit';
 
 export type FacilityResponse = BuildingDtos['RESPONSE'] | StationDtos['RESPONSE'];
 export type FacilityCreateRequest = BuildingDtos['CREATE_REQUEST'] | StationDtos['CREATE_REQUEST'];
@@ -85,10 +85,10 @@ export const getUpdatedBy = (data: FacilityData): string | undefined => {
 };
 
 export const updateFacilityField = (
-  data: FacilityFormData, 
+  data: FacilityUpdateRequest,
   path: string, 
   value: string | number | boolean | string[] | number[],
-): FacilityFormData => {
+): FacilityUpdateRequest => {
   const result = { ...data };
   const parts = path.split('.');
 

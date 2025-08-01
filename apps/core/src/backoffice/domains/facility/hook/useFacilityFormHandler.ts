@@ -1,8 +1,21 @@
 import { useEffect, useState } from "react";
-import {useFileUploadWithInfo, useUpdateFacilitiesDrawing} from "@plug/common-services";
-import { FacilityData, FacilityFormData, FacilityFormMode, updateFacilityField } from "../types/facilityTypeGuard";
+import {
+  useFileUploadWithInfo,
+  useUpdateFacilitiesDrawing,
+  Floor,
+  FacilityRequest,
+  StationInfo
+} from "@plug/common-services";
+import {
+  FacilityFormData,
+  FacilityFormMode,
+  FacilityResponse,
+  FacilityUpdateRequest,
+  updateFacilityField
+} from "../types/facilityTypeGuard";
 import { FacilityType, DrawingUpdateOptions } from "../types/facilityTypes";
 import { FacilityServiceFactory } from "../services/facilityServiceFactory";
+import { BaseFacilityRequest } from "@plug/common-services";
 
 interface FacilityFormHandlerProps {
   facilityType: FacilityType;
@@ -13,7 +26,7 @@ interface FacilityFormHandlerProps {
 }
 
 interface FacilityFormState {
-  facilityData?: FacilityData;
+  facilityData?: FacilityResponse;
   formData?: FacilityFormData;
   isLoading: boolean;
   error: Error | null;
@@ -33,6 +46,11 @@ interface FacilityFormHandlers {
   handleDelete: () => Promise<void>;
 }
 
+interface FacilityRequestFacility extends BaseFacilityRequest {
+  thumbnailFileId?: number;
+  drawingFileId?: number;
+}
+
 export function useFacilityFormHandler({
                                          facilityType,
                                          facilityId,
@@ -49,9 +67,9 @@ export function useFacilityFormHandler({
     thumbnailUploader: useFileUploadWithInfo(),
     drawingUploader: useFileUploadWithInfo()
   });
-  const drawingUpdateApi =  useUpdateFacilitiesDrawing(facilityId);
+  const drawingUpdateApi = useUpdateFacilitiesDrawing(facilityId || 1);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       if (!facilityType) return;
 
@@ -65,7 +83,7 @@ export function useFacilityFormHandler({
           if (data) {
             setFormState(prev => ({
               ...prev,
-              facilityData: data,
+              facilityData: data as FacilityResponse,
               formData: data as FacilityFormData,
               isLoading: false
             }));
@@ -137,44 +155,43 @@ export function useFacilityFormHandler({
   };
 
   const handleUpdateDrawing = async (data: DrawingUpdateOptions) => {
-        if (!facilityId ) {
-            console.error("도면 업데이트를 위한 시설 ID가 없거나 API가 초기화되지 않았습니다.");
-            return;
+    if (!facilityId) {
+      console.error("도면 업데이트를 위한 시설 ID가 없거나 API가 초기화되지 않았습니다.");
+      return;
+    }
+
+    setFormState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const response = await drawingUpdateApi.execute(data);
+
+      if (response) {
+        const facilityService = FacilityServiceFactory.getService(facilityType);
+        const updatedData = await facilityService.fetchDetail(facilityId);
+
+        if (updatedData) {
+          setFormState(prev => ({
+            ...prev,
+            facilityData: updatedData as FacilityResponse,
+            formData: updatedData as FacilityFormData,
+            isLoading: false
+          }));
+        } else {
+          throw new Error("업데이트된 시설물 데이터를 찾을 수 없습니다.");
         }
-
-        setFormState(prev => ({ ...prev, isLoading: true, error: null }));
-
-        try {
-            const response = await drawingUpdateApi.execute(data);
-
-            if (response) {
-                const facilityService = FacilityServiceFactory.getService(facilityType);
-                const updatedData = await facilityService.fetchDetail(facilityId);
-
-                if (updatedData) {
-                    setFormState(prev => ({
-                        ...prev,
-                        facilityData: updatedData,
-                        formData: updatedData as FacilityFormData,
-                        isLoading: false
-                    }));
-                } else {
-                    throw new Error("업데이트된 시설물 데이터를 찾을 수 없습니다.");
-                }
-            } else {
-                throw new Error("도면 업데이트에 실패했습니다.");
-            }
-
-        } catch (err) {
-            console.error("도면 업데이트 실패:", err);
-            setFormState(prev => ({
-                ...prev,
-                error: err as Error,
-                isLoading: false
-            }));
-            throw err;
-        }
-    };
+      } else {
+        throw new Error("도면 업데이트에 실패했습니다.");
+      }
+    } catch (err) {
+      console.error("도면 업데이트 실패:", err);
+      setFormState(prev => ({
+        ...prev,
+        error: err as Error,
+        isLoading: false
+      }));
+      throw err;
+    }
+  };
 
   const handleSave = async () => {
     if (!facilityType || !formState.formData) return;
@@ -184,11 +201,12 @@ export function useFacilityFormHandler({
     try {
       const facilityService = FacilityServiceFactory.getService(facilityType);
       let success = false;
+      const requestData = transformFormDataToRequest(formState.formData);
 
       if (facilityId) {
-        success = await facilityService.update(facilityId, formState.formData);
+        success = await facilityService.update(facilityId, requestData);
       } else {
-        success = await facilityService.create(formState.formData);
+        success = await facilityService.create(requestData);
       }
 
       if (success) {
@@ -208,6 +226,50 @@ export function useFacilityFormHandler({
         isLoading: false
       }));
     }
+  };
+
+  const transformFormDataToRequest = (formData: FacilityUpdateRequest): FacilityRequest => {
+    const facilityData = formData.facility || {};
+
+    const requestFacility: FacilityRequestFacility = {
+      name: facilityData.name || '',
+      code: facilityData.code || '',
+      description: facilityData.description || '',
+      lon: facilityData.lon,
+      lat: facilityData.lat,
+      locationMeta: facilityData.locationMeta || '{}'
+    };
+
+    if ('thumbnailFileId' in facilityData && facilityData.thumbnailFileId) {
+      requestFacility.thumbnailFileId = facilityData.thumbnailFileId as number;
+    }
+
+    if ('drawingFileId' in facilityData && facilityData.drawingFileId) {
+      requestFacility.drawingFileId = facilityData.drawingFileId as number;
+    }
+
+    const requestData: FacilityRequest = {
+      facility: requestFacility as BaseFacilityRequest
+    };
+
+    if (facilityType === 'buildings' && 'floors' in formData && formData.floors) {
+      requestData.floors = formData.floors as Floor[];
+    }
+
+    if (facilityType === 'stations') {
+      if ('floors' in formData && formData.floors) {
+        requestData.floors = formData.floors as Floor[];
+      }
+
+      if ('stationInfo' in formData && formData.stationInfo) {
+        requestData.stationInfo = {
+          lineIds: formData.stationInfo.lineIds || [],
+          stationCodes: formData.stationInfo.stationCodes || []
+        } as StationInfo;
+      }
+    }
+
+    return requestData;
   };
 
   const handleEditToggle = () => {

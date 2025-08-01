@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFacilitiesAllSWR, useDeletion } from "@plug/common-services";
 import { FacilityItem, SortOptions } from "./CardListType";
-import { FacilityType, useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
+import {  useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { FacilityCardListProps } from "@/backoffice/domains/facility/types/facilityCards";
 import {
   filterFacilities,
@@ -10,6 +10,7 @@ import {
   mapFacilityData,
   sortFacilities
 } from "@/backoffice/domains/facility/services/utils/facilityUtils";
+import { FacilityType } from "@/backoffice/domains/facility/types/facilityTypes";
 
 export const SEARCH_FIELDS = ["name", "code", "description", "createdBy"];
 
@@ -195,10 +196,10 @@ export const FacilityCardList: React.FC<FacilityCardListProps> = ({ initialType,
 
   const sortOptionsList = useMemo(
     () => [
-      { label: "생성자 (오름차순)", value: "createdBy_asc" },
-      { label: "생성자 (내림차순)", value: "createdBy_desc" },
       { label: "생성일 (최신순)", value: "createdAt_desc" },
       { label: "생성일 (오래된순)", value: "createdAt_asc" },
+      { label: "생성자 (오름차순)", value: "createdBy_asc" },
+      { label: "생성자 (내림차순)", value: "createdBy_desc" },
       { label: "이름 (가나다순)", value: "name_asc" },
       { label: "이름 (역순)", value: "name_desc" },
     ],

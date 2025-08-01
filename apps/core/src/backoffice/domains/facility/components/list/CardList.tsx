@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Card, CardContent, Button, FilterBar } from "@plug/ui";
 import { useSearchParams } from "react-router-dom";
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { FacilityCardListProps, FacilityItem } from "./CardListType";
 import { PaginationComponent } from "./PaginationComponent";
 
@@ -149,15 +149,6 @@ export function CardList<T extends FacilityItem>({ dataResponse, filterData, ren
       </div>
       <div className="absolute bottom-0 right-0 px-4 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full bg-white/70 backdrop-blur-sm hover:bg-white/90 border-transparent"
-            onClick={(e) => {e.stopPropagation(); actions.onEdit(item);}}
-          >
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">수정</span>
-          </Button>
           <Button
             variant="outline"
             size="icon"
