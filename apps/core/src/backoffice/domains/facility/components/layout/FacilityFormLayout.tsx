@@ -320,7 +320,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                   required
                 />
               ) : (
-                <div className="py-2">{facilityData?.facility?.name}</div>
+                <p>{facilityData?.facility?.name}</p>
               )}
             </FacilityFormItem>
 
@@ -343,7 +343,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
             {!isCreateMode && facilityData && "facility" in facilityData && (
               <>
                 <FacilityFormItem label="생성" className="col-span-2">
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 py-2">
                     <div>
                       <span className="text-gray-500 mr-7 text-sm">
                         최초 생성일
@@ -448,25 +448,29 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                 <div className="flex flex-col w-full gap-2">
                   <div className="flex justify-between items-center">
                     {drawingInfo ? (
-                      <div className="flex flex-1 items-center gap-2">
-                        <span className="text-gray-500">도면 파일:</span>
-                        <span className="font-medium text-gray-800">
+                      <div className="flex flex-1 items-center justify-between gap-2">
+                        <div>
+                          <span className="text-gray-500">도면 파일:</span>
+                          <span className="font-medium text-gray-800">
                           {drawingInfo.originalFileName}
                         </span>
-                        <Button
-                          className="ml-2"
-                          variant="outline"
-                          onClick={() => window.open(drawingInfo.url, "_blank")}
-                        >
-                          다운로드
-                        </Button>
-                        <Button
-                          className="ml-2"
-                          variant="default"
-                          onClick={() => setIsDrawingModalOpen(true)}
-                        >
-                          도면 업데이트
-                        </Button>
+                        </div>
+                        <div>
+                          <Button
+                              className="ml-2"
+                              variant="default"
+                              onClick={() => window.open(drawingInfo.url, "_blank")}
+                          >
+                            다운로드
+                          </Button>
+                          <Button
+                              className="ml-2"
+                              variant="secondary"
+                              onClick={() => setIsDrawingModalOpen(true)}
+                          >
+                            도면 업데이트
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center gap-2">
@@ -484,9 +488,8 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                     {history && history.length > 0 && (
                       <Button
                         variant="outline"
-                        size="sm"
                         onClick={toggleHistoryView}
-                        className="ml-auto"
+                        className="ml-2"
                       >
                         {showHistory ? "변경 이력 숨기기" : "변경 이력 보기"}
                       </Button>
@@ -602,7 +605,7 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, fa
                   <Button
                     type="button"
                     onClick={() => setIsPathModalOpen(true)}
-                    className="whitespace-nowrap hover:bg-blue-700 text-white px-4 py-2 "
+                    className="whitespace-nowrap hover:bg-blue-700 text-white px-4"
                   >
                     {facilityData?.facility?.lat ? "경로 수정" : "경로 추가"}
                   </Button>
