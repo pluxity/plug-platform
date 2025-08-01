@@ -1,5 +1,4 @@
-import { UseApiResponse, UseSWRApiReturn } from "@plug/api-hooks";
-import { BuildingDtos, FileResponse, StationDtos } from "@plug/common-services";
+import { BuildingDtos, FileResponse, StationDtos, StationInfo } from "@plug/common-services";
 import { BaseFacilityResponse, BaseFacilityRequest } from "@plug/common-services";
 
 export type FacilityFormMode = 'create' | 'detail' | 'edit';
@@ -153,9 +152,6 @@ export const isStationFacility = (data: unknown): data is StationDtos['RESPONSE'
   return isStationResponse(data) || isStationCreateRequest(data);
 };
 
-export function isApiHookResult<T = any, P = any>(result: any): result is UseApiResponse<T, P> {
-  return result && typeof result.execute === 'function' && 'isSuccess' in result;
-}
-export function isSWRHookResult<T = any>(result: any): result is UseSWRApiReturn<T> {
-  return result && typeof result.mutate === 'function' && !('isSuccess' in result);
+export function hasStationInfo(data: FacilityData): data is FacilityData & { stationInfo: StationInfo } {
+  return 'stationInfo' in data;
 }

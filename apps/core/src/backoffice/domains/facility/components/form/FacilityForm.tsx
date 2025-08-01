@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Card, CardContent } from "@plug/ui";
-import { FacilityType } from "../../store/FacilityListStore";
 import { useNavigate } from "react-router-dom";
 import { FacilityFormLayout } from "../layout/FacilityFormLayout";
-import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
+import { useFacilityFormHandler } from "../../hook/useFacilityFormHandler";
+import { useRegisterFacilityHooks } from "@/backoffice/domains/facility/hook/useFacilityFactory";
+import { FacilityType } from "@/backoffice/domains/facility/types/facilityTypes";
 
 interface FacilityFormProps {
   facilityType: FacilityType;
@@ -12,8 +13,15 @@ interface FacilityFormProps {
   facilityId?: number;
 }
 
-export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSaveSuccess, initialData, facilityId }) => {
+export const FacilityForm: React.FC<FacilityFormProps> = ({
+                                                            facilityType,
+                                                            onSaveSuccess,
+                                                            initialData,
+                                                            facilityId
+                                                          }) => {
   const navigate = useNavigate();
+
+  useRegisterFacilityHooks(facilityType, facilityId);
 
   const { data, handlers } = useFacilityFormHandler({
     facilityType,
@@ -22,10 +30,6 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({ facilityType, onSave
     initialData,
     onSaveSuccess
   });
-
-  useEffect(() => {
-    console.log('FacilityForm - facilityType:', facilityType);
-  }, [facilityType]);
 
   return (
     <Card>

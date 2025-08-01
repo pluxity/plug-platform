@@ -1,9 +1,15 @@
 import React, { useMemo } from "react";
 import { Button } from "@plug/ui";
-import { FacilityType } from "../../store/FacilityListStore";
-import { FacilityRegistry } from "@/backoffice/domains/facility/services/registry/FacilityRegistry";
+import { FacilityType } from "../../types/facilityTypes";
+import { FacilityServiceFactory } from "../../services/facilityServiceFactory";
 import { House } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+
+interface TabDefinition {
+  id: string;
+  label: string;
+  icon: () => React.ReactNode;
+}
 
 interface FacilityLayoutProps {
   children: React.ReactNode;
@@ -17,17 +23,23 @@ interface FacilityLayoutProps {
 
 export const FacilityTabLayout: React.FC<FacilityLayoutProps> = ({ children, activeTab, setActiveTab, showButton = true, buttonText = "시설 추가", onButtonClick, hideFirstTab = false }) => {
   const tabs = useMemo(() => {
-    const defaultTab = {
+    const defaultTab: TabDefinition = {
       id: 'facilities',
       label: '시설 전체',
       icon: () => (<House/>)
     };
 
-    const registeredTabs = FacilityRegistry.getAll().map(def => ({
-      id: def.type,
-      label: def.displayName,
-      icon: def.icon || defaultTab.icon
-    }));
+    const registeredTabs = FacilityServiceFactory.getSupportedTypes().map((type: FacilityType) => {
+      const displayName = type === 'buildings' ? '건물' :
+        type === 'stations' ? '역사' : type;
+
+      return {
+        id: type,
+        label: displayName,
+        icon: defaultTab.icon
+      };
+    });
+
     return [defaultTab, ...registeredTabs];
   }, []);
 
@@ -49,7 +61,7 @@ export const FacilityTabLayout: React.FC<FacilityLayoutProps> = ({ children, act
     <div className="space-y-6">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-wrap">
-          {visibleTabs.map(tab => {
+          {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button

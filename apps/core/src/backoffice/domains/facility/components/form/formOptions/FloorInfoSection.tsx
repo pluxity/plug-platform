@@ -1,18 +1,20 @@
 import React from "react";
-import { Floor } from "@plug/common-services";
+import { FacilityData } from "../../../types/facilityTypeGuard";
 
 interface FloorInfoSectionProps {
-  floors: Floor[];
+  data: FacilityData;
 }
 
-export const FloorInfoSection: React.FC<FloorInfoSectionProps> = ({ floors }) => {
+export const FloorInfoSection: React.FC<FloorInfoSectionProps> = ({ data }) => {
+  const floors = data.floors || [];
+
   return (
     <>
-      <div className="col-span-2 p-4 bg-gray-50 flex items-center gap-2 border-b">
+      <div className="col-span-3 p-4 bg-gray-50 flex items-center gap-2 border-b">
         <div className="w-1 h-6 bg-blue-600"></div>
-        <h3 className="text-lg font-medium">층 정보 입력</h3>
+        <h3 className="text-lg font-medium">층 정보</h3>
       </div>
-      <div className="col-span-2 p-4 border-b">
+      <div className="col-span-3 p-4 border-b">
         <div className="flex flex-wrap gap-2">
           {floors && floors.length > 0 ? (
             floors.map((floor, index) => (

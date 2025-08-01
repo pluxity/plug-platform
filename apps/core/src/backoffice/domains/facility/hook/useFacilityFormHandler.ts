@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { FacilityManager } from "../services/facilityManager";
-import { useFileUploadWithInfo, Floor, FacilityDrawingUpdateRequest, useUpdateFacilitiesDrawing } from "@plug/common-services";
-import { useFacilityDetail, useFacilityCreate, useFacilityUpdate } from "./useFacilityHooks";
-import { FacilityData, FacilityFormData, FacilityFormMode } from "../types/facilityTypeGuard";
-import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
+import { useFileUploadWithInfo,  } from "@plug/common-services";
+import { FacilityData, FacilityFormData, FacilityFormMode, updateFacilityField } from "../types/facilityTypeGuard";
+import { FacilityType, DrawingUpdateOptions } from "../types/facilityTypes";
+import { FacilityServiceFactory } from "../services/facilityServiceFactory";
 
 interface FacilityFormHandlerProps {
   facilityType: FacilityType;
@@ -13,42 +12,30 @@ interface FacilityFormHandlerProps {
   onSaveSuccess?: () => void;
 }
 
-export function useFacilityFormHandler({
-  facilityType,
-  facilityId,
-  mode,
-  initialData,
-  onSaveSuccess
-}: FacilityFormHandlerProps) {
-  const [formData, setFormData] = useState<FacilityFormData | null>(null);
+export function useFacilityFormHandler({ facilityType, facilityId, mode, initialData, onSaveSuccess }: FacilityFormHandlerProps) {
+  const [formData, setFormData] = useState<FacilityFormData | undefined>(undefined);
+  const [facilityData, setFacilityData] = useState<FacilityData | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(mode === 'edit');
-  const [facilityData, setFacilityData] = useState<FacilityData | null>(null);
 
   const thumbnailUploader = useFileUploadWithInfo();
   const drawingUploader = useFileUploadWithInfo();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const drawingUpdateService = facilityId ? useUpdateFacilitiesDrawing(facilityId) : null;
-  useFacilityDetail(facilityType, facilityId || 0);
-  useFacilityCreate(facilityType);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (facilityId) useFacilityUpdate(facilityType, facilityId);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!facilityType) return;
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
         if (facilityId) {
-
-          const data = await FacilityManager.fetchFacilityDetail<FacilityData>(facilityType, facilityId);
+          const facilityService = FacilityServiceFactory.getService(facilityType);
+          const data = await facilityService.fetchDetail(facilityId);
           if (data) {
             setFacilityData(data);
-            setFormData(data as unknown as FacilityFormData);
+            setFormData(data as FacilityFormData);
           }
         } else if (initialData) {
           setFormData(initialData as FacilityFormData);
@@ -66,8 +53,13 @@ export function useFacilityFormHandler({
     fetchData();
   }, [facilityType, facilityId, initialData]);
 
-  const handleInputChange = (key: string, value: any) => {
-    setFormData(prev => prev ? { ...prev, [key]: value } : { [key]: value });
+  type FormDataValue = string | number | boolean;
+
+  const handleInputChange = (key: string, value: FormDataValue) => {
+    setFormData((prev) => {
+      if (!prev) return { [key]: value } as unknown as FacilityFormData;
+      return updateFacilityField(prev, key, value);
+    });
   };
 
   const handleThumbnailUpload = async (file: File) => {
@@ -91,26 +83,36 @@ export function useFacilityFormHandler({
       console.error("도면 업로드 실패:", err);
     }
   };
-  const handleUpdateDrawing = async (data: FacilityDrawingUpdateRequest, floors: Floor[]) => {
-    if (!drawingUpdateService || !facilityId) {
-      console.error("도면 업데이트 서비스를 사용할 수 없습니다.");
+
+  const handleUpdateDrawing = async (data: DrawingUpdateOptions) => {
+    if (!facilityId) {
+      console.error("도면 업데이트를 위한 시설 ID가 없습니다.");
       return;
     }
 
     try {
-      await drawingUpdateService.execute({
-        ...data,
-        floors: floors
-      });
+      setIsLoading(true);
+      const facilityService = FacilityServiceFactory.getService(facilityType);
 
-      const updatedData = await FacilityManager.fetchFacilityDetail<FacilityData>(facilityType, facilityId);
-      if (updatedData) {
-        setFacilityData(updatedData);
-        setFormData(updatedData as unknown as FacilityFormData);
+      if (!facilityService.updateDrawing) {
+        throw new Error(`${facilityType} 타입은 도면 업데이트를 지원하지 않습니다.`);
+      }
+
+      const success = await facilityService.updateDrawing(facilityId, data);
+
+      if (success) {
+        const updatedData = await facilityService.fetchDetail(facilityId);
+        if (updatedData) {
+          setFacilityData(updatedData);
+          setFormData(updatedData as FacilityFormData);
+        }
       }
     } catch (err) {
+      setError(err as Error);
       console.error("도면 업데이트 실패:", err);
       throw err;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -121,12 +123,13 @@ export function useFacilityFormHandler({
     setError(null);
 
     try {
+      const facilityService = FacilityServiceFactory.getService(facilityType);
       let success = false;
-      
+
       if (facilityId) {
-        success = await FacilityManager.updateFacility(facilityType, facilityId, formData);
+        success = await facilityService.update(facilityId, formData);
       } else {
-        success = await FacilityManager.createFacility(facilityType, formData);
+        success = await facilityService.create(formData);
       }
 
       if (success && onSaveSuccess) {
@@ -155,7 +158,9 @@ export function useFacilityFormHandler({
     setError(null);
 
     try {
-      const success = await FacilityManager.deleteFacility(facilityType, facilityId);
+      const facilityService = FacilityServiceFactory.getService(facilityType);
+      const success = await facilityService.delete(facilityId);
+
       if (success && onSaveSuccess) {
         onSaveSuccess();
       }

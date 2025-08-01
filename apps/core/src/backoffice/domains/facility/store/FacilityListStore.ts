@@ -1,20 +1,36 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { persist } from 'zustand/middleware';
-import { FacilityRegistry } from "@/backoffice/domains/facility/services/registry/FacilityRegistry";
+import { persist } from "zustand/middleware";
+import { FacilityType } from "../types/facilityTypes";
 
-export type FacilityType = 'facilities' | 'buildings' | 'stations';
+interface FacilityDefinition {
+  type: FacilityType;
+  displayName: string;
+}
+
+class FacilityRegistryImpl {
+  private definitions: FacilityDefinition[] = [
+    { type: 'buildings', displayName: '빌딩' },
+    { type: 'stations', displayName: '역사' }
+  ];
+
+  getAll(): FacilityDefinition[] {
+    return this.definitions;
+  }
+}
+
+const FacilityRegistry = new FacilityRegistryImpl();
 
 export const getFacilityTypeLabels = (): Record<FacilityType, string> => {
   const labels: Record<string, string> = {
     'facilities': '시설 전체',
   };
 
-  FacilityRegistry.getAll().forEach(def => {
+  FacilityRegistry.getAll().forEach((def: FacilityDefinition) => {
     labels[def.type] = def.displayName;
   });
 
-  return labels;
+  return labels as Record<FacilityType, string>;
 };
 
 export const getFacilityButtonLabels = (): Record<FacilityType, string> => {
@@ -22,11 +38,11 @@ export const getFacilityButtonLabels = (): Record<FacilityType, string> => {
     'facilities': '시설 추가',
   };
 
-  FacilityRegistry.getAll().forEach(def => {
+  FacilityRegistry.getAll().forEach((def: FacilityDefinition) => {
     labels[def.type] = `${def.displayName} 추가`;
   });
 
-  return labels;
+  return labels as Record<FacilityType, string>;
 };
 
 export const FACILITY_TYPE_LABELS = getFacilityTypeLabels();

@@ -4,9 +4,9 @@ import { Card, CardContent } from "@plug/ui";
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { FacilityFormLayout } from "@/backoffice/domains/facility/components/layout/FacilityFormLayout";
 import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
-import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
 import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
 import { useHistory } from "@plug/common-services";
+import { FacilityType } from "@/backoffice/domains/facility/types/facilityTypes";
 
 const FacilityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

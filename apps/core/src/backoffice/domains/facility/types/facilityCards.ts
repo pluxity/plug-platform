@@ -1,6 +1,6 @@
 import React from "react";
 import { FacilityItem, StandardizedResponse } from "@/backoffice/domains/facility/components/list/CardListType";
-import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
+import { FacilityType } from "@/backoffice/domains/facility/types/facilityTypes";
 
 export interface FacilityAction {
   onView: (item: FacilityItem) => void;

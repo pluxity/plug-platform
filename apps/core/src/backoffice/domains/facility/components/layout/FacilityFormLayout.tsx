@@ -1,27 +1,15 @@
-
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Input, Separator, Textarea } from "@plug/ui";
 import { useFileUploadWithInfo, Floor, FacilityDrawingUpdateRequest, FacilityHistoryResponse } from "@plug/common-services";
-import { FacilityForm, FacilityFormItem } from "../form/FacilityFormComponent";
+import { FacilityForm, FacilityFormItem } from "../form/FacilityFormField";
 import { PathInputModal } from "../modal/PathInputModal";
 import { DrawingUpdateModal } from "../modal/DrawingUpdateModal";
-import { FacilityRegistry } from "../../services/registry/FacilityRegistry";
-
-import {
-  FacilityData,
-  getThumbnail,
-  getFacilityId,
-  getCreatedAt,
-  getCreatedBy,
-  getUpdatedAt,
-  getUpdatedBy,
-  getDrawingInfo,
-  isBuildingFacility,
-  isStationFacility
-} from "@/backoffice/domains/facility/types/facilityTypeGuard";
-
-export type FacilityFormMode = 'create' | 'detail' | 'edit';
+import { FloorInfoSection } from "../form/formOptions/FloorInfoSection";
+import { StationInfoSection } from "../form/formOptions/StationInfoSection";
+import { FacilityData, getThumbnail, getFacilityId, getCreatedAt, getCreatedBy, getUpdatedAt, getUpdatedBy, getDrawingInfo, isBuildingFacility, isStationFacility, FacilityFormMode } from "../../types/facilityTypeGuard";
+import { FacilityType, DrawingUpdateOptions } from "../../types/facilityTypes";
+import { FacilityServiceFactory } from "../../services/facilityServiceFactory";
 
 interface FacilityFormLayoutProps {
   mode: FacilityFormMode;
@@ -29,10 +17,10 @@ interface FacilityFormLayoutProps {
   formData?: FacilityData;
   isLoading?: boolean;
   error?: Error | null;
-  onInputChange?: (field: string, value: string | number | boolean | string[] | number[]) => void;
+  onInputChange?: (field: string, value: string | number | string[] | number[]) => void;
   onThumbnailUpload?: (file: File) => Promise<void>;
   onDrawingUpload?: (file: File) => Promise<void>;
-  onUpdateDrawing?: (data: FacilityDrawingUpdateRequest, floors: Floor[]) => Promise<void>;
+  onUpdateDrawing?: (data: DrawingUpdateOptions, floors?: Floor[]) => Promise<void>;
   onSave?: () => Promise<void>;
   onDelete?: () => Promise<void>;
   onBack?: () => void;
@@ -41,29 +29,10 @@ interface FacilityFormLayoutProps {
   drawingUploader?: ReturnType<typeof useFileUploadWithInfo>;
   history?: FacilityHistoryResponse[] | null;
   children?: React.ReactNode;
-  facilityType?: string;
+  facilityType?: FacilityType;
 }
 
-export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
-                                                                        mode,
-                                                                        facilityData,
-                                                                        formData,
-                                                                        isLoading,
-                                                                        error,
-                                                                        onInputChange,
-                                                                        onThumbnailUpload,
-                                                                        onDrawingUpload,
-                                                                        onUpdateDrawing,
-                                                                        onSave,
-                                                                        onDelete,
-                                                                        onBack,
-                                                                        onEditToggle,
-                                                                        thumbnailUploader,
-                                                                        drawingUploader,
-                                                                        history,
-                                                                        children,
-                                                                        facilityType
-                                                                      }) => {
+export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({ mode, facilityData, formData, isLoading, error, onInputChange, onThumbnailUpload, onDrawingUpload, onUpdateDrawing, onSave, onDelete, onBack, onEditToggle, thumbnailUploader, drawingUploader, history, children, facilityType }) => {
   const methods = useForm();
   const [isPathModalOpen, setIsPathModalOpen] = useState<boolean>(false);
   const [isDrawingModalOpen, setIsDrawingModalOpen] = useState<boolean>(false);
@@ -85,9 +54,6 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
       isStationFacility(facilityData) ? "stations" : "buildings");
 
   console.log('감지된 시설 유형:', detectedFacilityType, '전달된 facilityType:', facilityType);
-
-  const facilityDefinition = detectedFacilityType ? FacilityRegistry.get(detectedFacilityType) : undefined;
-  console.log('facilityDefinition:', facilityDefinition?.type, '섹션 수:', facilityDefinition?.sections?.length);
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -141,10 +107,10 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
   };
 
   const renderFacilitySections = () => {
-    console.log('renderFacilitySections 호출됨', { detectedFacilityType, facilityDefinition });
+    console.log('renderFacilitySections 호출됨', { detectedFacilityType });
 
-    if (!facilityDefinition || !facilityDefinition.sections) {
-      console.log('facilityDefinition 없음 또는 sections 없음');
+    if (!detectedFacilityType || !FacilityServiceFactory.supportsFacilityType(detectedFacilityType)) {
+      console.log('지원되지 않는 시설 타입:', detectedFacilityType);
       return null;
     }
 
@@ -160,24 +126,26 @@ export const FacilityFormLayout: React.FC<FacilityFormLayoutProps> = ({
       onFloorsChange: undefined,
     };
 
-    console.log('섹션 렌더링:', facilityDefinition.sections);
-
-    return facilityDefinition.sections.map(section => {
-      console.log('섹션 ID:', section.id);
-      return (
-        <div key={section.id} className="col-span-3">
-          {section.render({
-            data: dataToUse,
-            onChange: (newData) => {
-              console.log('섹션 데이터 변경됨:', newData);
-            },
-            handlers: sectionHandlers,
-            disabled: !(isEditMode || isCreateMode),
-            mode: mode
-          })}
-        </div>
-      );
-    });
+    switch (detectedFacilityType) {
+      case 'buildings':
+        return (
+          <FloorInfoSection data={dataToUse} />
+        );
+      case 'stations':
+        return (
+          <>
+            <FloorInfoSection data={dataToUse} />
+            <StationInfoSection
+              data={dataToUse}
+              handlers={sectionHandlers}
+              disabled={!(isEditMode || isCreateMode)}
+              mode={mode}
+            />
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
   if (isLoading) {

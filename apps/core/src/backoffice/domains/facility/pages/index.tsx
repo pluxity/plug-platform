@@ -2,23 +2,18 @@ import React, { useEffect, useState, useCallback } from "react";
 import { PageContainer } from "@/backoffice/common/view/layouts";
 import { FacilityTabLayout } from "../components/layout/FacilityTabLayout";
 import { useLocation } from "react-router-dom";
-import { useFacilityListStore, FacilityType, FACILITY_BUTTON_LABELS } from "../store/FacilityListStore";
+import { useFacilityListStore, FACILITY_BUTTON_LABELS } from "../store/FacilityListStore";
+import { FacilityType } from "../types/facilityTypes";
 import { FacilityCardList } from "@/backoffice/domains/facility/components/list/FacilityCardListRenderer";
 import { CardList } from "@/backoffice/domains/facility/components/list/CardList";
 import { FacilityForm } from "@/backoffice/domains/facility/components/form/FacilityForm";
-import { initializeFacilityDefinitions } from "@/backoffice/domains/facility/services/registry/FacilityDefinitionFactory";
 
 const FacilityManagement: React.FC = () => {
-
   const [activeTab, setActiveTab] = useState<FacilityType>("facilities");
   const [isCreateMode, setIsCreateMode] = useState(false);
   const location = useLocation();
   const previousPathRef = React.useRef<string | null>(null);
   const { setSelectedType } = useFacilityListStore();
-
-  useEffect(() => {
-    initializeFacilityDefinitions();
-  }, []);
 
   useEffect(() => {
     if (previousPathRef.current !== location.pathname && location.pathname === '/admin/facility') {
@@ -37,7 +32,6 @@ const FacilityManagement: React.FC = () => {
     }
   }, [isCreateMode, activeTab, setActiveTab, setSelectedType]);
 
-
   const handleTabChange = useCallback((tab: FacilityType) => {
     setActiveTab(tab);
     setSelectedType(tab);
@@ -54,7 +48,8 @@ const FacilityManagement: React.FC = () => {
       return "시설 목록";
     }
 
-    return FACILITY_BUTTON_LABELS[activeTab];
+    const buttonLabel = FACILITY_BUTTON_LABELS[activeTab as keyof typeof FACILITY_BUTTON_LABELS];
+    return buttonLabel || "시설 추가";
   }, [isCreateMode, activeTab]);
 
   const renderCreateForm = useCallback(() => {
@@ -78,13 +73,19 @@ const FacilityManagement: React.FC = () => {
     }
   }, [activeTab, setIsCreateMode]);
 
-
-
   const renderListComponent = useCallback(() => {
     return (
       <FacilityCardList initialType={activeTab}>
         {({ standardizedData, filterFacilities, actions, filterOptions, emptyStateAction, renderOptions }) => (
-          <CardList dataResponse={standardizedData} filterData={filterFacilities} actions={actions} filterOptions={filterOptions} emptyStateAction={emptyStateAction} pageSize={8} renderOptions={renderOptions} />
+          <CardList
+            dataResponse={standardizedData}
+            filterData={filterFacilities}
+            actions={actions}
+            filterOptions={filterOptions}
+            emptyStateAction={emptyStateAction}
+            pageSize={8}
+            renderOptions={renderOptions}
+          />
         )}
       </FacilityCardList>
     );

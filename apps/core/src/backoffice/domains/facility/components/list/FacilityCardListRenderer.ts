@@ -3,8 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useFacilitiesAllSWR, useDeletion } from "@plug/common-services";
 import { FacilityItem, SortOptions } from "./CardListType";
 import { FacilityType, useFacilityListStore, } from "@/backoffice/domains/facility/store/FacilityListStore";
-import { filterFacilities, getCardContentUtils, mapFacilityData, sortFacilities, } from "@/backoffice/domains/facility/services/facilitiesUtil";
-import { FacilityCardListProps } from "@/backoffice/domains/facility/types/facilities";
+import { FacilityCardListProps } from "@/backoffice/domains/facility/types/facilityCards";
+import {
+  filterFacilities,
+  getCardContentUtils,
+  mapFacilityData,
+  sortFacilities
+} from "@/backoffice/domains/facility/services/utils/facilityUtils";
 
 export const SEARCH_FIELDS = ["name", "code", "description", "createdBy"];
 

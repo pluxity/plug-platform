@@ -1,70 +1,93 @@
 import { useEffect } from "react";
 import { useDetail, useCreate, useUpdate, useDeletion } from "@plug/common-services";
-import { FacilityService } from "../services/facilityService";
+import { FacilityServiceFactory } from "../services/facilityServiceFactory";
 import { FacilityType } from "@/backoffice/domains/facility/store/FacilityListStore";
 
-export function useFacilityDetail<T = any>(type: FacilityType, id: number) {
+interface HookResult {
+  data?: any;
+  execute?: (...args: any[]) => Promise<any>;
+  isLoading: boolean;
+  error?: Error;
+}
+
+export function useFacilityDetail(type: FacilityType, id: number): HookResult {
   const hookResult = useDetail(type, id);
 
   useEffect(() => {
     if (!type) return;
 
-    const facilityService = FacilityService.getInstance();
-    facilityService.registerHook(type, 'useDetail', id, hookResult);
+    const facilityService = FacilityServiceFactory.getService(type);
+    if (facilityService?.registerHook) {
+      facilityService.registerHook(type, 'useDetail', id, hookResult);
+    }
 
     return () => {
-      if (type) facilityService.clearHook(type, 'useDetail', id);
+      if (type && facilityService?.clearHook) {
+        facilityService.clearHook(type, 'useDetail', id);
+      }
     };
   }, [type, id, hookResult]);
 
   return hookResult;
 }
 
-export function useFacilityCreate<T = any>(type: FacilityType) {
+export function useFacilityCreate(type: FacilityType): HookResult {
   const hookResult = useCreate(type);
 
   useEffect(() => {
     if (!type) return;
 
-    const facilityService = FacilityService.getInstance();
-    facilityService.registerHook(type, 'useCreate', null, hookResult);
+    const facilityService = FacilityServiceFactory.getService(type);
+    if (facilityService?.registerHook) {
+      facilityService.registerHook(type, 'useCreate', null, hookResult);
+    }
 
     return () => {
-      if (type) facilityService.clearHook(type, 'useCreate', null);
+      if (type && facilityService?.clearHook) {
+        facilityService.clearHook(type, 'useCreate', null);
+      }
     };
   }, [type, hookResult]);
 
   return hookResult;
 }
 
-export function useFacilityUpdate<T = any>(type: FacilityType, id: number) {
+export function useFacilityUpdate(type: FacilityType, id: number): HookResult {
   const hookResult = useUpdate(type, id);
 
   useEffect(() => {
-    if (!type) return; // null 타입 처리
+    if (!type) return;
 
-    const facilityService = FacilityService.getInstance();
-    facilityService.registerHook(type, 'useUpdate', id, hookResult);
+    const facilityService = FacilityServiceFactory.getService(type);
+    if (facilityService?.registerHook) {
+      facilityService.registerHook(type, 'useUpdate', id, hookResult);
+    }
 
     return () => {
-      if (type) facilityService.clearHook(type, 'useUpdate', id);
+      if (type && facilityService?.clearHook) {
+        facilityService.clearHook(type, 'useUpdate', id);
+      }
     };
   }, [type, id, hookResult]);
 
   return hookResult;
 }
 
-export function useFacilityDeletion(type: FacilityType, id: number) {
+export function useFacilityDeletion(type: FacilityType, id: number): HookResult {
   const hookResult = useDeletion(type, id);
 
   useEffect(() => {
     if (!type) return;
 
-    const facilityService = FacilityService.getInstance();
-    facilityService.registerHook(type, 'useDeletion', id, hookResult);
+    const facilityService = FacilityServiceFactory.getService(type);
+    if (facilityService?.registerHook) {
+      facilityService.registerHook(type, 'useDeletion', id, hookResult);
+    }
 
     return () => {
-      if (type) facilityService.clearHook(type, 'useDeletion', id);
+      if (type && facilityService?.clearHook) {
+        facilityService.clearHook(type, 'useDeletion', id);
+      }
     };
   }, [type, id, hookResult]);
 
