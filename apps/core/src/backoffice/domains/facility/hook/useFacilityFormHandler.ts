@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useFileUploadWithInfo } from "@plug/common-services";
+import {useFileUploadWithInfo, useUpdateFacilitiesDrawing} from "@plug/common-services";
 import { FacilityData, FacilityFormData, FacilityFormMode, updateFacilityField } from "../types/facilityTypeGuard";
 import { FacilityType, DrawingUpdateOptions } from "../types/facilityTypes";
 import { FacilityServiceFactory } from "../services/facilityServiceFactory";
@@ -49,8 +49,9 @@ export function useFacilityFormHandler({
     thumbnailUploader: useFileUploadWithInfo(),
     drawingUploader: useFileUploadWithInfo()
   });
+  const drawingUpdateApi =  useUpdateFacilitiesDrawing(facilityId);
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchData = async () => {
       if (!facilityType) return;
 
@@ -136,49 +137,45 @@ export function useFacilityFormHandler({
   };
 
   const handleUpdateDrawing = async (data: DrawingUpdateOptions) => {
-    if (!facilityId) {
-      console.error("도면 업데이트를 위한 시설 ID가 없습니다.");
-      return;
-    }
-
-    setFormState(prev => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const facilityService = FacilityServiceFactory.getService(facilityType);
-
-      if (!facilityService.updateDrawing) {
-        throw new Error(`${facilityType} 타입은 도면 업데이트를 지원하지 않습니다.`);
-      }
-
-      const success = await facilityService.updateDrawing(facilityId, data);
-
-      if (success) {
-        const updatedData = await facilityService.fetchDetail(facilityId);
-        if (updatedData) {
-          setFormState(prev => ({
-            ...prev,
-            facilityData: updatedData,
-            formData: updatedData as FacilityFormData,
-            isLoading: false
-          }));
-        } else {
-          throw new Error("업데이트된 시설물 데이터를 찾을 수 없습니다.");
+        if (!facilityId ) {
+            console.error("도면 업데이트를 위한 시설 ID가 없거나 API가 초기화되지 않았습니다.");
+            return;
         }
-      } else {
-        throw new Error("도면 업데이트에 실패했습니다.");
-      }
-    } catch (err) {
-      console.error("도면 업데이트 실패:", err);
-      setFormState(prev => ({
-        ...prev,
-        error: err as Error,
-        isLoading: false
-      }));
-      throw err;
-    }
-  };
 
-  // 저장 핸들러
+        setFormState(prev => ({ ...prev, isLoading: true, error: null }));
+
+        try {
+            const response = await drawingUpdateApi.execute(data);
+
+            if (response) {
+                const facilityService = FacilityServiceFactory.getService(facilityType);
+                const updatedData = await facilityService.fetchDetail(facilityId);
+
+                if (updatedData) {
+                    setFormState(prev => ({
+                        ...prev,
+                        facilityData: updatedData,
+                        formData: updatedData as FacilityFormData,
+                        isLoading: false
+                    }));
+                } else {
+                    throw new Error("업데이트된 시설물 데이터를 찾을 수 없습니다.");
+                }
+            } else {
+                throw new Error("도면 업데이트에 실패했습니다.");
+            }
+
+        } catch (err) {
+            console.error("도면 업데이트 실패:", err);
+            setFormState(prev => ({
+                ...prev,
+                error: err as Error,
+                isLoading: false
+            }));
+            throw err;
+        }
+    };
+
   const handleSave = async () => {
     if (!facilityType || !formState.formData) return;
 
