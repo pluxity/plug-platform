@@ -1,20 +1,24 @@
-import { useGet, usePut, usePatch, useSWRApi, api } from '@plug/api-hooks';
+import { useGet, usePatch, useSWRApi, api } from '@plug/api-hooks';
 import type { UserUpdateRequest, UserProfile } from '@plug/common-services';
 
 const END_POINT = `users/me`;
 
+// 사용자 프로필 조회
 export const useGetUserProfile = () => {
   return useGet<UserProfile>(END_POINT, { requireAuth: true });
 };
 
+// 사용자 프로필 수정
 export const useUpdateUserProfile = () => {
-  return usePut<UserUpdateRequest>(END_POINT, { requireAuth: true });
+  return usePatch<UserUpdateRequest>(END_POINT, { requireAuth: true });
 };
 
+// 사용자 비밀번호 변경
 export const useChangePassword = () => {
   return usePatch<{ password: string }>(`${END_POINT}/password`, { requireAuth: true });
 };
 
+// SWR 기반 훅
 export const useUserProfileSWR = () => {
   return useSWRApi<UserProfile>(END_POINT, 'GET', { requireAuth: true });
 };
