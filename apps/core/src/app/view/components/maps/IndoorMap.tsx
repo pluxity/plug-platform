@@ -1,40 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
-import { Engine3D, Loader } from '@plug/engine/src';
-import { FacilityResponse } from '@plug/common-services';
+import { IndoorMapViewer } from '@/global/components';
+import { FacilityFactory } from '@plug/common-services';
 
 interface IndoorMapProps {
-  facilityData?: FacilityResponse | null;
+  facilityId: number;
+  facilityType: FacilityFactory;
+  onOutdoorButtonClick?: () => void;
 }
 
-const IndoorMap: React.FC<IndoorMapProps> = ({ facilityData }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (containerRef.current && facilityData?.facility.drawing.url) {
-        new Engine3D(containerRef.current);
-        Loader.LoadGltf(facilityData.facility.drawing.url, 
-          () => { setIsLoading(false); });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdoorButtonClick }) => {
   return (
-    <div className="w-full h-full relative">
-      {isLoading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
-              <span className="text-lg font-medium">실내 지도 로딩 중...</span>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      <div ref={containerRef} className="w-full h-full" />
-    </div>
-  )
-}
+    <IndoorMapViewer 
+      facilityId={facilityId}
+      facilityType={facilityType}
+      showFloorControl={true}
+      floorControlPosition="top-right"
+      showOutdoorButton={!!onOutdoorButtonClick}
+      onOutdoorButtonClick={onOutdoorButtonClick}
+      className="w-full h-full"
+    />
+  );
+};
 
-export default IndoorMap
+export default IndoorMap;

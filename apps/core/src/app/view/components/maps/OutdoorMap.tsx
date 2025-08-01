@@ -4,10 +4,14 @@ import * as Cesium from 'cesium'
 import MapControls from '@/global/components/maps/MapControls'
 import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
-import type { BaseFacilityResponse } from '@plug/common-services'
-import { GoogleMap } from '@/global/components/maps'
+import type { FacilityFactory } from '@plug/common-services'
+import { VWorldMap } from '@/global/components/maps'
 
-const OutdoorMap: React.FC = () => {
+interface OutdoorMapProps {
+  onFacilitySelect?: (facilityId: number, facilityType: FacilityFactory) => void;
+}
+
+const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [cesiumViewer, setCesiumViewer] = useState<Cesium.Viewer | null>(null)
   const { facilities, facilitiesFetched, loadFacilities } = useFacilityStore()
@@ -34,12 +38,6 @@ const OutdoorMap: React.FC = () => {
     useEffect(() => {
       if (!viewer || !facilitiesFetched) return
 
-      if (viewer.canvas.dataset.eventListenersAdded === 'true') {
-        return
-      }
-
-      const allFacilities = Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
-      
       Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmNWJmZWEzOS1jMTJjLTQ0ZTYtOTFkNC1jZDMxMDlmYTRjMWEiLCJpZCI6MjgzMTA2LCJpYXQiOjE3NDE2NjE3OTR9.dZID1nZdOJeEv18BhwGwWlAjJQtWAFUDipJw7M4r0-w'
 
       let hoveredEntity: Cesium.Entity | null = null
@@ -49,57 +47,116 @@ const OutdoorMap: React.FC = () => {
       const createPOIs = async () => {
         const resource = await Cesium.IonResource.fromAssetId(3589754)
 
-        viewer.clock.shouldAnimate = true
+        viewer.clock.shouldAnimate = false
         viewer.clock.multiplier = 1
 
-        allFacilities.forEach((facility) => {
-          if (facility.lat && facility.lon) {
-            const position = Cesium.Cartesian3.fromDegrees(
-              facility.lon,
-              facility.lat,
-              0
-            )
+        if (facilities.buildings) {
+          facilities.buildings.forEach((facility) => {
+            if (facility.lat && facility.lon) {
+              const position = Cesium.Cartesian3.fromDegrees(
+                facility.lon,
+                facility.lat,
+                0
+              )
 
-            const rotationCallback = new Cesium.CallbackProperty(() => {
-              const time = Date.now() / 1000;
-              const angle = (time * Math.PI * 2) / 15;
-              return Cesium.Transforms.headingPitchRollQuaternion(
-                position,
-                new Cesium.HeadingPitchRoll(angle, 0, 0)
-              );
-            }, false);
+              const rotationCallback = new Cesium.CallbackProperty(() => {
+                const time = Date.now() / 1000;
+                const angle = (time * Math.PI * 2) / 30;
+                return Cesium.Transforms.headingPitchRollQuaternion(
+                  position,
+                  new Cesium.HeadingPitchRoll(angle, 0, 0)
+                );
+              }, false);
 
-            const scaleCallback = new Cesium.CallbackProperty(() => {
-              const cameraPosition = viewer.camera.position
-              const distance = Cesium.Cartesian3.distance(cameraPosition, position)
-              
-              const baseScale = 10.0
-              const maxScale = 25.0
-              const scaleDistance = 5000 
-              
-              const scaleFactor = Math.min(distance / scaleDistance, 2.5)
-              return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
-            }, false)
+              const scaleCallback = new Cesium.CallbackProperty(() => {
+                const cameraPosition = viewer.camera.position
+                const distance = Cesium.Cartesian3.distance(cameraPosition, position)
+                
+                const baseScale = 10.0
+                const maxScale = 25.0
+                const scaleDistance = 5000 
+                
+                const scaleFactor = Math.min(distance / scaleDistance, 2.5)
+                return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
+              }, false)
 
-            viewer.entities.add({
-              id: `facility-${facility.id}`,
-              name: facility.name,
-              position: position,
-              orientation: rotationCallback,
-              model: {
-                uri: resource,
-                scale: scaleCallback,
-                color: Cesium.Color.WHITE,
-                silhouetteColor: Cesium.Color.YELLOW,
-                silhouetteSize: new Cesium.ConstantProperty(0),
-              },
-              properties: {
-                facilityId: facility.id,
-                facilityData: facility
-              }
-            })
-          }
-        })
+              const entityId = `facility-${facility.id}`;
+
+              viewer.entities.add({
+                id: entityId,
+                name: facility.name,
+                position: position,
+                orientation: rotationCallback,
+                model: {
+                  uri: resource,
+                  scale: scaleCallback,
+                  color: Cesium.Color.WHITE,
+                  silhouetteColor: Cesium.Color.YELLOW,
+                  silhouetteSize: new Cesium.ConstantProperty(0),
+                },
+                properties: {
+                  facilityId: facility.id,
+                  facilityData: facility,
+                  facilityType: 'buildings' as FacilityFactory
+                }
+              })
+            }
+          })
+        }
+
+        if (facilities.stations) {
+          facilities.stations.forEach((facility) => {
+            if (facility.lat && facility.lon) {
+              const position = Cesium.Cartesian3.fromDegrees(
+                facility.lon,
+                facility.lat,
+                0
+              )
+
+              const rotationCallback = new Cesium.CallbackProperty(() => {
+                const time = Date.now() / 1000;
+                const angle = (time * Math.PI * 2) / 30;
+                return Cesium.Transforms.headingPitchRollQuaternion(
+                  position,
+                  new Cesium.HeadingPitchRoll(angle, 0, 0)
+                );
+              }, false);
+
+              const scaleCallback = new Cesium.CallbackProperty(() => {
+                const cameraPosition = viewer.camera.position
+                const distance = Cesium.Cartesian3.distance(cameraPosition, position)
+                
+                const baseScale = 10.0
+                const maxScale = 25.0
+                const scaleDistance = 5000 
+                
+                const scaleFactor = Math.min(distance / scaleDistance, 2.5)
+                return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
+              }, false)
+
+              const entityId = `facility-${facility.id}`;
+
+              viewer.entities.add({
+                id: entityId,
+                name: facility.name,
+                position: position,
+                orientation: rotationCallback,
+                model: {
+                  uri: resource,
+                  scale: scaleCallback,
+                  color: Cesium.Color.BLUE,
+                  silhouetteColor: Cesium.Color.CYAN,
+                  silhouetteSize: new Cesium.ConstantProperty(0),
+                },
+                properties: {
+                  facilityId: facility.id,
+                  facilityData: facility,
+                  facilityType: 'stations' as FacilityFactory
+                }
+              })
+            }
+          })
+        }
 
         handleMouseMove = (event: MouseEvent) => {
           const canvasPosition = new Cesium.Cartesian2(event.clientX, event.clientY)
@@ -127,32 +184,36 @@ const OutdoorMap: React.FC = () => {
           }
         }
 
-        handleClick = () => {}
+        handleClick = (event: MouseEvent) => {
+          const canvasPosition = new Cesium.Cartesian2(event.clientX, event.clientY)
+          const pickedObject = viewer.scene.pick(canvasPosition)
+          
+          if (pickedObject && pickedObject.id) {
+            if (pickedObject.id.id && pickedObject.id.id.startsWith('facility-')) {
+              const entity = pickedObject.id
+              const facilityId = entity.properties?.facilityId?.getValue()
+              const facilityType = entity.properties?.facilityType?.getValue()
+              
+              if (facilityId && facilityType && onFacilitySelect) {
+                onFacilitySelect(facilityId, facilityType)
+              }
+            }
+          }
+        }
 
         viewer.canvas.addEventListener('mousemove', handleMouseMove)
         viewer.canvas.addEventListener('click', handleClick)
-        
-        viewer.canvas.dataset.eventListenersAdded = 'true'
       }
 
       createPOIs()
 
       return () => {
-        allFacilities.forEach((facility) => {
-          const entity = viewer.entities.getById(`facility-${facility.id}`)
-          if (entity) {
-            viewer.entities.remove(entity)
-          }
-        })
-        
         if (handleMouseMove) {
           viewer.canvas.removeEventListener('mousemove', handleMouseMove)
         }
         if (handleClick) {
           viewer.canvas.removeEventListener('click', handleClick)
         }
-        
-        delete viewer.canvas.dataset.eventListenersAdded
       }
     }, [viewer])
 
@@ -160,14 +221,12 @@ const OutdoorMap: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="w-full h-full relative">
       {isLoading && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="text-lg font-medium">실외 지도 로딩 중...</span>
-            </div>
+          <div className="bg-white rounded-lg p-6 shadow-lg flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="text-lg font-medium">실외 지도 로딩 중...</span>
           </div>
         </div>
       )}
@@ -176,13 +235,11 @@ const OutdoorMap: React.FC = () => {
         <FacilitySearchForm viewer={cesiumViewer} />
       </div>
       
-      <div className="w-full h-full">
-        <GoogleMap className="w-full h-full relative">
-          <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
-          <FacilityPOIs />
-        </GoogleMap>
-      </div>
-    </>
+      <VWorldMap className="w-full h-full">
+        <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
+        <FacilityPOIs />
+      </VWorldMap>
+    </div>
   )
 }
 
