@@ -14,5 +14,5 @@ export interface RoleResponse {
     id: number;
     name: string;
     description: string;
-    permissions: Set<PermissionResponse>;
+    permissions: PermissionResponse[];
 }

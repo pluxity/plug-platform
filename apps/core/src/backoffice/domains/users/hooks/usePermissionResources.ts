@@ -37,7 +37,7 @@ export const usePermissionResources = () : UsePermissionResourcesReturn => {
                 });
             } else {
                  // maxDepth에 도달할 때까지 자식 노드를 재귀적으로 탐색
-                item.children.forEach(traverse);
+                item.children?.forEach(traverse);
             }
         };
         
