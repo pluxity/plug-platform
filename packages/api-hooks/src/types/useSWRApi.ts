@@ -4,7 +4,7 @@ import { DataResponseBody } from "./response";
 export type AllowedMethod = 'GET' | 'DELETE';
 
 export interface UseSWRApiReturn<T> {
-  data: T | null;
+  data: T | null ;
   error: Error | null;
   isLoading: boolean;
   mutate: KeyedMutator<DataResponseBody<T> | null>;
