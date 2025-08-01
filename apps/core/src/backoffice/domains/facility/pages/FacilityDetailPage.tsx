@@ -68,7 +68,7 @@ const FacilityDetailPage: React.FC = () => {
             formData={data?.formData as FacilityData || undefined}
             isLoading={data.isLoading || historyLoading}
             error={data.error}
-            onInputChange={handlers.handleInputChange}
+            onInputChange={handlers.handleInputChange as (field: string, value: string | number | string[] | number[]) => void}
             onThumbnailUpload={handlers.handleThumbnailUpload}
             onDrawingUpload={handlers.handleDrawingUpload}
             onUpdateDrawing={handlers.handleUpdateDrawing}
