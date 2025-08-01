@@ -5,8 +5,9 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 import { FacilityFormLayout } from "@/backoffice/domains/facility/components/layout/FacilityFormLayout";
 import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
 import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
-import { useDetail, useHistory } from "@plug/common-services";
+import { useHistory } from "@plug/common-services";
 import { FacilityType } from "@/backoffice/domains/facility/types/facilityTypes";
+import { useRegisterFacilityHooks } from "@/backoffice/domains/facility/hook/useFacilityFactory";
 
 const FacilityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,8 @@ const FacilityDetailPage: React.FC = () => {
   const facilityType = getFacilityTypeFromPath();
   const facilityId = id ? Number(id) : 0;
 
+  useRegisterFacilityHooks(facilityType, facilityId);
+
   const { data: historyData, isLoading: historyLoading } = useHistory(facilityType, facilityId);
   const { data, handlers } = useFacilityFormHandler({
     facilityType: facilityType,
@@ -34,9 +37,6 @@ const FacilityDetailPage: React.FC = () => {
     mode: "detail",
     onSaveSuccess: () => console.log("저장 성공"),
   });
-
-  const { data: directData, error: directError } = useDetail(facilityType, facilityId);
-  console.log('직접 호출 결과:', directData, '에러:', directError);
 
 
   const typeTitle = facilityType === 'buildings' ? '건물' : facilityType === 'stations' ? '역' : '시설';
