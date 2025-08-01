@@ -8,8 +8,6 @@ interface IndoorMapViewerProps {
   facilityType: FacilityFactory;
   showFloorControl?: boolean;
   floorControlPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  showOutdoorButton?: boolean;
-  onOutdoorButtonClick?: () => void;
   className?: string;
   onEngineReady?: (engine: Engine3D) => void;
 }
@@ -18,48 +16,33 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   facilityId,
   facilityType,
   showFloorControl = true,
-  floorControlPosition = 'top-right',
-  showOutdoorButton = true,
-  onOutdoorButtonClick,
+  floorControlPosition = 'bottom-right',
   className = "w-full h-full", 
   onEngineReady 
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engine3DRef = useRef<Engine3D | null>(null);
   const loadedModelUrlRef = useRef<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // false로 초기화
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Facility 데이터 가져오기
   const { data: facilityData, error, isLoading: isDataLoading } = useDetailSWR(facilityType, facilityId, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     revalidateIfStale: false,
-    dedupingInterval: 60000 * 10, // 10분
+    dedupingInterval: 60000 * 10,
   });
 
-  // modelUrl 추출
   const modelUrl = facilityData?.facility.drawing.url;
 
   useEffect(() => {
     const currentContainer = containerRef.current;
     
-    console.log('IndoorMapViewer useEffect triggered:', {
-      modelUrl,
-      hasContainer: !!currentContainer,
-      hasEngine: !!engine3DRef.current,
-      loadedUrl: loadedModelUrlRef.current
-    });
-    
-    // modelUrl이 없으면 처리하지 않음
     if (!modelUrl) {
-      console.log('No modelUrl provided, setting loading to false');
       setIsLoading(false);
       return;
     }
     
-    // 이미 같은 모델이 로드되어 있으면 스킵
     if (loadedModelUrlRef.current === modelUrl && engine3DRef.current) {
-      console.log('Same model already loaded, skipping');
       setIsLoading(false);
       if (onEngineReady && engine3DRef.current) {
         onEngineReady(engine3DRef.current);
@@ -67,9 +50,7 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       return;
     }
     
-    // 새로운 모델을 로드해야 하는 경우 기존 엔진 정리
     if (engine3DRef.current && loadedModelUrlRef.current !== modelUrl) {
-      console.log('Cleaning up existing engine');
       try {
         engine3DRef.current.Renderer.dispose();
         while(engine3DRef.current.RootScene.children.length > 0) {
@@ -102,21 +83,16 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       loadedModelUrlRef.current = null;
     }
     
-    // 새 엔진 생성 및 모델 로드
     if (currentContainer && modelUrl && !engine3DRef.current) {
-      console.log('Starting to load 3D model:', modelUrl);
       setIsLoading(true);
       const engine = new Engine3D(currentContainer);
       engine3DRef.current = engine;
       
-      // 타임아웃 설정 (10초 후 로딩 실패 처리)
       const timeoutId = setTimeout(() => {
-        console.warn('3D model loading timeout');
         setIsLoading(false);
       }, 10000);
       
       Loader.LoadGltf(modelUrl, () => {
-        console.log('3D model loaded successfully');
         clearTimeout(timeoutId);
         setIsLoading(false);
         loadedModelUrlRef.current = modelUrl;
@@ -126,10 +102,8 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       });
     }
 
-    // 컴포넌트 언마운트 시만 정리
     return () => {
       if (engine3DRef.current) {
-        console.log('Cleaning up engine on unmount');
         try {
           engine3DRef.current.Renderer.dispose();
           while(engine3DRef.current.RootScene.children.length > 0) {
@@ -194,15 +168,14 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   const positionClasses = {
     'top-left': 'absolute top-4 left-4',
     'top-right': 'absolute top-4 right-4',
-    'bottom-left': 'absolute bottom-4 left-4',
-    'bottom-right': 'absolute bottom-4 right-4',
+    'bottom-left': 'absolute bottom-6 left-6',
+    'bottom-right': 'absolute bottom-6 right-6',
   };
 
   return (
     <div className={`${className} relative`}>
       <div ref={containerRef} className="w-full h-full" />
       
-      {/* 데이터 로딩 중이거나 3D 모델 로딩 중 오버레이 */}
       {(isDataLoading || isLoading) && (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center z-50">
           <div className="bg-white/90 backdrop-blur-sm border border-blue-200 px-8 py-6 rounded-2xl shadow-xl">
@@ -225,43 +198,8 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
         </div>
       )}
       
-      {/* 실외 지도 전환 버튼 */}
-      {showOutdoorButton && onOutdoorButtonClick && (
-        <div className="absolute top-4 left-4 z-20">
-          <button
-            onClick={onOutdoorButtonClick}
-            className="group bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:bg-white hover:scale-105"
-          >
-            <div className="flex items-center space-x-2">
-              <div className="relative">
-                {/* 출구 아이콘 */}
-                <svg 
-                  className="w-5 h-5 text-green-600 group-hover:text-green-700 transition-colors" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
-                  />
-                </svg>
-                {/* 움직이는 화살표 효과 */}
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping opacity-75"></div>
-              </div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                실외 지도
-              </span>
-            </div>
-          </button>
-        </div>
-      )}
-      
-      {/* 층 컨트롤 */}
       {showFloorControl && hasFloors && (
-        <div className={`${positionClasses[floorControlPosition]} z-10 max-w-xs`}>
+        <div className={`${positionClasses[floorControlPosition]} z-20 max-w-xs`}>
           <FloorControl floors={facilityData.floors} />
         </div>
       )}
