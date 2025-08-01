@@ -1,32 +1,30 @@
 import { useCallback, useEffect } from 'react';
-import { Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Button, SelectContent, SelectItem, Select, SelectTrigger, SelectValue } from '@plug/ui';
+import { Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Button, Checkbox, Label } from '@plug/ui';
 import { PermissionEditModalProps } from '@/backoffice/domains/users/types/permisson';
-import { usePermissionDetail, useUpdatePermission, useResourceTypesSWR } from '@plug/common-services';
-import { z } from 'zod';
+import { usePermissionResources } from '@/backoffice/domains/users/hooks/usePermissionResources';
+import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
+import { usePermissionDetail, useUpdatePermission } from '@plug/common-services';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';
 import { toast } from 'sonner';
 
 export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpen, onClose, onSuccess, permissionId }) => {
     // 권한 상세 목록 조회
-    const { data, execute: detailPermission } = usePermissionDetail(permissionId);
+    const { data: detailData, execute: detailPermission } = usePermissionDetail(permissionId);
     const { execute: updatePermission, isLoading: isPermissionUpdating } = useUpdatePermission(permissionId);
-    const { data: resourceTypes } = useResourceTypesSWR();
 
-    const permissionFormSchema = z.object({
-        resourceName: z.string().min(1, {
-            message: '권한 명을 선택해주세요.'
-        }),
-        resourceId: z.string().min(1, {
-            message: '권한 ID를 입력해주세요.'
-        }),
-    })
+    // 리소스 데이터 가져오기
+    const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionResources();
+    // 리소스 체크박스 로직
+    const { isResourceSelected, handleCheckboxChange } = usePermissionCheckbox();
 
-    const modalForm = useForm<z.infer<typeof permissionFormSchema>>({
+    const modalForm = useForm<PermissionFormData>({
         resolver: zodResolver(permissionFormSchema),
         defaultValues: {
-            resourceName: '',
-            resourceId: '',
+            name: '',
+            description: '',
+            permissions: []
         },
         mode: 'onChange',
     });
@@ -38,27 +36,33 @@ export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpe
     }, [isOpen, permissionId]);
 
     useEffect(() => {
-        if (data) {
+        if (detailData) {  
             modalForm.reset({
-                resourceName: data.resourceName,
-                resourceId: data.resourceId,
+                name: detailData.name,
+                description: detailData.description,
+                permissions: detailData.permissions.map(permission => ({
+                    resourceType: permission.resourceType,
+                    resourceIds: permission.resourceIds
+                }))
             });
         }
-    }, [data, modalForm]);
+    }, [detailData, modalForm]);
 
     const resetForm = useCallback(() => {
         modalForm.reset({
-            resourceName: '',
-            resourceId: '',
+            name: '',
+            description: '',
+            permissions: []
         });
         onClose();
     }, [modalForm, onClose]);
 
-    const handleSubmit = useCallback(async (data: z.infer<typeof permissionFormSchema>) => {
+    const handleSubmit = useCallback(async (data: PermissionFormData) => {
         try {
             await updatePermission({
-                resourceName: data.resourceName,
-                resourceId: data.resourceId,
+                name: data.name,
+                description: data.description,
+                permissions: data.permissions,
             });
             toast.success('권한 수정 완료');
             onSuccess?.();
@@ -69,35 +73,80 @@ export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpe
     }, [updatePermission, onSuccess, resetForm]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose} >
-            <DialogContent title="권한 수정" className="max-w-xl" dimmed disableBackground>
+        <Dialog open={isOpen} onOpenChange={resetForm} >
+            <DialogContent title="권한 수정" className="max-w-5xl" dimmed disableBackground>
                 <ModalForm {...modalForm}>
                     <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
                         <ModalFormContainer>
+                        <ModalFormField
+                                control={modalForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <ModalFormItem label="권한 명" message={modalForm.formState.errors.name?.message}>
+                                        <Input {...field} placeholder="권한 명을 입력해주세요." required />
+                                    </ModalFormItem>
+                                )}  
+                            />
                             <ModalFormField
                                 control={modalForm.control}
-                                name="resourceName"
+                                name="description"
                                 render={({ field }) => (
-                                    <ModalFormItem label="권한 명" message={modalForm.formState.errors.resourceName?.message}>
-                                        <Select value={field.value} onValueChange={field.onChange}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="권한 명을 선택해주세요" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {resourceTypes?.map(type => (
-                                                    <SelectItem key={type} value={type}>{type}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                    <ModalFormItem label="권한 설명" message={modalForm.formState.errors.description?.message}>
+                                        <Input {...field} placeholder="권한 설명을 입력해주세요." required />
                                     </ModalFormItem>
                                 )}
                             />
                             <ModalFormField
                                 control={modalForm.control}
-                                name="resourceId"
+                                name="permissions"
                                 render={({ field }) => (
-                                    <ModalFormItem label="권한 ID" message={modalForm.formState.errors.resourceId?.message}>
-                                        <Input {...field} placeholder="권한 ID를 입력해주세요." required />
+                                    <ModalFormItem label="권한 목록" message={modalForm.formState.errors.permissions?.message}>
+                                        <div className="flex flex-col gap-6 max-h-100 min-h-80 overflow-y-auto">
+                                            {isResourceDataLoading ? (
+                                                <div className="text-center py-4">데이터를 불러오는 중...</div>
+                                            ) : resourceError ? (
+                                                <div className="text-center py-4 text-red-500">
+                                                    오류: {resourceError}
+                                                </div>
+                                            ) : (
+                                                resourceTypes?.map((resourceType) => {
+                                                    const resources = resourceData[resourceType.key] || [];
+                                                    return (
+                                                        <div key={resourceType.key} className="flex flex-col gap-2">
+                                                            <div className="font-semibold">{resourceType.name}</div>
+                                                            <div className="flex flex-wrap gap-x-6 gap-y-2">
+                                                                {resources.length > 0 ? (
+                                                                    resources.map((resource) => {
+                                                                        const checkboxId = `${resourceType.key}-${resource.id}`;
+                                                                        return (
+                                                                            <div key={resource.id} className="flex items-center gap-2">
+                                                                                <Checkbox 
+                                                                                    variant="square" 
+                                                                                    id={checkboxId}
+                                                                                    checked={isResourceSelected(field.value || [], resourceType.key, resource.id)}
+                                                                                    onCheckedChange={(checked) => 
+                                                                                        handleCheckboxChange(
+                                                                                            field.value || [], 
+                                                                                            field.onChange, 
+                                                                                            resourceType.key, 
+                                                                                            resource.id, 
+                                                                                            !!checked
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                                <Label htmlFor={checkboxId}>{resource.name}</Label>
+                                                                            </div>
+                                                                        );
+                                                                    })
+                                                                ) : (
+                                                                    <div className="text-gray-500 text-sm">사용 가능한 리소스가 없습니다.</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
                                     </ModalFormItem>
                                 )}
                             />

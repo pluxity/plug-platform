@@ -45,10 +45,3 @@ export const usePermissionDetailSWR = (permissionId: number) => {
         isPaused: () => !permissionId, // permissionId가 없으면 요청 중단
     });
 }
-
-// 권한 설정 가능 리소스 타입 목록 조회
-export const useResourceTypesSWR = () => {
-    return useSWRApi<string[]>(`${END_POINT}/resource-types`, 'GET', { requireAuth: true });
-}
-
-

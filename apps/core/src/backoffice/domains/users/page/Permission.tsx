@@ -70,11 +70,11 @@ const Permission: React.FC = () => {
     const columns = [
         {
             header: '권한 명',
-            accessorKey: 'resourceName',
+            accessorKey: 'name',
         },
         {
-            header: '권한 ID',
-            accessorKey: 'resourceId',
+            header: '권한 목록',
+            accessorKey: 'permissions',
         },
         {
             id: 'actions',
@@ -120,7 +120,7 @@ const Permission: React.FC = () => {
                 <AlertDialogHeader>
                     <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {deletePermissionData && `${deletePermissionData.resourceName}의 ${deletePermissionData.resourceId} 권한을 삭제하시겠습니까?`}
+                        {deletePermissionData && `${deletePermissionData.name} 권한을 삭제하시겠습니까?`}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

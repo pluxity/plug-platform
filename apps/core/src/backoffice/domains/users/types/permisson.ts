@@ -1,7 +1,7 @@
 export interface PermissionData {
     id: number;
-    resourceName: string;
-    resourceId: string;
+    name: string;
+    permissions: string[];
 }
 
 export interface PermissionCreateModalProps {
