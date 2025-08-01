@@ -1,6 +1,7 @@
 import { FacilityServiceBase } from "../facilityServiceBase";
 import { FacilityData, FacilityFormData } from "../../types/facilityTypeGuard";
-import { DrawingUpdateOptions, IFacilityService } from "@/backoffice/domains/facility/types/facilityFactory";
+import { DrawingUpdateOptions, IFacilityService } from "@/backoffice/domains/facility/types/facilityTypes";
+import { Floor } from "@plug/common-services";
 
 export class StationService extends FacilityServiceBase implements IFacilityService {
   async fetchDetail(id: number): Promise<FacilityData | null> {
@@ -9,7 +10,8 @@ export class StationService extends FacilityServiceBase implements IFacilityServ
       console.error(`Station detail hook not found for ID: ${id}`);
       return null;
     }
-    return this.executeApiHook(detailHook, {});
+    const result = await this.executeApiHook(detailHook, {});
+    return result as FacilityData | null;
   }
 
   async create(data: FacilityFormData): Promise<boolean> {
@@ -68,10 +70,27 @@ export class StationService extends FacilityServiceBase implements IFacilityServ
     }
 
     try {
-      await this.executeApiHook(updateDrawingHook, data);
+      const params = { ...data } as Record<string, unknown>;
+      await this.executeApiHook(updateDrawingHook, params);
       return true;
     } catch (error) {
-      console.error(`역 도면 업데이트 실패 (ID: ${id}):`, error);
+      console.error(`건물 도면 업데이트 실패 (ID: ${id}):`, error);
+      return false;
+    }
+  }
+
+  async updateFloors(id: number, floors: Floor[]): Promise<boolean> {
+    const updateHook = this.getHook('stations', 'useUpdate', id);
+    if (!updateHook) {
+      console.error(`Station update hook not found for ID: ${id}`);
+      return false;
+    }
+
+    try {
+      await this.executeApiHook(updateHook, { floors });
+      return true;
+    } catch (error) {
+      console.error(`역 층 정보 업데이트 실패 (ID: ${id}):`, error);
       return false;
     }
   }

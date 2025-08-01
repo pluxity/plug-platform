@@ -87,7 +87,7 @@ export const getUpdatedBy = (data: FacilityData): string | undefined => {
 export const updateFacilityField = (
   data: FacilityFormData, 
   path: string, 
-  value: string | number | boolean
+  value: string | number | boolean | string[] | number[],
 ): FacilityFormData => {
   const result = { ...data };
   const parts = path.split('.');

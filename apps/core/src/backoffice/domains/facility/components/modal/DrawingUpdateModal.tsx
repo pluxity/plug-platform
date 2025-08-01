@@ -41,14 +41,21 @@ export const DrawingUpdateModal: React.FC<DrawingUpdateModalProps> = ({ isOpen, 
       try {
         await drawingUploader.execute(files[0]);
         const fileUrl = URL.createObjectURL(files[0]);
+        console.log("파일 URL 생성됨:", fileUrl);
+
         if (fileUrl) {
+          console.log("모델 계층 정보 가져오기 시작");
           Px.Model.GetModelHierarchyFromUrl(fileUrl, (modelInfos: ModelInfo) => {
+            console.log("모델 정보 받음:", modelInfos);
             if (Array.isArray(modelInfos) && modelInfos.length > 0) {
               const extractedFloors = modelInfos.map(info => ({
                 name: info.displayName,
                 floorId: info.floorId
               }));
+              console.log("추출된 층 정보:", extractedFloors);
               setFloors(extractedFloors);
+            } else {
+              console.log("모델 정보가 없거나 유효하지 않습니다");
             }
           });
         }

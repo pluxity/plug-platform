@@ -5,7 +5,7 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 import { FacilityFormLayout } from "@/backoffice/domains/facility/components/layout/FacilityFormLayout";
 import { useFacilityFormHandler } from "@/backoffice/domains/facility/hook/useFacilityFormHandler";
 import { FacilityData } from "@/backoffice/domains/facility/types/facilityTypeGuard";
-import { useHistory } from "@plug/common-services";
+import { useDetail, useHistory } from "@plug/common-services";
 import { FacilityType } from "@/backoffice/domains/facility/types/facilityTypes";
 
 const FacilityDetailPage: React.FC = () => {
@@ -34,6 +34,10 @@ const FacilityDetailPage: React.FC = () => {
     mode: "detail",
     onSaveSuccess: () => console.log("저장 성공"),
   });
+
+  const { data: directData, error: directError } = useDetail(facilityType, facilityId);
+  console.log('직접 호출 결과:', directData, '에러:', directError);
+
 
   const typeTitle = facilityType === 'buildings' ? '건물' : facilityType === 'stations' ? '역' : '시설';
 

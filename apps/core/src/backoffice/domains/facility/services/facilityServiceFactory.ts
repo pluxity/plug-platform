@@ -1,18 +1,16 @@
-import { FacilityType } from "../types/facilityTypes";
-import { FacilityData } from "../types/facilityTypeGuard";
+import { DrawingUpdateOptions, FacilityType } from "../types/facilityTypes";
+import { FacilityData, FacilityFormData } from "../types/facilityTypeGuard";
 import { BuildingService } from "./definitions/BuildingService";
 import { StationService } from "./definitions/StationService";
+import { Floor } from "@plug/common-services";
 
 export interface IFacilityService {
   fetchDetail(id: number): Promise<FacilityData | null>;
-  create(data: any): Promise<boolean>;
-  update(id: number, data: any): Promise<boolean>;
+  create(data: FacilityFormData): Promise<boolean>;
+  update(id: number, data: Partial<FacilityFormData>): Promise<boolean>;
   delete(id: number): Promise<boolean>;
-  updateDrawing?(id: number, data: any): Promise<boolean>;
-  getHook?(resourceType: string, hookName: string, id: number | null): any;
-  registerHook?(resourceType: string, hookName: string, id: number | null, hook: any): void;
-  clearHook?(resourceType: string, hookName: string, id: number | null): void;
-  executeApiHook?(hook: any, params: any): Promise<any>;
+  updateDrawing(id: number, data: DrawingUpdateOptions): Promise<boolean>;
+  updateFloors(id: number, floors: Floor[]): Promise<boolean>;
 }
 
 export class FacilityServiceFactory {

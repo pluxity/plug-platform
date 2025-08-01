@@ -1,7 +1,8 @@
 import { FacilityServiceBase } from "../facilityServiceBase";
 import { FacilityData, FacilityFormData } from "../../types/facilityTypeGuard";
-import { DrawingUpdateOptions, IFacilityService } from "@/backoffice/domains/facility/types/facilityFactory";
 import { Floor } from "@plug/common-services";
+import { IFacilityService } from "../facilityServiceFactory";
+import { DrawingUpdateOptions } from "@/backoffice/domains/facility/types/facilityTypes";
 
 export class BuildingService extends FacilityServiceBase implements IFacilityService {
   async fetchDetail(id: number): Promise<FacilityData | null> {
@@ -10,7 +11,8 @@ export class BuildingService extends FacilityServiceBase implements IFacilitySer
       console.error(`Building detail hook not found for ID: ${id}`);
       return null;
     }
-    return this.executeApiHook(detailHook, {});
+    const result = await this.executeApiHook(detailHook, {});
+    return result as FacilityData | null;
   }
 
   async create(data: FacilityFormData): Promise<boolean> {
@@ -69,13 +71,15 @@ export class BuildingService extends FacilityServiceBase implements IFacilitySer
     }
 
     try {
-      await this.executeApiHook(updateDrawingHook, data);
+      const params = { ...data } as Record<string, unknown>;
+      await this.executeApiHook(updateDrawingHook, params);
       return true;
     } catch (error) {
       console.error(`건물 도면 업데이트 실패 (ID: ${id}):`, error);
       return false;
     }
   }
+
 
   async updateFloors(id: number, floors: Floor[]): Promise<boolean> {
     const updateHook = this.getHook('buildings', 'useUpdate', id);

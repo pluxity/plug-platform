@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useFileUploadWithInfo,  } from "@plug/common-services";
+import { useFileUploadWithInfo } from "@plug/common-services";
 import { FacilityData, FacilityFormData, FacilityFormMode, updateFacilityField } from "../types/facilityTypeGuard";
 import { FacilityType, DrawingUpdateOptions } from "../types/facilityTypes";
 import { FacilityServiceFactory } from "../services/facilityServiceFactory";
@@ -12,59 +12,110 @@ interface FacilityFormHandlerProps {
   onSaveSuccess?: () => void;
 }
 
-export function useFacilityFormHandler({ facilityType, facilityId, mode, initialData, onSaveSuccess }: FacilityFormHandlerProps) {
-  const [formData, setFormData] = useState<FacilityFormData | undefined>(undefined);
-  const [facilityData, setFacilityData] = useState<FacilityData | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [isEditMode, setIsEditMode] = useState<boolean>(mode === 'edit');
+interface FacilityFormState {
+  facilityData?: FacilityData;
+  formData?: FacilityFormData;
+  isLoading: boolean;
+  error: Error | null;
+  isEditMode: boolean;
+  thumbnailUploader: ReturnType<typeof useFileUploadWithInfo>;
+  drawingUploader: ReturnType<typeof useFileUploadWithInfo>;
+}
 
-  const thumbnailUploader = useFileUploadWithInfo();
-  const drawingUploader = useFileUploadWithInfo();
+interface FacilityFormHandlers {
+  handleInputChange: (key: string, value: string | number | boolean | string[] | number[]) => void;
+  handleThumbnailUpload: (file: File) => Promise<void>;
+  handleDrawingUpload: (file: File) => Promise<void>;
+  handleUpdateDrawing: (data: DrawingUpdateOptions) => Promise<void>;
+  handleSave: () => Promise<void>;
+  handleEditToggle: () => void;
+  handleBack: () => void;
+  handleDelete: () => Promise<void>;
+}
+
+export function useFacilityFormHandler({
+                                         facilityType,
+                                         facilityId,
+                                         mode,
+                                         initialData,
+                                         onSaveSuccess
+                                       }: FacilityFormHandlerProps) {
+  const [formState, setFormState] = useState<FacilityFormState>({
+    facilityData: undefined,
+    formData: undefined,
+    isLoading: true,
+    error: null,
+    isEditMode: mode === 'edit',
+    thumbnailUploader: useFileUploadWithInfo(),
+    drawingUploader: useFileUploadWithInfo()
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       if (!facilityType) return;
 
-      setIsLoading(true);
-      setError(null);
+      setFormState(prev => ({ ...prev, isLoading: true, error: null }));
 
       try {
         if (facilityId) {
           const facilityService = FacilityServiceFactory.getService(facilityType);
           const data = await facilityService.fetchDetail(facilityId);
+
           if (data) {
-            setFacilityData(data);
-            setFormData(data as FacilityFormData);
+            setFormState(prev => ({
+              ...prev,
+              facilityData: data,
+              formData: data as FacilityFormData,
+              isLoading: false
+            }));
+          } else {
+            throw new Error("시설물 데이터를 찾을 수 없습니다.");
           }
         } else if (initialData) {
-          setFormData(initialData as FacilityFormData);
+          setFormState(prev => ({
+            ...prev,
+            formData: initialData as FacilityFormData,
+            isLoading: false
+          }));
         } else {
-          setFormData({} as FacilityFormData);
+          setFormState(prev => ({
+            ...prev,
+            formData: {} as FacilityFormData,
+            isLoading: false
+          }));
         }
       } catch (err) {
-        setError(err as Error);
         console.error("시설물 데이터 로딩 실패:", err);
-      } finally {
-        setIsLoading(false);
+        setFormState(prev => ({
+          ...prev,
+          error: err as Error,
+          isLoading: false
+        }));
       }
     };
 
     fetchData();
   }, [facilityType, facilityId, initialData]);
 
-  type FormDataValue = string | number | boolean;
+  const handleInputChange = (key: string, value: string | number | boolean | string[] | number[]) => {
+    setFormState(prev => {
+      if (!prev.formData) {
+        return {
+          ...prev,
+          formData: { [key]: value } as unknown as FacilityFormData
+        };
+      }
 
-  const handleInputChange = (key: string, value: FormDataValue) => {
-    setFormData((prev) => {
-      if (!prev) return { [key]: value } as unknown as FacilityFormData;
-      return updateFacilityField(prev, key, value);
+      return {
+        ...prev,
+        formData: updateFacilityField(prev.formData, key, value)
+      };
     });
   };
 
   const handleThumbnailUpload = async (file: File) => {
     try {
-      const result = await thumbnailUploader.execute(file);
+      const result = await formState.thumbnailUploader.execute(file);
       if (result?.id) {
         handleInputChange('facility.thumbnailFileId', result.id);
       }
@@ -75,7 +126,7 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
 
   const handleDrawingUpload = async (file: File) => {
     try {
-      const result = await drawingUploader.execute(file);
+      const result = await formState.drawingUploader.execute(file);
       if (result?.id) {
         handleInputChange('facility.drawingFileId', result.id);
       }
@@ -90,8 +141,9 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
       return;
     }
 
+    setFormState(prev => ({ ...prev, isLoading: true, error: null }));
+
     try {
-      setIsLoading(true);
       const facilityService = FacilityServiceFactory.getService(facilityType);
 
       if (!facilityService.updateDrawing) {
@@ -103,48 +155,66 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
       if (success) {
         const updatedData = await facilityService.fetchDetail(facilityId);
         if (updatedData) {
-          setFacilityData(updatedData);
-          setFormData(updatedData as FacilityFormData);
+          setFormState(prev => ({
+            ...prev,
+            facilityData: updatedData,
+            formData: updatedData as FacilityFormData,
+            isLoading: false
+          }));
+        } else {
+          throw new Error("업데이트된 시설물 데이터를 찾을 수 없습니다.");
         }
+      } else {
+        throw new Error("도면 업데이트에 실패했습니다.");
       }
     } catch (err) {
-      setError(err as Error);
       console.error("도면 업데이트 실패:", err);
+      setFormState(prev => ({
+        ...prev,
+        error: err as Error,
+        isLoading: false
+      }));
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  // 저장 핸들러
   const handleSave = async () => {
-    if (!facilityType || !formData) return;
+    if (!facilityType || !formState.formData) return;
 
-    setIsLoading(true);
-    setError(null);
+    setFormState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const facilityService = FacilityServiceFactory.getService(facilityType);
       let success = false;
 
       if (facilityId) {
-        success = await facilityService.update(facilityId, formData);
+        success = await facilityService.update(facilityId, formState.formData);
       } else {
-        success = await facilityService.create(formData);
+        success = await facilityService.create(formState.formData);
       }
 
-      if (success && onSaveSuccess) {
-        onSaveSuccess();
+      if (success) {
+        if (onSaveSuccess) {
+          onSaveSuccess();
+        }
+      } else {
+        throw new Error("시설물 저장에 실패했습니다.");
       }
+
+      setFormState(prev => ({ ...prev, isLoading: false }));
     } catch (err) {
-      setError(err as Error);
       console.error("시설물 저장 실패:", err);
-    } finally {
-      setIsLoading(false);
+      setFormState(prev => ({
+        ...prev,
+        error: err as Error,
+        isLoading: false
+      }));
     }
   };
 
   const handleEditToggle = () => {
-    setIsEditMode(prev => !prev);
+    setFormState(prev => ({ ...prev, isEditMode: !prev.isEditMode }));
   };
 
   const handleBack = () => {
@@ -154,43 +224,44 @@ export function useFacilityFormHandler({ facilityType, facilityId, mode, initial
   const handleDelete = async () => {
     if (!facilityType || !facilityId) return;
 
-    setIsLoading(true);
-    setError(null);
+    setFormState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const facilityService = FacilityServiceFactory.getService(facilityType);
       const success = await facilityService.delete(facilityId);
 
-      if (success && onSaveSuccess) {
-        onSaveSuccess();
+      if (success) {
+        if (onSaveSuccess) {
+          onSaveSuccess();
+        }
+      } else {
+        throw new Error("시설물 삭제에 실패했습니다.");
       }
+
+      setFormState(prev => ({ ...prev, isLoading: false }));
     } catch (err) {
-      setError(err as Error);
       console.error("시설물 삭제 실패:", err);
-    } finally {
-      setIsLoading(false);
+      setFormState(prev => ({
+        ...prev,
+        error: err as Error,
+        isLoading: false
+      }));
     }
   };
 
+  const handlers: FacilityFormHandlers = {
+    handleInputChange,
+    handleThumbnailUpload,
+    handleDrawingUpload,
+    handleUpdateDrawing,
+    handleSave,
+    handleEditToggle,
+    handleBack,
+    handleDelete
+  };
+
   return {
-    data: {
-      facilityData,
-      formData,
-      isLoading,
-      error,
-      isEditMode,
-      thumbnailUploader,
-      drawingUploader,
-    },
-    handlers: {
-      handleInputChange,
-      handleThumbnailUpload,
-      handleDrawingUpload,
-      handleUpdateDrawing,
-      handleSave,
-      handleEditToggle,
-      handleBack,
-      handleDelete,
-    },
+    data: formState,
+    handlers
   };
 }

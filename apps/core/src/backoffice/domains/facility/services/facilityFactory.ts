@@ -1,12 +1,13 @@
-import { FacilityType } from "../store/FacilityListStore";
-import { FacilityData } from "../types/facilityTypeGuard";
+
+import { FacilityCreateRequest, FacilityData, FacilityUpdateRequest } from "../types/facilityTypeGuard";
 import { BuildingService } from "@/backoffice/domains/facility/services/definitions/BuildingService";
 import { StationService } from "@/backoffice/domains/facility/services/definitions/StationService";
+import { FacilityType } from "../types/facilityTypes";
 
 export interface IFacilityService {
   fetchDetail(id: number): Promise<FacilityData | null>;
-  create(data: any): Promise<boolean>;
-  update(id: number, data: any): Promise<boolean>;
+  create(data: FacilityCreateRequest): Promise<boolean>;
+  update(id: number, data: FacilityUpdateRequest): Promise<boolean>;
   delete(id: number): Promise<boolean>;
 }
 
