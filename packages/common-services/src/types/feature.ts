@@ -1,3 +1,5 @@
+import { AssetResponse } from './asset';
+
 export interface Spatial {
   x: number;
   y: number;
@@ -29,7 +31,7 @@ export interface FeatureResponse {
   position?: Spatial;
   rotation?: Spatial;
   scale?: Spatial;
-  asset?: any; // AssetResponse - avoid circular imports
+  asset?: AssetResponse;
   floorId: string;
   deviceId?: string;
 }

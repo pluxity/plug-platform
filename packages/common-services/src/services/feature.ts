@@ -1,4 +1,4 @@
-import { useGet, usePost, usePatch, useDelete, useSWRApi } from '@plug/api-hooks';
+import { useGet, usePost, useSWRApi } from '@plug/api-hooks';
 import { api } from '@plug/api-hooks/core';
 import type { 
   FeatureResponse, 
@@ -9,54 +9,49 @@ import type {
 
 const END_POINT = `features`;
 
-// 피처 목록 조회
-export const useFeatures = () => {
-  return useGet<FeatureResponse[]>(END_POINT, { requireAuth: true });
+export const useFeatures = (queryParams?: Record<string, any>) => {
+  const queryString = queryParams ? '?' + new URLSearchParams(queryParams).toString() : '';
+  return useGet<FeatureResponse[]>(`${END_POINT}${queryString}`, { requireAuth: true });
 };
 
-// 피처 상세 조회
 export const useFeatureDetail = (featureId: string) => {
   return useGet<FeatureResponse>(`${END_POINT}/${featureId}`, { requireAuth: true });
 };
 
-// 피처 생성
 export const useCreateFeature = () => {
   return usePost<FeatureCreateRequest>(END_POINT, { requireAuth: true });
 };
 
-// 피처 삭제
+export const createFeature = async (data: FeatureCreateRequest): Promise<FeatureResponse> => {
+  const response = await api.post(END_POINT, data, { requireAuth: true });
+  
+  if (response.status === 201) {
+    const result = await response.json() as any;
+    return result.data || result;
+  }
+  
+  throw new Error(`Unexpected response status: ${response.status}`);
+};
+
 export const deleteFeature = async (featureId: string) => {
   return api.delete(`${END_POINT}/${featureId}`, { requireAuth: true });
 };
 
-// 피처 정보 수정 (transform)
-export const useUpdateFeature = (featureId: string) => {
-  return usePatch<FeatureUpdateRequest>(`${END_POINT}/${featureId}/transform`, { requireAuth: true });
+export const updateFeature = async (featureId: string, data: FeatureUpdateRequest): Promise<void> => {
+  return api.patch(`${END_POINT}/${featureId}/transform`, data, { requireAuth: true });
 };
 
-// 피처에 디바이스 할당
-export const useAssignDeviceToFeature = (featureId: string) => {
-  return usePatch<FeatureAssignDto>(`${END_POINT}/${featureId}/assign-device`, { requireAuth: true });
+export const assignDeviceToFeature = async (featureId: string, data: FeatureAssignDto): Promise<void> => {
+  return api.patch(`${END_POINT}/${featureId}/assign-device`, data, { requireAuth: true });
 };
 
-// 피처에 에셋 할당
-export const useAssignAssetToFeature = (featureId: string, assetId: number) => {
-  return usePatch<null>(`${END_POINT}/${featureId}/assets/${assetId}`, { requireAuth: true });
+export const removeDeviceFromFeature = async (featureId: string): Promise<void> => {
+  return api.delete(`${END_POINT}/${featureId}/revoke-device`, { requireAuth: true });
 };
 
-// 피처에서 디바이스 연결 해제
-export const useRemoveDeviceFromFeature = (featureId: string) => {
-  return useDelete(`${END_POINT}/${featureId}/revoke-device`, { requireAuth: true });
-};
-
-// 피처에서 에셋 연결 해제
-export const useRemoveAssetFromFeature = (featureId: string) => {
-  return useDelete(`${END_POINT}/${featureId}/assets`, { requireAuth: true });
-};
-
-// SWR 기반 훅들
-export const useFeaturesSWR = () => {
-  return useSWRApi<FeatureResponse[]>(END_POINT, 'GET', { requireAuth: true });
+export const useFeaturesSWR = (queryParams?: Record<string, any>) => {
+  const queryString = queryParams ? '?' + new URLSearchParams(queryParams).toString() : '';
+  return useSWRApi<FeatureResponse[]>(`${END_POINT}${queryString}`, 'GET', { requireAuth: true });
 };
 
 export const useFeatureDetailSWR = (featureId: string) => {
