@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,32 +9,38 @@ import {
   ModalFormItem,
   ModalFormContainer,
   ModalFormField,
+  MultiSelect,
 } from '@plug/ui';
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useCreateRole } from '@plug/common-services/services';
+import { roleFormSchema, type RoleFormData } from '@/backoffice/domains/users/schemas/roleSchemas';
+import { useCreateRole, usePermissions } from '@plug/common-services/services';
 import { RoleCreateModalProps } from '@/backoffice/domains/users/types/role';
 
 export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
     // 역할 생성
     const { execute: createRole, isLoading: isRoleCreating } = useCreateRole();
+    const { data: permissionData, execute: getPermissions } = usePermissions();
 
-    const roleFormSchema = z.object({
-        name: z.string().min(1, {
-            message: '역할 이름을 입력해주세요.'
-        }),
-        description: z.string().min(1, {
-            message: '역할 설명을 입력해주세요.'
-        }),
-    });
+    // 권한 옵션
+    const permissionOptions = useMemo(() => {
+        return permissionData?.map(permission => ({
+            label: permission.name,
+            value: permission.id.toString(),
+        })) || [];
+    }, [permissionData]);
 
-    const modalForm = useForm<z.infer<typeof roleFormSchema>>({
+    useEffect(() => {
+        getPermissions();
+    }, []);
+
+    const modalForm = useForm<RoleFormData>({
         resolver: zodResolver(roleFormSchema),
         defaultValues: {
             name: '',
             description: '',
+            permissionGroupIds: [],
         },
         mode: 'onChange',
     });
@@ -43,13 +49,15 @@ export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClos
         modalForm.reset({
             name: '',
             description: '',
+            permissionGroupIds: [],
         });
         onClose();
     }, [modalForm, onClose]);
 
-    const handleSubmit = useCallback(async (data: z.infer<typeof roleFormSchema>) => {
+    const handleSubmit = useCallback(async (data: RoleFormData) => {
         try {
             await createRole({ 
+                permissionGroupIds: data.permissionGroupIds,
                 name: data.name, 
                 description: data.description 
             });
@@ -66,6 +74,20 @@ export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClos
             <DialogContent title="역할 등록" className="max-w-xl" dimmed disableBackground>
                 <ModalForm {...modalForm}>
                     <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
+                        <ModalFormField
+                            control={modalForm.control}
+                            name="permissionGroupIds"
+                            render={({ field }) => (
+                                <ModalFormItem label="권한" message={modalForm.formState.errors.permissionGroupIds?.message}>
+                                    <MultiSelect
+                                        value={field.value.map(String)}
+                                        onChange={(value) => field.onChange(value.map(Number))}
+                                        options={permissionOptions}
+                                        placeholder="권한(들)을 선택해주세요."
+                                    />
+                                </ModalFormItem>
+                            )}
+                        />
                         <ModalFormContainer>
                             <ModalFormField
                                 control={modalForm.control}

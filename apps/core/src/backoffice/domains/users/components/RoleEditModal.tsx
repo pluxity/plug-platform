@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,13 @@ import {
   ModalFormField,
   ModalFormContainer,
   ModalFormItem,
+  MultiSelect,
 } from '@plug/ui';
 import { toast } from 'sonner'; 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useRoleDetailSWR, useUpdateRole } from '@plug/common-services';
+import { roleFormSchema, type RoleFormData } from '@/backoffice/domains/users/schemas/roleSchemas';
+import { useRoleDetailSWR, useUpdateRole, usePermissions } from '@plug/common-services';
 import { RoleEditModalProps } from '@/backoffice/domains/users/types/role';
 
 export const RoleEditModal: React.FC<RoleEditModalProps> = ({
@@ -27,20 +28,26 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
     const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : undefined);
     const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId);
 
-    const roleFormSchema = z.object({
-        name: z.string().min(1, {
-            message: '역할 이름을 입력해주세요.'
-        }),
-        description: z.string().min(1, {
-            message: '역할 설명을 입력해주세요.'
-        }),
-    });
+    const { data: permissionData, execute: getPermissions } = usePermissions();
 
-    const modalForm = useForm<z.infer<typeof roleFormSchema>>({
+    // 권한 옵션
+    const permissionOptions = useMemo(() => {
+        return permissionData?.map(permission => ({
+            label: permission.name,
+            value: permission.id.toString(),
+        })) || [];
+    }, [permissionData]);
+
+    useEffect(() => {
+        getPermissions();
+    }, []);
+
+    const modalForm = useForm<RoleFormData>({
         resolver: zodResolver(roleFormSchema),
         defaultValues: {
             name: '',
             description: '',
+            permissionGroupIds: [],
         },
         mode: 'onChange',
     });
@@ -48,6 +55,7 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
     useEffect(() => {
         if (isOpen && data) {
             modalForm.reset({
+                permissionGroupIds: Array.from(data.permissions).map((permission) => permission.id),
                 name: data.name,
                 description: data.description,
             });
@@ -57,6 +65,7 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
     const resetForm = useCallback(() => {
         if (data) {
             modalForm.reset({
+                permissionGroupIds: Array.from(data.permissions).map((permission) => permission.id),
                 name: data.name,
                 description: data.description,
             });
@@ -65,9 +74,10 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
         mutate();
     }, [data, modalForm, onClose, mutate]);
 
-    const handleSubmit = useCallback(async (data: z.infer<typeof roleFormSchema>) => {
+    const handleSubmit = useCallback(async (data: RoleFormData) => {
         try {
             await updateRole({ 
+                permissionGroupIds: data.permissionGroupIds,
                 name: data.name, 
                 description: data.description 
             });
@@ -85,6 +95,20 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
                 <ModalForm {...modalForm}>
                     <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
                         <ModalFormContainer>
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="permissionGroupIds"
+                                render={({ field }) => (
+                                    <ModalFormItem label="권한" message={modalForm.formState.errors.permissionGroupIds?.message}>
+                                        <MultiSelect
+                                            value={field.value.map(String)}
+                                            onChange={(value) => field.onChange(value.map(Number))}
+                                            options={permissionOptions}
+                                            placeholder="권한(들)을 선택해주세요."
+                                        />
+                                    </ModalFormItem>
+                                )}
+                            />
                             <ModalFormField
                                 control={modalForm.control}
                                 name="name"

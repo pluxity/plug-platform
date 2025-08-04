@@ -2,6 +2,7 @@ export interface RoleData {
     id: number
     name: string;
     description: string;
+    permissionGroupIds: string[];
 }
 
 export interface RoleCreateModalProps {
