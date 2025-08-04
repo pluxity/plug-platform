@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { Engine3D, Loader } from '@plug/engine/src';
-import { useDetailSWR, FacilityFactory } from '@plug/common-services';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { Engine3D, Loader, Poi } from '@plug/engine/src';
+import { useDetailSWR, FacilityFactory, useFeaturesByFacilitySWR, useAssetsSWR } from '@plug/common-services';
 import { FloorControl } from './FloorControl';
 
 interface IndoorMapViewerProps {
@@ -31,6 +31,17 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
     revalidateIfStale: false,
     dedupingInterval: 60000 * 10,
   });
+
+  // Features 데이터 로드
+  const { data: featuresData } = useFeaturesByFacilitySWR(facilityId);
+  
+  // Assets 데이터 직접 로드 (무한 루프 방지)
+  const { data: assetsData } = useAssetsSWR();
+  
+  // Assets를 ID로 찾는 함수
+  const getAssetById = useCallback((id: number) => {
+    return assetsData?.find(asset => asset.id === id);
+  }, [assetsData]);
 
   const modelUrl = facilityData?.facility.drawing.url;
 
@@ -121,6 +132,103 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       }
     };
   }, [modelUrl, onEngineReady]);
+
+  // Features 데이터가 로드되고 engine이 준비되면 POI 생성
+  useEffect(() => {
+    if (!engine3DRef.current || !featuresData || featuresData.length === 0 || !assetsData) {
+      return;
+    }
+
+    const createPOIsFromFeatures = async () => {
+      try {
+        Poi.Clear();
+
+        let createdCount = 0;
+        let skippedCount = 0;
+
+        for (const feature of featuresData) {
+          if (!feature.assetId || !feature.position) {
+            console.warn('Feature missing assetId or position:', feature);
+            skippedCount++;
+            continue;
+          }
+
+          const asset = getAssetById(feature.assetId);
+          if (!asset || !asset.file?.url) {
+            console.warn('Asset not found or no file URL:', feature.assetId);
+            skippedCount++;
+            continue;
+          }
+
+          // 아이콘 URL 결정 로직
+          let iconUrl = '';
+          if (asset.thumbnailFile?.url) {
+            // 썸네일이 있으면 썸네일을 아이콘으로 사용
+            iconUrl = asset.thumbnailFile.url;
+          } else if (asset.file?.url.toLowerCase().includes('.png') || asset.file?.url.toLowerCase().includes('.jpg') || asset.file?.url.toLowerCase().includes('.jpeg')) {
+            // 메인 파일이 이미지면 아이콘으로 사용
+            iconUrl = asset.file.url;
+          } else {
+            // 기본 POI 아이콘 사용 (실제 경로는 프로젝트에 맞게 수정)
+            iconUrl = 'SamplePoiIcon.png';
+          }
+
+          // POI 생성 옵션 구성
+          const poiCreateOption = {
+            id: feature.id,
+            iconUrl: iconUrl,
+            modelUrl: asset.file?.url || '', // 메인 파일을 모델로 사용
+            displayText: asset.name || feature.id,
+            property: {
+              assetId: asset.id,
+              assetName: asset.name,
+              assetCode: asset.code,
+              facilityId: facilityId,
+              floorId: feature.floorId,
+              featureId: feature.id,
+              categoryId: asset.categoryId,
+              categoryName: asset.categoryName,
+              position: {
+                x: feature.position.x,
+                y: feature.position.y,
+                z: feature.position.z
+              },
+              rotation: feature.rotation ? {
+                x: feature.rotation.x,
+                y: feature.rotation.y,
+                z: feature.rotation.z
+              } : { x: 0, y: 0, z: 0 },
+              scale: feature.scale ? {
+                x: feature.scale.x,
+                y: feature.scale.y,
+                z: feature.scale.z
+              } : { x: 1, y: 1, z: 1 }
+            }
+          };
+
+          // POI Create를 사용하여 생성
+          Poi.Create(poiCreateOption, (data: unknown) => {
+            console.log('POI created for feature:', {
+              featureId: feature.id,
+              assetId: asset.id,
+              assetName: asset.name,
+              position: feature.position,
+              iconUrl: iconUrl,
+              modelUrl: asset.file?.url,
+              callbackData: data
+            });
+          });
+          createdCount++;
+        }
+
+        console.log(`POI creation completed. Created: ${createdCount}, Skipped: ${skippedCount}`);
+      } catch (error) {
+        console.error('Error creating POIs from features:', error);
+      }
+    };
+
+    createPOIsFromFeatures();
+  }, [featuresData, facilityId, getAssetById, assetsData]);
 
   // 에러 처리
   if (error) {

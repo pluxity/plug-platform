@@ -281,25 +281,26 @@ export const useAssetStore = create<AssetState>()(
 // Hook for using asset store with automatic data loading
 export const useAssets = () => {
   const store = useAssetStore()
+  const { setAssets, setAssetsFetched, setAssetError, setAssetsLoading } = store
   const { data: assetsData, error: assetsError, isLoading: assetsLoading } = useAssetsSWR()
   
   // Sync SWR data with store
   useEffect(() => {
     if (assetsData) {
-      store.setAssets(assetsData)
-      store.setAssetsFetched(true)
+      setAssets(assetsData)
+      setAssetsFetched(true)
     }
-  }, [assetsData, store])
+  }, [assetsData, setAssets, setAssetsFetched])
 
   useEffect(() => {
     if (assetsError) {
-      store.setAssetError(assetsError.message || 'Failed to load assets')
+      setAssetError(assetsError.message || 'Failed to load assets')
     }
-  }, [assetsError, store])
+  }, [assetsError, setAssetError])
 
   useEffect(() => {
-    store.setAssetsLoading(assetsLoading)
-  }, [assetsLoading, store])
+    setAssetsLoading(assetsLoading)
+  }, [assetsLoading, setAssetsLoading])
   
   return {
     assets: store.assets,
@@ -313,26 +314,27 @@ export const useAssets = () => {
 // Hook for using asset categories with automatic data loading
 export const useAssetCategories = () => {
   const store = useAssetStore()
+  const { setCategories, setMaxDepth, setCategoriesFetched, setCategoryError, setCategoriesLoading } = store
   const { data: categoriesData, error: categoriesError, isLoading: categoriesLoading } = useAssetCategoriesSWR()
   
   // Sync SWR data with store
   useEffect(() => {
     if (categoriesData) {
-      store.setCategories(categoriesData.list)
-      store.setMaxDepth(categoriesData.maxDepth)
-      store.setCategoriesFetched(true)
+      setCategories(categoriesData.list)
+      setMaxDepth(categoriesData.maxDepth)
+      setCategoriesFetched(true)
     }
-  }, [categoriesData, store])
+  }, [categoriesData, setCategories, setMaxDepth, setCategoriesFetched])
 
   useEffect(() => {
     if (categoriesError) {
-      store.setCategoryError(categoriesError.message || 'Failed to load categories')
+      setCategoryError(categoriesError.message || 'Failed to load categories')
     }
-  }, [categoriesError, store])
+  }, [categoriesError, setCategoryError])
 
   useEffect(() => {
-    store.setCategoriesLoading(categoriesLoading)
-  }, [categoriesLoading, store])
+    setCategoriesLoading(categoriesLoading)
+  }, [categoriesLoading, setCategoriesLoading])
   
   return {
     categories: store.categories,

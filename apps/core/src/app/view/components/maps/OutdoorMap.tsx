@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useCesium } from 'resium'
 import * as Cesium from 'cesium'
-import MapControls from '@/global/components/maps/MapControls'
+import MapControls from '@/global/components/outdoor-map/MapControls'
 import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
-import type { FacilityFactory } from '@plug/common-services'
-import { VWorldMap } from '@/global/components/maps'
+import type { FacilityFactory, BaseFacilityResponse } from '@plug/common-services'
+import { OSMBuildingsMap } from '@/global/components/outdoor-map'
 
 interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityFactory) => void;
@@ -50,8 +50,26 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
         viewer.clock.shouldAnimate = false
         viewer.clock.multiplier = 1
 
-        if (facilities.buildings) {
-          facilities.buildings.forEach((facility) => {
+        // 시설 타입별 설정
+        const facilityTypeConfigs = {
+          buildings: {
+            color: Cesium.Color.WHITE,
+            silhouetteColor: Cesium.Color.YELLOW
+          },
+          stations: {
+            color: Cesium.Color.BLUE,
+            silhouetteColor: Cesium.Color.CYAN
+          }
+        }
+
+        // 모든 시설 타입 처리
+        Object.entries(facilities).forEach(([facilityType, facilityList]) => {
+          if (!facilityList) return
+
+          const config = facilityTypeConfigs[facilityType as keyof typeof facilityTypeConfigs]
+          if (!config) return
+
+          facilityList.forEach((facility: BaseFacilityResponse) => {
             if (facility.lat && facility.lon) {
               const position = Cesium.Cartesian3.fromDegrees(
                 facility.lon,
@@ -60,7 +78,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
               )
 
               const rotationCallback = new Cesium.CallbackProperty(() => {
-                const time = Date.now() / 1000;
+                const time = Date.now() / 500;
                 const angle = (time * Math.PI * 2) / 30;
                 return Cesium.Transforms.headingPitchRollQuaternion(
                   position,
@@ -90,73 +108,20 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
                 model: {
                   uri: resource,
                   scale: scaleCallback,
-                  color: Cesium.Color.WHITE,
-                  silhouetteColor: Cesium.Color.YELLOW,
+                  color: config.color,
+                  silhouetteColor: config.silhouetteColor,
                   silhouetteSize: new Cesium.ConstantProperty(0),
+                  heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
                 },
                 properties: {
                   facilityId: facility.id,
                   facilityData: facility,
-                  facilityType: 'buildings' as FacilityFactory
+                  facilityType: facilityType as FacilityFactory
                 }
               })
             }
           })
-        }
-
-        if (facilities.stations) {
-          facilities.stations.forEach((facility) => {
-            if (facility.lat && facility.lon) {
-              const position = Cesium.Cartesian3.fromDegrees(
-                facility.lon,
-                facility.lat,
-                0
-              )
-
-              const rotationCallback = new Cesium.CallbackProperty(() => {
-                const time = Date.now() / 1000;
-                const angle = (time * Math.PI * 2) / 30;
-                return Cesium.Transforms.headingPitchRollQuaternion(
-                  position,
-                  new Cesium.HeadingPitchRoll(angle, 0, 0)
-                );
-              }, false);
-
-              const scaleCallback = new Cesium.CallbackProperty(() => {
-                const cameraPosition = viewer.camera.position
-                const distance = Cesium.Cartesian3.distance(cameraPosition, position)
-                
-                const baseScale = 10.0
-                const maxScale = 25.0
-                const scaleDistance = 5000 
-                
-                const scaleFactor = Math.min(distance / scaleDistance, 2.5)
-                return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
-              }, false)
-
-              const entityId = `facility-${facility.id}`;
-
-              viewer.entities.add({
-                id: entityId,
-                name: facility.name,
-                position: position,
-                orientation: rotationCallback,
-                model: {
-                  uri: resource,
-                  scale: scaleCallback,
-                  color: Cesium.Color.BLUE,
-                  silhouetteColor: Cesium.Color.CYAN,
-                  silhouetteSize: new Cesium.ConstantProperty(0),
-                },
-                properties: {
-                  facilityId: facility.id,
-                  facilityData: facility,
-                  facilityType: 'stations' as FacilityFactory
-                }
-              })
-            }
-          })
-        }
+        })
 
         handleMouseMove = (event: MouseEvent) => {
           const canvasPosition = new Cesium.Cartesian2(event.clientX, event.clientY)
@@ -235,10 +200,10 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
         <FacilitySearchForm viewer={cesiumViewer} />
       </div>
       
-      <VWorldMap className="w-full h-full">
+      <OSMBuildingsMap className="w-full h-full">
         <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
         <FacilityPOIs />
-      </VWorldMap>
+      </OSMBuildingsMap>
     </div>
   )
 }
