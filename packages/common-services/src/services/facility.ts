@@ -1,31 +1,54 @@
-import { usePatch, useSWRApi, api } from "@plug/api-hooks";
-import {FacilitiesAllResponse, FacilityDrawingUpdateRequest} from "../types";
+import { api } from '@plug/api-hooks';
+import { DataResponseBody } from '@plug/api-hooks';
+import {
+  FacilityResponse,
+  FacilityHistoryResponse,
+  FacilityLocationUpdateRequest,
+  FacilityPathSaveRequest,
+  FacilityPathUpdateRequest,
+  FacilityFloorUpdateRequest,
+  FacilityDrawingUpdateRequest
+} from '../types/facility';
+import { 
+  FacilityService,
+  domainServices
+} from './facility-generic';
 
-const END_POINT = 'facilities';
+export { 
+  FacilityService,
+  domainServices
+};
 
-// path
-export const useCreateFacilitiesPath = () => {
-  return usePatch(`${END_POINT}/path`, { requireAuth: true });
-}
+export const facilityService = {
+  getAllFacilities: async (): Promise<DataResponseBody<FacilityResponse[]>> => {
+    return api.get<FacilityResponse[]>('/facilities');
+  },
 
-export const useUpdateFacilitiesPath = (facilityId: number, pathId: number) => {
-  return usePatch(`${END_POINT}/${facilityId}/path/${pathId}`, { requireAuth: true });
-}
+  getFacilityHistory: async (facilityId: number): Promise<DataResponseBody<FacilityHistoryResponse[]>> => {
+    return api.get<FacilityHistoryResponse[]>(`/facilities/${facilityId}/history`);
+  },
 
-export const useDeleteFacilitiesPath = (facilityId: number, pathId: number) => {
-  return usePatch(`${END_POINT}/${facilityId}/path/${pathId}`, { requireAuth: true });
-}
+  updateFacilityLocation: async (facilityId: number, data: FacilityLocationUpdateRequest): Promise<void> => {
+    return api.put(`/facilities/${facilityId}/location`, data);
+  },
 
-export const useUpdateFacilitiesDrawing = (facilityId: number) => {
-  return usePatch<FacilityDrawingUpdateRequest>(`${END_POINT}/${facilityId}/drawing`, { requireAuth: true });
-}
+  addFacilityPath: async (facilityId: number, data: FacilityPathSaveRequest): Promise<void> => {
+    await api.post(`/facilities/${facilityId}/path`, data);
+  },
 
-export const useFacilitiesAllSWR = () => {
-  return useSWRApi<FacilitiesAllResponse>(END_POINT, 'GET', { requireAuth: true })
-}
+  updateFacilityPath: async (facilityId: number, pathId: number, data: FacilityPathUpdateRequest): Promise<void> => {
+    return api.patch(`/facilities/${facilityId}/path/${pathId}`, data);
+  },
 
-// 일반 API 호출 - 한 번만 실행
-export const getFacilitiesAll = async (): Promise<FacilitiesAllResponse> => {
-  const response = await api.get<FacilitiesAllResponse>(END_POINT, { requireAuth: true });
-  return response.data;
-}
+  deleteFacilityPath: async (facilityId: number, pathId: number): Promise<void> => {
+    return api.delete(`/facilities/${facilityId}/path/${pathId}`);
+  },
+
+  updateFacilityFloors: async (facilityId: number, data: FacilityFloorUpdateRequest): Promise<void> => {
+    return api.patch(`/facilities/${facilityId}/floors`, data);
+  },
+
+  updateFacilityDrawing: async (facilityId: number, data: FacilityDrawingUpdateRequest): Promise<void> => {
+    return api.patch(`/facilities/${facilityId}/drawing`, data);
+  },
+};
