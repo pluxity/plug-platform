@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { roleFormSchema, type RoleFormData } from '@/backoffice/domains/users/schemas/roleSchemas';
-import { useRoleDetailSWR, useUpdateRole, usePermissions } from '@plug/common-services';
+import { useRoleDetailSWR, useUpdateRole, usePermissionsSWR } from '@plug/common-services';
 import { RoleEditModalProps } from '@/backoffice/domains/users/types/role';
 
 export const RoleEditModal: React.FC<RoleEditModalProps> = ({
@@ -28,7 +28,8 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
     const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : undefined);
     const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId);
 
-    const { data: permissionData, execute: getPermissions } = usePermissions();
+    // 권한 목록 조회
+    const { data: permissionData } = usePermissionsSWR();
 
     // 권한 옵션
     const permissionOptions = useMemo(() => {
@@ -37,10 +38,6 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
             value: permission.id.toString(),
         })) || [];
     }, [permissionData]);
-
-    useEffect(() => {
-        getPermissions();
-    }, []);
 
     const modalForm = useForm<RoleFormData>({
         resolver: zodResolver(roleFormSchema),

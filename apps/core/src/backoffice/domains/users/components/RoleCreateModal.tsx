@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,13 +15,15 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { roleFormSchema, type RoleFormData } from '@/backoffice/domains/users/schemas/roleSchemas';
-import { useCreateRole, usePermissions } from '@plug/common-services/services';
+import { useCreateRole,  usePermissionsSWR } from '@plug/common-services/services';
 import { RoleCreateModalProps } from '@/backoffice/domains/users/types/role';
 
 export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
     // 역할 생성
     const { execute: createRole, isLoading: isRoleCreating } = useCreateRole();
-    const { data: permissionData, execute: getPermissions } = usePermissions();
+
+    // 권한 목록 조회
+    const { data: permissionData } = usePermissionsSWR();
 
     // 권한 옵션
     const permissionOptions = useMemo(() => {
@@ -31,9 +33,6 @@ export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClos
         })) || [];
     }, [permissionData]);
 
-    useEffect(() => {
-        getPermissions();
-    }, []);
 
     const modalForm = useForm<RoleFormData>({
         resolver: zodResolver(roleFormSchema),
