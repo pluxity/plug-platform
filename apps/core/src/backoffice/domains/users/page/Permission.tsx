@@ -8,6 +8,7 @@ import { deletePermission } from '@plug/common-services/services';
 import { toast } from 'sonner';
 import { PermissionCreateModal } from '@/backoffice/domains/users/components/PermisstionCreateModal';
 import { PermissionEditModal } from '@/backoffice/domains/users/components/PermissionEditModal';
+import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 
 const Permission: React.FC = () => {
     // 권한 상태 관리 
@@ -19,9 +20,13 @@ const Permission: React.FC = () => {
     // 권한 목록 조회
     const { data, execute } = usePermissions();
 
+    // 권한 리소스 가져오기
+    const { fetchPermissionResources } = usePermissionStore();
+
     // 권한 목록 조회 훅 실행
     useEffect(() => {
         execute();
+        fetchPermissionResources();
     }, []); 
 
     // 권한 목록 매핑

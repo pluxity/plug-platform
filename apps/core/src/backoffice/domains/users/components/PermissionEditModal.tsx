@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Button, Checkbox, Label } from '@plug/ui';
 import { PermissionEditModalProps } from '@/backoffice/domains/users/types/permisson';
-import { usePermissionResources } from '@/backoffice/domains/users/hooks/usePermissionResources';
+import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
 import { usePermissionDetail, useUpdatePermission } from '@plug/common-services';
 import { useForm } from 'react-hook-form';
@@ -13,9 +13,8 @@ export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpe
     // 권한 상세 목록 조회
     const { data: detailData, execute: detailPermission } = usePermissionDetail(permissionId);
     const { execute: updatePermission, isLoading: isPermissionUpdating } = useUpdatePermission(permissionId);
-
     // 리소스 데이터 가져오기
-    const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionResources();
+    const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();
     // 리소스 체크박스 로직
     const { isResourceSelected, handleCheckboxChange } = usePermissionCheckbox();
 

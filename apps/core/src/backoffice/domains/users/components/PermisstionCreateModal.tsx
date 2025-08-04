@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { PermissionCreateModalProps } from '@/backoffice/domains/users/types/permisson';
 import { Dialog, DialogContent, DialogFooter, Button, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Checkbox, Label } from '@plug/ui';
 import { useCreatePermission } from '@plug/common-services/services';
-import { usePermissionResources } from '@/backoffice/domains/users/hooks/usePermissionResources';
+import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -13,7 +13,7 @@ export const PermissionCreateModal: React.FC<PermissionCreateModalProps> = ({ is
     // 권한 생성
     const { execute: createPermission, isLoading: isPermissionCreating } = useCreatePermission();
     // 리소스 데이터 가져오기
-    const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionResources();
+    const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();
     // 리소스 체크박스 로직
     const { isResourceSelected, handleCheckboxChange } = usePermissionCheckbox();
 
