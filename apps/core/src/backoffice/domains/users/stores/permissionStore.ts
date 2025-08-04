@@ -1,14 +1,10 @@
 import { create } from 'zustand';
 import { PermissionResourceType } from '@plug/common-services/types';
+import { PermissionResourceData } from '@/backoffice/domains/users/types/permisson';
 import { api } from '@plug/api-hooks';
-
-interface ResourceItem {
-    id: string;
-    name: string;
-}
 interface PermissionStore {
     resourceTypes: PermissionResourceType[]
-    resourceData: Record<string, ResourceItem[]>
+    resourceData: Record<string, PermissionResourceData[]>
     isLoading: boolean
     error: string | null
     fetchPermissionResources: () => Promise<void>
@@ -20,8 +16,8 @@ const isCategoryType = (key: string): boolean => {
 };
 
 // 계층 구조에서 maxDepth에 해당하는 leaf 노드만 추출하는 함수 
-const getNodesByDepth = (maxDepth: number, items: any[]): ResourceItem[] => {
-    const leafNodes: ResourceItem[] = [];
+const getNodesByDepth = (maxDepth: number, items: any[]): PermissionResourceData[] => {
+    const leafNodes: PermissionResourceData[] = [];
     
     const traverse = (item: any) => {
         if (item.depth === maxDepth) {
@@ -56,14 +52,14 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
             const types = resourceTypesResponse.data;
 
             // 2단계: 각 resourceType별 데이터 가져오기
-            const data: Record<string, ResourceItem[]> = {};
+            const data: Record<string, PermissionResourceData[]> = {};
             
             for (const resourceType of types) {
                 try {
                     const endpoint = resourceType.endpoint;
                     
                     if (endpoint) {    
-                        const response = await api.get<ResourceItem[]>(`${endpoint}`);
+                        const response = await api.get<PermissionResourceData[]>(`${endpoint}`);
                         const responseData = (response as any)?.data || response;
 
                         if (isCategoryType(resourceType.key)) {
@@ -72,14 +68,14 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
 
                         } else if (resourceType.key === 'FACILITY') {
                             // Facility 타입인 경우 : 모든 시설 데이터를 하나의 배열로 합침
-                            const facilityAllArrays = (data: Record<string, ResourceItem[]>) => {
+                            const facilityAllArrays = (data: Record<string, PermissionResourceData[]>) => {
                                 return Object.values(data).reduce((acc, curr) => {
                                     return Array.isArray(curr) ? [...acc, ...curr] : acc;
                                 }, []);
                             };
 
                             const facilityList = facilityAllArrays(responseData);
-                            data[resourceType.key] = facilityList.map((item: ResourceItem) => ({
+                            data[resourceType.key] = facilityList.map((item: PermissionResourceData) => ({
                                 id: item.id.toString(),
                                 name: item.name
                             }));
@@ -87,7 +83,7 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
                         } else {
                             // 일반 타입 처리
                             data[resourceType.key] = Array.isArray(responseData) 
-                                ? responseData.map((item: ResourceItem) => ({
+                                ? responseData.map((item: PermissionResourceData) => ({
                                     id: item.id.toString(),
                                     name: item.name
                                 })) : [];

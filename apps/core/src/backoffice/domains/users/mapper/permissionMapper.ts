@@ -1,7 +1,7 @@
 import { PermissionResponse, PermissionResourceType } from '@plug/common-services';
-import { PermissionData } from '../types/permisson';
+import { PermissionData, PermissionResourceData } from '../types/permisson';
 
-export const PermissionMapper = (permission: PermissionResponse, resourceTypes: PermissionResourceType[], resourceData: Record<string, {id: string, name: string}[]>): PermissionData => ({
+export const PermissionMapper = (permission: PermissionResponse, resourceTypes: PermissionResourceType[], resourceData: Record<string, PermissionResourceData[]>): PermissionData => ({
     id: permission.id,
     name: permission.name,
     permissions: permission.permissions.map(p => {

@@ -4,6 +4,11 @@ export interface PermissionData {
     permissions: string[];
 }
 
+export interface PermissionResourceData{
+    id: string;
+    name: string;
+}
+
 export interface PermissionCreateModalProps {
     isOpen: boolean;
     onClose: () => void;
