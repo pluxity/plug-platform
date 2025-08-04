@@ -21,7 +21,7 @@ const Permission: React.FC = () => {
     const { data, execute } = usePermissions();
 
     // 권한 리소스 가져오기
-    const { fetchPermissionResources } = usePermissionStore();
+    const { fetchPermissionResources, resourceTypes, resourceData } = usePermissionStore();
 
     // 권한 목록 조회 훅 실행
     useEffect(() => {
@@ -30,7 +30,9 @@ const Permission: React.FC = () => {
     }, []); 
 
     // 권한 목록 매핑
-    const permissionData = data ? data.map(PermissionMapper) : [];
+    const permissionData = data ? data.map(permission => 
+        PermissionMapper(permission, resourceTypes, resourceData)
+    ) : [];
 
     const handleCreate = () => {
         setCreateModalOpen(true);
