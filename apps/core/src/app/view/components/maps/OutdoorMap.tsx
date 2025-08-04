@@ -11,7 +11,9 @@ interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityFactory) => void;
 }
 
-const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
+const OutdoorMap: React.FC<OutdoorMapProps> = ({ 
+  onFacilitySelect
+}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [cesiumViewer, setCesiumViewer] = useState<Cesium.Viewer | null>(null)
   const { facilities, facilitiesFetched, loadFacilities } = useFacilityStore()

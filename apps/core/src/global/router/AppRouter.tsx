@@ -9,8 +9,8 @@ import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
 import { ViewMain } from '@/backoffice/domains/view'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
-import FacilityManagement from "@/backoffice/domains/facility";
-import FacilityDetailPage from "@/backoffice/domains/facility/FacilityDetailPage";
+import FacilityManagement from "@/backoffice/domains/facility/pages";
+import FacilityDetailPage from "@/backoffice/domains/facility/pages/FacilityDetailPage";
 import LoginPage from '@/global/pages/LoginPage'
 import ProtectedRoute from '@/global/components/ProtectedRoute'
 

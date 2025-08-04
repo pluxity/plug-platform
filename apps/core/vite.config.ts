@@ -27,7 +27,7 @@ export default defineConfig({
     port: 4000,
     proxy: {
         '/api': {
-            target: 'http://api.pluxity.com:8080',
+            target: 'http://192.168.4.8:8080',
             changeOrigin: true,
             secure: false,
             rewrite: (path) => path.replace(/^\/api/, '')

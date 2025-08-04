@@ -25,27 +25,9 @@ function FilterBar({
 
   return(
     <form
-      className={cn("flex gap-2 items-center", className)}
+      className={cn("flex justify-between w-full items-center", className)}
       onSubmit={handleSubmit}
     >
-      {selects.map((select) => (
-      <Select
-        key={select.key}
-        value={select.value}
-        onValueChange={select.onChange}
-      >
-        <SelectTrigger className="w-fit min-w-30">
-          <SelectValue placeholder={select.placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-        {select.options.map(opt => (
-          <SelectItem key={opt.value} value={opt.value}>
-          {opt.label}
-          </SelectItem>
-        ))}
-        </SelectContent>
-      </Select>
-      ))}
       {showSearchInput && (
       <SearchInput
         value={searchValue ?? ""}
@@ -54,6 +36,24 @@ function FilterBar({
         onSubmit={() => onSearch?.(searchValue ?? "")}
       />
       )}
+      {selects.map((select) => (
+        <Select
+          key={select.key}
+          value={select.value}
+          onValueChange={select.onChange}
+        >
+          <SelectTrigger className="w-fit min-w-30 outline-none">
+            <SelectValue placeholder={select.placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {select.options.map(opt => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ))}
     </form>
   )
 
