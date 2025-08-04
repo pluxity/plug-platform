@@ -14,7 +14,7 @@ import {
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { userEditFormSchema, type UserEditFormData } from '@/backoffice/domains/users/schemas/userSchemas';
 import { useUpdateUser, useUserDetailSWR, useRolesSWR } from '@plug/common-services/services';
 import { UserEditModalProps } from '@/backoffice/domains/users/types/user';
 
@@ -32,24 +32,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
         })) || [];
     }, [roleData]);
 
-    const userEditFormSchema = z.object({
-        roleIds: z.array(z.number()).min(1, {
-            message: '최소 1개 이상의 역할을 선택해주세요.'
-        }),
-        name: z.string().min(1, {
-            message: '이름을 입력해주세요.'
-        }).max(10, {
-            message: '이름은 10글자 이하이어야 합니다.'
-        }),
-        phoneNumber: z.string().regex(/^01[016789]-?\d{3,4}-?\d{4}$/, {
-            message: '올바른 휴대폰 번호 형식을 입력해주세요.'
-        }),
-        department: z.string().min(1, {
-            message: '부서명을 입력해주세요.'
-        })
-    });
-
-    const modalForm = useForm<z.infer<typeof userEditFormSchema>>({
+    const modalForm = useForm<UserEditFormData>({
         resolver: zodResolver(userEditFormSchema),
         defaultValues: {
             roleIds: [],
@@ -85,7 +68,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
         onClose();
     }, [data, modalForm, onClose]);
 
-    const handleSubmit = useCallback(async (data: z.infer<typeof userEditFormSchema>) => {
+    const handleSubmit = useCallback(async (data: UserEditFormData) => {
         try {
             await updateUser({ 
                 roleIds: data.roleIds,

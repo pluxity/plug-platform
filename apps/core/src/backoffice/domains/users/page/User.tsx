@@ -10,17 +10,16 @@ import { UserEditModal } from '../components/UserEditModal'
 import { useRolesSWR } from '@plug/common-services/services';
 
 const User: React.FC = () => {
-
-    const { data, mutate } = useUsersSWR();
-    const userData = data ? data.map(UserMapper) : [];
-    const { data: roleData } = useRolesSWR();
-
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [passwordInitModalOpen, setPasswordInitModalOpen] = useState(false);
     const [passwordInitUserId, setPasswordInitUserId] = useState<number>();
     const [deleteUserData, setDeleteUserData] = useState<UserData>();
     const [selectedUserId, setSelectedUserId] = useState<number>();
+
+    const { data, mutate } = useUsersSWR();
+    const userData = data ? data.map(UserMapper) : [];
+    const { data: roleData } = useRolesSWR();
 
     const handleCreate = () => {
         setCreateModalOpen(true);

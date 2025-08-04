@@ -72,6 +72,10 @@ const Role: React.FC = () => {
       accessorKey: 'description',
     },
     {
+      header: '권한',
+      accessorKey: 'permissionGroupIds',
+    },
+    {
       id: 'actions',
       header: '관리',
       cell: ({row}: {row: { original: RoleData }}) => (
