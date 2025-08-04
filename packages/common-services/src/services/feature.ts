@@ -57,3 +57,7 @@ export const useFeaturesSWR = (queryParams?: Record<string, any>) => {
 export const useFeatureDetailSWR = (featureId: string) => {
   return useSWRApi<FeatureResponse>(`${END_POINT}/${featureId}`, 'GET', { requireAuth: true });
 };
+
+export const useFeaturesByFacilitySWR = (facilityId: number) => {
+  return useSWRApi<FeatureResponse[]>(`${END_POINT}?facilityId=${facilityId}`, 'GET', { requireAuth: true });
+};

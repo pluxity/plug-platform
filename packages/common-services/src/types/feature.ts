@@ -1,5 +1,3 @@
-import { AssetResponse } from './asset';
-
 export interface Spatial {
   x: number;
   y: number;
@@ -31,7 +29,7 @@ export interface FeatureResponse {
   position?: Spatial;
   rotation?: Spatial;
   scale?: Spatial;
-  asset?: AssetResponse;
+  assetId?: number;  // API가 실제로 assetId를 반환하는 경우
   floorId: string;
   deviceId?: string;
 }
