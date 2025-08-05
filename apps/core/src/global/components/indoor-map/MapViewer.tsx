@@ -3,6 +3,17 @@ import { Engine3D, Loader, Poi } from '@plug/engine/src';
 import { FacilityType, useFeaturesByFacilitySWR, useAssetsSWR, FacilityService, DomainResponse } from '@plug/common-services';
 import { FloorControl } from './FloorControl';
 
+// Floor 관련 타입 정의
+interface FloorResponse {
+  floorId: string;
+  name: string;
+}
+
+interface Floor {
+  floorId: number;
+  name: string;
+}
+
 interface IndoorMapViewerProps {
   facilityId: number;
   facilityType: FacilityType;
@@ -58,11 +69,45 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   }, [assetsData]);
 
   // FloorResponse를 Floor 타입으로 변환하는 함수
-  const convertFloors = useCallback((floors: { floorId: string; name: string }[]) => {
-    return floors?.map(floor => ({
-      floorId: parseInt(floor.floorId) || 0,
-      name: floor.name
-    })) || [];
+  const convertFloors = useCallback((floors: FloorResponse[]): Floor[] => {
+    if (!floors || !Array.isArray(floors)) {
+      return [];
+    }
+
+    const validFloors: Floor[] = [];
+    const seenFloorIds = new Set<number>();
+
+    for (const floor of floors) {
+      // floorId 유효성 검사
+      const parsedFloorId = parseInt(floor.floorId, 10);
+      
+      if (isNaN(parsedFloorId)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`Invalid floorId "${floor.floorId}" for floor "${floor.name}". Skipping floor.`);
+        }
+        continue;
+      }
+
+      // 중복 floorId 검사
+      if (seenFloorIds.has(parsedFloorId)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`Duplicate floorId ${parsedFloorId} found for floor "${floor.name}". Skipping duplicate.`);
+        }
+        continue;
+      }
+
+      seenFloorIds.add(parsedFloorId);
+      validFloors.push({
+        floorId: parsedFloorId,
+        name: floor.name
+      });
+    }
+
+    if (validFloors.length === 0 && floors.length > 0 && process.env.NODE_ENV === 'development') {
+      console.error('No valid floors found after conversion. Original data:', floors);
+    }
+
+    return validFloors;
   }, []);
 
   const modelUrl = facilityData?.facility?.drawing?.url;

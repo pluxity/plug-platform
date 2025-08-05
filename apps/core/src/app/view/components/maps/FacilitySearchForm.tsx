@@ -8,45 +8,34 @@ interface FacilitySearchFormProps {
 }
 
 const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<FacilityResponse[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   
-  const { facilities } = useFacilityStore()
-
-  const performSearch = (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([])
-      setIsOpen(false)
-      return
-    }
-    
-    const searchTerm = query.toLowerCase()
-    // Object.values를 사용해서 모든 시설 타입을 동적으로 합치기
-    const allFacilities = Object.values(facilities)
-      .filter(Array.isArray)
-      .flat() as FacilityResponse[]
-    
-    const results = allFacilities.filter((facility: FacilityResponse) =>
-      facility.name.toLowerCase().includes(searchTerm) ||
-      facility.code.toLowerCase().includes(searchTerm) ||
-      (facility.description && facility.description.toLowerCase().includes(searchTerm))
-    )
-    
-    setSearchResults(results)
-    setIsOpen(true)
-  }
+  const { 
+    searchQuery, 
+    searchResults, 
+    performSearch, 
+    clearSearch,
+    selectSearchResult,
+    setSearchSelectedFacility 
+  } = useFacilityStore()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value
-    setSearchQuery(query)
     performSearch(query)
+    
+    // 검색 결과가 있을 때만 드롭다운 열기
+    if (query.trim()) {
+      setIsOpen(true)
+    } else {
+      setIsOpen(false)
+    }
   }
 
   const handleSelectFacility = (facility: FacilityResponse) => {
-    setSearchQuery('')
-    setSearchResults([])
+    // Store의 검색 상태를 초기화하고 선택된 시설 설정
+    selectSearchResult()
+    setSearchSelectedFacility(facility)
     setIsOpen(false)
     
     if (viewer && facility.lat && facility.lon) {
@@ -67,8 +56,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   }
 
   const handleClear = () => {
-    setSearchQuery('')
-    setSearchResults([])
+    clearSearch()
     setIsOpen(false)
   }
 

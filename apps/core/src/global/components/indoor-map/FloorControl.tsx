@@ -90,9 +90,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
                 </div>
               )}
               {floors
-                .sort((a, b) => {
-                  return b.floorId - a.floorId;
-                })
+                .sort((a, b) => b.floorId - a.floorId)
                 .map((floor) => (
                 <div
                   key={floor.floorId}
