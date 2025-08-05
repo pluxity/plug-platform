@@ -68,7 +68,7 @@ export const AssetCategoryCard: React.FC<AssetCategoryCardProps> = ({
             )}
             
             {/* 뎁스 표시 */}
-            <span>레벨 {category.depth}</span>
+            <span>레벨 {category.depth + 1}</span>
           </div>
         </div>
       </div>

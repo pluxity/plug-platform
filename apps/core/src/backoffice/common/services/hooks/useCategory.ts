@@ -108,7 +108,7 @@ export const recalculateDepths = (items: CategoryItem[]): CategoryItem[] => {
     }))
   }
   
-  return calculateDepthRecursively(items, 0)
+  return calculateDepthRecursively(items, 1)
 }
 
 export const getChildrenCount = (node: CategoryItem): number => {

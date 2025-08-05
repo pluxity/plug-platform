@@ -142,7 +142,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
     } else if (y > height * 0.75) {
       setDragOver('bottom')
     } else {
-      setDragOver(item.depth < maxDepth ? 'inside' : 'none')
+      setDragOver(item.depth <= maxDepth ? 'inside' : 'none')
     }
   }
 
@@ -169,7 +169,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
   }
 
   const hasChildren = item.children && item.children.length > 0
-  const canAddChildren = item.depth < maxDepth
+  const canAddChildren = item.depth <= maxDepth
 
 
   return (
@@ -331,7 +331,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 size="sm"
                 className="w-8 h-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 onClick={() => setIsAdding(true)}
-                disabled={item.depth >= maxDepth - 1}
+                disabled={item.depth >= maxDepth}
                 title="하위 카테고리 추가"
               >
                 +

@@ -17,7 +17,7 @@ const convertToCategoryItems = (apiData: AssetCategoryResponse[]): CategoryItem[
     id: item.id.toString(),
     name: item.name,
     code: item.code,
-    depth: item.depth,
+    depth: item.depth + 1, // API depth가 0부터 시작하므로 1을 더함
     parentId: item.parentId?.toString(),
     thumbnailUrl: item.thumbnail?.url,
     thumbnailFileId: item.thumbnail?.id,
