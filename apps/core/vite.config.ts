@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite';
 import svgr from 'vite-plugin-svgr'
+import cesium from 'vite-plugin-cesium'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
     svgr({
       include: "**/*.svg",
     }),
+    cesium(),
   ],
   resolve: {
     alias: {
@@ -25,7 +27,7 @@ export default defineConfig({
     port: 4000,
     proxy: {
         '/api': {
-            target: 'http://api.pluxity.com:8080',
+            target: 'http://192.168.4.8:8080',
             changeOrigin: true,
             secure: false,
             rewrite: (path) => path.replace(/^\/api/, '')

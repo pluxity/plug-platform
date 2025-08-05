@@ -234,7 +234,7 @@ const AuthTest = () => {
           </button>
 
           <button
-            onClick={signout}
+            onClick={() => signout()}
             disabled={signOutLoading}
             style={{
               padding: "8px 16px",
