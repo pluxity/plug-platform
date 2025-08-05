@@ -28,6 +28,7 @@ export interface CategoryConfig {
   disabled?: boolean
   showCodes?: boolean
   allowRootAdd?: boolean
+  enableThumbnailUpload?: boolean
 }
 
 export type DragPosition = 'before' | 'after' | 'inside'

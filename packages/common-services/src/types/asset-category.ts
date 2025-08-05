@@ -3,14 +3,14 @@ import { FileResponse } from './file';
 export interface AssetCategoryCreateRequest {
   name: string;
   code: string;
-  parentId?: number;
+  parentId: number | null;
   thumbnailFileId?: number;
 }
 
 export interface AssetCategoryUpdateRequest {
-  name?: string;
-  code?: string;
-  parentId?: number;
+  name: string;
+  code: string;
+  parentId: number | null;
   thumbnailFileId?: number;
 }
 
@@ -18,7 +18,7 @@ export interface AssetCategoryResponse {
   id: number;
   name: string;
   code: string;
-  parentId?: number;
+  parentId: number | null;
   children: AssetCategoryResponse[];
   thumbnail?: FileResponse;
   assetIds: number[];

@@ -48,7 +48,7 @@ const AssetCategory: React.FC = () => {
       const result = await createAssetCategory.execute({
         name,
         code: code || name.toLowerCase().replace(/\s+/g, '-'),
-        parentId: parentIdNumber,
+        parentId: parentIdNumber || null,
         thumbnailFileId
       })
 
@@ -68,11 +68,13 @@ const AssetCategory: React.FC = () => {
   // 카테고리 수정
   const handleCategoryUpdate = async (id: string, name: string, thumbnailFileId?: number, code?: string): Promise<void> => {
     try {
+      const currentCategory = findNodeById(categories, id);
       const categoryId = parseInt(id)
       await updateAssetCategory(categoryId, {
         name,
         code: code || name.toLowerCase().replace(/\s+/g, '-'), 
-        thumbnailFileId
+        thumbnailFileId,
+        parentId: currentCategory?.parentId ? parseInt(currentCategory.parentId) : null,
       })
       await mutate()
     } catch (error) {
@@ -140,7 +142,7 @@ const AssetCategory: React.FC = () => {
       await updateAssetCategory(categoryId, {
         name: draggedCategory.name,
         code: draggedCategory.code || draggedCategory.name.toLowerCase().replace(/\s+/g, '-'),
-        parentId: newParentId,
+        parentId: newParentId || null,
         thumbnailFileId: draggedCategory.thumbnailFileId
       })
 
@@ -206,6 +208,7 @@ const AssetCategory: React.FC = () => {
             enableDragDrop={true}
             disabled={createAssetCategory.isLoading}
             thumbnailSize="large"
+            enableThumbnailUpload={true}
           />
         )}
       </div>

@@ -21,6 +21,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
   disabled = false,
   showCodes = true,
   allowRootAdd = true,
+  enableThumbnailUpload = false,
   className,
   title = '카테고리 관리',
   emptyMessage = '등록된 카테고리가 없습니다.',
@@ -164,12 +165,14 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
               )}
             </div>
             <div className="flex items-center gap-2">
-              <ThumbnailUploader
-                onThumbnailChange={setRootThumbnailFileId}
-                onUpload={operations.onThumbnailUpload}
-                disabled={disabled}
-                size={thumbnailSize}
-              />
+              {enableThumbnailUpload && (
+                <ThumbnailUploader
+                  onThumbnailChange={setRootThumbnailFileId}
+                  onUpload={operations.onThumbnailUpload}
+                  disabled={disabled}
+                  size={thumbnailSize}
+                />
+              )}
               <div className="flex-1" />
               <Button
                 variant="ghost"
@@ -220,6 +223,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
                 enableDragDrop={enableDragDrop}
                 thumbnailSize={thumbnailSize}
                 showCodes={showCodes}
+                enableThumbnailUpload={enableThumbnailUpload}
               />
             ))
           )}
