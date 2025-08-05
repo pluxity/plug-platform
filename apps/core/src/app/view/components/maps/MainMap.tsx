@@ -1,15 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import IndoorMap from './IndoorMap'
 import OutdoorMap from './OutdoorMap'
 import { MapMode } from '@/app/model/types/MapTypes'
-import { FacilityFactory } from '@plug/common-services'
+import type { FacilityType } from '@plug/common-services'
+import { useFacilityStore } from '@/app/store/facilityStore'
 
 const MainMap: React.FC = () => {
   const [mapMode, setMapMode] = useState<MapMode>(MapMode.OUTDOOR)
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
-  const [selectedFacilityType, setSelectedFacilityType] = useState<FacilityFactory | null>(null)
+  const [selectedFacilityType, setSelectedFacilityType] = useState<FacilityType | null>(null)
+  
+  // MainMap에서 한 번만 데이터 페칭
+  const { facilitiesFetched, loadFacilities } = useFacilityStore()
 
-  const handleFacilitySelect = (facilityId: number, facilityType: FacilityFactory) => {
+  useEffect(() => {
+    if (!facilitiesFetched) {
+      loadFacilities()
+    }
+  }, [facilitiesFetched, loadFacilities])
+
+  const handleFacilitySelect = (facilityId: number, facilityType: FacilityType) => {
     setSelectedFacilityId(facilityId)
     setSelectedFacilityType(facilityType)
     setMapMode(MapMode.INDOOR)

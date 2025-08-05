@@ -69,25 +69,25 @@ type ComposeResponse<T extends readonly ComponentName[]> =
 export const DOMAINS = {
   building: {
     displayName: '건물',
-    endpoint: '/buildings',
+    endpoint: 'buildings',
     components: ['facility', 'floors'] as const
   },
   
   station: {
     displayName: '역사',
-    endpoint: '/stations',
+    endpoint: 'stations',
     components: ['facility', 'floors', 'stationInfo'] as const
   },
   
   park: {
     displayName: '공원',
-    endpoint: '/parks',
+    endpoint: 'parks',
     components: ['facility', 'boundary'] as const
   },
 
   // airport: {
   //   displayName: '공항',
-  //   endpoint: '/airports',
+  //   endpoint: 'airports',
   //   components: ['facility', 'floors', 'airportInfo'] as const
   // }
 

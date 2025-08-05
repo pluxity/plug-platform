@@ -2,8 +2,8 @@ import React from 'react';
 import * as Cesium from 'cesium';
 import { Viewer as ResiumViewer, Scene, Cesium3DTileset } from 'resium';
 import InitialCameraSetup from './CameraSetup';
+import { GOOGLE_MAPS_API_KEY } from './constants';
 
-export const GOOGLE_MAPS_API_KEY = 'AIzaSyBn49Az8XCIk2zTj42aogqbf47y5D-E1ak';
 interface GoogleMapProps {
   className?: string;
   children?: React.ReactNode;

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Engine3D, Loader, Poi } from '@plug/engine/src';
-import { useDetailSWR, FacilityFactory, useFeaturesByFacilitySWR, useAssetsSWR } from '@plug/common-services';
+import { FacilityType, useFeaturesByFacilitySWR, useAssetsSWR, FacilityService, DomainResponse } from '@plug/common-services';
 import { FloorControl } from './FloorControl';
 
 interface IndoorMapViewerProps {
   facilityId: number;
-  facilityType: FacilityFactory;
+  facilityType: FacilityType;
   showFloorControl?: boolean;
   floorControlPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   className?: string;
@@ -24,13 +24,27 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   const engine3DRef = useRef<Engine3D | null>(null);
   const loadedModelUrlRef = useRef<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [facilityData, setFacilityData] = useState<DomainResponse<typeof facilityType> | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
-  const { data: facilityData, error, isLoading: isDataLoading } = useDetailSWR(facilityType, facilityId, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    revalidateIfStale: false,
-    dedupingInterval: 60000 * 10,
-  });
+  // Facility 데이터 한 번만 로드
+  useEffect(() => {
+    const loadFacilityData = async () => {
+      try {
+        setIsDataLoading(true);
+        setError(null);
+        const response = await FacilityService.getById(facilityType, facilityId);
+        setFacilityData(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to load facility data'));
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    loadFacilityData();
+  }, [facilityType, facilityId]);
 
   // Features 데이터 로드
   const { data: featuresData } = useFeaturesByFacilitySWR(facilityId);
@@ -43,7 +57,15 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
     return assetsData?.find(asset => asset.id === id);
   }, [assetsData]);
 
-  const modelUrl = facilityData?.facility.drawing.url;
+  // FloorResponse를 Floor 타입으로 변환하는 함수
+  const convertFloors = useCallback((floors: { floorId: string; name: string }[]) => {
+    return floors?.map(floor => ({
+      floorId: parseInt(floor.floorId) || 0,
+      name: floor.name
+    })) || [];
+  }, []);
+
+  const modelUrl = facilityData?.facility?.drawing?.url;
 
   useEffect(() => {
     const currentContainer = containerRef.current;
@@ -252,7 +274,7 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   }
 
   // 3D 도면이 없는 경우
-  if (facilityData && !facilityData.facility.drawing.url) {
+  if (facilityData && !facilityData.facility?.drawing?.url) {
     return (
       <div className={`${className} relative bg-gradient-to-br from-yellow-50 to-orange-50 flex items-center justify-center`}>
         <div className="bg-white border border-yellow-200 text-yellow-800 px-6 py-4 rounded-xl shadow-lg max-w-md mx-4">
@@ -272,7 +294,7 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
     );
   }
 
-  const hasFloors = facilityData?.floors && facilityData.floors.length > 0;
+  const hasFloors = facilityData && 'floors' in facilityData && facilityData.floors && facilityData.floors.length > 0;
   const positionClasses = {
     'top-left': 'absolute top-4 left-4',
     'top-right': 'absolute top-4 right-4',
@@ -308,7 +330,7 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       
       {showFloorControl && hasFloors && (
         <div className={`${positionClasses[floorControlPosition]} z-20 max-w-xs`}>
-          <FloorControl floors={facilityData.floors} />
+          <FloorControl floors={facilityData && 'floors' in facilityData ? convertFloors(facilityData.floors) : []} />
         </div>
       )}
     </div>

@@ -2,9 +2,7 @@ import React from 'react';
 import * as Cesium from 'cesium';
 import { Viewer as ResiumViewer, Scene, Cesium3DTileset } from 'resium';
 import InitialCameraSetup from './CameraSetup';
-
-export const CESIUM_ION_ASSET_ID = 96188; // 사용자 지정 Asset ID
-export const CESIUM_ION_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NGQ0YTBmZC1kMjVmLTQ2OGUtOTFiYy03YWYyNDJhOWZjYzMiLCJpZCI6MjgzMTA2LCJpYXQiOjE3NTMwNjEzMDF9.xhu9JUBNx01Zanmt1lz_MR8a5V0_vTaIpiN8gxhHuU0';
+import { CESIUM_ION_ASSET_ID, CESIUM_ION_ACCESS_TOKEN } from './constants';
 
 interface OSMBuildingsMapProps {
   className?: string;

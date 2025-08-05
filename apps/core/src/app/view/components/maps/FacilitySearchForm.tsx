@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useFacilityStore } from '@/app/store/facilityStore'
-import type { BaseFacilityResponse } from '@plug/common-services'
+import type { FacilityResponse } from '@plug/common-services'
 import * as Cesium from 'cesium'
 
 interface FacilitySearchFormProps {
@@ -9,7 +9,7 @@ interface FacilitySearchFormProps {
 
 const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<BaseFacilityResponse[]>([])
+  const [searchResults, setSearchResults] = useState<FacilityResponse[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   
@@ -23,9 +23,12 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
     }
     
     const searchTerm = query.toLowerCase()
-    const allFacilities = Object.values(facilities).flat().filter(Boolean) as BaseFacilityResponse[]
+    // Object.values를 사용해서 모든 시설 타입을 동적으로 합치기
+    const allFacilities = Object.values(facilities)
+      .filter(Array.isArray)
+      .flat() as FacilityResponse[]
     
-    const results = allFacilities.filter((facility: BaseFacilityResponse) =>
+    const results = allFacilities.filter((facility: FacilityResponse) =>
       facility.name.toLowerCase().includes(searchTerm) ||
       facility.code.toLowerCase().includes(searchTerm) ||
       (facility.description && facility.description.toLowerCase().includes(searchTerm))
@@ -41,7 +44,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
     performSearch(query)
   }
 
-  const handleSelectFacility = (facility: BaseFacilityResponse) => {
+  const handleSelectFacility = (facility: FacilityResponse) => {
     setSearchQuery('')
     setSearchResults([])
     setIsOpen(false)

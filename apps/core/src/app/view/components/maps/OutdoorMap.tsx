@@ -4,11 +4,11 @@ import * as Cesium from 'cesium'
 import MapControls from '@/global/components/outdoor-map/MapControls'
 import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
-import type { FacilityFactory, BaseFacilityResponse } from '@plug/common-services'
+import type { FacilityType, FacilityResponse } from '@plug/common-services'
 import { OSMBuildingsMap } from '@/global/components/outdoor-map'
 
 interface OutdoorMapProps {
-  onFacilitySelect?: (facilityId: number, facilityType: FacilityFactory) => void;
+  onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void;
 }
 
 const OutdoorMap: React.FC<OutdoorMapProps> = ({ 
@@ -16,13 +16,8 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [cesiumViewer, setCesiumViewer] = useState<Cesium.Viewer | null>(null)
-  const { facilities, facilitiesFetched, loadFacilities } = useFacilityStore()
-
-  useEffect(() => {
-    if (!facilitiesFetched) {
-      loadFacilities()
-    }
-  }, [facilitiesFetched, loadFacilities])
+  // 페칭은 MainMap에서 하므로, 여기서는 데이터만 가져옴
+  const { facilities, facilitiesFetched } = useFacilityStore()
 
   const handleInitialLoadComplete = () => {
     setIsLoading(false)
@@ -38,7 +33,8 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
     }, [viewer])
 
     useEffect(() => {
-      if (!viewer || !facilitiesFetched) return
+      // viewer가 있고, 시설 데이터가 로드되었고, 시설이 존재할 때만 POI 생성
+      if (!viewer || !facilitiesFetched || Object.keys(facilities).length === 0) return
 
       Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmNWJmZWEzOS1jMTJjLTQ0ZTYtOTFkNC1jZDMxMDlmYTRjMWEiLCJpZCI6MjgzMTA2LCJpYXQiOjE3NDE2NjE3OTR9.dZID1nZdOJeEv18BhwGwWlAjJQtWAFUDipJw7M4r0-w'
 
@@ -55,23 +51,29 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
         // 시설 타입별 설정
         const facilityTypeConfigs = {
           buildings: {
-            color: Cesium.Color.WHITE,
-            silhouetteColor: Cesium.Color.YELLOW
+            color: Cesium.Color.BLUE,
+            silhouetteColor: Cesium.Color.CYAN,
+            facilityType: 'building' as FacilityType
           },
           stations: {
-            color: Cesium.Color.BLUE,
-            silhouetteColor: Cesium.Color.CYAN
+            color: Cesium.Color.WHITE,
+            silhouetteColor: Cesium.Color.YELLOW,
+            facilityType: 'station' as FacilityType
+          },
+          parks: {
+            color: Cesium.Color.GREEN,
+            silhouetteColor: Cesium.Color.LIGHTGREEN,
+            facilityType: 'park' as FacilityType
           }
         }
 
-        // 모든 시설 타입 처리
-        Object.entries(facilities).forEach(([facilityType, facilityList]) => {
-          if (!facilityList) return
+        // Object.entries를 사용해서 시설 타입별로 처리
+        Object.entries(facilities).forEach(([facilityTypeKey, facilitiesOfType]) => {
+          const config = facilityTypeConfigs[facilityTypeKey as keyof typeof facilityTypeConfigs]
+          
+          if (!config || !Array.isArray(facilitiesOfType)) return
 
-          const config = facilityTypeConfigs[facilityType as keyof typeof facilityTypeConfigs]
-          if (!config) return
-
-          facilityList.forEach((facility: BaseFacilityResponse) => {
+          facilitiesOfType.forEach((facility: FacilityResponse) => {
             if (facility.lat && facility.lon) {
               const position = Cesium.Cartesian3.fromDegrees(
                 facility.lon,
@@ -118,7 +120,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
                 properties: {
                   facilityId: facility.id,
                   facilityData: facility,
-                  facilityType: facilityType as FacilityFactory
+                  facilityType: config.facilityType
                 }
               })
             }
@@ -172,6 +174,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
         viewer.canvas.addEventListener('click', handleClick)
       }
 
+      // POI 생성을 한 번만 실행
       createPOIs()
 
       return () => {
@@ -182,7 +185,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
           viewer.canvas.removeEventListener('click', handleClick)
         }
       }
-    }, [viewer])
+    }, [viewer]) // viewer 변경시에만 실행 (facilitiesFetched와 facilities는 조건문에서 체크)
 
     return null
   }

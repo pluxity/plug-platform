@@ -2,13 +2,7 @@ import React, { useMemo } from 'react';
 import * as Cesium from 'cesium';
 import { Viewer as ResiumViewer, Scene, ImageryLayer } from 'resium';
 import InitialCameraSetup from './CameraSetup';
-
-// VWorld API 정보
-export const VWORLD_MAP_URL = 'https://api.vworld.kr/req/wmts/1.0.0/';
-export const VWORLD_API_KEY = '8017E982-68EB-3F80-A79F-2FEA16608C65';
-
-// 지도 제공자 타입 정의
-export type MapProvider = 'vworld' | 'google' | 'osm';
+import { VWORLD_MAP_URL, VWORLD_API_KEY, MapProvider } from './constants';
 
 interface VWorldMapProps {
   className?: string;

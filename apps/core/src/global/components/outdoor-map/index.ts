@@ -8,3 +8,4 @@ export { default as MapLocationSelector } from './MapLocationSelector';
 export { default as LocationInputField } from './LocationInputField';
 
 export type { LocationData } from './LocationPicker';
+export type { MapProvider } from './constants';
