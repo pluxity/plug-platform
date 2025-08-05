@@ -36,7 +36,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
       // viewer가 있고, 시설 데이터가 로드되었고, 시설이 존재할 때만 POI 생성
       if (!viewer || !facilitiesFetched || Object.keys(facilities).length === 0) return
 
-      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmNWJmZWEzOS1jMTJjLTQ0ZTYtOTFkNC1jZDMxMDlmYTRjMWEiLCJpZCI6MjgzMTA2LCJpYXQiOjE3NDE2NjE3OTR9.dZID1nZdOJeEv18BhwGwWlAjJQtWAFUDipJw7M4r0-w'
+      Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_ACCESS_TOKEN
 
       let hoveredEntity: Cesium.Entity | null = null
       let handleMouseMove: ((event: MouseEvent) => void) | null = null
@@ -48,11 +48,14 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
         viewer.clock.shouldAnimate = false
         viewer.clock.multiplier = 1
 
+        // 기존 POI들 모두 제거
+        viewer.entities.removeAll()
+
         // 시설 타입별 설정
         const facilityTypeConfigs = {
           buildings: {
-            color: Cesium.Color.BLUE,
-            silhouetteColor: Cesium.Color.CYAN,
+            color: Cesium.Color.WHITE,
+            silhouetteColor: Cesium.Color.YELLOW,
             facilityType: 'building' as FacilityType
           },
           stations: {
@@ -61,8 +64,8 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
             facilityType: 'station' as FacilityType
           },
           parks: {
-            color: Cesium.Color.GREEN,
-            silhouetteColor: Cesium.Color.LIGHTGREEN,
+            color: Cesium.Color.WHITE,
+            silhouetteColor: Cesium.Color.YELLOW,
             facilityType: 'park' as FacilityType
           }
         }
@@ -174,7 +177,6 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
         viewer.canvas.addEventListener('click', handleClick)
       }
 
-      // POI 생성을 한 번만 실행
       createPOIs()
 
       return () => {
@@ -185,7 +187,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({
           viewer.canvas.removeEventListener('click', handleClick)
         }
       }
-    }, [viewer]) // viewer 변경시에만 실행 (facilitiesFetched와 facilities는 조건문에서 체크)
+    }, [viewer])
 
     return null
   }
