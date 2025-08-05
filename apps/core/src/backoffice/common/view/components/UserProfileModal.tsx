@@ -27,10 +27,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ show, onClose }) =>
               <label className="font-bold">사용자 ID:</label>
               <p>{user.username}</p>
             </div>
-            <div>
-              <label className="font-bold">역할:</label>
-              <p>{user.roles?.map(role => role.name).join(', ')}</p>
-            </div>
           </div>
         )}
       </DialogContent>

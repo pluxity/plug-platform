@@ -1,12 +1,11 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
-import { BackofficeLayout, ViewLayout, DashboardLayout } from '@/backoffice/common/view/layouts'
+import { BackofficeLayout, DashboardLayout } from '@/backoffice/common/view/layouts'
 import Dashboard from '@/backoffice/domains/dashboard'
 import Device from '@/backoffice/domains/device'
 import { Role , User, Permission } from '@/backoffice/domains/users'
 import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
-import { ViewMain } from '@/backoffice/domains/view'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import LoginPage from '@/global/pages/LoginPage'
@@ -39,10 +38,6 @@ const AppRouter: React.FC = () => {
               <Route path="device" element={<Device />} />
               <Route path="assetList" element={<AssetList />} />
               <Route path="assetCategory" element={<AssetCategory />} />
-            </Route>
-
-            <Route path="view" element={<ViewLayout />}>
-              <Route index element={<ViewMain />} />
             </Route>
           </Route>
 

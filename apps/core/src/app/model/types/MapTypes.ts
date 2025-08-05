@@ -34,3 +34,8 @@ export interface SystemStatus {
   dataStreamStatus: 'live' | 'offline' | 'pending'
   lastUpdate: Date
 }
+
+export enum MapMode {
+  OUTDOOR = 'outdoor',
+  INDOOR = 'indoor'
+}
