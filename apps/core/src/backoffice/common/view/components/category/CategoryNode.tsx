@@ -1,5 +1,18 @@
 import React, { useState } from 'react'
-import { Button, Input, Badge, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@plug/ui'
+import { 
+  Button, 
+  Input, 
+  Badge, 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from '@plug/ui'
 import { CategoryItem, DragState } from '@/backoffice/common/services/types/category'
 import { ThumbnailUploader } from './ThumbnailUploader'
 import { getChildrenCount } from '@/backoffice/common/services/hooks/useCategory'
@@ -14,6 +27,7 @@ export interface CategoryNodeProps {
   onThumbnailUpload?: (file: File) => Promise<number>
   disabled?: boolean
   enableDragDrop?: boolean
+  enableThumbnailUpload?: boolean
   thumbnailSize?: 'small' | 'medium' | 'large'
   showCodes?: boolean
 }
@@ -28,6 +42,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
   onThumbnailUpload,
   disabled = false,
   enableDragDrop = true,
+  enableThumbnailUpload = false,
   thumbnailSize = 'small',
   showCodes = true
 }) => {
@@ -156,6 +171,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
   const hasChildren = item.children && item.children.length > 0
   const canAddChildren = item.depth < maxDepth
 
+
   return (
     <div className="relative">
       {/* Drag indicators */}
@@ -167,12 +183,12 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
       )}
         
       <div 
-        className={`flex items-center gap-2 p-2 hover:bg-gray-50 rounded-md group relative transition-colors ${
-          isDragging ? 'opacity-50' : ''
-        } ${
-          dragOver === 'inside' ? 'bg-blue-50 border-2 border-dashed border-blue-300' : ''
-        }`}
-        style={{ paddingLeft: `${item.depth * 20 + 8}px` }}
+        className={`
+          flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg group relative transition-all duration-200
+          ${isDragging ? 'opacity-50' : ''}
+          ${dragOver === 'inside' ? 'bg-blue-50 border-2 border-dashed border-blue-300' : 'border border-transparent'}
+        `}
+        style={{ paddingLeft: `${item.depth * 24 + 12}px` }}
         draggable={enableDragDrop && !disabled}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
@@ -181,35 +197,38 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
         onDrop={handleDrop}
       >
         {enableDragDrop && !disabled && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-move text-gray-400 hover:text-gray-600">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-move text-gray-400 hover:text-gray-600 flex-shrink-0">
             ⋮⋮
           </div>
         )}
-        {hasChildren ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-5 h-5 p-0 text-gray-500 hover:text-gray-700"
-            onClick={handleToggleExpand}
-            disabled={disabled}
-          >
-            <span className="text-xs">
-              {isExpanded ? '▼' : '▶'}
-            </span>
-          </Button>
-        ) : (
-          <div className="w-5 h-5" />
-        )}
 
-        <div className="flex-1 flex items-center gap-2">
+        <div className="flex-shrink-0 w-6 flex justify-center">
+          {hasChildren ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-6 h-6 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              onClick={handleToggleExpand}
+              disabled={disabled}
+            >
+              <span className="text-sm">
+                {isExpanded ? '▼' : '▶'}
+              </span>
+            </Button>
+          ) : (
+            <div className="w-6 h-6" />
+          )}
+        </div>
+
+        <div className="flex-1 flex items-center gap-3 min-w-0">
           {isEditing ? (
-            <div className="flex flex-col gap-2 flex-1">
-              <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-3 flex-1">
+              <div className="flex flex-col gap-2">
                 <Input
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, 'edit')}
-                  className="h-7 text-sm"
+                  className="h-8 text-sm border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder="카테고리 이름"
                   autoFocus
                   disabled={disabled}
@@ -219,25 +238,27 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                     value={editCode}
                     onChange={(e) => setEditCode(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, 'edit')}
-                    className="h-6 text-xs"
+                    className="h-7 text-xs border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="카테고리 코드"
                     disabled={disabled}
                   />
                 )}
               </div>
-              <div className="flex items-center gap-1">
-                <ThumbnailUploader
-                  currentThumbnailUrl={item.thumbnailUrl}
-                  onThumbnailChange={setEditThumbnailFileId}
-                  onUpload={onThumbnailUpload}
-                  disabled={disabled}
-                  size={thumbnailSize}
-                />
+              <div className="flex items-center gap-2">
+                {enableThumbnailUpload && (
+                  <ThumbnailUploader
+                      currentThumbnailUrl={item.thumbnailUrl}
+                      onThumbnailChange={setEditThumbnailFileId}
+                      onUpload={onThumbnailUpload}
+                      disabled={disabled}
+                      size={thumbnailSize}
+                    />
+                )}
                 <div className="flex-1" />
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-6 h-6 p-0 text-green-600 hover:text-green-700"
+                  className="w-8 h-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
                   onClick={handleEditSubmit}
                   disabled={disabled}
                   title="확인"
@@ -247,7 +268,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
+                  className="w-8 h-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                   onClick={handleEditCancel}
                   disabled={disabled}
                   title="취소"
@@ -258,39 +279,44 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2">
-                {item.thumbnailUrl && (
-                  <div className="relative group/thumbnail">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {enableThumbnailUpload && item.thumbnailUrl && (
+                  <div className="relative group/thumbnail flex-shrink-0">
                     <img
                       src={item.thumbnailUrl}
                       alt={`${item.name} thumbnail`}
-                      className={`${sizeClasses[thumbnailSize]} object-cover rounded border`}
+                      className={`${sizeClasses[thumbnailSize]} object-cover rounded-md border border-gray-200 shadow-sm`}
                     />
-                    <div className="absolute left-full top-0 ml-2 opacity-0 group-hover/thumbnail:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+                    <div className="absolute left-full top-0 ml-3 opacity-0 group-hover/thumbnail:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
                       <div className="bg-white border border-gray-300 rounded-lg shadow-xl p-2 w-44">
                         <img
                           src={item.thumbnailUrl}
                           alt={`${item.name} 썸네일 미리보기`}
-                          className="w-40 h-40 object-cover rounded"
+                          className="w-40 h-40 object-cover rounded-md"
                         />
                       </div>
                     </div>
                   </div>
                 )}
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">
+                
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                  <span className="text-sm font-medium text-gray-900 truncate">
                     {item.name}
                   </span>
                   {showCodes && item.code && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 truncate">
                       {item.code}
                     </span>
                   )}
                 </div>
+
               </div>
               {getChildrenCount(item) > 0 && (
-                <Badge variant="secondary" className="text-xs">
-                  {getChildrenCount(item)}개의 하위 카테고리
+                <Badge 
+                  variant="secondary" 
+                  className="text-xs bg-gray-100 text-gray-600 flex-shrink-0"
+                >
+                  {getChildrenCount(item)}개 하위 카테고리
                 </Badge>
               )}
             </>
@@ -298,13 +324,14 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
         </div>
 
         {!isEditing && !disabled && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 flex-shrink-0">
             {canAddChildren && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-6 h-6 p-0 text-blue-600 hover:text-blue-700"
+                className="w-8 h-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 onClick={() => setIsAdding(true)}
+                disabled={item.depth >= maxDepth - 1}
                 title="하위 카테고리 추가"
               >
                 +
@@ -313,7 +340,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="w-6 h-6 p-0 text-gray-600 hover:text-gray-700"
+              className="w-8 h-8 p-0 text-gray-600 hover:text-gray-700 hover:bg-gray-100"
               onClick={() => setIsEditing(true)}
               title="카테고리 수정"
             >
@@ -324,10 +351,10 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`w-6 h-6 p-0 ${
+                  className={`w-8 h-8 p-0 ${
                     hasChildren
                       ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-red-600 hover:text-red-700'
+                      : 'text-red-600 hover:text-red-700 hover:bg-red-50'
                   }`}
                   disabled={hasChildren}
                   title={
@@ -350,10 +377,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>취소</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onDelete(item.id)}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
+                  <AlertDialogAction onClick={() => onDelete(item.id)}>
                     삭제
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -365,16 +389,16 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
 
       {isAdding && (
         <div 
-          className="flex flex-col gap-2 p-3 bg-blue-50 rounded-md ml-2"
-          style={{ paddingLeft: `${(item.depth + 1) * 20 + 8}px` }}
+          className="flex flex-col gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg p-4 mt-2 shadow-sm"
+          style={{ marginLeft: `${item.depth * 24 + 12}px` }}
         >
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-3">
             <Input
               value={addValue}
               onChange={(e) => setAddValue(e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, 'add')}
               placeholder="새 카테고리 이름"
-              className="h-7 text-sm"
+              className="h-8 text-sm border-blue-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               autoFocus
               disabled={disabled}
             />
@@ -384,45 +408,47 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 onChange={(e) => setAddCode(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 'add')}
                 placeholder="새 카테고리 코드"
-                className="h-6 text-xs"
+                className="h-7 text-xs border-blue-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 disabled={disabled}
               />
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ThumbnailUploader
-              onThumbnailChange={setAddThumbnailFileId}
-              onUpload={onThumbnailUpload}
-              disabled={disabled}
-              size={thumbnailSize}
-            />
+            {enableThumbnailUpload && (
+              <ThumbnailUploader
+                  onThumbnailChange={setAddThumbnailFileId}
+                  onUpload={onThumbnailUpload}
+                  disabled={disabled}
+                  size={thumbnailSize}
+                />
+            )}
             <div className="flex-1" />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-6 h-6 p-0 text-green-600 hover:text-green-700"
-              onClick={handleAddSubmit}
-              disabled={disabled}
-              title="확인"
-            >
-              ✓
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-6 h-6 p-0 text-red-600 hover:text-red-700"
-              onClick={handleAddCancel}
-              disabled={disabled}
-              title="취소"
-            >
-              ✕
-            </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-8 h-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                onClick={handleAddSubmit}
+                disabled={disabled}
+                title="확인"
+              >
+                ✓
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-8 h-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={handleAddCancel}
+                disabled={disabled}
+                title="취소"
+              >
+                ✕
+              </Button>
           </div>
         </div>
       )}
 
       {hasChildren && isExpanded && (
-        <div className="ml-2">
+        <div className="mt-1">
           {item.children!.map((child) => (
             <CategoryNode
               key={child.id}
@@ -437,6 +463,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
               enableDragDrop={enableDragDrop}
               thumbnailSize={thumbnailSize}
               showCodes={showCodes}
+              enableThumbnailUpload={enableThumbnailUpload}
             />
           ))}
         </div>
