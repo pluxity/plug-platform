@@ -1,93 +1,77 @@
-import React, { useState, useEffect } from 'react'
-import { PageContainer } from '@/backoffice/common/view/layouts'
-import { CategoryComponent, CategoryItem } from '@/backoffice/common/view/components/category'
+import React, { useState, useEffect } from 'react';
+import { PageContainer } from '@/backoffice/common/view/layouts';
+import { CategoryComponent, CategoryItem } from '@/backoffice/common/view/components/category';
 import { findNodeById, isDescendant } from '@/backoffice/common/services/hooks/useCategory'
+import { DeviceCategoryMapper } from '@/backoffice/domains/device/mapper/deviceMapper';
 import { 
-  useAssetCategoryTree,
-  useCreateAssetCategory,
-  updateAssetCategory,
-  deleteAssetCategory,
-  useFileUploadWithInfo
-} from '@plug/common-services'
-import type { AssetCategoryResponse, FileResponse } from '@plug/common-services'
-import { toast } from 'sonner'; 
+  useDeviceCategoryTree,
+  useCreateDeviceCategory,
+  useFileUploadWithInfo,
+  updateDeviceCategory,
+  deleteDeviceCategory,
+  FileResponse
+} from '@plug/common-services';
+import { toast } from 'sonner';
 
-const convertToCategoryItems = (apiData: AssetCategoryResponse[]): CategoryItem[] => {
-  return apiData.map(item => ({
-    id: item.id.toString(),
-    name: item.name,
-    code: item.code,
-    depth: item.depth + 1, // API depth가 0부터 시작하므로 1을 더함
-    parentId: item.parentId?.toString(),
-    thumbnailUrl: item.thumbnail?.url,
-    thumbnailFileId: item.thumbnail?.id,
-    children: item.children && item.children.length > 0 
-      ? convertToCategoryItems(item.children) 
-      : undefined
-  }))
-}
-
-const AssetCategory: React.FC = () => {
-  const [categories, setCategories] = useState<CategoryItem[]>([])
-  const { categories: apiCategories, maxDepth, error, isLoading: treeLoading, mutate } = useAssetCategoryTree()
-  const createAssetCategory = useCreateAssetCategory()
-  const fileUpload = useFileUploadWithInfo()
+const DeviceCategory: React.FC = () => {
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const { categories: deviceCategories, maxDepth, error, isLoading: treeLoading, mutate } = useDeviceCategoryTree();
+  const createDeviceCategory = useCreateDeviceCategory();
+  const fileUpload = useFileUploadWithInfo();
 
   useEffect(() => {
-    if (apiCategories.length > 0) {
-      const convertedCategories = convertToCategoryItems(apiCategories)
-      setCategories(convertedCategories)
+    if (deviceCategories.length > 0) {
+      const convertedCategories = DeviceCategoryMapper(deviceCategories);
+      setCategories(convertedCategories);
     } else {
-      setCategories([])
+      setCategories([]);
     }
-  }, [apiCategories])
+  }, [deviceCategories]);
 
-  const handleCategoryAdd = async (name: string, parentId?: string, thumbnailFileId?: number, code?: string): Promise<string> => {
-    try {
-      const parentIdNumber = parentId ? parseInt(parentId) : undefined
-      const result = await createAssetCategory.execute({
-        name,
-        code: code || name.toLowerCase().replace(/\s+/g, '-'),
-        parentId: parentIdNumber || null,
-        thumbnailFileId
-      })
+  // 디바이스 카테고리 생성
+  const handleCreateAdd = async (name: string, parentId?: string, thumbnailFileId?: number) => {
+    try{
+        const result = await createDeviceCategory.execute({
+          name,
+          parentId: parentId ? parseInt(parentId) : null,
+          thumbnailFileId
+        });
+    
+        if(result?.response?.status !== 201) {
+          throw new Error('카테고리 생성에 실패했습니다.');
+        }
+    
+        await mutate();
+        return result.response.headers.get('Location') || '';
+    } catch (error) {
+      console.error('카테고리 생성에 실패했습니다.', error);
+      throw error;
+    }
+  }
 
-      if (result?.response?.status !== 201) {
-        throw new Error('카테고리 생성에 실패했습니다.')
+  // 디바이스 카테고리 수정
+  const handleCategoryUpdate = async (id: string, name: string, thumbnailFileId?: number) => {
+      try{
+        const currentCategory = findNodeById(categories, id);
+        const categoryId = parseInt(id);
+        await updateDeviceCategory(categoryId, {
+          name,
+          thumbnailFileId,
+          parentId: currentCategory?.parentId ? parseInt(currentCategory.parentId) : null,
+        })
+        await mutate();
+    } catch (error) {
+      console.error('카테고리 수정에 실패했습니다.', error);
+      throw error;
       }
-      
-      await mutate();
-      return result.response.headers.get('Location') || '';
-      
-    } catch (error) {
-      console.error('카테고리 추가 실패:', error)
-      throw error
-    }
   }
 
-  // 카테고리 수정
-  const handleCategoryUpdate = async (id: string, name: string, thumbnailFileId?: number, code?: string): Promise<void> => {
-    try {
-      const currentCategory = findNodeById(categories, id);
-      const categoryId = parseInt(id)
-      await updateAssetCategory(categoryId, {
-        name,
-        code: code || name.toLowerCase().replace(/\s+/g, '-'), 
-        thumbnailFileId,
-        parentId: currentCategory?.parentId ? parseInt(currentCategory.parentId) : null,
-      })
-      await mutate()
-    } catch (error) {
-      console.error('카테고리 수정 실패:', error)
-      throw error
-    }
-  }
-
+  // 디바이스 카테고리 삭제
   const handleCategoryDelete = async (id: string): Promise<void> => {
     try {
       const categoryId = parseInt(id)
+      await deleteDeviceCategory(categoryId)
       
-      await deleteAssetCategory(categoryId)
       await mutate()
     } catch (error: unknown) {
       const errorObj = error as { status?: number; message?: string }
@@ -109,6 +93,7 @@ const AssetCategory: React.FC = () => {
     }
   }
 
+  // 디바이스 카테고리 이동
   const handleCategoryMove = async (
     draggedId: string, 
     targetId: string, 
@@ -139,13 +124,12 @@ const AssetCategory: React.FC = () => {
       
       const categoryId = parseInt(draggedId)
       
-      await updateAssetCategory(categoryId, {
+      await updateDeviceCategory(categoryId, {
         name: draggedCategory.name,
-        code: draggedCategory.code || draggedCategory.name.toLowerCase().replace(/\s+/g, '-'),
         parentId: newParentId || null,
         thumbnailFileId: draggedCategory.thumbnailFileId
       })
-
+          
       await mutate()
       
     } catch (error) {
@@ -166,6 +150,7 @@ const AssetCategory: React.FC = () => {
     }
   }
 
+  // 디바이스 카테고리 썸네일 업로드
   const handleThumbnailUpload = async (file: File): Promise<number> => {
     try {
       const fileInfo: FileResponse = await fileUpload.execute(file);
@@ -187,28 +172,29 @@ const AssetCategory: React.FC = () => {
     }
   }
 
-  const isLoading = treeLoading
-  const hasError = !!error
+  const isLoading = treeLoading;
+  const hasError = !!error;
 
-  return (
-    <PageContainer title="Asset Category">
+  return (  
+    <PageContainer title="Device Category">
       <div className="space-y-6">
         {/* 카테고리 관리 컴포넌트 */}
         {!isLoading && !hasError && (
           <CategoryComponent
-            items={categories}
-            maxDepth={maxDepth}
-            title="자산 카테고리 관리"
-            emptyMessage="등록된 자산 카테고리가 없습니다."
-            onAdd={handleCategoryAdd}
-            onUpdate={handleCategoryUpdate}
-            onDelete={handleCategoryDelete}
-            onMove={handleCategoryMove}
-            onThumbnailUpload={handleThumbnailUpload}
-            enableDragDrop={true}
-            disabled={createAssetCategory.isLoading}
-            thumbnailSize="large"
-            enableThumbnail={true}
+              items={categories}
+              maxDepth={maxDepth}
+              title="디바이스 카테고리 관리"
+              emptyMessage="등록된 디바이스 카테고리가 없습니다."
+              onAdd={handleCreateAdd}
+              onUpdate={handleCategoryUpdate}
+              onDelete={handleCategoryDelete}
+              onMove={handleCategoryMove}
+              onThumbnailUpload={handleThumbnailUpload}
+              enableDragDrop={true}
+              disabled={createDeviceCategory.isLoading}
+              thumbnailSize="large"
+              enableThumbnail={true}
+              enableCodes={false}
           />
         )}
       </div>
@@ -216,4 +202,4 @@ const AssetCategory: React.FC = () => {
   )
 }
 
-export default AssetCategory;
+export default DeviceCategory;

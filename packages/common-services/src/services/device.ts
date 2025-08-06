@@ -67,8 +67,8 @@ export const useCreateDeviceCategory = () => {
 };
 
 // 디바이스 카테고리 수정
-export const useUpdateDeviceCategory = (categoryId: number) => {
-  return usePatch<DeviceCategoryRequest>(`${DEVICE_CATEGORY_END_POINT}/${categoryId}`, { requireAuth: true });
+export const updateDeviceCategory = async (categoryId: number, data: DeviceCategoryRequest) => {  
+  return api.put(`${DEVICE_CATEGORY_END_POINT}/${categoryId}`, data, { requireAuth: true });
 };
 
 // 디바이스 카테고리 삭제
@@ -92,4 +92,18 @@ export const useDeviceDetailSWR = (deviceId: string) => {
 
 export const useDeviceCategoriesSWR = () => {
   return useSWRApi<DeviceCategoryAllResponse>(DEVICE_CATEGORY_END_POINT, 'GET', { requireAuth: true });
+};
+
+// 유틸리티 훅
+export const useDeviceCategoryTree = () => {
+  const { data, error, isLoading, mutate } = useDeviceCategoriesSWR();
+  
+  return {
+    categories: data?.list || [],
+    maxDepth: data?.maxDepth || 0,
+    error,
+    isLoading,
+    mutate, 
+    refresh: () => mutate(), 
+  };
 };
