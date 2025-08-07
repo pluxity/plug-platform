@@ -1,0 +1,1 @@
+export { default as DeviceCategory } from './page/DeviceCategory';

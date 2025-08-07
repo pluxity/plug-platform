@@ -27,9 +27,9 @@ export interface CategoryNodeProps {
   onThumbnailUpload?: (file: File) => Promise<number>
   disabled?: boolean
   enableDragDrop?: boolean
-  enableThumbnailUpload?: boolean
+  enableThumbnail?: boolean
   thumbnailSize?: 'small' | 'medium' | 'large'
-  showCodes?: boolean
+  enableCodes?: boolean
 }
 
 export const CategoryNode: React.FC<CategoryNodeProps> = ({
@@ -42,9 +42,9 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
   onThumbnailUpload,
   disabled = false,
   enableDragDrop = true,
-  enableThumbnailUpload = false,
+  enableThumbnail = false,
   thumbnailSize = 'small',
-  showCodes = true
+  enableCodes = true
 }) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -61,7 +61,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
   const sizeClasses = {
     small: 'w-6 h-6',
     medium: 'w-8 h-8', 
-    large: 'w-12 h-12'
+    large: 'w-16 h-16'
   }
 
   const handleToggleExpand = () => {
@@ -233,7 +233,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                   autoFocus
                   disabled={disabled}
                 />
-                {showCodes && (
+                {enableCodes && (
                   <Input
                     value={editCode}
                     onChange={(e) => setEditCode(e.target.value)}
@@ -245,7 +245,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {enableThumbnailUpload && (
+                {enableThumbnail && (
                   <ThumbnailUploader
                       currentThumbnailUrl={item.thumbnailUrl}
                       onThumbnailChange={setEditThumbnailFileId}
@@ -280,7 +280,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
           ) : (
             <>
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                {enableThumbnailUpload && item.thumbnailUrl && (
+                {enableThumbnail && item.thumbnailUrl && (
                   <div className="relative group/thumbnail flex-shrink-0">
                     <img
                       src={item.thumbnailUrl}
@@ -303,7 +303,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                   <span className="text-sm font-medium text-gray-900 truncate">
                     {item.name}
                   </span>
-                  {showCodes && item.code && (
+                  {enableCodes && item.code && (
                     <span className="text-xs text-gray-500 truncate">
                       {item.code}
                     </span>
@@ -402,19 +402,19 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
               autoFocus
               disabled={disabled}
             />
-            {showCodes && (
+            {enableCodes && (
               <Input
                 value={addCode}
                 onChange={(e) => setAddCode(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 'add')}
                 placeholder="새 카테고리 코드"
-                className="h-7 text-xs border-blue-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="h-8 text-xs border-blue-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 disabled={disabled}
               />
             )}
           </div>
           <div className="flex items-center gap-2">
-            {enableThumbnailUpload && (
+            {enableThumbnail && (
               <ThumbnailUploader
                   onThumbnailChange={setAddThumbnailFileId}
                   onUpload={onThumbnailUpload}
@@ -462,8 +462,8 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
               disabled={disabled}
               enableDragDrop={enableDragDrop}
               thumbnailSize={thumbnailSize}
-              showCodes={showCodes}
-              enableThumbnailUpload={enableThumbnailUpload}
+              enableCodes={enableCodes}
+              enableThumbnail={enableThumbnail}
             />
           ))}
         </div>
