@@ -8,6 +8,7 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 import FacilityCard from '../components/FacilityCard';
 import FacilityTypeFilter from '../components/FacilityTypeFilter';
 import Pagination from '../components/Pagination';
+import { CreateFacilityModal } from '../components/CreateFacilityModal';
 import { useFacilityData } from '../hooks/useFacilityData';
 
 const ITEMS_PER_PAGE = 8;
@@ -16,12 +17,14 @@ const FacilityList: React.FC = () => {
   const [selectedTypes, setSelectedTypes] = useState<FacilityType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { 
     isLoading, 
     error, 
     deleteFacility: deleteFacilityFromStore,
-    getAllFacilities 
+    getAllFacilities,
+    refetch
   } = useFacilityData();
 
   const handleFacilityDelete = async (id: number, facilityType: FacilityType): Promise<void> => {
@@ -70,7 +73,9 @@ const FacilityList: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handleDelete = async (id: number, facilityType: FacilityType) => {
+  const handleCreateSuccess = () => {
+    refetch(); // SWR 캐시 갱신하여 새로 등록된 시설 반영
+  };  const handleDelete = async (id: number, facilityType: FacilityType) => {
     try {
       await handleFacilityDelete(id, facilityType);
     } catch {
@@ -130,7 +135,10 @@ const FacilityList: React.FC = () => {
             />
           </div>
           <div className="ml-4">
-            <Button className='cursor-pointer rounded-md'>
+            <Button 
+              className='cursor-pointer rounded-md'
+              onClick={() => setIsCreateModalOpen(true)}
+            >
               새 시설 추가
             </Button>
           </div>
@@ -180,6 +188,13 @@ const FacilityList: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* 시설 생성 모달 */}
+      <CreateFacilityModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateSuccess}
+      />
     </PageContainer>
   );
 };

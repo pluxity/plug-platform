@@ -27,13 +27,12 @@ export class FacilityService {
   static async create<T extends DomainKey>(
     domain: T,
     data: DomainCreateRequest<T>
-  ): Promise<number> {
+  ): Promise<void> {
     const config = domainUtils.getConfig(domain);
     const response = await api.post(config.endpoint, data);
-    if (response.ok) {
-      return response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to create ${config.displayName}: ${response.status}`);
     }
-    throw new Error(`Failed to create ${config.displayName}: ${response.status}`);
   }
 
   static async update<T extends DomainKey>(
@@ -75,7 +74,7 @@ export class FacilityService {
 type DomainServiceMethods<T extends DomainKey> = {
   getAll: () => Promise<DataResponseBody<DomainResponse<T>[]>>;
   getById: (id: number) => Promise<DataResponseBody<DomainResponse<T>>>;
-  create: (data: DomainCreateRequest<T>) => Promise<number>;
+  create: (data: DomainCreateRequest<T>) => Promise<void>;
   update: (id: number, data: DomainUpdateRequest<T>) => Promise<void>;
   delete: (id: number) => Promise<void>;
   getDomainInfo: () => ReturnType<typeof FacilityService.getDomainInfo>;
