@@ -1,1 +1,1 @@
-export { default } from './FacilityList';
+export { default } from './page/FacilityList';

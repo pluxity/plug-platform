@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardAction, Badge } from '@plug/ui';
 import { FacilityResponse } from '@plug/common-services';
 import { DOMAINS, FacilityType } from '@plug/common-services';
+import { useNavigate } from 'react-router-dom';
 import ThumbnailHoverButtons from './ThumbnailHoverButtons';
 
 interface FacilityCardProps {
@@ -17,12 +18,21 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   onEdit,
   onDelete
 }) => {
+  const navigate = useNavigate();
   
   const displayType = facilityType && facilityType in DOMAINS ? facilityType : 'building';
   const typeConfig = DOMAINS[displayType];
 
+  const handleCardClick = () => {
+    navigate(`/admin/facility/${displayType}/${facility.id}`);
+  };
+
+  const handleEdit = () => {
+    navigate(`/admin/facility/${displayType}/${facility.id}`);
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 pt-4">
+    <Card className="hover:shadow-md transition-shadow duration-200 pt-4 cursor-pointer" onClick={handleCardClick}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
@@ -41,37 +51,41 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0 cursor-pointer">
+      <CardContent className="pt-0">
         <div>
           {/* 썸네일 또는 첫 글자 표시 */}
           <div className="relative group my-4">
             {facility.thumbnail?.url ? (
               // 썸네일이 있는 경우
-              <div className="relative overflow-hidden rounded-md border cursor-pointer">
+              <div className="relative overflow-hidden rounded-md border">
                 <img
                   src={facility.thumbnail.url}
                   alt={`${facility.name} 썸네일`}
                   className="w-full h-48 object-cover transition-transform duration-200 group-hover:scale-105"
                 />
                 {/* 호버 시 나타나는 버튼들 */}
-                <ThumbnailHoverButtons
-                  onEdit={onEdit ? () => onEdit(facility) : undefined}
-                  onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
-                  facilityName={facility.name}
-                />
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ThumbnailHoverButtons
+                    onEdit={onEdit ? () => onEdit(facility) : handleEdit}
+                    onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
+                    facilityName={facility.name}
+                  />
+                </div>
               </div>
             ) : (
               // 썸네일이 없는 경우 - 첫 글자 표시
-              <div className="relative w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md border flex items-center justify-center group cursor-pointer">
+              <div className="relative w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md border flex items-center justify-center group">
                 <span className="text-white text-4xl font-bold">
                   {facility.name.charAt(0).toUpperCase()}
                 </span>
                 {/* 호버 시 나타나는 버튼들 */}
-                <ThumbnailHoverButtons
-                  onEdit={onEdit ? () => onEdit(facility) : undefined}
-                  onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
-                  facilityName={facility.name}
-                />
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ThumbnailHoverButtons
+                    onEdit={onEdit ? () => onEdit(facility) : handleEdit}
+                    onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
+                    facilityName={facility.name}
+                  />
+                </div>
               </div>
             )}
           </div>

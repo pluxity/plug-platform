@@ -5,10 +5,10 @@ import {
   FacilityType
 } from '@plug/common-services';
 import { PageContainer } from '@/backoffice/common/view/layouts';
-import FacilityCard from './components/FacilityCard';
-import FacilityTypeFilter from './components/FacilityTypeFilter';
-import Pagination from './components/Pagination';
-import { useFacilityData } from './hooks/useFacilityData';
+import FacilityCard from '../components/FacilityCard';
+import FacilityTypeFilter from '../components/FacilityTypeFilter';
+import Pagination from '../components/Pagination';
+import { useFacilityData } from '../hooks/useFacilityData';
 
 const ITEMS_PER_PAGE = 8;
 

@@ -20,9 +20,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
   const showCounts = !isLoading;
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
-      <span className="text-sm font-medium text-gray-700 py-1">필터:</span>
-      
+    <div className="flex flex-wrap gap-2 mb-6">      
       {/* All 옵션 */}
       <Badge
         variant={selectedTypes.length === 0 ? "default" : "outline"}
@@ -37,11 +35,9 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
         }}
       >
         전체
-        {selectedTypes.length === 0 && showCounts && (
-          <span className="ml-1 text-xs">
-            ({Object.values(facilityCount).reduce((sum: number, count: number) => sum + count, 0)})
-          </span>
-        )}
+        <span className="ml-1 text-xs">
+          ({Object.values(facilityCount).reduce((sum: number, count: number) => sum + count, 0)})
+        </span>
       </Badge>
 
       {/* 각 시설 타입별 필터 */}
@@ -53,7 +49,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
           <Badge
             key={type}
             variant={isSelected ? "default" : "outline"}
-            className={`cursor-pointer transition-colors ${
+            className={`cursor-pointer transition-colors py-1 ${
               isSelected 
                 ? "hover:bg-primary/90" 
                 : "hover:bg-gray-100"
