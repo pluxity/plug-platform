@@ -9,6 +9,6 @@ export const DeviceCategoryMapper = (deviceCategory: DeviceCategoryResponse[]): 
         parentId: item.parentId?.toString(),
         thumbnailUrl: item.thumbnailFile?.url,    
         thumbnailFileId: item.thumbnailFile?.id, 
-        children: item.children && item.children.length > 0 ? DeviceCategoryMapper(item.children) : undefined, 
+        children: item.children?.length ? DeviceCategoryMapper(item.children) : undefined,
     }));
 };

@@ -33,16 +33,18 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file || !onUpload) return
-
+  
     const previewUrl = URL.createObjectURL(file)
     setPreviewThumbnailUrl(previewUrl)
-
+  
     setUploading(true)
     try {
       const fileId = await onUpload(file)
       onThumbnailChange(fileId)
-      URL.revokeObjectURL(previewUrl)
+    } catch (error) {
+      console.error("업로드 중 오류 발생:", error)
     } finally {
+      URL.revokeObjectURL(previewUrl)  
       setUploading(false)
     }
   }

@@ -51,19 +51,25 @@ const DeviceCategory: React.FC = () => {
 
   // 디바이스 카테고리 수정
   const handleCategoryUpdate = async (id: string, name: string, thumbnailFileId?: number) => {
-      try{
-        const currentCategory = findNodeById(categories, id);
-        const categoryId = parseInt(id);
-        await updateDeviceCategory(categoryId, {
-          name,
-          thumbnailFileId,
-          parentId: currentCategory?.parentId ? parseInt(currentCategory.parentId) : null,
-        })
-        await mutate();
+    try {
+      const currentCategory = findNodeById(categories, id);
+      if (!currentCategory) {
+        toast.error('수정할 카테고리를 찾을 수 없습니다.');
+        throw new Error('Category to update not found');
+      }
+  
+      const categoryId = parseInt(id);
+      await updateDeviceCategory(categoryId, {
+        name,
+        thumbnailFileId,
+        parentId: currentCategory.parentId ? parseInt(currentCategory.parentId) : null,
+      });
+  
+      await mutate();
     } catch (error) {
       console.error('카테고리 수정에 실패했습니다.', error);
-      throw error;
-      }
+      throw error; 
+    }
   }
 
   // 디바이스 카테고리 삭제
