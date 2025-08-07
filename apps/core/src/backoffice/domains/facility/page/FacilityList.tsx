@@ -74,12 +74,14 @@ const FacilityList: React.FC = () => {
   };
 
   const handleCreateSuccess = () => {
-    refetch(); // SWR 캐시 갱신하여 새로 등록된 시설 반영
-  };  const handleDelete = async (id: number, facilityType: FacilityType) => {
+    refetch();
+  };
+
+  const handleDelete = async (id: number, facilityType: FacilityType) => {
     try {
       await handleFacilityDelete(id, facilityType);
-    } catch {
-      // Error is already handled in toast
+    } catch (error) {
+      console.error('Failed to delete facility:', error);
     }
   };
 
@@ -117,33 +119,28 @@ const FacilityList: React.FC = () => {
   return (
     <PageContainer title="시설 관리">
       <div className="space-y-6">
-
-        {/* 타입 필터 */}
-        <FacilityTypeFilter
-          selectedTypes={selectedTypes}
-          onTypeToggle={handleTypeToggle}
-        />
-        {/* 검색 및 액션 버튼 */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex-1 max-w-md">
+        <div className="mb-6">
+          <FacilityTypeFilter 
+            selectedTypes={selectedTypes}
+            onTypeToggle={handleTypeToggle}
+          />
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 items-start sm:items-center justify-between">
+          <div className="relative flex-1 max-w-md">
             <input
               type="text"
-              placeholder="시설명, 코드, 설명으로 검색..."
+              placeholder="시설명, 코드 또는 설명으로 검색..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <div className="ml-4">
-            <Button 
-              className='cursor-pointer rounded-md'
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              새 시설 추가
-            </Button>
-          </div>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            새 시설 등록
+          </Button>
         </div>
-        {/* 시설 카드 그리드 */}
+
         {paginatedFacilities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">표시할 시설이 없습니다.</p>
@@ -177,7 +174,6 @@ const FacilityList: React.FC = () => {
               })}
             </div>
 
-            {/* 페이징 */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -189,7 +185,6 @@ const FacilityList: React.FC = () => {
         )}
       </div>
 
-      {/* 시설 생성 모달 */}
       <CreateFacilityModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}

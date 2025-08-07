@@ -9,6 +9,7 @@ import {
 } from '@plug/ui';
 import { ExtendedFacilityFormComponentProps } from '../../types';
 import { FileUpload } from './FileUpload';
+import { FileResponse } from '@plug/common-services';
 
 export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps> = ({
   register,
@@ -16,20 +17,34 @@ export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps>
   setValue,
   watch,
   onDrawingFileUploaded,
+  currentThumbnailFile,
+  currentDrawingFile,
+  isEditMode = false,
 }) => {
   const watchedThumbnailFileId = watch?.('facility.thumbnailFileId');
   const watchedDrawingFileId = watch?.('facility.drawingFileId');
 
   const handleThumbnailChange = (fileId: number | null) => {
-    setValue?.('facility.thumbnailFileId', fileId || undefined);
+    if (!isEditMode || fileId !== null) {
+      setValue?.('facility.thumbnailFileId', fileId || undefined);
+    }
   };
 
   const handleDrawingChange = (fileId: number | null) => {
-    setValue?.('facility.drawingFileId', fileId || undefined);
+    if (!isEditMode || fileId !== null) {
+      setValue?.('facility.drawingFileId', fileId || undefined);
+    }
   };
 
-  const handleDrawingUploaded = (fileInfo: { id: number; url: string; originalFileName: string }) => {
-    console.log('Drawing file uploaded in FacilityFormComponent:', fileInfo);
+  const handleThumbnailRemoved = () => {
+    setValue?.('facility.thumbnailFileId', undefined);
+  };
+
+  const handleDrawingRemoved = () => {
+    setValue?.('facility.drawingFileId', undefined);
+  };
+
+  const handleDrawingUploaded = (fileInfo: FileResponse) => {
     if (onDrawingFileUploaded) {
       onDrawingFileUploaded(fileInfo.url);
     }
@@ -80,7 +95,7 @@ export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps>
           />
         </div>
 
-        {/* 파일 업로드 섹션 */}
+          {/* 파일 업로드 섹션 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FileUpload
             label="썸네일 이미지"
@@ -88,7 +103,11 @@ export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps>
             fileType="image"
             placeholder="썸네일 이미지를 업로드하세요"
             currentFileId={watchedThumbnailFileId}
+            currentFileInfo={currentThumbnailFile}
             onFileChange={handleThumbnailChange}
+            onFileRemoved={handleThumbnailRemoved}
+            isEditMode={isEditMode}
+            maxSizeInMB={10} // 이미지는 10MB 제한
           />
           
           <FileUpload
@@ -97,8 +116,12 @@ export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps>
             fileType="document"
             placeholder="3D 모델 파일을 업로드하세요 (GLB, GLTF)"
             currentFileId={watchedDrawingFileId}
+            currentFileInfo={currentDrawingFile}
             onFileChange={handleDrawingChange}
             onFileUploaded={handleDrawingUploaded}
+            onFileRemoved={handleDrawingRemoved}
+            isEditMode={isEditMode}
+            maxSizeInMB={100} // 3D 모델은 100MB 제한
           />
         </div>
 

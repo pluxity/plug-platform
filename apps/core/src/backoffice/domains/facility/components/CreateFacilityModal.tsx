@@ -26,7 +26,6 @@ import {
 } from '@plug/common-services';
 import { FacilityFormComponent, FloorsFormComponent, StationInfoFormComponent, BoundaryFormComponent } from './form-components';
 import { FacilityCreateFormData } from '../types';
-// engine 모듈의 Model 네임스페이스에서 GetModelHierarchyFromUrl 함수 임포트
 import { Model, Interfaces } from '@plug/engine/src';
 
 const createFacilitySchema = z.object({
@@ -109,12 +108,11 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
     onClose();
   };
 
-  // FloorsFormComponent의 replace 함수를 받는 콜백
   const handleFloorsReplaceReady = (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => {
     setFloorsReplaceFunction(() => replaceFunction);
   };
+
   const handleDrawingFileUploaded = (fileUrl: string) => {
-    console.log('Drawing file uploaded:', fileUrl);
     setIsProcessingDrawing(true);
     
     try {
@@ -145,8 +143,6 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
     } catch (error) {
       console.error('Error processing drawing file with engine:', error);
       
-      // 에러 발생 시 빈 배열로 설정
-      console.log('Using empty floor data due to error');
       if (floorsReplaceFunction) {
         floorsReplaceFunction([]);
       } else {
@@ -162,15 +158,11 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
 
     setIsLoading(true);
     try {
-      
-      // 도메인 설정에 따라 필요한 컴포넌트만 포함하여 요청 데이터 구성
       const domainConfig = domainUtils.getConfig(selectedFacilityType);
       const createRequest: Record<string, unknown> = {};
 
-      // facility는 모든 도메인에 필수
       createRequest.facility = data.facility;
 
-      // 각 도메인의 컴포넌트에 따라 데이터 추가
       domainConfig.components.forEach((component) => {
         switch (component) {
           case 'floors':
@@ -199,11 +191,9 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await FacilityService.create(selectedFacilityType, createRequest as any);
       
-      // 성공 시 토스트 메시지 표시
       const config = domainUtils.getConfig(selectedFacilityType);
       toast.success(`${config.displayName}이(가) 성공적으로 등록되었습니다.`);
       
-      // 모달 닫고 목록 새로고침
       handleClose();
       onSuccess();
     } catch (error) {
@@ -242,8 +232,6 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
             control={control}
             register={register}
             errors={errors}
-            setValue={setValue}
-            watch={watch}
             onFloorsReplaceReady={handleFloorsReplaceReady}
             isProcessingDrawing={isProcessingDrawing}
           />
@@ -313,7 +301,6 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
             </CardContent>
           </Card>
 
-          {/* 기본 정보 - 시설 유형 선택 후에만 표시 */}
           {selectedFacilityType && (
             <FacilityFormComponent
               register={register}
@@ -322,6 +309,9 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
               setValue={setValue}
               watch={watch}
               onDrawingFileUploaded={handleDrawingFileUploaded}
+              currentThumbnailFile={null}
+              currentDrawingFile={null}
+              isEditMode={false}
             />
           )}
 
@@ -337,7 +327,6 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
             </Card>
           )}
 
-          {/* 동적 컴포넌트 렌더링 - 시설 유형 선택 후에만 표시 */}
           {selectedFacilityType && renderDynamicComponents()}
 
           <DialogFooter>

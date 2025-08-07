@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Card,
   CardHeader,
@@ -18,22 +18,30 @@ export const StationInfoFormComponent: React.FC<StationInfoFormComponentProps> =
   watch,
 }) => {
   const [stationCodes, setStationCodes] = useState<string[]>(['']);
+  const [isInitialized, setIsInitialized] = useState(false);
   
-  // 노선 목록 조회
   const { data: linesData } = useLinesSWR();
   
-  // 현재 선택된 노선 ID들 가져오기
-  const watchedLineIds = watch?.('stationInfo.lineIds') || [];
+  const currentLineIds = watch?.('stationInfo.lineIds') || [];
+  
+  useEffect(() => {
+    if (!isInitialized) {
+      const currentStationCodes = watch?.('stationInfo.stationCodes') || [];
+      const stationCodesToSet = currentStationCodes.length > 0 ? [...currentStationCodes] : [''];
+      setStationCodes(stationCodesToSet);
+      setIsInitialized(true);
+    }
+  }, [isInitialized, watch]);
 
-  // 노선 옵션 생성
+  
   const lineOptions = useMemo(() => {
-    return linesData?.map(line => ({
+    const options = linesData?.map(line => ({
       label: line.name,
       value: line.id.toString(),
     })) || [];
+    return options;
   }, [linesData]);
 
-  // 노선 ID 변경 핸들러
   const handleLineIdsChange = (selectedValues: string[]) => {
     const lineIds = selectedValues.map(Number);
     setValue('stationInfo.lineIds', lineIds);
@@ -44,18 +52,23 @@ export const StationInfoFormComponent: React.FC<StationInfoFormComponentProps> =
     setStationCodes(newCodes);
   };
 
-  const removeStationCode = (index: number) => {
-    if (stationCodes.length > 1) {
-      const newCodes = stationCodes.filter((_, i) => i !== index);
-      setStationCodes(newCodes);
-    }
-  };
-
   const handleStationCodeChange = (index: number, value: string) => {
     const newCodes = [...stationCodes];
     newCodes[index] = value;
     setStationCodes(newCodes);
-    setValue('stationInfo.stationCodes', newCodes.filter(code => code.trim() !== ''));
+    
+    const filteredCodes = newCodes.filter(code => code.trim() !== '');
+    setValue('stationInfo.stationCodes', filteredCodes);
+  };
+
+  const removeStationCode = (index: number) => {
+    if (stationCodes.length > 1) {
+      const newCodes = stationCodes.filter((_, i) => i !== index);
+      setStationCodes(newCodes);
+      
+      const filteredCodes = newCodes.filter(code => code.trim() !== '');
+      setValue('stationInfo.stationCodes', filteredCodes);
+    }
   };
 
   return (
@@ -64,7 +77,6 @@ export const StationInfoFormComponent: React.FC<StationInfoFormComponentProps> =
         <CardTitle>역사 정보</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 py-2">
-        {/* 역 코드 섹션 */}
         <div>
           <div className="flex justify-between items-center mb-3">
             <label className="text-sm font-medium">역 코드</label>
@@ -109,11 +121,10 @@ export const StationInfoFormComponent: React.FC<StationInfoFormComponentProps> =
           )}
         </div>
 
-        {/* 노선 ID 섹션 */}
         <div>
           <label className="block text-sm font-medium mb-2">노선</label>
           <MultiSelect
-            value={watchedLineIds.map(String)}
+            value={currentLineIds.map(String)}
             onChange={handleLineIdsChange}
             options={lineOptions}
             placeholder="노선을 선택하세요"

@@ -1,33 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit3 } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent } from '@plug/ui';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { ArrowLeft, Edit3, Save } from 'lucide-react';
+import { Button, Separator } from '@plug/ui';
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { 
   FacilityService, 
-  DomainKey, 
   domainUtils,
-  DomainUpdateRequest,
   FacilityType,
   FacilityResponse,
-  FloorResponse,
-  StationInfoResponse,
-  FileResponse
 } from '@plug/common-services';
 import { toast } from 'sonner';
-
-import { FacilityInfoComponent, FloorsComponent, StationInfoComponent, BoundaryComponent } from '../components';
-import { ThumbnailUploadComponent } from '@/backoffice/common/components/ThumbnailUploadComponent';
-import { DrawingUploadComponent } from '@/backoffice/common/components/DrawingUploadComponent';
 import { useFacilityData } from '../hooks/useFacilityData';
+import { FacilityFormComponent, FloorsFormComponent, StationInfoFormComponent, BoundaryFormComponent } from '../components/form-components';
+import { FacilityCreateFormData } from '../types';
+import { Model, Interfaces } from '@plug/engine/src';
+
+const editFacilitySchema = z.object({
+  facilityType: z.string().min(1, '시설 유형을 선택해주세요'),
+  facility: z.object({
+    name: z.string().min(1, '시설명은 필수입니다'),
+    code: z.string().min(1, '시설 코드는 필수입니다'),
+    description: z.string().optional(),
+    drawingFileId: z.number().optional(),
+    thumbnailFileId: z.number().optional(),
+    lon: z.number().optional(),
+    lat: z.number().optional(),
+    locationMeta: z.string().optional(),
+  }),
+  floors: z.array(z.object({
+    name: z.string().min(1, '층 이름은 필수입니다'),
+    floorId: z.string().min(1, '층 ID는 필수입니다'),
+  })).optional(),
+  stationInfo: z.object({
+    lineIds: z.array(z.number()).optional(),
+    stationCodes: z.array(z.string()).optional(),
+  }).optional(),
+  boundary: z.string().optional(),
+});
+
+type EditFacilityFormData = FacilityCreateFormData;
 
 type FacilityData = {
   facility?: FacilityResponse;
-  floors?: FloorResponse[];
-  stationInfo?: StationInfoResponse;
+  floors?: Array<{name: string; floorId: string}>;
+  stationInfo?: {lineIds?: number[]; stationCodes?: string[]};
   boundary?: string;
-  boundaryFiles?: FileResponse[];
-  thumbnailFile?: FileResponse;
 };
 
 const FacilityEdit: React.FC = () => {
@@ -37,11 +57,43 @@ const FacilityEdit: React.FC = () => {
   const [facilityType, setFacilityType] = useState<FacilityType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [floorsReplaceFunction, setFloorsReplaceFunction] = useState<((floors: Array<{name: string; floorId: string}>) => void) | null>(null);
+  const [isProcessingDrawing, setIsProcessingDrawing] = useState(false);
 
   const { getAllFacilities, isLoading: isFacilitiesLoading } = useFacilityData();
   const facilityId = id ? parseInt(id, 10) : null;
+  const [hasLoadedData, setHasLoadedData] = useState(false);
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<EditFacilityFormData>({
+    resolver: zodResolver(editFacilitySchema),
+    defaultValues: {
+      facilityType: '',
+      facility: {
+        name: '',
+        code: '',
+        description: '',
+      },
+      floors: [],
+      stationInfo: {
+        lineIds: [],
+        stationCodes: [],
+      },
+    },
+  });
 
   useEffect(() => {
+    if (!facilityId || hasLoadedData || isFacilitiesLoading) {
+      return;
+    }
+
     if (!facilityId) {
       navigate('/admin/facility');
       return;
@@ -51,7 +103,6 @@ const FacilityEdit: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // useFacilityData의 getAllFacilities에서 해당 ID의 시설을 찾기
         const targetFacility = getAllFacilities.find(f => f.id === facilityId);
         
         if (!targetFacility) {
@@ -60,11 +111,35 @@ const FacilityEdit: React.FC = () => {
           return;
         }
 
-        // 찾은 시설의 타입으로 상세 정보 로드
         const response = await FacilityService.getById(targetFacility.facilityType, facilityId);
         if (response.data) {
+          const facilityData = response.data as FacilityData;
           setFacilityType(targetFacility.facilityType);
-          setFacility(response.data as FacilityData);
+          setFacility(facilityData);
+
+          const formData = {
+            facilityType: targetFacility.facilityType,
+            facility: {
+              name: facilityData.facility?.name || '',
+              code: facilityData.facility?.code || '',
+              description: facilityData.facility?.description || '',
+              drawingFileId: facilityData.facility?.drawing?.id,
+              thumbnailFileId: facilityData.facility?.thumbnail?.id,
+              lon: facilityData.facility?.lon,
+              lat: facilityData.facility?.lat,
+              locationMeta: facilityData.facility?.locationMeta || '',
+            },
+            floors: facilityData.floors || [],
+            stationInfo: {
+              lineIds: facilityData.stationInfo?.lineIds || [],
+              stationCodes: facilityData.stationInfo?.stationCodes || [],
+            },
+            boundary: facilityData.boundary || '',
+          };
+          
+          reset(formData);
+          
+          setHasLoadedData(true);
         } else {
           toast.error('시설을 찾을 수 없습니다.');
           navigate('/admin/facility');
@@ -78,83 +153,123 @@ const FacilityEdit: React.FC = () => {
       }
     };
 
-    // getAllFacilities가 로드된 후에만 실행
-    if (!isFacilitiesLoading && getAllFacilities.length > 0) {
+    if (getAllFacilities.length > 0) {
       loadFacility();
     } else if (!isFacilitiesLoading && getAllFacilities.length === 0) {
-      // 시설이 없는 경우
       toast.error('시설을 찾을 수 없습니다.');
       navigate('/admin/facility');
     }
-  }, [facilityId, navigate, getAllFacilities, isFacilitiesLoading]);
+  }, [facilityId, navigate, getAllFacilities, isFacilitiesLoading, reset, hasLoadedData]);
 
-  const handleUpdateComponent = async (componentData: Partial<DomainUpdateRequest<DomainKey>>) => {
-    if (!facilityId || !facility || !facilityType) return;
+  const handleFloorsReplaceReady = (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => {
+    setFloorsReplaceFunction(() => replaceFunction);
+  };
 
+  const handleDrawingFileUploaded = (fileUrl: string) => {
+    setIsProcessingDrawing(true);
+    
     try {
-      setIsUpdating(true);
-      
-      const updateData = {
-        ...facility,
-        ...componentData,
-      } as DomainUpdateRequest<DomainKey>;
-
-      await FacilityService.update(facilityType, facilityId, updateData);
-      
-      const response = await FacilityService.getById(facilityType, facilityId);
-      setFacility(response.data as FacilityData);
-      toast.success('수정되었습니다.');
+      Model.GetModelHierarchyFromUrl(fileUrl, (modelInfo: Interfaces.ModelInfo[]) => {
+        const floors = modelInfo
+          .sort((a, b) => b.sortingOrder - a.sortingOrder)
+          .map(info => ({
+            name: info.displayName || info.objectName,
+            floorId: info.floorId
+          }));
+        
+        if (floors.length > 0) {
+          if (floorsReplaceFunction) {
+            floorsReplaceFunction(floors);
+          } else {
+            setValue('floors', floors);
+          }
+        } else {
+          if (floorsReplaceFunction) {
+            floorsReplaceFunction([]);
+          } else {
+            setValue('floors', []);
+          }
+        }
+        
+        setIsProcessingDrawing(false);
+      });
     } catch (error) {
-      console.error('Failed to update facility:', error);
-      toast.error('수정에 실패했습니다.');
-    } finally {
-      setIsUpdating(false);
+      console.error('Error processing drawing file with engine:', error);
+      
+      if (floorsReplaceFunction) {
+        floorsReplaceFunction([]);
+      } else {
+        setValue('floors', []);
+      }
+      
+      setIsProcessingDrawing(false);
     }
   };
 
-  const handleThumbnailUpload = async (file: FileResponse) => {
-    if (!facilityId || !facility || !facilityType) return;
+  const onSubmit = async (data: EditFacilityFormData) => {
+    if (!facilityId || !facilityType) return;
 
+    setIsUpdating(true);
     try {
-      setIsUpdating(true);
-      
-      // facility 정보만 업데이트
-      const facilityUpdateData = {
-        name: facility.facility!.name,
-        code: facility.facility!.code,
-        description: facility.facility!.description,
-        thumbnailFileId: file.id,
-        lon: facility.facility!.lon,
-        lat: facility.facility!.lat,
-        locationMeta: facility.facility!.locationMeta
+      const domainConfig = domainUtils.getConfig(facilityType);
+      const updateRequest: Record<string, unknown> = {};
+
+      const facilityData = {
+        ...data.facility,
+        thumbnailFileId: data.facility.thumbnailFileId !== undefined 
+          ? data.facility.thumbnailFileId 
+          : facility?.facility?.thumbnail?.id || null,
+        drawingFileId: data.facility.drawingFileId !== undefined 
+          ? data.facility.drawingFileId 
+          : facility?.facility?.drawing?.id || null,
       };
 
-      await handleUpdateComponent({ facility: facilityUpdateData });
-      toast.success('썸네일이 업데이트되었습니다.');
-    } catch (error) {
-      console.error('Failed to update thumbnail:', error);
-      toast.error('썸네일 업데이트에 실패했습니다.');
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+      updateRequest.facility = facilityData;
 
-  const handleDrawingUpload = async (file: FileResponse) => {
-    if (!facilityId || !facility || !facilityType) return;
+      domainConfig.components.forEach((component) => {
+        switch (component) {
+          case 'floors':
+            if (data.floors && data.floors.length > 0) {
+              updateRequest.floors = data.floors.filter(
+                floor => floor.name.trim() !== '' && floor.floorId.trim() !== ''
+              );
+            } else {
+              updateRequest.floors = [];
+            }
+            break;
+          case 'stationInfo':
+            if (data.stationInfo) {
+              const stationInfoData = {
+                lineIds: data.stationInfo.lineIds || [],
+                stationCodes: data.stationInfo.stationCodes?.filter(code => code.trim() !== '') || [],
+              };
+              updateRequest.stationInfo = stationInfoData;
+            } else {
+              updateRequest.stationInfo = {
+                lineIds: [],
+                stationCodes: [],
+              };
+            }
+            break;
+          case 'boundary':
+            if (data.boundary && data.boundary.trim() !== '') {
+              updateRequest.boundary = data.boundary;
+            } else {
+              updateRequest.boundary = '';
+            }
+            break;
+        }
+      });
 
-    try {
-      setIsUpdating(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await FacilityService.update(facilityType, facilityId, updateRequest as any);
       
-      // TODO: drawing 파일 업데이트를 위한 별도 API 호출이 필요할 수 있습니다
-      console.log('Drawing file uploaded:', file);
+      const config = domainUtils.getConfig(facilityType);
+      toast.success(`${config.displayName}이(가) 성공적으로 수정되었습니다.`);
       
-      // 현재는 데이터를 다시 로드하는 방식으로 처리
-      const response = await FacilityService.getById(facilityType, facilityId);
-      setFacility(response.data as FacilityData);
-      toast.success('도면 파일이 업데이트되었습니다.');
     } catch (error) {
-      console.error('Failed to update drawing:', error);
-      toast.error('도면 파일 업데이트에 실패했습니다.');
+      console.error('Failed to update facility:', error);
+      toast.error('시설 수정에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsUpdating(false);
     }
@@ -162,6 +277,60 @@ const FacilityEdit: React.FC = () => {
 
   const handleGoBack = () => {
     navigate('/admin/facility');
+  };
+
+  const renderDynamicComponents = () => {
+    if (!facilityType) return null;
+
+    const domainConfig = domainUtils.getConfig(facilityType);
+    const components: React.ReactElement[] = [];
+
+    domainConfig.components.forEach((component) => {
+      if (component === 'facility') return;
+
+      components.push(
+        <div key={component}>
+          <Separator className="my-6" />
+          {renderComponentForm(component)}
+        </div>
+      );
+    });
+
+    return components;
+  };
+
+  const renderComponentForm = (component: string) => {
+    switch (component) {
+      case 'floors':
+        return (
+          <FloorsFormComponent
+            control={control}
+            register={register}
+            errors={errors}
+            onFloorsReplaceReady={handleFloorsReplaceReady}
+            isProcessingDrawing={isProcessingDrawing}
+          />
+        );
+      case 'stationInfo':
+        return (
+          <StationInfoFormComponent
+            register={register}
+            errors={errors}
+            control={control}
+            setValue={setValue}
+            watch={watch}
+          />
+        );
+      case 'boundary':
+        return (
+          <BoundaryFormComponent
+            register={register}
+            errors={errors}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   if (isLoading || isFacilitiesLoading) {
@@ -197,20 +366,40 @@ const FacilityEdit: React.FC = () => {
   return (
     <PageContainer title={`${facility.facility?.name || '시설'} 편집`}>
       <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleGoBack}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft size={18} />
-          </Button>
-          <Edit3 size={20} className="text-blue-600" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGoBack}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <ArrowLeft size={18} />
+            </Button>
+            <Edit3 size={20} className="text-blue-600" />
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={handleGoBack}
+              disabled={isUpdating}
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              disabled={isUpdating}
+              className="flex items-center gap-2"
+            >
+              <Save size={16} />
+              {isUpdating ? '저장 중...' : '저장'}
+            </Button>
+          </div>
         </div>
       </div>
       
-      <div className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-blue-800">
@@ -222,111 +411,20 @@ const FacilityEdit: React.FC = () => {
           </div>
         </div>
 
-        {/* 시설 기본 정보 및 썸네일 섹션 */}
-        {domainUtils.hasComponent(facilityType, 'facility') && facility.facility && (
-          <Card>
-            <CardHeader>
-              <CardTitle>기본 정보</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* 썸네일 */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-900">썸네일</h4>
-                  <ThumbnailUploadComponent
-                    currentFile={facility.facility.thumbnail}
-                    onFileUpload={handleThumbnailUpload}
-                    isLoading={isUpdating}
-                  />
-                </div>
+        <FacilityFormComponent
+          register={register}
+          errors={errors}
+          control={control}
+          setValue={setValue}
+          watch={watch}
+          onDrawingFileUploaded={handleDrawingFileUploaded}
+          currentThumbnailFile={facility.facility?.thumbnail}
+          currentDrawingFile={facility.facility?.drawing}
+          isEditMode={true}
+        />
 
-                {/* 도면 파일 */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-900">도면 파일</h4>
-                  <DrawingUploadComponent
-                    currentFile={facility.facility.drawing}
-                    onFileUpload={handleDrawingUpload}
-                    isLoading={isUpdating}
-                  />
-                </div>
-
-                {/* 기본 정보 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-gray-900">시설 정보</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <span className="text-sm font-medium text-gray-600">시설명</span>
-                      <p className="mt-1 text-sm text-gray-800">{facility.facility.name}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-600">시설 코드</span>
-                      <p className="mt-1 text-sm text-gray-800">{facility.facility.code}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-600">설명</span>
-                      <p className="mt-1 text-sm text-gray-800">{facility.facility.description || '-'}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-600">위치</span>
-                      <p className="mt-1 text-sm text-gray-800">
-                        {facility.facility.lon && facility.facility.lat 
-                          ? `${facility.facility.lat.toFixed(6)}, ${facility.facility.lon.toFixed(6)}`
-                          : '-'
-                        }
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-600">등록일</span>
-                      <p className="mt-1 text-sm text-gray-800">
-                        {new Date(facility.facility.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-600">등록자</span>
-                      <p className="mt-1 text-sm text-gray-800">{facility.facility.createdBy}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {domainUtils.hasComponent(facilityType, 'facility') && facility.facility && (
-          <FacilityInfoComponent
-            facility={facility.facility}
-            onSave={(data) => handleUpdateComponent({ facility: data })}
-            isLoading={isUpdating}
-          />
-        )}
-
-        {domainUtils.hasComponent(facilityType, 'floors') && (
-          <FloorsComponent
-            floors={facility.floors || []}
-            onSave={(data) => handleUpdateComponent(data)}
-            isLoading={isUpdating}
-          />
-        )}
-
-        {domainUtils.hasComponent(facilityType, 'stationInfo') && (
-          <StationInfoComponent
-            stationInfo={facility.stationInfo}
-            onSave={(data) => handleUpdateComponent(data)}
-            isLoading={isUpdating}
-          />
-        )}
-
-        {domainUtils.hasComponent(facilityType, 'boundary') && (
-          <BoundaryComponent
-            boundary={facility.boundary}
-            files={facility.facility?.drawing ? [facility.facility.drawing] : []}
-            version={facility.facility?.drawing?.originalFileName || ''}
-            description={facility.facility?.description || ''}
-            onSave={(data) => handleUpdateComponent(data)}
-            isLoading={isUpdating}
-          />
-        )}
-      </div>
+        {renderDynamicComponents()}
+      </form>
     </PageContainer>
   );
 };

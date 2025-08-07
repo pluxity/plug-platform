@@ -8,9 +8,7 @@ export const useFacilityData = () => {
   const getFacilityCount = useMemo(() => {
     if (!facilitiesByType) return {} as Record<FacilityType, number>;
     
-    // endpoint 키를 facility type 키로 변환하여 카운트 생성
     return Object.entries(facilitiesByType).reduce((acc, [endpointKey, facilities]) => {
-      // endpoint에서 facility type으로 역매핑
       const domainEntry = Object.entries(DOMAINS).find(([, config]) => config.endpoint === endpointKey);
       const facilityType = domainEntry ? domainEntry[0] as FacilityType : 'building';
       
@@ -23,7 +21,6 @@ export const useFacilityData = () => {
     if (!facilitiesByType) return [];
     
     const mapApiKeyToFacilityType = (apiKey: string): FacilityType => {
-      // DOMAINS 객체를 활용해서 endpoint에서 도메인 키로 역매핑
       const domainEntry = Object.entries(DOMAINS).find(([, config]) => config.endpoint === apiKey);
       return domainEntry ? domainEntry[0] as FacilityType : 'building';
     };
@@ -39,7 +36,7 @@ export const useFacilityData = () => {
   const handleDeleteFacility = async (id: number, facilityType: FacilityType) => {
     try {
       await FacilityService.delete(facilityType, id);
-      await mutate(); // SWR 캐시 갱신
+      await mutate();
       toast.success('시설이 성공적으로 삭제되었습니다.');
     } catch (error: unknown) {
       const errorObj = error as { status?: number; message?: string };
