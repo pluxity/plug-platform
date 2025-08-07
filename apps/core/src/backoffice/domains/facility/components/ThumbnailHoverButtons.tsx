@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Eye } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,22 +13,37 @@ import {
 } from '@plug/ui';
 
 interface ThumbnailHoverButtonsProps {
+  onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   facilityName?: string;
 }
 
 const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
+  onView,
   onEdit,
   onDelete,
   facilityName = '시설'
 }) => {
   return (
     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+      {onView && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onView();
+          }}
+          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          title="상세보기"
+        >
+          <Eye size={16} className="text-green-600" />
+        </button>
+      )}
       {onEdit && (
         <button
           onClick={(e) => {
             e.stopPropagation();
+            console.log('편집 버튼 클릭:', facilityName);
             onEdit();
           }}
           className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"

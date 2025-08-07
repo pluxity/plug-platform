@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Edit3, Save } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { Button, Separator } from '@plug/ui';
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { 
@@ -103,6 +103,7 @@ const FacilityEdit: React.FC = () => {
       try {
         setIsLoading(true);
         
+        // 전체 시설 목록에서 해당 ID를 가진 시설을 찾음
         const targetFacility = getAllFacilities.find(f => f.id === facilityId);
         
         if (!targetFacility) {
@@ -111,6 +112,7 @@ const FacilityEdit: React.FC = () => {
           return;
         }
 
+        // 해당 시설의 상세 정보를 가져옴
         const response = await FacilityService.getById(targetFacility.facilityType, facilityId);
         if (response.data) {
           const facilityData = response.data as FacilityData;
@@ -153,6 +155,7 @@ const FacilityEdit: React.FC = () => {
       }
     };
 
+    // 시설 목록이 로드되면 시설 상세 정보 로드
     if (getAllFacilities.length > 0) {
       loadFacility();
     } else if (!isFacilitiesLoading && getAllFacilities.length === 0) {
@@ -366,36 +369,15 @@ const FacilityEdit: React.FC = () => {
   return (
     <PageContainer title={`${facility.facility?.name || '시설'} 편집`}>
       <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGoBack}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <ArrowLeft size={18} />
-            </Button>
-            <Edit3 size={20} className="text-blue-600" />
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={handleGoBack}
-              disabled={isUpdating}
-            >
-              취소
-            </Button>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              disabled={isUpdating}
-              className="flex items-center gap-2"
-            >
-              <Save size={16} />
-              {isUpdating ? '저장 중...' : '저장'}
-            </Button>
-          </div>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleGoBack}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            <ArrowLeft size={18} />
+          </Button>
         </div>
       </div>
       
@@ -424,6 +406,24 @@ const FacilityEdit: React.FC = () => {
         />
 
         {renderDynamicComponents()}
+
+        <div className="flex items-center justify-end gap-3 pt-6 mt-8 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGoBack}
+          >
+            목록으로
+          </Button>
+          <Button
+            type="submit"
+            disabled={isUpdating}
+            className="flex items-center gap-2"
+          >
+            <Save size={16} />
+            {isUpdating ? '저장 중...' : '저장'}
+          </Button>
+        </div>
       </form>
     </PageContainer>
   );

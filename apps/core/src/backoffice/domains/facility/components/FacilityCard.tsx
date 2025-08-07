@@ -26,8 +26,13 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
     navigate(`/admin/facility/${facility.id}`);
   };
 
-  const handleEdit = () => {
+  const handleView = () => {
     navigate(`/admin/facility/${facility.id}`);
+  };
+
+  const handleEdit = () => {
+    console.log('편집 버튼 클릭:', facility.name);
+    // 여기에 나중에 편집 모달이나 다른 편집 방식 구현
   };
 
   return (
@@ -67,6 +72,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 />
                 {/* 호버 시 나타나는 버튼들 */}
                 <ThumbnailHoverButtons
+                  onView={handleView}
                   onEdit={handleEdit}
                   onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
                   facilityName={facility.name}
@@ -80,6 +86,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 </span>
                 {/* 호버 시 나타나는 버튼들 */}
                 <ThumbnailHoverButtons
+                  onView={handleView}
                   onEdit={handleEdit}
                   onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
                   facilityName={facility.name}
