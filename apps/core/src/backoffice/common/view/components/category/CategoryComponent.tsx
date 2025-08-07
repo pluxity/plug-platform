@@ -19,9 +19,9 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
   enableDragDrop = true,
   thumbnailSize = 'small',
   disabled = false,
-  showCodes = true,
+  enableCodes = true,
   allowRootAdd = true,
-  enableThumbnailUpload = false,
+  enableThumbnail = false,
   className,
   title = '카테고리 관리',
   emptyMessage = '등록된 카테고리가 없습니다.',
@@ -153,19 +153,19 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
                 autoFocus
                 disabled={disabled}
               />
-              {showCodes && (
+              {enableCodes && (
                 <Input
                   value={rootAddCode}
                   onChange={(e) => setRootAddCode(e.target.value)}
                   onKeyDown={handleRootKeyDown}
                   placeholder="루트 카테고리 코드"
-                  className="h-7 text-xs"
+                  className="h-8 text-xs"
                   disabled={disabled}
                 />
               )}
             </div>
             <div className="flex items-center gap-2">
-              {enableThumbnailUpload && (
+              {enableThumbnail && (
                 <ThumbnailUploader
                   onThumbnailChange={setRootThumbnailFileId}
                   onUpload={operations.onThumbnailUpload}
@@ -222,8 +222,8 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
                 disabled={disabled}
                 enableDragDrop={enableDragDrop}
                 thumbnailSize={thumbnailSize}
-                showCodes={showCodes}
-                enableThumbnailUpload={enableThumbnailUpload}
+                enableCodes={enableCodes}
+                enableThumbnail={enableThumbnail}
               />
             ))
           )}
