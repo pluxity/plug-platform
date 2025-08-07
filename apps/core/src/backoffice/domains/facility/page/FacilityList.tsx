@@ -70,11 +70,6 @@ const FacilityList: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleEdit = (_facility: FacilityResponse) => {
-    // TODO: Implement edit functionality
-  };
-
   const handleDelete = async (id: number, facilityType: FacilityType) => {
     try {
       await handleFacilityDelete(id, facilityType);
@@ -168,7 +163,6 @@ const FacilityList: React.FC = () => {
                     key={facility.id}
                     facility={facility}
                     facilityType={facilityType}
-                    onEdit={handleEdit}
                     onDelete={handleDelete}
                   />
                 );

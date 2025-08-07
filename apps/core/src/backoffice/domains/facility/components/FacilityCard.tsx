@@ -8,14 +8,12 @@ import ThumbnailHoverButtons from './ThumbnailHoverButtons';
 interface FacilityCardProps {
   facility: FacilityResponse;
   facilityType?: FacilityType;
-  onEdit?: (facility: FacilityResponse) => void;
   onDelete?: (id: number, facilityType: FacilityType) => void;
 }
 
 const FacilityCard: React.FC<FacilityCardProps> = ({
   facility,
   facilityType,
-  onEdit,
   onDelete
 }) => {
   const navigate = useNavigate();
@@ -24,16 +22,20 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   const typeConfig = DOMAINS[displayType];
 
   const handleCardClick = () => {
-    navigate(`/admin/facility/${displayType}/${facility.id}`);
+    // 카드 클릭 시 상세보기 대신 편집 페이지로 이동
+    navigate(`/admin/facility/${facility.id}`);
   };
 
   const handleEdit = () => {
-    navigate(`/admin/facility/${displayType}/${facility.id}`);
+    navigate(`/admin/facility/${facility.id}`);
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 pt-4 cursor-pointer" onClick={handleCardClick}>
-      <CardHeader>
+    <Card className="hover:shadow-md transition-shadow duration-200 pt-4">
+      <CardHeader 
+        className="cursor-pointer" 
+        onClick={handleCardClick}
+      >
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg font-semibold text-gray-900 truncate flex">
@@ -64,13 +66,11 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                   className="w-full h-48 object-cover transition-transform duration-200 group-hover:scale-105"
                 />
                 {/* 호버 시 나타나는 버튼들 */}
-                <div onClick={(e) => e.stopPropagation()}>
-                  <ThumbnailHoverButtons
-                    onEdit={onEdit ? () => onEdit(facility) : handleEdit}
-                    onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
-                    facilityName={facility.name}
-                  />
-                </div>
+                <ThumbnailHoverButtons
+                  onEdit={handleEdit}
+                  onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
+                  facilityName={facility.name}
+                />
               </div>
             ) : (
               // 썸네일이 없는 경우 - 첫 글자 표시
@@ -79,13 +79,11 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                   {facility.name.charAt(0).toUpperCase()}
                 </span>
                 {/* 호버 시 나타나는 버튼들 */}
-                <div onClick={(e) => e.stopPropagation()}>
-                  <ThumbnailHoverButtons
-                    onEdit={onEdit ? () => onEdit(facility) : handleEdit}
-                    onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
-                    facilityName={facility.name}
-                  />
-                </div>
+                <ThumbnailHoverButtons
+                  onEdit={handleEdit}
+                  onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
+                  facilityName={facility.name}
+                />
               </div>
             )}
           </div>
