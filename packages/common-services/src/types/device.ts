@@ -20,15 +20,13 @@ export interface DeviceCategoryAllResponse {
 }
 
 export interface GsDeviceCreateRequest {
-  id: string;
+  id?: string;
   name?: string;
-  featureId?: string;
   categoryId?: number;
 }
 
 export interface GsDeviceUpdateRequest {
   name?: string;
-  featureId?: string;
   categoryId?: number;
 }
 

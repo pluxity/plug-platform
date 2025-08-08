@@ -18,26 +18,14 @@ import {
 import { toast } from 'sonner'; 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useCreateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
 import { AssetCreateModalProps } from '@/backoffice/domains/asset/types/asset';
 import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
+import { assetFormSchema, type AssetFormData } from '@/backoffice/domains/asset/schemas/assetSchemas';
 
 export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
 
-    const assetFormSchema = z.object({
-        categoryId: z.string().min(1, {
-            message: '에셋 카테고리를 선택해주세요.'
-        }),
-        name: z.string().min(1, {
-            message: '에셋 이름을 입력해주세요.'
-        }),
-        code: z.string().min(1, {
-            message: '에셋 코드를 입력해주세요.'
-        }),
-    });
-
-    const modalForm = useForm<z.infer<typeof assetFormSchema>>({
+    const modalForm = useForm<AssetFormData>({
         resolver: zodResolver(assetFormSchema),
         defaultValues: {
             categoryId: '',
@@ -132,7 +120,7 @@ export const AssetCreateModal: React.FC<AssetCreateModalProps> = ({ isOpen, onCl
         onClose();
     }, [modalForm, onClose, clearModelInfo, clearThumbnailInfo]);
 
-    const handleSubmit = useCallback(async (data: z.infer<typeof assetFormSchema>) => {
+    const handleSubmit = useCallback(async (data: AssetFormData) => {
         if (!modelFileId) {
             toast.error('3D 모델 파일을 선택해주세요.');
             return;

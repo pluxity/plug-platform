@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { CategoryComponent, CategoryItem } from '@/backoffice/common/view/components/category';
 import { findNodeById, isDescendant } from '@/backoffice/common/services/hooks/useCategory'
-import { DeviceCategoryMapper } from '@/backoffice/domains/device/mapper/deviceMapper';
+import { DeviceCategoryMapper } from '@/backoffice/domains/device/mapper/deviceCategoryMapper';
 import { 
   useDeviceCategoryTree,
   useCreateDeviceCategory,
@@ -182,7 +182,7 @@ const DeviceCategory: React.FC = () => {
   const hasError = !!error;
 
   return (  
-    <PageContainer title="Device Category">
+    <PageContainer title="디바이스 카테고리 관리">
       <div className="space-y-6">
         {/* 카테고리 관리 컴포넌트 */}
         {!isLoading && !hasError && (

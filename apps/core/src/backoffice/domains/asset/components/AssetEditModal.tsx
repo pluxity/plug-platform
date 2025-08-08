@@ -18,10 +18,10 @@ import {
 import { toast } from 'sonner'; 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useAssetDetailSWR, useUpdateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
 import { AssetEditModalProps } from '@/backoffice/domains/asset/types/asset';
 import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
+import { assetFormSchema, type AssetFormData } from '@/backoffice/domains/asset/schemas/assetSchemas';
 
 export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   isOpen,
@@ -32,19 +32,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
 
   const { mutate, data } = useAssetDetailSWR(isOpen && assetId ? assetId : undefined);
 
-  const assetFormSchema = z.object({
-    categoryId: z.string().min(1, {
-      message: '에셋 카테고리를 선택해주세요.'
-    }),
-    name: z.string().min(1, {
-      message: '에셋 이름을 입력해주세요.'
-    }),
-    code: z.string().min(1, {
-      message: '에셋 코드를 입력해주세요.'
-    }),
-  });
 
-  const modalForm = useForm<z.infer<typeof assetFormSchema>>({
+  const modalForm = useForm<AssetFormData>({
     resolver: zodResolver(assetFormSchema),
     defaultValues: {
       categoryId: '',
@@ -160,7 +149,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     mutate();
   }, [data, onClose, mutate]);
 
-  const handleSubmit = useCallback(async (data: z.infer<typeof assetFormSchema>) => {
+  const handleSubmit = useCallback(async (data: AssetFormData) => {
       try {
         await updateAsset({
             name: data.name,
