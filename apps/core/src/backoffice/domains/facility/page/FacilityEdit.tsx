@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,11 +13,11 @@ import {
   FacilityResponse,
   facilityService,
   DOMAINS,
+  FacilityHistoryResponse,
 } from '@plug/common-services';
 import { toast } from 'sonner';
-import { FacilityForm, FloorsForm, StationInfoForm, BoundaryForm } from '../components/form-components';
+import { FacilityForm, FloorsForm, StationInfoForm, BoundaryForm, DrawingFileHistory } from '../components/form-components';
 import { FacilityCreateFormData } from '../types';
-import { Model, Interfaces } from '@plug/engine/src';
 
 const editFacilitySchema = z.object({
   facilityType: z.string().min(1, '시설 유형을 선택해주세요'),
@@ -25,7 +25,6 @@ const editFacilitySchema = z.object({
     name: z.string().min(1, '시설명은 필수입니다'),
     code: z.string().min(1, '시설 코드는 필수입니다'),
     description: z.string().optional(),
-    drawingFileId: z.number().optional(),
     thumbnailFileId: z.number().optional(),
     lon: z.number().optional(),
     lat: z.number().optional(),
@@ -59,9 +58,33 @@ const FacilityEdit: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [floorsReplaceFunction, setFloorsReplaceFunction] = useState<((floors: Array<{name: string; floorId: string}>) => void) | null>(null);
-  const [isProcessingDrawing, setIsProcessingDrawing] = useState(false);
+  const [drawingHistory, setDrawingHistory] = useState<FacilityHistoryResponse[]>([]);
 
   const facilityId = id ? parseInt(id, 10) : null;
+
+  const loadDrawingHistory = useCallback(async () => {
+    if (!facilityId) return;
+    
+    try {
+      const historyResponse = await facilityService.getFacilityHistory(facilityId);
+      setDrawingHistory(historyResponse.data);
+    } catch (error) {
+      console.error('Failed to load drawing history:', error);
+    }
+  }, [facilityId]);
+
+  const handleHistoryUpdate = () => {
+    loadDrawingHistory();
+  };
+
+  const handleFloorsExtracted = (floors: Array<{name: string; floorId: string}>) => {
+    // 층 정보가 변경되었을 때 폼의 floors 필드도 업데이트
+    if (floorsReplaceFunction) {
+      floorsReplaceFunction(floors);
+    } else {
+      setValue('floors', floors);
+    }
+  };
 
   const {
     control,
@@ -136,7 +159,6 @@ const FacilityEdit: React.FC = () => {
               name: facilityData.facility?.name || '',
               code: facilityData.facility?.code || '',
               description: facilityData.facility?.description || '',
-              drawingFileId: facilityData.facility?.drawing?.id,
               thumbnailFileId: facilityData.facility?.thumbnail?.id,
               lon: facilityData.facility?.lon,
               lat: facilityData.facility?.lat,
@@ -151,6 +173,9 @@ const FacilityEdit: React.FC = () => {
           };
           
           reset(formData);
+          
+          // 도면 파일 이력 로드
+          await loadDrawingHistory();
         } else {
           toast.error('시설을 찾을 수 없습니다.');
           navigate('/admin/facility');
@@ -165,51 +190,10 @@ const FacilityEdit: React.FC = () => {
     };
 
     loadFacility();
-  }, [facilityId, navigate, reset]);
+  }, [facilityId, navigate, reset, loadDrawingHistory]);
 
   const handleFloorsReplaceReady = (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => {
     setFloorsReplaceFunction(() => replaceFunction);
-  };
-
-  const handleDrawingFileUploaded = (fileUrl: string) => {
-    setIsProcessingDrawing(true);
-    
-    try {
-      Model.GetModelHierarchyFromUrl(fileUrl, (modelInfo: Interfaces.ModelInfo[]) => {
-        const floors = modelInfo
-          .sort((a, b) => b.sortingOrder - a.sortingOrder)
-          .map(info => ({
-            name: info.displayName || info.objectName,
-            floorId: info.floorId
-          }));
-        
-        if (floors.length > 0) {
-          if (floorsReplaceFunction) {
-            floorsReplaceFunction(floors);
-          } else {
-            setValue('floors', floors);
-          }
-        } else {
-          if (floorsReplaceFunction) {
-            floorsReplaceFunction([]);
-          } else {
-            setValue('floors', []);
-          }
-        }
-        
-        setIsProcessingDrawing(false);
-      });
-    } catch (error) {
-      console.error('Error processing drawing file with engine:', error);
-      
-      if (floorsReplaceFunction) {
-        floorsReplaceFunction([]);
-      } else {
-        setValue('floors', []);
-      }
-      
-      setIsProcessingDrawing(false);
-    }
   };
 
   const onSubmit = async (data: EditFacilityFormData) => {
@@ -225,9 +209,6 @@ const FacilityEdit: React.FC = () => {
         thumbnailFileId: data.facility.thumbnailFileId !== undefined 
           ? data.facility.thumbnailFileId 
           : facility?.facility?.thumbnail?.id || null,
-        drawingFileId: data.facility.drawingFileId !== undefined 
-          ? data.facility.drawingFileId 
-          : facility?.facility?.drawing?.id || null,
       };
 
       updateRequest.facility = facilityData;
@@ -314,7 +295,7 @@ const FacilityEdit: React.FC = () => {
             register={register}
             errors={errors}
             onFloorsReplaceReady={handleFloorsReplaceReady}
-            isProcessingDrawing={isProcessingDrawing}
+            isProcessingDrawing={false}
           />
         );
       case 'stationInfo':
@@ -402,10 +383,15 @@ const FacilityEdit: React.FC = () => {
           control={control}
           setValue={setValue}
           watch={watch}
-          onDrawingFileUploaded={handleDrawingFileUploaded}
           currentThumbnailFile={facility.facility?.thumbnail}
-          currentDrawingFile={facility.facility?.drawing}
           isEditMode={true}
+        />
+
+        <DrawingFileHistory
+          facilityId={facilityId!}
+          history={drawingHistory}
+          onHistoryUpdate={handleHistoryUpdate}
+          onFloorsExtracted={handleFloorsExtracted}
         />
 
         {renderDynamicComponents()}

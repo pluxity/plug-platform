@@ -9,7 +9,6 @@ import {
 } from '@plug/ui';
 import { ExtendedFacilityFormProps } from '../../types';
 import { FileUpload } from './FileUpload';
-import { FileResponse } from '@plug/common-services';
 import { LocationSelectorField } from './location/LocationSelectorField';
 
 export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
@@ -18,13 +17,10 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
   control,
   setValue,
   watch,
-  onDrawingFileUploaded,
   currentThumbnailFile,
-  currentDrawingFile,
   isEditMode = false,
 }) => {
   const watchedThumbnailFileId = watch?.('facility.thumbnailFileId');
-  const watchedDrawingFileId = watch?.('facility.drawingFileId');
 
   const handleThumbnailChange = (fileId: number | null) => {
     if (!isEditMode || fileId !== null) {
@@ -32,24 +28,8 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
     }
   };
 
-  const handleDrawingChange = (fileId: number | null) => {
-    if (!isEditMode || fileId !== null) {
-      setValue?.('facility.drawingFileId', fileId || undefined);
-    }
-  };
-
   const handleThumbnailRemoved = () => {
     setValue?.('facility.thumbnailFileId', undefined);
-  };
-
-  const handleDrawingRemoved = () => {
-    setValue?.('facility.drawingFileId', undefined);
-  };
-
-  const handleDrawingUploaded = (fileInfo: FileResponse) => {
-    if (onDrawingFileUploaded) {
-      onDrawingFileUploaded(fileInfo.url);
-    }
   };
   return (
     <Card>
@@ -98,7 +78,7 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
         </div>
 
           {/* 파일 업로드 섹션 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="w-full">
           <FileUpload
             label="썸네일 이미지"
             accept="image/*"
@@ -110,20 +90,6 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
             onFileRemoved={handleThumbnailRemoved}
             isEditMode={isEditMode}
             maxSizeInMB={10} // 이미지는 10MB 제한
-          />
-          
-          <FileUpload
-            label="도면 파일"
-            accept=".glb,.gltf"
-            fileType="document"
-            placeholder="3D 모델 파일을 업로드하세요 (GLB, GLTF)"
-            currentFileId={watchedDrawingFileId}
-            currentFileInfo={currentDrawingFile}
-            onFileChange={handleDrawingChange}
-            onFileUploaded={handleDrawingUploaded}
-            onFileRemoved={handleDrawingRemoved}
-            isEditMode={isEditMode}
-            maxSizeInMB={100} // 3D 모델은 100MB 제한
           />
         </div>
 

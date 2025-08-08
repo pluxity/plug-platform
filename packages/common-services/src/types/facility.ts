@@ -22,7 +22,6 @@ export interface FacilityCreateRequest {
   name: string;
   code: string;
   description?: string;
-  drawingFileId?: number;
   thumbnailFileId?: number;
   lon?: number;
   lat?: number;
@@ -33,7 +32,7 @@ export interface FacilityUpdateRequest {
   name: string;
   code: string;
   description: string;
-  thumbnailFileId: number;
+  thumbnailFileId?: number;
   lon: number;
   lat: number;
   locationMeta: string;

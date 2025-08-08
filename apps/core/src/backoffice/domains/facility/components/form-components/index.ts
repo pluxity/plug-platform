@@ -6,3 +6,4 @@ export { MapLocationSelector } from './location/MapLocationSelector';
 export { LocationPicker } from './location/LocationPicker';
 export { BoundaryForm } from './BoundaryForm';
 export { FileUpload } from './FileUpload';
+export { DrawingFileHistory } from './DrawingFileHistory';

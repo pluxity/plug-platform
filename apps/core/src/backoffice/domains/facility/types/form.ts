@@ -20,7 +20,6 @@ export interface FacilityCreateFormData {
     name: string;
     code: string;
     description?: string;
-    drawingFileId?: number;
     thumbnailFileId?: number;
     lon?: number;
     lat?: number;
@@ -46,10 +45,8 @@ export interface ExtendedFacilityFormProps extends FacilityFormProps {
   control: Control<FacilityCreateFormData>;
   setValue: UseFormSetValue<FacilityCreateFormData>;
   watch: UseFormWatch<FacilityCreateFormData>;
-  onDrawingFileUploaded?: (fileUrl: string) => void;
   onFloorsReplaceReady?: (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => void;
   currentThumbnailFile?: FileResponse | null;
-  currentDrawingFile?: FileResponse | null;
   isEditMode?: boolean;
 }
 
