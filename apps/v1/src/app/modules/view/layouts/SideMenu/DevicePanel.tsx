@@ -107,29 +107,34 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
           </button>
         </div>
 
-        {categoryName && categoryName.includes('-') && categoryName.includes('(') && categoryName.includes(')') && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {categoryName
-              .split('-')[1]
-              .match(/\(([^)]+)\)/)?.[1]
-              .split(',')
-              .map((tag, index) => (
-                <div
-                  key={index}
-                  className="text-xs px-2 py-0.5 rounded-full bg-gray-700/60 text-white/70 font-medium border border-white/5"
-                >
-                  {tag.trim()}
-                </div>
-              ))}
-          </div>
-        )}
-        
+        {categoryName &&
+          categoryName.includes('-') &&
+          categoryName.includes('(') &&
+          categoryName.includes(')') && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {categoryName
+                .split('-')[1]
+                .match(/\(([^)]+)\)/)?.[1]
+                .split(',')
+                .map((tag, index) => (
+                  <div
+                    key={index}
+                    className="text-xs px-2 py-0.5 rounded-full bg-gray-700/60 text-white/70 font-medium border border-white/5"
+                  >
+                    {tag.trim()}
+                  </div>
+                ))}
+            </div>
+          )}
+
         {devices.length === 0 && (
-          <p className="text-gray-400 text-center py-4">No devices found in this category.</p>
+          <p className="text-gray-400 text-center py-4">
+            해당 카테고리에 등록된 <br /> 장치가 없습니다.
+          </p>
         )}
 
         {devices.length > 0 && (
-          <ul className="space-y-2 h-[90%] overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-primary-900/20">
+          <ul className="space-y-2 h-[90%] overflow-y-auto custom-scrollbar pr-1">
             {devices.map((device) => (
               <li
                 key={device.id}
