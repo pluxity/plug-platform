@@ -5,5 +5,5 @@ export const DeviceMapper = (device: GsDeviceResponse): DeviceData => ({
     id: device.id,
     name: device.name,
     categoryName: device.deviceCategory?.name,
-    thumbnailFile: device.deviceCategory?.thumbnailFile?.originalFileName,
+    thumbnailFile: device.deviceCategory?.thumbnailFile?.url,
 });
