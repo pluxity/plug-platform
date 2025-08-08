@@ -34,7 +34,9 @@ const SideMenu: React.FC = () => {
 
   const { stationCode, currentFloor } = useStationStore();
   const { assets } = useAssetStore();
-  const { setPendingPoiData } = usePoiStore();useEffect(() => {
+  const { setPendingPoiData } = usePoiStore();
+
+  useEffect(() => {
     const fetchCategory = async () => {
       if (!stationCode) {
         return;

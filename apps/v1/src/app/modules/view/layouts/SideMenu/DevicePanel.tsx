@@ -48,6 +48,31 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
     }
   };
 
+  const renderCategoryTitle = () => {
+    if (!categoryName) return "장비 목록";
+
+    if (categoryName.includes('-')) {
+      const parts = categoryName.split('-');
+      const prefix = parts[0].trim();
+      let mainPart = parts[1].trim();
+
+      if (mainPart.includes('(')) {
+        mainPart = mainPart.split('(')[0].trim();
+      }
+      
+      return (
+        <>
+          <span className="text-lg font-semibold text-white">{mainPart}</span>
+          <div className="text-xs px-2 py-0.5 ml-2 rounded-full bg-primary-700/60 text-white/80 font-medium border border-white/10">
+            {prefix}
+          </div>
+        </>
+      );
+    }
+
+    return <span className="text-lg font-semibold text-white">{categoryName}</span>;
+  };
+
   if (!categoryId) {
     return null;
   }
@@ -55,8 +80,13 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
   return (
     <>
       <div className="fixed left-16 top-16 bottom-0 w-72 bg-gradient-to-b from-primary-900/20 to-primary-900/5 backdrop-blur-lg p-4 z-20 transition-all duration-300 ease-in-out transform translate-x-0 border-r border-gray-100/10">
-        <div className="flex justify-between items-center mb-6 border-b border-gray-100/20 pb-3">
-          <h2 className="text-lg font-semibold text-white">{categoryName}</h2>
+        <div className="flex justify-between items-center mb-4 border-b border-gray-100/20 pb-3">
+          <div className="flex flex-wrap items-center">
+            {renderCategoryTitle()}
+            {devices.length > 0 && (
+              <span className="text-sm text-white/70 ml-2">{devices.length} 개</span>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors p-1"
@@ -76,6 +106,24 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
             </svg>
           </button>
         </div>
+
+        {categoryName && categoryName.includes('-') && categoryName.includes('(') && categoryName.includes(')') && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {categoryName
+              .split('-')[1]
+              .match(/\(([^)]+)\)/)?.[1]
+              .split(',')
+              .map((tag, index) => (
+                <div
+                  key={index}
+                  className="text-xs px-2 py-0.5 rounded-full bg-gray-700/60 text-white/70 font-medium border border-white/5"
+                >
+                  {tag.trim()}
+                </div>
+              ))}
+          </div>
+        )}
+        
         {devices.length === 0 && (
           <p className="text-gray-400 text-center py-4">No devices found in this category.</p>
         )}
@@ -85,7 +133,8 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
             {devices.map((device) => (
               <li
                 key={device.id}
-                className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"                onClick={() => {
+                className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
+                onClick={() => {
                   openModal(device.name, device.id, categoryType, String(externalCode));
                   handleDeviceClick(device);
                 }}
@@ -107,7 +156,8 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                 {device.name}
               </li>
             ))}
-          </ul>        )}
+          </ul>
+        )}
       </div>
     </>
   );
