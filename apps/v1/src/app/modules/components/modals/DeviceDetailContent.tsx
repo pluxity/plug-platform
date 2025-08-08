@@ -100,25 +100,26 @@ const StatusBadge = ({ status, type }: { status: IOStatus | string; type: Status
     return baseColor.replace('text-', 'shadow-');
   };
   return (
-    <div className={`px-3 py-1 rounded-full ${getStatusColor(status, type)} ${getGlowColor(status, type)}/20 border border-current/30 bg-black/20 backdrop-blur-sm text-xs font-medium flex items-center gap-2 shadow-lg`}>
+    <div className={`px-3 py-1.5 rounded-full ${getStatusColor(status, type)} ${getGlowColor(status, type)}/20 border border-current/40 bg-black/30 backdrop-blur-sm text-sm font-medium flex items-center gap-2 shadow-lg`}>
       <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
       {getStatusText(status, type)}
     </div>
   );
 };
 
-const StatusRow = ({ label, status, type = 'normalError', suffix = '' }: { 
+
+const StatusRow = ({ label, status, type = 'normalError', suffix = '' }: {
   label: string;
   status: IOStatus | string;
   type?: StatusType;
   suffix?: string;
 }) => (
-  <div className="relative group flex justify-between items-center bg-primary-950/40 hover:bg-primary-900/40 backdrop-blur-md rounded-lg px-4 py-3 border border-primary-700/20 hover:border-primary-600/30 transition-all duration-200">
-    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-    <span className="text-primary-200 text-sm font-medium">{label}</span>
+  <div className="relative group flex justify-between items-center bg-primary-950/50 hover:bg-primary-900/50 backdrop-blur-md rounded-lg px-4 py-2 border border-primary-700/30 hover:border-primary-600/40 transition-all duration-200">
+    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+    <span className="text-white text-sm font-medium">{label}</span>
     <div className="flex items-center gap-3">
       {type === 'value' ? (
-        <span className="text-primary-100 font-medium tabular-nums">
+        <span className="text-white font-medium tabular-nums text-base">
           {typeof status === 'string' ? status : status?.ioValue}{suffix}
         </span>
       ) : (
@@ -163,17 +164,18 @@ const PumpList = ({ pumps }: { pumps: Pump[] }) => (
 );
 
 export const CommonInfo = ({ device }: { device: DeviceData }) => (
-  <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30 space-y-4 mb-6">
+  <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-500/40 space-y-4 mb-6">
     <div className="grid gap-3">
       {[
         { label: "장비명", value: getDeviceName(device) },
         { label: "수집시간", value: device.collectedTime ?? '정보 없음' },
         { label: "역사", value: getStationName(device) }
-      ].map(({ label, value }, index) => (        <div key={index} className="group relative bg-primary-900/30 hover:bg-primary-900/40 rounded-lg px-4 py-3 border border-primary-700/20 transition-all duration-200">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+      ].map(({ label, value }, index) => (
+        <div key={index} className="group relative bg-primary-900/40 hover:bg-primary-900/50 rounded-lg px-4 py-2 border border-primary-700/30 transition-all duration-200">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="relative flex justify-between items-center">
-            <span className="text-primary-300 font-medium">{label}</span>
-            <span className="text-primary-100 font-semibold">{value}</span>
+            <span className="text-primary-200 font-medium text-base">{label}</span>
+            <span className="text-white font-medium text-base">{value}</span>
           </div>
         </div>
       ))}
@@ -182,20 +184,21 @@ export const CommonInfo = ({ device }: { device: DeviceData }) => (
 );
 
 const LightDetails = ({ device }: { device: Light }) => (
-  <div className="rounded-lg bg-gray-800/40 border border-gray-500/30 p-4">
-    <h4 className="text-primary-100 font-medium flex items-center gap-2 mb-4">
-      <svg className="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <div className="rounded-lg bg-gray-800/50 border border-gray-500/40 p-5">
+    <h4 className="text-white font-medium flex items-center gap-2 mb-5 text-lg">
+      <svg className="w-5 h-5 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
       </svg>
-      <span className="font-medium text-primary-100">조명 상태</span>
+      <span className="font-medium text-white">조명 상태</span>
     </h4>
-    <div className="space-y-3">
+    <div className="space-y-3.5">
       <StatusRow label="동작 상태" status={device.status} type="onoff" />
-      <StatusRow label="제어 위치" status={device.controlPosition} type="remoteLocal" />      <div className="group relative bg-primary-900/30 hover:bg-primary-900/40 rounded-lg px-4 py-3 border border-primary-700/20 transition-all duration-200">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+      <StatusRow label="제어 위치" status={device.controlPosition} type="remoteLocal" />
+      <div className="group relative bg-primary-900/40 hover:bg-primary-900/50 rounded-lg px-4 py-2 border border-primary-700/30 transition-all duration-200">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="relative flex justify-between items-center">
-          <span className="text-primary-300 font-medium">순서</span>
-          <span className="text-primary-100 font-semibold">{device.orderingSequence}</span>
+          <span className="text-primary-200 font-medium text-base">순서</span>
+          <span className="text-white font-semibold text-base">{device.orderingSequence}</span>
         </div>
       </div>
     </div>
@@ -203,17 +206,17 @@ const LightDetails = ({ device }: { device: Light }) => (
 );
 
 const ShutterDetails = ({ device }: { device: Shutter }) => (
-  <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
-    <h4 className="text-primary-100 font-medium flex items-center gap-2 mb-4">
-      <svg className="w-5 h-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-500/40">
+    <h4 className="text-white font-medium flex items-center gap-2 mb-5 text-lg">
+      <svg className="w-5 h-5 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M19 9l-7 7-7-7M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2zM8 12h8" />
       </svg>
-      <span className="font-medium text-primary-100">셔터 상태</span>
+      <span className="font-medium text-white">셔터 상태</span>
     </h4>
-    <div className="bg-orange-950/20 rounded-lg p-4 border border-orange-500/20">
-      <div className="bg-primary-900/30 rounded-lg p-3 border border-primary-700/20">
-        <div className="flex items-center gap-2 mb-2 text-orange-300">
+    <div className="bg-orange-950/30 rounded-lg p-4 border border-orange-500/30">
+      <div className="bg-primary-900/40 rounded-lg p-3.5 border border-primary-700/30">
+        <div className="flex items-center gap-2 mb-2.5 text-orange-200">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
@@ -228,22 +231,22 @@ const ShutterDetails = ({ device }: { device: Shutter }) => (
 
 const FireSensorDetails = ({ device }: { device: FireSensor }) => (
   <div className="space-y-4">
-    <h4 className="text-primary-100 font-medium flex items-center gap-2">
-      <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <h4 className="text-white font-medium flex items-center gap-2 text-lg">
+      <svg className="w-5 h-5 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
       </svg>
       화재수신기 상태
     </h4>
-    <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
-      <div className="flex items-center gap-2 mb-2 text-red-300">
+    <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-500/40">
+      <div className="flex items-center gap-2 mb-3 text-red-200">
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
         감지 상태 정보
       </div>
       <div className="relative">
-        <div className="absolute -left-1 top-0 bottom-0 w-[2px] bg-gradient-to-b from-red-500/50 via-red-500/20 to-transparent" />
+        <div className="absolute -left-1 top-0 bottom-0 w-[2px] bg-gradient-to-b from-red-500/60 via-red-500/30 to-transparent" />
         <StatusRow label="감지 상태" status={device.status} type="fire" />
       </div>
     </div>
