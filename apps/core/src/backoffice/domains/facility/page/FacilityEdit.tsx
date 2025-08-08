@@ -11,10 +11,11 @@ import {
   domainUtils,
   FacilityType,
   FacilityResponse,
+  facilityService,
+  DOMAINS,
 } from '@plug/common-services';
 import { toast } from 'sonner';
-import { useFacilityData } from '../hooks/useFacilityData';
-import { FacilityFormComponent, FloorsFormComponent, StationInfoFormComponent, BoundaryFormComponent } from '../components/form-components';
+import { FacilityForm, FloorsForm, StationInfoForm, BoundaryForm } from '../components/form-components';
 import { FacilityCreateFormData } from '../types';
 import { Model, Interfaces } from '@plug/engine/src';
 
@@ -60,9 +61,7 @@ const FacilityEdit: React.FC = () => {
   const [floorsReplaceFunction, setFloorsReplaceFunction] = useState<((floors: Array<{name: string; floorId: string}>) => void) | null>(null);
   const [isProcessingDrawing, setIsProcessingDrawing] = useState(false);
 
-  const { getAllFacilities, isLoading: isFacilitiesLoading } = useFacilityData();
   const facilityId = id ? parseInt(id, 10) : null;
-  const [hasLoadedData, setHasLoadedData] = useState(false);
 
   const {
     control,
@@ -90,10 +89,6 @@ const FacilityEdit: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!facilityId || hasLoadedData || isFacilitiesLoading) {
-      return;
-    }
-
     if (!facilityId) {
       navigate('/admin/facility');
       return;
@@ -103,8 +98,24 @@ const FacilityEdit: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // 전체 시설 목록에서 해당 ID를 가진 시설을 찾음
-        const targetFacility = getAllFacilities.find(f => f.id === facilityId);
+        // 전체 시설 목록을 가져와서 해당 ID의 시설 유형을 찾기
+        const facilitiesResponse = await facilityService.getAllFacilities();
+        const facilitiesByType = facilitiesResponse.data;
+        
+        // useFacilityData hook과 동일한 로직으로 시설을 찾기
+        const mapApiKeyToFacilityType = (apiKey: string): FacilityType => {
+          const domainEntry = Object.entries(DOMAINS).find(([, config]) => config.endpoint === apiKey);
+          return domainEntry ? domainEntry[0] as FacilityType : 'building';
+        };
+
+        const allFacilities = Object.entries(facilitiesByType || {}).flatMap(([type, facilities]) =>
+          facilities.map(facility => ({
+            ...facility,
+            facilityType: mapApiKeyToFacilityType(type)
+          }))
+        );
+        
+        const targetFacility = allFacilities.find(f => f.id === facilityId);
         
         if (!targetFacility) {
           toast.error('시설을 찾을 수 없습니다.');
@@ -140,8 +151,6 @@ const FacilityEdit: React.FC = () => {
           };
           
           reset(formData);
-          
-          setHasLoadedData(true);
         } else {
           toast.error('시설을 찾을 수 없습니다.');
           navigate('/admin/facility');
@@ -155,14 +164,8 @@ const FacilityEdit: React.FC = () => {
       }
     };
 
-    // 시설 목록이 로드되면 시설 상세 정보 로드
-    if (getAllFacilities.length > 0) {
-      loadFacility();
-    } else if (!isFacilitiesLoading && getAllFacilities.length === 0) {
-      toast.error('시설을 찾을 수 없습니다.');
-      navigate('/admin/facility');
-    }
-  }, [facilityId, navigate, getAllFacilities, isFacilitiesLoading, reset, hasLoadedData]);
+    loadFacility();
+  }, [facilityId, navigate, reset]);
 
   const handleFloorsReplaceReady = (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => {
     setFloorsReplaceFunction(() => replaceFunction);
@@ -306,7 +309,7 @@ const FacilityEdit: React.FC = () => {
     switch (component) {
       case 'floors':
         return (
-          <FloorsFormComponent
+          <FloorsForm
             control={control}
             register={register}
             errors={errors}
@@ -316,7 +319,7 @@ const FacilityEdit: React.FC = () => {
         );
       case 'stationInfo':
         return (
-          <StationInfoFormComponent
+          <StationInfoForm
             register={register}
             errors={errors}
             control={control}
@@ -326,7 +329,7 @@ const FacilityEdit: React.FC = () => {
         );
       case 'boundary':
         return (
-          <BoundaryFormComponent
+          <BoundaryForm
             register={register}
             errors={errors}
           />
@@ -336,7 +339,7 @@ const FacilityEdit: React.FC = () => {
     }
   };
 
-  if (isLoading || isFacilitiesLoading) {
+  if (isLoading) {
     return (
       <PageContainer title="시설 편집">
         <div className="flex items-center justify-center min-h-[400px]">
@@ -393,7 +396,7 @@ const FacilityEdit: React.FC = () => {
           </div>
         </div>
 
-        <FacilityFormComponent
+        <FacilityForm
           register={register}
           errors={errors}
           control={control}

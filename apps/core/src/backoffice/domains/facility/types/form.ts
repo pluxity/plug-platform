@@ -7,6 +7,13 @@ import {
 } from 'react-hook-form';
 import { FileResponse } from '@plug/common-services';
 
+// 위치 데이터 타입 정의
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  altitude: number;
+}
+
 export interface FacilityCreateFormData {
   facilityType: string;
   facility: {
@@ -30,12 +37,12 @@ export interface FacilityCreateFormData {
   boundary?: string;
 }
 
-export interface FacilityFormComponentProps {
+export interface FacilityFormProps {
   register: UseFormRegister<FacilityCreateFormData>;
   errors: FieldErrors<FacilityCreateFormData>;
 }
 
-export interface ExtendedFacilityFormComponentProps extends FacilityFormComponentProps {
+export interface ExtendedFacilityFormProps extends FacilityFormProps {
   control: Control<FacilityCreateFormData>;
   setValue: UseFormSetValue<FacilityCreateFormData>;
   watch: UseFormWatch<FacilityCreateFormData>;
@@ -46,13 +53,13 @@ export interface ExtendedFacilityFormComponentProps extends FacilityFormComponen
   isEditMode?: boolean;
 }
 
-export interface FloorsFormComponentProps extends FacilityFormComponentProps {
+export interface FloorsFormProps extends FacilityFormProps {
   control: Control<FacilityCreateFormData>;
   onFloorsReplaceReady?: (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => void;
   isProcessingDrawing?: boolean;
 }
 
-export interface StationInfoFormComponentProps extends FacilityFormComponentProps {
+export interface StationInfoFormProps extends FacilityFormProps {
   control: Control<FacilityCreateFormData>;
   setValue: UseFormSetValue<FacilityCreateFormData>;
   watch: UseFormWatch<FacilityCreateFormData>;

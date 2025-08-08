@@ -10,9 +10,9 @@ import {
 } from '@plug/ui';
 import { Plus, Trash2 } from 'lucide-react';
 import { useLinesSWR } from '@plug/common-services';
-import { StationInfoFormComponentProps } from '../../types';
+import { StationInfoFormProps } from '../../types';
 
-export const StationInfoFormComponent: React.FC<StationInfoFormComponentProps> = ({
+export const StationInfoForm: React.FC<StationInfoFormProps> = ({
   errors,
   setValue,
   watch,

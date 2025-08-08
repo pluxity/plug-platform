@@ -7,9 +7,9 @@ import {
   CardContent,
   Input,
 } from '@plug/ui';
-import { FloorsFormComponentProps } from '../../types';
+import { FloorsFormProps } from '../../types';
 
-export const FloorsFormComponent: React.FC<FloorsFormComponentProps> = ({
+export const FloorsForm: React.FC<FloorsFormProps> = ({
   control,
   register,
   errors,

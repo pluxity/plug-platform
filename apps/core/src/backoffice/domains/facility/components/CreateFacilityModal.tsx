@@ -24,7 +24,7 @@ import {
   domainUtils,
   FacilityService,
 } from '@plug/common-services';
-import { FacilityFormComponent, FloorsFormComponent, StationInfoFormComponent, BoundaryFormComponent } from './form-components';
+import { FacilityForm, FloorsForm, StationInfoForm, BoundaryForm } from './form-components';
 import { FacilityCreateFormData } from '../types';
 import { Model, Interfaces } from '@plug/engine/src';
 
@@ -228,7 +228,7 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
     switch (component) {
       case 'floors':
         return (
-          <FloorsFormComponent
+          <FloorsForm
             control={control}
             register={register}
             errors={errors}
@@ -238,7 +238,7 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
         );
       case 'stationInfo':
         return (
-          <StationInfoFormComponent
+          <StationInfoForm
             register={register}
             errors={errors}
             control={control}
@@ -248,7 +248,7 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
         );
       case 'boundary':
         return (
-          <BoundaryFormComponent
+          <BoundaryForm
             register={register}
             errors={errors}
           />
@@ -302,7 +302,7 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
           </Card>
 
           {selectedFacilityType && (
-            <FacilityFormComponent
+            <FacilityForm
               register={register}
               errors={errors}
               control={control}

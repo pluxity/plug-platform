@@ -1,7 +1,3 @@
-export { FacilityInfoComponent } from './FacilityInfoComponent';
-export { FloorsComponent } from './FloorsComponent';
-export { StationInfoComponent } from './StationInfoComponent';
-export { BoundaryComponent } from './BoundaryComponent';
 export { CreateFacilityModal } from './CreateFacilityModal';
 export { default as FacilityCard } from './FacilityCard';
 export { default as FacilityTypeFilter } from './FacilityTypeFilter';

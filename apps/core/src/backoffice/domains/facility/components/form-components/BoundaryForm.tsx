@@ -6,9 +6,9 @@ import {
   CardContent,
   Textarea,
 } from '@plug/ui';
-import { FacilityFormComponentProps } from '../../types';
+import { FacilityFormProps } from '../../types';
 
-export const BoundaryFormComponent: React.FC<FacilityFormComponentProps> = ({
+export const BoundaryForm: React.FC<FacilityFormProps> = ({
   register,
   errors,
 }) => {

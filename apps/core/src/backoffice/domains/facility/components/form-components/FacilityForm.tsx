@@ -7,13 +7,15 @@ import {
   Input,
   Textarea,
 } from '@plug/ui';
-import { ExtendedFacilityFormComponentProps } from '../../types';
+import { ExtendedFacilityFormProps } from '../../types';
 import { FileUpload } from './FileUpload';
 import { FileResponse } from '@plug/common-services';
+import { LocationSelectorField } from './location/LocationSelectorField';
 
-export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps> = ({
+export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
   register,
   errors,
+  control,
   setValue,
   watch,
   onDrawingFileUploaded,
@@ -125,50 +127,12 @@ export const FacilityFormComponent: React.FC<ExtendedFacilityFormComponentProps>
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              경도
-            </label>
-            <Input
-              {...register('facility.lon', { valueAsNumber: true })}
-              type="number"
-              step="any"
-              placeholder="경도를 입력하세요"
-            />
-            {errors.facility?.lon && (
-              <p className="text-red-500 text-sm mt-1">{errors.facility.lon.message}</p>
-            )}
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              위도
-            </label>
-            <Input
-              {...register('facility.lat', { valueAsNumber: true })}
-              type="number"
-              step="any"
-              placeholder="위도를 입력하세요"
-            />
-            {errors.facility?.lat && (
-              <p className="text-red-500 text-sm mt-1">{errors.facility.lat.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            위치 메타데이터
-          </label>
-          <Input
-            {...register('facility.locationMeta')}
-            placeholder="위치 메타데이터를 입력하세요"
-          />
-          {errors.facility?.locationMeta && (
-            <p className="text-red-500 text-sm mt-1">{errors.facility.locationMeta.message}</p>
-          )}
-        </div>
+        <LocationSelectorField
+          control={control}
+          setValue={setValue}
+          watch={watch}
+          errors={errors}
+        />
       </CardContent>
     </Card>
   );
