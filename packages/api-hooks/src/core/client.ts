@@ -1,10 +1,11 @@
 import ky, {Options} from 'ky';
 import { ResponseTypes, RequestOptions } from '../types';
 
-const CONTEXT_PATH = '/3d-map';
+// const CONTEXT_PATH = '/3d-map';
 
 export const baseKy = ky.create({
-  prefixUrl: `${CONTEXT_PATH}/api`,
+  // prefixUrl: `${CONTEXT_PATH}/api`,
+  prefixUrl: '/api',
   credentials: 'include',
   headers: {
     'Content-Type': 'application/json'
