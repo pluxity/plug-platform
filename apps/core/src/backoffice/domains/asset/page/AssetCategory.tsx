@@ -9,23 +9,9 @@ import {
   deleteAssetCategory,
   useFileUploadWithInfo
 } from '@plug/common-services'
-import type { AssetCategoryResponse, FileResponse } from '@plug/common-services'
+import type { FileResponse } from '@plug/common-services'
 import { toast } from 'sonner'; 
-
-const convertToCategoryItems = (apiData: AssetCategoryResponse[]): CategoryItem[] => {
-  return apiData.map(item => ({
-    id: item.id.toString(),
-    name: item.name,
-    code: item.code,
-    depth: item.depth + 1, // API depth가 0부터 시작하므로 1을 더함
-    parentId: item.parentId?.toString(),
-    thumbnailUrl: item.thumbnail?.url,
-    thumbnailFileId: item.thumbnail?.id,
-    children: item.children && item.children.length > 0 
-      ? convertToCategoryItems(item.children) 
-      : undefined
-  }))
-}
+import { assetCategoryMapper } from '@/backoffice/domains/asset/mapper/assetCategoryMapper';
 
 const AssetCategory: React.FC = () => {
   const [categories, setCategories] = useState<CategoryItem[]>([])
@@ -35,7 +21,7 @@ const AssetCategory: React.FC = () => {
 
   useEffect(() => {
     if (apiCategories.length > 0) {
-      const convertedCategories = convertToCategoryItems(apiCategories)
+      const convertedCategories = assetCategoryMapper(apiCategories)
       setCategories(convertedCategories)
     } else {
       setCategories([])
@@ -191,7 +177,7 @@ const AssetCategory: React.FC = () => {
   const hasError = !!error
 
   return (
-    <PageContainer title="Asset Category">
+    <PageContainer title="에셋 카테고리 관리">
       <div className="space-y-6">
         {/* 카테고리 관리 컴포넌트 */}
         {!isLoading && !hasError && (

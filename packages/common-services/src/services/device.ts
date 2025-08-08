@@ -1,4 +1,4 @@
-import { useGet, usePost, usePatch, useDelete, useSWRApi } from '@plug/api-hooks';
+import { useGet, usePost, usePatch, useDelete, useSWRApi, usePut } from '@plug/api-hooks';
 import { api } from '@plug/api-hooks/core';
 import type { 
   GsDeviceResponse, 
@@ -31,7 +31,7 @@ export const useCreateDevice = () => {
 
 // 디바이스 수정
 export const useUpdateDevice = (deviceId: string) => {
-  return usePatch<GsDeviceUpdateRequest>(`${DEVICE_END_POINT}/${deviceId}`, { requireAuth: true });
+  return usePut<GsDeviceUpdateRequest>(`${DEVICE_END_POINT}/${deviceId}`, { requireAuth: true });
 };
 
 // 디바이스 삭제
@@ -47,6 +47,18 @@ export const useAssignDeviceCategory = (deviceId: string, categoryId: number) =>
 // 디바이스의 카테고리 제거
 export const useRemoveDeviceCategory = (deviceId: string) => {
   return useDelete(`${DEVICE_END_POINT}/${deviceId}/category`, { requireAuth: true });
+};
+
+// SWR 기반 훅들
+export const useDevicesSWR = () => {
+  return useSWRApi<GsDeviceResponse[]>(DEVICE_END_POINT, 'GET', { requireAuth: true });
+};
+
+export const useDeviceDetailSWR = (deviceId: string | undefined) => {
+  const url = deviceId ? `${DEVICE_END_POINT}/${deviceId}` : '';
+  return useSWRApi<GsDeviceResponse>(url, 'GET', { requireAuth: true }, {
+    isPaused: () => !deviceId, // deviceId가 없으면 요청 중단
+  });
 };
 
 // === Device Category 관련 ===
@@ -79,15 +91,6 @@ export const deleteDeviceCategory = async (categoryId: number) => {
 // 하위 디바이스 카테고리 목록 조회
 export const useChildDeviceCategories = (categoryId: number) => {
   return useGet<DeviceCategoryResponse[]>(`${DEVICE_CATEGORY_END_POINT}/${categoryId}/children`, { requireAuth: true });
-};
-
-// SWR 기반 훅들
-export const useDevicesSWR = () => {
-  return useSWRApi<GsDeviceResponse[]>(DEVICE_END_POINT, 'GET', { requireAuth: true });
-};
-
-export const useDeviceDetailSWR = (deviceId: string) => {
-  return useSWRApi<GsDeviceResponse>(`${DEVICE_END_POINT}/${deviceId}`, 'GET', { requireAuth: true });
 };
 
 export const useDeviceCategoriesSWR = () => {

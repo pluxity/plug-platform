@@ -5,10 +5,11 @@ import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
 const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'Asset', label: 'Asset', depth: 1, showToggle: true},
-  { id: 'AssetList', label: 'AssetList', to: '/admin/assetList', depth: 2, showToggle: false, parentId: 'Asset'},
   { id: 'AssetCategory', label: 'AssetCategory', to: '/admin/assetCategory', depth: 2, showToggle: false, parentId: 'Asset'},
+  { id: 'AssetList', label: 'AssetList', to: '/admin/assetList', depth: 2, showToggle: false, parentId: 'Asset'},
   { id: 'Device', label: 'Device', depth: 1, showToggle: true},
   { id: 'DeviceCategory', label: 'DeviceCategory', to: '/admin/deviceCategory', depth: 2, showToggle: false, parentId: 'Device'},
+  { id: 'DeviceList', label: 'DeviceList', to: '/admin/deviceList', depth: 2, showToggle: false, parentId: 'Device'},
   { id: 'Facility', label: 'Facility', to: '/admin/facility', depth: 1, showToggle: true},
   { id: 'Users', label: 'Users', depth: 1, showToggle: true},
   { id: 'Permission', label: 'Permission', to: '/admin/permission', depth: 2, showToggle: false, parentId: 'Users'},

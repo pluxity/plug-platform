@@ -25,38 +25,37 @@ function FilterBar({
 
   return(
     <form
-      className={cn("flex justify-between w-full items-center", className)}
+      className={cn("flex gap-2 items-center", className)}
       onSubmit={handleSubmit}
     >
-      {showSearchInput && (
-      <SearchInput
-        value={searchValue ?? ""}
-        onChange={handleChange}
-        placeholder={searchPlaceholder}
-        onSubmit={() => onSearch?.(searchValue ?? "")}
-      />
-      )}
       {selects.map((select) => (
         <Select
           key={select.key}
           value={select.value}
           onValueChange={select.onChange}
         >
-          <SelectTrigger className="w-fit min-w-30 outline-none">
+          <SelectTrigger className="w-fit min-w-30">
             <SelectValue placeholder={select.placeholder} />
           </SelectTrigger>
           <SelectContent>
-            {select.options.map(opt => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
+          {select.options.map(opt => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
           </SelectContent>
         </Select>
-      ))}
+        ))}
+        {showSearchInput && (
+          <SearchInput
+            value={searchValue ?? ""}
+            onChange={handleChange}
+            placeholder={searchPlaceholder}
+            onSubmit={() => onSearch?.(searchValue ?? "")}
+          />
+      )}
     </form>
   )
-
 }
 
 FilterBar.displayName = "FilterBar";
