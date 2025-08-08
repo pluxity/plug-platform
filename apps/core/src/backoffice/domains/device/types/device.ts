@@ -14,5 +14,5 @@ export interface DeviceEditModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
-    deviceId: string ;
+    deviceId: string;
 }

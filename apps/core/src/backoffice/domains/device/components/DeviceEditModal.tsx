@@ -31,7 +31,7 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
     useEffect(() => {
         if(isOpen && data && !modalForm.formState.isDirty){
             modalForm.reset({
-                categoryId: data.deviceCategory?.id.toString(),
+                categoryId: data.deviceCategory?.id.toString() ?? '',
                 id: data.id,
                 name: data.name,
             });

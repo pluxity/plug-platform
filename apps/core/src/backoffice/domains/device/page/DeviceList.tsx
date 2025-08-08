@@ -60,9 +60,9 @@ const DeviceList: React.FC = () => {
     }
 
     const handleDeleteConfirm = async () => {
-        if (!deleteDeviceData) return;
+        if (!deleteDeviceData?.id) return;
         try{
-            await deleteDevice(deleteDeviceData.id || '');
+            await deleteDevice(deleteDeviceData.id);
             toast.success('삭제가 완료되었습니다.');
             mutate();
         } catch(error){
@@ -105,7 +105,7 @@ const DeviceList: React.FC = () => {
             header: '관리',
             cell: ({ row }: { row: { original: DeviceData } }) => (
                 <div className="flex space-x-2">
-                    <Button variant="secondary" size="sm" onClick={() => handleEdit(row.original.id || '')}>수정</Button>
+                    <Button variant="secondary" size="sm" onClick={() => row.original.id && handleEdit(row.original.id)}>수정</Button>
                     <Button variant="outline" size="sm" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
             ),
