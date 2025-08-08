@@ -26,7 +26,7 @@ bodyClassName,
             ref={ref}
             closeOnOverlayClick={false}
             contentClassName={cn(
-                'max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden',
+                'max-h-[100vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden',
                 contentClassName
             )}
         >

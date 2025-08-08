@@ -126,7 +126,7 @@ export const CctvModal: React.FC<CctvModalProps> = ({
         </Button>
       }
     >
-      <div className="min-h-[50vh] max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
+      <div className="min-h-[50vh] max-h-[75vh] overflow-y-auto custom-scrollbar pr-1">
         <div className={`grid gap-6 ${getGridLayout()}`}>
           {cctvList.map((cctv, index) => (
             <div 

@@ -595,7 +595,7 @@ const ShutterGroupDetails = ({ device }: { device: ShutterGroup }) => (
             </svg>
             그룹 내 셔터 목록 ({device.shutterList.length}개)
           </div>
-          <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
+          <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
             {device.shutterList.map((shutter, index) => (
               <div key={`${shutter.shutterId}-${index}`} 
                    className="bg-primary-950/40 rounded-lg px-3 py-2 border border-primary-700/10">

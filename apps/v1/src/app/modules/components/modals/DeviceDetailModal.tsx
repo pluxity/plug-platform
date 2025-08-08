@@ -195,9 +195,10 @@ export const DeviceDetailModal = ({
         border border-primary-600/20
         shadow-2xl shadow-primary-500/10
         ${hasCctvs ? '!max-w-7xl !w-[95vw]' : '!max-w-xl !w-[50vw]'}
+        ${hasCctvs && cctvList.length >= 4 ? '!h-[90vh]' : ''}
       `}
       headerClassName="!bg-transparent !border-b !border-primary-600/20 !px-6 !py-4"
-      bodyClassName="!bg-transparent !px-6 !py-4  overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20"
+      bodyClassName="!bg-transparent !px-6 !py-4 overflow-y-auto custom-scrollbar pr-1"
       footer={
         <Button
           variant="outline"
@@ -235,15 +236,8 @@ export const DeviceDetailModal = ({
             </div>
           ) : (
             hasCctvs ? (
-            <div className="flex gap-6 h-[60vh]">
-                <div className="flex-1 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
-                  <h3 className="text-primary-100 font-medium flex items-center gap-2 sticky top-0 bg-primary-900/50 backdrop-blur-sm py-2 rounded-lg px-3">
-                    <svg className="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    CCTV 영상
-                  </h3>
+            <div className="flex gap-6 h-full">
+                <div className="flex-1 space-y-4 custom-scrollbar pr-1">
                   {cctvList.map((cctv, index) => {
                     const shouldShowOnLeft = cctvList.length === 1 || index % 2 === 0;
                     if (!shouldShowOnLeft) return null;
@@ -252,7 +246,6 @@ export const DeviceDetailModal = ({
                       <CctvStream
                         key={`left-${index}`}
                         cctv={cctv}
-                        className="mb-4"
                       />
                     );
                   })}
@@ -271,14 +264,7 @@ export const DeviceDetailModal = ({
                 </div>
 
                 {cctvList.length > 1 && (
-                  <div className="flex-1 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
-                    <h3 className="text-primary-100 font-medium flex items-center gap-2 sticky top-0 bg-primary-900/50 backdrop-blur-sm py-2 rounded-lg px-3">
-                      <svg className="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      CCTV 영상
-                    </h3>
+                  <div className="flex-1 space-y-4 custom-scrollbar pr-1">
                     {cctvList.map((cctv, index) => {
                       const shouldShowOnRight = index % 2 === 1;
                       if (!shouldShowOnRight) return null;
@@ -287,14 +273,13 @@ export const DeviceDetailModal = ({
                         <CctvStream
                           key={`right-${index}`}
                           cctv={cctv}
-                          className="mb-4"
                         />
                       );
                     })}
                   </div>
                 )}
               </div>
-            ) : (              <div className="min-h-[50vh] max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20">
+            ) : (              <div className="min-h-[50vh] max-h-[75vh] overflow-y-auto custom-scrollbar pr-1">
                 {!HIDE_COMMON_INFO_DEVICES.includes(deviceType.toLowerCase()) && <CommonInfo device={deviceData} />}
                 <DeviceDetailContent deviceData={deviceData} deviceType={deviceType} />
               </div>
