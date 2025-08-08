@@ -66,13 +66,13 @@ const createKyClient = (baseUrl: string, token?: string) => {
 
 
 // const BASE_URL = 'http://192.168.4.22:8090/HI-SMP/poi';
-const BASE_URL = 'http://101.254.21.120:10300/HI-SMP/poi';
+const BASE_URL = 'http://101.254.21.120:10300/HI-SMP';
 
 export const createNfluxApiClient = (customAuthToken?: string, stationId?: string) => {
   const token = customAuthToken || authToken || getAccessTokenFromStorage();
   const baseUrl = stationId 
-    ? `${BASE_URL}/station/${stationId}`
-    : `${BASE_URL}/station`;
+    ? `${BASE_URL}/poi/station/${stationId}`
+    : `${BASE_URL}/poi/station`;
 
   const cacheKey = `${baseUrl}:${token || 'no-token'}`;
   
@@ -88,7 +88,7 @@ export const createNfluxApiClient = (customAuthToken?: string, stationId?: strin
 
 export const createNfluxWidgetApiClient = (customAuthToken?: string) => {
   const token = customAuthToken || authToken || getAccessTokenFromStorage();
-  const baseUrl = `${BASE_URL}/widget`;
+  const baseUrl = `${BASE_URL}`;
 
   const cacheKey = `widget:${baseUrl}:${token || 'no-token'}`;
   

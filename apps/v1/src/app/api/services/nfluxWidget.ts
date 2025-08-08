@@ -20,8 +20,8 @@ export const nfluxWidgetService = {
   },
 
   // 환기설비 개별 조회
-  getVentilationMachine: async (fcltsId: string): Promise<VentilationMachine> => {
+  getVentilationMachine: async (fcltsId: string): Promise<Record<string, VentilationMachine>> => {
     const client = createNfluxWidgetApiClient(undefined);
-    return client.get(`ventilation/machine/${fcltsId}`).json<VentilationMachine>();
+    return client.get(`ventilation/machine/${fcltsId}`).json<Record<string,VentilationMachine>>();
   }
 };

@@ -38,7 +38,7 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
       try {
         let data: DeviceData | null = null;
 
-        switch (deviceType.toLowerCase()) {          
+        switch (deviceType.toLowerCase()) {
           case 'light':
           case 'lights': {
             const result = await nfluxService.getLights(stationId);
@@ -86,7 +86,7 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
             const result = await nfluxService.getCatchpits(stationId);
             data = result.find(item => item.catchpitId === deviceId) || null;
             break;
-          }          
+          }
           case 'airpurifier':
           case 'airpurifiers': {
             const result = await nfluxService.getAirPurifiers(stationId);
@@ -110,7 +110,7 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
           case 'ventilationmachine':
           case 'ventilationmachines': {
             const result = await nfluxWidgetService.getVentilationMachine(deviceId);
-            data = result;
+            data = result["ventilationMachine"];
             break;
           }
           default:
@@ -119,8 +119,8 @@ const useDeviceData = (isOpen: boolean, deviceId: string | null, deviceType: str
 
         if (!data) {
           throw new Error(`장비를 찾을 수 없습니다: ${deviceId}`);
-        }        
-        
+        }
+
         setDeviceData(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '장비 정보를 불러오는데 실패했습니다.');
@@ -142,14 +142,14 @@ export const DeviceDetailModal = ({
   deviceType,
   stationId,
   deviceId,
-}: DeviceDetailProps) => {  
-  
+}: DeviceDetailProps) => {
+
   const { deviceData, loading, error } = useDeviceData(isOpen, deviceId, deviceType, stationId);
-  
+
   // Get CCTV list from device data
   const cctvList: CCTV[] = (() => {
     if (!deviceData) return [];
-    
+
     if ('cctvList' in deviceData && deviceData.cctvList) {
       return deviceData.cctvList.map(cctv => {
         if ('streamAddress' in cctv && 'cctvId' in cctv && 'cctvName' in cctv) {
@@ -165,11 +165,13 @@ export const DeviceDetailModal = ({
         return cctv as CCTV;
       });
     }
-    
+
     return [];
   })();
-  
-  const hasCctvs = cctvList.length > 0;
+
+  // const hasCctvs = cctvList.length > 0;
+  const hasCctvs = cctvList.map(cctv =>  cctv.streamAddress)
+    .filter(streamAddress => streamAddress.length > 0).length > 0;
 
   return (
     <Modal
@@ -187,7 +189,7 @@ export const DeviceDetailModal = ({
             </span>
           )}
         </div>
-      }      
+      }
       contentClassName={`
         !bg-primary-900/30 backdrop-blur-xl
         border border-primary-600/20
@@ -196,7 +198,7 @@ export const DeviceDetailModal = ({
       `}
       headerClassName="!bg-transparent !border-b !border-primary-600/20 !px-6 !py-4"
       bodyClassName="!bg-transparent !px-6 !py-4  overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400/30 scrollbar-track-primary-600/20"
-      footer={        
+      footer={
         <Button
           variant="outline"
           onClick={onClose}
@@ -245,10 +247,10 @@ export const DeviceDetailModal = ({
                   {cctvList.map((cctv, index) => {
                     const shouldShowOnLeft = cctvList.length === 1 || index % 2 === 0;
                     if (!shouldShowOnLeft) return null;
-                    
+
                     return (
-                      <CctvStream 
-                        key={`left-${index}`} 
+                      <CctvStream
+                        key={`left-${index}`}
                         cctv={cctv}
                         className="mb-4"
                       />
@@ -280,10 +282,10 @@ export const DeviceDetailModal = ({
                     {cctvList.map((cctv, index) => {
                       const shouldShowOnRight = index % 2 === 1;
                       if (!shouldShowOnRight) return null;
-                      
+
                       return (
-                        <CctvStream 
-                          key={`right-${index}`} 
+                        <CctvStream
+                          key={`right-${index}`}
                           cctv={cctv}
                           className="mb-4"
                         />

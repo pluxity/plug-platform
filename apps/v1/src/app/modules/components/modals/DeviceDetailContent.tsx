@@ -339,38 +339,40 @@ const WaterTankDetails = ({ device }: { device: WaterTank }) => (
               <StatusRow label="고수위 상태" status={device.highWaterLevelStatus} type="waterLevel" />
               <StatusRow label="만수위 상태" status={device.fullWaterLevelStatus} type="waterLevel" />
             </div>
-            <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
-              <div className="flex items-center gap-2 mb-3 text-blue-300">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                현재 수위 상태
-              </div>
-              <div className="h-50 bg-primary-950/80 rounded-lg border border-primary-700/30 relative overflow-hidden">
-
-                <div
-                  className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-500/40 to-blue-500/20 transition-all duration-500"
-                  style={{
-                    height: device.waterLevel?.ioValue ? `${device.waterLevel.ioValue}%` : '35%',
-                  }}
-                >
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-blue-400/40 shadow-lg shadow-blue-400/30" />
-                </div>
-                <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
-                    style={{ top: `${100 - Number(device.fullWaterLevelSetting.ioValue)}%` }}>
-                  <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">만수위</div>
-                </div>
-                <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
-                    style={{ top: `${100 - Number(device.highWaterLevelSetting.ioValue)}%` }}>
-                  <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">고수위</div>
-                </div>
-                <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
-                    style={{ top: `${100 - Number(device.lowWaterLevelSetting.ioValue)}%` }}>
-                  <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">저수위</div>
-                </div>
-              </div>
-            </div>
+            {
+              device.waterLevel && device.fullWaterLevelSetting && device.highWaterLevelSetting && device.lowWaterLevelSetting &&
+                  (<div className="bg-gray-800/40 rounded-lg p-4 border border-gray-500/30">
+                    <div className="flex items-center gap-2 mb-3 text-blue-300">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      현재 수위 상태
+                    </div>
+                    <div className="h-50 bg-primary-950/80 rounded-lg border border-primary-700/30 relative overflow-hidden">
+                      <div
+                          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-500/40 to-blue-500/20 transition-all duration-500"
+                          style={{
+                            height: device.waterLevel?.ioValue ? `${device.waterLevel.ioValue}%` : '35%',
+                          }}
+                      >
+                        <div className="absolute top-0 left-0 right-0 h-[1px] bg-blue-400/40 shadow-lg shadow-blue-400/30" />
+                      </div>
+                      <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
+                           style={{ top: `${100 - Number(device.fullWaterLevelSetting?.ioValue)}%` }}>
+                        <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">만수위</div>
+                      </div>
+                      <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
+                           style={{ top: `${100 - Number(device.highWaterLevelSetting?.ioValue)}%` }}>
+                        <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">고수위</div>
+                      </div>
+                      <div className="absolute top-0 left-0 right-0 border-t border-dashed border-blue-400/30 flex justify-end"
+                           style={{ top: `${100 - Number(device.lowWaterLevelSetting?.ioValue)}%` }}>
+                        <div className="bg-primary-950 text-blue-300 text-xs px-2 py-0.5 rounded-md mr-2">저수위</div>
+                      </div>
+                    </div>
+                  </div>)
+            }
           </div>
         </div>
       </div>
