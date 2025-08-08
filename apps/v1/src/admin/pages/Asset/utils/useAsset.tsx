@@ -8,23 +8,37 @@ export const useAsset = (
   onDelete: (assetId: number) => void,
   onEdit: (assetId: number) => void
 ): Asset[] => {
-  return data.map(asset => ({
+  return data.map((asset) => ({
     id: String(asset.id),
     name: asset.name,
     code: asset.code,
-    thumbnailFile: asset.thumbnailFile?.originalFileName,
+    thumbnailFile: asset.thumbnailFile?.url ? (
+      <img
+        src={asset.thumbnailFile.url}
+        alt="thumbnail"
+        width={70}
+        height={70}
+        className="rounded-md object-cover m-auto"
+      />
+    ) : '',
     creator: asset.createdBy,
     update: DateFormatter(asset.createdAt),
     management: (
       <div className="flex flex-wrap gap-1">
-        <Button color="primary"
-                className="w-15 bg-secondary-100 text-secondary-700 font-semibold hover:bg-secondary-200"
-                onClick={() => onEdit(asset.id)}>수정</Button>
-        <Button 
-            color="destructive" 
-            className="w-15 bg-destructive-100 text-destructive-700 font-semibold hover:bg-destructive-200"
-            onClick={() => onDelete(asset.id)}
-          >삭제</Button>
+        <Button
+          color="primary"
+          className="w-15 bg-secondary-100 text-secondary-700 font-semibold hover:bg-secondary-200"
+          onClick={() => onEdit(asset.id)}
+        >
+          수정
+        </Button>
+        <Button
+          color="destructive"
+          className="w-15 bg-destructive-100 text-destructive-700 font-semibold hover:bg-destructive-200"
+          onClick={() => onDelete(asset.id)}
+        >
+          삭제
+        </Button>
       </div>
     ),
   }));

@@ -11,7 +11,9 @@ export const useCategory = (
     return data.map(category => ({  
         id: category.id,
         name: category.name,
-        iconFile: category.iconFile?.originalFileName,
+        iconFile: category.iconFile?.url ? (
+          <img src={category.iconFile.url} alt="icon" width={30} height={30} className="rounded-md object-cover m-auto" />
+        ) : '',
         creator: category.createdBy,
         update: DateFormatter(category.createdAt),
         management: (
