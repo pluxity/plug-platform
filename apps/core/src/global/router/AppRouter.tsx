@@ -9,7 +9,6 @@ import FacilityEdit from '@/backoffice/domains/facility/page/FacilityEdit'
 import FacilityIndoor from '@/backoffice/domains/facility/page/FacilityIndoor'
 import { Role , User, Permission } from '@/backoffice/domains/users'
 import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
-import { IndoorMapEditor } from '@/backoffice/domains/facility'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import LoginPage from '@/global/pages/LoginPage'
@@ -49,8 +48,6 @@ const AppRouter: React.FC = () => {
             {/* 실내지도 편집을 위한 별도 레이아웃 */}
             <Route element={<IndoorLayout />}>
               <Route path="facility/:id/indoor" element={<FacilityIndoor />} />
-              {/* 또는 domains indoor 사용 시 */}
-              <Route path="indoor/:id" element={<IndoorMapEditor />} />
             </Route>
           </Route>
 

@@ -57,7 +57,6 @@ const FacilityEdit: React.FC = () => {
   
   // Router state에서 데이터 추출
   const facilityTypeFromState = location.state?.facilityType as FacilityType | null;
-  console.log(location.state);
   
   const [facility, setFacility] = useState<FacilityData | null>(null);
   const [facilityType, setFacilityType] = useState<FacilityType | null>(null);
@@ -129,11 +128,8 @@ const FacilityEdit: React.FC = () => {
         
         // 1. State에서 facilityType이 전달된 경우 (추천 경로)
         if (facilityTypeFromState) {
-          console.log('Using facilityType from state:', facilityTypeFromState);
-          
           try {
             const response = await FacilityService.getById(facilityTypeFromState, facilityId);
-            console.log('FacilityService.getById response:', response);
             
             if (response.data) {
               const facilityData = response.data as FacilityData;

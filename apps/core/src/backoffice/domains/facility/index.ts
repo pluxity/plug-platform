@@ -1,4 +1,3 @@
-export { default } from './page/FacilityList';
-export { default as IndoorMapEditor } from './components/IndoorMapEditor';
+export { default  } from './page/FacilityList';
 export * from './types';
 export * from './components';
