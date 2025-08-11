@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as Px from '@plug/engine/src';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import useDeviceModalStore from '@plug/v1/app/stores/deviceModalStore';
+import useSideMenuStore from '@plug/v1/app/stores/sideMenuStore';
 
 interface DeviceData {
   id: string;
@@ -25,16 +26,21 @@ interface DevicePanelProps {
 }
 
 const DevicePanel: React.FC<DevicePanelProps> = ({
-                                                   categoryId,
-                                                   categoryType,
-                                                   categoryName,
-                                                   devices = [],
-                                                   onClose
-                                                 }) => {
+  categoryId,
+  categoryType,
+  categoryName,
+  devices = [],
+  onClose
+}) => {
   const { externalCode, setCurrentFloor } = useStationStore();
   const { openModal } = useDeviceModalStore();
+  const { selectedMenus, toggleSelectedMenu, menuItems } = useSideMenuStore();
+  
   const [searchValue, setSearchValue] = useState('');
   const [filteredDevices, setFilteredDevices] = useState<DeviceData[]>(devices);
+  
+  // 현재 카테고리가 선택되어 있는지 확인
+  const isSelected = categoryId ? selectedMenus.some(menu => menu.id === categoryId) : false;
 
   useEffect(() => {
     if (searchValue) {
@@ -65,29 +71,32 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
     }
   };
 
+  const handleToggleCategory = () => {
+    if (categoryId) {
+      const currentMenu = menuItems.find(item => item.id === categoryId);
+      if (currentMenu) {
+        toggleSelectedMenu(currentMenu);
+      }
+    }
+  };
+
   const renderCategoryTitle = () => {
     if (!categoryName) return "장비 목록";
 
+    let displayName = categoryName;
+    
     if (categoryName.includes('-')) {
       const parts = categoryName.split('-');
-      const prefix = parts[0].trim();
       let mainPart = parts[1].trim();
 
       if (mainPart.includes('(')) {
         mainPart = mainPart.split('(')[0].trim();
       }
-
-      return (
-        <>
-          <span className="text-lg font-semibold text-white">{mainPart}</span>
-          <div className="text-xs px-2 py-0.5 ml-2 rounded-full bg-primary-700/60 text-white/80 font-medium border border-white/10">
-            {prefix}
-          </div>
-        </>
-      );
+      
+      displayName = mainPart;
     }
 
-    return <span className="text-lg font-semibold text-white">{categoryName}</span>;
+    return <span className="text-lg font-semibold text-white">{displayName}</span>;
   };
 
   if (!categoryId) {
@@ -106,24 +115,36 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
               </span>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors p-1"
-            aria-label="Close device panel"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+          <div className='flex items-center gap-1'>
+            <button
+              onClick={handleToggleCategory}
+              className={`relative inline-flex items-center py-1.5 px-3 rounded-full border ${
+                isSelected
+                  ? 'bg-blue-500/20 text-blue-400 border-blue-500/40 hover:bg-blue-500/30'
+                  : 'bg-gray-700/20 text-gray-300 border-gray-600/40 hover:bg-gray-700/40'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 focus:ring-offset-transparent transition-all duration-200`}
             >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+              <span className="text-xs font-medium tracking-wide">{isSelected ? 'ON' : 'OFF'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white transition-colors p-1"
+              aria-label="Close device panel"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {categoryName &&
@@ -223,9 +244,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                 ))}
             </ul>
             {filteredDevices.length === 0 && (
-              <p className="text-gray-400 text-center py-4">
-                검색 결과가 없습니다.
-              </p>
+              <p className="text-gray-400 text-center py-4">검색 결과가 없습니다.</p>
             )}
           </>
         )}

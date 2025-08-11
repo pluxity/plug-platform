@@ -59,7 +59,7 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
     
     return (
         <>
-            <FloorSelector floors={floorSelectorItems} />
+          <FloorSelector floors={floorSelectorItems} />
           <ZoomControls />
           <div className="engine absolute inset-0 z-0">
                 <div

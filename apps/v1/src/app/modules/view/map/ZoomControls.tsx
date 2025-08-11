@@ -26,13 +26,13 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
         const wheelEvent = new WheelEvent('wheel', {
           bubbles: true,
           cancelable: true,
-          deltaY: zoomFactorRef.current > 0 ? -10 : 10,
+          deltaY: zoomFactorRef.current > 0 ? -2 : 2,
           clientX: centerX,
           clientY: centerY
         });
 
         container.dispatchEvent(wheelEvent);
-        zoomFactorRef.current *= 0.9;
+        zoomFactorRef.current *= 0.7;
 
         if (Math.abs(zoomFactorRef.current) < 0.1) {
           zoomFactorRef.current = 0;

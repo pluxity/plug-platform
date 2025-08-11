@@ -1,5 +1,6 @@
+
 import { useParams } from 'react-router-dom';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react'; // useState 추가
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
 import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
@@ -27,12 +28,13 @@ const ViewerPage = () => {
   const { openMenuByDeviceId } = useSideMenuStore();
   const { openModal, closeModal, isOpen, title, deviceId, deviceType, stationId } = useDeviceModalStore();
   const { pendingPoiData, clearPendingPoiData } = usePoiStore();
-
   const { stationData, stationLoading, error } = useStationData(parsedCode);
   const { floorItems, modelPath } = useFloorData(stationData);
-
   const { setTtcData, setEventData, setShutterData } = useEventStore();
   const { addToast } = useToastStore();
+
+  const [simulationActive, setSimulationActive] = useState(false);
+
   const handleLoadError = useCallback((loadError: Error) => {
     console.error('3D 모델 로드 실패:', loadError);
   }, []);
@@ -41,7 +43,7 @@ const ViewerPage = () => {
     const deviceId = poi.property?.deviceId;
     const displayText = poi.displayText || '장치 정보';
     const deviceType = poi.property?.deviceType || 'shutter';
-    
+
     if (deviceId && stationData?.externalCode) {
       openMenuByDeviceId(deviceId);
       openModal(displayText, deviceId, deviceType, stationData.externalCode);
@@ -52,32 +54,30 @@ const ViewerPage = () => {
     features: [],
     onPoiSelect: handlePoiSelect,
   });  const handleModelLoadedWithEngine = useCallback(() => {
-    engineModelLoaded(); 
+    engineModelLoaded();
     if (pendingPoiData && pendingPoiData.length > 0) {
       Px.Poi.Import(JSON.stringify(pendingPoiData));
-      
+
       Px.Poi.HideAllLine();
       Px.Poi.HideAllDisplayText();
-      
+
       clearPendingPoiData();
     } else {
       setTimeout(() => {
         const currentPoiData = usePoiStore.getState().pendingPoiData;
         if (currentPoiData && currentPoiData.length > 0) {
           Px.Poi.Import(JSON.stringify(currentPoiData));
-          
+
           Px.Poi.HideAllLine();
           Px.Poi.HideAllDisplayText();
-          
+
           usePoiStore.getState().clearPendingPoiData();
         }
       }, 2000);
     }
 
-    // Import Label3Ds if available
     if (stationData?.label3Ds && stationData.label3Ds.length > 0) {
       try {
-        // Convert Label3Ds to the format expected by Label3D.Import
         const label3DsForImport = stationData.label3Ds.map(label => ({
           id: label.id,
           displayText: label.displayText,
@@ -86,8 +86,6 @@ const ViewerPage = () => {
           rotation: label.rotation,
           scale: label.scale
         }));
-        
-        // Import the Label3Ds
         Px.Label3D.Import(JSON.stringify(label3DsForImport));
         console.log('Label3Ds imported successfully:', label3DsForImport.length);
       } catch (error) {
@@ -99,11 +97,11 @@ const ViewerPage = () => {
       Px.Path3D.Import(JSON.parse(stationData?.route));
       Px.Path3D.HideAll();
     }
-    
+
     const loadTrainModels = () => {
       return Promise.all([
         new Promise<void>((resolve) => {
-          Px.Subway.LoadTrainHead("/3d-map/assets/models/head.glb", () => { 
+          Px.Subway.LoadTrainHead("/3d-map/assets/models/head.glb", () => {
             resolve();
           });
         }),
@@ -123,10 +121,67 @@ const ViewerPage = () => {
         Px.Subway.Import(JSON.parse(stationData?.subway));
         Px.Subway.HideAll();
       }
+      setSimulationActive(true);
     });
 
     Px.Camera.ExtendView(1.0);
   }, [engineModelLoaded, stationData, pendingPoiData, clearPendingPoiData]);
+
+  useEffect(() => {
+    if (!simulationActive || !stationData) return;
+
+    const generateTrainData = (): TrainData[] => {
+      const now = new Date();
+      console.log('Generating train data at:', now.toISOString());
+      const trainData: TrainData[] = [
+        {
+          line: '1호선',
+          arrivalStationCode: parsedCode,
+          timestamp: now.toISOString(),
+          opCode: '출발',
+          messageNumber: 1,
+          arrivalStationName: '서면역',
+          trainDirection: '상행',
+          thisTrainNumber: '1001',
+          nextTrainNumber: '1002',
+        },
+      ];
+      console.log('Generated train data:', trainData);
+      return trainData;
+    };
+
+    console.log('Simulation active, starting train simulation');
+    const initialTrainData = generateTrainData();
+    console.log('Setting initial train data');
+    setTtcData(initialTrainData);
+    console.log('Showing all subway models');
+    Px.Subway.ShowAll();
+    const testInterval = 30000;
+
+    const hideTimeout = setTimeout(() => {
+      console.log('Hiding subway models after timeout');
+      Px.Subway.HideAll();
+    }, 15000);
+
+    console.log('Setting up interval for repeated train simulation');
+    const interval = setInterval(() => {
+      console.log('Interval triggered');
+      const trainData = generateTrainData();
+      setTtcData(trainData);
+      console.log('Showing subway models');
+      Px.Subway.ShowAll();
+      setTimeout(() => {
+        console.log('Hiding subway models after inner timeout');
+        Px.Subway.HideAll();
+      }, 15000);
+    }, testInterval);
+
+    return () => {
+      console.log('Cleaning up train simulation');
+      clearInterval(interval);
+      clearTimeout(hideTimeout);
+    };
+  }, [simulationActive, parsedCode, setTtcData, stationData]);
 
   useEffect(() => {
     setStationCode(parsedCode);
@@ -144,6 +199,8 @@ const ViewerPage = () => {
     const eventSource = new EventSource('/3d-map/api/sse');
 
     eventSource.addEventListener('ttc-data', (event) => {
+      if (simulationActive) return;
+
       const data = JSON.parse(event.data) as TrainData[];
       const filteredData = data.filter(d => d.arrivalStationCode === parsedCode);
       if (filteredData.length > 0) {
@@ -186,7 +243,7 @@ const ViewerPage = () => {
     return () => {
       eventSource.close();
     };
-  }, [parsedCode, setTtcData, setEventData, setShutterData, addToast]);
+  }, [parsedCode, setTtcData, setEventData, setShutterData, addToast, simulationActive]);
 
   if (error && !stationLoading) {
     return (

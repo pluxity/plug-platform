@@ -24,12 +24,16 @@ const SideMenu: React.FC = () => {
   const [devicesByCategory, setDevicesByCategory] = useState<Record<string, DeviceData[]>>({});
   
   const { 
-    activeMenu, 
+    activeMenu,
+    selectedMenus,
     menuItems, 
     isDevicePanelOpen, 
-    setActiveMenu, 
+    setActiveMenu,
+    toggleSelectedMenu,
     setMenuItems, 
-    setIsDevicePanelOpen 
+    setIsDevicePanelOpen,
+    addSelectedMenu,
+    removeSelectedMenu
   } = useSideMenuStore();
 
   const { stationCode, currentFloor } = useStationStore();
@@ -100,34 +104,65 @@ const SideMenu: React.FC = () => {
     
     if (assets.length > 0) {
       fetchCategory();
-    }  }, [stationCode, setMenuItems, assets, setPendingPoiData]);  // activeMenu가 변경될 때마다 POI 텍스트 제어
-    useEffect(() => {
-    // 모든 POI 텍스트 숨기기
+    }  }, [stationCode, setMenuItems, assets, setPendingPoiData]);
+
+  useEffect(() => {
     Px.Poi.HideAllDisplayText();
-    
-    // 활성화된 메뉴가 있고 해당 카테고리의 디바이스 데이터가 있으면 POI 텍스트 표시
-    if (activeMenu && devicesByCategory[activeMenu.id]) {
-      devicesByCategory[activeMenu.id].forEach(device => {
-        // 현재 층이 'ALL'이거나 디바이스가 현재 층에 있을 때만 텍스트 표시
-        if (currentFloor === 'ALL' || device.feature.floorId === currentFloor) {
-          Px.Poi.ShowDisplayText(device.feature.id);
+
+    if (selectedMenus.length > 0) {
+      selectedMenus.forEach(menu => {
+        if (devicesByCategory[menu.id]) {
+          devicesByCategory[menu.id].forEach(device => {
+            if (currentFloor === 'ALL' || device.feature.floorId === currentFloor) {
+              Px.Poi.ShowDisplayText(device.feature.id);
+            }
+          });
         }
       });
     }
-  }, [activeMenu, devicesByCategory, currentFloor]);
+  }, [selectedMenus, devicesByCategory, currentFloor]);
 
   const handleMenuItemClick = (id: string) => {
     const clickedMenu = menuItems.find(item => item.id === id) || null;
-    const newActive = activeMenu?.id === id ? null : clickedMenu;
-    
-    setActiveMenu(newActive);
-    setIsDevicePanelOpen(newActive !== null);
+
+    if (clickedMenu) {
+      if (!activeMenu || activeMenu.id !== id) {
+        if (!selectedMenus.some(menu => menu.id === id)) {
+          toggleSelectedMenu(clickedMenu);
+        }
+      }
+
+      const isAlreadyActive = activeMenu?.id === id;
+      if (isAlreadyActive) {
+        setActiveMenu(null);
+        setIsDevicePanelOpen(false);
+      } else {
+        setActiveMenu(clickedMenu);
+        setIsDevicePanelOpen(true);
+      }
+    }
   };
+
+  const handleSelectAll = () => {
+    menuItems.forEach(item => {
+      if (!selectedMenus.some(menu => menu.id === item.id)) {
+        addSelectedMenu(item);
+      }
+    });
+  };
+
+  const handleDeselectAll = () => {
+    selectedMenus.forEach(menu => {
+      removeSelectedMenu(menu.id);
+    });
+  };
+
+  const isAllSelected = menuItems.length > 0 && selectedMenus.length === menuItems.length;
 
   return (
     <>
       <div className="fixed left-0 top-16 bottom-0 w-16 bg-gradient-to-b from-primary-900/30 to-primary-900/20 backdrop-blur-md flex flex-col items-center pt-4 px-2 z-30 shadow-xl border-r border-primary-100/5">
-        <div className="flex-1 mt-2 space-y-3">
+        <div className="flex-1 space-y-3 custom-scrollbar">
           {menuItems
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((item) => (
@@ -136,17 +171,32 @@ const SideMenu: React.FC = () => {
                   <MenuItem
                     id={item.id}
                     icon={item.icon}
-                    isActive={activeMenu?.id === item.id}
+                    isActive={selectedMenus.some((menu) => menu.id === item.id)}
+                    isCurrentPanel={activeMenu?.id === item.id}
                     onClick={handleMenuItemClick}
                   />
                 </Tooltip.Trigger>
-                <Tooltip.Content className="bg-[#10385E] text-white backdrop-blur-md rounded-lg shadow-2xl px-4 py-2 text-sm font-medium after:bg-none after:content-none border border-primary-400/30">
+                <Tooltip.Content className="bg-primary-900/90 text-white backdrop-blur-md rounded-lg shadow-2xl px-3 py-1.5 text-xs font-medium after:bg-none after:content-none border border-primary-400/20">
                   {item.name}
                 </Tooltip.Content>
               </Tooltip>
             ))}
         </div>
+
+        <div className="mb-4 w-full space-y-2">
+          <button
+            onClick={isAllSelected ? handleDeselectAll : handleSelectAll}
+            className={`relative inline-flex w-full items-center justify-center py-1.5 rounded-lg border ${
+              isAllSelected
+                ? 'bg-primary-500/20 text-primary-400 border-primary-500/30 hover:bg-primary-500/30'
+                : 'bg-gray-700/20 text-gray-400 border-gray-600/30 hover:bg-gray-700/30'
+            } focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:ring-offset-1 focus:ring-offset-transparent transition-all duration-200`}
+          >
+            <span className="text-xs font-medium">{isAllSelected ? 'ON' : 'OFF'}</span>
+          </button>
+        </div>
       </div>
+
       {isDevicePanelOpen && activeMenu && (
         <DevicePanel
           categoryId={activeMenu.id}

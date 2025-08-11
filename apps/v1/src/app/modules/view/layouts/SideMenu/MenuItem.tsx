@@ -3,15 +3,11 @@ interface MenuItemProps {
   id: string;
   icon: React.ReactNode;
   isActive: boolean;
+  isCurrentPanel?: boolean;
   onClick: (id: string) => void;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({
-                                             id,
-                                             icon,
-                                             isActive,
-                                             onClick
-                                           }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ id, icon, isActive, isCurrentPanel, onClick }) => {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClick?.(id);
@@ -20,11 +16,15 @@ const MenuItem: React.FC<MenuItemProps> = ({
     <button
       onClick={handleClick}
       className={`
-        group flex items-center justify-center w-12 h-12 rounded-lg border transition-all duration-200 
-        ${isActive 
-          ? 'bg-gradient-to-br from-primary-500/40 to-primary-600/50 shadow-lg shadow-primary-500/30 border-2 border-primary-400/60 ring-2 ring-primary-400/20' 
-          : 'bg-primary-300/10 border-none hover:bg-primary-300/30'
-        }
+        group flex items-center justify-center w-12 h-12 rounded-lg border transition-all duration-200 cursor-pointer
+        ${isActive
+        ? 'bg-gradient-to-br from-primary-500/40 to-primary-600/50 shadow-lg shadow-primary-500/30 border-2 border-primary-400/60 ring-2 ring-primary-400/20'
+        : 'bg-primary-300/10 border-none hover:bg-primary-300/30'
+      }
+        ${isCurrentPanel
+        ? 'brightness-150'
+        : ''
+      }
       `}
     >
       <img
