@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
 
 interface ZoomControlsProps {
@@ -12,15 +12,67 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
                                                      onZoomOut,
                                                      onResetView
                                                    }) => {
-  const handleZoomIn = () => {
-    Px.Camera?.SetDragZoomButton(0.2);
-    onZoomIn?.();
-  };
+  const zoomAnimationRef = useRef<number | null>(null);
+  const zoomFactorRef = useRef<number>(0);
 
-  const handleZoomOut = () => {
-    Px.Camera?.ZoomOut(0.2);
+  const animateZoom = useCallback(() => {
+    if (zoomFactorRef.current !== 0) {
+      const container = document.querySelector('.three-d-viewer-container');
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const wheelEvent = new WheelEvent('wheel', {
+          bubbles: true,
+          cancelable: true,
+          deltaY: zoomFactorRef.current > 0 ? -10 : 10,
+          clientX: centerX,
+          clientY: centerY
+        });
+
+        container.dispatchEvent(wheelEvent);
+        zoomFactorRef.current *= 0.9;
+
+        if (Math.abs(zoomFactorRef.current) < 0.1) {
+          zoomFactorRef.current = 0;
+          zoomAnimationRef.current = null;
+        } else {
+          zoomAnimationRef.current = requestAnimationFrame(animateZoom);
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (zoomAnimationRef.current !== null) {
+        cancelAnimationFrame(zoomAnimationRef.current);
+      }
+    };
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    if (zoomAnimationRef.current !== null) {
+      cancelAnimationFrame(zoomAnimationRef.current);
+    }
+
+    zoomFactorRef.current = 1;
+    zoomAnimationRef.current = requestAnimationFrame(animateZoom);
+
+    onZoomIn?.();
+  }, [animateZoom, onZoomIn]);
+
+  const handleZoomOut = useCallback(() => {
+    if (zoomAnimationRef.current !== null) {
+      cancelAnimationFrame(zoomAnimationRef.current);
+    }
+
+    zoomFactorRef.current = -1;
+    zoomAnimationRef.current = requestAnimationFrame(animateZoom);
+
     onZoomOut?.();
-  };
+  }, [animateZoom, onZoomOut]);
 
   const handleResetView = () => {
     Px.Camera.ExtendView(1.0);
@@ -31,7 +83,7 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
     <div className="fixed right-5 bottom-5 z-10 rounded-r-md shadow-[1px_0px_4px_2px_rgba(0,76,151,0.5)] bg-primary-900/20 backdrop-blur-md flex gap-2 p-2">
       <button
         onClick={handleZoomIn}
-        className="relative rounded-md py-3 px-3 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"
+        className="relative rounded-md py-2 px-2 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"
         title="확대"
       >
         <div className="flex justify-center items-center">
@@ -43,7 +95,7 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
 
       <button
         onClick={handleZoomOut}
-        className="relative rounded-md py-3 px-3 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"
+        className="relative rounded-md py-2 px-2 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"
         title="축소"
       >
         <div className="flex justify-center items-center">
@@ -55,7 +107,7 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
 
       <button
         onClick={handleResetView}
-        className="relative rounded-md py-3 px-3 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"
+        className="relative rounded-md py-2 px-2 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"
         title="전체 보기"
       >
         <div className="flex justify-center items-center">
