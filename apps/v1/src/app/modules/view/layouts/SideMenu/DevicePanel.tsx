@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Px from '@plug/engine/src';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import useDeviceModalStore from '@plug/v1/app/stores/deviceModalStore';
@@ -24,25 +24,42 @@ interface DevicePanelProps {
   onClose: () => void;
 }
 
-const DevicePanel: React.FC<DevicePanelProps> = ({ 
-  categoryId, 
-  categoryType, 
-  categoryName, 
-  devices = [],
-  onClose 
-}) => {
+const DevicePanel: React.FC<DevicePanelProps> = ({
+                                                   categoryId,
+                                                   categoryType,
+                                                   categoryName,
+                                                   devices = [],
+                                                   onClose
+                                                 }) => {
   const { externalCode, setCurrentFloor } = useStationStore();
   const { openModal } = useDeviceModalStore();
-  
+  const [searchValue, setSearchValue] = useState('');
+  const [filteredDevices, setFilteredDevices] = useState<DeviceData[]>(devices);
+
+  useEffect(() => {
+    if (searchValue) {
+      const filtered = devices.filter((device) =>
+        device.name.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      setFilteredDevices(filtered);
+    } else {
+      setFilteredDevices(devices);
+    }
+  }, [searchValue, devices]);
+
+  useEffect(() => {
+    setSearchValue('');
+  }, [categoryId]);
+
   const handleDeviceClick = (device: DeviceData) => {
     try {
       if (device.feature.id && device.feature.floorId) {
         setCurrentFloor(device.feature.floorId);
-        
+
         Px.Model.HideAll();
         Px.Model.Show(device.feature.floorId);
         Px.Camera.MoveToPoi(device.feature.id, 1.0);
-      } 
+      }
     } catch (error) {
       console.error('이동 중 오류 발생:', error);
     }
@@ -59,7 +76,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
       if (mainPart.includes('(')) {
         mainPart = mainPart.split('(')[0].trim();
       }
-      
+
       return (
         <>
           <span className="text-lg font-semibold text-white">{mainPart}</span>
@@ -84,7 +101,9 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
           <div className="flex flex-wrap items-center">
             {renderCategoryTitle()}
             {devices.length > 0 && (
-              <span className="text-sm text-white/70 ml-2">{devices.length} 개</span>
+              <span className="text-sm text-white/70 ml-2">
+                {searchValue ? `${filteredDevices.length}/${devices.length}` : devices.length} 개
+              </span>
             )}
           </div>
           <button
@@ -134,19 +153,19 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
         )}
 
         {devices.length > 0 && (
-          <ul className="space-y-2 h-[90%] overflow-y-auto custom-scrollbar pr-1">
-            {devices.map((device) => (
-              <li
-                key={device.id}
-                className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
-                onClick={() => {
-                  openModal(device.name, device.id, categoryType, String(externalCode));
-                  handleDeviceClick(device);
-                }}
-              >
+          <>
+            <div className="mb-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full px-4 py-2 bg-primary-800/30 border border-gray-100/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  placeholder="장비 검색..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
                 <svg
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-3 text-gray-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -155,13 +174,60 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-                {device.name}
-              </li>
-            ))}
-          </ul>
+              </div>
+            </div>
+            <ul className="space-y-2 h-[85%] overflow-y-auto custom-scrollbar pr-1">
+              {filteredDevices
+                .sort((a, b) => {
+                  const aNum = /^\d/.test(a.name);
+                  const bNum = /^\d/.test(b.name);
+
+                  if (aNum && bNum) {
+                    return parseInt(a.name) - parseInt(b.name);
+                  } else if (aNum) {
+                    return -1;
+                  } else if (bNum) {
+                    return 1;
+                  } else {
+                    return a.name.localeCompare(b.name);
+                  }
+                })
+                .map((device) => (
+                  <li
+                    key={device.id}
+                    className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
+                    onClick={() => {
+                      openModal(device.name, device.id, categoryType, String(externalCode));
+                      handleDeviceClick(device);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-3 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                      />
+                    </svg>
+                    {device.name}
+                  </li>
+                ))}
+            </ul>
+            {filteredDevices.length === 0 && (
+              <p className="text-gray-400 text-center py-4">
+                검색 결과가 없습니다.
+              </p>
+            )}
+          </>
         )}
       </div>
     </>
