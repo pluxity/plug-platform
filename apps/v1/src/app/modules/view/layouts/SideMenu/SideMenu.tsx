@@ -54,8 +54,7 @@ const SideMenu: React.FC = () => {
           }));          
           
           setMenuItems(transformedMenuItems);
-
-          // 카테고리별 디바이스 데이터 저장
+          
           const categoryDevices: Record<string, DeviceData[]> = {};
           response.data.forEach(category => {
             categoryDevices[category.categoryId.toString()] = category.devices.map(device => ({
@@ -129,21 +128,23 @@ const SideMenu: React.FC = () => {
     <>
       <div className="fixed left-0 top-16 bottom-0 w-16 bg-gradient-to-b from-primary-900/30 to-primary-900/20 backdrop-blur-md flex flex-col items-center pt-4 px-2 z-30 shadow-xl border-r border-primary-100/5">
         <div className="flex-1 mt-2 space-y-3">
-          {menuItems.map((item) => (
-            <Tooltip key={item.id} position="right" trigger="hover" className="z-50 block">
-              <Tooltip.Trigger className="w-full">
-                <MenuItem
-                  id={item.id}
-                  icon={item.icon}
-                  isActive={activeMenu?.id === item.id}
-                  onClick={handleMenuItemClick}
-                />
-              </Tooltip.Trigger>
-              <Tooltip.Content className="bg-[#10385E] text-white backdrop-blur-md rounded-lg shadow-2xl px-4 py-2 text-sm font-medium after:bg-none after:content-none border border-primary-400/30">
-                {item.name}
-              </Tooltip.Content>
-            </Tooltip>
-          ))}
+          {menuItems
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((item) => (
+              <Tooltip key={item.id} position="right" trigger="hover" className="z-50 block">
+                <Tooltip.Trigger className="w-full">
+                  <MenuItem
+                    id={item.id}
+                    icon={item.icon}
+                    isActive={activeMenu?.id === item.id}
+                    onClick={handleMenuItemClick}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Content className="bg-[#10385E] text-white backdrop-blur-md rounded-lg shadow-2xl px-4 py-2 text-sm font-medium after:bg-none after:content-none border border-primary-400/30">
+                  {item.name}
+                </Tooltip.Content>
+              </Tooltip>
+            ))}
         </div>
       </div>
       {isDevicePanelOpen && activeMenu && (
@@ -151,7 +152,8 @@ const SideMenu: React.FC = () => {
           categoryId={activeMenu.id}
           categoryName={activeMenu.name}
           categoryType={activeMenu.type}
-          devices={activeMenu.devices}          onClose={() => {
+          devices={activeMenu.devices}
+          onClose={() => {
             setActiveMenu(null);
             setIsDevicePanelOpen(false);
           }}
