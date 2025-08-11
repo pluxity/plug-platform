@@ -153,7 +153,7 @@ const FeatureEditToolbar = memo<FeatureEditToolbarProps>(({
   const isEditingActive = currentMode !== 'none';
   return (
         <>
-            <div className="absolute top-16 right-4 z-10">
+            <div className="absolute top-3 right-4 z-10">
                 {/* 툴바 버튼들 */}
                 <div className={`flex flex-row gap-2 p-2 transition-all duration-300 
                                 bg-transparent`}>
