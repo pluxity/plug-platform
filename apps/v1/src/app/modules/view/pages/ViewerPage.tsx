@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useCallback } from 'react';
 import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
-import { MapViewer } from '@plug/v1/app/modules/components/map';
 import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
@@ -17,6 +16,7 @@ import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/typ
 import * as Px from '@plug/engine/src';
 import { useToastStore } from '@plug/v1/admin/components/hook/useToastStore';
 import { ToastContainer } from '@plug/v1/admin/components/toast/ToastContainer';
+import { MapViewer } from '@plug/v1/app/modules/view/map';
 
 const ViewerPage = () => {
   const { code } = useParams<{ code: string }>();

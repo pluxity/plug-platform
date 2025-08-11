@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { StationWithFeatures } from '../types/station';
-import type { FloorItem } from '@plug/v1/app/modules/components/map/types';
+import type { FloorItem } from '@plug/v1/app/modules/view/map/types';
 
 interface UseFloorDataReturn {
     floorItems: FloorItem[];

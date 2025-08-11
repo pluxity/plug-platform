@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
 import type { MapViewerProps, FloorItem } from './types';
 import FloorSelector from './FloorSelector';
+import ZoomControls from '@plug/v1/app/modules/view/map/ZoomControls';
 
 const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapViewerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -58,10 +59,9 @@ const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapVi
     
     return (
         <>
-            <FloorSelector 
-                floors={floorSelectorItems} 
-            />
-            <div className="engine absolute inset-0 z-0">
+            <FloorSelector floors={floorSelectorItems} />
+          <ZoomControls />
+          <div className="engine absolute inset-0 z-0">
                 <div
                     ref={containerRef}
                     className="three-d-viewer-container"
