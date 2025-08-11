@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -53,6 +53,12 @@ type FacilityData = {
 const FacilityEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Router state에서 데이터 추출
+  const facilityTypeFromState = location.state?.facilityType as FacilityType | null;
+  console.log(location.state);
+  
   const [facility, setFacility] = useState<FacilityData | null>(null);
   const [facilityType, setFacilityType] = useState<FacilityType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -121,7 +127,50 @@ const FacilityEdit: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // 전체 시설 목록을 가져와서 해당 ID의 시설 유형을 찾기
+        // 1. State에서 facilityType이 전달된 경우 (추천 경로)
+        if (facilityTypeFromState) {
+          console.log('Using facilityType from state:', facilityTypeFromState);
+          
+          try {
+            const response = await FacilityService.getById(facilityTypeFromState, facilityId);
+            console.log('FacilityService.getById response:', response);
+            
+            if (response.data) {
+              const facilityData = response.data as FacilityData;
+              setFacilityType(facilityTypeFromState);
+              setFacility(facilityData);
+
+              const formData = {
+                facilityType: facilityTypeFromState,
+                facility: {
+                  name: facilityData.facility?.name || '',
+                  code: facilityData.facility?.code || '',
+                  description: facilityData.facility?.description || '',
+                  thumbnailFileId: facilityData.facility?.thumbnail?.id,
+                  lon: facilityData.facility?.lon,
+                  lat: facilityData.facility?.lat,
+                  locationMeta: facilityData.facility?.locationMeta || '',
+                },
+                floors: facilityData.floors || [],
+                stationInfo: {
+                  lineIds: facilityData.stationInfo?.lineIds || [],
+                  stationCodes: facilityData.stationInfo?.stationCodes || [],
+                },
+                boundary: facilityData.boundary || '',
+              };
+              
+              reset(formData);
+              await loadDrawingHistory();
+              return; // 성공하면 여기서 함수 종료
+            } else {
+              console.log('No data in response, falling back to existing logic');
+            }
+          } catch (facilityError) {
+            console.error('Error getting facility by ID:', facilityError);
+            console.log('Falling back to existing logic due to error');
+          }
+        }
+        
         const facilitiesResponse = await facilityService.getAllFacilities();
         const facilitiesByType = facilitiesResponse.data;
         
@@ -190,7 +239,7 @@ const FacilityEdit: React.FC = () => {
     };
 
     loadFacility();
-  }, [facilityId, navigate, reset, loadDrawingHistory]);
+  }, [facilityId, facilityTypeFromState, navigate, reset, loadDrawingHistory]);
 
   const handleFloorsReplaceReady = (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => {
     setFloorsReplaceFunction(() => replaceFunction);

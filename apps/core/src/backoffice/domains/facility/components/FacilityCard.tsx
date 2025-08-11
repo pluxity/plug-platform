@@ -22,17 +22,34 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   const typeConfig = DOMAINS[displayType];
 
   const handleCardClick = () => {
+    console.log('카드 클릭:', facility.name);
     // 카드 클릭 시 상세보기 대신 편집 페이지로 이동
-    navigate(`/admin/facility/${facility.id}`);
+    navigate(`/admin/facility/${facility.id}`, {
+      state: { 
+        facilityType: displayType, 
+        facilityData: facility 
+      }
+    });
   };
 
   const handleView = () => {
-    navigate(`/admin/facility/${facility.id}`);
+    console.log('상세보기 버튼 클릭:', facility.name);
+    navigate(`/admin/facility/${facility.id}`, {
+      state: { 
+        facilityType: displayType, 
+        facilityData: facility 
+      }
+    });
   };
 
-  const handleEdit = () => {
-    console.log('편집 버튼 클릭:', facility.name);
-    // 여기에 나중에 편집 모달이나 다른 편집 방식 구현
+  const handleIndoorEdit = () => {
+    console.log('실내지도 편집 버튼 클릭:', facility.name);
+    navigate(`/admin/facility/${facility.id}/indoor`, {
+      state: { 
+        facilityType: displayType, 
+        facilityData: facility 
+      }
+    });
   };
 
   return (
@@ -73,7 +90,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 {/* 호버 시 나타나는 버튼들 */}
                 <ThumbnailHoverButtons
                   onView={handleView}
-                  onEdit={handleEdit}
+                  onIndoorEdit={handleIndoorEdit}
                   onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
                   facilityName={facility.name}
                 />
@@ -87,7 +104,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 {/* 호버 시 나타나는 버튼들 */}
                 <ThumbnailHoverButtons
                   onView={handleView}
-                  onEdit={handleEdit}
+                  onIndoorEdit={handleIndoorEdit}
                   onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
                   facilityName={facility.name}
                 />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2, Eye } from 'lucide-react';
+import { Edit2, Trash2, Eye, Map } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +15,7 @@ import {
 interface ThumbnailHoverButtonsProps {
   onView?: () => void;
   onEdit?: () => void;
+  onIndoorEdit?: () => void;
   onDelete?: () => void;
   facilityName?: string;
 }
@@ -22,6 +23,7 @@ interface ThumbnailHoverButtonsProps {
 const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
   onView,
   onEdit,
+  onIndoorEdit,
   onDelete,
   facilityName = '시설'
 }) => {
@@ -50,6 +52,18 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
           title="편집"
         >
           <Edit2 size={16} className="text-blue-600" />
+        </button>
+      )}
+      {onIndoorEdit && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onIndoorEdit();
+          }}
+          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          title="실내지도 편집"
+        >
+          <Map size={16} className="text-purple-600" />
         </button>
       )}
       {onDelete && (

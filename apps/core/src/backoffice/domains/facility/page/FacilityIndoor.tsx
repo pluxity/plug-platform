@@ -1,0 +1,177 @@
+import React, { useEffect, useState } from "react"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { PageContainer } from '@/backoffice/common/view/layouts'
+import { FacilityService, FacilityType } from '@plug/common-services'
+import { IndoorMapViewer } from '@/global/components'
+import { Button } from "@plug/ui"
+import { ArrowLeft } from "lucide-react"
+
+type FacilityData = {
+  facility?: {
+    id: number
+    name: string
+    code: string
+    description?: string
+  }
+  floors?: Array<{name: string; floorId: string}>
+  stationInfo?: {lineIds?: number[]; stationCodes?: string[]}
+  boundary?: string
+}
+
+const FacilityIndoor: React.FC = () => {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const location = useLocation()
+  
+  // Router state에서 데이터 추출
+  const facilityTypeFromState = location.state?.facilityType as FacilityType | null
+  
+  const facilityId = id ? parseInt(id, 10) : null
+  const [facilityData, setFacilityData] = useState<FacilityData | null>(null)
+  const [facilityType, setFacilityType] = useState<FacilityType | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (!facilityId) {
+      navigate('/admin/facility')
+      return
+    }
+
+    const loadFacility = async () => {
+      try {
+        setIsLoading(true)
+        
+        // 1. State에서 facilityType이 전달된 경우 (추천 경로)
+        if (facilityTypeFromState) {
+          console.log('Using facilityType from state:', facilityTypeFromState)
+          
+          const response = await FacilityService.getById(facilityTypeFromState, facilityId)
+          if (response.data) {
+            setFacilityType(facilityTypeFromState)
+            setFacilityData(response.data)
+
+            // drawing 정보에서 3D 도면 존재 여부 확인
+            const hasDrawing = response.data.facility?.drawing?.url ? true : false
+            setHas3DDrawing(hasDrawing)
+            
+            return
+          }
+        }
+        
+        navigate('/admin/facility')
+        
+      } catch (error) {
+        console.error('Failed to load facility:', error)
+        navigate('/admin/facility')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadFacility()
+  }, [facilityId, facilityTypeFromState, navigate])
+
+  if (isLoading) {
+    return (
+      <PageContainer title="실내지도 편집">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">시설 정보를 불러오는 중...</p>
+          </div>
+        </div>
+      </PageContainer>
+    )
+  }
+
+  const handleGoBack = () => {
+    navigate('/admin/facility')
+  }
+
+  return (
+    <PageContainer title={`실내지도 편집 - ${facilityData?.facility?.name || id}`}>
+      <div className="flex flex-col h-full">
+        {/* 뒤로가기 버튼 */}
+        <div className="flex items-center gap-3 mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleGoBack}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            <ArrowLeft size={18} />
+            목록으로
+          </Button>
+        </div>        
+        {/* 실내지도 편집기 */}
+        <div className="bg-white flex-1 border rounded-lg overflow-hidden">          
+          {/* 3D 도면 확인 중 */}
+          {has3DDrawing === null && (
+            <div className="h-full flex items-center justify-center bg-gray-100">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">3D 도면을 확인하는 중...</p>
+              </div>
+            </div>
+          )}
+          
+          {/* 3D 도면이 없는 경우 */}
+          {has3DDrawing === false && (
+            <div className="h-full flex items-center justify-center bg-gray-100">
+              <div className="text-center">
+                <div className="mb-6">
+                  <svg 
+                    className="w-16 h-16 mx-auto mb-4 text-yellow-500" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z" 
+                    />
+                  </svg>
+                  <h3 className="text-xl font-bold mb-2 text-gray-700">3D 도면이 없습니다</h3>
+                  <p className="text-gray-600 mb-6">
+                    실내지도를 편집하려면 먼저 3D 도면을 업로드해주세요.
+                  </p>
+                  <Button
+                    onClick={() => navigate(`/admin/facility/edit/${facilityId}`, {
+                      state: { facilityType }
+                    })}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    시설 편집에서 도면 업로드하기
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* 3D 도면이 있는 경우 - IndoorMapViewer 표시 */}
+          {has3DDrawing === true && facilityType && (
+            <div className="h-168 relative">
+              <IndoorMapViewer 
+                facilityId={facilityId!}
+                facilityType={facilityType}
+                showFloorControl={true}
+                floorControlPosition="bottom-right"
+                className="w-full h-full"
+              />
+              
+              {/* 편집 모드 표시 */}
+              <div className="absolute top-4 left-4 z-30 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-medium">
+                편집 모드
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </PageContainer>
+  )
+}
+
+export default FacilityIndoor
