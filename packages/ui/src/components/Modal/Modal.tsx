@@ -12,10 +12,12 @@ const Modal = React.memo(({
                               width = '500px',
                               height = 'auto',
                               closable = true,
+                              closeOnOverlayClick = true,
                               contentClassName,
                               headerClassName,
-  titleClassName, showCloseButton,
-bodyClassName,
+                              titleClassName,
+                              showCloseButton,
+                              bodyClassName,
                               footerClassName,
                               ref,
                               ...props
@@ -24,7 +26,7 @@ bodyClassName,
         <Dialog
             {...props}
             ref={ref}
-            closeOnOverlayClick={false}
+            closeOnOverlayClick={closeOnOverlayClick}
             contentClassName={cn(
                 'max-h-[100vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden',
                 contentClassName

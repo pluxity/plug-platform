@@ -240,7 +240,9 @@ const CctvStream: React.FC<CctvStreamProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-xs text-primary-400">{cctv.cctvId}</span>
             <div className="flex items-center gap-1 text-xs text-primary-400">
-              <div className={`w-1.5 h-1.5 rounded-full ${hasError ? 'bg-red-500' : isLoading ? 'bg-yellow-500' : 'bg-green-500'}`} />
+              <div
+                className={`w-1.5 h-1.5 rounded-full ${hasError ? 'bg-red-500' : isLoading ? 'bg-yellow-500' : 'bg-green-500'}`}
+              />
               {hasError ? '연결 실패' : isLoading ? '연결 중' : '연결됨'}
             </div>
           </div>
@@ -261,14 +263,29 @@ const CctvStream: React.FC<CctvStreamProps> = ({
           {hasError && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
               <div className="flex flex-col items-center gap-3 text-center">
-                <svg className="w-12 h-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-12 h-12 text-red-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <div>
                   <p className="text-red-400 font-medium">{getErrorMessage()}</p>
-                  <p className="text-gray-400 text-sm">{errorMessage || 'CCTV 스트림을 확인해주세요'}</p>
+                  <p className="text-gray-400 text-sm mb-2">
+                    {errorMessage
+                      ? '관리자에게 문의해주시기 바랍니다.'
+                      : 'CCTV 스트림을 확인해주세요'}
+                  </p>
+                  <p className="text-gray-500 text-xs">에러 원인: {errorMessage}</p>
                   {autoReconnect && reconnectCount > 0 && reconnectCount < reconnectAttempts && (
-                    <p className="text-yellow-400 text-xs mt-1">
+                    <p className="text-yellow-400 text-xs mt-2">
                       자동 재연결 시도 중... ({reconnectCount}/{reconnectAttempts})
                     </p>
                   )}
@@ -293,7 +310,7 @@ const CctvStream: React.FC<CctvStreamProps> = ({
             onLoadedData={() => setIsLoading(false)}
             onError={(e) => {
               const mediaError = new Error(
-                `비디오 요소 오류: ${e.currentTarget.error?.message || '알 수 없는 미디어 오류'}`
+                `비디오 요소 오류: ${e.currentTarget.error?.message || '알 수 없는 미디어 오류'}`,
               ) as StreamError;
               handleError(mediaError, StreamErrorType.MEDIA_ERROR);
             }}
@@ -308,7 +325,12 @@ const CctvStream: React.FC<CctvStreamProps> = ({
               title="다시 연결"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
               </svg>
             </button>
             <button
@@ -317,7 +339,12 @@ const CctvStream: React.FC<CctvStreamProps> = ({
               title="전체화면"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                />
               </svg>
             </button>
           </div>

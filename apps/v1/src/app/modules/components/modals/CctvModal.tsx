@@ -77,7 +77,6 @@ export const CctvModal: React.FC<CctvModalProps> = ({
   const theme = getDeviceTheme(deviceType);
   const DeviceIcon = () => getDeviceIcon(deviceType);
 
-  // CCTV 개수에 따른 그리드 레이아웃 결정
   const getGridLayout = () => {
     const count = cctvList.length;
     if (count <= 2) return 'grid-cols-1 lg:grid-cols-2';
