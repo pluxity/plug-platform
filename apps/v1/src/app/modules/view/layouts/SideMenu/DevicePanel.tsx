@@ -65,6 +65,11 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
         Px.Model.HideAll();
         Px.Model.Show(device.feature.floorId);
         Px.Camera.MoveToPoi(device.feature.id, 1.0);
+        const evt = {
+          type: 'onPoiSelect',
+          target: { id: device.feature.id }
+        };
+        Px.EventDispatcher.InternalHandler.dispatchEvent(evt);
       }
     } catch (error) {
       console.error('이동 중 오류 발생:', error);

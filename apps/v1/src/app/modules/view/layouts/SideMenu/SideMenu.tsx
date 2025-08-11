@@ -192,7 +192,7 @@ const SideMenu: React.FC = () => {
                 : 'bg-gray-700/20 text-gray-400 border-gray-600/30 hover:bg-gray-700/30'
             } focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:ring-offset-1 focus:ring-offset-transparent transition-all duration-200`}
           >
-            <span className="text-xs font-medium">{isAllSelected ? 'ON' : 'OFF'}</span>
+            <span className="text-xs font-medium">{isAllSelected ? 'OFF' : 'ON'}</span>
           </button>
         </div>
       </div>
