@@ -20,6 +20,7 @@ export interface AssetRegistProps {
 export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAssetId}: AssetRegistProps) => {
     const {addToast} = useToastStore();
     const [name, setName] = useState('');
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     // 3d 모델 파일 상태 관리
     const [modelFile, setModelFile] = useState<File | null>(null);
@@ -86,7 +87,9 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             .finally(() => {
                 setIsUploading(false);
             });
-    }, [uploadFile, name, addToast]);    // Thumbnail 파일 선택 핸들러
+    }, [uploadFile, name, addToast]);    
+
+    // Thumbnail 파일 선택 핸들러
     const handleThumbnailChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -127,7 +130,15 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             .finally(() => {
                 setIsUploading(false);
             });
-    }, [uploadFile, addToast]);
+
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+        const newPreviewUrl = URL.createObjectURL(file);
+        // 썸네일 미리보기 URL 설정
+        setPreviewUrl(newPreviewUrl);
+
+    }, [uploadFile, addToast, previewUrl]);
 
 
     useEffect(() => {
@@ -144,6 +155,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
         setThumbnailFile(null);
         setUploadedModelId(null);
         setUploadThumbnailId(null);
+        setPreviewUrl(null);
         onClose();
     }, [onClose]);
 
@@ -277,7 +289,26 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                 </FormItem>
 
                 <FormItem name="assetRegistThumbnail" label='Thumbnail 파일' required>
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-4">                        <input
+                    <div className="flex items-center gap-2 border-2 border-dashed border-gray-300 rounded-md p-4">                        
+                        <div className="w-15 h-15 rounded-sm overflow-hidden border border-gray-200 shrink-0">
+                            {previewUrl ? (
+                                <img 
+                                    src={previewUrl} 
+                                    alt="선택된 썸네일 파일" 
+                                    className="w-full h-full"
+                                />
+                            ) : (detailAssetData?.thumbnailFile?.url && mode === 'edit' ? (
+                                    <img 
+                                        src={detailAssetData.thumbnailFile.url}
+                                        alt="썸네일 파일" 
+                                        className="w-full h-full"
+                                    />
+                                ) : (
+                                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-xs text-gray-500 text-center">No Image</div>
+                                )
+                            )}
+                        </div>
+                        <input
                             type="file"
                             id="thumbnail-file"
                             className="hidden"
@@ -285,7 +316,8 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                             accept="image/*"
                         />
 
-                        {!thumbnailFile ? (                            <div className="flex items-center">
+                        {!thumbnailFile ? (                            
+                            <div className="flex items-center flex-1">
                                 {mode === 'edit' && detailAssetData
                                     ? <p className="flex-1 text-sm">{detailAssetData.thumbnailFile.originalFileName}</p>
                                     : <p className="flex-1 text-sm text-gray-500">이미지 파일만 가능합니다. (JPEG, JPG, PNG, WebP, GIF 등)</p>
@@ -301,9 +333,9 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                             </div>
                         ) : (
                             <div className="flex items-center justify-between w-full">
-                <span className="text-sm truncate max-w-xs">
-                  {thumbnailFile.name} ({Math.round(thumbnailFile.size / 1024)} KB)
-                </span>
+                                <span className="text-sm truncate max-w-xs">
+                                {thumbnailFile.name} ({Math.round(thumbnailFile.size / 1024)} KB)
+                                </span>
 
                                 {isUploading ? (
                                     <div
