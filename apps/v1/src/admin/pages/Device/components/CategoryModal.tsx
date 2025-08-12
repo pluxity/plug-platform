@@ -22,6 +22,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
     const [name, setName] = useState<string>('');
     const [contextPath, setContextPath] = useState<string>('');
     const [iconFile, setIconFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [uploadIconFileId, setUploadIconFileId] = useState<number | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const {execute: uploadFile, isLoading: isFileUploading, error: fileError} = useFileUpload();
@@ -35,6 +36,8 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
 
   useEffect(() => {
     if (mode === 'edit' && detailCategoryData && isOpen) {
+      console.log('detailCategoryData:', detailCategoryData);
+      console.log('iconFile URL:', detailCategoryData?.iconFile?.url);
       setName(detailCategoryData.name);
       setContextPath(detailCategoryData.contextPath);
     }
@@ -53,7 +56,13 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             return;
         }
 
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+        const newPreviewUrl = URL.createObjectURL(file);
+
         setIconFile(file);
+        setPreviewUrl(newPreviewUrl);
         setIsUploading(true);
 
         const formData = createFileFormData(file, file.type);
@@ -77,7 +86,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             .finally(() => {
                 setIsUploading(false);
             });
-    }, [uploadFile, addToast]);
+    }, [uploadFile, addToast, previewUrl]);
 
     const handleFinish = useCallback(async (values: Record<string, string>) => {
         if (mode === 'edit' && detailCategoryData) {
@@ -150,10 +159,12 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
         setContextPath('');
         setIconFile(null);
         setUploadIconFileId(null);
-      if (selectedCategoryId) {
-        mutate();
-      }
-      onClose();
+        setPreviewUrl(null);
+        
+        if (selectedCategoryId) {
+            mutate();
+        }
+        onClose();
     };
 
     const isProcessing = isCreating || isFileUploading || isCategoryUpdating;
@@ -201,12 +212,29 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                     <Input.Text
                         placeholder="컨텍스트 패스를 입력하세요"
                         value={contextPath}
-                        onChange={value => setName(value)}
+                        onChange={value => setContextPath(value)}
                     />
                 </FormItem>
 
                 <FormItem name="iconFile" label="분류 아이콘 파일" required>
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+                    <div className="flex items-center gap-2 border-2 border-dashed border-gray-300 rounded-md p-4">
+                        <div className="w-15 h-15 rounded-sm overflow-hidden border border-gray-200 shrink-0">
+                            {previewUrl ? (
+                                <img 
+                                    src={previewUrl} 
+                                    alt="선택된 파일" 
+                                    className="w-full h-full"
+                                />
+                            ) : (detailCategoryData?.iconFile?.url && mode === 'edit') ? (
+                                <img 
+                                    src={detailCategoryData.iconFile.url} 
+                                    alt="썸네일 파일" 
+                                    className="w-full h-full"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-xs text-gray-500 text-center">No Image</div>
+                            )}
+                        </div>
                         <input
                             type="file"
                             id="icon-file"
@@ -216,7 +244,7 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
                         />
 
                         {!iconFile ? (
-                            <div className="flex items-center">
+                            <div className="flex items-center flex-1">
                                 {mode === 'edit' && detailCategoryData
                                     ? <p className="flex-1 text-sm">{detailCategoryData.iconFile?.originalFileName}</p>
                                     : <p className="flex-1 text-sm text-gray-500">IMAGE 파일 업로드</p>

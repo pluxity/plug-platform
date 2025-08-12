@@ -22,8 +22,14 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
 
   // poi가 변경될 때마다 selectedDeviceId 업데이트
   useEffect(() => {
-    setSelectedDeviceId(poi?.property?.code || '');
-  }, [poi]);  const handleSubmit = useCallback(async () => {
+    if (poi?.property?.deviceId) {
+      setSelectedDeviceId(poi.property.deviceId);
+    } else {
+      setSelectedDeviceId('');
+    }
+  }, [poi]);
+
+  const handleSubmit = useCallback(async () => {
     if (!poi) return;
     
     try {
@@ -44,6 +50,13 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
       // 선택된 장비 정보 찾기
       const selectedDevice = devices?.find(device => device.id === deviceId);
       const displayText = selectedDevice?.id || deviceId;
+      
+      // POI 속성 업데이트
+      if (poi.property) {
+        poi.property.deviceId = deviceId;
+      } else {
+        poi.property = { deviceId: deviceId };
+      }
       
       Px.Poi.SetDisplayText(poi.id, displayText);
       onSuccess?.();
@@ -69,13 +82,14 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
   return (
     <Modal
       isOpen={isOpen}
+      showCloseButton={true}
       onClose={onClose}
       title={poi.displayText || 'Feature'}
       contentClassName={'h-full max-h-100 overflow-y-hidden'}
     >      
     <Form
         initialValues={{
-          deviceId: poi.property?.code || ''
+          deviceId: poi.property?.deviceId || ''
         }}
         onSubmit={handleSubmit}
         className={'flex flex-col justify-between h-full'}
@@ -89,7 +103,16 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
                 setSelectedDeviceId(deviceId || '');
               }}
             >
-              <Select.Trigger />
+              <Select.Trigger 
+                placeholder={
+                  (() => {
+                    const currentDevice = devices?.find(device => device.id === selectedDeviceId);
+                    return currentDevice 
+                      ? `현재: ${currentDevice.name} (${currentDevice.id})` 
+                      : selectedDeviceId ? `${selectedDeviceId}` : "장비를 선택하세요";
+                  })()
+                } 
+              />
               <Select.Content>
                 {devices?.map((device) => (
                   <Select.Item key={device.id} value={device.id}>
