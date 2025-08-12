@@ -7,6 +7,7 @@ import type { ModelInfo, PoiImportOption } from "@plug/engine/src/interfaces";
 import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
 import { PoiEditModal, ErrorBoundary, TextLabelModal } from "./components";
 import { useStation, useEditMode, useEngineIntegration, useFeatureApi } from "./hooks";
+
 import type { UseEditModeResult } from "./hooks/useEditMode";
 import type { StationWithFeatures, FeatureResponse } from "./types/station";
 
@@ -165,6 +166,7 @@ const ViewerContent = memo(({
   selectedPoi: PoiImportOption | null;
   isModalOpen: boolean;
   onModalClose: () => void;
+  onPoiSuccess: (deviceId: string) => void;
   navigate: (value: number) => void;
 }) => {
   const modelPath = stationData?.facility?.drawing?.url || '';
@@ -216,6 +218,7 @@ const ViewerContent = memo(({
         poi={selectedPoi}
         isOpen={isModalOpen}
         onClose={onModalClose}
+   
       />
     </>
   );
@@ -301,6 +304,23 @@ const ViewerPage = memo(() => {
   const handleFloorChangeUI = useCallback((floorId: string) => {
     setSelectedFloor(floorId);
   }, []);
+
+  // POI 성공 시 즉시 상태 업데이트 함수
+  const handlePoiSuccess = useCallback((deviceId: string) => {
+    if (selectedPoi) {
+      // ✅ 즉시 selectedPoi 상태 업데이트
+      setSelectedPoi(prev => prev ? {
+        ...prev,
+        property: {
+          ...prev.property,
+          deviceId: deviceId
+        }
+      } : null);
+    }
+    
+    // 모달 닫기
+    handleModalClose();
+  }, [selectedPoi, handleModalClose]);
 
   const handlePoiDelete = useCallback((poi: PoiImportOption) => {
     setConfirmModal({
@@ -425,6 +445,7 @@ const ViewerPage = memo(() => {
         selectedPoi={selectedPoi}
         isModalOpen={isModalOpen}
         onModalClose={handleModalClose}
+        onPoiSuccess={handlePoiSuccess}
         navigate={navigate}
       />
       
