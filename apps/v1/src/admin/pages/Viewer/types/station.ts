@@ -23,6 +23,7 @@ export interface FeatureResponse {
   id: string;
   assetId: number;
   deviceId: string | null;
+  deviceName?: string;
   floorId: string;
   position: Vector3;
   rotation: Vector3;

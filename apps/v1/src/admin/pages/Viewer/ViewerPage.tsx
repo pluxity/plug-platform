@@ -1,6 +1,6 @@
 import { useState, useCallback, memo, Suspense, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Select, ConfirmModal } from "@plug/ui";
+import { Select, ConfirmModal, PrevIcon, Button, AccordionIcon } from "@plug/ui";
 import { useStationStore } from './store/stationStore';
 import type { ModelInfo, PoiImportOption } from "@plug/engine/src/interfaces";
 
@@ -8,12 +8,13 @@ import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
 import { PoiEditModal, ErrorBoundary, TextLabelModal } from "./components";
 import { useStation, useEditMode, useEngineIntegration, useFeatureApi } from "./hooks";
 import type { UseEditModeResult } from "./hooks/useEditMode";
-import type { StationWithFeatures } from "./types/station";
+import type { StationWithFeatures, FeatureResponse } from "./types/station";
 
 import { Poi, Label3D } from '@plug/engine/src';
 import { v4 as uuidv4 } from 'uuid';
 import { label3dService } from "@plug/common-services";
 import type { Label3DCreateRequest } from "@plug/common-services";
+import { Camera } from '@plug/engine/src';
 
 // Loading and Error components with better UX
 const LoadingSpinner = memo(() => (
@@ -46,47 +47,99 @@ const FloorSelector = memo(({
   };
 
   return (
-    <Select 
-      className="text-sm text-gray-300 ml-2 w-64" 
-      selected={selectedFloor ? [selectedFloor] : []}
-      onChange={handleFloorSelect}
-    >
-      <Select.Trigger />
-      <Select.Content>
-        {hierarchies
-          .sort((a, b) => Number(b.floorId) - Number(a.floorId))
-          .map(floor => (
-            <Select.Item key={floor.floorId} value={floor.floorId}>
-              {floor.displayName}
-            </Select.Item>
-          ))
+    <div className="flex items-center justify-between px-2 pt-4">
+      <Select 
+        className="text-sm text-gray-300 ml-2 w-64" 
+        selected={selectedFloor ? [selectedFloor] : []}
+        onChange={handleFloorSelect}
+      >
+        <div className="relative">
+          <Select.Trigger />
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none w-4 h-4">
+            <AccordionIcon />
+          </div>
+        </div>
+        <Select.Content>
+          {hierarchies
+            .sort((a, b) => Number(b.floorId) - Number(a.floorId))
+            .map(floor => (
+              <Select.Item key={floor.floorId} value={floor.floorId}>
+                {floor.displayName}
+              </Select.Item>
+            ))
+          }
+        </Select.Content>
+      </Select>
+    </div>
+  );
+});
+
+// Feature SearchFeature
+const SearchFeature = memo(({ features }: { features: FeatureResponse[] }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const term = searchTerm.trim();
+      if (!term) {
+        return;
+      }
+
+      const foundFeature = features.find(feature => 
+        feature.id.toLowerCase().includes(term.toLowerCase()) ||
+        (feature.deviceId && feature.deviceId.toLowerCase().includes(term.toLowerCase())) ||
+        (feature.deviceName && feature.deviceName.toLowerCase().includes(term.toLowerCase()))
+      );
+
+      if (foundFeature) {
+        try {
+          Camera.MoveToPoi(foundFeature.id, 1.5);
+        } catch (error) {
+          console.error('카메라 이동 중 오류:', error);
         }
-      </Select.Content>
-    </Select>
+      } 
+    }
+  }, [searchTerm, features]);
+
+  return (
+    <div className="flex items-center justify-between px-2 pt-4">
+      <div className="w-60">
+        <input 
+          type="text" 
+          placeholder="장비를 입력해주세요." 
+          className="bg-white h-10 w-full py-1 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-sm text-sm"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+    </div>
   );
 });
 
 // Main header component
 const ViewerHeader = memo(({ 
-  stationName, 
   hierarchies, 
   selectedFloor, 
-  onFloorChange
+  onFloorChange,
+  features
 }: {
-  stationName: string;
   hierarchies: ModelInfo[] | null;
   selectedFloor: string | null;
   onFloorChange: (floorId: string) => void;
+  features: FeatureResponse[];
 }) => (
-  <div className="flex absolute text-white pl-4 pt-2 items-center z-10 space-x-4">
-    <h2 className="text-xl font-bold">{stationName}</h2>
-    {hierarchies && (
-      <FloorSelector 
-        hierarchies={hierarchies}
-        selectedFloor={selectedFloor}
-        onFloorChange={onFloorChange}
-      />
-    )}
+  <div className="flex absolute pl-4 pt-2 items-center z-10 space-x-4">
+    <div className="flex items-center justify-center">
+      {hierarchies && (
+        <FloorSelector 
+          hierarchies={hierarchies}
+          selectedFloor={selectedFloor}
+          onFloorChange={onFloorChange}
+        />
+      )}
+      <SearchFeature features={features} />
+    </div>
   </div>
 ));
 
@@ -100,7 +153,8 @@ const ViewerContent = memo(({
   editMode,
   selectedPoi,
   isModalOpen,
-  onModalClose
+  onModalClose,
+  navigate
 }: {
   stationData: StationWithFeatures;
   hierarchies: ModelInfo[] | null;
@@ -111,21 +165,37 @@ const ViewerContent = memo(({
   selectedPoi: PoiImportOption | null;
   isModalOpen: boolean;
   onModalClose: () => void;
+  navigate: (value: number) => void;
 }) => {
   const modelPath = stationData?.facility?.drawing?.url || '';
 
   return (
     <>
       <aside className="bg-white w-1/4 overflow-y-auto shrink-0">
+        <div className="flex items-center justify-between px-4 pt-4">
+          <div className="flex items-center space-x-3">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="ghost"
+              size="icon"
+              className="flex items-center justify-center w-9 h-9"
+              aria-label="뒤로가기"
+            >
+                <PrevIcon />
+            </Button>
+            <h2 className="text-xl font-bold">{stationData?.facility?.name}</h2>
+          </div>
+        </div>
         <AssetList />
       </aside>
       <main className="w-full">
         <ViewerHeader
-          stationName={stationData?.facility?.name || ''}
           hierarchies={hierarchies}
           selectedFloor={selectedFloor}
           onFloorChange={onFloorChange}
-        />        <Suspense fallback={<LoadingSpinner />}>
+          features={stationData.features} 
+        />        
+        <Suspense fallback={<LoadingSpinner />}>
           <MapViewer 
             modelPath={modelPath}
             onModelLoaded={onModelLoaded}
@@ -355,6 +425,7 @@ const ViewerPage = memo(() => {
         selectedPoi={selectedPoi}
         isModalOpen={isModalOpen}
         onModalClose={handleModalClose}
+        navigate={navigate}
       />
       
       {/* 플로팅 버튼 - 3D 텍스트 추가 */}

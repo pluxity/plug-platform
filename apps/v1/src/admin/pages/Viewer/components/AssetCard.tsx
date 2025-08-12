@@ -67,7 +67,7 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
             <Card.Content className="p-2">
                 <div 
                     key={asset.id} 
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative"
                 >
                     {asset.thumbnailFile ? (
                         <div className="thumbnail-container h-48 overflow-hidden bg-gray-100">
@@ -85,12 +85,12 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
                             <span className="text-gray-500">썸네일 없음</span>
                         </div>
                     )}
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-secondary-400 text-white text-xs font-medium rounded-full shadow-sm"> 
+                        {asset.name}
+                    </div>
                 </div>
             </Card.Content>
-            <Card.Footer className="justify-center p-2 pt-0">
-                {/* <p className="text-sm text-gray-500 mt-1 truncate">{asset.categoryName || 'No Category'}</p> */}
-                <h3 className="font-medium text-gray-800 truncate text-center">{asset.name}</h3>
-            </Card.Footer>
+            
         </Card>
     );
 } 
