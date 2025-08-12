@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { IndoorMapViewer } from '@/global/components';
-import { FacilityType } from '@plug/common-services';
+import { FloorControl } from '@/global/components/indoor-map/FloorControl';
+import { FacilityType, FacilityService, FeatureResponse, DomainResponse } from '@plug/common-services';
+import { useFacilityStore } from '@/app/store/facilityStore';
+import { useAssets } from '@/global/store/assetStore';
+import { api } from '@plug/api-hooks/core';
+import { Poi } from '@plug/engine/src';
+import { convertFloors } from '@/global/utils/floorUtils';
+import type { Floor } from '@/global/types';
 
 interface IndoorMapProps {
   facilityId: number;
@@ -11,44 +18,197 @@ interface IndoorMapProps {
 const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdoorButtonClick }) => {
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null);
   const [countdown, setCountdown] = useState(3);
+  const [facilityData, setFacilityData] = useState<DomainResponse<typeof facilityType> | null>(null);
+  const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [floors, setFloors] = useState<Floor[]>([]);
+  
+  const { isLoading, facilitiesFetched } = useFacilityStore();
+  const { assets } = useAssets();
 
+  // Features 로드를 위한 함수
+  const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
+    try {
+      const response = await api.get<FeatureResponse[]>(`features?facilityId=${facilityId}`, { requireAuth: true });
+      return response.data || [];
+    } catch (error) {
+      console.error('Failed to load features:', error);
+      return [];
+    }
+  }, []);
+
+  // Asset을 ID로 찾는 함수 (assetStore 사용)
+  const getAssetById = useCallback((id: number) => {
+    return assets.find(asset => asset.id === id);
+  }, [assets]);
+
+  // 시설 데이터 로드
   useEffect(() => {
-    // TODO: 여기서 실제로 해당 시설에 3D 도면이 있는지 확인하는 로직 추가
-    // 임시로 랜덤하게 설정 (실제로는 API 호출 또는 데이터 확인)
-    const checkDrawing = async () => {
-      // 예시: 시설 ID가 짝수이면 3D 도면이 있다고 가정
-      const hasDrawing = facilityId % 2 === 0;
-      setHas3DDrawing(hasDrawing);
-      
-      // 3D 도면이 없으면 카운트다운 시작
-      if (!hasDrawing) {
-        const timer = setInterval(() => {
-          setCountdown((prev) => {
-            if (prev <= 1) {
-              clearInterval(timer);
-              if (onOutdoorButtonClick) {
-                onOutdoorButtonClick();
-              }
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
+    const loadFacilityData = async () => {
+      try {
+        setIsDataLoading(true);
+        const response = await FacilityService.getById(facilityType, facilityId);
+        setFacilityData(response.data);
         
+        // 3D 도면 존재 여부 확인
+        const hasDrawing = !!(response.data?.facility?.drawing?.url && response.data.facility.drawing.url.trim() !== '');
+        setHas3DDrawing(hasDrawing);
+        
+        // 층 정보 변환
+        if (response.data && 'floors' in response.data && response.data.floors) {
+          const convertedFloors = convertFloors(response.data.floors);
+          setFloors(convertedFloors);
+        }
+        
+        // 3D 도면이 없으면 카운트다운 시작
+        if (!hasDrawing) {
+          const timer = setInterval(() => {
+            setCountdown((prev) => {
+              if (prev <= 1) {
+                clearInterval(timer);
+                if (onOutdoorButtonClick) {
+                  onOutdoorButtonClick();
+                }
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+          
         return () => clearInterval(timer);
       }
-    };
-    
-    checkDrawing();
-  }, [facilityId, onOutdoorButtonClick]);
+    } catch (error) {
+      console.error('Failed to load facility data:', error);
+      setHas3DDrawing(false);
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
 
-  // 3D 도면 확인 중인 경우
-  if (has3DDrawing === null) {
+  loadFacilityData();
+}, [facilityType, facilityId, onOutdoorButtonClick]);  // Features 로드
+  useEffect(() => {
+    const loadFeatures = async () => {
+      if (!facilityId) return;
+      
+      try {
+        const features = await loadFeaturesByFacility(facilityId);
+        setFeaturesData(features);
+      } catch (error) {
+        console.error('Failed to load features for facility:', facilityId, error);
+        setFeaturesData([]);
+      }
+    };
+
+    loadFeatures();
+  }, [facilityId, loadFeaturesByFacility]);
+
+  // 엔진이 준비되면 POI 생성
+  const handleLoadComplete = useCallback(() => {
+    if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) {
+      return;
+    }
+
+    const createPOIsFromFeatures = async () => {
+      try {
+        Poi.Clear();
+
+        let createdCount = 0;
+        let skippedCount = 0;
+
+        for (const feature of featuresData) {
+          if (!feature.assetId || !feature.position) {
+            console.warn('Feature missing assetId or position:', feature);
+            skippedCount++;
+            continue;
+          }
+
+          const asset = getAssetById(feature.assetId);
+          if (!asset || !asset.file?.url) {
+            console.warn('Asset not found or no file URL:', feature.assetId);
+            skippedCount++;
+            continue;
+          }
+
+          // 아이콘 URL 결정 로직
+          let iconUrl = '';
+          if (asset.thumbnailFile?.url) {
+            // 썸네일이 있으면 썸네일을 아이콘으로 사용
+            iconUrl = asset.thumbnailFile.url;
+          } else if (asset.file?.url.toLowerCase().includes('.png') || asset.file?.url.toLowerCase().includes('.jpg') || asset.file?.url.toLowerCase().includes('.jpeg')) {
+            // 메인 파일이 이미지면 아이콘으로 사용
+            iconUrl = asset.file.url;
+          } else {
+            // 기본 POI 아이콘 사용 (실제 경로는 프로젝트에 맞게 수정)
+            iconUrl = 'SamplePoiIcon.png';
+          }
+
+          // POI 생성 옵션 구성
+          const poiCreateOption = {
+            id: feature.id,
+            iconUrl: iconUrl,
+            modelUrl: asset.file?.url || '', // 메인 파일을 모델로 사용
+            displayText: asset.name || feature.id,
+            property: {
+              assetId: asset.id,
+              assetName: asset.name,
+              assetCode: asset.code,
+              facilityId: facilityId,
+              floorId: feature.floorId,
+              featureId: feature.id,
+              categoryId: asset.categoryId,
+              categoryName: asset.categoryName,
+              position: {
+                x: feature.position.x,
+                y: feature.position.y,
+                z: feature.position.z
+              },
+              rotation: feature.rotation ? {
+                x: feature.rotation.x,
+                y: feature.rotation.y,
+                z: feature.rotation.z
+              } : { x: 0, y: 0, z: 0 },
+              scale: feature.scale ? {
+                x: feature.scale.x,
+                y: feature.scale.y,
+                z: feature.scale.z
+              } : { x: 1, y: 1, z: 1 }
+            }
+          };
+
+          // POI Create를 사용하여 생성
+          Poi.Create(poiCreateOption, (data: unknown) => {
+            console.log('POI created for feature:', {
+              featureId: feature.id,
+              assetId: asset.id,
+              assetName: asset.name,
+              position: feature.position,
+              iconUrl: iconUrl,
+              modelUrl: asset.file?.url,
+              callbackData: data
+            });
+          });
+          createdCount++;
+        }
+
+        console.log(`POI creation completed. Created: ${createdCount}, Skipped: ${skippedCount}`);
+      } catch (error) {
+        console.error('Error creating POIs from features:', error);
+      }
+    };
+
+    createPOIsFromFeatures();
+  }, [featuresData, facilityId, getAssetById, assets]);
+
+  // 시설 데이터 로딩 중이거나 3D 도면 확인 중인 경우
+  if (isLoading || !facilitiesFetched || isDataLoading || has3DDrawing === null) {
     return (
       <div className="w-full h-full relative flex items-center justify-center bg-gray-900">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-lg">3D 도면을 확인하는 중...</p>
+          <p className="text-lg">
+            {isLoading || !facilitiesFetched || isDataLoading ? '시설 정보를 불러오는 중...' : '3D 도면을 확인하는 중...'}
+          </p>
         </div>
       </div>
     );
@@ -95,12 +255,17 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
   return (
     <div className="w-full h-full relative">
       <IndoorMapViewer 
-        facilityId={facilityId}
-        facilityType={facilityType}
-        showFloorControl={true}
-        floorControlPosition="bottom-right"
+        modelUrl={facilityData?.facility?.drawing?.url || ''}
         className="w-full h-full"
+        onLoadComplete={handleLoadComplete}
       />
+      
+      {/* Floor Control - 우측 하단 */}
+      {floors.length > 0 && (
+        <div className="absolute bottom-6 right-6 z-20 max-w-xs">
+          <FloorControl floors={floors} />
+        </div>
+      )}
       
       {onOutdoorButtonClick && (
         <button

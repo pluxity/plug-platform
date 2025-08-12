@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Model } from '@plug/engine/src';
-
-interface Floor {
-  floorId: number;
-  name: string;
-}
+import type { Floor } from '@/global/types';
 
 interface FloorControlProps {
   floors?: Floor[];

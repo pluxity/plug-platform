@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType } from '@plug/common-services'
+import { FacilityService, FacilityType, FeatureResponse } from '@plug/common-services'
 import { IndoorMapViewer } from '@/global/components'
+import { FloorControl } from '@/global/components/indoor-map/FloorControl'
 import { Button } from "@plug/ui"
 import { ArrowLeft } from "lucide-react"
+import { IndoorMapEditTools } from '../components'
+import { useAssets } from '@/global/store/assetStore'
+import { api } from '@plug/api-hooks/core'
+import { Poi } from '@plug/engine/src'
+import { convertFloors } from '@/global/utils/floorUtils'
+import type { Floor } from '@/global/types'
 
 type FacilityData = {
   facility?: {
@@ -12,6 +19,9 @@ type FacilityData = {
     name: string
     code: string
     description?: string
+    drawing?: {
+      url: string
+    }
   }
   floors?: Array<{name: string; floorId: string}>
   stationInfo?: {lineIds?: number[]; stationCodes?: string[]}
@@ -31,6 +41,123 @@ const FacilityIndoor: React.FC = () => {
   const [facilityType, setFacilityType] = useState<FacilityType | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null)
+  const [floors, setFloors] = useState<Floor[]>([])
+  const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([])
+  
+  const { assets } = useAssets()
+
+  // Features 로드를 위한 함수
+  const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
+    try {
+      const response = await api.get<FeatureResponse[]>(`features?facilityId=${facilityId}`, { requireAuth: true });
+      return response.data || [];
+    } catch (error) {
+      console.error('Failed to load features:', error);
+      return [];
+    }
+  }, []);
+
+  // Asset을 ID로 찾는 함수 (assetStore 사용)
+  const getAssetById = useCallback((id: number) => {
+    return assets.find(asset => asset.id === id);
+  }, [assets]);
+
+  // 엔진이 준비되면 POI 생성
+  const handleLoadComplete = useCallback(() => {
+    if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) {
+      return;
+    }
+
+    const createPOIsFromFeatures = async () => {
+      try {
+        Poi.Clear();
+
+        let createdCount = 0;
+        let skippedCount = 0;
+
+        for (const feature of featuresData) {
+          if (!feature.assetId || !feature.position) {
+            console.warn('Feature missing assetId or position:', feature);
+            skippedCount++;
+            continue;
+          }
+
+          const asset = getAssetById(feature.assetId);
+          if (!asset || !asset.file?.url) {
+            console.warn('Asset not found or no file URL:', feature.assetId);
+            skippedCount++;
+            continue;
+          }
+
+          // 아이콘 URL 결정 로직
+          let iconUrl = '';
+          if (asset.thumbnailFile?.url) {
+            // 썸네일이 있으면 썸네일을 아이콘으로 사용
+            iconUrl = asset.thumbnailFile.url;
+          } else if (asset.file?.url.toLowerCase().includes('.png') || asset.file?.url.toLowerCase().includes('.jpg') || asset.file?.url.toLowerCase().includes('.jpeg')) {
+            // 메인 파일이 이미지면 아이콘으로 사용
+            iconUrl = asset.file.url;
+          } else {
+            // 기본 POI 아이콘 사용 (실제 경로는 프로젝트에 맞게 수정)
+            iconUrl = 'SamplePoiIcon.png';
+          }
+
+          // POI 생성 옵션 구성
+          const poiCreateOption = {
+            id: feature.id,
+            iconUrl: iconUrl,
+            modelUrl: asset.file?.url || '', // 메인 파일을 모델로 사용
+            displayText: asset.name || feature.id,
+            property: {
+              assetId: asset.id,
+              assetName: asset.name,
+              assetCode: asset.code,
+              facilityId: facilityId,
+              floorId: feature.floorId,
+              featureId: feature.id,
+              categoryId: asset.categoryId,
+              categoryName: asset.categoryName,
+              position: {
+                x: feature.position.x,
+                y: feature.position.y,
+                z: feature.position.z
+              },
+              rotation: feature.rotation ? {
+                x: feature.rotation.x,
+                y: feature.rotation.y,
+                z: feature.rotation.z
+              } : { x: 0, y: 0, z: 0 },
+              scale: feature.scale ? {
+                x: feature.scale.x,
+                y: feature.scale.y,
+                z: feature.scale.z
+              } : { x: 1, y: 1, z: 1 }
+            }
+          };
+
+          // POI Create를 사용하여 생성
+          Poi.Create(poiCreateOption, (data: unknown) => {
+            console.log('POI created for feature:', {
+              featureId: feature.id,
+              assetId: asset.id,
+              assetName: asset.name,
+              position: feature.position,
+              iconUrl: iconUrl,
+              modelUrl: asset.file?.url,
+              callbackData: data
+            });
+          });
+          createdCount++;
+        }
+
+        console.log(`POI creation completed. Created: ${createdCount}, Skipped: ${skippedCount}`);
+      } catch (error) {
+        console.error('Error creating POIs from features:', error);
+      }
+    };
+
+    createPOIsFromFeatures();
+  }, [featuresData, facilityId, getAssetById, assets]);
 
   useEffect(() => {
     if (!facilityId) {
@@ -41,19 +168,20 @@ const FacilityIndoor: React.FC = () => {
     const loadFacility = async () => {
       try {
         setIsLoading(true)
-        
-        // 1. State에서 facilityType이 전달된 경우 (추천 경로)
         if (facilityTypeFromState) {
-          console.log('Using facilityType from state:', facilityTypeFromState)
-          
           const response = await FacilityService.getById(facilityTypeFromState, facilityId)
           if (response.data) {
             setFacilityType(facilityTypeFromState)
             setFacilityData(response.data)
 
-            // drawing 정보에서 3D 도면 존재 여부 확인
             const hasDrawing = response.data.facility?.drawing?.url ? true : false
             setHas3DDrawing(hasDrawing)
+            
+            // 층 정보 변환
+            if (response.data && 'floors' in response.data && response.data.floors) {
+              const convertedFloors = convertFloors(response.data.floors);
+              setFloors(convertedFloors);
+            }
             
             return
           }
@@ -71,6 +199,23 @@ const FacilityIndoor: React.FC = () => {
 
     loadFacility()
   }, [facilityId, facilityTypeFromState, navigate])
+
+  // Features 로드
+  useEffect(() => {
+    const loadFeatures = async () => {
+      if (!facilityId) return;
+      
+      try {
+        const features = await loadFeaturesByFacility(facilityId);
+        setFeaturesData(features);
+      } catch (error) {
+        console.error('Failed to load features for facility:', facilityId, error);
+        setFeaturesData([]);
+      }
+    };
+
+    loadFeatures();
+  }, [facilityId, loadFeaturesByFacility]);
 
   if (isLoading) {
     return (
@@ -92,7 +237,6 @@ const FacilityIndoor: React.FC = () => {
   return (
     <PageContainer title={`실내지도 편집 - ${facilityData?.facility?.name || id}`}>
       <div className="flex flex-col h-full">
-        {/* 뒤로가기 버튼 */}
         <div className="flex items-center gap-3 mb-4">
           <Button
             variant="ghost"
@@ -104,9 +248,7 @@ const FacilityIndoor: React.FC = () => {
             목록으로
           </Button>
         </div>        
-        {/* 실내지도 편집기 */}
         <div className="bg-white flex-1 border rounded-lg overflow-hidden">          
-          {/* 3D 도면 확인 중 */}
           {has3DDrawing === null && (
             <div className="h-full flex items-center justify-center bg-gray-100">
               <div className="text-center">
@@ -151,20 +293,27 @@ const FacilityIndoor: React.FC = () => {
             </div>
           )}
           
-          {/* 3D 도면이 있는 경우 - IndoorMapViewer 표시 */}
           {has3DDrawing === true && facilityType && (
             <div className="h-168 relative">
-              <IndoorMapViewer 
-                facilityId={facilityId!}
-                facilityType={facilityType}
-                showFloorControl={true}
-                floorControlPosition="bottom-right"
-                className="w-full h-full"
-              />
-              
-              {/* 편집 모드 표시 */}
               <div className="absolute top-4 left-4 z-30 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-medium">
                 편집 모드
+              </div>
+              <IndoorMapViewer 
+                modelUrl={facilityData?.facility?.drawing?.url || ''}
+                className="w-full h-full"
+                onLoadComplete={handleLoadComplete}
+              />
+              
+              {/* Floor Control - 우측 하단 */}
+              {floors.length > 0 && (
+                <div className="absolute bottom-6 right-6 z-20 max-w-xs">
+                  <FloorControl floors={floors} />
+                </div>
+              )}
+              
+              {/* POI 편집 툴 - 우측 상단 */}
+              <div className="absolute top-4 right-4 z-30">
+                <IndoorMapEditTools />
               </div>
             </div>
           )}

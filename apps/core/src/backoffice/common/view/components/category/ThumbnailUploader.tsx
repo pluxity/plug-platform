@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@plug/ui'
 
 export interface ThumbnailUploaderProps {
@@ -16,6 +16,7 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
   disabled = false,
   size = 'small'
 }) => {
+  const [previewThumbnailUrl, setPreviewThumbnailUrl] = useState('');
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -25,20 +26,31 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
     large: 'w-16 h-16'
   }
 
+  useEffect(() => {
+    setPreviewThumbnailUrl(currentThumbnailUrl || '');
+  }, [currentThumbnailUrl]);
+
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file || !onUpload) return
-
+  
+    const previewUrl = URL.createObjectURL(file)
+    setPreviewThumbnailUrl(previewUrl)
+  
     setUploading(true)
     try {
       const fileId = await onUpload(file)
       onThumbnailChange(fileId)
+    } catch (error) {
+      console.error("업로드 중 오류 발생:", error)
     } finally {
+      URL.revokeObjectURL(previewUrl)  
       setUploading(false)
     }
   }
 
   const handleRemoveThumbnail = () => {
+    setPreviewThumbnailUrl('')
     onThumbnailChange(undefined)
   }
 
@@ -48,29 +60,19 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
 
   return (
     <div className={`relative ${sizeClasses[size]} flex-shrink-0`}>
-      {currentThumbnailUrl ? (
+      {previewThumbnailUrl ? (
         <div className="relative group">
           <img
-            src={currentThumbnailUrl}
+            src={previewThumbnailUrl}
             alt="썸네일"
-            className={`${sizeClasses[size]} object-cover rounded border cursor-pointer`}
+            className={`${sizeClasses[size]} object-cover rounded border-2 border-dashed border-gray-300 cursor-pointer`}
             onClick={!disabled ? handleClick : undefined}
           />
-          {/* Hover Preview */}
-          <div className="absolute left-full top-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-            <div className="bg-white border border-gray-300 rounded-lg shadow-xl p-2">
-              <img
-                src={currentThumbnailUrl}
-                alt="썸네일 미리보기"
-                className="w-40 h-40 object-cover rounded"
-              />
-            </div>
-          </div>
           {!disabled && (
             <Button
               type="button"
               onClick={handleRemoveThumbnail}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity p-0 min-w-0 h-4"
+              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors min-w-0 min-h-0 px-0 cursor-pointer"
             >
               ×
             </Button>

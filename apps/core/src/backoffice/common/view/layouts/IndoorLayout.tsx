@@ -1,31 +1,27 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Sidebar } from '@plug/ui'
-import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
-
-const IndoorSidebarItems: AsideMenuItemProps[] = [
-  { id: 'AssetCategory', label: 'Asset Category', to: '/admin/assetCategory', depth: 1, showToggle: false},
-  // 필요시 다른 실내지도 관련 메뉴들을 추가할 수 있습니다
-]
+import { AssetListSideBar } from '@/backoffice/common/view/components/AssetListSidebar'
 
 const IndoorLayout: React.FC = () => {
-  const [activeItem, setActiveItem] = useState<string | null>('AssetCategory');
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  
+  const handleAssetClick = (assetId: number) => {
+    // 에셋 클릭 시 처리 로직 (필요에 따라 구현)
+    console.log('Asset clicked:', assetId)
+  }
 
-  const handleClick = (id: string) => {setActiveItem(id);};
-
-  const handleToggle = (id: string) => setExpandedItems((prev) => (prev.includes(id) ? [] : [id]));
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed)
+  }
 
   return (
     <div className="flex h-full overflow-hidden">
-      <Sidebar
-        items={IndoorSidebarItems}
-        activeItemId={activeItem}
-        expandedItemIds={expandedItems}
-        onItemClick={handleClick}
-        onToggleExpand={handleToggle}
+      <AssetListSideBar 
+        onAssetClick={handleAssetClick} 
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={handleToggleSidebar}
       />
-
+      
       <main className="flex-1 p-6 overflow-auto">
         <Outlet />
       </main>

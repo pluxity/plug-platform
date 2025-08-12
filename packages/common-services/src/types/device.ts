@@ -1,15 +1,16 @@
+import { FileResponse } from "./file";
 export interface DeviceCategoryResponse {
   id: number;
   name: string;
   parentId?: number;
   children?: DeviceCategoryResponse[];
-  thumbnailFile?: any; // FileResponse type can be imported if needed
+  thumbnailFile?: FileResponse;
   depth: number;
 }
 
 export interface DeviceCategoryRequest {
   name: string;
-  parentId?: number;
+  parentId?: number | null;
   thumbnailFileId?: number;
 }
 
