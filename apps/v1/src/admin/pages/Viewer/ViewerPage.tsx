@@ -1,6 +1,6 @@
 import { useState, useCallback, memo, Suspense, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Select, ConfirmModal, PrevIcon, Button, AccordionIcon } from "@plug/ui";
+import { Select, ConfirmModal, Button, AccordionIcon } from "@plug/ui";
 import { useStationStore } from './store/stationStore';
 import type { Label3DImportOption, ModelInfo, PoiImportOption } from '@plug/engine/src/interfaces';
 import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
@@ -26,7 +26,6 @@ const ErrorMessage = memo(({ message }: { message: string }) => (
   </div>
 ));
 
-// Floor selector component
 const FloorSelector = memo(({ 
   hierarchies, 
   selectedFloor, 
@@ -173,22 +172,30 @@ const ViewerContent = memo(({
 
   return (
     <>
-      <aside className="bg-white w-1/4 overflow-y-auto shrink-0">
-        <div className="flex items-center justify-between px-4 pt-4">
-          <div className="flex items-center space-x-3">
+      <aside className="bg-white w-1/4 shrink-0 flex flex-col h-screen">
+        <div className="flex items-center justify-between p-3 border-b border-gray-200">
+          <div className="flex items-center space-x-2">
             <Button
               onClick={() => navigate(-1)}
               variant="ghost"
               size="icon"
-              className="flex items-center justify-center w-9 h-9"
+              className="flex items-center justify-center w-9 h-9 hover:bg-gray-100 rounded-lg transition-all duration-200"
               aria-label="뒤로가기"
             >
-                <PrevIcon />
+              <div className="w-6 h-6 flex items-center justify-center text-primary-900">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                     className="lucide lucide-chevron-left-icon lucide-chevron-left">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </div>
             </Button>
-            <h2 className="text-xl font-bold">{stationData?.facility?.name}</h2>
+            <h2 className="text-xl font-bold text-gray-800">{stationData?.facility?.name}</h2>
           </div>
         </div>
-        <AssetList />
+        <div className="flex-1 overflow-auto bg-gray-100">
+          <AssetList />
+        </div>
       </aside>
       <div className="w-full relative">
         <ViewerHeader

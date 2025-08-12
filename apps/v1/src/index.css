@@ -32,6 +32,23 @@
     transition: background-color 0.2s ease;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(181, 198, 234, 0.6);
+.custom-admin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 117, 150, 0.6);
+}
+
+.custom-admin-scrollbar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.custom-admin-scrollbar::-webkit-scrollbar-track {
+    background: rgba(242, 242, 242, 0.2);
+    border-radius: 6px;
+}
+
+.custom-admin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.4);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.2s ease;
 }

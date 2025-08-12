@@ -63,35 +63,41 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
     }
 
     return (
-        <Card onClick={handleClick}>
-            <Card.Content className="p-2">
-                <div 
-                    key={asset.id} 
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative"
-                >
-                    {asset.thumbnailFile ? (
-                        <div className="thumbnail-container h-48 overflow-hidden bg-gray-100">
-                            <img 
-                                src={asset.thumbnailFile.url} 
-                                alt={asset.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                    console.error('Error loading image:', e);
-                                }}
-                            />
-                        </div>
-                    ) : (
-                        <div className="py-4 text-center bg-gray-100">
-                            <span className="text-gray-500">썸네일 없음</span>
-                        </div>
-                    )}
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-secondary-400 text-white text-xs font-medium rounded-full shadow-sm"> 
-                        {asset.name}
-                    </div>
-                </div>
-            </Card.Content>
-            
-        </Card>
+      <Card onClick={handleClick} className="border-none hover:translate-y-[-5px] transition-all duration-300">
+        <Card.Content className="p-0">
+          <div
+            key={asset.id}
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer relative group"
+          >
+            {asset.thumbnailFile ? (
+              <div className="thumbnail-container h-48 overflow-hidden bg-gray-100 relative">
+                <img
+                  src={asset.thumbnailFile.url}
+                  alt={asset.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    console.error('Error loading image:', e);
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            ) : (
+              <div className="h-48 flex items-center justify-center bg-gray-100">
+          <span className="text-gray-500 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+            </svg>
+            썸네일 없음
+          </span>
+              </div>
+            )}
+            <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1.5 bg-white/90 backdrop-blur-sm text-primary-700 text-xs font-medium rounded-full shadow-sm group-hover:bg-primary-500 group-hover:text-white transition-all duration-300">
+              {asset.name}
+            </div>
+
+          </div>
+        </Card.Content>
+      </Card>
     );
 } 
 
