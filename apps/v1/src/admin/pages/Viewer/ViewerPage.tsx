@@ -162,6 +162,7 @@ const ViewerContent = memo(({
   selectedPoi: PoiImportOption | null;
   isModalOpen: boolean;
   onModalClose: () => void;
+  onPoiSuccess: (deviceId: string) => void;
   navigate: (value: number) => void;
   isTextLabelModalOpen: boolean;
   handleOpenTextLabelModal: () => void;
@@ -344,6 +345,19 @@ const ViewerPage = memo(() => {
     setSelectedFloor(floorId);
   }, []);
 
+  const handlePoiSuccess = useCallback((deviceId: string) => {
+    if (selectedPoi) {
+      setSelectedPoi(prev => prev ? {
+        ...prev,
+        property: {
+          ...prev.property,
+          deviceId: deviceId
+        }
+      } : null);
+    }
+    handleModalClose();
+  }, [selectedPoi, handleModalClose]);
+
   const handlePoiDelete = useCallback((poi: PoiImportOption) => {
     setConfirmModal({
       isOpen: true,
@@ -470,6 +484,7 @@ const ViewerPage = memo(() => {
         handleOpenTextLabelModal={handleOpenTextLabelModal}
         handleCloseTextLabelModal={handleCloseTextLabelModal}
         handleCreateTextLabel={handleCreateTextLabel}
+        onPoiSuccess={handlePoiSuccess}
         navigate={navigate}
       />
       <ConfirmModal

@@ -3,15 +3,20 @@ import { api } from '@plug/api-hooks';
 import type { PoiImportOption } from '@plug/engine/src/interfaces';
 
 export interface UseFeatureApiResult {
-  assignDevice: (featureId: string, deviceId: string) => Promise<void>;
+  assignDevice: (featureId: string, deviceId: string, force: boolean) => Promise<void>;
   updateTransform: (featureId: string, transform: Partial<Pick<PoiImportOption, 'position' | 'rotation' | 'scale'>>) => Promise<void>;
   deleteFeature: (featureId: string) => Promise<void>;
 }
 
 export function useFeatureApi(): UseFeatureApiResult {
-  const assignDevice = useCallback(async (featureId: string, deviceId: string) => {
+  const assignDevice = useCallback(async (featureId: string, deviceId: string, force: boolean = false) => {
     try {
-      await api.put(`features/${featureId}/assign-device`, { id: deviceId });
+      if(force){
+        await api.put(`features/${featureId}/assign-device?force=true`, { id: deviceId });
+      }else{
+        await api.put(`features/${featureId}/assign-device`, { id: deviceId });
+      }
+    
     } catch (error) {
       console.error('Error updating device code:', error);
       throw error;
