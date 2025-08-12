@@ -58,7 +58,6 @@ export function useEditMode(): UseEditModeResult {
     }
   }, [currentMode, exitEdit]);
 
-  // ESC 키 이벤트 리스너
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && currentMode !== 'none') {

@@ -143,7 +143,7 @@ const ViewerContent = memo(({
         <div className="absolute bottom-20 left-6 flex gap-4">
           <Button
             onClick={handleOpenTextLabelModal}
-            className="w-10 h-10 bg-white hover:bg-gray-50 text-zinc-700 rounded-lg transition-all duration-300 flex items-center justify-center z-50 group p-1"
+            className="w-10 h-10 bg-white hover:bg-gray-50 text-zinc-700 rounded-lg transition-all duration-300 flex items-center justify-center z-50 group p-2.5"
             title="텍스트 추가"
           >
             <svg
