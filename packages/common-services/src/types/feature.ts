@@ -11,7 +11,7 @@ export interface FeatureCreateRequest {
   scale?: Spatial;
   assetId: number;
   facilityId: number;
-  floorId: string;
+  floorId?: string;
 }
 
 export interface FeatureUpdateRequest {
@@ -29,7 +29,7 @@ export interface FeatureResponse {
   position?: Spatial;
   rotation?: Spatial;
   scale?: Spatial;
-  assetId?: number;  // API가 실제로 assetId를 반환하는 경우
+  assetId: number;
   floorId: string;
   deviceId?: string;
 }
