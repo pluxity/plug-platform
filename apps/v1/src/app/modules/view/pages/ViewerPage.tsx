@@ -130,56 +130,37 @@ const ViewerPage = () => {
   useEffect(() => {
     if (!simulationActive || !stationData) return;
 
-    const generateTrainData = (): TrainData[] => {
-      const now = new Date();
-      console.log('Generating train data at:', now.toISOString());
-      const trainData: TrainData[] = [
-        {
-          line: '1호선',
-          arrivalStationCode: parsedCode,
-          timestamp: now.toISOString(),
-          opCode: '출발',
-          messageNumber: 1,
-          arrivalStationName: '서면역',
-          trainDirection: '상행',
-          thisTrainNumber: '1001',
-          nextTrainNumber: '1002',
-        },
-      ];
-      console.log('Generated train data:', trainData);
-      return trainData;
-    };
-
-    console.log('Simulation active, starting train simulation');
-    const initialTrainData = generateTrainData();
-    console.log('Setting initial train data');
-    setTtcData(initialTrainData);
-    console.log('Showing all subway models');
-    Px.Subway.ShowAll();
     const testInterval = 30000;
-
-    const hideTimeout = setTimeout(() => {
-      console.log('Hiding subway models after timeout');
-      Px.Subway.HideAll();
-    }, 15000);
-
-    console.log('Setting up interval for repeated train simulation');
     const interval = setInterval(() => {
-      console.log('Interval triggered');
-      const trainData = generateTrainData();
-      setTtcData(trainData);
-      console.log('Showing subway models');
-      Px.Subway.ShowAll();
-      setTimeout(() => {
-        console.log('Hiding subway models after inner timeout');
-        Px.Subway.HideAll();
-      }, 15000);
+      Px.Subway.Show("1_UP_SUBWAY");
+      Px.Subway.Show("1_DOWN_SUBWAY");
+
+      Px.Subway.DoEnter("1_UP_SUBWAY", 5, () => {
+        console.log('Train 1_UP_SUBWAY entered');
+
+        setTimeout(() => {
+          Px.Subway.DoExit("1_UP_SUBWAY", 5, () => {
+            console.log('Train 1_UP_SUBWAY exited');
+            Px.Subway.Hide("1_UP_SUBWAY");
+          });
+        }, 3000);
+      });
+
+      Px.Subway.DoEnter("1_DOWN_SUBWAY", 5, () => {
+        console.log('Train 1_DOWN_SUBWAY entered');
+
+        setTimeout(() => {
+          Px.Subway.DoExit("1_DOWN_SUBWAY", 5, () => {
+            console.log('Train 1_DOWN_SUBWAY exited');
+            Px.Subway.Hide("1_DOWN_SUBWAY");
+          });
+        }, 3000);
+      });
     }, testInterval);
 
     return () => {
       console.log('Cleaning up train simulation');
       clearInterval(interval);
-      clearTimeout(hideTimeout);
     };
   }, [simulationActive, parsedCode, setTtcData, stationData]);
 
