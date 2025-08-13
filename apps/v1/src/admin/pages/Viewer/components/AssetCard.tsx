@@ -91,7 +91,7 @@ const AssetCard = ({asset}: {asset: Asset;}) => {
           </span>
               </div>
             )}
-            <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1.5 bg-white/90 backdrop-blur-sm text-primary-700 text-xs font-medium rounded-full shadow-sm group-hover:bg-primary-500 group-hover:text-white transition-all duration-300">
+            <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1.5 bg-white/90 backdrop-blur-sm text-primary-800 text-xs font-medium rounded-full shadow-sm group-hover:bg-primary-500 group-hover:text-white transition-all duration-300">
               {asset.name}
             </div>
 

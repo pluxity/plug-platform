@@ -29,14 +29,12 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      // Custom fallback UI
       if (this.props.fallback && this.state.error) {
         return this.props.fallback(this.state.error);
       }
 
-      // Default fallback UI
       return (
-        <div className="flex flex-col justify-center items-center h-screen bg-gray-50">
+        <div className="flex flex-col justify-center items-center h-screen bg-gray-50 p-4">
           <div className="text-red-500 text-lg font-semibold mb-4">
             문제가 발생했습니다
           </div>

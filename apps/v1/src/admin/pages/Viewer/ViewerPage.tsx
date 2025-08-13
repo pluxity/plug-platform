@@ -10,9 +10,10 @@ import type { UseEditModeResult } from "./hooks/useEditMode";
 import type { StationWithFeatures, FeatureResponse } from "./types/station";
 import { Poi, Label3D } from '@plug/engine/src';
 import { v4 as uuidv4 } from 'uuid';
-import { label3dService } from "@plug/common-services";
+import { label3dService, useDevicesSWR } from '@plug/common-services';
 import type { Label3DCreateRequest } from "@plug/common-services";
 import * as Px from '@plug/engine/src';
+import SearchList from '@plug/v1/admin/pages/Viewer/components/SearchList';
 
 const LoadingSpinner = memo(() => (
   <div className="flex justify-center items-center h-screen">
@@ -170,6 +171,12 @@ const ViewerContent = memo(({
   handleCreateTextLabel: (text: string) => void;
 }) => {
   const modelPath = stationData?.facility?.drawing?.url || '';
+  const { data: devices } = useDevicesSWR();
+  const [showSearchList, setShowSearchList] = useState(false);
+
+  const toggleSearchList = () => {
+    setShowSearchList(!showSearchList);
+  };
 
   return (
     <>
@@ -193,9 +200,43 @@ const ViewerContent = memo(({
             </Button>
             <h2 className="text-xl font-bold text-gray-800">{stationData?.facility?.name}</h2>
           </div>
+          <div
+            className="flex items-center space-x-2 cursor-pointer bg-primary-100 hover:bg-primary-200 rounded-lg px-3 py-2 transition-all duration-300"
+            onClick={toggleSearchList}
+          >
+            {!showSearchList ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <span className="text-gray-700 text-sm">목록</span>
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                     className="lucide lucide-list">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                <span className="text-gray-700 text-sm">에셋</span>
+              </>
+            )
+            }
+          </div>
         </div>
         <div className="flex-1 overflow-auto bg-gray-100">
-          <AssetList />
+          {showSearchList ? (
+            <SearchList deviceData={devices || []} featureData={stationData} />
+          ) : (
+            <AssetList />
+          )}
         </div>
       </aside>
       <div className="w-full relative">
