@@ -7,8 +7,8 @@ import { useAssetStore } from '@plug/v1/common/store/assetStore';
 import MenuItem from './MenuItem';
 import DevicePanel from './DevicePanel';
 import { Tooltip } from '@plug/ui';
-import type { PoiImportOption } from '@plug/engine/src/interfaces';
-import type { Category } from '@plug/v1/app/modules/view/types/sidemenu';
+import type { PoiImportOption } from '@plug/engine/dist/src/interfaces';
+import type { Category } from '@plug/v1/app/view/types/sidemenu';
 import * as Px from '@plug/engine/src';
 
 interface DeviceData {
@@ -198,16 +198,16 @@ const SideMenu: React.FC = () => {
       </div>
 
       {isDevicePanelOpen && activeMenu && (
-        <DevicePanel
-          categoryId={activeMenu.id}
-          categoryName={activeMenu.name}
-          categoryType={activeMenu.type}
-          devices={activeMenu.devices}
-          onClose={() => {
-            setActiveMenu(null);
-            setIsDevicePanelOpen(false);
-          }}
-        />
+          <DevicePanel
+            categoryId={activeMenu.id}
+            categoryName={activeMenu.name}
+            categoryType={activeMenu.type}
+            devices={activeMenu.devices}
+            onClose={() => {
+              setActiveMenu(null);
+              setIsDevicePanelOpen(false);
+            }}
+          />
       )}
     </>
   );

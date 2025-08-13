@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { EventData, ShutterData, TrainData } from '../modules/view/types/stream';
+import { EventData, ShutterData, TrainData } from '@plug/v1/app/view/types/stream';
 
 interface EventStore {
   ttcData: TrainData[];

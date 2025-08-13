@@ -9,7 +9,7 @@ import type {
   EngineIntegrationResult 
 } from './types';
 import type { Label3DImportOption, PoiImportOption } from '@plug/engine/src/interfaces';
-import { TrainData } from '@plug/v1/app/modules/view/types/stream';
+import { TrainData } from '@plug/v1/app/view/types/stream';
 
 interface UseEngineIntegrationProps {
   features: BaseFeature[] | null;

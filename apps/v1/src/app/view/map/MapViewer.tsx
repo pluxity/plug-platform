@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
 import type { MapViewerProps, FloorItem } from './types';
 import FloorSelector from './FloorSelector';
-import ZoomControls from '@plug/v1/app/modules/view/map/ZoomControls';
+import ZoomControls from '@plug/v1/app/view/map/ZoomControls';
 
 const MapViewer = ({ modelPath, floors = [], onModelLoaded, onLoadError }: MapViewerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);

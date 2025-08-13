@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useEngineIntegration as useBaseEngineIntegration } from '@plug/v1/common/libs/engine';
-import type { PoiImportOption } from '@plug/engine/src/interfaces';
-import type { FeatureResponse as Feature } from '@plug/v1/app/modules/view/types/station';
+import type { PoiImportOption } from '@plug/engine/dist/src/interfaces';
+import type { FeatureResponse as Feature } from '@plug/v1/app/view/types/station';
 import type { EngineEventHandlers, EngineIntegrationConfig } from '@plug/v1/common/libs/engine';
 
 interface UseEngineIntegrationProps {

@@ -1,9 +1,8 @@
-
 import { useParams } from 'react-router-dom';
 import { useEffect, useCallback, useState } from 'react'; // useState 추가
-import { Header, SideMenu, EventCounter } from "@plug/v1/app/modules/view/layouts";
-import { DeviceDetailModal } from '@plug/v1/app/modules/components/modals/DeviceDetailModal';
-import type { PoiImportOption } from '@plug/engine/src/interfaces';
+import { Header, SideMenu, EventCounter } from "@plug/v1/app/view/layouts";
+import { DeviceDetailModal } from '@plug/v1/app/view/components/modals/DeviceDetailModal';
+import type { PoiImportOption } from '@plug/engine/dist/src/interfaces';
 import useStationStore from '@plug/v1/app/stores/stationStore';
 import useEventStore from '@plug/v1/app/stores/eventSourceStore';
 import useSideMenuStore from '@plug/v1/app/stores/sideMenuStore';
@@ -13,11 +12,11 @@ import usePoiStore from '@plug/v1/app/stores/poiStore';
 import { useEngineIntegration } from '../hooks/useEngineIntegration';
 import { useStationData } from '../hooks/useStationData';
 import { useFloorData } from '../hooks/useFloorData';
-import { EventData, ShutterData, TrainData } from '@plug/v1/app/modules/view/types/stream';
+import { EventData, ShutterData, TrainData } from '@plug/v1/app/view/types/stream';
 import * as Px from '@plug/engine/src';
 import { useToastStore } from '@plug/v1/admin/components/hook/useToastStore';
 import { ToastContainer } from '@plug/v1/admin/components/toast/ToastContainer';
-import { MapViewer } from '@plug/v1/app/modules/view/map';
+import { MapViewer } from '@plug/v1/app/view/map';
 
 const ViewerPage = () => {
   const { code } = useParams<{ code: string }>();
