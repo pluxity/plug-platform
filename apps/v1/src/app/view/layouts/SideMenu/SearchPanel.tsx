@@ -3,14 +3,17 @@ import { useDebounce } from 'react-use';
 import { Input } from '@plug/ui';
 import useSideMenuStore from '@plug/v1/app/stores/sideMenuStore';
 import useStationStore from '@plug/v1/app/stores/stationStore';
+import useDeviceModalStore from '@plug/v1/app/stores/deviceModalStore';
 import * as Px from '@plug/engine/src';
 import { clsx } from 'clsx';
+import { useToastStore } from '@plug/v1/admin/components/hook/useToastStore';
 
 interface SearchResult {
   id: string;
   name: string;
   categoryName: string;
   categoryId: string;
+  categoryType: string;
   featureId: string;
   floorId: string;
 }
@@ -21,10 +24,15 @@ const SearchPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  
   const { menuItems, isDevicePanelOpen, openMenuByDeviceId } = useSideMenuStore();
-  const { setCurrentFloor } = useStationStore();
+  const { setCurrentFloor, externalCode } = useStationStore();
+  const { openModal } = useDeviceModalStore();
+  const { addToast } = useToastStore();
 
   useDebounce(
     () => {
@@ -34,6 +42,13 @@ const SearchPanel: React.FC = () => {
     [searchTerm]
   );
 
+  useEffect(() => {
+    if (selectedResult) {
+      handleDeviceActions(selectedResult);
+      setSelectedResult(null);
+    }
+  }, [selectedResult]);
+
   const allDevices = useMemo(() => {
     return menuItems.flatMap(category =>
       category.devices.map(device => ({
@@ -41,6 +56,7 @@ const SearchPanel: React.FC = () => {
         name: device.name,
         categoryName: category.name,
         categoryId: category.id,
+        categoryType: category.type,
         featureId: device.feature.id,
         floorId: device.feature.floorId
       }))
@@ -65,14 +81,15 @@ const SearchPanel: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        isExpanded &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
+        panelRef.current &&
+        !panelRef.current.contains(event.target as Node)
       ) {
-        if (searchTerm.trim() === '') {
+        if (isExpanded && searchTerm.trim() === '') {
           setIsExpanded(false);
         }
-        setIsOpen(false);
+        if (isOpen) {
+          setIsOpen(false);
+        }
       }
     };
 
@@ -80,7 +97,15 @@ const SearchPanel: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isExpanded, searchTerm]);
+  }, [isExpanded, searchTerm, isOpen]);
+
+  useEffect(() => {
+    if (!isExpanded) {
+      setSearchTerm('');
+      setResults([]);
+      setIsOpen(false);
+    }
+  }, [isExpanded]);
 
   const handleExpandClick = () => {
     setIsExpanded(true);
@@ -91,24 +116,90 @@ const SearchPanel: React.FC = () => {
     }, 100);
   };
 
-  const handleSelectDevice = (device: SearchResult) => {
-    setCurrentFloor(device.floorId);
-
-    Px.Model.HideAll();
-    if (device.floorId === 'ALL') {
-      Px.Model.ShowAll();
-    } else {
-      Px.Model.Show(device.floorId);
+  const clearSearchTerm = () => {
+    setSearchTerm('');
+    setIsOpen(false);
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
+  };
 
-    setTimeout(() => {
-      Px.Camera.MoveToPoi(device.featureId, 1.5);
+  const handleDeviceActions = (device: SearchResult) => {
+    try {
+      console.log('디바이스 액션 실행:', device);
+      setCurrentFloor(device.floorId);
+
+      Px.Model.HideAll();
+      if (device.floorId === 'ALL') {
+        Px.Model.ShowAll();
+      } else {
+        Px.Model.Show(device.floorId);
+      }
+
       openMenuByDeviceId(device.id);
-    }, 200);
 
+      if (externalCode) {
+        console.log('모달 열기:', {
+          name: device.name,
+          id: device.id,
+          type: device.categoryType,
+          stationId: String(externalCode)
+        });
+        openModal(device.name, device.id, device.categoryType, String(externalCode));
+      }
+
+      setTimeout(() => {
+        console.log('카메라 이동:', device.featureId);
+        Px.Camera.MoveToPoi(device.featureId, 1.5);
+
+        const evt = {
+          type: 'onPoiSelect',
+          target: { id: device.featureId }
+        };
+        Px.EventDispatcher.InternalHandler.dispatchEvent(evt);
+      }, 800);
+
+      addToast({
+        variant: 'normal',
+        title: `${device.name} 선택`,
+        description: `${device.name} 위치로 이동합니다`
+      });
+    } catch (error) {
+      console.error('디바이스 선택 중 오류 발생:', error);
+      addToast({
+        variant: 'critical',
+        title: '오류 발생',
+        description: String(error)
+      });
+    }
+  };
+
+  const handleSelectDevice = (event: React.MouseEvent, device: SearchResult) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setSelectedResult(device);
     setIsOpen(false);
     setSearchTerm('');
+    setIsExpanded(false);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isOpen) {
+          setIsOpen(false);
+        } else if (isExpanded) {
+          setIsExpanded(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, isExpanded]);
 
   return (
     <div
@@ -116,6 +207,7 @@ const SearchPanel: React.FC = () => {
         'fixed transition-all duration-300 ease-in-out top-20 z-20',
         isDevicePanelOpen ? 'left-[23rem]' : 'left-20',
       )}
+      ref={panelRef}
     >
       <div
         className={clsx(
@@ -125,8 +217,7 @@ const SearchPanel: React.FC = () => {
       >
         {isExpanded ? (
           <div
-            className="backdrop-blur-md rounded-lg shadow-xl transition-opacity duration-300 opacity-100"
-            ref={inputRef}
+            className="backdrop-blur-md rounded-lg shadow-xl transition-opacity duration-300 opacity-100 relative"
           >
             <Input
               type="text"
@@ -134,9 +225,22 @@ const SearchPanel: React.FC = () => {
               value={searchTerm}
               onChange={setSearchTerm}
               onFocus={() => setIsOpen(true)}
-              className="w-full text-white"
+              className="w-full text-white pr-10"
               autoComplete="off"
+              ref={inputRef}
             />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex space-x-1">
+              {searchTerm && (
+                <button
+                  onClick={clearSearchTerm}
+                  className="text-white/70 hover:text-white transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <button
@@ -159,12 +263,16 @@ const SearchPanel: React.FC = () => {
         )}
 
         {isOpen && results.length > 0 && (
-          <div className="mt-2 absolute w-full left-0 max-h-80 overflow-y-auto custom-scrollbar bg-primary-900/60 backdrop-blur-lg border border-primary-100/10 rounded-lg shadow-xl">
+          <div 
+            ref={resultsRef}
+            className="mt-2 absolute w-full left-0 max-h-80 overflow-y-auto custom-scrollbar bg-primary-900/60 backdrop-blur-lg border border-primary-100/10 rounded-lg shadow-xl"
+          >
             {results.map((result) => (
               <div
                 key={result.id}
                 className="p-3 hover:bg-primary-800/50 cursor-pointer border-b border-primary-100/5 last:border-0"
-                onClick={() => handleSelectDevice(result)}
+                onClick={(e) => handleSelectDevice(e, result)}
+                onMouseDown={(e) => e.preventDefault()}
               >
                 <div className="flex items-start justify-between">
                   <div className="font-medium text-white truncate">{result.name}</div>
