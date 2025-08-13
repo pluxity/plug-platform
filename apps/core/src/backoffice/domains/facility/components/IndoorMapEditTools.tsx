@@ -1,25 +1,34 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@plug/ui'
-import { Move, RotateCcw, Scale, Square } from 'lucide-react'
+import { Move, RotateCcw, Scale, Square, Trash } from 'lucide-react'
 import { Poi } from '@plug/engine/src'
 
 interface IndoorMapEditToolsProps {
   className?: string
+  onDeleteMode?: (type: boolean) => void
 }
 
 type EditMode = 'translate' | 'rotate' | 'scale' | null
 
 export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({ 
-  className = '' 
+  className = '',
+  onDeleteMode
 }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editMode, setEditMode] = useState<EditMode>(null)
+  const [isDeleteMode, setIsDeleteMode] = useState(false)
 
   const handleFinishEdit = () => {
     try {
-      Poi.FinishEdit()
-      setIsEditing(false)
-      setEditMode(null)
+      if (isDeleteMode) {
+        // 삭제 모드 종료
+        setIsDeleteMode(false)
+      } else if (isEditing) {
+        // 일반 편집 모드 종료
+        Poi.FinishEdit()
+        setIsEditing(false)
+        setEditMode(null)
+      }
     } catch (error) {
       console.error('편집 종료 중 오류:', error)
     }
@@ -32,6 +41,12 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         Poi.FinishEdit()
       }
       
+      // 삭제 모드가 활성화되어 있다면 종료
+      if (isDeleteMode) {
+        setIsDeleteMode(false) 
+        onDeleteMode?.(false)
+      }
+      
       // 새로운 편집 시작
       Poi.StartEdit(mode)
       setIsEditing(true)
@@ -41,16 +56,33 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
     }
   }
 
+  const handleStartDeleteMode = () => {
+    try {
+      // 현재 편집 중이면 먼저 종료
+      if (isEditing) {
+        Poi.FinishEdit()
+        setIsEditing(false)
+        setEditMode(null)
+      }
+      
+      // 삭제 모드 시작
+      setIsDeleteMode(true)   
+      onDeleteMode?.(true)
+    } catch (error) {
+      console.error('삭제 모드 시작 중 오류:', error)
+    }
+  }
+
   // ESC 키로 편집 종료
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isEditing) {
+      if (event.key === 'Escape' && (isEditing || isDeleteMode)) {
         handleFinishEdit()
       }
     }
 
     // 편집 중일 때만 키보드 이벤트 리스너 추가
-    if (isEditing) {
+    if (isEditing || isDeleteMode) {
       document.addEventListener('keydown', handleKeyDown)
     }
 
@@ -58,7 +90,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isEditing]) // isEditing이 변경될 때마다 effect 재실행
+  }, [isEditing, isDeleteMode]) // 변경될 때마다 effect 재실행
 
   const isActiveMode = (mode: 'translate' | 'rotate' | 'scale') => {
     return isEditing && editMode === mode
@@ -118,16 +150,35 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         title={isActiveMode('scale') ? '크기 편집 종료' : '크기 편집 시작'}
       >
         <Scale size={18} className={`transition-transform duration-200 ${isActiveMode('scale') ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-110'}`} />
-        {isActiveMode('scale') && (
+        {isDeleteMode && (
+          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl animate-pulse" />
+        )}
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => isDeleteMode ? handleFinishEdit() : handleStartDeleteMode()}
+        className={`
+          h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
+          ${isDeleteMode 
+            ? 'bg-gradient-to-br from-red-400 via-pink-500 to-red-600 text-white shadow-xl shadow-red-500/40 scale-110 ring-2 ring-red-300/50' 
+            : 'bg-gradient-to-br from-red-100 to-pink-100 hover:from-red-200 hover:to-pink-200 text-red-700 hover:text-pink-700 hover:scale-105 shadow-md hover:shadow-lg'
+          }
+        `}
+        title={isDeleteMode ? '삭제 모드 종료' : '삭제 모드 시작'}
+      >
+        <Trash size={18} className={`transition-transform duration-200 ${isDeleteMode ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-110'}`} />
+        {isDeleteMode && (
           <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl animate-pulse" />
         )}
       </Button>
       
-      {isEditing && (
+      {(isEditing || isDeleteMode) && (
         <div className="w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent mx-1 self-stretch" />
       )}
       
-      {isEditing && (
+      {(isEditing || isDeleteMode) && (
         <Button
           variant="ghost"
           size="sm"

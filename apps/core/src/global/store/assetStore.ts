@@ -204,7 +204,7 @@ export const useAssetStore = create<AssetState>()(
         if (!category) break
         
         path.unshift(category)
-        currentId = category.parentId
+        currentId = category.parentId || undefined
       }
 
       return path

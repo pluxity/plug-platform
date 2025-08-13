@@ -156,7 +156,6 @@ const FacilityIndoor: React.FC = () => {
       }
     };
 
-    createPOIsFromFeatures();
   }, [featuresData, facilityId, getAssetById, assets]);
 
   useEffect(() => {
@@ -295,9 +294,6 @@ const FacilityIndoor: React.FC = () => {
           
           {has3DDrawing === true && facilityType && (
             <div className="h-168 relative">
-              <div className="absolute top-4 left-4 z-30 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                편집 모드
-              </div>
               <IndoorMapViewer 
                 modelUrl={facilityData?.facility?.drawing?.url || ''}
                 className="w-full h-full"
