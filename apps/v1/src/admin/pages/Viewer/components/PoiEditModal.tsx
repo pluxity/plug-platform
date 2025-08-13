@@ -21,7 +21,6 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
 
   const addToast = useToastStore((state) => state.addToast);
 
-  // poi가 변경될 때마다 selectedDeviceId 업데이트
   useEffect(() => {
     if (poi?.property?.deviceId) {
       setSelectedDeviceId(poi.property.deviceId);
@@ -34,7 +33,6 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
     if (!poi) return;
     
     try {
-      // selectedDeviceId 상태값 사용
       const deviceId = selectedDeviceId;
       if (!deviceId) {
         addToast({
@@ -144,7 +142,7 @@ export function PoiEditModal({ isOpen, poi, onClose, onSuccess }: PoiEditModalPr
         showCloseButton={true}
         onClose={onClose}
         title={poi?.displayText || 'Feature'}
-        contentClassName={'h-full max-h-100 overflow-y-hidden'}
+        contentClassName={'h-full max-h-100 overflow-y-hidden backdrop-blur-none'}
       >      
         <Form
           initialValues={{

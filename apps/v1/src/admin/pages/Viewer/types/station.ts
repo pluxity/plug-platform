@@ -41,7 +41,7 @@ export interface Label3D {
 
 export interface Floor {
   name: string;
-  groupId: string;
+  floorId: string;
 }
 
 export interface StationWithFeatures {

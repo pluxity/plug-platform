@@ -53,7 +53,7 @@ const AssetList = () => {
   }
     
     return (
-      <div className="p-4 pb-20">
+      <div className="p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {assets.map(asset => (
             <AssetCard key={asset.id} asset={asset} />

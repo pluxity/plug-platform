@@ -18,23 +18,14 @@ export const DeviceModal = ({
     onSuccess,
     selectedDeviceId
 }: DeviceModalProps) => {
-    // 장비 상태 관리 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
     const [categoryId, setCategoryId] = useState<number>();
 
     const { addToast } = useToastStore();
-
-    // 디바이스 생성 훅 
     const { execute: createDevice, isLoading: isCreating, error: createError } = useCreateDevice();
-
-    // 디바이스 생성 - 카테고리 목록 조회 
     const { data: categoryDevice } = useCategoriesSWR();
-
-    // 디바이스 상세 조회 훅 
     const { data: detailDeviceData, mutate } = useDeviceDetailSWR(mode === 'edit' && selectedDeviceId ? selectedDeviceId : '');
-
-    // 디바이스 수정 훅 
     const { execute: updateDevice, isLoading: isUpdating, error: updateError } = useUpdateDevice(selectedDeviceId || '');
 
     useEffect(() => {
@@ -44,7 +35,6 @@ export const DeviceModal = ({
         } 
     }, [mode, detailDeviceData, isOpen, categoryDevice]);
 
-    // 제출 핸들러
     const handleFinish = useCallback(async (values: Record<string, string>) => {
         if (mode === 'edit' && detailDeviceData) {
             try {
@@ -103,14 +93,12 @@ export const DeviceModal = ({
         }
     }, [mode, detailDeviceData, createDevice, updateDevice, onSuccess, addToast, mutate, createError, updateError, categoryDevice, categoryId, name]);
 
-    // 폼 초기화
     const resetForm = () => {
         setName('');
         setId('');
         onClose();
     };
 
-    // 에러 처리
     const isProcessing = isCreating || isUpdating;
 
     return (
