@@ -10,28 +10,33 @@ import { Tooltip } from '@plug/ui';
 import type { PoiImportOption } from '@plug/engine/dist/src/interfaces';
 import type { Category } from '@plug/v1/app/view/types/sidemenu';
 import * as Px from '@plug/engine/src';
-import SearchPanel from './SearchPanel';
+import SearchPanel from '@plug/v1/app/view/layouts/SideMenu/SearchPanel';
 
 interface DeviceData {
   id: string;
   name: string;
+  code?: string;
   feature: {
     id: string;
     floorId: string;
+    assetId: string;
+    position?: { x: number; y: number; z: number };
+    rotation?: { x: number; y: number; z: number };
+    scale?: { x: number; y: number; z: number };
   };
 }
 
 const SideMenu: React.FC = () => {
   const [devicesByCategory, setDevicesByCategory] = useState<Record<string, DeviceData[]>>({});
-  
-  const { 
+
+  const {
     activeMenu,
     selectedMenus,
-    menuItems, 
-    isDevicePanelOpen, 
+    menuItems,
+    isDevicePanelOpen,
     setActiveMenu,
     toggleSelectedMenu,
-    setMenuItems, 
+    setMenuItems,
     setIsDevicePanelOpen,
     addSelectedMenu,
     removeSelectedMenu
@@ -46,41 +51,48 @@ const SideMenu: React.FC = () => {
       if (!stationCode) {
         return;
       }
-      
+
       try {
         const response = await api.get<Category[]>(`devices/station/${stationCode}/grouped`);
         if (response.data) {
-          const transformedMenuItems = response.data.map(item => ({
+
+          const mergedCategories = mergeGroupAndIndividualCategories(response.data);
+          const transformedMenuItems = mergedCategories.map(item => ({
             id: item.categoryId.toString(),
             name: item.categoryName,
-            type: item.contextPath.replace(/\//g, ''),
+            type: item.contextPath,
             icon: item.iconFile?.url,
             devices: item.devices || []
-          }));          
-          
+          }));
+
           setMenuItems(transformedMenuItems);
-          
           const categoryDevices: Record<string, DeviceData[]> = {};
-          response.data.forEach(category => {
+          mergedCategories.forEach(category => {
             categoryDevices[category.categoryId.toString()] = category.devices.map(device => ({
               id: device.id,
               name: device.name,
               feature: {
                 id: device.feature.id,
-                floorId: device.feature.floorId
+                floorId: device.feature.floorId,
+                assetId: device.feature.assetId,
+                position: device.feature.position,
+                rotation: device.feature.rotation,
+                scale: device.feature.scale
               }
             }));
           });
           setDevicesByCategory(categoryDevices);
 
-          const allDevices = response.data.flatMap(category => 
+          const allDevices = mergedCategories.flatMap(category =>
             category.devices.map(device => ({
               ...device,
-              categoryType: category.contextPath.replace(/\//g, '')
+              categoryType: category.contextPath
             }))
-          );const poiData: PoiImportOption[] = allDevices.map(device => {
+          );
+
+          const poiData: PoiImportOption[] = allDevices.map(device => {
             const modelUrl = assets.find(asset => asset.id === parseInt(device.feature.assetId))?.file?.url || '';
-            
+
             return {
               id: device.feature.id,
               iconUrl: '',
@@ -91,10 +103,11 @@ const SideMenu: React.FC = () => {
                 deviceId: device.id,
                 deviceType: device.categoryType
               },
-              position: device.feature.position || { x: 0, y: 0, z: 0 }, // 기본 위치값
-              rotation: device.feature.rotation || { x: 0, y: 0, z: 0 }, // 기본 회전값
-              scale: device.feature.scale || { x: 1, y: 1, z: 1 } // 기본 스케일값
-            };          });
+              position: device.feature.position || { x: 0, y: 0, z: 0 },
+              rotation: device.feature.rotation || { x: 0, y: 0, z: 0 },
+              scale: device.feature.scale || { x: 1, y: 1, z: 1 }
+            };
+          });
 
           setPendingPoiData(poiData);
         }
@@ -102,10 +115,73 @@ const SideMenu: React.FC = () => {
         console.error("Error fetching categories:", error);
       }
     };
-    
+
     if (assets.length > 0) {
       fetchCategory();
-    }  }, [stationCode, setMenuItems, assets, setPendingPoiData]);
+    }
+  }, [stationCode, setMenuItems, assets, setPendingPoiData]);
+
+
+  const mergeGroupAndIndividualCategories = (categories: Category[]): Category[] => {
+
+    const baseTypeMap: Record<string, string> = {
+      'shutterGroups': 'shutters',
+      'lightGroups': 'lights',
+      'alarmGroups': 'alarms',
+    };
+
+    const typeToCategory: Record<string, Category> = {};
+    categories.forEach(category => {
+      const path = category.contextPath.replace(/\//g, '');
+      typeToCategory[path] = category;
+    });
+
+    const result: Category[] = [];
+    const processedTypes = new Set<string>();
+
+    categories.forEach(category => {
+      const type = category.contextPath.replace(/\//g, '');
+
+      if (processedTypes.has(type)) {
+        return;
+      }
+
+      if (type.endsWith('Groups')) {
+        const baseType = baseTypeMap[type];
+
+        if (baseType && typeToCategory[baseType]) {
+          const individualCategory = typeToCategory[baseType];
+          const groupCategory = category;
+
+          const combinedDevices = [
+            ...groupCategory.devices,
+            ...individualCategory.devices
+          ];
+
+          const combinedCategory: Category = {
+            ...individualCategory,
+            devices: combinedDevices
+          };
+
+          result.push(combinedCategory);
+          processedTypes.add(type);
+          processedTypes.add(baseType);
+        } else {
+          result.push(category);
+          processedTypes.add(type);
+        }
+      }
+      else if (!processedTypes.has(type)) {
+        const groupType = Object.keys(baseTypeMap).find(key => baseTypeMap[key] === type);
+        if (!groupType || !typeToCategory[groupType]) {
+          result.push(category);
+          processedTypes.add(type);
+        }
+      }
+    });
+
+    return result;
+  };
 
   useEffect(() => {
     Px.Poi.HideAllDisplayText();
@@ -197,19 +273,20 @@ const SideMenu: React.FC = () => {
           </button>
         </div>
       </div>
+
       <SearchPanel />
 
       {isDevicePanelOpen && activeMenu && (
-          <DevicePanel
-            categoryId={activeMenu.id}
-            categoryName={activeMenu.name}
-            categoryType={activeMenu.type}
-            devices={activeMenu.devices}
-            onClose={() => {
-              setActiveMenu(null);
-              setIsDevicePanelOpen(false);
-            }}
-          />
+        <DevicePanel
+          categoryId={activeMenu.id}
+          categoryName={activeMenu.name}
+          categoryType={activeMenu.type}
+          devices={activeMenu.devices}
+          onClose={() => {
+            setActiveMenu(null);
+            setIsDevicePanelOpen(false);
+          }}
+        />
       )}
     </>
   );

@@ -26,20 +26,44 @@ interface DevicePanelProps {
 }
 
 const DevicePanel: React.FC<DevicePanelProps> = ({
-  categoryId,
-  categoryType,
-  categoryName,
-  devices = [],
-  onClose
-}) => {
+                                                   categoryId,
+                                                   categoryType,
+                                                   categoryName,
+                                                   devices = [],
+                                                   onClose
+                                                 }) => {
   const { externalCode, setCurrentFloor } = useStationStore();
   const { openModal } = useDeviceModalStore();
   const { selectedMenus, toggleSelectedMenu, menuItems } = useSideMenuStore();
-  
+
   const [searchValue, setSearchValue] = useState('');
   const [filteredDevices, setFilteredDevices] = useState<DeviceData[]>(devices);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['group', 'individual']);
 
   const isSelected = categoryId ? selectedMenus.some(menu => menu.id === categoryId) : false;
+  const baseType = categoryType.endsWith('Groups')
+    ? categoryType.replace(/Groups$/, '')
+    : categoryType;
+
+  const { groupDevices, individualDevices, hasGroups, hasIndividuals } = React.useMemo(() => {
+    const groupItems: DeviceData[] = [];
+    const individualItems: DeviceData[] = [];
+
+    devices.forEach(device => {
+      if (device.name.toLowerCase().includes('그룹')) {
+        groupItems.push(device);
+      } else {
+        individualItems.push(device);
+      }
+    });
+
+    return {
+      groupDevices: groupItems.sort((a, b) => a.name.localeCompare(b.name)),
+      individualDevices: individualItems.sort((a, b) => a.name.localeCompare(b.name)),
+      hasGroups: groupItems.length > 0,
+      hasIndividuals: individualItems.length > 0
+    };
+  }, [devices]);
 
   useEffect(() => {
     if (searchValue) {
@@ -54,6 +78,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
 
   useEffect(() => {
     setSearchValue('');
+    setExpandedSections(['group', 'individual']);
   }, [categoryId]);
 
   const handleDeviceClick = (device: DeviceData) => {
@@ -84,11 +109,19 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
     }
   };
 
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev =>
+      prev.includes(section)
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
   const renderCategoryTitle = () => {
     if (!categoryName) return "장비 목록";
 
     let displayName = categoryName;
-    
+
     if (categoryName.includes('-')) {
       const parts = categoryName.split('-');
       let mainPart = parts[1].trim();
@@ -96,11 +129,202 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
       if (mainPart.includes('(')) {
         mainPart = mainPart.split('(')[0].trim();
       }
-      
+
       displayName = mainPart;
     }
 
     return <span className="text-lg font-semibold text-white">{displayName}</span>;
+  };
+
+  const renderNormalDeviceList = (devices: DeviceData[]) => (
+    <ul className="space-y-2 overflow-y-auto pr-1 h-[85%] custom-scrollbar">
+      {devices
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((device) => (
+          <li
+            key={device.id}
+            className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
+            onClick={() => {
+              openModal(device.name, device.id, baseType, String(externalCode));
+              handleDeviceClick(device);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-3 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+              />
+            </svg>
+            {device.name}
+          </li>
+        ))}
+    </ul>
+  );
+
+  const renderAccordionSections = () => {
+    return (
+      <div className="space-y-4 h-[85%] overflow-y-auto custom-scrollbar pr-1">
+        {hasGroups && (
+          <div className="bg-primary-800/30 rounded-lg overflow-hidden">
+            <div
+              className="px-4 py-3 bg-primary-700/60 cursor-pointer flex justify-between items-center"
+              onClick={() => toggleSection('group')}
+            >
+              <div className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2 text-gray-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <span className="text-white font-medium">그룹</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-xs text-gray-300 mr-2">{groupDevices.length}개</span>
+                <svg
+                  className={`h-5 w-5 text-gray-400 transition-transform ${
+                    expandedSections.includes('group') ? 'transform rotate-180' : ''
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {expandedSections.includes('group') && (
+              <ul className="mt-1 space-y-1 p-2">
+                {groupDevices.map((device) => (
+                  <li
+                    key={device.id}
+                    className="px-4 py-2.5 bg-primary-700/30 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
+                    onClick={() => {
+                      openModal(device.name, device.id, baseType, String(externalCode));
+                      handleDeviceClick(device);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    {device.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {hasIndividuals && (
+          <div className="bg-primary-800/30 rounded-lg overflow-hidden">
+            <div
+              className="px-4 py-3 bg-primary-700/60 cursor-pointer flex justify-between items-center"
+              onClick={() => toggleSection('individual')}
+            >
+              <div className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2 text-gray-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                <span className="text-white font-medium">개별</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-xs text-gray-300 mr-2">{individualDevices.length}개</span>
+                <svg
+                  className={`h-5 w-5 text-gray-400 transition-transform ${
+                    expandedSections.includes('individual') ? 'transform rotate-180' : ''
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {expandedSections.includes('individual') && (
+              <ul className="mt-1 space-y-1 p-2">
+                {individualDevices.map((device) => (
+                  <li
+                    key={device.id}
+                    className="px-4 py-2.5 bg-primary-700/30 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
+                    onClick={() => {
+                      openModal(device.name, device.id, baseType, String(externalCode));
+                      handleDeviceClick(device);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    {device.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   if (!categoryId) {
@@ -204,50 +428,15 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
                 </svg>
               </div>
             </div>
-            <ul className="space-y-2 h-[85%] overflow-y-auto custom-scrollbar pr-1">
-              {filteredDevices
-                .sort((a, b) => {
-                  const aNum = /^\d/.test(a.name);
-                  const bNum = /^\d/.test(b.name);
 
-                  if (aNum && bNum) {
-                    return parseInt(a.name) - parseInt(b.name);
-                  } else if (aNum) {
-                    return -1;
-                  } else if (bNum) {
-                    return 1;
-                  } else {
-                    return a.name.localeCompare(b.name);
-                  }
-                })
-                .map((device) => (
-                  <li
-                    key={device.id}
-                    className="px-4 py-3 bg-primary-700/40 hover:bg-primary-600/40 rounded-lg cursor-pointer text-gray-200 hover:text-white transition-all flex items-center"
-                    onClick={() => {
-                      openModal(device.name, device.id, categoryType, String(externalCode));
-                      handleDeviceClick(device);
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-3 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                      />
-                    </svg>
-                    {device.name}
-                  </li>
-                ))}
-            </ul>
-            {filteredDevices.length === 0 && (
+            {searchValue ?
+              renderNormalDeviceList(filteredDevices) :
+              (hasGroups && hasIndividuals) ?
+                renderAccordionSections() :
+                renderNormalDeviceList(devices)
+            }
+
+            {filteredDevices.length === 0 && searchValue && (
               <p className="text-gray-400 text-center py-4">검색 결과가 없습니다.</p>
             )}
           </>
