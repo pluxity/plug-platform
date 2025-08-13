@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
-import ZoomControls from '@plug/v1/admin/pages/Viewer/components/ZoomControls';
 
 export interface MapViewerProps {
   modelPath: string;
@@ -46,7 +45,6 @@ const MapViewer = ({ modelPath, onModelLoaded }: MapViewerProps) => {
 
     return (
       <>
-        <ZoomControls />
         <div className="engine w-full h-full inset-0 z-0">
           <div
             ref={containerRef}

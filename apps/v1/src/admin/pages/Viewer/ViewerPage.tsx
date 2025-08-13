@@ -1,19 +1,22 @@
 import { useState, useCallback, memo, Suspense, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Select, ConfirmModal, Button, AccordionIcon } from "@plug/ui";
+import { ConfirmModal, Button } from "@plug/ui";
 import { useStationStore } from './store/stationStore';
 import type { Label3DImportOption, ModelInfo, PoiImportOption } from '@plug/engine/src/interfaces';
 import { AssetList, MapViewer, FeatureEditToolbar } from "./components";
 import { PoiEditModal, ErrorBoundary, TextLabelModal } from "./components";
 import { useStation, useEditMode, useEngineIntegration, useFeatureApi } from "./hooks";
 import type { UseEditModeResult } from "./hooks/useEditMode";
-import type { StationWithFeatures, FeatureResponse } from "./types/station";
+import type { StationWithFeatures } from "./types/station";
 import { Poi, Label3D } from '@plug/engine/src';
 import { v4 as uuidv4 } from 'uuid';
 import { label3dService, useDevicesSWR } from '@plug/common-services';
 import type { Label3DCreateRequest } from "@plug/common-services";
 import * as Px from '@plug/engine/src';
 import SearchList from '@plug/v1/admin/pages/Viewer/components/SearchList';
+import { FloorSelector } from '@plug/v1/admin/pages/Viewer/components/FloorSelector';
+import ZoomControls from '@plug/v1/admin/pages/Viewer/components/ZoomControls';
+
 
 const LoadingSpinner = memo(() => (
   <div className="flex justify-center items-center h-screen">
@@ -27,102 +30,15 @@ const ErrorMessage = memo(({ message }: { message: string }) => (
   </div>
 ));
 
-const FloorSelector = memo(({ 
-  hierarchies, 
-  selectedFloor, 
-  onFloorChange 
-}: {
-  hierarchies: ModelInfo[];
-  selectedFloor: string | null;
-  onFloorChange: (floorId: string) => void;
-}) => {
-  const handleFloorSelect = (values: string[]) => {
-    const floorId = values[0];
-    if (floorId) {
-      onFloorChange(floorId);
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-between px-2 pt-4">
-      <Select
-        className="text-sm text-gray-300 ml-2 w-64"
-        selected={selectedFloor ? [selectedFloor] : []}
-        onChange={handleFloorSelect}
-      >
-        <div className="relative">
-          <Select.Trigger />
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none w-4 h-4">
-            <AccordionIcon />
-          </div>
-        </div>
-        <Select.Content>
-          {hierarchies
-            .sort((a, b) => Number(b.floorId) - Number(a.floorId))
-            .map(floor => (
-              <Select.Item key={floor.floorId} value={floor.floorId}>
-                {floor.displayName}
-              </Select.Item>
-            ))
-          }
-        </Select.Content>
-      </Select>
-    </div>
-  );
-});
-
-const SearchFeature = memo(({ features }: { features: FeatureResponse[] }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      const term = searchTerm.trim();
-      if (!term) {
-        return;
-      }
-
-      const foundFeature = features.find(feature =>
-        feature.id.toLowerCase().includes(term.toLowerCase()) ||
-        (feature.deviceId && feature.deviceId.toLowerCase().includes(term.toLowerCase())) ||
-        (feature.deviceName && feature.deviceName.toLowerCase().includes(term.toLowerCase()))
-      );
-
-      if (foundFeature) {
-        try {
-          Px.Camera.MoveToPoi(foundFeature.id, 1.5);
-        } catch (error) {
-          console.error('카메라 이동 중 오류:', error);
-        }
-      }
-    }
-  }, [searchTerm, features]);
-
-  return (
-    <div className="flex items-center justify-between px-2 pt-4">
-      <div className="w-60">
-        <input
-          type="text"
-          placeholder="장비를 입력해주세요."
-          className="bg-white h-10 w-full py-1 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-sm text-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-      </div>
-    </div>
-  );
-});
 
 const ViewerHeader = memo(({ 
   hierarchies,
   selectedFloor,
   onFloorChange,
-  features
 }: {
   hierarchies: ModelInfo[] | null;
   selectedFloor: string | null;
   onFloorChange: (floorId: string) => void;
-  features: FeatureResponse[];
 }) => (
   <div className="flex absolute pl-4 pt-2 items-center z-10 space-x-4">
     <div className="flex items-center justify-center">
@@ -133,7 +49,6 @@ const ViewerHeader = memo(({
           onFloorChange={onFloorChange}
         />
       )}
-      <SearchFeature features={features} />
     </div>
   </div>
 ));
@@ -279,7 +194,6 @@ const ViewerContent = memo(({
           hierarchies={hierarchies}
           selectedFloor={selectedFloor}
           onFloorChange={onFloorChange}
-          features={stationData.features}
         />
         <Suspense fallback={<LoadingSpinner />}>
           <MapViewer modelPath={modelPath} onModelLoaded={onModelLoaded} />
@@ -291,6 +205,11 @@ const ViewerContent = memo(({
           onDeleteMode={editMode.setDeleteMode}
           onExitEdit={editMode.exitEdit}
           currentMode={editMode.currentMode}
+        />
+        <ZoomControls
+          hierarchies={hierarchies || []}
+          selectedFloor={selectedFloor}
+          onFloorChange={onFloorChange}
         />
         <div className="absolute bottom-20 left-6 flex gap-4">
           <Button

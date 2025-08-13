@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import * as Px from '@plug/engine/src';
+import type { ModelInfo } from '@plug/engine/dist/src/interfaces';
 
 interface ZoomControlsProps {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onResetView?: () => void;
+  hierarchies?: ModelInfo[];
+  selectedFloor: string | null;
+  onFloorChange: (floorId: string) => void;
 }
 
 const ZoomControls: React.FC<ZoomControlsProps> = ({
-                                                          onZoomIn,
-                                                          onZoomOut,
-                                                          onResetView
-                                                        }) => {
+                                                     onZoomIn,
+                                                     onZoomOut,
+                                                     onResetView,
+                                                     hierarchies,
+                                                     selectedFloor,
+                                                     onFloorChange
+                                                   }) => {
   const zoomAnimationRef = useRef<number | null>(null);
   const zoomFactorRef = useRef<number>(0);
 
@@ -79,46 +86,156 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
     onResetView?.();
   };
 
+  const sortedFloors = React.useMemo(() => {
+    if (!hierarchies) return [];
+    return [...hierarchies].sort((a, b) => Number(b.floorId) - Number(a.floorId));
+  }, [hierarchies]);
+
+  const currentFloorIndex = React.useMemo(() => {
+    if (!selectedFloor || !hierarchies) return -1;
+    return sortedFloors.findIndex(floor => floor.floorId === selectedFloor);
+  }, [selectedFloor, sortedFloors]);
+
+  const goToUpperFloor = () => {
+    if (currentFloorIndex > 0) {
+      onFloorChange(sortedFloors[currentFloorIndex - 1].floorId);
+    }
+  };
+
+  const goToLowerFloor = () => {
+    if (currentFloorIndex < sortedFloors.length - 1) {
+      onFloorChange(sortedFloors[currentFloorIndex + 1].floorId);
+    }
+  };
+
+  const formatDisplayName = (floor: ModelInfo) => {
+    return floor.displayName.replace(/\(.*\)/g, '');
+  };
+
+  const selectedFloorInfo = selectedFloor && hierarchies ?
+    sortedFloors.find(f => f.floorId === selectedFloor) : null;
+
   return (
     <div className="fixed right-5 bottom-5 z-10 flex flex-col gap-2">
-      <button
-        onClick={handleZoomIn}
-        className="bg-white rounded-full shadow-lg p-2 hover:bg-gray-100 transition-colors duration-200"
-        title="확대"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        <span className="absolute right-full mr-3 px-3 py-2 bg-white/80 backdrop-blur-md text-zinc-700 text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
-          확대
-        </span>
-      </button>
+      <div className="flex flex-col items-center space-y-1 bg-white rounded-lg p-1 shadow-md border border-gray-100">
+        <button
+          onClick={goToUpperFloor}
+          disabled={currentFloorIndex <= 0}
+          className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${
+            currentFloorIndex <= 0
+              ? 'text-gray-300 cursor-not-allowed'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-primary-500'
+          }`}
+          title="위층으로 이동"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m18 15-6-6-6 6" />
+          </svg>
+        </button>
 
-      <button
-        onClick={handleZoomOut}
-        className="bg-white rounded-full shadow-lg p-2 hover:bg-gray-100 transition-colors duration-200"
-        title="축소"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
-        </svg>
-        <span className="absolute right-full mr-3 px-3 py-2 bg-white/80 backdrop-blur-md text-zinc-700 text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
-          축소
-        </span>
-      </button>
+        {selectedFloorInfo && (
+          <div className="w-7 h-7 flex items-center justify-center bg-primary-500 rounded-md text-xs font-bold text-white shadow-sm">
+            {formatDisplayName(selectedFloorInfo)}
+          </div>
+        )}
 
-      <button
-        onClick={handleResetView}
-        className="bg-white rounded-full shadow-lg p-2 hover:bg-gray-100 transition-colors duration-200"
-        title="전체 보기"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-        </svg>
-        <span className="absolute right-full mr-3 px-3 py-2 bg-white/80 backdrop-blur-md text-zinc-700 text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
-          전체 보기
-        </span>
-      </button>
+        <button
+          onClick={goToLowerFloor}
+          disabled={currentFloorIndex >= sortedFloors.length - 1 || currentFloorIndex < 0}
+          className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${
+            currentFloorIndex >= sortedFloors.length - 1 || currentFloorIndex < 0
+              ? 'text-gray-300 cursor-not-allowed'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-primary-500'
+          }`}
+          title="아래층으로 이동"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="flex flex-col items-center space-y-1 bg-white rounded-lg p-1 shadow-md border border-gray-100">
+        <button
+          onClick={handleZoomIn}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary-500 transition-colors"
+          title="확대"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+
+        <button
+          onClick={handleZoomOut}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary-500 transition-colors"
+          title="축소"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14" />
+          </svg>
+        </button>
+
+        <button
+          onClick={handleResetView}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary-500 transition-colors"
+          title="전체 보기"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };
