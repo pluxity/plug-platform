@@ -15,7 +15,7 @@ export interface DeviceFeature {
 }
 
 export interface Category{
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   contextPath: string;
   iconFile: {url: string;};

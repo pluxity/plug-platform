@@ -38,8 +38,7 @@ const DevicePanel: React.FC<DevicePanelProps> = ({
   
   const [searchValue, setSearchValue] = useState('');
   const [filteredDevices, setFilteredDevices] = useState<DeviceData[]>(devices);
-  
-  // 현재 카테고리가 선택되어 있는지 확인
+
   const isSelected = categoryId ? selectedMenus.some(menu => menu.id === categoryId) : false;
 
   useEffect(() => {

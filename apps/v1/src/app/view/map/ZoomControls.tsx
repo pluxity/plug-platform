@@ -80,7 +80,7 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
   };
 
   return (
-    <div className="fixed right-5 bottom-5 z-10 rounded-r-md shadow-[1px_0px_4px_2px_rgba(0,76,151,0.5)] bg-primary-900/20 backdrop-blur-md flex gap-2 p-2">
+    <div className="fixed right-5 bottom-5 z-10 rounded-md shadow-[1px_0px_4px_2px_rgba(0,76,151,0.5)] bg-primary-900/20 backdrop-blur-md flex gap-2 p-2">
       <button
         onClick={handleZoomIn}
         className="relative rounded-md py-2 px-2 cursor-pointer group transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_8px_rgba(0,120,255,0.3)]"

@@ -10,6 +10,7 @@ import { Tooltip } from '@plug/ui';
 import type { PoiImportOption } from '@plug/engine/dist/src/interfaces';
 import type { Category } from '@plug/v1/app/view/types/sidemenu';
 import * as Px from '@plug/engine/src';
+import SearchPanel from './SearchPanel';
 
 interface DeviceData {
   id: string;
@@ -196,6 +197,7 @@ const SideMenu: React.FC = () => {
           </button>
         </div>
       </div>
+      <SearchPanel />
 
       {isDevicePanelOpen && activeMenu && (
           <DevicePanel
