@@ -107,14 +107,14 @@ const SearchPanel: React.FC = () => {
     }
   }, [isExpanded]);
 
-  const handleExpandClick = () => {
-    setIsExpanded(true);
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 100);
-  };
+  // const handleExpandClick = () => {
+  //   setIsExpanded(true);
+  //   setTimeout(() => {
+  //     if (inputRef.current) {
+  //       inputRef.current.focus();
+  //     }
+  //   }, 100);
+  // };
 
   const clearSearchTerm = () => {
     setSearchTerm('');
@@ -211,56 +211,83 @@ const SearchPanel: React.FC = () => {
     >
       <div
         className={clsx(
-          'transition-all duration-300 ease-in-out relative',
-          isExpanded ? 'w-80' : 'w-10',
+          'transition-all duration-300 ease-in-out relative w-80',
+          // isExpanded ? 'w-80' : 'w-10',
         )}
       >
-        {isExpanded ? (
-          <div
-            className="backdrop-blur-md rounded-lg shadow-xl transition-opacity duration-300 opacity-100 relative"
-          >
-            <Input
-              type="text"
-              placeholder="디바이스 검색..."
-              value={searchTerm}
-              onChange={setSearchTerm}
-              onFocus={() => setIsOpen(true)}
-              className="w-full text-white pr-10"
-              autoComplete="off"
-              ref={inputRef}
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex space-x-1">
-              {searchTerm && (
-                <button
-                  onClick={clearSearchTerm}
-                  className="text-white/70 hover:text-white transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              )}
-            </div>
+        {/*{isExpanded ? (*/}
+        {/*  <div*/}
+        {/*    className="backdrop-blur-md rounded-lg shadow-xl transition-opacity duration-300 opacity-100 relative"*/}
+        {/*  >*/}
+        {/*    <Input*/}
+        {/*      type="text"*/}
+        {/*      placeholder="디바이스 검색..."*/}
+        {/*      value={searchTerm}*/}
+        {/*      onChange={setSearchTerm}*/}
+        {/*      onFocus={() => setIsOpen(true)}*/}
+        {/*      className="w-full text-white pr-10"*/}
+        {/*      autoComplete="off"*/}
+        {/*      ref={inputRef}*/}
+        {/*    />*/}
+        {/*    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex space-x-1">*/}
+        {/*      {searchTerm && (*/}
+        {/*        <button*/}
+        {/*          onClick={clearSearchTerm}*/}
+        {/*          className="text-white/70 hover:text-white transition-colors"*/}
+        {/*        >*/}
+        {/*          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">*/}
+        {/*            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />*/}
+        {/*          </svg>*/}
+        {/*        </button>*/}
+        {/*      )}*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*) : (*/}
+        {/*  <button*/}
+        {/*    onClick={handleExpandClick}*/}
+        {/*    className="w-10 h-10 flex items-center justify-center bg-primary-900/40 backdrop-blur-md border border-primary-100/10 rounded-full shadow-xl text-white hover:bg-primary-800/80 transition-all duration-300"*/}
+        {/*  >*/}
+        {/*    <svg*/}
+        {/*      xmlns="http://www.w3.org/2000/svg"*/}
+        {/*      viewBox="0 0 20 20"*/}
+        {/*      fill="currentColor"*/}
+        {/*      className="w-5 h-5 text-gray-300"*/}
+        {/*    >*/}
+        {/*      <path*/}
+        {/*        fillRule="evenodd"*/}
+        {/*        d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"*/}
+        {/*        clipRule="evenodd"*/}
+        {/*      />*/}
+        {/*    </svg>*/}
+        {/*  </button>*/}
+        {/*)}*/}
+        <div
+          className="backdrop-blur-md rounded-lg shadow-xl transition-opacity duration-300 opacity-100 relative"
+        >
+          <Input
+            type="text"
+            placeholder="디바이스 검색..."
+            value={searchTerm}
+            onChange={setSearchTerm}
+            onFocus={() => setIsOpen(true)}
+            className="w-full text-white pr-10"
+            autoComplete="off"
+            ref={inputRef}
+          />
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex space-x-1">
+            {searchTerm && (
+              <button
+                onClick={clearSearchTerm}
+                className="text-white/70 hover:text-white transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            )}
           </div>
-        ) : (
-          <button
-            onClick={handleExpandClick}
-            className="w-10 h-10 flex items-center justify-center bg-primary-900/40 backdrop-blur-md border border-primary-100/10 rounded-full shadow-xl text-white hover:bg-primary-800/80 transition-all duration-300"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5 text-gray-300"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        )}
+        </div>
+
 
         {isOpen && results.length > 0 && (
           <div 

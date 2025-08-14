@@ -176,6 +176,7 @@ const ViewerPage = () => {
   }, [fetchAssets]);
 
   useEffect(() => {
+    // TODO: 개발서버에서는 3d-map 빼기
     const eventSource = new EventSource('/3d-map/api/sse');
 
     eventSource.addEventListener('ttc-data', (event) => {

@@ -127,7 +127,6 @@ const SideMenu: React.FC = () => {
     const baseTypeMap: Record<string, string> = {
       'shutterGroups': 'shutters',
       'lightGroups': 'lights',
-      'alarmGroups': 'alarms',
     };
 
     const typeToCategory: Record<string, Category> = {};
