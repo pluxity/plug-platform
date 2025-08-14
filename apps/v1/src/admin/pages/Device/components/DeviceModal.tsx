@@ -106,7 +106,6 @@ export const DeviceModal = ({
             title={mode === 'create' ? '장비 등록' : '장비 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form

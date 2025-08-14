@@ -79,7 +79,7 @@ const Pagination = ({
     return (
         <div className={
             cn(  
-                "flex justify-center mt-6 space-x-2",  
+                "flex justify-center space-x-2",
                 className  
             )}
             role="navigation" 

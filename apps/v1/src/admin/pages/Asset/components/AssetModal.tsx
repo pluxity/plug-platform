@@ -21,50 +21,33 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
     const {addToast} = useToastStore();
     const [name, setName] = useState('');
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-    // 3d 모델 파일 상태 관리
     const [modelFile, setModelFile] = useState<File | null>(null);
     const [uploadedModelId, setUploadedModelId] = useState<number | null>(null);
-
-    // thumbnail파일 상태 관리
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
     const [uploadThumbnailId, setUploadThumbnailId] = useState<number | null>(null);
-
-    // 파일 공통 로딩 상태 관리
     const [isUploading, setIsUploading] = useState(false);
 
-    // 파일 업로드 훅
     const {execute: uploadFile, isLoading: isFileUploading, error: fileError} = useFileUpload();
-
-    // 에셋 생성 훅
     const {execute: createAsset, isLoading: isAssetCreating, error: assetError} = useAssetCreate();
-
-    // 에셋 상세 조회 훅
     const {mutate, data: detailAssetData} = useAssetsDetailSWR(mode === 'edit' && selectedAssetId ? Number(selectedAssetId) : 0);
-
-    // 에셋 수정 훅
     const { execute: updateAsset, isLoading: isAssetUpdating, error: assetUpdateError} = useAssetUpdate(Number(selectedAssetId));
 
-    // 3D 모델 파일 선택 핸들러
     const handleModelChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
         setModelFile(file);
 
-        // 파일명을 기본 이름 값으로 설정
         if (!name) {
-            setName(file.name.replace(/\.[^/.]+$/, "")); // 확장자 제거
+            setName(file.name.replace(/\.[^/.]+$/, ""));
         }
 
-        // GLB 파일인지 확인하고 적절한 MIME 타입 설정
         const mimeType = file.name.endsWith('.glb') ? 'model/gltf-binary' :
             file.name.endsWith('.gltf') ? 'model/gltf+json' :
                 undefined;
 
-        // 파일이 선택되면 자동으로 업로드 시작
         setIsUploading(true);
-        // 올바른 MIME 타입으로 FormData 생성
+
         const formData = createFileFormData(file, mimeType);
         uploadFile(formData)
             .then(response => {
@@ -89,12 +72,10 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             });
     }, [uploadFile, name, addToast]);    
 
-    // Thumbnail 파일 선택 핸들러
     const handleThumbnailChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        // 이미지 파일 체크 (JPEG, JPG, PNG, WebP, GIF 등)
         if (!file.type.startsWith('image/')) {
             addToast({
                 title: '파일 형식 오류',
@@ -105,9 +86,8 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
         }
 
         setThumbnailFile(file);
+        setIsUploading(true);
 
-        // 파일이 선택되면 자동으로 업로드 시작
-        setIsUploading(true);        // 올바른 MIME 타입으로 FormData 생성
         const formData = createFileFormData(file, file.type);
         uploadFile(formData)
             .then(response => {
@@ -135,7 +115,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             URL.revokeObjectURL(previewUrl);
         }
         const newPreviewUrl = URL.createObjectURL(file);
-        // 썸네일 미리보기 URL 설정
         setPreviewUrl(newPreviewUrl);
 
     }, [uploadFile, addToast, previewUrl]);
@@ -147,8 +126,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
         }
     }, [mode, detailAssetData, isOpen]);
 
-
-    // 폼 초기화
     const resetForm = useCallback(() => {
         setName('');
         setModelFile(null);
@@ -159,9 +136,7 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
         onClose();
     }, [onClose]);
 
-    // 제출 핸들러
     const handleFinish = useCallback(async (values: Record<string, string>) => {
-        // 수정 모달 제출
         if (mode === 'edit' && detailAssetData) {
             try {
                 const asset = await updateAsset({
@@ -171,7 +146,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                     thumbnailFileId: uploadThumbnailId || undefined
                 });
 
-                // 성공 처리
                 if (asset) {
                     await mutate();
                     addToast({
@@ -193,7 +167,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             }  finally {
                setIsUploading(false);
             }
-            // 등록 모달 제출
         } else {
             if (!uploadedModelId || !uploadThumbnailId) {
                 addToast({
@@ -205,7 +178,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             }
 
             try {
-                // 에셋 생성 API 호출
                 const asset = await createAsset({
                     name: values.assetRegistName || name,
                     code: values.assetCode || '',
@@ -213,7 +185,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
                     thumbnailFileId: uploadThumbnailId,
                 });
 
-                // 성공 처리
                 if (asset) {
                     addToast({
                         title: '등록 완료',
@@ -236,11 +207,8 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
         }
     }, [createAsset, uploadedModelId, name, mode, onSuccess, detailAssetData, updateAsset, uploadThumbnailId, resetForm, addToast]);
 
-
-    // 에러 메시지 표시
     const isProcessing = isFileUploading || isAssetCreating || isAssetUpdating;
 
-    // 파일 선택기 열기
     const openFilePicker = (type: 'model' | 'thumbnail') => {
         const fileInput = document.getElementById(type === 'model' ? 'icon-file' : 'thumbnail-file');
         if (fileInput) {
@@ -253,7 +221,6 @@ export const AssetRegistModal = ({isOpen, onClose, onSuccess, mode, selectedAsse
             title={mode === 'create' ? '에셋 등록' : '에셋 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form

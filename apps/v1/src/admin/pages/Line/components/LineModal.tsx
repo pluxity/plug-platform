@@ -101,7 +101,6 @@ export const LineModal = ({isOpen, onClose, onSuccess, mode, selectedLineId}: Li
             title={mode === 'create' ? '호선 등록' : '호선 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form

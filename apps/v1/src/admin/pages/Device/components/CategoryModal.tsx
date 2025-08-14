@@ -181,7 +181,6 @@ export const CategoryModal = ({isOpen, onClose, onSuccess, mode, selectedCategor
             title={mode === 'create' ? '장비 분류 등록' : '장비 분류 수정'}
             isOpen={isOpen}
             onClose={isProcessing ? undefined : resetForm}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form

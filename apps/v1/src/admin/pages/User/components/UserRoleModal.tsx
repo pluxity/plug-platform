@@ -46,7 +46,6 @@ export const UserRoleModal = ({isOpen, onClose, onSuccess, selectedUserId}: User
             title="사용자 권한 관리"
             isOpen={isOpen}
             onClose={onClose}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form onSubmit={handleFinish}>

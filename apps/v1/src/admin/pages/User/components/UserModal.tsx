@@ -119,7 +119,6 @@ export const UserModal = ({isOpen, onClose, onSuccess, mode, selectedUserId}: Us
             title={mode === 'create' ? '사용자 등록' : '사용자 수정'}
             isOpen={isOpen}
             onClose={isCreating ? undefined : resetForm}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form

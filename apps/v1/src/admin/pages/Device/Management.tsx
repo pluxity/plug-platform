@@ -155,7 +155,7 @@ export default function DevicePage() {
           <DataTable
             data={deviceData || []}
             columns={columns}
-            pageSize={7}
+            pageSize={8}
             selectable={true}
             showSearch={true}
             selectedRows={selectedDevices}

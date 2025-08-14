@@ -55,7 +55,6 @@ export const UserPasswordModal = ({isOpen, onClose, onSuccess, selectedUserId}: 
             title='비밀번호 수정'
             isOpen={isOpen}
             onClose={isPasswordUpdating ? undefined : resetForm}
-            closeOnOverlayClick={false}
             overlayClassName="bg-black/50"
         >
             <Form onSubmit={handlePasswordFinish}>

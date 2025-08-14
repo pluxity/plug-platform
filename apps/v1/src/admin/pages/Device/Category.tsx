@@ -130,7 +130,7 @@ export default function DeviceCategory() {
             <DataTable
               data={categoryData || []}
               columns={columns}
-              pageSize={7}
+              pageSize={8}
               selectable={true}
               selectedRows={selectedCategories}
               onSelectChange={setSelectedCategories}

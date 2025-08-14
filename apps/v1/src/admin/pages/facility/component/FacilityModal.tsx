@@ -31,7 +31,6 @@ export const FacilityModal = ({ isOpen, onClose, onSuccess }: FacilityModalProps
             title="역사 정보 등록"
             isOpen={isOpen}
             onClose={isLoading ? undefined : resetForm}
-            closeOnOverlayClick={false}
         >
             <div>
                 <Form onSubmit={handleFinish}>

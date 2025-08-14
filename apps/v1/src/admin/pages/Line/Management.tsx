@@ -63,7 +63,7 @@ export default function LinePage() {
     };
 
     const handleEdit = async (lineId: number) => {
-        await setSelectedLineId(lineId);
+      setSelectedLineId(lineId);
         openModal('edit');
     };
 
@@ -87,7 +87,7 @@ export default function LinePage() {
                     await Promise.all(
                         Array.from(selectedLines).map(line => handleDelete(line.id), false)
                     );
-                    await mutate();
+                  mutate();
                     addToast({
                         variant: "normal",
                         title: '삭제 완료',
@@ -125,7 +125,7 @@ export default function LinePage() {
                     <DataTable
                         data={lineData || []}
                         columns={columns}
-                        pageSize={7}
+                        pageSize={8}
                         selectable={true}
                         selectedRows={selectedLines}
                         onSelectChange={setSelectedLines}

@@ -112,7 +112,7 @@ export default function AssetPage() {
     };
     return (
         <>
-            <div className='mt-4 relative h-[90%]'>
+            <div className='mt-4 relative'>
                 <div className='ml-auto flex gap-1 w-48 absolute z-10 right-0'>
                     <Button color='primary'
                             className='bg-primary-150 text-primary-700 font-semibold hover:bg-primary-200'

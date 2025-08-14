@@ -61,7 +61,7 @@ export default function FacilitiesPage() {
                     등록
                 </Button>
             </div>
-            <div className='flex flex-col gap-6 mt-2.5'>
+            <div className='w-full h-[90%] mt-5 flex flex-col justify-between' >
                 <div className='grid grid-cols-4 gap-4'>
                     {currentStations.length === 0 ? (
                         <StateInfoWrapper preset="emptyTable" onClick={() => openModal('create')}
