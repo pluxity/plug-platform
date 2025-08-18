@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { Button } from '@plug/ui'
 import { toast } from 'sonner'
 
@@ -11,8 +12,8 @@ import {
   useAssetStore
 } from '@/global/store'
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services'
+import { createFeature } from '@plug/common-services'
 import { Poi } from '@plug/engine/src';
-import { PoiImportOption } from '@plug/engine/src/interfaces'
 
 interface AssetListSideBarProps {
   onAssetClick?: (assetId: number) => void
@@ -214,6 +215,8 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
   isCollapsed = false,
   // onToggleCollapse
 }) => {
+  // facilityId 가져오기
+  const { id: facilityId } = useParams<{ id: string }>();
   // Asset Store hooks
   const { isLoading: assetsLoading, error: assetsError } = useAssets()
   const { isLoading: categoriesLoading, error: categoriesError } = useAssetCategories()
@@ -262,9 +265,7 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
           }
         }
         
-        Poi.Create(poiOption, (data: PoiImportOption) => {
-          toast.success(`Feature 배치 완료: ${data.id}`)
-        })
+        Poi.Create(poiOption, handleCreateFeature)  
       } else {
         const errorMessage = !asset 
           ? 'Asset을 찾을 수 없습니다.' 
@@ -273,6 +274,31 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
         toast.error(errorMessage)
       }
   }
+ 
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCreateFeature = async (feature: any) => {
+    if (!facilityId) { 
+      toast.error('시설이 선택되지 않았습니다.');
+      return;
+    }
+    try{
+      await createFeature({
+        id: feature.id,
+        assetId: feature.property.assetId,
+        facilityId: parseInt(facilityId), 
+        floorId: feature.floorId,
+        position: feature.position,
+        rotation: feature.rotation,
+        scale: feature.scale,
+      })
+
+      toast.success('Feature 생성 완료')
+    } catch (error) {
+      console.error('Failed to create feature:', error)
+      toast.error('Feature 생성에 실패했습니다. 다시 시도해주세요.')
+    }
+  }   
 
   const renderContent = () => {
     if (isLoading) {
