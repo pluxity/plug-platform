@@ -5,12 +5,14 @@ interface IndoorMapViewerProps {
   modelUrl: string;
   className?: string;
   onLoadComplete?: () => void;
+  isDeleteMode?: boolean;
+  onFeatureDelete?: (featureId: string) => void;
 }
 
 export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({ 
   modelUrl,
   className = "w-full h-full", 
-  onLoadComplete
+  onLoadComplete,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engine3DRef = useRef<Engine3D | null>(null);

@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType, FeatureResponse } from '@plug/common-services'
+import { FacilityService, FacilityType, FeatureResponse, deleteFeature } from '@plug/common-services'
 import { IndoorMapViewer } from '@/global/components'
 import { FloorControl } from '@/global/components/indoor-map/FloorControl'
-import { Button } from "@plug/ui"
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
 import { ArrowLeft } from "lucide-react"
 import { IndoorMapEditTools } from '../components'
 import { useAssets } from '@/global/store/assetStore'
@@ -12,6 +12,8 @@ import { api } from '@plug/api-hooks/core'
 import { Poi } from '@plug/engine/src'
 import { convertFloors } from '@/global/utils/floorUtils'
 import type { Floor } from '@/global/types'
+import { Event } from '@plug/engine/src'
+import { toast } from "sonner"
 
 type FacilityData = {
   facility?: {
@@ -26,6 +28,20 @@ type FacilityData = {
   floors?: Array<{name: string; floorId: string}>
   stationInfo?: {lineIds?: number[]; stationCodes?: string[]}
   boundary?: string
+}
+
+type featureData = {
+  target:{
+    displayText: string;
+    id: string;
+    property?:{
+      assetCode: string;
+      assetId: number;
+      assetName: string;
+      categoryId: number;
+      categoryName?: string;
+    }
+  }
 }
 
 const FacilityIndoor: React.FC = () => {
@@ -45,6 +61,61 @@ const FacilityIndoor: React.FC = () => {
   const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([])
   
   const { assets } = useAssets()
+
+  // 삭제 모드 상태 추가
+  const [isDeleteMode, setIsDeleteMode] = useState(false)
+  const [selectedFeature, setSelectedFeature] = useState<featureData | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  // 삭제 모드 변경 핸들러
+  const handleDeleteModeChange = (deleteMode: boolean) => {
+    setIsDeleteMode(deleteMode);
+  }
+
+  // POI 삭제 처리
+  const handleFeatureDelete = async (featureId: string) => {
+    try {
+      Poi.Delete(featureId);
+      console.log('3d 엔진에서 삭제 완료')
+
+      await deleteFeature(featureId);
+      console.log('API 삭제 완료')
+
+      setIsDeleteMode(false)
+      setShowDeleteDialog(false)
+      setSelectedFeature(null);
+      
+      toast.success('POI가 성공적으로 삭제되었습니다.')
+    } catch (error) {
+      console.error('POI 삭제 중 오류:', error)
+      toast.error('POI 삭제 중 오류가 발생했습니다.')
+    }
+  }
+
+  // 삭제 취소 처리
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false)
+    setSelectedFeature(null)
+  }
+
+  // POI 클릭 이벤트 리스너 등록
+  useEffect(() => {
+    const handleFeatureClick = (eventData: unknown) => {
+      if (isDeleteMode) {
+        setSelectedFeature(eventData as featureData);
+        setShowDeleteDialog(true);
+      }
+    };
+
+    if (isDeleteMode) {
+      Event.AddEventListener('onPoiPointerUp' as never, handleFeatureClick);
+    } 
+    
+    // 클린업 함수를 if 블록 밖으로 이동
+    return () => {
+      Event.RemoveEventListener('onPoiPointerUp' as never, handleFeatureClick);
+    };
+  }, [isDeleteMode]);
 
   // Features 로드를 위한 함수
   const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
@@ -298,6 +369,8 @@ const FacilityIndoor: React.FC = () => {
                 modelUrl={facilityData?.facility?.drawing?.url || ''}
                 className="w-full h-full"
                 onLoadComplete={handleLoadComplete}
+                isDeleteMode={isDeleteMode}
+                onFeatureDelete={handleFeatureDelete}
               />
               
               {/* Floor Control - 우측 하단 */}
@@ -309,12 +382,32 @@ const FacilityIndoor: React.FC = () => {
               
               {/* POI 편집 툴 - 우측 상단 */}
               <div className="absolute top-4 right-4 z-30">
-                <IndoorMapEditTools />
+                <IndoorMapEditTools onDeleteMode={handleDeleteModeChange} />
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {showDeleteDialog && selectedFeature && (
+        <Dialog open={showDeleteDialog} onOpenChange={handleDeleteCancel}>
+          <DialogContent title="삭제 확인">
+          <DialogDescription>
+            선택된 POI를 삭제하겠습니까? <br/>
+            id: {selectedFeature.target.id} <br/>
+            name: {selectedFeature.target.displayText}
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleDeleteCancel}>
+              취소
+            </Button>
+            <Button onClick={() => handleFeatureDelete(selectedFeature.target.id)}>
+              삭제
+            </Button>
+          </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </PageContainer>
   )
 }

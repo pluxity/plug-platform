@@ -41,7 +41,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         Poi.FinishEdit()
       }
       
-      // 삭제 모드가 활성화되어 있다면 종료
+      // 현재 삭제 모드 중이면 종료
       if (isDeleteMode) {
         setIsDeleteMode(false) 
         onDeleteMode?.(false)
@@ -56,22 +56,25 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
     }
   }
 
-  const handleStartDeleteMode = () => {
+  const handleDeleteMode = () => {
     try {
-      // 현재 편집 중이면 먼저 종료
-      if (isEditing) {
-        Poi.FinishEdit()
-        setIsEditing(false)
-        setEditMode(null)
+      if (isDeleteMode) {
+        setIsDeleteMode(false);
+        onDeleteMode?.(false);
+      } else {
+        if (isEditing) {
+          Poi.FinishEdit();
+          setIsEditing(false);
+          setEditMode(null);
+        }
+        
+        setIsDeleteMode(true);
+        onDeleteMode?.(true);
       }
-      
-      // 삭제 모드 시작
-      setIsDeleteMode(true)   
-      onDeleteMode?.(true)
     } catch (error) {
-      console.error('삭제 모드 시작 중 오류:', error)
+      console.error('삭제 모드 중 오류:', error);
     }
-  }
+  };
 
   // ESC 키로 편집 종료
   useEffect(() => {
@@ -158,12 +161,12 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => isDeleteMode ? handleFinishEdit() : handleStartDeleteMode()}
+        onClick={handleDeleteMode}
         className={`
           h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
           ${isDeleteMode 
             ? 'bg-gradient-to-br from-red-400 via-pink-500 to-red-600 text-white shadow-xl shadow-red-500/40 scale-110 ring-2 ring-red-300/50' 
-            : 'bg-gradient-to-br from-red-100 to-pink-100 hover:from-red-200 hover:to-pink-200 text-red-700 hover:text-pink-700 hover:scale-105 shadow-md hover:shadow-lg'
+            : 'bg-gradient-to-br from-red-100 to-pink-100 hover:from-red-200 hover:to-pink-200 text-red-700 hover:text-red-700 hover:scale-105 shadow-md hover:shadow-lg'
           }
         `}
         title={isDeleteMode ? '삭제 모드 종료' : '삭제 모드 시작'}
