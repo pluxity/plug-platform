@@ -64,18 +64,11 @@ export default function OSMBuildingsMap({ className, children }: OSMBuildingsMap
             tileset.skipLevels = 1;
             tileset.immediatelyLoadDesiredLevelOfDetail = false;
             tileset.loadSiblings = false;
-            
-            // 건물을 terrain에 맞게 조정
-            // clampToHeight 옵션으로 건물이 지형을 따라가도록 설정
-            tileset.style = new Cesium.Cesium3DTileStyle({
-              heightOffset: '0' // 건물 높이 오프셋을 0으로 설정
-            });
           }}
         />
         
-        {children}
-        
-        <InitialCameraSetup/>
+  {children}
+  <InitialCameraSetup/>
       </ResiumViewer>
     </>
   );

@@ -22,7 +22,7 @@ export const usePermissionCheckbox = () => {
         resourceId: string, 
         checked: boolean
     ) => {
-        let newPermissions = [...permissions];
+        const newPermissions = [...permissions];
         
         // 해당 resourceType의 permission 찾기
         const existingPermissionIndex = newPermissions.findIndex(p => p.resourceType === resourceType);

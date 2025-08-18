@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { FacilityResponse } from '@plug/common-services'
 import * as Cesium from 'cesium'
@@ -9,34 +9,39 @@ interface FacilitySearchFormProps {
 
 const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<FacilityResponse[]>([])
   const searchRef = useRef<HTMLDivElement>(null)
   
-  const { 
-    searchQuery, 
-    searchResults, 
-    performSearch, 
-    clearSearch,
-    selectSearchResult,
-    setSearchSelectedFacility 
-  } = useFacilityStore()
+  // facilities만 선택적으로 구독 (리렌더 최소화)
+  const facilities = useFacilityStore(s => s.facilities)
+  const allFacilities = useMemo(() => {
+    return Object.values(facilities).filter(Array.isArray).flat() as FacilityResponse[]
+  }, [facilities])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value
-    performSearch(query)
-    
-    // 검색 결과가 있을 때만 드롭다운 열기
-    if (query.trim()) {
+    const value = e.target.value
+    setQuery(value)
+    if (value.trim()) {
+      const q = value.toLowerCase()
+      const filtered = allFacilities.filter((f) =>
+        f.name.toLowerCase().includes(q) ||
+        f.code.toLowerCase().includes(q) ||
+        (f.description && f.description.toLowerCase().includes(q))
+      )
+      setResults(filtered)
       setIsOpen(true)
     } else {
+      setResults([])
       setIsOpen(false)
     }
   }
 
   const handleSelectFacility = (facility: FacilityResponse) => {
-    // Store의 검색 상태를 초기화하고 선택된 시설 설정
-    selectSearchResult()
-    setSearchSelectedFacility(facility)
-    setIsOpen(false)
+  // 로컬 상태 정리
+  setIsOpen(false)
+  setQuery('')
+  setResults([])
     
     if (viewer && facility.lat && facility.lon) {
       const targetPosition = Cesium.Cartesian3.fromDegrees(facility.lon, facility.lat, 0)
@@ -56,7 +61,8 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   }
 
   const handleClear = () => {
-    clearSearch()
+    setQuery('')
+    setResults([])
     setIsOpen(false)
   }
 
@@ -67,7 +73,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   }
 
   const handleInputFocus = () => {
-    if (searchQuery.trim().length > 0 && searchResults.length > 0) {
+    if (query.trim().length > 0 && results.length > 0) {
       setIsOpen(true)
     }
   }
@@ -88,7 +94,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
       <div className="relative">
         <input
           type="text"
-          value={searchQuery}
+          value={query}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onKeyDown={handleKeyDown}
@@ -97,7 +103,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         />
         
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-          {searchQuery ? (
+          {query ? (
             <button
               onClick={handleClear}
               className="text-gray-400 hover:text-gray-600 focus:outline-none"
@@ -114,12 +120,12 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         </div>
       </div>
 
-      {isOpen && searchResults.length > 0 && (
+      {isOpen && results.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs text-gray-600">
-            {searchResults.length}개의 시설을 찾았습니다
+            {results.length}개의 시설을 찾았습니다
           </div>
-          {searchResults.map((facility) => (
+          {results.map((facility) => (
             <button
               key={facility.id}
               onClick={() => handleSelectFacility(facility)}
@@ -142,7 +148,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         </div>
       )}
 
-      {isOpen && searchQuery && searchResults.length === 0 && (
+      {isOpen && query && results.length === 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
           <div className="px-4 py-3 text-gray-500 text-center">
             검색 결과가 없습니다.
