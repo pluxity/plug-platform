@@ -34,7 +34,7 @@ const MainMap: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-full relative">
+    <>
       {mapMode === MapMode.OUTDOOR && (
         <OutdoorMap 
           onFacilitySelect={handleFacilitySelect} 
@@ -48,7 +48,7 @@ const MainMap: React.FC = () => {
           onOutdoorButtonClick={toggleMapMode}
         />
       )}
-    </div>
+    </>
   )
 }
 

@@ -109,10 +109,10 @@ const FacilityPOIs: React.FC<{
           if (hoveredEntity?.model) {
             hoveredEntity.model.silhouetteSize = new Cesium.ConstantProperty(3.0)
           }
-          viewer.container.style.cursor = 'pointer'
+          ;(viewer.container as HTMLElement).style.cursor = 'pointer'
         } else {
           hoveredEntity = null
-          viewer.container.style.cursor = 'default'
+          ;(viewer.container as HTMLElement).style.cursor = 'default'
         }
       }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
 

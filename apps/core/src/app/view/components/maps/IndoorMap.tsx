@@ -23,7 +23,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [floors, setFloors] = useState<Floor[]>([]);
   
-  const { isLoading, facilitiesFetched } = useFacilityStore();
+  // Facilities fetched flag from store
+  const facilitiesFetched = useFacilityStore((s) => s.facilitiesFetched);
   const { assets } = useAssets();
 
   // Features 로드를 위한 함수
@@ -44,6 +45,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
 
   // 시설 데이터 로드
   useEffect(() => {
+    let timer: number | undefined
+
     const loadFacilityData = async () => {
       try {
         setIsDataLoading(true);
@@ -62,31 +65,36 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
         
         // 3D 도면이 없으면 카운트다운 시작
         if (!hasDrawing) {
-          const timer = setInterval(() => {
+          timer = window.setInterval(() => {
             setCountdown((prev) => {
               if (prev <= 1) {
-                clearInterval(timer);
-                if (onOutdoorButtonClick) {
-                  onOutdoorButtonClick();
+                if (timer) {
+                  window.clearInterval(timer);
                 }
+                onOutdoorButtonClick?.();
                 return 0;
               }
               return prev - 1;
             });
           }, 1000);
-          
-        return () => clearInterval(timer);
+        }
+      } catch (error) {
+        console.error('Failed to load facility data:', error);
+        setHas3DDrawing(false);
+      } finally {
+        setIsDataLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to load facility data:', error);
-      setHas3DDrawing(false);
-    } finally {
-      setIsDataLoading(false);
-    }
-  };
+    };
 
-  loadFacilityData();
-}, [facilityType, facilityId, onOutdoorButtonClick]);  // Features 로드
+    loadFacilityData();
+
+    return () => {
+      if (timer) {
+        window.clearInterval(timer);
+      }
+    };
+  }, [facilityType, facilityId, onOutdoorButtonClick]); 
+
   useEffect(() => {
     const loadFeatures = async () => {
       if (!facilityId) return;
@@ -108,6 +116,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
     if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) {
       return;
     }
+
+    console.log('Model Loaded');
 
     const createPOIsFromFeatures = async () => {
       try {
@@ -201,13 +211,13 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
   }, [featuresData, facilityId, getAssetById, assets]);
 
   // 시설 데이터 로딩 중이거나 3D 도면 확인 중인 경우
-  if (isLoading || !facilitiesFetched || isDataLoading || has3DDrawing === null) {
+  if (!facilitiesFetched || isDataLoading || has3DDrawing === null) {
     return (
       <div className="w-full h-full relative flex items-center justify-center bg-gray-900">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-lg">
-            {isLoading || !facilitiesFetched || isDataLoading ? '시설 정보를 불러오는 중...' : '3D 도면을 확인하는 중...'}
+            {!facilitiesFetched || isDataLoading ? '시설 정보를 불러오는 중...' : '3D 도면을 확인하는 중...'}
           </p>
         </div>
       </div>
@@ -253,10 +263,9 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
 
   // 3D 도면이 있는 경우
   return (
-    <div className="w-full h-full relative">
+    <>
       <IndoorMapViewer 
         modelUrl={facilityData?.facility?.drawing?.url || ''}
-        className="w-full h-full"
         onLoadComplete={handleLoadComplete}
       />
       
@@ -291,7 +300,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
           </div>
         </button>
       )}
-    </div>
+    </>
   );
 };
 
