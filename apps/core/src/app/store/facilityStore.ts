@@ -79,12 +79,22 @@ export const useFacilityStore = create<FacilityState>()(
           // facilityService를 사용해서 모든 시설 목록 가져오기
           const response = await facilityService.getAllFacilities()
           
-          // API 응답이 그룹화된 구조인지 확인
+          // API 응답이 그룹화된 구조인지 확인하고 OutdoorMap이 기대하는 복수형 키로 정규화(buildings/stations/parks)
           let facilitiesData: FacilitiesData = {}
           
           if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
-            // 이미 그룹화된 객체인 경우 - 그대로 사용
-            facilitiesData = response.data as Record<string, FacilityResponse[]>
+            const raw = response.data as Record<string, FacilityResponse[]>
+            const normalizeKey = (key: string) => {
+              if (key === 'building') return 'buildings'
+              if (key === 'station') return 'stations'
+              if (key === 'park') return 'parks'
+              return key
+            }
+            const normalized: FacilitiesData = {}
+            Object.entries(raw).forEach(([key, list]) => {
+              normalized[normalizeKey(key)] = Array.isArray(list) ? list : []
+            })
+            facilitiesData = normalized
           } else if (Array.isArray(response.data)) {
             // 배열인 경우 기본적으로 buildings로 분류
             facilitiesData.buildings = response.data

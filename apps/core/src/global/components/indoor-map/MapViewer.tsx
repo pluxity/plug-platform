@@ -5,110 +5,105 @@ interface IndoorMapViewerProps {
   modelUrl: string;
   className?: string;
   onLoadComplete?: () => void;
+  // 엔진 정리를 외부(@plug/engine)에서 수행할 수 있도록 언마운트 시 호출되는 훅
+  onDispose?: (engine: Engine3D) => void;
 }
 
 export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({ 
   modelUrl,
   className = "w-full h-full", 
-  onLoadComplete
+  onLoadComplete,
+  onDispose
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engine3DRef = useRef<Engine3D | null>(null);
   const loadedModelUrlRef = useRef<string | null>(null);
+  const loadTimeoutRef = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const currentContainer = containerRef.current;
+    let canceled = false; // 이 이펙트 수명 종료 후 콜백 가드
     
     if (!modelUrl || !currentContainer) {
       setIsLoading(false);
       return;
     }
 
-    // 이미 동일한 모델이 로드되어 있으면 다시 로드하지 않음
-    if (loadedModelUrlRef.current === modelUrl && engine3DRef.current) {
-      setIsLoading(false);
-      if (onLoadComplete) {
-        onLoadComplete();
-      }
-      return;
-    }
-
-    // 다른 모델이 로드되어 있으면 기존 엔진 정리
-    if (engine3DRef.current && loadedModelUrlRef.current !== modelUrl) {
-      try {
-        engine3DRef.current.Renderer.dispose();
-        while(engine3DRef.current.RootScene.children.length > 0) {
-          const child = engine3DRef.current.RootScene.children[0];
-          engine3DRef.current.RootScene.remove(child);
-        }
-        if (engine3DRef.current.Renderer.domElement.parentNode === currentContainer) {
-          currentContainer.removeChild(engine3DRef.current.Renderer.domElement);
-        }
-      } catch (cleanupError) {
-        console.warn('Engine3D cleanup error:', cleanupError);
-      }
-      engine3DRef.current = null;
-      loadedModelUrlRef.current = null;
-    }
-
-    // 새 엔진 생성 및 모델 로드
+    // 엔진이 없으면 생성
     if (!engine3DRef.current) {
       setIsLoading(true);
       setError(null);
-      
       try {
         const engine = new Engine3D(currentContainer);
         engine3DRef.current = engine;
-        
-        const timeoutId = setTimeout(() => {
-          setIsLoading(false);
-          setError(new Error('3D 모델 로딩 시간 초과'));
-        }, 10000);
-        
-        Loader.LoadGltf(modelUrl, () => {
-          clearTimeout(timeoutId);
-          setIsLoading(false);
-          loadedModelUrlRef.current = modelUrl;
-          if (onLoadComplete) {
-            onLoadComplete();
-          }
-        });
       } catch (err) {
         setIsLoading(false);
         setError(err instanceof Error ? err : new Error('3D 엔진 초기화 실패'));
+        return () => { /* no-op */ };
       }
     }
 
-    // cleanup function - 컴포넌트가 완전히 언마운트될 때만 실행
+    // 이미 동일한 모델이 로드되어 있으면 콜백만
+    if (loadedModelUrlRef.current === modelUrl) {
+      setIsLoading(false);
+      onLoadComplete?.();
+      return () => { /* no-op */ };
+    }
+
+    // 모델 로드
+    setIsLoading(true);
+    setError(null);
+    loadTimeoutRef.current = window.setTimeout(() => {
+      if (canceled) return;
+      setIsLoading(false);
+      setError(new Error('3D 모델 로딩 시간 초과'));
+    }, 10000);
+
+    Loader.LoadGltf(modelUrl, () => {
+      if (canceled) return; // 언마운트/변경 후 콜백 무시
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current = null;
+      }
+      setIsLoading(false);
+      loadedModelUrlRef.current = modelUrl;
+      onLoadComplete?.();
+    });
+
+    // 이 이펙트의 클린업: 로더 타임아웃 해제 및 콜백 가드 설정
     return () => {
-      // 컴포넌트가 언마운트되어도 엔진은 유지 (탭 전환 등을 위해)
-      // 실제 정리는 페이지를 떠날 때나 다른 모델을 로드할 때만 수행
+      canceled = true;
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current = null;
+      }
     };
   }, [modelUrl, onLoadComplete]);
 
-  // 페이지 언로드 시 정리
+  // 컴포넌트 언마운트 시 엔진 정리
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (engine3DRef.current) {
-        try {
-          engine3DRef.current.Renderer.dispose();
-          while(engine3DRef.current.RootScene.children.length > 0) {
-            const child = engine3DRef.current.RootScene.children[0];
-            engine3DRef.current.RootScene.remove(child);
-          }
-        } catch (error) {
-          console.warn('Engine3D cleanup error:', error);
-        }
+    return () => {
+      // 남아있는 타임아웃 해제
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current = null;
+      }
+      // 외부 엔진 정리 훅 호출 및 향후 엔진 clear 지원과의 연동
+      const engine = engine3DRef.current;
+      if (engine) {
+        // 인스턴스 메서드 형태를 우선 시도 (향후 engine.clear() 제공 시)
+        (engine as unknown as { clear?: () => void }).clear?.();
+        // 선택적 외부 콜백 제공
+        onDispose?.(engine);
+        // 레퍼런스 해제
+        engine3DRef.current = null;
+        loadedModelUrlRef.current = null;
       }
     };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
+  }, [onDispose]);
+  
 
   if (error) {
     return (

@@ -1,13 +1,14 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { IndoorMapViewer } from '@/global/components';
 import { FloorControl } from '@/global/components/indoor-map/FloorControl';
 import { FacilityType, FacilityService, FeatureResponse, DomainResponse } from '@plug/common-services';
+import { getFeaturesByFacility } from '@plug/common-services';
 import { useFacilityStore } from '@/app/store/facilityStore';
 import { useAssets } from '@/global/store/assetStore';
-import { api } from '@plug/api-hooks/core';
-import { Poi } from '@plug/engine/src';
 import { convertFloors } from '@/global/utils/floorUtils';
+import DeviceSearchForm from './DeviceSearchForm';
 import type { Floor } from '@/global/types';
+import { Camera, Poi, Interfaces } from '@plug/engine/src';
 
 interface IndoorMapProps {
   facilityId: number;
@@ -22,28 +23,24 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
   const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [floors, setFloors] = useState<Floor[]>([]);
+  const importedRef = useRef(false);
+  const engineReadyRef = useRef(false);
   
   // Facilities fetched flag from store
   const facilitiesFetched = useFacilityStore((s) => s.facilitiesFetched);
   const { assets } = useAssets();
 
-  // Features 로드를 위한 함수
+  // Features 로드를 위한 함수(단발성 호출)
   const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
     try {
-      const response = await api.get<FeatureResponse[]>(`features?facilityId=${facilityId}`, { requireAuth: true });
-      return response.data || [];
+      const list = await getFeaturesByFacility(facilityId);
+      return list || [];
     } catch (error) {
       console.error('Failed to load features:', error);
       return [];
     }
   }, []);
 
-  // Asset을 ID로 찾는 함수 (assetStore 사용)
-  const getAssetById = useCallback((id: number) => {
-    return assets.find(asset => asset.id === id);
-  }, [assets]);
-
-  // 시설 데이터 로드
   useEffect(() => {
     let timer: number | undefined
 
@@ -111,104 +108,70 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
     loadFeatures();
   }, [facilityId, loadFeaturesByFacility]);
 
+  // 시설 변경 시 POI 임포트 상태 초기화
+  useEffect(() => {
+    importedRef.current = false;
+  }, [facilityId]);
+
   // 엔진이 준비되면 POI 생성
-  const handleLoadComplete = useCallback(() => {
-    if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) {
-      return;
+  const tryImportPois = useCallback(() => {
+    if (importedRef.current) return;
+    if (!engineReadyRef.current) return;
+    if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) return;
+
+    const assetById = new Map(assets.map(a => [a.id, a]));
+    const poiData: Interfaces.PoiImportOption[] = featuresData.map((f) => {
+      const asset = assetById.get(f.assetId);
+      const modelUrl = asset?.file?.url || '';
+      const position: Interfaces.Vector3 = {
+        x: f.position?.x ?? 0,
+        y: f.position?.y ?? 0,
+        z: f.position?.z ?? 0,
+      };
+      const rotation: Interfaces.Vector3 = {
+        x: f.rotation?.x ?? 0,
+        y: f.rotation?.y ?? 0,
+        z: f.rotation?.z ?? 0,
+      };
+      const scale: Interfaces.Vector3 = {
+        x: f.scale?.x ?? 1,
+        y: f.scale?.y ?? 1,
+        z: f.scale?.z ?? 1,
+      };
+
+      return {
+        id: f.id,
+        iconUrl: '',
+        modelUrl,
+        displayText: f.id,
+        floorId: f.floorId,
+        property: {
+          assetId: f.assetId,
+          deviceId: f.deviceId ?? null,
+        },
+        position,
+        rotation,
+        scale,
+      };
+    });
+
+    try {
+      Poi.Import(poiData);
+      importedRef.current = true;
+    } catch (e) {
+      console.error('Poi.Import failed', e);
     }
+  }, [featuresData, assets]);
 
-    console.log('Model Loaded');
+  const handleLoadComplete = useCallback(() => {
+    Camera.ExtendView(1);
+    engineReadyRef.current = true;
+    tryImportPois();
+  }, [tryImportPois]);
 
-    const createPOIsFromFeatures = async () => {
-      try {
-        Poi.Clear();
-
-        let createdCount = 0;
-        let skippedCount = 0;
-
-        for (const feature of featuresData) {
-          if (!feature.assetId || !feature.position) {
-            console.warn('Feature missing assetId or position:', feature);
-            skippedCount++;
-            continue;
-          }
-
-          const asset = getAssetById(feature.assetId);
-          if (!asset || !asset.file?.url) {
-            console.warn('Asset not found or no file URL:', feature.assetId);
-            skippedCount++;
-            continue;
-          }
-
-          // 아이콘 URL 결정 로직
-          let iconUrl = '';
-          if (asset.thumbnailFile?.url) {
-            // 썸네일이 있으면 썸네일을 아이콘으로 사용
-            iconUrl = asset.thumbnailFile.url;
-          } else if (asset.file?.url.toLowerCase().includes('.png') || asset.file?.url.toLowerCase().includes('.jpg') || asset.file?.url.toLowerCase().includes('.jpeg')) {
-            // 메인 파일이 이미지면 아이콘으로 사용
-            iconUrl = asset.file.url;
-          } else {
-            // 기본 POI 아이콘 사용 (실제 경로는 프로젝트에 맞게 수정)
-            iconUrl = 'SamplePoiIcon.png';
-          }
-
-          // POI 생성 옵션 구성
-          const poiCreateOption = {
-            id: feature.id,
-            iconUrl: iconUrl,
-            modelUrl: asset.file?.url || '', // 메인 파일을 모델로 사용
-            displayText: asset.name || feature.id,
-            property: {
-              assetId: asset.id,
-              assetName: asset.name,
-              assetCode: asset.code,
-              facilityId: facilityId,
-              floorId: feature.floorId,
-              featureId: feature.id,
-              categoryId: asset.categoryId,
-              categoryName: asset.categoryName,
-              position: {
-                x: feature.position.x,
-                y: feature.position.y,
-                z: feature.position.z
-              },
-              rotation: feature.rotation ? {
-                x: feature.rotation.x,
-                y: feature.rotation.y,
-                z: feature.rotation.z
-              } : { x: 0, y: 0, z: 0 },
-              scale: feature.scale ? {
-                x: feature.scale.x,
-                y: feature.scale.y,
-                z: feature.scale.z
-              } : { x: 1, y: 1, z: 1 }
-            }
-          };
-
-          // POI Create를 사용하여 생성
-          Poi.Create(poiCreateOption, (data: unknown) => {
-            console.log('POI created for feature:', {
-              featureId: feature.id,
-              assetId: asset.id,
-              assetName: asset.name,
-              position: feature.position,
-              iconUrl: iconUrl,
-              modelUrl: asset.file?.url,
-              callbackData: data
-            });
-          });
-          createdCount++;
-        }
-
-        console.log(`POI creation completed. Created: ${createdCount}, Skipped: ${skippedCount}`);
-      } catch (error) {
-        console.error('Error creating POIs from features:', error);
-      }
-    };
-
-    createPOIsFromFeatures();
-  }, [featuresData, facilityId, getAssetById, assets]);
+  useEffect(() => {
+    tryImportPois();
+  }, [tryImportPois]);
 
   // 시설 데이터 로딩 중이거나 3D 도면 확인 중인 경우
   if (!facilitiesFetched || isDataLoading || has3DDrawing === null) {
@@ -263,11 +226,16 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
 
   // 3D 도면이 있는 경우
   return (
-    <>
+    <div className="w-full h-full relative">
       <IndoorMapViewer 
         modelUrl={facilityData?.facility?.drawing?.url || ''}
         onLoadComplete={handleLoadComplete}
+        onDispose={(engine) => (engine as unknown as { clear?: () => void })?.clear?.()}
       />
+      {/* Device Search - 좌측 상단 */}
+      <div className="absolute top-4 left-4 z-30">
+        <DeviceSearchForm features={featuresData} />
+      </div>
       
       {/* Floor Control - 우측 하단 */}
       {floors.length > 0 && (
@@ -300,7 +268,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
           </div>
         </button>
       )}
-    </>
+    </div>
   );
 };
 

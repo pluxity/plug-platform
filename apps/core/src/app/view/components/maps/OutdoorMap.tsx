@@ -4,7 +4,7 @@ import * as Cesium from 'cesium'
 import MapControls from '@/global/components/outdoor-map/MapControls'
 import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
-import type { FacilityType, FacilityResponse } from '@plug/common-services'
+import type { FacilityType } from '@plug/common-services'
 import { OSMBuildingsMap } from '@/global/components/outdoor-map'
 
 interface OutdoorMapProps {
@@ -35,7 +35,13 @@ const FacilityPOIs: React.FC<{
   let screenHandler: Cesium.ScreenSpaceEventHandler | null = null
 
     const createPOIs = async () => {
-      const resource = await Cesium.IonResource.fromAssetId(3589754)
+      let resource: Cesium.Resource | undefined
+      try {
+        resource = await Cesium.IonResource.fromAssetId(3589754)
+      } catch (e) {
+        console.error('Failed to resolve Cesium Ion resource for facility POIs', e)
+        return
+      }
       viewer.clock.shouldAnimate = false
       viewer.clock.multiplier = 1
       viewer.entities.removeAll()
@@ -46,13 +52,40 @@ const FacilityPOIs: React.FC<{
         parks: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'park' as FacilityType },
       }
 
+      const keyMap: Record<string, keyof typeof facilityTypeConfigs> = {
+        building: 'buildings',
+        station: 'stations',
+        park: 'parks',
+      }
+
       Object.entries(facilities).forEach(([facilityTypeKey, facilitiesOfType]) => {
-        const config = facilityTypeConfigs[facilityTypeKey as keyof typeof facilityTypeConfigs]
+        const normalizedKey = (facilityTypeKey in facilityTypeConfigs)
+          ? facilityTypeKey as keyof typeof facilityTypeConfigs
+          : (keyMap[facilityTypeKey] ?? (facilityTypeKey as keyof typeof facilityTypeConfigs))
+        const config = facilityTypeConfigs[normalizedKey]
         if (!config || !Array.isArray(facilitiesOfType)) return
 
-        facilitiesOfType.forEach((facility: FacilityResponse) => {
-          if (!(facility.lat && facility.lon)) return
-          const position = Cesium.Cartesian3.fromDegrees(facility.lon, facility.lat, 0)
+        type FlatFacility = { id: number; name?: string; lat?: number; lon?: number }
+        type NestedFacility = { facility?: FlatFacility }
+        const getFlat = (f: unknown): FlatFacility | undefined => {
+          if (!f || typeof f !== 'object') return undefined
+          const maybeFlat = f as Partial<FlatFacility>
+          if (typeof maybeFlat.id === 'number' && ('lat' in maybeFlat || 'lon' in maybeFlat)) {
+            return maybeFlat as FlatFacility
+          }
+          const maybeNested = f as NestedFacility
+          if (maybeNested.facility && typeof maybeNested.facility.id === 'number') return maybeNested.facility
+          return undefined
+        }
+
+        facilitiesOfType.forEach((facility: unknown) => {
+          const base = getFlat(facility)
+          const lat: number | undefined = base?.lat
+          const lon: number | undefined = base?.lon
+          const id: number | undefined = base?.id
+          const name: string | undefined = base?.name
+          if (lat == null || lon == null || id == null) return
+          const position = Cesium.Cartesian3.fromDegrees(lon, lat, 0)
 
           const rotationCallback = new Cesium.CallbackProperty(() => {
             const time = Date.now() / 500
@@ -70,15 +103,15 @@ const FacilityPOIs: React.FC<{
             return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
           }, false)
 
-          const entityId = `facility-${facility.id}`
+          const entityId = `facility-${id}`
 
           viewer.entities.add({
             id: entityId,
-            name: facility.name,
+            name: name ?? String(id),
             position,
             orientation: rotationCallback,
             model: {
-              uri: resource,
+              uri: resource!,
               scale: scaleCallback,
               color: config.color,
               silhouetteColor: config.silhouetteColor,
@@ -86,7 +119,7 @@ const FacilityPOIs: React.FC<{
               heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
             },
             properties: {
-              facilityId: facility.id,
+              facilityId: id,
               facilityData: facility,
               facilityType: config.facilityType
             }
