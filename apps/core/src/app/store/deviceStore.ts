@@ -1,36 +1,58 @@
 import { create } from 'zustand'
-import { api, type DataResponseBody } from '@plug/api-hooks'
 import type { GsDeviceResponse } from '@plug/common-services'
-
-export type DeviceLite = { id: string; name?: string | null }
+import { getDevices } from '@plug/common-services'
 
 interface DeviceState {
   devices: GsDeviceResponse[]
-  devicesFetched: boolean
-  isLoading: boolean
-  error: string | null
-  setDevices: (devices: GsDeviceResponse[]) => void
-  setFetched: (fetched: boolean) => void
-  loadOnce: () => Promise<void>
 }
 
-export const useDeviceStore = create<DeviceState>()((set, get) => ({
+interface DeviceActions {
+  setDevices: (devices: GsDeviceResponse[]) => void
+  loadAll: () => Promise<void>
+  searchDevices: (query: string) => { category: string; items: GsDeviceResponse[] }[]
+}
+
+type DeviceStore = DeviceState & DeviceActions
+
+export const useDeviceStore = create<DeviceStore>()((set, get) => ({
   devices: [],
-  devicesFetched: false,
-  isLoading: false,
-  error: null,
   setDevices: (devices) => set({ devices }),
-  setFetched: (devicesFetched) => set({ devicesFetched }),
-  loadOnce: async () => {
-    const { devicesFetched, isLoading } = get()
-    if (devicesFetched || isLoading) return
-    set({ isLoading: true, error: null })
-    try {
-  const resp = await api.get<GsDeviceResponse[]>('devices', { requireAuth: true }) as unknown as DataResponseBody<GsDeviceResponse[]>
-  const list = resp?.data ?? []
-  set({ devices: list, devicesFetched: true, isLoading: false })
-    } catch (e) {
-      set({ error: (e as Error)?.message ?? 'Failed to load devices', isLoading: false })
+  loadAll: async () => {
+    const list = await getDevices()
+    set({ devices: list ?? [] })
+  },
+  searchDevices: (query: string) => {
+    const normalizeText = (value: unknown) => (value ?? '')
+      .toString()
+      .trim()
+      .toLowerCase()
+      .normalize('NFC')
+
+    const q = normalizeText(query)
+    if (!q) return []
+
+    const deviceList = get().devices
+
+    const filtered = deviceList.filter((device) => {
+      const name = normalizeText(device.name)
+      const id = normalizeText(device.id)
+      const category = normalizeText(device.deviceCategory?.name)
+      return name.includes(q) || id.includes(q) || category.includes(q)
+    })
+
+    const grouped = new Map<string, GsDeviceResponse[]>()
+    for (const device of filtered) {
+      const category = device.deviceCategory?.name || '미분류'
+      if (!grouped.has(category)) grouped.set(category, [])
+      grouped.get(category)!.push(device)
     }
-  }
+
+    for (const list of grouped.values()) {
+      list.sort((a, b) => normalizeText(a.name).localeCompare(normalizeText(b.name)))
+    }
+
+    return Array.from(grouped.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([category, items]) => ({ category, items }))
+  },
 }))

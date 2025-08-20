@@ -5,6 +5,7 @@ import type {
   DeviceCategoryRequest,
   DeviceCategoryAllResponse,
 } from '../types/device';
+import type { GsDeviceResponse } from '../types/device';
 
 const DEVICE_CATEGORY_END_POINT = `device-categories`;
 
@@ -47,4 +48,22 @@ export const useDeviceCategoryTree = () => {
     mutate,
     refresh: () => mutate(),
   };
+};
+
+export const getDevicesByCategory = async (
+  categoryId: number,
+  facilityId: number
+): Promise<GsDeviceResponse[]> => {
+  const qs = `?facilityId=${facilityId}`;
+  try {
+    const resp = await api.get<GsDeviceResponse[]>(`${DEVICE_CATEGORY_END_POINT}/${categoryId}/devices${qs}`, { requireAuth: true });
+    return (resp as any)?.data ?? (resp as any) ?? [];
+  } catch (_) {
+    return [];
+  }
+};
+
+export const getAllDeviceCategories = async (): Promise<DeviceCategoryAllResponse> => {
+  const resp = await api.get<DeviceCategoryAllResponse>(DEVICE_CATEGORY_END_POINT, { requireAuth: true });
+  return ((resp as any)?.data ?? (resp as any)) as DeviceCategoryAllResponse;
 };

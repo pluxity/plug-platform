@@ -5,7 +5,7 @@ import MapControls from '@/global/components/outdoor-map/MapControls'
 import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { FacilityType } from '@plug/common-services'
-import { OSMBuildingsMap } from '@/global/components/outdoor-map'
+import { VWorldMap } from '@/global/components/outdoor-map'
 
 interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void;
@@ -180,6 +180,15 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [cesiumViewer, setCesiumViewer] = useState<Cesium.Viewer | null>(null)
 
+  // Ensure facilities are loaded before POIs/search rely on them
+  const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
+  const loadFacilities = useFacilityStore(s => s.loadFacilities)
+  useEffect(() => {
+    if (!facilitiesFetched) {
+      loadFacilities()
+    }
+  }, [facilitiesFetched, loadFacilities])
+
   const handleInitialLoadComplete = () => {
     setIsLoading(false)
   }
@@ -197,14 +206,18 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
         </div>
       )}
       
-      <div className="absolute top-4 left-4 z-40">
-        <FacilitySearchForm viewer={cesiumViewer} />
-      </div>
+      {facilitiesFetched && (
+        <div className="absolute top-4 left-4 z-40">
+          <FacilitySearchForm viewer={cesiumViewer} />
+        </div>
+      )}
       
-      <OSMBuildingsMap className="w-full h-full">
+        <VWorldMap className="w-full h-full">
         <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
-  <FacilityPOIs onFacilitySelect={onFacilitySelect} onViewerReady={setCesiumViewer} />
-      </OSMBuildingsMap>
+        {facilitiesFetched && (
+          <FacilityPOIs onFacilitySelect={onFacilitySelect} onViewerReady={setCesiumViewer} />
+        )}
+      </VWorldMap>
     </div>
   )
 }

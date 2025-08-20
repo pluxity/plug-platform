@@ -7,16 +7,10 @@ import type {
 } from '../types/device';
 
 const DEVICE_END_POINT = `devices`;
-// Re-export category-related APIs from the split file to preserve public API surface
-export * from './device-category';
 
 export const getDevices = async (): Promise<GsDeviceResponse[]> => {
-  try {
-    const resp = await api.get<GsDeviceResponse[]>(DEVICE_END_POINT, { requireAuth: true });
-    return (resp as any)?.data ?? [];
-  } catch (_) {
-    return [];
-  }
+    const response = await api.get<GsDeviceResponse[]>(DEVICE_END_POINT, { requireAuth: true });
+    return response.data;
 };
 
 export const useDevices = () => {

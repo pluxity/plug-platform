@@ -15,6 +15,13 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   
   // facilities만 선택적으로 구독 (리렌더 최소화)
   const facilities = useFacilityStore(s => s.facilities)
+  const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
+  const loadFacilities = useFacilityStore(s => s.loadFacilities)
+  useEffect(() => {
+    if (!facilitiesFetched) {
+      loadFacilities()
+    }
+  }, [facilitiesFetched, loadFacilities])
   const allFacilities = useMemo(() => {
     return Object.values(facilities).filter(Array.isArray).flat() as FacilityResponse[]
   }, [facilities])
@@ -113,8 +120,9 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onKeyDown={handleKeyDown}
-          placeholder="시설명 또는 코드를 검색하세요..."
-          className="w-full px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder={facilitiesFetched ? "시설명 또는 코드를 검색하세요..." : "시설 데이터를 불러오는 중..."}
+          disabled={!facilitiesFetched}
+          className="w-full px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
         />
         
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">

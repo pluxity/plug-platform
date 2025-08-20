@@ -252,14 +252,10 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
         onDispose={(engine) => (engine as unknown as { clear?: () => void })?.clear?.()}
       />
 
-      {/* Device Search + Category chips - 좌측 상단 (한 줄 배치) */}
-      <div className="absolute top-4 left-4 z-30 flex items-center gap-3 pr-4 max-w-[80vw]">
-        <DeviceSearchForm features={featuresData} />
-        <div className="min-w-0">
-          <DeviceCategoryChips />
-        </div>
+      <div className="absolute top-4 left-4 z-20 flex flex-row gap-3 items-start">
+        <DeviceSearchForm className="pointer-events-auto" />
+        <DeviceCategoryChips />
       </div>
-
       {/* Floor Control - 우측 하단 */}
       {floors.length > 0 && (
         <div className="absolute bottom-6 right-6 z-20 max-w-xs">
@@ -269,7 +265,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
 
       <button
         onClick={handleOutdoorClick}
-        className="absolute top-4 right-4 rounded-xl px-4 py-3 text-white cursor-pointer select-none bg-gradient-to-r from-sky-600 to-cyan-600 shadow-lg shadow-cyan-600/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300/70 pointer-events-auto"
+        className="absolute top-4 right-4 z-20 rounded-xl px-4 py-3 text-white cursor-pointer select-none bg-gradient-to-r from-sky-600 to-cyan-600 shadow-lg shadow-cyan-600/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300/70 pointer-events-auto"
         title="실외 지도로 나가기"
         aria-label="실외 지도로 나가기"
         role="button"

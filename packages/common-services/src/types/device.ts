@@ -4,6 +4,7 @@ export type {
   DeviceCategoryRequest,
   DeviceCategoryAllResponse,
 } from './device-category';
+import { FeatureResponse } from './feature'
 
 export interface GsDeviceCreateRequest {
   id: string;
@@ -21,6 +22,6 @@ export interface GsDeviceUpdateRequest {
 export interface GsDeviceResponse {
   id: string;
   name?: string;
-  feature?: any; // FeatureResponse type can be imported if needed
+  feature?: FeatureResponse;
   deviceCategory?: DeviceCategoryResponse;
 }
