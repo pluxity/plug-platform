@@ -2,6 +2,7 @@ export * from './asset';
 export * from './asset-category';
 export * from './auth';
 export * from './device';
+export * from './device-category';
 export * from './facility';
 export * from './facility-category';
 export * from './facility-generic';
