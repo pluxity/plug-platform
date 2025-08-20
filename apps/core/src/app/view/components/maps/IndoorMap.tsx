@@ -7,16 +7,19 @@ import { useFacilityStore } from '@/app/store/facilityStore';
 import { useAssets } from '@/global/store/assetStore';
 import { convertFloors } from '@/global/utils/floorUtils';
 import DeviceSearchForm from './DeviceSearchForm';
+import DeviceCategoryChips from './DeviceCategoryChips';
 import type { Floor } from '@/global/types';
 import { Camera, Poi, Interfaces } from '@plug/engine/src';
 
 interface IndoorMapProps {
   facilityId: number;
   facilityType: FacilityType;
-  onOutdoorButtonClick?: () => void;
 }
 
-const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdoorButtonClick }) => {
+const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
+  const requestOutdoor = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('indoor:goOutdoor'));
+  }, []);
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null);
   const [countdown, setCountdown] = useState(3);
   const [facilityData, setFacilityData] = useState<DomainResponse<typeof facilityType> | null>(null);
@@ -68,7 +71,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
                 if (timer) {
                   window.clearInterval(timer);
                 }
-                onOutdoorButtonClick?.();
+                requestOutdoor();
                 return 0;
               }
               return prev - 1;
@@ -90,7 +93,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
         window.clearInterval(timer);
       }
     };
-  }, [facilityType, facilityId, onOutdoorButtonClick]); 
+  }, [facilityType, facilityId, requestOutdoor]); 
 
   useEffect(() => {
     const loadFeatures = async () => {
@@ -173,6 +176,17 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
     tryImportPois();
   }, [tryImportPois]);
 
+  const handleOutdoorClick = useCallback(() => {
+    requestOutdoor();
+  }, [requestOutdoor]);
+
+  // Unmount 시에도 한 번 더 야외 요청 이벤트 디스패치 (중복 호출은 상위에서 가드)
+  useEffect(() => {
+    return () => {
+      requestOutdoor();
+    };
+  }, [requestOutdoor]);
+
   // 시설 데이터 로딩 중이거나 3D 도면 확인 중인 경우
   if (!facilitiesFetched || isDataLoading || has3DDrawing === null) {
     return (
@@ -211,14 +225,19 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
             <div className="text-4xl font-bold text-yellow-400 mb-4">{countdown}</div>
           </div>
           
-          {onOutdoorButtonClick && (
-            <button
-              onClick={onOutdoorButtonClick}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
-            >
-              지금 실외로 나가기
-            </button>
-          )}
+          <button
+            onClick={handleOutdoorClick}
+            title="실외 지도로 나가기"
+            className="relative px-6 py-3 bg-blue-600 text-white rounded-xl font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-blue-900/20 pointer-events-auto"
+            style={{ zIndex: 60 }}
+          >
+            <span className="inline-flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>지금 실외로 나가기</span>
+            </span>
+          </button>
         </div>
       </div>
     );
@@ -232,42 +251,37 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
         onLoadComplete={handleLoadComplete}
         onDispose={(engine) => (engine as unknown as { clear?: () => void })?.clear?.()}
       />
-      {/* Device Search - 좌측 상단 */}
-      <div className="absolute top-4 left-4 z-30">
+
+      {/* Device Search + Category chips - 좌측 상단 (한 줄 배치) */}
+      <div className="absolute top-4 left-4 z-30 flex items-center gap-3 pr-4 max-w-[80vw]">
         <DeviceSearchForm features={featuresData} />
+        <div className="min-w-0">
+          <DeviceCategoryChips />
+        </div>
       </div>
-      
+
       {/* Floor Control - 우측 하단 */}
       {floors.length > 0 && (
         <div className="absolute bottom-6 right-6 z-20 max-w-xs">
           <FloorControl floors={floors} />
         </div>
       )}
-      
-      {onOutdoorButtonClick && (
-        <button
-          onClick={onOutdoorButtonClick}
-          className="absolute top-4 right-4 z-30 group px-4 py-3 text-white hover:text-gray-200 transition-all duration-200 cursor-pointer select-none"
-          title="실외 지도로 나가기"
-        >
-          <div className="flex items-center space-x-3">
-            <svg 
-              className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-0.5" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-            <span className="text-base font-medium">실외로 나가기</span>
-          </div>
-        </button>
-      )}
+
+      <button
+        onClick={handleOutdoorClick}
+        className="absolute top-4 right-4 rounded-xl px-4 py-3 text-white cursor-pointer select-none bg-gradient-to-r from-sky-600 to-cyan-600 shadow-lg shadow-cyan-600/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300/70 pointer-events-auto"
+        title="실외 지도로 나가기"
+        aria-label="실외 지도로 나가기"
+        role="button"
+        style={{ zIndex: 60 }}
+      >
+        <div className="flex items-center space-x-3">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span className="text-base font-medium">실외로 나가기</span>
+        </div>
+      </button>
     </div>
   );
 };

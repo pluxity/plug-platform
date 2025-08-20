@@ -67,8 +67,8 @@ export default function OSMBuildingsMap({ className, children }: OSMBuildingsMap
           }}
         />
         
-  {children}
-  <InitialCameraSetup/>
+        {children}
+        <InitialCameraSetup/>
       </ResiumViewer>
     </>
   );

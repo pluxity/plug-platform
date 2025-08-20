@@ -19,19 +19,26 @@ const MainMap: React.FC = () => {
     }
   }, [facilitiesFetched, loadFacilities])
 
+  // Listen to global event from IndoorMap requesting outdoor view
+  useEffect(() => {
+    const handler = () => {
+      if (mapMode === MapMode.INDOOR) {
+        setMapMode(MapMode.OUTDOOR)
+        setSelectedFacilityId(null)
+        setSelectedFacilityType(null)
+      }
+    }
+    window.addEventListener('indoor:goOutdoor', handler)
+    return () => window.removeEventListener('indoor:goOutdoor', handler)
+  }, [mapMode])
+
   const handleFacilitySelect = (facilityId: number, facilityType: FacilityType) => {
     setSelectedFacilityId(facilityId)
     setSelectedFacilityType(facilityType)
     setMapMode(MapMode.INDOOR)
   }
 
-  const toggleMapMode = () => {
-    if (mapMode === MapMode.INDOOR) {
-      setMapMode(MapMode.OUTDOOR)
-      setSelectedFacilityId(null)
-      setSelectedFacilityType(null)
-    }
-  }
+  // toggleMapMode removed; event-based switching used instead
 
   return (
     <>
@@ -45,7 +52,6 @@ const MainMap: React.FC = () => {
         <IndoorMap 
           facilityId={selectedFacilityId}
           facilityType={selectedFacilityType}
-          onOutdoorButtonClick={toggleMapMode}
         />
       )}
     </>

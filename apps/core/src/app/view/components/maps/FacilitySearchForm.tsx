@@ -43,18 +43,33 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
   setQuery('')
   setResults([])
     
-    if (viewer && facility.lat && facility.lon) {
+    if (!viewer) return
+
+    // Prefer flying to the POI entity created for this facility to keep camera/POI consistent
+    const entityId = `facility-${facility.id}`
+    const entity = viewer.entities.getById(entityId)
+    if (entity && entity.position) {
+      const pos = entity.position.getValue(Cesium.JulianDate.now())
+      if (pos) {
+        viewer.camera.flyToBoundingSphere(
+          new Cesium.BoundingSphere(pos, 1000),
+          {
+            duration: 2.0,
+            offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-15), 2000)
+          }
+        )
+        return
+      }
+    }
+
+    // Fallback to lat/lon if entity not found yet
+    if (facility.lat && facility.lon) {
       const targetPosition = Cesium.Cartesian3.fromDegrees(facility.lon, facility.lat, 0)
-      
       viewer.camera.flyToBoundingSphere(
         new Cesium.BoundingSphere(targetPosition, 1000),
         {
           duration: 2.0,
-          offset: new Cesium.HeadingPitchRange(
-            0,
-            Cesium.Math.toRadians(-15),
-            2000
-          )
+          offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-15), 2000)
         }
       )
     }
