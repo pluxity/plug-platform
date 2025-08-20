@@ -9,23 +9,22 @@ import { convertFloors } from '@/global/utils/floorUtils';
 import DeviceSearchForm from './DeviceSearchForm';
 import DeviceCategoryChips from './DeviceCategoryChips';
 import type { Floor } from '@/global/types';
-import { Camera, Poi, Interfaces } from '@plug/engine/src';
+import { Camera, Poi, Interfaces } from '@plug/engine';
 
 interface IndoorMapProps {
   facilityId: number;
   facilityType: FacilityType;
+  onGoOutdoor?: () => void; // optional parent-controlled transition callback
 }
 
-const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
-  const requestOutdoor = useCallback(() => {
-    window.dispatchEvent(new CustomEvent('indoor:goOutdoor'));
-  }, []);
+const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOutdoor }) => {
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null);
   const [countdown, setCountdown] = useState(3);
   const [facilityData, setFacilityData] = useState<DomainResponse<typeof facilityType> | null>(null);
   const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [floors, setFloors] = useState<Floor[]>([]);
+  // Prevent duplicate POI imports (idempotency guard) across multiple triggers
   const importedRef = useRef(false);
   const engineReadyRef = useRef(false);
   
@@ -64,7 +63,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
                 if (timer) {
                   window.clearInterval(timer);
                 }
-                requestOutdoor();
+                onGoOutdoor?.();
                 return 0;
               }
               return prev - 1;
@@ -85,7 +84,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
         window.clearInterval(timer);
       }
     };
-  }, [facilityType, facilityId, requestOutdoor]); 
+  }, [facilityType, facilityId, onGoOutdoor]); 
 
   useEffect(() => {
     const loadFeatures = async () => {
@@ -167,14 +166,14 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
   }, [tryImportPois]);
 
   const handleOutdoorClick = useCallback(() => {
-    requestOutdoor();
-  }, [requestOutdoor]);
+    onGoOutdoor?.();
+  }, [onGoOutdoor]);
 
   useEffect(() => {
     return () => {
-      requestOutdoor();
+      onGoOutdoor?.();
     };
-  }, [requestOutdoor]);
+  }, [onGoOutdoor]);
 
   // 시설 데이터 로딩 중이거나 3D 도면 확인 중인 경우
   if (!facilitiesFetched || isDataLoading || has3DDrawing === null) {
