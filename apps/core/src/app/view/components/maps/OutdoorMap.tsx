@@ -11,7 +11,6 @@ interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void;
 }
 
-// POIs are rendered once after facilities are fetched and viewer is ready
 const FacilityPOIs: React.FC<{
   onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void
   onViewerReady?: (viewer: Cesium.Viewer) => void
@@ -29,7 +28,7 @@ const FacilityPOIs: React.FC<{
     if (!viewer || didInitRef.current) return
     if (!facilitiesFetched || Object.keys(facilities).length === 0) return
 
-    Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_ACCESS_TOKEN
+  Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_ACCESS_TOKEN
 
   let hoveredEntity: Cesium.Entity | null = null
   let screenHandler: Cesium.ScreenSpaceEventHandler | null = null
@@ -38,8 +37,7 @@ const FacilityPOIs: React.FC<{
       let resource: Cesium.Resource | undefined
       try {
         resource = await Cesium.IonResource.fromAssetId(3589754)
-      } catch (e) {
-        console.error('Failed to resolve Cesium Ion resource for facility POIs', e)
+  } catch {
         return
       }
       viewer.clock.shouldAnimate = false
@@ -127,7 +125,6 @@ const FacilityPOIs: React.FC<{
         })
       })
 
-      // Use Cesium's ScreenSpaceEventHandler for proper canvas-relative coords
       screenHandler = new Cesium.ScreenSpaceEventHandler(viewer.canvas)
 
       screenHandler.setInputAction((movement: unknown) => {
@@ -180,7 +177,6 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [cesiumViewer, setCesiumViewer] = useState<Cesium.Viewer | null>(null)
 
-  // Ensure facilities are loaded before POIs/search rely on them
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const loadFacilities = useFacilityStore(s => s.loadFacilities)
   useEffect(() => {
@@ -192,8 +188,6 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
   const handleInitialLoadComplete = () => {
     setIsLoading(false)
   }
-
-  
 
   return (
     <div className="w-full h-full relative">

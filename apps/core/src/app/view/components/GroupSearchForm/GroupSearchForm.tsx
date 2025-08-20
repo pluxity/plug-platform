@@ -12,7 +12,7 @@ function flattenCount<T>(groups: GroupSearchGroup<T>[]) {
 function DefaultEmpty({ text }: { text: string }) {
   return (
     <div className="px-4 py-3 text-gray-500 text-center">
-      {text}
+  {text}
     </div>
   )
 }

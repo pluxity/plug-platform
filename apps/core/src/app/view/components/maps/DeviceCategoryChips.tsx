@@ -16,7 +16,7 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
   const dragStartXRef = useRef(0);
   const startScrollLeftRef = useRef(0);
   const dragDistanceRef = useRef(0);
-  const chipRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+  
 
   const topLevel = useMemo(() => {
     return (categories || []).filter(c => !c.parentId);
@@ -125,11 +125,10 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
           </div>
         )}
 
-        {!isLoading && topLevel.map(category => (
+  {!isLoading && topLevel.map(category => (
             <button
                 key={category.id}
                 type="button"
-                ref={(element) => { if (element) chipRefs.current[category.id] = element; }}
                 data-chip="true"
                 onClick={() => {
                     if (dragDistanceRef.current > 10) return;

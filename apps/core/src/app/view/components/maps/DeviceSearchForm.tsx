@@ -21,17 +21,11 @@ const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className }) => {
 
   const groups = useMemo<GroupSearchGroup<GsDeviceResponse>[]>(() => {
     const result = searchDevices(query)
-    // map category -> heading for GroupSearchForm
     return result.map(({ category, items }) => ({ heading: category, items }))
   }, [searchDevices, query])
 
-  const handleSelectDevice = (device: GsDeviceResponse) => {
-    setQuery('')
-    console.log('Selected device:', device);
-  }
-
   return (
-    <div ref={searchRef} className={["relative w-96", className || ''].join(' ').trim()}>
+  <div ref={searchRef} className={["relative w-96", className || ''].join(' ').trim()}>
       <GroupSearchForm<GsDeviceResponse>
         value={query}
         onValueChange={setQuery}
@@ -44,7 +38,7 @@ const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className }) => {
             <span className="text-xs text-blue-600">{String(device.id)}</span>
           </div>
         )}
-        onSelect={(device) => handleSelectDevice(device)}
+    onSelect={() => setQuery('')}
       />
     </div>
   )

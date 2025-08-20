@@ -9,8 +9,6 @@ const MainMap: React.FC = () => {
   const [mapMode, setMapMode] = useState<MapMode>(MapMode.OUTDOOR)
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
   const [selectedFacilityType, setSelectedFacilityType] = useState<FacilityType | null>(null)
-  
-  // MainMap에서 한 번만 데이터 페칭
   const { facilitiesFetched, loadFacilities } = useFacilityStore()
 
   useEffect(() => {
@@ -19,7 +17,6 @@ const MainMap: React.FC = () => {
     }
   }, [facilitiesFetched, loadFacilities])
 
-  // Listen to global event from IndoorMap requesting outdoor view
   useEffect(() => {
     const handler = () => {
       if (mapMode === MapMode.INDOOR) {
@@ -37,8 +34,6 @@ const MainMap: React.FC = () => {
     setSelectedFacilityType(facilityType)
     setMapMode(MapMode.INDOOR)
   }
-
-  // toggleMapMode removed; event-based switching used instead
 
   return (
     <>

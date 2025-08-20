@@ -29,17 +29,14 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
   const importedRef = useRef(false);
   const engineReadyRef = useRef(false);
   
-  // Facilities fetched flag from store
   const facilitiesFetched = useFacilityStore((s) => s.facilitiesFetched);
   const { assets } = useAssets();
 
-  // Features 로드를 위한 함수(단발성 호출)
   const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
     try {
       const list = await getFeaturesByFacility(facilityId);
       return list || [];
-    } catch (error) {
-      console.error('Failed to load features:', error);
+    } catch {
       return [];
     }
   }, []);
@@ -52,18 +49,14 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
         setIsDataLoading(true);
         const response = await FacilityService.getById(facilityType, facilityId);
         setFacilityData(response.data);
-        
-        // 3D 도면 존재 여부 확인
         const hasDrawing = !!(response.data?.facility?.drawing?.url && response.data.facility.drawing.url.trim() !== '');
         setHas3DDrawing(hasDrawing);
-        
-        // 층 정보 변환
+
         if (response.data && 'floors' in response.data && response.data.floors) {
           const convertedFloors = convertFloors(response.data.floors);
           setFloors(convertedFloors);
         }
-        
-        // 3D 도면이 없으면 카운트다운 시작
+
         if (!hasDrawing) {
           timer = window.setInterval(() => {
             setCountdown((prev) => {
@@ -78,8 +71,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
             });
           }, 1000);
         }
-      } catch (error) {
-        console.error('Failed to load facility data:', error);
+      } catch {
         setHas3DDrawing(false);
       } finally {
         setIsDataLoading(false);
@@ -111,12 +103,10 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
     loadFeatures();
   }, [facilityId, loadFeaturesByFacility]);
 
-  // 시설 변경 시 POI 임포트 상태 초기화
   useEffect(() => {
     importedRef.current = false;
   }, [facilityId]);
 
-  // 엔진이 준비되면 POI 생성
   const tryImportPois = useCallback(() => {
     if (importedRef.current) return;
     if (!engineReadyRef.current) return;
@@ -161,8 +151,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
     try {
       Poi.Import(poiData);
       importedRef.current = true;
-    } catch (e) {
-      console.error('Poi.Import failed', e);
+    } catch {
+      void 0;
     }
   }, [featuresData, assets]);
 
@@ -180,7 +170,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
     requestOutdoor();
   }, [requestOutdoor]);
 
-  // Unmount 시에도 한 번 더 야외 요청 이벤트 디스패치 (중복 호출은 상위에서 가드)
   useEffect(() => {
     return () => {
       requestOutdoor();
@@ -201,7 +190,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
     );
   }
 
-  // 3D 도면이 없는 경우
   if (!has3DDrawing) {
     return (
       <div className="w-full h-full relative flex items-center justify-center bg-gray-900">
@@ -256,7 +244,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType }) => {
         <DeviceSearchForm className="pointer-events-auto" />
         <DeviceCategoryChips />
       </div>
-      {/* Floor Control - 우측 하단 */}
       {floors.length > 0 && (
         <div className="absolute bottom-6 right-6 z-20 max-w-xs">
           <FloorControl floors={floors} />
