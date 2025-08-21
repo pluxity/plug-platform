@@ -1,8 +1,11 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
-import { BackofficeLayout, DashboardLayout } from '@/backoffice/common/view/layouts'
+import { BackofficeLayout, DashboardLayout, IndoorLayout } from '@/backoffice/common/view/layouts'
 import Dashboard from '@/backoffice/domains/dashboard'
+import FacilityList from '@/backoffice/domains/facility/page/FacilityList'
+import FacilityEdit from '@/backoffice/domains/facility/page/FacilityEdit'
+import FacilityIndoor from '@/backoffice/domains/facility/page/FacilityIndoor'
 import { Role , User, Permission } from '@/backoffice/domains/users'
 import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
 import { DeviceCategory, DeviceList } from '@/backoffice/domains/device'
@@ -35,10 +38,17 @@ const AppRouter: React.FC = () => {
               <Route path="role" element={<Role />} />
               <Route path="user" element={<User />} />
               <Route path="permission" element={<Permission />} />
+              <Route path="facility" element={<FacilityList />} />
+              <Route path="facility/:id" element={<FacilityEdit />} />
+              <Route path="assetList" element={<AssetList />} />
               <Route path="assetCategory" element={<AssetCategory />} />
               <Route path="assetList" element={<AssetList />} />
               <Route path="deviceCategory" element={<DeviceCategory />} />
-              <Route path="deviceList" element={<DeviceList />} />
+            </Route>
+
+            {/* 실내지도 편집을 위한 별도 레이아웃 */}
+            <Route element={<IndoorLayout />}>
+              <Route path="facility/:id/indoor" element={<FacilityIndoor />} />
             </Route>
           </Route>
 

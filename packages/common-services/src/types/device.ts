@@ -1,23 +1,9 @@
-import { FileResponse } from "./file";
-export interface DeviceCategoryResponse {
-  id: number;
-  name: string;
-  parentId?: number;
-  children?: DeviceCategoryResponse[];
-  thumbnailFile?: FileResponse;
-  depth: number;
-}
-
-export interface DeviceCategoryRequest {
-  name: string;
-  parentId?: number | null;
-  thumbnailFileId?: number;
-}
-
-export interface DeviceCategoryAllResponse {
-  maxDepth: number;
-  list: DeviceCategoryResponse[];
-}
+import type { DeviceCategoryResponse } from './device-category';
+export type {
+  DeviceCategoryResponse,
+  DeviceCategoryRequest,
+} from './device-category';
+import { FeatureResponse } from './feature'
 
 export interface GsDeviceCreateRequest {
   id?: string;
@@ -33,6 +19,6 @@ export interface GsDeviceUpdateRequest {
 export interface GsDeviceResponse {
   id: string;
   name?: string;
-  feature?: any; // FeatureResponse type can be imported if needed
+  feature?: FeatureResponse;
   deviceCategory?: DeviceCategoryResponse;
 }

@@ -30,12 +30,28 @@ export interface DataComponentTypes {
     updateRequest: { boundary: string; };
     response: { boundary: string; };
   };
-  // airportInfo: {
-  //   createRequest: { terminalCount?: number; runwayCount?: number; };
-  //   updateRequest: { terminalCount: number; runwayCount: number; };
-  //   response: { airportInfo: { terminalCount: number; runwayCount: number; } };
-  // };
 }
+
+export const DOMAINS = {
+  building: {
+    displayName: '건물',
+    endpoint: 'buildings',
+    components: ['facility', 'floors'] as const
+  },
+  
+  station: {
+    displayName: '역사',
+    endpoint: 'stations',
+    components: ['facility', 'floors', 'stationInfo'] as const
+  },
+  
+  park: {
+    displayName: '공원',
+    endpoint: 'parks',
+    components: ['facility', 'boundary'] as const
+  },
+
+} as const;
 
 type ComponentName = keyof DataComponentTypes;
 
@@ -66,54 +82,33 @@ type ComposeResponse<T extends readonly ComponentName[]> =
       : {}
     : {};
 
-export const DOMAINS = {
-  building: {
-    displayName: '건물',
-    endpoint: 'buildings',
-    components: ['facility', 'floors'] as const
-  },
-  
-  station: {
-    displayName: '역사',
-    endpoint: 'stations',
-    components: ['facility', 'floors', 'stationInfo'] as const
-  },
-  
-  park: {
-    displayName: '공원',
-    endpoint: 'parks',
-    components: ['facility', 'boundary'] as const
-  },
+export type FacilityKey = keyof typeof DOMAINS;
+export type FacilityType = Uppercase<FacilityKey>;
 
-  // airport: {
-  //   displayName: '공항',
-  //   endpoint: 'airports',
-  //   components: ['facility', 'floors', 'airportInfo'] as const
-  // }
+type FacilityMap = {
+  [K in FacilityKey as Uppercase<K>]: typeof DOMAINS[K]
+};
 
-} as const;
-
-export type DomainKey = keyof typeof DOMAINS;
-export type DomainCreateRequest<T extends DomainKey> = ComposeCreateRequest<typeof DOMAINS[T]['components']>;
-export type DomainUpdateRequest<T extends DomainKey> = ComposeUpdateRequest<typeof DOMAINS[T]['components']>;
-export type DomainResponse<T extends DomainKey> = ComposeResponse<typeof DOMAINS[T]['components']>;
-export type FacilityType = DomainKey;
+export type DomainCreateRequest<T extends FacilityType> = ComposeCreateRequest<FacilityMap[T]['components']>;
+export type DomainUpdateRequest<T extends FacilityType> = ComposeUpdateRequest<FacilityMap[T]['components']>;
+export type DomainResponse<T extends FacilityType> = ComposeResponse<FacilityMap[T]['components']>;
 
 export const domainUtils = {
-  getConfig<T extends DomainKey>(domain: T): typeof DOMAINS[T] {
-    return DOMAINS[domain];
+  getConfig(domain: FacilityType | FacilityKey) {
+  const domainKey = String(domain).toLowerCase() as FacilityKey;
+  return DOMAINS[domainKey];
   },
 
-  getAllDomains(): DomainKey[] {
-    return Object.keys(DOMAINS) as DomainKey[];
+  getAllDomains(): FacilityType[] {
+    return (Object.keys(DOMAINS) as FacilityKey[]).map(k => k.toUpperCase() as FacilityType);
   },
 
-  isValidDomain(domain: string): domain is DomainKey {
-    return domain in DOMAINS;
+  isValidDomain(domain: string): domain is FacilityType | FacilityKey {
+    return String(domain).toLowerCase() in DOMAINS;
   },
 
-  hasComponent<T extends DomainKey>(domain: T, componentName: ComponentName): boolean {
-    const config = this.getConfig(domain);
-    return (config.components as readonly ComponentName[]).includes(componentName);
+  hasComponent(domain: FacilityType | FacilityKey, componentName: ComponentName): boolean {
+  const config = this.getConfig(domain as FacilityType);
+  return (config.components as readonly ComponentName[]).includes(componentName);
   }
 };

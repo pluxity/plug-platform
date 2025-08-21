@@ -31,3 +31,8 @@ export interface AssetCategoryAllResponse {
   maxDepth: number;
   list: AssetCategoryResponse[];
 }
+
+// New: API now provides maxDepth via a separate endpoint
+export interface AssetCategoryDepthResponse {
+  maxDepth: number;
+}

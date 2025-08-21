@@ -8,12 +8,22 @@ interface VWorldMapProps {
   className?: string;
   children?: React.ReactNode;
   mapProvider?: MapProvider;
+  initialPosition?: {
+    longitude: number;
+    latitude: number;
+    altitude: number;
+  };
+  preventCameraReset?: boolean;
+  onMapInitialized?: () => void;
 }
 
 export default function VWorldMap({ 
   className = "w-full h-full", 
   children, 
-  mapProvider = 'vworld' 
+  mapProvider = 'vworld',
+  initialPosition,
+  preventCameraReset = false,
+  onMapInitialized
 }: VWorldMapProps) {
   
   // 지도 제공자에 따른 ImageryProvider를 메모이제이션
@@ -83,7 +93,11 @@ export default function VWorldMap({
       >
         <Scene />
         
-        <InitialCameraSetup />
+        <InitialCameraSetup 
+          initialPosition={initialPosition}
+          hasInitialized={preventCameraReset}
+          onInitialSetupComplete={onMapInitialized}
+        />
         
         {/* 동적 지도 레이어 */}
         <ImageryLayer imageryProvider={imageryProvider} />

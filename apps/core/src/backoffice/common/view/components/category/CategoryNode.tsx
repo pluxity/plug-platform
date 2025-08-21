@@ -377,8 +377,12 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>취소</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(item.id)}>
-                    삭제
+                  <AlertDialogAction>
+                    <button
+                      onClick={() => onDelete(item.id)}
+                    >
+                      삭제
+                    </button>
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
