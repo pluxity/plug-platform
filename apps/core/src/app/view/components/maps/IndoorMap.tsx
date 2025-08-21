@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IndoorMapViewer } from '@/global/components';
 import { FacilityType } from '@plug/common-services';
+import { useFacilityStore } from '@/app/store/facilityStore';
 
 interface IndoorMapProps {
   facilityId: number;
@@ -11,13 +12,28 @@ interface IndoorMapProps {
 const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdoorButtonClick }) => {
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null);
   const [countdown, setCountdown] = useState(3);
+  const { getFacilityById, isLoading, facilitiesFetched, facilities, getAllFacilities } = useFacilityStore();
 
   useEffect(() => {
-    // TODO: 여기서 실제로 해당 시설에 3D 도면이 있는지 확인하는 로직 추가
-    // 임시로 랜덤하게 설정 (실제로는 API 호출 또는 데이터 확인)
+    // 시설 데이터가 로드되지 않았거나 로딩 중인 경우 대기
+    if (!facilitiesFetched || isLoading) {
+      return;
+    }
+
+    // 해당 시설에 3D 도면이 있는지 확인하는 로직
     const checkDrawing = async () => {
-      // 예시: 시설 ID가 짝수이면 3D 도면이 있다고 가정
-      const hasDrawing = facilityId % 2 === 0;
+      const facility = getFacilityById(facilityId);
+      
+      // facility가 없는 경우 (시설을 찾을 수 없음)
+      if (!facility) {
+        console.warn(`Facility with ID ${facilityId} not found`);
+        setHas3DDrawing(false);
+        return;
+      }
+      
+      // drawing이 있고 url이 유효하면 3D 도면이 있는 것으로 간주
+      const hasDrawing = !!(facility?.drawing?.url && facility.drawing.url.trim() !== '');
+      
       setHas3DDrawing(hasDrawing);
       
       // 3D 도면이 없으면 카운트다운 시작
@@ -40,15 +56,17 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onOutdo
     };
     
     checkDrawing();
-  }, [facilityId, onOutdoorButtonClick]);
+  }, [facilityId, facilityType, onOutdoorButtonClick, getFacilityById, facilitiesFetched, isLoading, facilities, getAllFacilities]);
 
-  // 3D 도면 확인 중인 경우
-  if (has3DDrawing === null) {
+  // 시설 데이터 로딩 중이거나 3D 도면 확인 중인 경우
+  if (isLoading || !facilitiesFetched || has3DDrawing === null) {
     return (
       <div className="w-full h-full relative flex items-center justify-center bg-gray-900">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-lg">3D 도면을 확인하는 중...</p>
+          <p className="text-lg">
+            {isLoading || !facilitiesFetched ? '시설 정보를 불러오는 중...' : '3D 도면을 확인하는 중...'}
+          </p>
         </div>
       </div>
     );
