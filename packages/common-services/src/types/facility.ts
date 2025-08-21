@@ -1,11 +1,11 @@
 import { FileResponse } from "./file";
-
-// === FACILITY CORE TYPES ===
+import type { FacilityType } from "../constants/domain-config";
 export interface FacilityResponse {
   id: number;
   code: string;
   name: string;
   description: string;
+  type?: FacilityType;
   drawing: FileResponse;
   thumbnail: FileResponse;
   paths: FacilityPathResponse[];
@@ -80,7 +80,6 @@ export interface FacilityHistoryResponse {
   file: FileResponse;
 }
 
-// === COMPONENT TYPES ===
 export interface FloorRequest {
   name: string;
   floorId: string;

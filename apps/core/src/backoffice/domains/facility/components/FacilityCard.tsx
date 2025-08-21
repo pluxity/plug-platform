@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardAction, Badge } from '@plug/ui';
 import { FacilityResponse } from '@plug/common-services';
-import { DOMAINS, FacilityType } from '@plug/common-services';
+import { domainUtils, FacilityType } from '@plug/common-services';
 import { useNavigate } from 'react-router-dom';
 import ThumbnailHoverButtons from './ThumbnailHoverButtons';
 
@@ -18,12 +18,10 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const displayType = facilityType && facilityType in DOMAINS ? facilityType : 'building';
-  const typeConfig = DOMAINS[displayType];
+  const displayType = (facilityType ? facilityType : 'BUILDING') as FacilityType;
+  const typeConfig = domainUtils.getConfig(displayType);
 
   const handleCardClick = () => {
-    console.log('카드 클릭:', facility.name);
-    // 카드 클릭 시 상세보기 대신 편집 페이지로 이동
     navigate(`/admin/facility/${facility.id}`, {
       state: { 
         facilityType: displayType, 
@@ -33,7 +31,6 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   };
 
   const handleView = () => {
-    console.log('상세보기 버튼 클릭:', facility.name);
     navigate(`/admin/facility/${facility.id}`, {
       state: { 
         facilityType: displayType, 
@@ -43,7 +40,6 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   };
 
   const handleIndoorEdit = () => {
-    console.log('실내지도 편집 버튼 클릭:', facility.name);
     navigate(`/admin/facility/${facility.id}/indoor`, {
       state: { 
         facilityType: displayType, 
@@ -77,17 +73,14 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
 
       <CardContent className="pt-0">
         <div>
-          {/* 썸네일 또는 첫 글자 표시 */}
           <div className="relative group my-4">
             {facility.thumbnail?.url ? (
-              // 썸네일이 있는 경우
               <div className="relative overflow-hidden rounded-md border">
                 <img
                   src={facility.thumbnail.url}
                   alt={`${facility.name} 썸네일`}
                   className="w-full h-48 object-cover transition-transform duration-200 group-hover:scale-105"
                 />
-                {/* 호버 시 나타나는 버튼들 */}
                 <ThumbnailHoverButtons
                   onView={handleView}
                   onIndoorEdit={handleIndoorEdit}
@@ -96,12 +89,10 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 />
               </div>
             ) : (
-              // 썸네일이 없는 경우 - 첫 글자 표시
               <div className="relative w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md border flex items-center justify-center group">
                 <span className="text-white text-4xl font-bold">
                   {facility.name.charAt(0).toUpperCase()}
                 </span>
-                {/* 호버 시 나타나는 버튼들 */}
                 <ThumbnailHoverButtons
                   onView={handleView}
                   onIndoorEdit={handleIndoorEdit}

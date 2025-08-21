@@ -1,37 +1,27 @@
-import { useFacilitiesSWR, FacilityType, FacilityResponse, DOMAINS, FacilityService } from '@plug/common-services';
+import { useFacilitiesSWR, FacilityType, FacilityResponse, domainUtils, FacilityService } from '@plug/common-services';
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 
 export const useFacilityData = () => {
-  const { data: facilitiesByType, error, isLoading, mutate } = useFacilitiesSWR();
+  const { data: facilitiesArray, error, isLoading, mutate } = useFacilitiesSWR();
 
   const getFacilityCount = useMemo(() => {
-    if (!facilitiesByType) return {} as Record<FacilityType, number>;
-    
-    return Object.entries(facilitiesByType).reduce((acc, [endpointKey, facilities]) => {
-      const domainEntry = Object.entries(DOMAINS).find(([, config]) => config.endpoint === endpointKey);
-      const facilityType = domainEntry ? domainEntry[0] as FacilityType : 'building';
-      
-      acc[facilityType] = facilities.length;
-      return acc;
-    }, {} as Record<FacilityType, number>);
-  }, [facilitiesByType]);
+    const counts: Record<FacilityType, number> = {} as Record<FacilityType, number>;
+    if (!Array.isArray(facilitiesArray)) return counts;
+    facilitiesArray.forEach((f) => {
+      const t = (f as FacilityResponse & { type?: FacilityType }).type ?? 'BUILDING';
+      counts[t] = (counts[t] ?? 0) + 1;
+    });
+    return counts;
+  }, [facilitiesArray]);
 
   const getAllFacilities = useMemo(() => {
-    if (!facilitiesByType) return [];
-    
-    const mapApiKeyToFacilityType = (apiKey: string): FacilityType => {
-      const domainEntry = Object.entries(DOMAINS).find(([, config]) => config.endpoint === apiKey);
-      return domainEntry ? domainEntry[0] as FacilityType : 'building';
-    };
-
-    return Object.entries(facilitiesByType).flatMap(([type, facilities]) =>
-      facilities.map(facility => ({
-        ...facility,
-        facilityType: mapApiKeyToFacilityType(type)
-      }))
-    );
-  }, [facilitiesByType]);
+    if (!Array.isArray(facilitiesArray)) return [];
+    return facilitiesArray.map((f) => ({
+      ...f,
+      facilityType: (f as FacilityResponse & { type?: FacilityType }).type ?? 'BUILDING'
+    }));
+  }, [facilitiesArray]);
 
   const handleDeleteFacility = async (id: number, facilityType: FacilityType) => {
     try {
@@ -58,7 +48,7 @@ export const useFacilityData = () => {
   };
 
   return {
-    facilitiesByType: facilitiesByType || Object.keys(DOMAINS).reduce((acc, key) => {
+    facilitiesByType: domainUtils.getAllDomains().reduce((acc, key) => {
       acc[key as FacilityType] = [];
       return acc;
     }, {} as Record<FacilityType, FacilityResponse[]>),

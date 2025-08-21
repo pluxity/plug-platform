@@ -31,6 +31,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
       {onView && (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             onView();
@@ -43,9 +44,9 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
       )}
       {onEdit && (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('편집 버튼 클릭:', facilityName);
             onEdit();
           }}
           className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
@@ -56,6 +57,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
       )}
       {onIndoorEdit && (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             onIndoorEdit();
@@ -70,6 +72,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -90,15 +93,14 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>취소</AlertDialogCancel>
-              <AlertDialogAction>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                >
-                  삭제
-                </button>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete();
+                }}
+              >
+                삭제
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

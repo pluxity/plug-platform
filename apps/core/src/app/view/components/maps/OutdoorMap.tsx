@@ -45,9 +45,9 @@ const FacilityPOIs: React.FC<{
       viewer.entities.removeAll()
 
       const facilityTypeConfigs = {
-        buildings: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'building' as FacilityType },
-        stations: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'station' as FacilityType },
-        parks: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'park' as FacilityType },
+        buildings: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'BUILDING' as FacilityType },
+        stations: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'STATION' as FacilityType },
+        parks: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'PARK' as FacilityType },
       }
 
       const keyMap: Record<string, keyof typeof facilityTypeConfigs> = {
@@ -63,7 +63,7 @@ const FacilityPOIs: React.FC<{
         const config = facilityTypeConfigs[normalizedKey]
         if (!config || !Array.isArray(facilitiesOfType)) return
 
-        type FlatFacility = { id: number; name?: string; lat?: number; lon?: number }
+  type FlatFacility = { id: number; name?: string; lat?: number; lon?: number }
         type NestedFacility = { facility?: FlatFacility }
         const getFlat = (f: unknown): FlatFacility | undefined => {
           if (!f || typeof f !== 'object') return undefined

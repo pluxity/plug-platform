@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@plug/ui';
-import { DOMAINS, FacilityType } from '@plug/common-services';
+import { domainUtils, FacilityType } from '@plug/common-services';
 import { useFacilityData } from '../hooks/useFacilityData';
 
 interface FacilityTypeFilterProps {
@@ -14,14 +14,11 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
 }) => {
   const { getFacilityCount, isLoading } = useFacilityData();
   const facilityCount = getFacilityCount;
-  const availableTypes = Object.keys(DOMAINS) as FacilityType[];
-
-  // 로딩 중일 때는 카운트를 표시하지 않음
+  const availableTypes = domainUtils.getAllDomains();
   const showCounts = !isLoading;
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6">      
-      {/* All 옵션 */}
+  <div className="flex flex-wrap gap-2 mb-6">      
       <Badge
         variant={selectedTypes.length === 0 ? "default" : "outline"}
         className={`cursor-pointer transition-colors ${
@@ -30,7 +27,6 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
             : "hover:bg-gray-100"
         }`}
         onClick={() => {
-          // 모든 타입 선택 해제
           selectedTypes.forEach(type => onTypeToggle(type));
         }}
       >
@@ -40,7 +36,6 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
         </span>
       </Badge>
 
-      {/* 각 시설 타입별 필터 */}
       {availableTypes.map((type) => {
         const isSelected = selectedTypes.includes(type);
         const count = facilityCount[type] || 0;
@@ -56,7 +51,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
             }`}
             onClick={() => onTypeToggle(type)}
           >
-            {DOMAINS[type].displayName}
+            {domainUtils.getConfig(type).displayName}
             {showCounts && <span className="ml-1 text-xs">({count})</span>}
           </Badge>
         );

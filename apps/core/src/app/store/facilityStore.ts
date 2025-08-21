@@ -26,7 +26,6 @@ interface FacilityActions {
 
 type FacilityStore = FacilityState & FacilityActions
 
-// Deduplicate concurrent loads across all subscribers
 let loadFacilitiesPromise: Promise<void> | null = null
 
 export const useFacilityStore = create<FacilityStore>()(
@@ -76,32 +75,17 @@ export const useFacilityStore = create<FacilityStore>()(
           try {
             const response = await facilityService.getAllFacilities()
 
-            let facilitiesData: FacilitiesData = {}
+            const flatList = Array.isArray(response.data) ? response.data : []
+            const groupedByEndpoint: FacilitiesData = {}
 
-            if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
-              const raw = response.data as Record<string, FacilityResponse[]>
-              const toEndpointKey = (key: string) => {
-                const lower = String(key).toLowerCase()
-                if (domainUtils.isValidDomain(lower)) {
-                  return domainUtils.getConfig(lower as FacilityType).endpoint
-                }
-                const endpoints = domainUtils
-                  .getAllDomains()
-                  .map(d => domainUtils.getConfig(d).endpoint)
-                const match = endpoints.find(e => e.toLowerCase() === lower)
-                return match ?? key
-              }
-              const normalized: FacilitiesData = {}
-              Object.entries(raw).forEach(([key, list]) => {
-                normalized[toEndpointKey(key)] = Array.isArray(list) ? list : []
-              })
-              facilitiesData = normalized
-            } else if (Array.isArray(response.data)) {
-              const defaultEndpoint = domainUtils.getConfig('building').endpoint
-              facilitiesData[defaultEndpoint] = response.data
-            }
+            flatList.forEach((item) => {
+              const itemType = (item as FacilityResponse & { type?: FacilityType }).type
+              const endpoint = itemType ? domainUtils.getConfig(itemType).endpoint : domainUtils.getConfig('BUILDING').endpoint
+              if (!groupedByEndpoint[endpoint]) groupedByEndpoint[endpoint] = []
+              groupedByEndpoint[endpoint].push(item)
+            })
 
-            set({ facilities: facilitiesData, facilitiesFetched: true })
+            set({ facilities: groupedByEndpoint, facilitiesFetched: true })
           } catch (error) {
             set({ error: error instanceof Error ? error.message : 'Failed to load facilities' })
           } finally {

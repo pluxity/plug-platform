@@ -12,7 +12,6 @@ import {
   FacilityType,
   FacilityResponse,
   facilityService,
-  DOMAINS,
   FacilityHistoryResponse,
 } from '@plug/common-services';
 import { toast } from 'sonner';
@@ -54,8 +53,7 @@ const FacilityEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Router state에서 데이터 추출
+
   const facilityTypeFromState = location.state?.facilityType as FacilityType | null;
   
   const [facility, setFacility] = useState<FacilityData | null>(null);
@@ -74,7 +72,7 @@ const FacilityEdit: React.FC = () => {
       const historyResponse = await facilityService.getFacilityHistory(facilityId);
       setDrawingHistory(historyResponse.data);
     } catch (error) {
-      console.error('Failed to load drawing history:', error);
+  console.error('Failed to load drawing history:', error);
     }
   }, [facilityId]);
 
@@ -83,7 +81,6 @@ const FacilityEdit: React.FC = () => {
   };
 
   const handleFloorsExtracted = (floors: Array<{name: string; floorId: string}>) => {
-    // 층 정보가 변경되었을 때 폼의 floors 필드도 업데이트
     if (floorsReplaceFunction) {
       floorsReplaceFunction(floors);
     } else {
@@ -126,7 +123,6 @@ const FacilityEdit: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // 1. State에서 facilityType이 전달된 경우 (추천 경로)
         if (facilityTypeFromState) {
           try {
             const response = await FacilityService.getById(facilityTypeFromState, facilityId);
@@ -157,7 +153,7 @@ const FacilityEdit: React.FC = () => {
               
               reset(formData);
               await loadDrawingHistory();
-              return; // 성공하면 여기서 함수 종료
+      return;
             } else {
               console.log('No data in response, falling back to existing logic');
             }
@@ -168,20 +164,11 @@ const FacilityEdit: React.FC = () => {
         }
         
         const facilitiesResponse = await facilityService.getAllFacilities();
-        const facilitiesByType = facilitiesResponse.data;
-        
-        // useFacilityData hook과 동일한 로직으로 시설을 찾기
-        const mapApiKeyToFacilityType = (apiKey: string): FacilityType => {
-          const domainEntry = Object.entries(DOMAINS).find(([, config]) => config.endpoint === apiKey);
-          return domainEntry ? domainEntry[0] as FacilityType : 'building';
-        };
-
-        const allFacilities = Object.entries(facilitiesByType || {}).flatMap(([type, facilities]) =>
-          facilities.map(facility => ({
-            ...facility,
-            facilityType: mapApiKeyToFacilityType(type)
-          }))
-        );
+        const facilitiesArray = Array.isArray(facilitiesResponse.data) ? facilitiesResponse.data : [];
+        const allFacilities = facilitiesArray.map(f => ({
+          ...f,
+          facilityType: (f as FacilityResponse & { type?: FacilityType }).type ?? 'BUILDING'
+        }));
         
         const targetFacility = allFacilities.find(f => f.id === facilityId);
         
@@ -191,8 +178,7 @@ const FacilityEdit: React.FC = () => {
           return;
         }
 
-        // 해당 시설의 상세 정보를 가져옴
-        const response = await FacilityService.getById(targetFacility.facilityType, facilityId);
+    const response = await FacilityService.getById(targetFacility.facilityType, facilityId);
         if (response.data) {
           const facilityData = response.data as FacilityData;
           setFacilityType(targetFacility.facilityType);
@@ -219,7 +205,6 @@ const FacilityEdit: React.FC = () => {
           
           reset(formData);
           
-          // 도면 파일 이력 로드
           await loadDrawingHistory();
         } else {
           toast.error('시설을 찾을 수 없습니다.');
