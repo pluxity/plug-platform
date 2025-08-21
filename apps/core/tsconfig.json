@@ -25,9 +25,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@plug/core/*": ["./src/*"]
+      "@plug/core/*": ["./src/*"],
+      "@plug/engine": ["../../packages/engine/dist/src"],
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "build", "../../packages/engine/**/*"],
+  "exclude": ["node_modules", "dist", "build"],
 }

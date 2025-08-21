@@ -101,7 +101,7 @@ function DialogContent({
         </div>
 
         {/* 본문 */}
-        <div className="p-6">{children}</div>
+        <div className="p-6 h-full">{children}</div>
       </DialogPrimitive.Content>
     </DialogPortal>
   )

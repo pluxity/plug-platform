@@ -1,22 +1,22 @@
 import { api } from '@plug/api-hooks';
 import { DataResponseBody } from '@plug/api-hooks';
 import { 
-  DomainKey, 
   domainUtils,
   DomainCreateRequest,
   DomainUpdateRequest,
-  DomainResponse
+  DomainResponse,
+  FacilityType
 } from '../constants/domain-config';
 
 export class FacilityService {
-  static async getAll<T extends DomainKey>(
+  static async getAll<T extends FacilityType>(
     domain: T
   ): Promise<DataResponseBody<DomainResponse<T>[]>> {
     const config = domainUtils.getConfig(domain);
     return api.get<DomainResponse<T>[]>(config.endpoint);
   }
 
-  static async getById<T extends DomainKey>(
+  static async getById<T extends FacilityType>(
     domain: T,
     id: number
   ): Promise<DataResponseBody<DomainResponse<T>>> {
@@ -24,19 +24,18 @@ export class FacilityService {
     return api.get<DomainResponse<T>>(`${config.endpoint}/${id}`);
   }
 
-  static async create<T extends DomainKey>(
+  static async create<T extends FacilityType>(
     domain: T,
     data: DomainCreateRequest<T>
-  ): Promise<number> {
+  ): Promise<void> {
     const config = domainUtils.getConfig(domain);
     const response = await api.post(config.endpoint, data);
-    if (response.ok) {
-      return response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to create ${config.displayName}: ${response.status}`);
     }
-    throw new Error(`Failed to create ${config.displayName}: ${response.status}`);
   }
 
-  static async update<T extends DomainKey>(
+  static async update<T extends FacilityType>(
     domain: T,
     id: number,
     data: DomainUpdateRequest<T>
@@ -45,7 +44,7 @@ export class FacilityService {
     return api.put(`${config.endpoint}/${id}`, data);
   }
 
-  static async delete<T extends DomainKey>(
+  static async delete<T extends FacilityType>(
     domain: T,
     id: number
   ): Promise<void> {
@@ -53,7 +52,7 @@ export class FacilityService {
     return api.delete(`${config.endpoint}/${id}`);
   }
 
-  static getDomainInfo<T extends DomainKey>(domain: T) {
+  static getDomainInfo<T extends FacilityType>(domain: T) {
     const config = domainUtils.getConfig(domain);
     return {
       name: domain,
@@ -63,25 +62,25 @@ export class FacilityService {
     };
   }
 
-  static getSupportedDomains(): DomainKey[] {
+  static getSupportedDomains(): FacilityType[] {
     return domainUtils.getAllDomains();
   }
 
-  static isValidDomain(domain: string): domain is DomainKey {
+  static isValidDomain(domain: string): domain is FacilityType {
     return domainUtils.isValidDomain(domain);
   }
 }
 
-type DomainServiceMethods<T extends DomainKey> = {
+type DomainServiceMethods<T extends FacilityType> = {
   getAll: () => Promise<DataResponseBody<DomainResponse<T>[]>>;
   getById: (id: number) => Promise<DataResponseBody<DomainResponse<T>>>;
-  create: (data: DomainCreateRequest<T>) => Promise<number>;
+  create: (data: DomainCreateRequest<T>) => Promise<void>;
   update: (id: number, data: DomainUpdateRequest<T>) => Promise<void>;
   delete: (id: number) => Promise<void>;
   getDomainInfo: () => ReturnType<typeof FacilityService.getDomainInfo>;
 };
 
-function createDomainService<T extends DomainKey>(domain: T): DomainServiceMethods<T> {
+function createDomainService<T extends FacilityType>(domain: T): DomainServiceMethods<T> {
   return {
     getAll: () => FacilityService.getAll(domain),
     getById: (id: number) => FacilityService.getById(domain, id),
@@ -95,4 +94,4 @@ function createDomainService<T extends DomainKey>(domain: T): DomainServiceMetho
 export const domainServices = domainUtils.getAllDomains().reduce((services, domain) => {
   services[domain] = createDomainService(domain);
   return services;
-}, {} as Record<DomainKey, DomainServiceMethods<any>>);
+}, {} as Record<FacilityType, DomainServiceMethods<any>>);

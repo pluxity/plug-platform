@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import { useEffect } from 'react'
-import {
-  useAssetsSWR,
-  useAssetCategoriesSWR
-} from '@plug/common-services'
+import { getAssetCategoryList, getAssetCategoryMaxDepth } from '@plug/common-services/services'
+import { api, type DataResponseBody } from '@plug/api-hooks'
 import type { 
   AssetResponse, 
   AssetCategoryResponse
@@ -197,14 +195,13 @@ export const useAssetStore = create<AssetState>()(
     getCategoryPath: (categoryId: number) => {
       const { categories } = get()
       const path: AssetCategoryResponse[] = []
-      let currentId: number | undefined = categoryId
+      let currentId: number | null = categoryId
 
-      while (currentId) {
+      while (currentId != null) {
         const category = categories.find(cat => cat.id === currentId)
         if (!category) break
-        
         path.unshift(category)
-        currentId = category.parentId
+  currentId = category.parentId ?? null
       }
 
       return path
@@ -213,23 +210,13 @@ export const useAssetStore = create<AssetState>()(
     // Data loading functions
     loadAssets: async () => {
       const { assetsFetched, isLoadingAssets } = get()
-      
-      if (assetsFetched || isLoadingAssets) {
-        return
-      }
-
+      if (assetsFetched || isLoadingAssets) return
       set({ isLoadingAssets: true, assetError: null })
-      
       try {
-        // Note: This should be replaced with actual API call
-        // Using SWR hook data would require a different approach
-        // For now, this is a placeholder structure
-        console.warn('loadAssets: This should be implemented with actual API call')
-        
-        set({ 
-          assetsFetched: true,
-          isLoadingAssets: false 
-        })
+  const resp = await api.get<AssetResponse[]>('assets', { requireAuth: true }) as unknown as DataResponseBody<AssetResponse[]>
+  const list = resp?.data ?? []
+        get().setAssets(list)
+        set({ assetsFetched: true, isLoadingAssets: false })
       } catch (error) {
         set({ 
           assetError: error instanceof Error ? error.message : 'Failed to load assets',
@@ -238,7 +225,7 @@ export const useAssetStore = create<AssetState>()(
       }
     },
 
-    loadCategories: async () => {
+  loadCategories: async () => {
       const { categoriesFetched, isLoadingCategories } = get()
       
       if (categoriesFetched || isLoadingCategories) {
@@ -248,10 +235,12 @@ export const useAssetStore = create<AssetState>()(
       set({ isLoadingCategories: true, categoryError: null })
       
       try {
-        // Note: This should be replaced with actual API call
-        // Using SWR hook data would require a different approach
-        console.warn('loadCategories: This should be implemented with actual API call')
-        
+        const [list, maxDepth] = await Promise.all([
+          getAssetCategoryList(),
+          getAssetCategoryMaxDepth(),
+        ])
+        get().setCategories(list)
+        get().setMaxDepth(maxDepth)
         set({ 
           categoriesFetched: true,
           isLoadingCategories: false 
@@ -281,32 +270,13 @@ export const useAssetStore = create<AssetState>()(
 // Hook for using asset store with automatic data loading
 export const useAssets = () => {
   const store = useAssetStore()
-  const { setAssets, setAssetsFetched, setAssetError, setAssetsLoading } = store
-  const { data: assetsData, error: assetsError, isLoading: assetsLoading } = useAssetsSWR()
-  
-  // Sync SWR data with store
-  useEffect(() => {
-    if (assetsData) {
-      setAssets(assetsData)
-      setAssetsFetched(true)
-    }
-  }, [assetsData, setAssets, setAssetsFetched])
-
-  useEffect(() => {
-    if (assetsError) {
-      setAssetError(assetsError.message || 'Failed to load assets')
-    }
-  }, [assetsError, setAssetError])
-
-  useEffect(() => {
-    setAssetsLoading(assetsLoading)
-  }, [assetsLoading, setAssetsLoading])
-  
+  const { loadAssets } = store
+  useEffect(() => { loadAssets() }, [loadAssets])
   return {
     assets: store.assets,
     filteredAssets: store.filteredAssets,
-    isLoading: assetsLoading,
-    error: assetsError,
+    isLoading: store.isLoadingAssets,
+    error: store.assetError,
     mutate: () => store.refreshData()
   }
 }
@@ -315,32 +285,34 @@ export const useAssets = () => {
 export const useAssetCategories = () => {
   const store = useAssetStore()
   const { setCategories, setMaxDepth, setCategoriesFetched, setCategoryError, setCategoriesLoading } = store
-  const { data: categoriesData, error: categoriesError, isLoading: categoriesLoading } = useAssetCategoriesSWR()
-  
-  // Sync SWR data with store
   useEffect(() => {
-    if (categoriesData) {
-      setCategories(categoriesData.list)
-      setMaxDepth(categoriesData.maxDepth)
-      setCategoriesFetched(true)
+    let mounted = true
+    const run = async () => {
+      setCategoriesLoading(true)
+      try {
+        const [list, maxDepth] = await Promise.all([
+          getAssetCategoryList(),
+          getAssetCategoryMaxDepth(),
+        ])
+        if (!mounted) return
+        setCategories(list)
+        setMaxDepth(maxDepth)
+        setCategoriesFetched(true)
+      } catch (e) {
+        if (!mounted) return
+        setCategoryError((e as Error)?.message ?? 'Failed to load categories')
+      } finally {
+        if (mounted) setCategoriesLoading(false)
+      }
     }
-  }, [categoriesData, setCategories, setMaxDepth, setCategoriesFetched])
-
-  useEffect(() => {
-    if (categoriesError) {
-      setCategoryError(categoriesError.message || 'Failed to load categories')
-    }
-  }, [categoriesError, setCategoryError])
-
-  useEffect(() => {
-    setCategoriesLoading(categoriesLoading)
-  }, [categoriesLoading, setCategoriesLoading])
-  
+    run()
+    return () => { mounted = false }
+  }, [setCategories, setMaxDepth, setCategoriesFetched, setCategoryError, setCategoriesLoading])
   return {
     categories: store.categories,
     maxDepth: store.maxDepth,
-    isLoading: categoriesLoading,
-    error: categoriesError,
+    isLoading: store.isLoadingCategories,
+    error: store.categoryError,
     mutate: () => store.refreshData()
   }
 }

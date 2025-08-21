@@ -1,7 +1,14 @@
+import { 
+  useGet, 
+  usePost, 
+  useSWRApi
+} from '@plug/api-hooks';
 import { api } from '@plug/api-hooks';
 import { DataResponseBody } from '@plug/api-hooks';
 import {
   FacilityResponse,
+  FacilityCreateRequest,
+  FacilityUpdateRequest,
   FacilityHistoryResponse,
   FacilityLocationUpdateRequest,
   FacilityPathSaveRequest,
@@ -17,6 +24,45 @@ import {
 export { 
   FacilityService,
   domainServices
+};
+
+const END_POINT = 'facilities';
+
+export const useFacilities = () => {
+  return useGet<FacilityResponse[]>(END_POINT, { requireAuth: true });
+};
+
+export const useFacilityDetail = (facilityId: number) => {
+  return useGet<FacilityResponse>(`${END_POINT}/${facilityId}`, { requireAuth: true });
+};
+
+export const useCreateFacility = () => {
+  return usePost<FacilityCreateRequest>(END_POINT, { requireAuth: true });
+};
+
+export const updateFacility = async (facilityId: number, data: FacilityUpdateRequest) => {
+  return api.put(`${END_POINT}/${facilityId}`, data, { requireAuth: true });
+};
+
+export const deleteFacility = async (facilityId: number) => {
+  return api.delete(`${END_POINT}/${facilityId}`, { requireAuth: true });
+};
+
+export const useFacilitiesSWR = () => {
+  return useSWRApi<FacilityResponse[]>(END_POINT, 'GET', { requireAuth: true });
+};
+
+export const useFacilityDetailSWR = (facilityId: number) => {
+  return useSWRApi<FacilityResponse>(`${END_POINT}/${facilityId}`, 'GET', { requireAuth: true });
+};
+
+export const useFacilityDetailSWRConditional = (facilityId?: number) => {
+  const url = facilityId ? `${END_POINT}/${facilityId}` : '';
+  return useSWRApi<FacilityResponse>(url, 'GET', { requireAuth: true }, {
+    fallbackData: null,
+    shouldRetryOnError: false,
+    isPaused: () => !facilityId,
+  });
 };
 
 export const facilityService = {

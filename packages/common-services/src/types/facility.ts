@@ -1,11 +1,11 @@
 import { FileResponse } from "./file";
-
-// === FACILITY CORE TYPES ===
+import type { FacilityType } from "../constants/domain-config";
 export interface FacilityResponse {
   id: number;
   code: string;
   name: string;
   description: string;
+  type?: FacilityType;
   drawing: FileResponse;
   thumbnail: FileResponse;
   paths: FacilityPathResponse[];
@@ -22,7 +22,6 @@ export interface FacilityCreateRequest {
   name: string;
   code: string;
   description?: string;
-  drawingFileId?: number;
   thumbnailFileId?: number;
   lon?: number;
   lat?: number;
@@ -33,7 +32,7 @@ export interface FacilityUpdateRequest {
   name: string;
   code: string;
   description: string;
-  thumbnailFileId: number;
+  thumbnailFileId?: number;
   lon: number;
   lat: number;
   locationMeta: string;
@@ -81,7 +80,6 @@ export interface FacilityHistoryResponse {
   file: FileResponse;
 }
 
-// === COMPONENT TYPES ===
 export interface FloorRequest {
   name: string;
   floorId: string;
