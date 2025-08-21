@@ -28,8 +28,9 @@ export const useDeviceStore = create<DeviceStore>()((set, get) => ({
       .toLowerCase()
       .normalize('NFC')
 
-    const q = normalizeText(query)
-    if (!q) return []
+  const q = normalizeText(query)
+  // Require at least 2 characters to start searching
+  if (q.length < 2) return []
 
     const deviceList = get().devices
 

@@ -71,9 +71,11 @@ const GroupSearchFormInner = <T,>(
   }), [onValueChange, setOpen])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onValueChange(e.target.value)
-    if (!open && e.target.value.trim()) setOpen(true)
-    if (open && !e.target.value.trim()) setOpen(false)
+  const next = e.target.value
+  onValueChange(next)
+  const hasMin = next.trim().length >= 2
+  if (!open && hasMin) setOpen(true)
+  if (open && !hasMin) setOpen(false)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -81,7 +83,8 @@ const GroupSearchFormInner = <T,>(
   }
 
   const handleFocus = () => {
-    if (value.trim().length > 0 && totalCount > 0) setOpen(true)
+    const hasMin = value.trim().length >= 2
+    if (hasMin && totalCount > 0) setOpen(true)
   }
 
   return (

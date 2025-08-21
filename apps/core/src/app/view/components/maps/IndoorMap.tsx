@@ -166,12 +166,21 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   }, [tryImportPois]);
 
   const handleOutdoorClick = useCallback(() => {
-    onGoOutdoor?.();
+    if (onGoOutdoor) {
+      onGoOutdoor();
+    } else {
+      // Fallback for legacy listeners
+      window.dispatchEvent(new Event('indoor:goOutdoor'));
+    }
   }, [onGoOutdoor]);
 
   useEffect(() => {
     return () => {
-      onGoOutdoor?.();
+      if (onGoOutdoor) {
+        onGoOutdoor();
+      } else {
+        window.dispatchEvent(new Event('indoor:goOutdoor'));
+      }
     };
   }, [onGoOutdoor]);
 

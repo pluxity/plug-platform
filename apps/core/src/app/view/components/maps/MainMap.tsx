@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import IndoorMap from './IndoorMap'
 import OutdoorMap from './OutdoorMap'
 import { MapMode } from '@/app/model/types/MapTypes'
@@ -17,17 +17,19 @@ const MainMap: React.FC = () => {
     }
   }, [facilitiesFetched, loadFacilities])
 
+  const goOutdoor = useCallback(() => {
+    setMapMode(MapMode.OUTDOOR)
+    setSelectedFacilityId(null)
+    setSelectedFacilityType(null)
+  }, [])
+
   useEffect(() => {
     const handler = () => {
-      if (mapMode === MapMode.INDOOR) {
-        setMapMode(MapMode.OUTDOOR)
-        setSelectedFacilityId(null)
-        setSelectedFacilityType(null)
-      }
+      goOutdoor()
     }
     window.addEventListener('indoor:goOutdoor', handler)
     return () => window.removeEventListener('indoor:goOutdoor', handler)
-  }, [mapMode])
+  }, [goOutdoor])
 
   const handleFacilitySelect = (facilityId: number, facilityType: FacilityType) => {
     setSelectedFacilityId(facilityId)
@@ -47,6 +49,7 @@ const MainMap: React.FC = () => {
         <IndoorMap 
           facilityId={selectedFacilityId}
           facilityType={selectedFacilityType}
+          onGoOutdoor={goOutdoor}
         />
       )}
     </>
