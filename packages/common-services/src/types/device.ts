@@ -6,15 +6,13 @@ export type {
 import { FeatureResponse } from './feature'
 
 export interface GsDeviceCreateRequest {
-  id: string;
+  id?: string;
   name?: string;
-  featureId?: string;
   categoryId?: number;
 }
 
 export interface GsDeviceUpdateRequest {
   name?: string;
-  featureId?: string;
   categoryId?: number;
 }
 

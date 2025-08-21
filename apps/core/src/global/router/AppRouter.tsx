@@ -8,7 +8,7 @@ import FacilityEdit from '@/backoffice/domains/facility/page/FacilityEdit'
 import FacilityIndoor from '@/backoffice/domains/facility/page/FacilityIndoor'
 import { Role , User, Permission } from '@/backoffice/domains/users'
 import { AssetList, AssetCategory } from '@/backoffice/domains/asset'
-import { DeviceCategory } from '@/backoffice/domains/device'
+import { DeviceCategory, DeviceList } from '@/backoffice/domains/device'
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
 import LoginPage from '@/global/pages/LoginPage'
@@ -42,6 +42,7 @@ const AppRouter: React.FC = () => {
               <Route path="facility/:id" element={<FacilityEdit />} />
               <Route path="assetList" element={<AssetList />} />
               <Route path="assetCategory" element={<AssetCategory />} />
+              <Route path="assetList" element={<AssetList />} />
               <Route path="deviceCategory" element={<DeviceCategory />} />
             </Route>
 
