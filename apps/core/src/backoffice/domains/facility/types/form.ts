@@ -46,7 +46,9 @@ export interface ExtendedFacilityFormProps extends FacilityFormProps {
   setValue: UseFormSetValue<FacilityCreateFormData>;
   watch: UseFormWatch<FacilityCreateFormData>;
   onFloorsReplaceReady?: (replaceFunction: (floors: Array<{name: string; floorId: string}>) => void) => void;
+  onDrawingFileUploaded?: (fileUrl: string) => void;
   currentThumbnailFile?: FileResponse | null;
+  currentDrawingFile?: FileResponse | null;
   isEditMode?: boolean;
 }
 

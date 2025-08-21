@@ -90,14 +90,15 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>취소</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                삭제
+              <AlertDialogAction>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                >
+                  삭제
+                </button>
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { Button } from '@plug/ui'
 import { toast } from 'sonner'
+
+
 import { 
   useAssets, 
   useAssetCategories, 
@@ -9,8 +12,8 @@ import {
   useAssetStore
 } from '@/global/store'
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services'
+import { createFeature } from '@plug/common-services'
 import { Poi } from '@plug/engine/src';
-import { PoiImportOption } from '@plug/engine/src/interfaces'
 
 interface AssetListSideBarProps {
   onAssetClick?: (assetId: number) => void
@@ -153,7 +156,7 @@ const AssetCategoryBreadcrumb: React.FC = () => {
           onClick={goToRootCategory}
           className="text-blue-600 hover:text-blue-800 p-1 h-auto cursor-pointer"
         >
-          홈
+          전체
         </Button>
         
         {currentCategoryPath.map((category) => (
@@ -212,19 +215,25 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
   isCollapsed = false,
   // onToggleCollapse
 }) => {
+  // facilityId 가져오기
+  const { id: facilityId } = useParams<{ id: string }>();
   // Asset Store hooks
   const { isLoading: assetsLoading, error: assetsError } = useAssets()
   const { isLoading: categoriesLoading, error: categoriesError } = useAssetCategories()
   const { 
     selectedCategoryId,
     navigateToCategory, 
-    goToParentCategory
   } = useAssetCategoryNavigation()
   const { 
     childCategories, 
     hasChildCategories, 
     isRootLevel 
   } = useCurrentCategoryContent()
+
+  // 루트 카테고리로 초기화 
+  useEffect(() => {
+    navigateToCategory(null) 
+  }, [])
 
   // 현재 선택된 카테고리의 asset들을 직접 가져오기
   const store = useAssetStore()
@@ -256,9 +265,7 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
           }
         }
         
-        Poi.Create(poiOption, (data: PoiImportOption) => {
-          toast.success(`Feature 배치 완료: ${data.id}`)
-        })
+        Poi.Create(poiOption, handleCreateFeature)  
       } else {
         const errorMessage = !asset 
           ? 'Asset을 찾을 수 없습니다.' 
@@ -267,6 +274,31 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
         toast.error(errorMessage)
       }
   }
+ 
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCreateFeature = async (feature: any) => {
+    if (!facilityId) { 
+      toast.error('시설이 선택되지 않았습니다.');
+      return;
+    }
+    try{
+      await createFeature({
+        id: feature.id,
+        assetId: feature.property.assetId,
+        facilityId: parseInt(facilityId), 
+        floorId: feature.floorId,
+        position: feature.position,
+        rotation: feature.rotation,
+        scale: feature.scale,
+      })
+
+      toast.success('Feature 생성 완료')
+    } catch (error) {
+      console.error('Failed to create feature:', error)
+      toast.error('Feature 생성에 실패했습니다. 다시 시도해주세요.')
+    }
+  }   
 
   const renderContent = () => {
     if (isLoading) {
@@ -290,30 +322,24 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
 
     return (
       <div className="space-y-3">
-        {/* 브레드크럼 네비게이션 */}
-        <AssetCategoryBreadcrumb />
 
-        {/* 뒤로가기 버튼 */}
-        {!isRootLevel && (
-          <div className="px-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={goToParentCategory}
-              className="w-full text-xs cursor-pointer"
-            >
-              ← 뒤로가기
-            </Button>
-            
-            {/* 현재 상태 표시 */}
-            <div className="text-xs text-gray-500 mt-2 text-center">
-              {hasChildCategories 
-                ? `하위 카테고리 ${childCategories.length}개` 
-                : `에셋 ${currentAssets.length}개`
-              }
-            </div>
+        <div className="flex items-center gap-2">
+          {/* 브레드크럼 네비게이션 */}
+          <div className="flex-1">
+            <AssetCategoryBreadcrumb />
           </div>
-        )}
+
+          {/* 현재 상태 표시 */}
+          {!isRootLevel && (
+            <span className="text-xs text-gray-500 text-center ml-auto mr-4">
+                {hasChildCategories 
+                  ? `하위 카테고리 ${childCategories.length}개` 
+                  : `에셋 ${currentAssets.length}개`
+                }
+            </span>
+          )}
+        </div>
+
 
         {/* 컨텐츠 영역 */}
         <div className="px-2">
