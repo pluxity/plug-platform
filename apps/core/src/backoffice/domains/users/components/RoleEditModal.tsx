@@ -24,14 +24,9 @@ export const RoleEditModal: React.FC<RoleEditModalProps> = ({
   onSuccess,
   roleId,
 }) => {
-    // 역할 상세 목록 조회
     const { data, mutate } = useRoleDetailSWR(isOpen && roleId ? roleId : undefined);
     const { execute: updateRole, isLoading: isRoleUpdating } = useUpdateRole(roleId);
-
-    // 권한 목록 조회
     const { data: permissionData } = usePermissionsSWR();
-
-    // 권한 옵션
     const permissionOptions = useMemo(() => {
         return permissionData?.map(permission => ({
             label: permission.name,

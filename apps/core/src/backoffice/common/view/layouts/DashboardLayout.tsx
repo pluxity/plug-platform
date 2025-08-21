@@ -4,17 +4,20 @@ import { Sidebar } from '@plug/ui'
 import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
 
 const AsideMenuItems: AsideMenuItemProps[] = [
-  { id: 'Asset', label: 'Asset', depth: 1, showToggle: true},
-  { id: 'AssetCategory', label: 'AssetCategory', to: '/admin/assetCategory', depth: 2, showToggle: false, parentId: 'Asset'},
-  { id: 'AssetList', label: 'AssetList', to: '/admin/assetList', depth: 2, showToggle: false, parentId: 'Asset'},
-  { id: 'Device', label: 'Device', depth: 1, showToggle: true},
-  { id: 'DeviceCategory', label: 'DeviceCategory', to: '/admin/deviceCategory', depth: 2, showToggle: false, parentId: 'Device'},
-  { id: 'DeviceList', label: 'DeviceList', to: '/admin/deviceList', depth: 2, showToggle: false, parentId: 'Device'},
-  { id: 'Facility', label: 'Facility', to: '/admin/facility', depth: 1, showToggle: true},
-  { id: 'Users', label: 'Users', depth: 1, showToggle: true},
-  { id: 'Permission', label: 'Permission', to: '/admin/permission', depth: 2, showToggle: false, parentId: 'Users'},
-  { id: 'Role', label: 'Role', to: '/admin/role', depth: 2, showToggle: false, parentId: 'Users'},
-  { id: 'User', label: 'User', to: '/admin/user', depth: 2, showToggle: false, parentId: 'Users'},
+  { id: 'Facility', label: '시설물', to: '/admin/facility', depth: 1, showToggle: true},
+
+  { id: 'Asset', label: '에셋', depth: 1, showToggle: true},
+  { id: 'AssetCategory', label: '에셋 분류', to: '/admin/asset-category', depth: 2, showToggle: false, parentId: 'Asset'},
+  { id: 'AssetList', label: '에셋 목록', to: '/admin/asset-list', depth: 2, showToggle: false, parentId: 'Asset'},
+
+  { id: 'Device', label: '장치', depth: 1, showToggle: true},
+  { id: 'DeviceCategory', label: '장치 분류', to: '/admin/device-category', depth: 2, showToggle: false, parentId: 'Device'},
+  { id: 'DeviceList', label: '장치 목록', to: '/admin/device-list', depth: 2, showToggle: false, parentId: 'Device'},
+
+  { id: 'Users', label: '사용자', depth: 1, showToggle: true},
+  { id: 'Permission', label: '권한', to: '/admin/permission', depth: 2, showToggle: false, parentId: 'Users'},
+  { id: 'Role', label: '역할', to: '/admin/role', depth: 2, showToggle: false, parentId: 'Users'},
+  { id: 'User', label: '사용자', to: '/admin/user', depth: 2, showToggle: false, parentId: 'Users'},
 
 ]
 
