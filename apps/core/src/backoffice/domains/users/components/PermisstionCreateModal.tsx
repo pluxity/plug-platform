@@ -10,11 +10,8 @@ import { permissionFormSchema, type PermissionFormData } from '@/backoffice/doma
 import { toast } from 'sonner';
 
 export const PermissionCreateModal: React.FC<PermissionCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
-    // 권한 생성
     const { execute: createPermission, isLoading: isPermissionCreating } = useCreatePermission();
-    // 리소스 데이터 가져오기
     const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();
-    // 리소스 체크박스 로직
     const { isResourceSelected, handleCheckboxChange } = usePermissionCheckbox();
 
     const modalForm = useForm<PermissionFormData>({

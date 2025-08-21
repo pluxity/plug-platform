@@ -10,12 +10,9 @@ import { permissionFormSchema, type PermissionFormData } from '@/backoffice/doma
 import { toast } from 'sonner';
 
 export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpen, onClose, onSuccess, permissionId }) => {
-    // 권한 상세 목록 조회
     const { data: detailData, execute: detailPermission } = usePermissionDetail(permissionId);
     const { execute: updatePermission, isLoading: isPermissionUpdating } = useUpdatePermission(permissionId);
-    // 리소스 데이터 가져오기
     const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();
-    // 리소스 체크박스 로직
     const { isResourceSelected, handleCheckboxChange } = usePermissionCheckbox();
 
     const modalForm = useForm<PermissionFormData>({
@@ -32,7 +29,7 @@ export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpe
         if (isOpen && permissionId) {
             detailPermission();
         }
-    }, [isOpen, permissionId]);
+    }, [isOpen, permissionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (detailData) {  

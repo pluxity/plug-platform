@@ -19,12 +19,9 @@ import { useUpdateUser, useUserDetailSWR, useRolesSWR } from '@plug/common-servi
 import { UserEditModalProps } from '@/backoffice/domains/users/types/user';
 
 export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, onSuccess, userId }) => {
-    // 사용자 정보 
     const { data, mutate } = useUserDetailSWR(isOpen && userId ? userId : undefined);
     const { execute: updateUser, isLoading: isUserUpdating } = useUpdateUser(userId);
     const { data: roleData } = useRolesSWR();
-
-    // 역할 옵션 
     const roleOptions = useMemo(() => {
         return roleData?.map(role => ({
             label: role.name,
@@ -55,7 +52,6 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, o
         }
     }, [isOpen, data, modalForm]);
 
-    // 폼 초기화
     const resetForm = useCallback(() => {
         if (data) {
             modalForm.reset({

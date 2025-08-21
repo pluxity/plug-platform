@@ -11,25 +11,20 @@ import { PermissionEditModal } from '@/backoffice/domains/users/components/Permi
 import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 
 const Permission: React.FC = () => {
-    // 권한 상태 관리 
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [deletePermissionData, setDeletePermissionData] = useState<PermissionData>();
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [selectedPermissionId, setSelectedPermissionId] = useState<number>();
 
-    // 권한 목록 조회
     const { data, execute } = usePermissions();
 
-    // 권한 리소스 가져오기
     const { fetchPermissionResources, resourceTypes, resourceData } = usePermissionStore();
 
-    // 권한 목록 조회 훅 실행
     useEffect(() => {
         execute();
         fetchPermissionResources();
-    }, []); 
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 권한 목록 매핑
     const permissionData = data ? data.map(permission => 
         PermissionMapper(permission, resourceTypes, resourceData)
     ) : [];

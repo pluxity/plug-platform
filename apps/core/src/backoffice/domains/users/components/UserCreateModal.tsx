@@ -28,11 +28,8 @@ const FORM_INITIAL_STATE = {
 }
 
 export const UserCreateModal: React.FC<UserCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
-    // 사용자 생성
     const { execute: createUser, isLoading: isUserCreating } = useCreateUser();
     const { data: roleData } = useRolesSWR();
-
-    // 역할 옵션 
     const roleOptions = useMemo(() => {
         return roleData?.map(role => ({
             label: role.name,
@@ -46,7 +43,6 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({ isOpen, onClos
         mode: 'onChange',
     });
         
-    // 폼 초기화
     const resetForm = useCallback(() => {
         modalForm.reset(FORM_INITIAL_STATE);
         onClose();

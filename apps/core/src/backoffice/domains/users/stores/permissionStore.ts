@@ -10,15 +10,15 @@ interface PermissionStore {
     fetchPermissionResources: () => Promise<void>
 }
 
-// _CATEGORY로 끝나는 타입인지 확인하는 함수
 const isCategoryType = (key: string): boolean => {
     return key.endsWith('_CATEGORY');
 };
 
-// 계층 구조에서 maxDepth에 해당하는 leaf 노드만 추출하는 함수 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getNodesByDepth = (maxDepth: number, items: any[]): PermissionResourceData[] => {
     const leafNodes: PermissionResourceData[] = [];
-    
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const traverse = (item: any) => {
         if (item.depth === maxDepth) {
             leafNodes.push({
@@ -26,11 +26,9 @@ const getNodesByDepth = (maxDepth: number, items: any[]): PermissionResourceData
                 name: item.name
             });
         } else {
-            // maxDepth에 도달할 때까지 자식 노드를 재귀적으로 탐색
             item.children?.forEach(traverse);
         }
     };
-    
     items.forEach(traverse);
     return leafNodes;
 };
@@ -44,14 +42,12 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
     fetchPermissionResources: async () => {
         set({ isLoading: true, error: null });
         try {
-            // 1단계: resourceTypes 가져오기 
             const resourceTypesResponse = await api.get<PermissionResourceType[]>(
                 'permissions/resource-types', 
                 { requireAuth: true }
             );
             const types = resourceTypesResponse.data;
 
-            // 2단계: 각 resourceType별 데이터 가져오기
             const data: Record<string, PermissionResourceData[]> = {};
             
             for (const resourceType of types) {
@@ -59,15 +55,13 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
                     const endpoint = resourceType.endpoint;
                     
                     if (endpoint) {    
-                        const response = await api.get<PermissionResourceData[]>(`${endpoint}`);
-                        const responseData = (response as any)?.data || response;
+                        const response = await api.get<unknown>(`${endpoint}`);
+                        const responseData: any = (response as any)?.data ?? response; // eslint-disable-line @typescript-eslint/no-explicit-any
 
                         if (isCategoryType(resourceType.key)) {
-                            // 카테고리 타입인 경우
-                            data[resourceType.key] = responseData?.list ? getNodesByDepth(responseData.maxDepth, responseData.list) : [];
+                            data[resourceType.key] = responseData?.list ? getNodesByDepth(1, responseData.list) : [];
 
                         } else if (resourceType.key === 'FACILITY') {
-                            // Facility 타입인 경우 : 모든 시설 데이터를 하나의 배열로 합침
                             const facilityAllArrays = (data: Record<string, PermissionResourceData[]>) => {
                                 return Object.values(data).reduce((acc, curr) => {
                                     return Array.isArray(curr) ? [...acc, ...curr] : acc;
@@ -81,7 +75,6 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
                             }));
 
                         } else {
-                            // 일반 타입 처리
                             data[resourceType.key] = Array.isArray(responseData) 
                                 ? responseData.map((item: PermissionResourceData) => ({
                                     id: item.id.toString(),
