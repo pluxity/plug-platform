@@ -17,7 +17,6 @@ interface PermissionStore {
     fetchPermissionResources: () => Promise<void>
 }
 
-// _CATEGORY로 끝나는 타입인지 확인하는 함수
 const isCategoryType = (key: string): boolean => {
     return key.endsWith('_CATEGORY');
 };
@@ -33,11 +32,9 @@ const getNodesByDepth = (maxDepth: number, items: TreeNode[]): PermissionResourc
                 name: item.name
             });
         } else {
-            // maxDepth에 도달할 때까지 자식 노드를 재귀적으로 탐색
             item.children?.forEach(traverse);
         }
     };
-    
     items.forEach(traverse);
     return leafNodes;
 };
@@ -51,14 +48,12 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
     fetchPermissionResources: async () => {
         set({ isLoading: true, error: null });
         try {
-            // 1단계: resourceTypes 가져오기 
             const resourceTypesResponse = await api.get<PermissionResourceType[]>(
                 'permissions/resource-types', 
                 { requireAuth: true }
             );
             const types = resourceTypesResponse.data;
 
-            // 2단계: 각 resourceType별 데이터 가져오기
             const data: Record<string, PermissionResourceData[]> = {};
             
             for (const resourceType of types) {

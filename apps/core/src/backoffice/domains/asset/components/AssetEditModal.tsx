@@ -51,6 +51,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
   const modelInputRef = useRef<HTMLInputElement>(null);
   const [thumbnailFileId, setThumbnailFileId] = useState<number | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
 
   // 3D 모델 파일 업로드
   const {
@@ -83,6 +84,11 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
       clearThumbnailInfo();
       setModelFileId(data.file?.id || null);
       setThumbnailFileId(data.thumbnailFile?.id || null);
+      if (data.thumbnailFile?.url) {
+        setThumbnailPreview(data.thumbnailFile.url);
+      } else {
+        setThumbnailPreview(null);
+      }
     }
   }, [isOpen, assetId, data]);
 
@@ -119,6 +125,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.warning('이미지 파일만 업로드 가능합니다.');
         return;
       }
+      const previewUrl = URL.createObjectURL(file);
+      setThumbnailPreview(previewUrl);
       try {
         const fileInfo = await uploadThumbnail(file);
         if (fileInfo?.id) {
@@ -130,6 +138,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         toast.error((error as Error).message || '썸네일 업로드에 실패했습니다.');
         clearThumbnailInfo();
         setThumbnailFileId(null);
+        setThumbnailPreview(null);
       }
     },
     [uploadThumbnail, clearThumbnailInfo]
@@ -233,6 +242,13 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
                 <div data-slot="content">
                   <Input type="file" ref={thumbnailInputRef} className="hidden" accept="image/*" onChange={handleThumbnailChange} />
                   <div className="flex items-center gap-2 border-2 border-gray-300 rounded-md p-2 border-dashed">
+                    {thumbnailPreview ? (
+                      <img src={thumbnailPreview} alt="썸네일 파일" className="w-20 h-20 rounded-sm object-contain" />
+                    ):(
+                      <span className="w-20 h-20 rounded-sm bg-gray-200 flex items-center justify-center text-xs text-gray-700">
+                        이미지 미리보기
+                      </span>
+                    )}
                     <span className="flex-1 text-sm text-gray-700">
                       {thumbnailInfo?.originalFileName || data?.thumbnailFile?.originalFileName || '선택된 파일 없음'}
                     </span>

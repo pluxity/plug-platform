@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// 공통 필드들을 포함한 기본 스키마
 const baseUserSchema = z.object({
     roleIds: z.array(z.number()).min(1, {
         message: '최소 1개 이상의 역할을 선택해주세요.'

@@ -84,7 +84,6 @@ const User: React.FC = () => {
         }
     }
 
-    // 사용자 컬럼 정의
     const columns = [
         {
             header: '이름',

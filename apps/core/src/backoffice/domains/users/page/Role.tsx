@@ -9,16 +9,13 @@ import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditMod
 import { toast } from 'sonner';
 
 const Role: React.FC = () => {
-  // 역할 상태 관리
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState<number>();
   const [deleteRoleData, setDeleteRoleData] = useState<RoleData>();
 
-  // 역할 목록 조회 
   const { data, mutate } = useRolesSWR();
 
-  // 역할 목록 매핑
   const roleData = data ? data.map(RoleMapper) : [];
 
   const handleCreate = () => {
@@ -61,7 +58,6 @@ const Role: React.FC = () => {
     setDeleteRoleData(undefined);
   };
 
-  // 역할 컬럼 정의
   const columns = [
     {
       header: '이름',

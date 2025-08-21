@@ -19,13 +19,8 @@ import { useCreateRole,  usePermissionsSWR } from '@plug/common-services/service
 import { RoleCreateModalProps } from '@/backoffice/domains/users/types/role';
 
 export const RoleCreateModal: React.FC<RoleCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
-    // 역할 생성
     const { execute: createRole, isLoading: isRoleCreating } = useCreateRole();
-
-    // 권한 목록 조회
     const { data: permissionData } = usePermissionsSWR();
-
-    // 권한 옵션
     const permissionOptions = useMemo(() => {
         return permissionData?.map(permission => ({
             label: permission.name,
