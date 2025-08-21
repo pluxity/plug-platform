@@ -109,6 +109,13 @@ const AssetList: React.FC = () => {
     {
       accessorKey: 'thumbnailFile',
       header: '썸네일 파일',
+      cell: ({ row }: { row: { original: AssetData } }) => (
+        <img 
+          src={row.original.thumbnailFile} 
+          alt="썸네일" 
+          className="w-8 h-8 rounded-sm object-contain" 
+        />
+      ),
     },
     {
       id: 'actions',

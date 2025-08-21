@@ -8,5 +8,5 @@ export const AssetMapper = (asset: AssetResponse): AssetData => ({
   code: asset.code,
   name: asset.name,
   file: asset.file?.originalFileName || '',
-  thumbnailFile: asset.thumbnailFile?.originalFileName || '',
+  thumbnailFile: asset.thumbnailFile?.url || '',
 });
