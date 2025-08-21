@@ -15,7 +15,7 @@ export interface DeviceCategoryRequest {
   thumbnailFileId?: number;
 }
 
-export interface DeviceCategoryAllResponse {
+// New: API now provides maxDepth via a separate endpoint
+export interface DeviceCategoryDepthResponse {
   maxDepth: number;
-  list: DeviceCategoryResponse[];
 }

@@ -2,7 +2,6 @@ import type { DeviceCategoryResponse } from './device-category';
 export type {
   DeviceCategoryResponse,
   DeviceCategoryRequest,
-  DeviceCategoryAllResponse,
 } from './device-category';
 import { FeatureResponse } from './feature'
 

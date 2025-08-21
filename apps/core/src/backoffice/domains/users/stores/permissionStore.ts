@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { PermissionResourceType } from '@plug/common-services/types';
 import { PermissionResourceData } from '@/backoffice/domains/users/types/permisson';
 import { api } from '@plug/api-hooks';
+
+interface TreeNode {
+    id: number | string;
+    name: string;
+    depth: number;
+    children?: TreeNode[];
+}
 interface PermissionStore {
     resourceTypes: PermissionResourceType[]
     resourceData: Record<string, PermissionResourceData[]>
@@ -16,10 +23,10 @@ const isCategoryType = (key: string): boolean => {
 };
 
 // 계층 구조에서 maxDepth에 해당하는 leaf 노드만 추출하는 함수 
-const getNodesByDepth = (maxDepth: number, items: any[]): PermissionResourceData[] => {
+const getNodesByDepth = (maxDepth: number, items: TreeNode[]): PermissionResourceData[] => {
     const leafNodes: PermissionResourceData[] = [];
     
-    const traverse = (item: any) => {
+    const traverse = (item: TreeNode) => {
         if (item.depth === maxDepth) {
             leafNodes.push({
                 id: item.id.toString(),
@@ -59,33 +66,30 @@ export const usePermissionStore = create<PermissionStore>((set) => ({
                     const endpoint = resourceType.endpoint;
                     
                     if (endpoint) {    
-                        const response = await api.get<PermissionResourceData[]>(`${endpoint}`);
-                        const responseData = (response as any)?.data || response;
+                        const response = await api.get<TreeNode[]>(`${endpoint}`, { requireAuth: true });
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const list: TreeNode[] = (response as any)?.data ?? (response as unknown as TreeNode[]);
 
                         if (isCategoryType(resourceType.key)) {
-                            // 카테고리 타입인 경우
-                            data[resourceType.key] = responseData?.list ? getNodesByDepth(responseData.maxDepth, responseData.list) : [];
-
+                            data[resourceType.key] = list.length ? getNodesByDepth(1, list) : [];
                         } else if (resourceType.key === 'FACILITY') {
-                            // Facility 타입인 경우 : 모든 시설 데이터를 하나의 배열로 합침
-                            const facilityAllArrays = (data: Record<string, PermissionResourceData[]>) => {
-                                return Object.values(data).reduce((acc, curr) => {
-                                    return Array.isArray(curr) ? [...acc, ...curr] : acc;
-                                }, []);
-                            };
-
-                            const facilityList = facilityAllArrays(responseData);
-                            data[resourceType.key] = facilityList.map((item: PermissionResourceData) => ({
-                                id: item.id.toString(),
-                                name: item.name
+                            // Facility 타입: 배열로 내려오는 시설 목록에서 id, name만 추출
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const facilityList = (list as any[]);
+                            data[resourceType.key] = facilityList.map((item) => ({
+                                id: String(item.id),
+                                name: String(item.name ?? item.facility?.name ?? '')
                             }));
 
                         } else {
                             // 일반 타입 처리
-                            data[resourceType.key] = Array.isArray(responseData) 
-                                ? responseData.map((item: PermissionResourceData) => ({
-                                    id: item.id.toString(),
-                                    name: item.name
+                            // 일반 타입 처리 (배열 가정)
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const arr = (list as any[]);
+                            data[resourceType.key] = Array.isArray(arr) 
+                                ? arr.map((item) => ({
+                                    id: String(item.id),
+                                    name: String(item.name ?? '')
                                 })) : [];
                         }
                     } else {

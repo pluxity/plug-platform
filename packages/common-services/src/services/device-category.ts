@@ -3,14 +3,15 @@ import { api } from '@plug/api-hooks/core';
 import type {
   DeviceCategoryResponse,
   DeviceCategoryRequest,
-  DeviceCategoryAllResponse,
-} from '../types/device';
+} from '../types/device-category';
+import type { DeviceCategoryDepthResponse } from '../types/device-category';
 import type { GsDeviceResponse } from '../types/device';
 
 const DEVICE_CATEGORY_END_POINT = `device-categories`;
+const DEVICE_CATEGORY_DEPTH_END_POINT = `${DEVICE_CATEGORY_END_POINT}/max-depth`;
 
 export const useDeviceCategories = () => {
-  return useGet<DeviceCategoryAllResponse>(DEVICE_CATEGORY_END_POINT, { requireAuth: true });
+  return useGet<DeviceCategoryResponse[]>(DEVICE_CATEGORY_END_POINT, { requireAuth: true });
 };
 
 export const useDeviceCategoryDetail = (categoryId: number) => {
@@ -34,19 +35,25 @@ export const useChildDeviceCategories = (categoryId: number) => {
 };
 
 export const useDeviceCategoriesSWR = () => {
-  return useSWRApi<DeviceCategoryAllResponse>(DEVICE_CATEGORY_END_POINT, 'GET', { requireAuth: true });
+  return useSWRApi<DeviceCategoryResponse[]>(DEVICE_CATEGORY_END_POINT, 'GET', { requireAuth: true });
+};
+
+export const useDeviceCategoryMaxDepthSWR = () => {
+  return useSWRApi<DeviceCategoryDepthResponse>(DEVICE_CATEGORY_DEPTH_END_POINT, 'GET', { requireAuth: true });
 };
 
 export const useDeviceCategoryTree = () => {
-  const { data, error, isLoading, mutate } = useDeviceCategoriesSWR();
-  
+  const { data: list, error: listError, isLoading: listLoading, mutate: mutateList } = useDeviceCategoriesSWR();
+  const { data: depthData, error: depthError, isLoading: depthLoading, mutate: mutateDepth } = useDeviceCategoryMaxDepthSWR();
+  const error = listError || depthError;
+  const isLoading = listLoading || depthLoading;
   return {
-    categories: data?.list || [],
-    maxDepth: data?.maxDepth || 0,
+    categories: list ?? [],
+    maxDepth: depthData?.maxDepth ?? 0,
     error,
     isLoading,
-    mutate,
-    refresh: () => mutate(),
+    mutate: async () => { await Promise.all([mutateList(), mutateDepth()]); },
+    refresh: async () => { await Promise.all([mutateList(), mutateDepth()]); },
   };
 };
 
@@ -63,7 +70,13 @@ export const getDevicesByCategory = async (
   }
 };
 
-export const getAllDeviceCategories = async (): Promise<DeviceCategoryAllResponse> => {
-  const resp = await api.get<DeviceCategoryAllResponse>(DEVICE_CATEGORY_END_POINT, { requireAuth: true });
-  return ((resp as any)?.data ?? (resp as any)) as DeviceCategoryAllResponse;
+export const getAllDeviceCategories = async (): Promise<DeviceCategoryResponse[]> => {
+  const resp = await api.get<DeviceCategoryResponse[]>(DEVICE_CATEGORY_END_POINT, { requireAuth: true });
+  return ((resp as any)?.data ?? (resp as any)) as DeviceCategoryResponse[];
+};
+
+export const getDeviceCategoryMaxDepth = async (): Promise<number> => {
+  const resp = await api.get<DeviceCategoryDepthResponse>(DEVICE_CATEGORY_DEPTH_END_POINT, { requireAuth: true });
+  const data = (resp as any)?.data ?? (resp as any);
+  return (data?.maxDepth ?? 0) as number;
 };

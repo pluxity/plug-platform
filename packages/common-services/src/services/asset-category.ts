@@ -2,24 +2,37 @@ import { useGet, usePost, useSWRApi } from '@plug/api-hooks';
 import { api } from '@plug/api-hooks/core';
 import type {
   AssetCategoryResponse,
-  AssetCategoryAllResponse,
   AssetCategoryCreateRequest,
-  AssetCategoryUpdateRequest
+  AssetCategoryUpdateRequest,
+  AssetCategoryDepthResponse,
 } from '@plug/common-services';
 
 const END_POINT = `asset-categories`;
+const DEPTH_END_POINT = `${END_POINT}/max-depth`;
 
-export const getAssetCategories = async (): Promise<AssetCategoryAllResponse> => {
+// New API: list and maxDepth are fetched separately
+export const getAssetCategoryList = async (): Promise<AssetCategoryResponse[]> => {
   try {
-    const resp = await api.get<AssetCategoryAllResponse>(END_POINT, { requireAuth: true });
-    return (resp as any) ?? { list: [], maxDepth: 0 } as AssetCategoryAllResponse;
+    const resp = await api.get<AssetCategoryResponse[]>(END_POINT, { requireAuth: true });
+    // Some backends wrap the response in { data }
+    return ((resp as any)?.data ?? (resp as any)) as AssetCategoryResponse[];
   } catch (_) {
-    return { list: [], maxDepth: 0 } as AssetCategoryAllResponse;
+    return [];
+  }
+};
+
+export const getAssetCategoryMaxDepth = async (): Promise<number> => {
+  try {
+    const resp = await api.get<AssetCategoryDepthResponse>(DEPTH_END_POINT, { requireAuth: true });
+    const data = (resp as any)?.data ?? (resp as any);
+    return (data?.maxDepth ?? 0) as number;
+  } catch (_) {
+    return 0;
   }
 };
 
 export const useAssetCategories = () => {
-  return useGet<AssetCategoryAllResponse>(END_POINT, { requireAuth: true });
+  return useGet<AssetCategoryResponse[]>(END_POINT, { requireAuth: true });
 };
 
 export const useAssetCategoryDetail = (categoryId: number) => {
@@ -43,7 +56,11 @@ export const deleteAssetCategory = async (categoryId: number) => {
 };
 
 export const useAssetCategoriesSWR = () => {
-  return useSWRApi<AssetCategoryAllResponse>(END_POINT, 'GET', { requireAuth: true });
+  return useSWRApi<AssetCategoryResponse[]>(END_POINT, 'GET', { requireAuth: true });
+};
+
+export const useAssetCategoryMaxDepthSWR = () => {
+  return useSWRApi<AssetCategoryDepthResponse>(DEPTH_END_POINT, 'GET', { requireAuth: true });
 };
 
 export const useAssetCategoryDetailSWR = (categoryId: number) => {
@@ -73,14 +90,20 @@ export const useAssetCategoryChildrenSWRConditional = (categoryId?: number) => {
 };
 
 export const useAssetCategoryTree = () => {
-  const { data, error, isLoading, mutate } = useAssetCategoriesSWR();
-  
+  const { data: list, error: listError, isLoading: listLoading, mutate: mutateList } = useAssetCategoriesSWR();
+  const { data: depthData, error: depthError, isLoading: depthLoading, mutate: mutateDepth } = useAssetCategoryMaxDepthSWR();
+  const error = listError || depthError;
+  const isLoading = listLoading || depthLoading;
   return {
-    categories: data?.list || [],
-    maxDepth: data?.maxDepth || 0,
+    categories: list ?? [],
+    maxDepth: depthData?.maxDepth ?? 0,
     error,
     isLoading,
-    mutate,
-    refresh: () => mutate(),
+    mutate: async () => {
+      await Promise.all([mutateList(), mutateDepth()]);
+    },
+    refresh: async () => {
+      await Promise.all([mutateList(), mutateDepth()]);
+    },
   };
 };

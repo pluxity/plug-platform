@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { useEffect } from 'react'
-import { getAssetCategories } from '@plug/common-services/services'
+import { getAssetCategoryList, getAssetCategoryMaxDepth } from '@plug/common-services/services'
 import { api, type DataResponseBody } from '@plug/api-hooks'
 import type { 
   AssetResponse, 
@@ -201,7 +201,7 @@ export const useAssetStore = create<AssetState>()(
         const category = categories.find(cat => cat.id === currentId)
         if (!category) break
         path.unshift(category)
-        currentId = category.parentId || undefined
+  currentId = category.parentId ?? null
       }
 
       return path
@@ -225,7 +225,7 @@ export const useAssetStore = create<AssetState>()(
       }
     },
 
-    loadCategories: async () => {
+  loadCategories: async () => {
       const { categoriesFetched, isLoadingCategories } = get()
       
       if (categoriesFetched || isLoadingCategories) {
@@ -235,10 +235,12 @@ export const useAssetStore = create<AssetState>()(
       set({ isLoadingCategories: true, categoryError: null })
       
       try {
-        // Note: This should be replaced with actual API call
-        // Using SWR hook data would require a different approach
-        console.warn('loadCategories: This should be implemented with actual API call')
-        
+        const [list, maxDepth] = await Promise.all([
+          getAssetCategoryList(),
+          getAssetCategoryMaxDepth(),
+        ])
+        get().setCategories(list)
+        get().setMaxDepth(maxDepth)
         set({ 
           categoriesFetched: true,
           isLoadingCategories: false 
@@ -288,10 +290,13 @@ export const useAssetCategories = () => {
     const run = async () => {
       setCategoriesLoading(true)
       try {
-        const data = await getAssetCategories()
+        const [list, maxDepth] = await Promise.all([
+          getAssetCategoryList(),
+          getAssetCategoryMaxDepth(),
+        ])
         if (!mounted) return
-        setCategories(data.list)
-        setMaxDepth(data.maxDepth)
+        setCategories(list)
+        setMaxDepth(maxDepth)
         setCategoriesFetched(true)
       } catch (e) {
         if (!mounted) return
