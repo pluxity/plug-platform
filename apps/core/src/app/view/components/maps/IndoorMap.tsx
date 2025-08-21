@@ -9,7 +9,7 @@ import { convertFloors } from '@/global/utils/floorUtils';
 import DeviceSearchForm from './DeviceSearchForm';
 import DeviceCategoryChips from './DeviceCategoryChips';
 import type { Floor } from '@/global/types';
-import { Camera, Poi, Interfaces } from '@plug/engine';
+import { Camera, Poi, Interfaces } from '@plug/engine/src';
 
 interface IndoorMapProps {
   facilityId: number;
