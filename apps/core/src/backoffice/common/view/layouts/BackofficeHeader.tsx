@@ -40,7 +40,7 @@ const BackofficeHeader: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900">
-                Control Center
+                  
               </h1>
             </div>
             <div className="flex items-center space-x-4">

@@ -16,14 +16,15 @@ interface ThumbnailHoverButtonsProps {
   onView?: () => void;
   onEdit?: () => void;
   onIndoorEdit?: () => void;
+  onIndoorView?: () => void; // 새 실내 보기 버튼
   onDelete?: () => void;
   facilityName?: string;
 }
 
 const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
   onView,
-  onEdit,
   onIndoorEdit,
+  onIndoorView,
   onDelete,
   facilityName = '시설'
 }) => {
@@ -42,19 +43,6 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
           <Eye size={16} className="text-green-600" />
         </button>
       )}
-      {onEdit && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit();
-          }}
-          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
-          title="편집"
-        >
-          <Edit2 size={16} className="text-blue-600" />
-        </button>
-      )}
       {onIndoorEdit && (
         <button
           type="button"
@@ -65,7 +53,20 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
           className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
           title="실내지도 편집"
         >
-          <Map size={16} className="text-purple-600" />
+          <Edit2 size={16} className="text-purple-600" />
+        </button>
+      )}
+      {onIndoorView && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onIndoorView();
+          }}
+          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          title="실내보기로 이동"
+        >
+          <Map size={16} className="text-amber-600" />
         </button>
       )}
       {onDelete && (
