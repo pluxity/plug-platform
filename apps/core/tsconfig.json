@@ -28,6 +28,9 @@
       "@plug/core/*": ["./src/*"],
     }
   },
+  "references": [
+    { "path": "../../packages/engine" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "build"],
 }
