@@ -21,6 +21,7 @@ export interface FacilityCreateFormData {
     code: string;
     description?: string;
     thumbnailFileId?: number;
+  drawingFileId?: number; // 생성 시 도면 파일 ID
     lon?: number;
     lat?: number;
     locationMeta?: string;

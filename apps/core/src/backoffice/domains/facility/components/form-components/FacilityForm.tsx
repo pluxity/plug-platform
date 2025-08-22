@@ -18,9 +18,12 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
   setValue,
   watch,
   currentThumbnailFile,
+  currentDrawingFile,
+  onDrawingFileUploaded,
   isEditMode = false,
 }) => {
-  const watchedThumbnailFileId = watch?.('facility.thumbnailFileId');
+  const watchedThumbnailFileId = watch?.('facility.thumbnailFileId') as number | undefined;
+  const watchedDrawingFileId = watch?.('facility.drawingFileId') as number | undefined;
 
   const handleThumbnailChange = (fileId: number | null) => {
     if (!isEditMode || fileId !== null) {
@@ -30,6 +33,24 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
 
   const handleThumbnailRemoved = () => {
     setValue?.('facility.thumbnailFileId', undefined);
+  };
+
+  // 도면 파일 업로드 핸들러
+  const handleDrawingChange = (fileId: number | null) => {
+    // 생성 단계에서는 삭제 시 undefined 세팅 (null 허용하지 않음)
+    if (!isEditMode || fileId !== null) {
+      setValue?.('facility.drawingFileId', fileId || undefined);
+    }
+  };
+
+  const handleDrawingRemoved = () => {
+    setValue?.('facility.drawingFileId', undefined);
+  };
+
+  const handleDrawingUploaded = (fileInfo: { url?: string }) => {
+    if (fileInfo?.url && onDrawingFileUploaded) {
+      onDrawingFileUploaded(fileInfo.url);
+    }
   };
   return (
     <Card>
@@ -92,6 +113,25 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
             maxSizeInMB={10} // 이미지는 10MB 제한
           />
         </div>
+
+        {/* 도면 파일 업로드 (생성 시에만 노출, 수정은 별도 이력 관리 컴포넌트 사용) */}
+        {!isEditMode && (
+          <div className="w-full">
+            <FileUpload
+              label="도면 파일 (GLB/GLTF)"
+              accept=".glb,.gltf"
+              fileType="document"
+              placeholder="도면 파일을 업로드하세요"
+              currentFileId={watchedDrawingFileId}
+              currentFileInfo={currentDrawingFile}
+              onFileChange={handleDrawingChange}
+              onFileRemoved={handleDrawingRemoved}
+              onFileUploaded={handleDrawingUploaded}
+              maxSizeInMB={200} // 도면은 200MB 제한 (필요 시 조정)
+            />
+            <p className="text-xs text-gray-500 mt-2">업로드 후 자동으로 층 정보가 추출됩니다.</p>
+          </div>
+        )}
 
         <LocationSelectorField
           control={control}
