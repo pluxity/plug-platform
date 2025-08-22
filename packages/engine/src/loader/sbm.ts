@@ -9,19 +9,18 @@ import * as ModelInternal from '../model/model';
 let engine: Engine3D;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     engine = null;
-});
+}
 
 /**
  * 대상 객체의 재질에 환경맵을 적용한다.
@@ -108,5 +107,8 @@ async function LoadSbm(url: string, onLoad: Function) {
 }
 
 export {
+    initialize,
+    dispose,
+    
     LoadSbm,
 }

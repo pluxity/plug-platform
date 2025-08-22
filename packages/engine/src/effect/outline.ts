@@ -8,10 +8,11 @@ let outlinePass: Addon.OutlinePass;
 let outlineTargets: THREE.Object3D[] = [];
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 외각선 기능 초기화
+ * @param _engine - Engine3D 인스턴스
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 외각선 렌더링 패스 등록
     const container = engine.Dom as HTMLElement;
@@ -24,12 +25,13 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     // 외각선 패스 사용시 씬이 어두워 지는 이슈가 있으므로 GammaCorrectionShader를 추가한다.
     const gammaCorrectionPass = new Addon.ShaderPass(Addon.GammaCorrectionShader);
     engine.Composer.addPass(gammaCorrectionPass);
-});
+
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 외각선 기능 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     clearOutlineObjects();
 
     // outlinePass.dispose(); // 각 pass의 dispose는 Engine3D.dispose()에서 처리되므로 별도로 호출하지 않는다.
@@ -37,7 +39,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
 
     outlineTargets = null;
     engine = null;
-});
+}
 
 /**
  * 외각선 대상 객체 제거
@@ -84,6 +86,9 @@ function getOutlineTargets(): THREE.Object3D[] {
 }
 
 export {
+    initialize,
+    dispose,
+    
     clearOutlineObjects,
     setOutlineObjects,
     addOutlineObjects,

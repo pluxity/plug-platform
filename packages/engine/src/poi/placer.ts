@@ -17,10 +17,10 @@ let bPlacerEnabled: boolean = false;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 이동시 미리보기용 라인 객체
     let geometry = new THREE.BufferGeometry().setFromPoints([
@@ -34,20 +34,19 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 
     previewLine.visible = false;
     previewLine.layers.set(Interfaces.CustomLayer.Invisible);
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
-
+function dispose() {
     target = null;
     previewLine = null;
     previewPointMesh = null;
     completeCallback = null;
     currentPicktarget = null;
     engine = null;
-});
+}
 
 
 /**
@@ -245,5 +244,8 @@ function releasePreviewPointMesh() {
 }
 
 export {
-    bPlacerEnabled as Enabled
+    bPlacerEnabled as Enabled,
+
+    initialize,
+    dispose,
 }

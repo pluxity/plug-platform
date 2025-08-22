@@ -19,16 +19,16 @@ let editMode: Addon.TransformControlsMode = 'translate';
 let enabled: boolean = false;
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     unregisterPointerEvents();
 
     if (gizmo) {
@@ -40,7 +40,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     
     enabled = null;
     engine = null;
-});
+}
 
 /**
  * 포인터 다운 이벤트 처리
@@ -157,6 +157,9 @@ function FinishEdit() {
 }
 
 export {
+    initialize,
+    dispose,
+    
     enabled as Enabled,
 
     StartEdit,

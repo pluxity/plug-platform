@@ -13,17 +13,16 @@ let tailModelSrc: THREE.Group;
 let trains: Record<string, SubwayTrain> = {};
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     Clear();
     subwayTrainRenderGroup = null;
     headModelSrc = null;
@@ -31,7 +30,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     tailModelSrc = null;
     trains = null;
     engine = null;
-});
+}
 
 /**
  * 열차 렌더링 그룹 생성 이벤트 콜백
@@ -188,6 +187,9 @@ function Import(data: Interfaces.SubwayImportOption | Interfaces.SubwayImportOpt
 }
 
 export {
+    initialize,
+    dispose,
+
     Hide,
     Show,
     HideAll,

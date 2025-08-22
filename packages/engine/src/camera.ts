@@ -32,11 +32,10 @@ const mouseDownPos: Record<string, THREE.Vector2> = {
 const mouseBtnState: Record<string, boolean> = { 'rotate': false, 'pan': false, 'dragZoom': false };
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 포인터 클릭시 표시할 커서 객체
     const geometry = new THREE.SphereGeometry(0.1, 32, 32);
@@ -53,12 +52,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 
     // 이벤트 등록
     SetEnabled(true);
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     SetEnabled(false);
 
     if (posTween) {
@@ -66,7 +65,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
         engine.TweenUpdateGroups.remove(posTween);
         posTween = undefined;
     }
-    
+
     if (rotTween) {
         rotTween.stop();
         engine.TweenUpdateGroups.remove(rotTween);
@@ -88,7 +87,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     dragZoomBtnId = null;
     screenPanKey = null;
     engine = null;
-});
+}
 
 /**
  * 렌더링 전 이벤트 콜백
@@ -685,6 +684,9 @@ function MoveToFloor(floorId: string, transitionTime: number) {
 }
 
 export {
+    initialize,
+    dispose,
+
     SetEnabled,
     SetRotateButton,
     SetPanButton,

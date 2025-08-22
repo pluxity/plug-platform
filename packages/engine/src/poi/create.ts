@@ -7,6 +7,7 @@ import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 import * as PoiData from './data';
 
+let engine: Engine3D;
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
 let lineGroup: THREE.Group;
@@ -14,12 +15,10 @@ let textGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-
-    const engine: Engine3D = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // poi 최상위 루트 그룹
     poiRootGroup = new THREE.Group();
@@ -55,18 +54,18 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
         lineGroup: lineGroup,
         pointMeshGroup: pointMeshGroup,
     });
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     poiRootGroup = null;
     iconGroup = null;
     lineGroup = null;
     textGroup = null;
     pointMeshGroup = null;
-});
+}
 
 /**
  * poi 생성
@@ -107,5 +106,8 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
 }
 
 export {
+    initialize,
+    dispose, 
+
     Create,
 }

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine';
+import * as EngineAll from '@plug/engine';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
@@ -74,6 +75,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         //         Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
         //     }
         // });
+        console.log('engine All', EngineAll);
     }
 
     /**

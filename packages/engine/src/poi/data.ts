@@ -21,10 +21,10 @@ let poiDummies: THREE.Object3D[] = [];
 let bNeedsUpdate: boolean = false;
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 공용 텍스트 geometry
     sharedTextGeometry = new THREE.PlaneGeometry(1, 1.10, 1, 1);
@@ -34,12 +34,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
     // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
     // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     Clear();
     poiDataList = null;
     poiLine = null;
@@ -53,7 +53,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     poiDummies = null;
     bNeedsUpdate = null;
     engine = null;
-});
+}
 
 /**
  * Engine3D 렌더링 전 이벤트 처리
@@ -291,7 +291,7 @@ function updatePoiLine() {
                 const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
 
                 linePoints.push(p0, p1);
-                
+
                 element.MeshBoundingHeight = p1.y - element.WorldPosition.y;
 
             } else {
@@ -718,6 +718,9 @@ function StopAnimation(id: string) {
 
 export {
     poiDataList as PoiDataList,
+
+    initialize,
+    dispose,
 
     getIcon,
     createTextMesh,

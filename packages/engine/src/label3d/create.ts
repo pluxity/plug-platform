@@ -13,18 +13,17 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 let enabled: boolean = false;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
-
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
+
     Cancel();
 
     workingLabel = null;
@@ -32,7 +31,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     currentPicktarget = null;
     enabled = null;
     engine = null;
-});
+}
 
 /**
  * 포인터 이벤트 등록
@@ -159,6 +158,9 @@ function Cancel() {
 }
 
 export {
+    initialize, 
+    dispose,
+    
     enabled as Enabled,
 
     Create,

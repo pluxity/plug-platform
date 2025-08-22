@@ -17,10 +17,10 @@ let objSelGroup: THREE.Group;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // poi 이벤트 처리에서 사용할 그룹 객체
     objSelGroup = new THREE.Group();
@@ -31,13 +31,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine.Dom.addEventListener('pointerdown', onPointerDown);
     engine.Dom.addEventListener('pointermove', onPointerMove);
     engine.Dom.addEventListener('pointerup', onPointerUp);
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
-    
+function dispose() {
     engine.Dom.removeEventListener('pointerdown', onPointerDown);
     engine.Dom.removeEventListener('pointermove', onPointerMove);
     engine.Dom.removeEventListener('pointerup', onPointerUp);
@@ -46,7 +45,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     hoverObjects = null;
     objSelGroup = null;
     engine = null;
-});
+}
 
 /**
  * Poi 생성 이벤트 처리
@@ -255,4 +254,9 @@ function onPointerUp(evt: PointerEvent) {
             }
         }
     }
+}
+
+export {
+    initialize,
+    dispose,
 }

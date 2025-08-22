@@ -3,6 +3,16 @@ import * as Addon from 'three/addons';
 import * as Interfaces from './interfaces';
 import * as Event from './eventDispatcher';
 import * as TWEEN from '@tweenjs/tween.js';
+import * as Effect from './effect';
+import * as Label3D from './label3d';
+import * as Loader from './loader';
+import * as Model from './model';
+import * as ObjectSelector from './objectselector';
+import * as Path3D from './path3d';
+import * as Poi from './poi';
+import * as Subway from './subway';
+import * as Camera from './camera';
+import * as Util from './util';
 
 class Engine3D {
 
@@ -22,7 +32,7 @@ class Engine3D {
     private envScene: Addon.DebugEnvironment;
     private pmremGenerator: THREE.PMREMGenerator;
     private generatedCubeRenderTarget: THREE.WebGLRenderTarget;
-    
+
     private tweenUpdateGroups: TWEEN.Group;
 
     /**
@@ -30,7 +40,7 @@ class Engine3D {
      * @param container - WebGL이 붙을 dom 객체
      */
     constructor(container: HTMLElement) {
-        
+
         this.dom = container;
         this.clock = new THREE.Clock();
 
@@ -102,6 +112,9 @@ class Engine3D {
         // 트윈 그룹 생성
         this.tweenUpdateGroups = new TWEEN.Group();
 
+        // 기능 모듈들 초기화 작업
+        this.initializeApiModules();
+
         // 초기화 완료 이벤트 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onEngineInitialized',
@@ -127,7 +140,7 @@ class Engine3D {
      * 렌더링 루프
      */
     onRender(): void {
-        
+
         const deltaTime = this.clock.getDelta();
 
         // 트윈업데이트
@@ -184,11 +197,8 @@ class Engine3D {
      * WebGL 엔진 메모리 해제
      */
     dispose(): void {
-        // 메모리 해제 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
-            type: 'onEngineDisposed',
-            engine: this,
-        });
+        // 하위 모듈 메모리 해제
+        this.disposeApiModules();
 
         // 애니메이션 루프 중지
         this.renderer.setAnimationLoop(null);
@@ -249,6 +259,48 @@ class Engine3D {
 
         // 컨테이너
         this.dom = null;
+    }
+
+    /**
+     * 기능 모듈 초기화 작업
+     */
+    initializeApiModules(): void {
+        // 효과 모듈 초기화
+        Effect.initialize(this);
+        // 라벨3D 모듈 초기화
+        Label3D.initialize(this);
+        // 로더 모듈 초기화
+        Loader.initialize(this);
+        // 모델 모듈 초기화
+        Model.initialize(this);
+        // 객체 선택기 모듈 초기화
+        ObjectSelector.initialize(this);
+        // 경로3d 모듈 초기화
+        Path3D.initialize(this);
+        // Poi 모듈 초기화
+        Poi.initialize(this);
+        // 지하철 모듈 초기화
+        Subway.initialize(this);
+        // 카메라 모듈 초기화
+        Camera.initialize(this);
+        // 유틸리티 모듈 초기화
+        Util.initialize(this);
+    }
+
+    /**
+     * 기능 모듈 메모리 해제 작업
+     */
+    disposeApiModules(): void {
+        Effect.dispose();
+        Label3D.dispose();
+        Loader.dispose();
+        Model.dispose();
+        ObjectSelector.dispose();
+        Path3D.dispose();
+        Poi.dispose();
+        Subway.dispose();
+        Camera.dispose();
+        Util.dispose();
     }
 
     /**

@@ -12,23 +12,21 @@ let engine: Engine3D;
 let modelGroup: THREE.Group;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 배경 모델 그룹 생성
     modelGroup = new THREE.Group();
     modelGroup.name = '#ModelGroup';
     engine.RootScene.add(modelGroup);
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
-
+function dispose() {
     if (posTween) {
         posTween.stop();
         engine.TweenUpdateGroups.remove(posTween as TWEEN.Tween);
@@ -37,7 +35,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
 
     modelGroup = null;
     engine = null;
-});
+}
 
 /**
  * gltf 로드 완료후 콜백 초기화 이벤트 콜백
@@ -404,6 +402,9 @@ function Collapse(transitionTime: number, onComplete?: Function) {
 
 export {
     modelGroup as ModelGroup,
+
+    initialize,
+    dispose,
 
     convertWorldToFloorLocal,
     convertFloorLocalToWorld,

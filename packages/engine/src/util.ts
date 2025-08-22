@@ -12,11 +12,10 @@ let pixiApp: PIXI.Application;
 let engine: Engine3D;
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 텍스트 텍스쳐 생성을 위한 pixi.js 인스턴스
     pixiApp = new PIXI.Application();
@@ -24,16 +23,16 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
         autoStart: false,
         backgroundAlpha: 0,
     });
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     pixiApp.destroy(true, true);
     pixiApp = null;
     engine = null;
-});
+}
 
 /**
  * 대상 재질의 셰이더를 빌보드 세이더로 변경한다.
@@ -380,6 +379,8 @@ function SetBackground(backgroundData: number | string) {
 
 export {
     // 내부사용
+    initialize,
+    dispose,
     createTextMaterial,
     getMergedGeometry,
     setObjectLayer,

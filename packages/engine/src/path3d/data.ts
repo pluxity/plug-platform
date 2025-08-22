@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Engine3D } from '../engine';
 import { Path3DObject } from './path3dobject';
 import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
@@ -7,15 +8,21 @@ import * as ModelInternal from '../model/model';
 let pathObjectList: Record<string, Path3DObject> = {};
 let pathRenderGroup: THREE.Group;
 
+/**
+ * 초기화
+ */
+function initialize(_engine: Engine3D) {
+
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     Clear();
     pathObjectList = null;
     pathRenderGroup = null;
-});
+}
 
 /**
  * pathcreator.ts 초기화 완료 이벤트 처리
@@ -209,6 +216,9 @@ function ShowAll() {
 }
 
 export {
+    initialize,
+    dispose,
+
     exists,
     getPathObjects,
     getPathObject,

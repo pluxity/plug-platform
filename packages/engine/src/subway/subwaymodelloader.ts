@@ -9,22 +9,21 @@ let bodyModelSrc: THREE.Group;
 let tailModelSrc: THREE.Group;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     headModelSrc = null;
     bodyModelSrc = null;
     tailModelSrc = null;
     engine = null;
-});
+}
 
 /**
  * 지하철 열차 머리 모델 로드
@@ -32,7 +31,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
  * @param onLoad - 로드 완료 후 호출 콜백
  */
 function LoadTrainHead(url: string, onLoad: Function) {
-    new Addon.GLTFLoader().load(url, (gltf)=>{
+    new Addon.GLTFLoader().load(url, (gltf) => {
 
         headModelSrc = gltf.scene;
 
@@ -43,7 +42,7 @@ function LoadTrainHead(url: string, onLoad: Function) {
         });
 
         // 완료 콜백 호출
-		onLoad?.();
+        onLoad?.();
     });
 }
 
@@ -53,10 +52,10 @@ function LoadTrainHead(url: string, onLoad: Function) {
  * @param onLoad - 로드 완료 후 호출 콜백
  */
 function LoadTrainBody(url: string, onLoad: Function) {
-    new Addon.GLTFLoader().load(url, (gltf)=>{
+    new Addon.GLTFLoader().load(url, (gltf) => {
 
         bodyModelSrc = gltf.scene;
-        
+
         // 이벤트 내부 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onSubwayModelLoader_BodyModelLoaded',
@@ -74,10 +73,10 @@ function LoadTrainBody(url: string, onLoad: Function) {
  * @param onLoad - 로드 완료 후 호출 콜백
  */
 function LoadTrainTail(url: string, onLoad: Function) {
-    new Addon.GLTFLoader().load(url, (gltf)=>{
+    new Addon.GLTFLoader().load(url, (gltf) => {
 
         tailModelSrc = gltf.scene;
-        
+
         // 이벤트 내부 통지
         Event.InternalHandler.dispatchEvent({
             type: 'onSubwayModelLoader_TailModelLoaded',
@@ -90,6 +89,9 @@ function LoadTrainTail(url: string, onLoad: Function) {
 }
 
 export {
+    initialize,
+    dispose,
+
     LoadTrainHead,
     LoadTrainBody,
     LoadTrainTail,

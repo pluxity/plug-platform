@@ -8,19 +8,18 @@ import * as ModelInternal from '../model/model';
 let engine: Engine3D;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     engine = null;
-});
+}
 
 /**
  * Gltf모델 로드
@@ -96,11 +95,11 @@ async function getGltfWithAnimation(url: string) {
 
         // 그림자, 재질 설정
         gltf.scene.traverse((child) => {
-            if( child instanceof THREE.Mesh ) {
+            if (child instanceof THREE.Mesh) {
                 child.receiveShadow = true;
                 child.castShadow = true;
 
-                if( Array.isArray(child.material) ) {
+                if (Array.isArray(child.material)) {
                     child.material.forEach(mat => {
                         mat.envMap = engine.GeneratedCubeRenderTarget.texture;
                         mat.envMapIntensity = 0.1;
@@ -127,6 +126,8 @@ async function getGltfWithAnimation(url: string) {
 }
 
 export {
+    initialize,
+    dispose,
     getGltfWithAnimation,
 
     LoadGltf,

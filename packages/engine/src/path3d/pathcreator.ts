@@ -21,10 +21,11 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 const rayCast: THREE.Raycaster = new THREE.Raycaster();
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+
+    engine = _engine;
 
     // 경로 객체 렌더링 그룹
     pathRenderGroup = new THREE.Group();
@@ -47,12 +48,12 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
         type: 'onPathCreatorInitialized',
         pathRenderGroup: pathRenderGroup,
     });
-});
+}
 
 /**
- * Engine3D 메모리 해제 이벤트
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+function dispose() {
     Cancel();
 
     workingPath = null;
@@ -65,7 +66,7 @@ Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
     isStraightLine = null;
 
     engine = null;
-});
+}
 
 /**
  * 마우스 좌표에 대해 공간상의 픽킹 좌표 계산
@@ -346,6 +347,9 @@ function Finish(): Interfaces.Path3DData {
 }
 
 export {
+    initialize,
+    dispose,
+
     CreatePath,
     Cancel,
     Finish,
