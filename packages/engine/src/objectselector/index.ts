@@ -34,6 +34,21 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    
+    engine.Dom.removeEventListener('pointerdown', onPointerDown);
+    engine.Dom.removeEventListener('pointermove', onPointerMove);
+    engine.Dom.removeEventListener('pointerup', onPointerUp);
+    
+    clearHoverObjects();
+    hoverObjects = null;
+    objSelGroup = null;
+    engine = null;
+});
+
+/**
  * Poi 생성 이벤트 처리
  */
 Event.InternalHandler.addEventListener('onPoiCreate' as never, () => {

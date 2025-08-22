@@ -56,6 +56,41 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    SetEnabled(false);
+
+    if (posTween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween);
+        posTween = undefined;
+    }
+    
+    if (rotTween) {
+        rotTween.stop();
+        engine.TweenUpdateGroups.remove(rotTween);
+        rotTween = undefined;
+    }
+
+    engine = null;
+    cursor = null;
+    rayCast = null;
+    enabled = null;
+    pickPoint = null;
+    rotateSmoothingFactor = null;
+    panSmoothingFactor = null;
+    zoomIntervalFactor = null;
+    posTween = null;
+    rotTween = null;
+    rotateBtnId = null;
+    panBtnId = null;
+    dragZoomBtnId = null;
+    screenPanKey = null;
+    engine = null;
+});
+
+/**
  * 렌더링 전 이벤트 콜백
  */
 Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => {
@@ -515,7 +550,7 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
 
     // poi데이터
     const poiElement = PoiDataInternal.getPoiElement(id);
-    if(!poiElement){
+    if (!poiElement) {
         console.error('poi를 찾을 수 없음:', id);
         return;
     }
@@ -543,12 +578,12 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
         const bounding = poiElement.PointMeshData.instanceMeshRef?.geometry.boundingBox?.clone();
         const matrix = new THREE.Matrix4().compose(poiElement.WorldPosition, new THREE.Quaternion().setFromEuler(poiElement.Rotation), poiElement.Scale);
         bounding?.applyMatrix4(matrix);
-        
+
         const boundCenter = new THREE.Vector3();
         const boundSize = new THREE.Vector3();
         bounding?.getCenter(boundCenter);
         bounding?.getSize(boundSize);
-        
+
         const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
         p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
 
@@ -575,7 +610,7 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
     if (posTween instanceof TWEEN.Tween) {
         posTween.stop();
         engine.TweenUpdateGroups.remove(posTween);
-    }    
+    }
     if (rotTween instanceof TWEEN.Tween) {
         rotTween.stop();
         engine.TweenUpdateGroups.remove(rotTween);

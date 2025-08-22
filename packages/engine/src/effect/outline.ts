@@ -14,7 +14,8 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     engine = evt.engine as Engine3D;
 
     // 외각선 렌더링 패스 등록
-    outlinePass = new Addon.OutlinePass(new THREE.Vector2(engine.Dom.clientWidth, engine.Dom.clientHeight), engine.RootScene, engine.Camera);
+    const container = engine.Dom as HTMLElement;
+    outlinePass = new Addon.OutlinePass(new THREE.Vector2(container.clientWidth, container.clientHeight), engine.RootScene, engine.Camera);
     outlinePass.hiddenEdgeColor = new THREE.Color('white');
     outlinePass.edgeThickness = 5.0;
     outlinePass.edgeStrength = 10.0;
@@ -26,11 +27,25 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    clearOutlineObjects();
+
+    // outlinePass.dispose(); // 각 pass의 dispose는 Engine3D.dispose()에서 처리되므로 별도로 호출하지 않는다.
+    outlinePass = null;
+
+    outlineTargets = null;
+    engine = null;
+});
+
+/**
  * 외각선 대상 객체 제거
  */
 function clearOutlineObjects() {
     outlineTargets = [];
-    outlinePass.selectedObjects = outlineTargets;
+    if (outlinePass)
+        outlinePass.selectedObjects = outlineTargets;
 }
 
 /**
@@ -43,7 +58,9 @@ function setOutlineObjects(target: THREE.Object3D | THREE.Object3D[]) {
         outlineTargets = outlineTargets.concat(target);
     else
         outlineTargets.push(target);
-    outlinePass.selectedObjects = outlineTargets;
+
+    if (outlinePass)
+        outlinePass.selectedObjects = outlineTargets;
 }
 
 /**

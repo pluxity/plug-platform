@@ -27,6 +27,15 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    pixiApp.destroy(true, true);
+    pixiApp = null;
+    engine = null;
+});
+
+/**
  * 대상 재질의 셰이더를 빌보드 세이더로 변경한다.
  * @param target - 대상 재질
  */

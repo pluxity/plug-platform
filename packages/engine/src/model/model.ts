@@ -25,6 +25,21 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+
+    if (posTween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween as TWEEN.Tween);
+        posTween = null;
+    }
+
+    modelGroup = null;
+    engine = null;
+});
+
+/**
  * gltf 로드 완료후 콜백 초기화 이벤트 콜백
  * 
  */
@@ -280,7 +295,7 @@ function Expand(transitionTime: number, interval: number, onComplete?: Function)
         });
 
         // 펼치기 트윈 데이터 생성
-        const expandData = {
+        const expandData: { ratio: number; floors: any[] } = {
             ratio: 0.0,
             floors: []
         };
@@ -342,7 +357,7 @@ function Collapse(transitionTime: number, onComplete?: Function) {
         });
 
         // 접기 트윈 데이터 생성
-        const collapseData = {
+        const collapseData: { ratio: number; floors: any[] } = {
             ratio: 0.0,
             floors: []
         };

@@ -17,6 +17,16 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    Clear();
+
+    labels = null;
+    engine = null;
+});
+
+/**
  * 라벨 생성 완료 콜백
  */
 Event.InternalHandler.addEventListener('onLabel3DCreated' as never, (evt: any) => {

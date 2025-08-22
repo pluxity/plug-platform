@@ -17,6 +17,16 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    headModelSrc = null;
+    bodyModelSrc = null;
+    tailModelSrc = null;
+    engine = null;
+});
+
+/**
  * 지하철 열차 머리 모델 로드
  * @param url - 모델링 주소
  * @param onLoad - 로드 완료 후 호출 콜백

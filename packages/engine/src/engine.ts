@@ -6,7 +6,7 @@ import * as TWEEN from '@tweenjs/tween.js';
 
 class Engine3D {
 
-    private dom: HTMLElement;
+    private dom: HTMLElement | null;
 
     private renderer: THREE.WebGLRenderer;
     private composer: Addon.EffectComposer;
@@ -115,11 +115,12 @@ class Engine3D {
      */
     onResize(): void {
         // 카메라 종횡비, 렌더러 사이즈 설정
-        this.camera.aspect = this.dom.clientWidth / this.dom.clientHeight;
+        const container = this.dom as HTMLElement;
+        this.camera.aspect = container.clientWidth / container.clientHeight;
         this.camera.updateProjectionMatrix();
 
-        this.renderer.setSize(this.dom.clientWidth, this.dom.clientHeight);
-        this.composer.setSize(this.dom.clientWidth, this.dom.clientHeight);
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.composer.setSize(container.clientWidth, container.clientHeight);
     }
 
     /**
@@ -177,6 +178,77 @@ class Engine3D {
         this.directionalLight.shadow.camera.far = sphere.radius * 2.0;
         this.directionalLight.shadow.camera.updateProjectionMatrix();
 
+    }
+
+    /**
+     * WebGL 엔진 메모리 해제
+     */
+    dispose(): void {
+        // 메모리 해제 이벤트 통지
+        Event.InternalHandler.dispatchEvent({
+            type: 'onEngineDisposed',
+            engine: this,
+        });
+
+        // 애니메이션 루프 중지
+        this.renderer.setAnimationLoop(null);
+
+        // 트윈 그룹 제거
+        this.tweenUpdateGroups.removeAll();
+        this.tweenUpdateGroups = null;
+
+        // 이펙트 컴포저와 패스 메모리 해제
+        this.composer.passes.forEach(pass => {
+            this.composer.removePass(pass);
+            pass.dispose();
+        });
+        this.composer.dispose();
+        this.composer = null;
+
+        // 씬의 모든 Geometry와 Material, Diffuse Map 메모리 해제
+        this.rootScene.traverse((object) => {
+            if (object instanceof THREE.Mesh) {
+                if (object.geometry) {
+                    object.geometry.dispose();
+                }
+                if (object.material) {
+                    if (Array.isArray(object.material)) {
+                        object.material.forEach(material => {
+                            if (material.map) material.map.dispose();
+                            material.dispose();
+                        });
+                    } else {
+                        if (object.material.map) object.material.map.dispose();
+                        object.material.dispose();
+                    }
+                }
+            }
+        });
+        this.rootScene = null;
+
+        // 기타 변수들
+        this.camera = null;
+        this.ambientLight = null;
+        this.directionalLight = null;
+        this.hemiLight = null;
+        this.envScene = null;
+
+        this.pmremGenerator.dispose();
+        this.generatedCubeRenderTarget.dispose();
+
+        this.pmremGenerator = null;
+        this.generatedCubeRenderTarget = null;
+
+        this.clock.stop();
+        this.clock = null;
+
+        // 렌더러 정리
+        this.renderer.dispose();
+        this.renderer.forceContextLoss();
+        this.renderer = null;
+
+        // 컨테이너
+        this.dom = null;
     }
 
     /**

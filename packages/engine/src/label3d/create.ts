@@ -8,7 +8,6 @@ import { Label3DElement } from './element';
 let engine: Engine3D;
 let workingLabel: Label3DElement | undefined;
 let onCompleteCallback: Function | undefined;
-// let label3DRenderGroup: THREE.Group;
 let currentPicktarget: THREE.Object3D | undefined;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 let enabled: boolean = false;
@@ -19,11 +18,20 @@ let enabled: boolean = false;
  */
 Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
     engine = evt.engine as Engine3D;
+});
 
-    // // 라벨3d렌더링 그룹
-    // label3DRenderGroup = new THREE.Group();
-    // label3DRenderGroup.name = '#Label3DGroup';
-    // engine.RootScene.add(label3DRenderGroup);
+
+/**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    Cancel();
+
+    workingLabel = null;
+    onCompleteCallback = null;
+    currentPicktarget = null;
+    enabled = null;
+    engine = null;
 });
 
 /**

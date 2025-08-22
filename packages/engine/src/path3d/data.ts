@@ -7,6 +7,16 @@ import * as ModelInternal from '../model/model';
 let pathObjectList: Record<string, Path3DObject> = {};
 let pathRenderGroup: THREE.Group;
 
+
+/**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    Clear();
+    pathObjectList = null;
+    pathRenderGroup = null;
+});
+
 /**
  * pathcreator.ts 초기화 완료 이벤트 처리
  */
@@ -87,7 +97,10 @@ function exists(id: string) {
  * @returns - 경로 객체 배열
  */
 function getPathObjects(): Path3DObject[] {
-    return Object.values(pathObjectList);
+    if (pathObjectList)
+        return Object.values(pathObjectList);
+    else
+        return [];
 }
 
 /**

@@ -25,6 +25,31 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+
+    bPoiEditEnabled = false;
+
+    unregisterPointerEvents();
+    disposePreviewObject();
+
+    if (gizmo) {
+        const helper = gizmo.getHelper();
+        engine.RootScene.remove(helper);
+        gizmo.dispose();
+        gizmo = null;
+    }
+
+    target = null;
+    previewObject = null;
+    _editMode = null;
+    bPoiEditEnabled = null;
+
+    engine = null;
+});
+
+/**
  * 포인터 다운 이벤트 처리
  * @param event - 포인터 다운 이벤트 정보
  */

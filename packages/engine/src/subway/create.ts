@@ -40,6 +40,23 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    Cancel();
+
+    createOption = null;
+    mouseState = null;
+    headModelSrc = null;
+    bodyModelSrc = null;
+    tailModelSrc = null;
+    workingTrain = null;
+    subwayTrainRenderGroup = null;
+    trainOffsetUpdateLoopHandle = null;
+    engine = null;
+});
+
+/**
  * 머리 모델 로드 완료 이벤트 처리
  */
 Event.InternalHandler.addEventListener('onSubwayModelLoader_HeadModelLoaded' as never, (evt: any) => {

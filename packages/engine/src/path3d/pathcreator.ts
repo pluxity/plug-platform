@@ -50,6 +50,24 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    Cancel();
+
+    workingPath = null;
+    pathRenderGroup = null;
+    bLeftBtnDown = null;
+    controlPoint = null;
+    mouseDownPickData = null;
+    cursor = null;
+    previewLine = null;
+    isStraightLine = null;
+
+    engine = null;
+});
+
+/**
  * 마우스 좌표에 대해 공간상의 픽킹 좌표 계산
  * @param mousePos - 마우스 좌표
  * @returns - 공간상의 픽킹 위치
@@ -289,12 +307,12 @@ function Cancel() {
     cursor.layers.set(Interfaces.CustomLayer.Invisible);
 
     // 작업객체
-    pathRenderGroup.add(workingPath);
-    workingPath.dispose();
+    pathRenderGroup.remove(workingPath);
+    workingPath?.dispose();
 
     // 미리보기 선객체    
     pathRenderGroup.remove(previewLine);
-    previewLine.dispose();
+    previewLine?.dispose();
 
     // 이벤트 등록 해제
     unregisterEventListeners();

@@ -37,6 +37,20 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+
+    target = null;
+    previewLine = null;
+    previewPointMesh = null;
+    completeCallback = null;
+    currentPicktarget = null;
+    engine = null;
+});
+
+
+/**
  * poi 데이터 추가 이벤트 콜백
  */
 Event.InternalHandler.addEventListener('onPoiCreate' as never, async (evt: any) => {

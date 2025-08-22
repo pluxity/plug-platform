@@ -692,8 +692,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              * Test
              */
             case 'Test': {
-                Model.HideAll();
-                Model.Show('0');
+                // Model.HideAll();
+                // Model.Show('0');
             } break;
         }
     }

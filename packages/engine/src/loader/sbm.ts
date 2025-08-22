@@ -17,6 +17,13 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    engine = null;
+});
+
+/**
  * 대상 객체의 재질에 환경맵을 적용한다.
  * @param target - 대상 객체
  */

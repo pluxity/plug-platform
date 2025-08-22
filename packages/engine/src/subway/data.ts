@@ -21,6 +21,19 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    Clear();
+    subwayTrainRenderGroup = null;
+    headModelSrc = null;
+    bodyModelSrc = null;
+    tailModelSrc = null;
+    trains = null;
+    engine = null;
+});
+
+/**
  * 열차 렌더링 그룹 생성 이벤트 콜백
  */
 Event.InternalHandler.addEventListener('onSubwayTrainRenderGroupCreated' as never, (evt: any) => {

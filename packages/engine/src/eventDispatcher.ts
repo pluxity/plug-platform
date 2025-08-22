@@ -29,13 +29,23 @@ class CustomEventDispatcher extends THREE.EventDispatcher {
         }
 
     }
+
+    /**
+     * 메모리 해제
+     */
+    dispose() {
+        this._listeners = null;
+    }
 }
 
-const internalHandler = new CustomEventDispatcher(); // 내부 이벤트 핸들러
-const externalHandler = new CustomEventDispatcher(); // 외부 노출용 이벤트 핸들러
+let internalHandler: CustomEventDispatcher = new CustomEventDispatcher(); // 내부 이벤트 핸들러
+let externalHandler: CustomEventDispatcher = new CustomEventDispatcher(); // 외부 노출용 이벤트 핸들러
 
 export {
     CustomEventDispatcher,
     internalHandler as InternalHandler,
     externalHandler as ExternalHandler,
 }
+
+let a = 0;
+console.log('asdasdasd: ', a++);

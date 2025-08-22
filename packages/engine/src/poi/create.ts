@@ -58,6 +58,17 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 });
 
 /**
+ * Engine3D 메모리 해제 이벤트
+ */
+Event.InternalHandler.addEventListener('onEngineDisposed' as never, () => {
+    poiRootGroup = null;
+    iconGroup = null;
+    lineGroup = null;
+    textGroup = null;
+    pointMeshGroup = null;
+});
+
+/**
  * poi 생성
  * @param option - poi 생성 옵션
  */
