@@ -13,7 +13,7 @@ import {
 } from '@/global/store'
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services'
 import { createFeature } from '@plug/common-services'
-import { Poi } from '@plug/engine/src';
+import { Poi } from '@plug/engine'
 
 interface AssetListSideBarProps {
   onAssetClick?: (assetId: number) => void
@@ -314,7 +314,7 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
         <div className="flex items-center justify-center h-64">
           <div className="text-red-500 text-sm text-center">
             오류가 발생했습니다<br />
-            {error.message || '알 수 없는 오류'}
+            {error || '알 수 없는 오류'}
           </div>
         </div>
       )

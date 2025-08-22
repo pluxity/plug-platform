@@ -8,7 +8,7 @@ import { useDeviceCategoriesSWR, useDeviceDetailSWR, useUpdateDevice } from '@pl
 import { toast } from 'sonner';
 
 export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClose, onSuccess, deviceId }) => {
-    const { data: deviceData } = useDeviceCategoriesSWR();
+    const { data: categoryList } = useDeviceCategoriesSWR();
     const { data, mutate } = useDeviceDetailSWR(deviceId);
     const { execute: updateDevice, isLoading: isDeviceUpdating } = useUpdateDevice(deviceId);
     
@@ -22,11 +22,11 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
         mode: 'onChange',
     });
     const categoryOptions = useMemo(() => {
-        return deviceData?.list.map((category) => ({
+        return categoryList?.map((category) => ({
             label: category.name,
             value: category.id.toString(),
         })) || [];
-    }, [deviceData]);
+    }, [categoryList]);
 
     useEffect(() => {
         if(isOpen && data && !modalForm.formState.isDirty){

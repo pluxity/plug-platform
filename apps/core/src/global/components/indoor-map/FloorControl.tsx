@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Model } from '@plug/engine/src';
+import { Model } from '@plug/engine';
 import type { Floor } from '@/global/types';
 
 interface FloorControlProps {

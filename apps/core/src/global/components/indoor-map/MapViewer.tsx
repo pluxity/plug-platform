@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Engine3D, Loader } from '@plug/engine/src';
+import { Engine3D, Loader } from '@plug/engine';
 
 interface IndoorMapViewerProps {
   modelUrl: string;

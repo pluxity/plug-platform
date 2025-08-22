@@ -26,7 +26,6 @@
     "paths": {
       "@/*": ["./src/*"],
       "@plug/core/*": ["./src/*"],
-      "@plug/engine": ["../../packages/engine/dist/src"],
     }
   },
   "include": ["src/**/*"],

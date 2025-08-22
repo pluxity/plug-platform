@@ -26,7 +26,7 @@ import {
 } from '@plug/common-services';
 import { FacilityForm, FloorsForm, StationInfoForm, BoundaryForm } from './form-components';
 import { FacilityCreateFormData } from '../types';
-import { Model, Interfaces } from '@plug/engine/src';
+import { Model, Interfaces } from '@plug/engine';
 
 const createFacilitySchema = z.object({
   facilityType: z.string().min(1, '시설 유형을 선택해주세요'),
