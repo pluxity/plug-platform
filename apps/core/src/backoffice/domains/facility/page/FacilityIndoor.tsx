@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { PageContainer } from '@/backoffice/common/view/layouts'
 import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility } from '@plug/common-services'
@@ -8,7 +8,7 @@ import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "
 import { ArrowLeft } from "lucide-react"
 import { IndoorMapEditTools } from '../components'
 import { useAssets } from '@/global/store/assetStore'
-import { Poi, Event } from '@plug/engine'
+import { Poi, Event, Interfaces } from '@plug/engine'
 import { convertFloors } from '@/global/utils/floorUtils'
 import type { Floor } from '@/global/types'
 import { toast } from "sonner"
@@ -65,10 +65,12 @@ const FacilityIndoor: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null)
   const [floors, setFloors] = useState<Floor[]>([])
-  
   const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([])
   
   const { assets } = useAssets()
+  
+  const importedRef = useRef(false);
+  const engineReadyRef = useRef(false);
 
   // 삭제 모드 상태 추가
   const [isDeleteMode, setIsDeleteMode] = useState(false)
@@ -86,16 +88,15 @@ const FacilityIndoor: React.FC = () => {
       Poi.Delete(featureId);
       await deleteFeature(featureId);
 
-      setIsDeleteMode(false)
-      setShowDeleteDialog(false)
+      setShowDeleteDialog(false);
       setSelectedFeature(null);
       
-      toast.success('POI가 성공적으로 삭제되었습니다.')
+      toast.success('POI가 성공적으로 삭제되었습니다.');
     } catch (error) {
-      console.error('POI 삭제 중 오류:', error)
-      toast.error('POI 삭제 중 오류가 발생했습니다.')
+      console.error('POI 삭제 중 오류:', error);
+      toast.error('POI 삭제 중 오류가 발생했습니다.');
     }
-  }
+  };
 
   // 삭제 취소 처리
   const handleDeleteCancel = () => {
@@ -138,12 +139,69 @@ const FacilityIndoor: React.FC = () => {
     }
   }, []);
 
-  // 엔진이 준비되면 POI 생성
-  const handleLoadComplete = useCallback(() => {
-    if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) {
-      return;
+
+  // POI Import 함수 
+  const tryImportPois = useCallback(() => {
+    if (importedRef.current) return;
+    if (!engineReadyRef.current) return;
+    if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) return;
+
+    const assetById = new Map(assets.map(a => [a.id, a]));
+    const poiData: Interfaces.PoiImportOption[] = featuresData.map((f) => {
+      const asset = assetById.get(f.assetId);
+      const modelUrl = asset?.file?.url || '';
+      const position: Interfaces.Vector3 = {
+        x: f.position?.x ?? 0,
+        y: f.position?.y ?? 0,
+        z: f.position?.z ?? 0,
+      };
+      const rotation: Interfaces.Vector3 = {
+        x: f.rotation?.x ?? 0,
+        y: f.rotation?.y ?? 0,
+        z: f.rotation?.z ?? 0,
+      };
+      const scale: Interfaces.Vector3 = {
+        x: f.scale?.x ?? 1,
+        y: f.scale?.y ?? 1,
+        z: f.scale?.z ?? 1,
+      };
+
+      return {
+        id: f.id,
+        iconUrl: '',
+        modelUrl,
+        displayText: f.deviceId ? f.deviceId : '장치 할당 필요', 
+        floorId: f.floorId,
+        property: {
+          assetId: f.assetId,
+          deviceId: f.deviceId ?? null,
+        },
+        position,
+        rotation,
+        scale,
+      };
+    });
+
+    try {
+      Poi.Import(poiData);
+      importedRef.current = true;
+    } catch {
+      void 0;
     }
   }, [featuresData, assets]);
+
+  const handleLoadComplete = useCallback(() => {
+    engineReadyRef.current = true;
+    tryImportPois();
+  }, [tryImportPois]);
+
+  useEffect(() => {
+    tryImportPois();
+  }, [tryImportPois]);
+
+  useEffect(() => {
+    importedRef.current = false;
+  }, [facilityId]);
 
   useEffect(() => {
     if (!facilityId) {
@@ -193,7 +251,6 @@ const FacilityIndoor: React.FC = () => {
       
       try {
         const features = await loadFeaturesByFacility(facilityId);
-        console.log('Loaded features:', features.length);
         setFeaturesData(features);
       } catch (error) {
         console.error('Failed to load features for facility:', facilityId, error);
