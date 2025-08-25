@@ -35,19 +35,19 @@ export interface DataComponentTypes {
 export const DOMAINS = {
   building: {
     displayName: '건물',
-    endpoint: 'buildings',
+    endpoint: 'facilities/buildings',
     components: ['facility', 'floors'] as const
   },
   
   station: {
     displayName: '역사',
-    endpoint: 'stations',
+    endpoint: 'facilities/stations',
     components: ['facility', 'floors', 'stationInfo'] as const
   },
   
   park: {
     displayName: '공원',
-    endpoint: 'parks',
+    endpoint: 'facilities/parks',
     components: ['facility', 'boundary'] as const
   },
 
