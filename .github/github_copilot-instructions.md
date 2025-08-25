@@ -57,3 +57,4 @@ Ensure tree shaking compatibility avoid side effect imports
 Run build script pnpm build if build system files changed
 Before adding new dependency verify if existing dependency covers need
 Document breaking changes in CHANGELOG before merging
+Always give variable names clear, descriptive meaning; avoid vague tokens, cryptic abbreviations, or purpose-ambiguous identifiers.

@@ -1,181 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useCesium } from 'resium'
 import * as Cesium from 'cesium'
-import MapControls from '@/global/components/outdoor-map/MapControls'
-import FacilitySearchForm from './FacilitySearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { FacilityType } from '@plug/common-services'
-import { VWorldMap } from '@/global/components/outdoor-map'
+import { VWorldMap, MapControls } from '@/global/components/outdoor-map'
+import FacilityPOIs from './FacilityPOIs'
+import FacilitySearchForm from './FacilitySearchForm'
 
 interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void;
 }
 
-const FacilityPOIs: React.FC<{
-  onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void
-  onViewerReady?: (viewer: Cesium.Viewer) => void
-}> = React.memo(({ onFacilitySelect, onViewerReady }) => {
-  const { viewer } = useCesium()
-  const facilities = useFacilityStore(s => s.facilities)
-  const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
-  const didInitRef = useRef(false)
-
-  useEffect(() => {
-    if (viewer) onViewerReady?.(viewer)
-  }, [viewer, onViewerReady])
-
-  useEffect(() => {
-    if (!viewer || didInitRef.current) return
-    if (!facilitiesFetched || Object.keys(facilities).length === 0) return
-
-  Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_ACCESS_TOKEN
-
-  let hoveredEntity: Cesium.Entity | null = null
-  let screenHandler: Cesium.ScreenSpaceEventHandler | null = null
-
-    const createPOIs = async () => {
-      let resource: Cesium.Resource | undefined
-      try {
-        resource = await Cesium.IonResource.fromAssetId(3589754)
-  } catch {
-        return
-      }
-      viewer.clock.shouldAnimate = false
-      viewer.clock.multiplier = 1
-      viewer.entities.removeAll()
-
-      const facilityTypeConfigs = {
-        buildings: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'BUILDING' as FacilityType },
-        stations: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'STATION' as FacilityType },
-        parks: { color: Cesium.Color.WHITE, silhouetteColor: Cesium.Color.YELLOW, facilityType: 'PARK' as FacilityType },
-      }
-
-      const keyMap: Record<string, keyof typeof facilityTypeConfigs> = {
-        building: 'buildings',
-        station: 'stations',
-        park: 'parks',
-      }
-
-      Object.entries(facilities).forEach(([facilityTypeKey, facilitiesOfType]) => {
-        const normalizedKey = (facilityTypeKey in facilityTypeConfigs)
-          ? facilityTypeKey as keyof typeof facilityTypeConfigs
-          : (keyMap[facilityTypeKey] ?? (facilityTypeKey as keyof typeof facilityTypeConfigs))
-        const config = facilityTypeConfigs[normalizedKey]
-        if (!config || !Array.isArray(facilitiesOfType)) return
-
-  type FlatFacility = { id: number; name?: string; lat?: number; lon?: number }
-        type NestedFacility = { facility?: FlatFacility }
-        const getFlat = (f: unknown): FlatFacility | undefined => {
-          if (!f || typeof f !== 'object') return undefined
-          const maybeFlat = f as Partial<FlatFacility>
-          if (typeof maybeFlat.id === 'number' && ('lat' in maybeFlat || 'lon' in maybeFlat)) {
-            return maybeFlat as FlatFacility
-          }
-          const maybeNested = f as NestedFacility
-          if (maybeNested.facility && typeof maybeNested.facility.id === 'number') return maybeNested.facility
-          return undefined
-        }
-
-        facilitiesOfType.forEach((facility: unknown) => {
-          const base = getFlat(facility)
-          const lat: number | undefined = base?.lat
-          const lon: number | undefined = base?.lon
-          const id: number | undefined = base?.id
-          const name: string | undefined = base?.name
-          if (lat == null || lon == null || id == null) return
-          const position = Cesium.Cartesian3.fromDegrees(lon, lat, 0)
-
-          const rotationCallback = new Cesium.CallbackProperty(() => {
-            const time = Date.now() / 500
-            const angle = (time * Math.PI * 2) / 30
-            return Cesium.Transforms.headingPitchRollQuaternion(position, new Cesium.HeadingPitchRoll(angle, 0, 0))
-          }, false)
-
-          const scaleCallback = new Cesium.CallbackProperty(() => {
-            const cameraPosition = viewer.camera.position
-            const distance = Cesium.Cartesian3.distance(cameraPosition, position)
-            const baseScale = 10.0
-            const maxScale = 25.0
-            const scaleDistance = 5000
-            const scaleFactor = Math.min(distance / scaleDistance, 2.5)
-            return baseScale + (scaleFactor * (maxScale - baseScale) / 2.5)
-          }, false)
-
-          const entityId = `facility-${id}`
-
-          viewer.entities.add({
-            id: entityId,
-            name: name ?? String(id),
-            position,
-            orientation: rotationCallback,
-            model: {
-              uri: resource!,
-              scale: scaleCallback,
-              color: config.color,
-              silhouetteColor: config.silhouetteColor,
-              silhouetteSize: new Cesium.ConstantProperty(0),
-              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-            },
-            properties: {
-              facilityId: id,
-              facilityData: facility,
-              facilityType: config.facilityType
-            }
-          })
-        })
-      })
-
-      screenHandler = new Cesium.ScreenSpaceEventHandler(viewer.canvas)
-
-      screenHandler.setInputAction((movement: unknown) => {
-        const endPosition = (movement as { endPosition: Cesium.Cartesian2 }).endPosition
-        if (!endPosition) return
-        const pickedObject = viewer.scene.pick(endPosition)
-        if (hoveredEntity?.model) {
-          hoveredEntity.model.silhouetteSize = new Cesium.ConstantProperty(0)
-        }
-        if (pickedObject && pickedObject.id && pickedObject.id.id?.startsWith('facility-')) {
-          hoveredEntity = pickedObject.id as Cesium.Entity
-          if (hoveredEntity?.model) {
-            hoveredEntity.model.silhouetteSize = new Cesium.ConstantProperty(3.0)
-          }
-          ;(viewer.container as HTMLElement).style.cursor = 'pointer'
-        } else {
-          hoveredEntity = null
-          ;(viewer.container as HTMLElement).style.cursor = 'default'
-        }
-      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
-
-      screenHandler.setInputAction((click: unknown) => {
-        const position = (click as { position: Cesium.Cartesian2 }).position
-        if (!position) return
-        const pickedObject = viewer.scene.pick(position)
-        if (pickedObject && pickedObject.id && pickedObject.id.id?.startsWith('facility-')) {
-          const entity = pickedObject.id as Cesium.Entity
-          const facilityId = entity.properties?.facilityId?.getValue()
-          const facilityType = entity.properties?.facilityType?.getValue()
-          if (facilityId && facilityType && onFacilitySelect) onFacilitySelect(facilityId, facilityType)
-        }
-      }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
-    }
-
-    createPOIs()
-    didInitRef.current = true
-
-    return () => {
-      if (screenHandler) {
-        screenHandler.destroy()
-        screenHandler = null
-      }
-    }
-  }, [viewer, facilitiesFetched, facilities, onFacilitySelect])
-
-  return null
-})
-
 const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [cesiumViewer, setCesiumViewer] = useState<Cesium.Viewer | null>(null)
+  const initialCameraSetRef = useRef(false)
+
+  const YONGSAN_GU_OFFICE_LAT = 37.5323
+  const YONGSAN_GU_OFFICE_LON = 126.9903
 
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const loadFacilities = useFacilityStore(s => s.loadFacilities)
@@ -184,6 +25,41 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
       loadFacilities()
     }
   }, [facilitiesFetched, loadFacilities])
+
+  useEffect(() => {
+    if (!cesiumViewer || initialCameraSetRef.current) return
+
+    // 타겟(용산구청) 지점 (지표 고도 0 가정)
+    const target = Cesium.Cartesian3.fromDegrees(
+      YONGSAN_GU_OFFICE_LON,
+      YONGSAN_GU_OFFICE_LAT,
+      0
+    )
+
+    // 원하는 시야 각도 및 고도 느낌 설정
+    const pitchDeg = -35
+    const desiredAltitude = 2500 // 눈으로 보이는 고도 느낌
+    // range = altitude / sin(|pitch|)
+    const range = desiredAltitude / Math.sin(Math.abs(pitchDeg) * Math.PI / 180)
+
+    const offset = new Cesium.HeadingPitchRange(
+      Cesium.Math.toRadians(0), // 남쪽 위치 -> 북쪽(위쪽) 바라봄
+      Cesium.Math.toRadians(pitchDeg),
+      range
+    )
+
+    cesiumViewer.camera.flyToBoundingSphere(
+      new Cesium.BoundingSphere(target, 60),
+      {
+        offset,
+        duration: 1.2,
+        maximumHeight: 10000,
+        complete: () => {
+          initialCameraSetRef.current = true
+        },
+      }
+    )
+  }, [cesiumViewer])
 
   const handleInitialLoadComplete = () => {
     setIsLoading(false)
@@ -207,10 +83,10 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
       )}
       
         <VWorldMap className="w-full h-full">
-        <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
-        {facilitiesFetched && (
-          <FacilityPOIs onFacilitySelect={onFacilitySelect} onViewerReady={setCesiumViewer} />
-        )}
+          <MapControls onInitialLoadComplete={handleInitialLoadComplete} />
+          {facilitiesFetched && (
+            <FacilityPOIs onFacilitySelect={onFacilitySelect} onViewerReady={setCesiumViewer} />
+          )}
       </VWorldMap>
     </div>
   )

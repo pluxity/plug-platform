@@ -13,8 +13,8 @@ interface CameraSetupProps {
 }
 
 const DEFAULT_INITIAL_POSITION = {
-  longitude: 127.023556,
-  latitude: 37.459722,
+  longitude: 126.9905, // 용산구청 경도
+  latitude: 37.5326,   // 용산구청 위도
   altitude: 1000,
 }
 
@@ -29,7 +29,6 @@ const InitialCameraSetup: React.FC<CameraSetupProps> = ({
 
   useEffect(() => {
     if (!viewer) return
-    // 이미 초기화했다면 재실행 방지 (검색창 입력 등 리렌더 시 다시 실행되지 않음)
     if (initializedRef.current || hasInitialized) return
     initializedRef.current = true
 
@@ -47,10 +46,11 @@ const InitialCameraSetup: React.FC<CameraSetupProps> = ({
       initPos.latitude,
       0
     )
+
     const offset = new Cesium.HeadingPitchRange(
-      0, // heading
-      Cesium.Math.toRadians(-15), // 더 눕힌 각도
-      Math.max(300, initPos.altitude ?? 1500) // 카메라와 타겟 거리
+      Cesium.Math.toRadians(0),
+      Cesium.Math.toRadians(-15),
+      Math.max(300, initPos.altitude ?? 1500)
     )
 
     viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(target, 100), {

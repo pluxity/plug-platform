@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { FacilityService, getFeaturesByFacility, FacilityType, FeatureResponse, DomainResponse } from '@plug/common-services'
+import { FacilityService, getFeaturesByFacility, FacilityType, FeatureResponse, FacilityResponse } from '@plug/common-services'
 import type { Floor } from '@/global/types'
 import { convertFloors } from '@/global/utils/floorUtils'
 
@@ -22,7 +22,7 @@ interface UseIndoorFacilityDataReturn {
 export function useIndoorFacilityData(
   { facilityId, facilityType, onGoOutdoor }: UseIndoorFacilityDataParams
 ): UseIndoorFacilityDataReturn {
-  const [facilityData, setFacilityData] = useState<DomainResponse<FacilityType> | null>(null)
+  const [facilityData, setFacilityData] = useState<FacilityResponse | null>(null)
   const [features, setFeatures] = useState<FeatureResponse[]>([])
   const [floors, setFloors] = useState<Floor[]>([])
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null)
@@ -53,14 +53,16 @@ export function useIndoorFacilityData(
       try {
         setIsLoading(true)
         const response = await FacilityService.getById(facilityType, facilityId)
-        setFacilityData(response.data as unknown as DomainResponse<FacilityType>)
+  setFacilityData(response.data?.facility as FacilityResponse)
 
-        const drawingUrl = response.data?.facility?.drawing?.url?.trim() || ''
+  interface RawFacilityBundle { facility?: FacilityResponse & { drawing?: { url?: string } }; floors?: { name: string; floorId: string }[] }
+  const bundle = response.data as unknown as RawFacilityBundle
+  const drawingUrl = bundle?.facility?.drawing?.url?.trim() || ''
         const has = drawingUrl !== ''
         setHas3DDrawing(has)
 
-        if (response.data && 'floors' in response.data && response.data.floors) {
-          setFloors(convertFloors(response.data.floors))
+        if (bundle?.floors) {
+          setFloors(convertFloors(bundle.floors))
         }
 
         if (!has) {
@@ -97,7 +99,7 @@ export function useIndoorFacilityData(
     loadFeatures(facilityId)
   }, [facilityId, loadFeatures])
 
-  const modelUrl = facilityData?.facility?.drawing?.url || ''
+  const modelUrl = facilityData?.drawing?.url || ''
 
   return {
     features,

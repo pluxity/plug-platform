@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { GroupSearchForm, type GroupSearchGroup, type GroupSearchFormRef } from '@/app/view/components/GroupSearchForm'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { FacilityResponse } from '@plug/common-services'
-import { domainUtils } from '@plug/common-services'
 import * as Cesium from 'cesium'
 
 interface FacilitySearchFormProps {
@@ -10,7 +9,7 @@ interface FacilitySearchFormProps {
 }
 
 const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
-  const [value, setValue] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const formRef = useRef<GroupSearchFormRef>(null)
   const facilities = useFacilityStore(s => s.facilities)
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
@@ -20,26 +19,22 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
     if (!facilitiesFetched) loadFacilities()
   }, [facilitiesFetched, loadFacilities])
 
-  const match = (f: FacilityResponse, q: string) => {
-    const name = f.name?.toLowerCase() ?? ''
-    const code = f.code?.toLowerCase() ?? ''
-    const desc = f.description?.toLowerCase() ?? ''
-    return name.includes(q) || code.includes(q) || desc.includes(q)
+  const matchesSearch = (facility: FacilityResponse, query: string) => {
+    const name = facility.name?.toLowerCase() ?? ''
+    const code = facility.code?.toLowerCase() ?? ''
+    const description = facility.description?.toLowerCase() ?? ''
+    return name.includes(query) || code.includes(query) || description.includes(query)
   }
 
   const groups: GroupSearchGroup<FacilityResponse>[] = useMemo(() => {
-    const q = value.trim().toLowerCase()
-    if (!q) return []
-    return domainUtils.getAllDomains().map(domain => {
-      const { endpoint, displayName } = domainUtils.getConfig(domain)
-      const list = Array.isArray(facilities[endpoint]) ? facilities[endpoint] : []
-      const filtered = (list as FacilityResponse[]).filter(f => match(f, q))
-      return { heading: displayName, items: filtered }
-    }).filter(g => g.items.length > 0)
-  }, [value, facilities])
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return []
+    const filtered = facilities.filter(f => matchesSearch(f as FacilityResponse, query)) as FacilityResponse[]
+    return [{ heading: '시설', items: filtered }]
+  }, [searchQuery, facilities])
 
   const handleSelectFacility = (facility: FacilityResponse) => {
-    setValue('')
+    setSearchQuery('')
     formRef.current?.close()
 
     if (!viewer) return
@@ -47,10 +42,10 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
     const entityId = `facility-${facility.id}`
     const entity = viewer.entities.getById(entityId)
     if (entity && entity.position) {
-      const pos = entity.position.getValue(Cesium.JulianDate.now())
-      if (pos) {
+    const position = entity.position.getValue(Cesium.JulianDate.now())
+    if (position) {
         viewer.camera.flyToBoundingSphere(
-          new Cesium.BoundingSphere(pos, 1000),
+          new Cesium.BoundingSphere(position, 1000),
           {
             duration: 2.0,
             offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-15), 2000)
@@ -74,11 +69,11 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
 
   return (
     <GroupSearchForm<FacilityResponse>
-      ref={formRef}
-      value={value}
-      onValueChange={setValue}
+  ref={formRef}
+  value={searchQuery}
+  onValueChange={setSearchQuery}
       groups={groups}
-      placeholder={facilitiesFetched ? '시설명 또는 코드를 검색하세요...' : '시설 데이터를 불러오는 중...'}
+  placeholder={facilitiesFetched ? '시설명 또는 코드를 검색하세요...' : '시설 데이터를 불러오는 중...'}
       disabled={!facilitiesFetched}
       renderItem={(facility) => (
         <div>
@@ -95,7 +90,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         </div>
       )}
       onSelect={handleSelectFacility}
-      getItemKey={(f) => f.id}
+  getItemKey={(facility) => facility.id}
     />
   )
 }
