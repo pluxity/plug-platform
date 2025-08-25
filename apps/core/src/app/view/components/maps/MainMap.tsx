@@ -2,9 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import IndoorMap from './IndoorMap'
 import OutdoorMap from './OutdoorMap'
-import { MapMode } from '@/app/model/types/MapTypes'
 import type { FacilityType } from '@plug/common-services'
 import { useFacilityStore } from '@/app/store/facilityStore'
+
+enum MapMode {
+  OUTDOOR = 'outdoor',
+  INDOOR = 'indoor'
+}
 
 const MainMap: React.FC = () => {
   const [mapMode, setMapMode] = useState<MapMode>(MapMode.OUTDOOR)
