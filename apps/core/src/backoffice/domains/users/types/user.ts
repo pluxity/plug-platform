@@ -1,5 +1,6 @@
 export interface UserData {
     id: number;
+    username: string; // 로그인 아이디
     name: string;
     code: string;
     phoneNumber: string;

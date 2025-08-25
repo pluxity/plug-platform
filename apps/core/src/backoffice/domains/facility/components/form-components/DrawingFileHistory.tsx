@@ -16,7 +16,7 @@ import {
 } from '@plug/ui';
 import { FacilityHistoryResponse, facilityService } from '@plug/common-services';
 import { useFileUploadWithInfo } from '@plug/common-services';
-import { Model, Interfaces } from '@plug/engine/src';
+import { Model, Interfaces } from '@plug/engine';
 
 interface DrawingFileHistoryProps {
   facilityId: number;

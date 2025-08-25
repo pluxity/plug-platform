@@ -86,6 +86,10 @@ const User: React.FC = () => {
 
     const columns = [
         {
+            header: '아이디',
+            accessorKey: 'username',
+        },
+        {
             header: '이름',
             accessorKey: 'name',
         },

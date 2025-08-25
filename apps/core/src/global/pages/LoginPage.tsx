@@ -10,6 +10,7 @@ const LoginPage: React.FC = () => {
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [oldPassword, setOldPassword] = useState('')
   const navigate = useNavigate()
 
   const { execute: signInWithInfo, isLoading: isSigningIn, error: signInError } = useSignInWithInfo()
@@ -49,8 +50,8 @@ const LoginPage: React.FC = () => {
   }
 
   const handlePasswordChange = async () => {
-    if (!newPassword || !confirmPassword) {
-      toast.error('새 비밀번호와 비밀번호 확인을 모두 입력해주세요.')
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      toast.error('이전 비밀번호, 새 비밀번호와 비밀번호 확인을 모두 입력해주세요.')
       return
     }
 
@@ -60,16 +61,17 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      await changePassword({ password: newPassword })
-      
+      await changePassword({ newPassword, currentPassword: oldPassword })
+
       if (user) {
         const updatedUser = { ...user, shouldChangePassword: false }
         setUser(updatedUser)
       }
       
       setShowPasswordChangeModal(false)
-      setNewPassword('')
-      setConfirmPassword('')
+  setOldPassword('')
+  setNewPassword('')
+  setConfirmPassword('')
       
       const hasAdminRole = hasRole('ADMIN')
       navigate(hasAdminRole ? '/admin' : '/')
@@ -99,6 +101,18 @@ const LoginPage: React.FC = () => {
             <p className="text-sm text-gray-600 mb-4">
               보안을 위해 비밀번호를 변경해주세요.
             </p>
+            <div>
+              <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                이전 비밀번호
+              </label>
+              <Input
+                id="oldPassword"
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="현재(이전) 비밀번호를 입력하세요"
+              />
+            </div>
             
             <div>
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">

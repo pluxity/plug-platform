@@ -26,9 +26,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@plug/core/*": ["./src/*"],
-      "@plug/engine": ["../../packages/engine/dist/src"],
     }
   },
+  "references": [
+    { "path": "../../packages/engine" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "build"],
 }

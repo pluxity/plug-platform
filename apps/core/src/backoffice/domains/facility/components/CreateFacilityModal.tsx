@@ -26,7 +26,7 @@ import {
 } from '@plug/common-services';
 import { FacilityForm, FloorsForm, StationInfoForm, BoundaryForm } from './form-components';
 import { FacilityCreateFormData } from '../types';
-import { Model, Interfaces } from '@plug/engine/src';
+import { Model, Interfaces } from '@plug/engine';
 
 const createFacilitySchema = z.object({
   facilityType: z.string().min(1, '시설 유형을 선택해주세요'),
@@ -85,6 +85,7 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
         name: '',
         code: '',
         description: '',
+  drawingFileId: undefined,
       },
       floors: [],
       stationInfo: {
@@ -161,7 +162,17 @@ export const CreateFacilityModal: React.FC<CreateFacilityModalProps> = ({
       const domainConfig = domainUtils.getConfig(selectedFacilityType);
       const createRequest: Record<string, unknown> = {};
 
-      createRequest.facility = data.facility;
+      // 도면 파일 ID 포함 (선택적)
+      createRequest.facility = {
+        name: data.facility.name,
+        code: data.facility.code,
+        description: data.facility.description,
+        thumbnailFileId: data.facility.thumbnailFileId,
+        drawingFileId: data.facility.drawingFileId,
+        lon: data.facility.lon,
+        lat: data.facility.lat,
+        locationMeta: data.facility.locationMeta,
+      };
 
       domainConfig.components.forEach((component) => {
         switch (component) {
