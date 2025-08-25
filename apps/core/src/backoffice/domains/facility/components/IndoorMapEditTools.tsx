@@ -23,6 +23,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
       if (isDeleteMode) {
         // 삭제 모드 종료
         setIsDeleteMode(false)
+        onDeleteMode?.(false)
       } else if (isEditing) {
         // 일반 편집 모드 종료
         Poi.FinishEdit()
@@ -108,8 +109,8 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
           ${isActiveMode('translate') 
-            ? 'bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 text-white shadow-xl shadow-blue-400/50 ring-2 ring-blue-200/60' 
-            : 'bg-gradient-to-br from-white/60 to-cyan-50/60 hover:from-blue-400 hover:via-blue-500 hover:to-indigo-600 text-cyan-700 hover:text-white hover:scale-105 shadow-md hover:shadow-xl border border-white/30'
+            ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 text-white shadow-xl shadow-blue-500/40 scale-110 ring-2 ring-blue-300/50' 
+            : 'bg-gradient-to-br from-cyan-100 to-blue-100 hover:from-cyan-200 hover:to-blue-200 text-cyan-700 hover:text-blue-700 hover:scale-105 shadow-md hover:shadow-lg'
           }
         `}
         title={isActiveMode('translate') ? '위치 편집 종료' : '위치 편집 시작'}
@@ -127,8 +128,8 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
           ${isActiveMode('rotate') 
-            ? 'bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600 text-white shadow-xl shadow-emerald-400/50 ring-2 ring-emerald-200/60' 
-            : 'bg-gradient-to-br from-white/60 to-emerald-50/60 hover:from-emerald-400 hover:via-green-500 hover:to-teal-600 text-emerald-700 hover:text-white hover:scale-105 shadow-md hover:shadow-xl border border-white/30'
+            ? 'bg-gradient-to-br from-emerald-400 via-green-500 to-emerald-600 text-white shadow-xl shadow-emerald-500/40 scale-110 ring-2 ring-emerald-300/50' 
+            : 'bg-gradient-to-br from-emerald-100 to-green-100 hover:from-emerald-200 hover:to-green-200 text-emerald-700 hover:text-green-700 hover:scale-105 shadow-md hover:shadow-lg'
           }
         `}
         title={isActiveMode('rotate') ? '회전 편집 종료' : '회전 편집 시작'}
@@ -146,8 +147,8 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
           ${isActiveMode('scale') 
-            ? 'bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-600 text-white shadow-xl shadow-violet-400/50 ring-2 ring-violet-200/60' 
-            : 'bg-gradient-to-br from-white/60 to-violet-50/60 hover:from-violet-400 hover:via-purple-500 hover:to-indigo-600 text-violet-700 hover:text-white hover:scale-105 shadow-md hover:shadow-xl border border-white/30'
+            ? 'bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-600 text-white shadow-xl shadow-purple-500/40 scale-110 ring-2 ring-purple-300/50' 
+            : 'bg-gradient-to-br from-violet-100 to-purple-100 hover:from-violet-200 hover:to-purple-200 text-violet-700 hover:text-purple-700 hover:scale-105 shadow-md hover:shadow-lg'
           }
         `}
         title={isActiveMode('scale') ? '크기 편집 종료' : '크기 편집 시작'}
@@ -165,8 +166,8 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
           ${isDeleteMode 
-            ? 'bg-gradient-to-br from-red-400 via-pink-500 to-rose-600 text-white shadow-xl shadow-red-400/50 ring-2 ring-red-200/60' 
-            : 'bg-gradient-to-br from-white/60 to-red-50/60 hover:from-red-400 hover:via-pink-500 hover:to-rose-600 text-red-700 hover:text-white hover:scale-105 shadow-md hover:shadow-xl border border-white/30'
+            ? 'bg-gradient-to-br from-red-400 via-pink-500 to-red-600 text-white shadow-xl shadow-red-500/40 scale-110 ring-2 ring-red-300/50' 
+            : 'bg-gradient-to-br from-red-100 to-pink-100 hover:from-red-200 hover:to-pink-200 text-red-700 hover:text-red-700 hover:scale-105 shadow-md hover:shadow-lg'
           }
         `}
         title={isDeleteMode ? '삭제 모드 종료' : '삭제 모드 시작'}

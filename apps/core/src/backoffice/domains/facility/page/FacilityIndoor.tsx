@@ -12,6 +12,7 @@ import { Poi, Event, Interfaces } from '@plug/engine'
 import { convertFloors } from '@/global/utils/floorUtils'
 import type { Floor } from '@/global/types'
 import { toast } from "sonner"
+import DeviceSearchForm from "@/app/view/components/maps/DeviceSearchForm"
 
 type FacilityData = {
   facility?: {
@@ -68,7 +69,7 @@ const FacilityIndoor: React.FC = () => {
   const [featuresData, setFeaturesData] = useState<FeatureResponse[]>([])
   
   const { assets } = useAssets()
-  
+
   const importedRef = useRef(false);
   const engineReadyRef = useRef(false);
 
@@ -344,6 +345,10 @@ const FacilityIndoor: React.FC = () => {
                 className="w-full h-full"
                 onLoadComplete={handleLoadComplete}
               />
+
+            <div className="absolute top-4 left-4 z-20">
+              <DeviceSearchForm className="pointer-events-auto" />
+            </div>
               
               {/* Floor Control - 우측 하단 */}
               {floors.length > 0 && (
