@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@plug/ui'
 import { Move, RotateCcw, Scale, Square, Trash } from 'lucide-react'
-import { Poi } from '@plug/engine/src'
+import { Poi } from '@plug/engine'
 
 interface IndoorMapEditToolsProps {
   className?: string

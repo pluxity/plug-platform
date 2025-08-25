@@ -48,6 +48,18 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
     });
   };
 
+  // 실내 지도 보기 (편집 모드가 아닌 앱 메인 지도 전환)
+  const handleIndoorView = () => {
+    // 메인 앱 영역('/') 로 이동하면서 state 로 시설 선택 전달 (URL 깔끔 유지)
+    navigate('/', {
+      state: {
+        facilityId: facility.id,
+        facilityType: displayType,
+        mode: 'indoor'
+      }
+    });
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200 pt-4">
       <CardHeader 
@@ -83,6 +95,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 />
                 <ThumbnailHoverButtons
                   onView={handleView}
+                  onIndoorView={handleIndoorView}
                   onIndoorEdit={handleIndoorEdit}
                   onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
                   facilityName={facility.name}
@@ -95,6 +108,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
                 </span>
                 <ThumbnailHoverButtons
                   onView={handleView}
+                  onIndoorView={handleIndoorView}
                   onIndoorEdit={handleIndoorEdit}
                   onDelete={onDelete && facilityType ? () => onDelete(facility.id, facilityType) : undefined}
                   facilityName={facility.name}

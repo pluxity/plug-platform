@@ -23,7 +23,6 @@ export default defineConfig({
   },
   server: {
     host: true,
-    allowedHosts: ['app.plug-platform.com'],
     port: 4000,
     proxy: {
         '/api': {

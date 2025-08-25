@@ -15,7 +15,7 @@ export const useUpdateUserProfile = () => {
 
 // 사용자 비밀번호 변경
 export const useChangePassword = () => {
-  return usePatch<{ password: string }>(`${END_POINT}/password`, { requireAuth: true });
+  return usePatch<{ newPassword: string, currentPassword: string }>(`${END_POINT}/password`, { requireAuth: true });
 };
 
 // SWR 기반 훅

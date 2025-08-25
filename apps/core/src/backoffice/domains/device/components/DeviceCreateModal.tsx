@@ -11,7 +11,7 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
 
     const { execute: createDevice, isLoading: isDeviceCreating } = useCreateDevice();
 
-    const { data: deviceData } = useDeviceCategoriesSWR();
+    const { data: categoryList } = useDeviceCategoriesSWR();
     
     const modalForm = useForm<DeviceFormData>({
         resolver: zodResolver(deviceFormSchema),
@@ -24,11 +24,11 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
     });
 
     const categoryOptions = useMemo(() => {
-        return deviceData?.list.map((category) => ({
+        return categoryList?.map((category) => ({
             label: category.name,
             value: category.id.toString(),
         })) || [];
-    }, [deviceData]);
+    }, [categoryList]);
 
     const resetForm = useCallback(() => {
         modalForm.reset({
