@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType, deleteFeature, FeatureResponse } from '@plug/common-services'
+import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility } from '@plug/common-services'
 import { IndoorMapViewer } from '@/global/components'
 import { FloorControl } from '@/global/components/indoor-map/FloorControl'
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
 import { ArrowLeft } from "lucide-react"
 import { IndoorMapEditTools } from '../components'
 import { useAssets } from '@/global/store/assetStore'
-import { api } from '@plug/api-hooks/core'
 import { Poi, Event } from '@plug/engine'
 import { convertFloors } from '@/global/utils/floorUtils'
 import type { Floor } from '@/global/types'
@@ -121,7 +120,8 @@ const FacilityIndoor: React.FC = () => {
     // PromiseAll
     //   console.log('onPoiTransformChange', evt);
     // });
-    
+
+
     return () => {
       Event.RemoveEventListener('onPoiPointerUp' as never, handleFeatureClick);
     };
@@ -130,8 +130,8 @@ const FacilityIndoor: React.FC = () => {
   // Features 로드를 위한 함수
   const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
     try {
-      const response = await api.get<FeatureResponse[]>(`features?facilityId=${facilityId}`, { requireAuth: true });
-      return response.data || [];
+      const features = await getFeaturesByFacility(facilityId)  
+      return features || [];
     } catch (error) {
       console.error('Failed to load features:', error);
       return [];
@@ -193,6 +193,7 @@ const FacilityIndoor: React.FC = () => {
       
       try {
         const features = await loadFeaturesByFacility(facilityId);
+        console.log('Loaded features:', features.length);
         setFeaturesData(features);
       } catch (error) {
         console.error('Failed to load features for facility:', facilityId, error);
