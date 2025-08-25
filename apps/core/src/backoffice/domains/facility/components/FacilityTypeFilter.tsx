@@ -47,7 +47,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
             className={`cursor-pointer transition-colors py-1 ${
               isSelected 
                 ? "hover:bg-primary/90" 
-                : "hover:bg-gray-100"
+                : "hover:bg-gray-100 bg-white"
             }`}
             onClick={() => onTypeToggle(type)}
           >
