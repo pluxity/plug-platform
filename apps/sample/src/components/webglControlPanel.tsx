@@ -377,7 +377,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              */
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
-                const iconUrl: string = 'SamplePoiIcon.png';
+                const iconUrl: string = '';//'SamplePoiIcon.png';
                 const displayText: string = id.substring(0, 8) + '테스트__-';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
@@ -858,6 +858,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         // poi 편집 이벤트 등록
         Event.AddEventListener('onPoiTransformChange' as never, (evt: any) => {
             console.log('onPoiTransformChange', evt);
+        });
+        // poi 편집 완료 이벤트 등록
+        Event.AddEventListener('onPoiFinishEdit' as never, (evt: any)=>{
+            console.log('onPoiFinishEdit', evt);
         });
         // poi 객체 포인터업 이벤트 등록
         Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {

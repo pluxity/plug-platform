@@ -15,12 +15,15 @@ let gizmo: Addon.TransformControls;
 let previewObject: THREE.Object3D;
 let _editMode: Addon.TransformControlsMode = 'translate';
 let bPoiEditEnabled: boolean = false;
+let edittedPoiList: string[] = [];
 
 /**
  * 초기화
  */
 function initialize(_engine: Engine3D) {
     engine = _engine;
+
+    edittedPoiList = [];
 }
 
 /**
@@ -46,6 +49,8 @@ function dispose() {
     previewObject = null;
     _editMode = 'translate';
     bPoiEditEnabled = false;
+
+    edittedPoiList = [];
 
     engine = null;
 }
@@ -205,6 +210,10 @@ async function createEditPreviewObject() {
         PoiData.updatePoiLine();
         PoiData.updatePoiMesh();
 
+        // 기즈모에서 버튼업 이벤트 발생시 편집했던 Poi의 id값을 저장
+        if (edittedPoiList.indexOf(target.id) === -1)
+            edittedPoiList.push(target.id);
+
         // 외부 이벤트 통지
         engine.EventHandler.dispatchEvent({
             type: 'onPoiTransformChange',
@@ -233,6 +242,8 @@ function StartEdit(editMode: string) {
     engine.EventHandler.dispatchEvent({
         type: 'onPoiStartEdit',
     });
+
+    edittedPoiList = [];
 }
 
 /**
@@ -245,11 +256,22 @@ function FinishEdit() {
     unregisterPointerEvents();
     disposePreviewObject();
 
+    // 외부 이벤트 통지
+    const result: any[] = [];
+    edittedPoiList.forEach(id => result.push(PoiData.Export(id)));
+
+    engine.EventHandler.dispatchEvent({
+        type: 'onPoiFinishEdit',
+        targets: result,
+    });
+
     if (gizmo) {
         const helper = gizmo.getHelper();
         engine.RootScene.remove(helper);
         gizmo.dispose();
     }
+
+    edittedPoiList = [];
 }
 
 export {
