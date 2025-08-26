@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import type { GsDeviceResponse, FeatureResponse } from '@plug/common-services'
+import type { DeviceResponse } from '@plug/common-services'
 import { useDeviceStore } from '@/app/store/deviceStore'
 import { GroupSearchForm } from '@/app/view/components/group-search-form'
 import type { GroupSearchGroup, GroupSearchFormRef } from '@/app/view/components/group-search-form'
@@ -7,11 +7,10 @@ import { Camera } from '@plug/engine'
 
 interface DeviceSearchFormProps {
   className?: string
-  features?: FeatureResponse[]
-  onDeviceSelect?: (device: GsDeviceResponse) => void
+  onDeviceSelect?: (device: DeviceResponse) => void
 }
 
-const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className, features = [], onDeviceSelect }) => {
+const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className, onDeviceSelect }) => {
   const [query, setQuery] = useState('')
   const searchRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<GroupSearchFormRef>(null)
@@ -23,29 +22,21 @@ const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className, features
     loadAllDevices()
   }, [loadAllDevices])
 
-  const groups = useMemo<GroupSearchGroup<GsDeviceResponse>[]>(() => {
+  const groups = useMemo<GroupSearchGroup<DeviceResponse>[]>(() => {
     const result = searchDevices(query)
     return result.map(({ category, items }) => ({ heading: category, items }))
   }, [searchDevices, query])
 
-  const handleSelect = useCallback((device: GsDeviceResponse) => {
+  const handleSelect = useCallback((device: DeviceResponse) => {
     setQuery('')
     formRef.current?.close()
-    // feature 중 deviceId 매칭되는 poi(feature.id) 찾기
-    const matchedFeature = features.find(f => f.deviceId === device.id)
-    if (matchedFeature) {
-      try {
-        Camera.MoveToPoi(String(matchedFeature.id), 0.5, 3)
-      } catch {
-        /* swallow */
-      }
-    }
+    Camera.MoveToPoi(String(device.featureId), 0.5, 1);
     onDeviceSelect?.(device)
-  }, [features, onDeviceSelect])
+  }, [onDeviceSelect])
 
   return (
     <div ref={searchRef} className={['relative w-96', className || ''].join(' ').trim()}>
-      <GroupSearchForm<GsDeviceResponse>
+      <GroupSearchForm<DeviceResponse>
         ref={formRef}
         value={query}
         onValueChange={setQuery}

@@ -74,15 +74,6 @@ export const MapLocationSelector: React.FC<MapLocationSelectorProps> = ({
               <VWorldMap 
                 className="w-full "
                 mapProvider="vworld"
-                initialPosition={
-                  initialLat && initialLon 
-                    ? {
-                        longitude: initialLon,
-                        latitude: initialLat,
-                        altitude: 1000
-                      }
-                    : undefined
-                }
                 preventCameraReset={isInitializedRef.current}
                 onMapInitialized={() => {
                   isInitializedRef.current = true;

@@ -22,3 +22,15 @@ export interface GsDeviceResponse {
   feature?: FeatureResponse;
   deviceCategory?: DeviceCategoryResponse;
 }
+
+export interface GsDeviceCctvUpdateRequest {
+  cctvIds: string[];
+}
+
+export interface DeviceResponse {
+  id: string;
+  name?: string;
+  featureId?: string;
+  type?: string;
+  deviceCategory?: DeviceCategoryResponse;
+}

@@ -66,7 +66,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     <div className='absolute top-4 left-4 z-20 flex flex-row gap-3 items-start'>
       <DeviceSearchForm
         className='pointer-events-auto'
-        features={features}
         onDeviceSelect={(device) => setSelectedDevice(device)}
       />
       <DeviceCategoryChips />
