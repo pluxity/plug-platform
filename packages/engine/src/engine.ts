@@ -35,6 +35,10 @@ class Engine3D {
 
     private tweenUpdateGroups: TWEEN.Group;
 
+    private eventHandler: Event.CustomEventDispatcher;
+
+    private onResizeBinder: (event: Event) => void;
+
     /**
      * 생성자
      * @param container - WebGL이 붙을 dom 객체
@@ -101,13 +105,16 @@ class Engine3D {
         this.composer.addPass(new Addon.RenderPass(this.rootScene, this.camera));
 
         // 창크기변경 이벤트 등록
-        window.addEventListener('resize', this.onResize.bind(this));
+        this.onResizeBinder = this.onRender.bind(this);
+        window.addEventListener('resize', this.onResizeBinder);
 
         // 렌더링 루프 콜백
         this.renderer.setAnimationLoop(this.onRender.bind(this));
 
+        // 이벤트 핸들러
+        this.eventHandler = new Event.CustomEventDispatcher();
         // 그림자맵 이벤트 콜백 등록
-        Event.InternalHandler.addEventListener('onShadowMapNeedsUpdate' as never, this.updateShadowMap.bind(this));
+        this.eventHandler.addEventListener('onShadowMapNeedsUpdate' as never, this.updateShadowMap.bind(this));
 
         // 트윈 그룹 생성
         this.tweenUpdateGroups = new TWEEN.Group();
@@ -116,7 +123,7 @@ class Engine3D {
         this.initializeApiModules();
 
         // 초기화 완료 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        this.eventHandler.dispatchEvent({
             type: 'onEngineInitialized',
             engine: this,
         });
@@ -147,7 +154,7 @@ class Engine3D {
         this.tweenUpdateGroups.update();
 
         // 렌더링 전 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        this.eventHandler.dispatchEvent({
             type: 'onBeforeRender',
             deltaTime: deltaTime,
         });
@@ -156,7 +163,7 @@ class Engine3D {
         this.composer.render();
 
         // 렌더링 후 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        this.eventHandler.dispatchEvent({
             type: 'onAfterRender',
             deltaTime: deltaTime,
         });
@@ -197,6 +204,10 @@ class Engine3D {
      * WebGL 엔진 메모리 해제
      */
     dispose(): void {
+        // 창크기변경 이벤트 해제
+        window.removeEventListener('resize', this.onResizeBinder);
+
+
         // 하위 모듈 메모리 해제
         this.disposeApiModules();
 
@@ -253,6 +264,7 @@ class Engine3D {
         this.clock = null;
 
         // 렌더러 정리
+        this.dom.removeChild(this.renderer.domElement);
         this.renderer.dispose();
         this.renderer.forceContextLoss();
         this.renderer = null;
@@ -265,6 +277,8 @@ class Engine3D {
      * 기능 모듈 초기화 작업
      */
     initializeApiModules(): void {
+        // 유틸리티 모듈 초기화
+        Util.initialize(this);
         // 효과 모듈 초기화
         Effect.initialize(this);
         // 라벨3D 모듈 초기화
@@ -283,14 +297,13 @@ class Engine3D {
         Subway.initialize(this);
         // 카메라 모듈 초기화
         Camera.initialize(this);
-        // 유틸리티 모듈 초기화
-        Util.initialize(this);
     }
 
     /**
      * 기능 모듈 메모리 해제 작업
      */
     disposeApiModules(): void {
+        Util.dispose();
         Effect.dispose();
         Label3D.dispose();
         Loader.dispose();
@@ -300,7 +313,6 @@ class Engine3D {
         Poi.dispose();
         Subway.dispose();
         Camera.dispose();
-        Util.dispose();
     }
 
     /**
@@ -350,6 +362,13 @@ class Engine3D {
      */
     get TweenUpdateGroups() {
         return this.tweenUpdateGroups;
+    }
+
+    /**
+     * 이벤트 핸들러
+     */
+    get EventHandler(): Event.CustomEventDispatcher {
+        return this.eventHandler;
     }
 }
 

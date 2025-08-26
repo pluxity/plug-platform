@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
 import * as Camera from '../camera';
@@ -41,10 +40,12 @@ function dispose() {
         gizmo = null;
     }
 
+    target?.dispose();
     target = null;
+
     previewObject = null;
-    _editMode = null;
-    bPoiEditEnabled = null;
+    _editMode = 'translate';
+    bPoiEditEnabled = false;
 
     engine = null;
 }
@@ -81,7 +82,7 @@ function onPointerUp(evt: MouseEvent) {
             rayCast.setFromCamera(mousePos, engine.Camera);
 
             const result = Util.getPoiFromRaycast(rayCast);
-            if (result !== undefined) {
+            if (result) {
                 target = result.poi;
                 createEditPreviewObject();
                 unregisterPointerEvents();
@@ -165,7 +166,7 @@ async function createEditPreviewObject() {
     disposePreviewObject();
 
     // 편집 대상 poi의 modelUrl을 기준으로 편집용 임시 객체를 생성한다.
-    if (target.modelUrl !== undefined) {
+    if (target.modelUrl) {
         const loader = new Addon.GLTFLoader();
         const gltf = await loader.loadAsync(target.modelUrl);
 
@@ -205,7 +206,7 @@ async function createEditPreviewObject() {
         PoiData.updatePoiMesh();
 
         // 외부 이벤트 통지
-        Event.ExternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onPoiTransformChange',
             target: target.ExportData
         });
@@ -229,7 +230,7 @@ function StartEdit(editMode: string) {
 
     bPoiEditEnabled = true;
 
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPoiStartEdit',
     });
 }

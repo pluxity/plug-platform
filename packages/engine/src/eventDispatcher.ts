@@ -38,14 +38,6 @@ class CustomEventDispatcher extends THREE.EventDispatcher {
     }
 }
 
-let internalHandler: CustomEventDispatcher = new CustomEventDispatcher(); // 내부 이벤트 핸들러
-let externalHandler: CustomEventDispatcher = new CustomEventDispatcher(); // 외부 노출용 이벤트 핸들러
-
 export {
     CustomEventDispatcher,
-    internalHandler as InternalHandler,
-    externalHandler as ExternalHandler,
 }
-
-let a = 0;
-console.log('asdasdasd: ', a++);

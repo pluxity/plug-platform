@@ -1,21 +1,25 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as PIXI from 'pixi.js';
-import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
 import * as ModelInternal from './model/model';
 import * as PoiData from './poi/data';
-import { PoiElement } from './poi/element';
 import { Engine3D } from './engine';
 
 let pixiApp: PIXI.Application;
 let engine: Engine3D;
+let deferredRegCallbacks: Interfaces.DeferredRegisterationCallbackData[] = [];
 
 /**
  * 초기화
  */
 function initialize(_engine: Engine3D) {
     engine = _engine;
+
+    // 지연 이벤트 등록 처리
+    deferredRegCallbacks.forEach(item => {
+        engine.EventHandler.addEventListener(item.type as never, item.callback as never);
+    });
 
     // 텍스트 텍스쳐 생성을 위한 pixi.js 인스턴스
     pixiApp = new PIXI.Application();
@@ -29,6 +33,7 @@ function initialize(_engine: Engine3D) {
  * 메모리 해제
  */
 function dispose() {
+    deferredRegCallbacks = [];
     pixiApp.destroy(true, true);
     pixiApp = null;
     engine = null;
@@ -132,6 +137,12 @@ function createTextMaterial(text: string, outSize: THREE.Vector2, useBillboard: 
  * @param url - 모델파일 주소
  */
 async function getMergedGeometry(url: string) {
+    if (!isValidUrl(url)) {
+        return {
+            geometry: null,
+            material: null,
+        };
+    }
 
     // 인스턴스 메시 생성용 리소스, geometry의 경우 누적하는 형태로 처리
     let mergedGeometry: THREE.BufferGeometry | undefined = undefined;
@@ -365,6 +376,29 @@ function getClosestPointOnCurvePath(curvePath: THREE.CurvePath<THREE.Vector3>, p
 }
 
 /**
+ * 엔진 인스턴스 초기화전 콜백 처리 함수 추가
+ */
+function addDeferredEventCallback(type: string, callback: Function) {
+    deferredRegCallbacks.push({ type, callback });
+}
+
+/**
+ * url이 유효한지 검증
+ */
+function isValidUrl(url: string): boolean {
+    try {
+        new URL(url); // 생성 성공 시 유효
+        return true;
+    } catch {
+
+        if (url !== undefined && url !== null && url !== 'undefined' && url !== '')
+            return true;
+
+        return false;
+    }
+}
+
+/**
  * 색상이나 이미지로 배경 설정
  * @param backgroundData - 배경색상 숫자일경우 0xff0000의 형식으로 판단하고, 문자열일 경우 이미지 주소로 판단하여 배경을 설정한다.
  */
@@ -388,6 +422,8 @@ export {
     getPoiFromRaycast,
     toScreenPos,
     getClosestPointOnCurvePath,
+    addDeferredEventCallback,
+    isValidUrl,
 
     // 외부노출
     SetBackground,

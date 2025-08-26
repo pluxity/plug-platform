@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import * as ModelInternal from '../model/model';
@@ -34,34 +33,72 @@ function initialize(_engine: Engine3D) {
     // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
     // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
     // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
+
+    // 이벤트
+    engine.EventHandler.addEventListener('onBeforeRender' as never, onBeforeRender);
+    engine.EventHandler.addEventListener('onPoiSceneGroupCreated' as never, onPoiSceneGroupCreated);
+    engine.EventHandler.addEventListener('onPoiPlaced' as never, onPoiPlaced);
+    engine.EventHandler.addEventListener('onModelBeforeMove' as never, onModelBeforeMove);
+    engine.EventHandler.addEventListener('onModelAfterMove' as never, onModelAfterMove);
+    engine.EventHandler.addEventListener('onModelShow' as never, onModelShow);
+    engine.EventHandler.addEventListener('onModelHide' as never, onModelHide);
+    engine.EventHandler.addEventListener('onModelShowAll' as never, onModelShowAll);
+    engine.EventHandler.addEventListener('onModelHideAll' as never, onModelHideAll);
 }
 
 /**
  * 메모리 해제
  */
 function dispose() {
+    engine.EventHandler.removeEventListener('onBeforeRender' as never, onBeforeRender);
+    engine.EventHandler.removeEventListener('onPoiSceneGroupCreated' as never, onPoiSceneGroupCreated);
+    engine.EventHandler.removeEventListener('onPoiPlaced' as never, onPoiPlaced);
+    engine.EventHandler.removeEventListener('onModelBeforeMove' as never, onModelBeforeMove);
+    engine.EventHandler.removeEventListener('onModelAfterMove' as never, onModelAfterMove);
+    engine.EventHandler.removeEventListener('onModelShow' as never, onModelShow);
+    engine.EventHandler.removeEventListener('onModelHide' as never, onModelHide);
+    engine.EventHandler.removeEventListener('onModelShowAll' as never, onModelShowAll);
+    engine.EventHandler.removeEventListener('onModelHideAll' as never, onModelHideAll);
+
     Clear();
-    poiDataList = null;
+
+    // 메시 객체들 제거
+    Object.values(pointMeshStorage).forEach(mesh => {
+        mesh.geometry.dispose();
+        if (Array.isArray(mesh.material)) {
+            mesh.material.forEach(material => {
+                (material as any).map?.dispose();
+                material.dispose();
+            });
+        } else {
+            (mesh.material as any).map?.dispose();
+            mesh.material.dispose();
+        }
+        pointMeshGroup.remove(mesh);
+    });
+    pointMeshStorage = {};
+
+    poiDataList = {};
     poiLine = null;
     poiIconGroup = null;
     poiTextGroup = null;
     poiLineGroup = null;
     pointMeshGroup = null;
-    pointMeshStorage = null;
-    iconStorage = null;
+    pointMeshStorage = {};
+    iconStorage = {};
     sharedTextGeometry = null;
-    poiDummies = null;
-    bNeedsUpdate = null;
+    poiDummies = [];
+    bNeedsUpdate = false;
     engine = null;
 }
 
 /**
  * Engine3D 렌더링 전 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onBeforeRender' as never, async (evt: any) => {
+async function onBeforeRender(evt: any) {
     const deltaTime = evt.deltaTime as number;
     // 애니메이션 믹서 업데이트
-    const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined);
+    const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined && poi.Mixer !== null);
     animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
 
     // 업데이트가 필요한경우
@@ -70,32 +107,32 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, async (evt: an
         await updatePoiMesh();
         updatePoiLine();
     }
-});
+}
 
 /**
  * Poi 씬그룹 초기화 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onPoiSceneGroupCreated' as never, (evt: any) => {
+function onPoiSceneGroupCreated(evt: any) {
     poiIconGroup = evt.iconGroup as THREE.Group;
     poiTextGroup = evt.textGroup as THREE.Group;
     poiLineGroup = evt.lineGroup as THREE.Group;
     pointMeshGroup = evt.pointMeshGroup as THREE.Group;
-});
+}
 
 /**
  * poi 생성 이벤트
  */
-Event.InternalHandler.addEventListener('onPoiPlaced' as never, (evt: any) => {
+function onPoiPlaced(evt: any) {
     const data: PoiElement = evt.target as PoiElement;
     poiDataList[data.id] = data;
 
     bNeedsUpdate = true;
-});
+}
 
 /**
  * 층 이동 전 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelBeforeMove' as never, (evt: any) => {
+function onModelBeforeMove(evt: any) {
     const floorObjects: Record<string, THREE.Object3D> = evt.floorObjects;
 
     // 가시화 요소 숨기기
@@ -128,12 +165,12 @@ Event.InternalHandler.addEventListener('onModelBeforeMove' as never, (evt: any) 
             poiDummies.push(dummy);
         }
     });
-});
+}
 
 /**
  * 층 이동 후 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) => {
+function onModelAfterMove(evt: any) {
     const floorObjects: Record<string, THREE.Object3D> = evt.floorObjects;
 
     // 이동된 더미객체의 위치값을 poi에 적용시킨다.
@@ -164,12 +201,12 @@ Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) =
 
     pointMeshGroup.visible = true;
     pointMeshGroup.layers.set(Interfaces.CustomLayer.Default);
-});
+}
 
 /**
  * 특정층 가시화 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
+function onModelShow(evt: any) {
     const floorId: string = evt.floorId;
     Object.values(poiDataList).forEach(poi => {
         if (poi.FloorId === floorId) {
@@ -178,12 +215,12 @@ Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
     });
 
     bNeedsUpdate = true;
-});
+}
 
 /**
  * 특정층 숨기기 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
+function onModelHide(evt: any) {
     const floorId: string = evt.floorId;
     Object.values(poiDataList).forEach(poi => {
         if (poi.FloorId === floorId) {
@@ -192,27 +229,27 @@ Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
     });
 
     bNeedsUpdate = true;
-});
+}
 
 /**
  * 모든층 가시화 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => {
+function onModelShowAll(evt: any) {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = true);
 
     bNeedsUpdate = true;
-});
+}
 
 /**
  * 모든층 숨기기 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
+function onModelHideAll(evt: any) {
 
     Object.values(poiDataList).forEach(poi => poi.Visible = false);
 
     bNeedsUpdate = true;
-});
+}
 
 /**
  * id에 해당하는 poi가 생성되어 있는지 체크
@@ -236,6 +273,9 @@ function getPoiElement(id: string): PoiElement {
  * @param url - 아이콘 url 주소
  */
 function getIcon(url: string): THREE.SpriteMaterial {
+
+    if (!Util.isValidUrl(url))
+        return null;
 
     if (iconStorage.hasOwnProperty(url) === false) {
         iconStorage[url] = new THREE.SpriteMaterial({
@@ -267,10 +307,11 @@ function createTextMesh(displayText: string): THREE.Mesh {
 function updatePoiLine() {
 
     // 이전에 생성된 라인 제거
-    if (poiLine !== undefined) {
+    if (poiLine) {
         poiLineGroup.remove(poiLine);
         poiLine.geometry.dispose();
         (poiLine.material as THREE.Material).dispose();
+        poiLine = null;
     }
 
     // 라인 버텍스 수집
@@ -278,7 +319,7 @@ function updatePoiLine() {
     Object.values(poiDataList).forEach(element => {
         if (element.Visible && element.LineVisible) {
 
-            if (element.PointMeshData.animMeshRef !== undefined) {
+            if (element.PointMeshData.animMeshRef) {
 
                 // 애니메이션 메시가 있는 경우
                 const center = new THREE.Vector3();
@@ -363,7 +404,7 @@ async function updatePoiMesh() {
             // 애니메이션 객체는 인스턴싱 처리를 하지않고 개별 생성
             currPoiArray.forEach(poi => {
                 // 위치점 메시 데이터에서 애니메이션 메시가 유효하지 않은 경우만 메시 초기화 및 애니메이션 클립 처리 수행
-                if (poi.PointMeshData.animMeshRef === undefined) {
+                if (!poi.PointMeshData.animMeshRef) {
                     const clonedScene = gltfData.scene.clone();
                     pointMeshGroup.add(clonedScene); // 씬에 추가
                     poi.PointMeshData.animMeshRef = clonedScene; // poi에 복제된 씬 설정
@@ -390,7 +431,7 @@ async function updatePoiMesh() {
 
         } else {
 
-            let mergedGeometry: THREE.BufferGeometry | undefined = undefined;
+            let mergedGeometry: THREE.BufferGeometry = null;
             let mergedMaterial: THREE.Material[] = [];
             if (url === undefined || url === '' || url === 'undefined') {
                 // 모델url이 undefined이거나 빈문자열일 경우는 구체사용

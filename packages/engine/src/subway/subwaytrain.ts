@@ -17,11 +17,11 @@ class SubwayTrain extends THREE.Group {
     private curvePath: THREE.CurvePath<THREE.Vector3>;
 
     private currentUValue: number;
-    private entranceUValue: number | undefined;
-    private stopUValue: number | undefined;
-    private exitUValue: number | undefined;
+    private entranceUValue: number;
+    private stopUValue: number;
+    private exitUValue: number;
 
-    private moveTween: TWEEN.Tween | undefined;
+    private moveTween: TWEEN.Tween;
 
     /**
      * 생성자

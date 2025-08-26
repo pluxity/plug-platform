@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import * as ModelInternal from '../model/model';
@@ -14,25 +13,29 @@ let labels: Record<string, Label3DElement> = {};
  */
 function initialize(_engine: Engine3D) {
     engine = _engine;
+
+    engine.EventHandler.addEventListener('onLabel3DCreated' as never, onLabel3DCreated);
 }
 
 /**
  * 메모리 해제
  */
 function dispose() {
+    engine.EventHandler.removeEventListener('onLabel3DCreated' as never, onLabel3DCreated);
+
     Clear();
 
-    labels = null;
+    labels = {};
     engine = null;
 }
 
 /**
  * 라벨 생성 완료 콜백
  */
-Event.InternalHandler.addEventListener('onLabel3DCreated' as never, (evt: any) => {
+function onLabel3DCreated(evt: any) {
     const label: Label3DElement = evt.target;
     labels[label.name] = label;
-});
+}
 
 /**
  * 레이캐스트 대상 얻기

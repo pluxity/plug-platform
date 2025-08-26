@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import { Engine3D } from '../engine';
 
 let engine: Engine3D;
@@ -37,7 +36,7 @@ function dispose() {
     // outlinePass.dispose(); // 각 pass의 dispose는 Engine3D.dispose()에서 처리되므로 별도로 호출하지 않는다.
     outlinePass = null;
 
-    outlineTargets = null;
+    outlineTargets = [];
     engine = null;
 }
 

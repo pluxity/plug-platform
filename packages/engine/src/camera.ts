@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from './eventDispatcher';
 import * as Interfaces from './interfaces';
 import * as TWEEN from '@tweenjs/tween.js';
 import * as PoiDataInternal from './poi/data';
@@ -10,12 +9,12 @@ let engine: Engine3D;
 let cursor: THREE.Object3D;
 let rayCast: THREE.Raycaster;
 let enabled: boolean = false;
-let pickPoint: THREE.Vector3 | undefined = new THREE.Vector3();
+let pickPoint: THREE.Vector3 = new THREE.Vector3();
 let rotateSmoothingFactor: number = 0.6;
 let panSmoothingFactor: number = 0.7;
 let zoomIntervalFactor: number = 1.0;
-let posTween: TWEEN.Tween | undefined = undefined;
-let rotTween: TWEEN.Tween | undefined = undefined;
+let posTween: TWEEN.Tween;
+let rotTween: TWEEN.Tween;
 let rotateBtnId: number = Interfaces.MouseButton.Left;
 let panBtnId: number = Interfaces.MouseButton.Right;
 let dragZoomBtnId: number = Interfaces.MouseButton.Middle;
@@ -52,12 +51,16 @@ function initialize(_engine: Engine3D) {
 
     // 이벤트 등록
     SetEnabled(true);
+
+    engine.EventHandler.addEventListener('onBeforeRender' as never, onBeforeRender);
 }
 
 /**
  * 메모리 해제
  */
 function dispose() {
+    engine.EventHandler.removeEventListener('onBeforeRender' as never, onBeforeRender);
+
     SetEnabled(false);
 
     if (posTween) {
@@ -75,24 +78,24 @@ function dispose() {
     engine = null;
     cursor = null;
     rayCast = null;
-    enabled = null;
     pickPoint = null;
-    rotateSmoothingFactor = null;
-    panSmoothingFactor = null;
-    zoomIntervalFactor = null;
+    rotateSmoothingFactor = 0.6;
+    panSmoothingFactor = 0.7;
+    zoomIntervalFactor = 1.0;
     posTween = null;
     rotTween = null;
-    rotateBtnId = null;
-    panBtnId = null;
-    dragZoomBtnId = null;
-    screenPanKey = null;
+    rotateBtnId = Interfaces.MouseButton.Left;
+    panBtnId = Interfaces.MouseButton.Right;
+    dragZoomBtnId = Interfaces.MouseButton.Middle;
+    screenPanKey = Interfaces.ModifyKey.Shift;
     engine = null;
 }
 
 /**
  * 렌더링 전 이벤트 콜백
  */
-Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => {
+function onBeforeRender(evt: any) {
+
     const deltaTime = evt.deltaTime;
 
     // 현재 카메라 방향 얻기
@@ -139,7 +142,7 @@ Event.InternalHandler.addEventListener('onBeforeRender' as never, (evt: any) => 
     const mat_translate = new THREE.Matrix4().makeTranslation(panDelta.x, panDelta.y, panDelta.z);
     engine.Camera.position.applyMatrix4(mat_translate);
     panDelta.multiplyScalar(panSmoothingFactor);
-});
+}
 
 /**
  * 카메라 컨트롤러 활성화 상태 지정

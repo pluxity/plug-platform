@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Effect from '../effect';
 import * as PathData from '../path3d/data';
@@ -17,7 +16,6 @@ let tailModelSrc: THREE.Group;
 let workingTrain: SubwayTrain | undefined;
 let subwayTrainRenderGroup: THREE.Group;
 let trainOffsetUpdateLoopHandle: number;
-const clock: THREE.Clock = new THREE.Clock();
 const trainOffsetControlKeyMap: Record<string, boolean> = {};
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
@@ -32,16 +30,26 @@ function initialize(_engine: Engine3D) {
     subwayTrainRenderGroup.name = '#SubwayTrain';
     engine.RootScene.add(subwayTrainRenderGroup);
 
-    Event.InternalHandler.dispatchEvent({
+    // 이벤트 통지
+    engine.EventHandler.dispatchEvent({
         type: 'onSubwayTrainRenderGroupCreated',
         target: subwayTrainRenderGroup
     });
+
+    // 이벤트
+    engine.EventHandler.addEventListener('onSubwayModelLoader_HeadModelLoaded' as never, onSubwayModelLoader_HeadModelLoaded);
+    engine.EventHandler.addEventListener('onSubwayModelLoader_BodyModelLoaded' as never, onSubwayModelLoader_BodyModelLoaded);
+    engine.EventHandler.addEventListener('onSubwayModelLoader_TailModelLoaded' as never, onSubwayModelLoader_TailModelLoaded);
 }
 
 /**
  * 메모리 해제
  */
 function dispose() {
+    engine.EventHandler.removeEventListener('onSubwayModelLoader_HeadModelLoaded' as never, onSubwayModelLoader_HeadModelLoaded);
+    engine.EventHandler.removeEventListener('onSubwayModelLoader_BodyModelLoaded' as never, onSubwayModelLoader_BodyModelLoaded);
+    engine.EventHandler.removeEventListener('onSubwayModelLoader_TailModelLoaded' as never, onSubwayModelLoader_TailModelLoaded);
+
     Cancel();
 
     createOption = null;
@@ -58,23 +66,23 @@ function dispose() {
 /**
  * 머리 모델 로드 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onSubwayModelLoader_HeadModelLoaded' as never, (evt: any) => {
+function onSubwayModelLoader_HeadModelLoaded(evt: any) {
     headModelSrc = evt.target;
-});
+}
 
 /**
  * 몸체 모델 로드 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onSubwayModelLoader_BodyModelLoaded' as never, (evt: any) => {
+function onSubwayModelLoader_BodyModelLoaded(evt: any) {
     bodyModelSrc = evt.target;
-});
+}
 
 /**
  * 꼬리 모델 로드 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onSubwayModelLoader_TailModelLoaded' as never, (evt: any) => {
+function onSubwayModelLoader_TailModelLoaded(evt: any) {
     tailModelSrc = evt.target;
-});
+}
 
 /**
  * 대상 객체의 부모 객체를 탐색하여 경로 객체를 찾아 반환
@@ -93,68 +101,27 @@ function findPath3DObject(target: THREE.Object3D): Path3DObject | undefined {
     return result;
 }
 
+/**
+ * 포인터 이벤트 등록
+ */
 function registerPointerEvents() {
     engine.Dom.addEventListener('pointerdown', onPointerDown);
     engine.Dom.addEventListener('pointermove', onPointerMove);
     engine.Dom.addEventListener('pointerup', onPointerUp);
 }
 
+/**
+ * 포인터 이벤트 등록 해제
+ */
 function unregisterPointerEvents() {
     engine.Dom.removeEventListener('pointerdown', onPointerDown);
     engine.Dom.removeEventListener('pointermove', onPointerMove);
     engine.Dom.removeEventListener('pointerup', onPointerUp);
 }
 
-// let tt = 0;
-// function trainOffsetUpdateLoop() {
-//     trainOffsetUpdateLoopHandle = requestAnimationFrame(trainOffsetUpdateLoop);
-
-//     const delta = clock.getDelta();
-
-//     // const ratios = workingTrain.TrainBodyLengthRatios;
-//     // if (trainOffsetControlKeyMap['q']) {
-//     //     ratios[0] += 0.05 * delta;
-//     //     ratios[ratios.length - 2] += 0.05 * delta;
-//     //     ratios[ratios.length - 1] += 0.05 * delta;
-//     //     workingTrain.TrainBodyLengthRatios = ratios;
-//     //     workingTrain.updateTrainLocations(tt);
-//     // } else if (trainOffsetControlKeyMap['a']) {
-//     //     ratios[0] -= 0.05 * delta;
-//     //     ratios[ratios.length - 2] -= 0.05 * delta;
-//     //     ratios[ratios.length - 1] -= 0.05 * delta;
-//     //     workingTrain.TrainBodyLengthRatios = ratios;
-//     //     workingTrain.updateTrainLocations(tt);
-//     // } else if (trainOffsetControlKeyMap['w']) {
-//     //     for (let i = 1; i < ratios.length - 2; i++) {
-//     //         ratios[i] += 0.05 * delta;
-//     //     }
-//     //     workingTrain.TrainBodyLengthRatios = ratios;
-//     //     workingTrain.updateTrainLocations(tt);
-//     // } else if (trainOffsetControlKeyMap['s']) {
-//     //     for (let i = 1; i < ratios.length - 2; i++) {
-//     //         ratios[i] -= 0.05 * delta;
-//     //     }
-//     //     workingTrain.TrainBodyLengthRatios = ratios;
-//     //     workingTrain.updateTrainLocations(tt);
-//     // }
-
-//     if (trainOffsetControlKeyMap['1']) {
-//         tt += 0.05 * delta;
-//         workingTrain.updateTrainLocation(tt);
-//     } else if (trainOffsetControlKeyMap['2']) {
-//         tt -= 0.05 * delta;
-//         workingTrain.updateTrainLocation(tt);
-//     }
-// }
-
-function onKeyDown(evt: KeyboardEvent) {
-    trainOffsetControlKeyMap[evt.key] = true;
-}
-
-function onKeyUp(evt: KeyboardEvent) {
-    trainOffsetControlKeyMap[evt.key] = false;
-}
-
+/**
+ * 포인터 다운 이벤트 처리
+ */
 function onPointerDown(evt: PointerEvent) {
 
     if (evt.button === 0) {
@@ -163,6 +130,9 @@ function onPointerDown(evt: PointerEvent) {
     }
 }
 
+/**
+ * 포인터 이동 이벤트 처리
+ */
 function onPointerMove(evt: PointerEvent) {
 
     const mousePos = new THREE.Vector2(
@@ -203,6 +173,9 @@ function onPointerMove(evt: PointerEvent) {
     }
 }
 
+/**
+ * 포인터 버튼업 이벤트 처리
+ */
 function onPointerUp(evt: PointerEvent) {
 
     if (evt.button === 0) {
@@ -275,30 +248,9 @@ function Create(option: Interfaces.SubwayCreateOption, onCreate?: Function) {
     registerPointerEvents();
 }
 
-// /**
-//  * 지하철 차량간 간격 조절 기능 on
-//  */
-// function EnableTrainOffsetControl() {
-
-//     if (!workingTrain) {
-//         console.error('작업중인 지하철 없음');
-//         return;
-//     }
-
-//     document.body.addEventListener('keydown', onKeyDown);
-//     document.body.addEventListener('keyup', onKeyUp);
-//     trainOffsetUpdateLoop();
-// }
-
-// /**
-//  * 지하철 차량간 간격 조절 기능 off
-//  */
-// function DisableTrainOffsetControl() {
-//     document.body.removeEventListener('keydown', onKeyDown);
-//     document.body.removeEventListener('keyup', onKeyUp);
-//     cancelAnimationFrame(trainOffsetUpdateLoopHandle);
-// }
-
+/**
+ * 작업 취소
+ */
 function Cancel() {
 
     Effect.Outline.clearOutlineObjects();
@@ -316,6 +268,9 @@ function Cancel() {
     unregisterPointerEvents();
 }
 
+/**
+ * 열차 진입 지점 설정
+ */
 function EnableSetEntranceLocation() {
 
     if (!workingTrain) {
@@ -328,6 +283,9 @@ function EnableSetEntranceLocation() {
     mouseState = Interfaces.SubwayCreateMouseState.SetEntranceLocation;
 }
 
+/**
+ * 열차 정차 지점 설정
+ */
 function EnableSetStopLocation() {
 
     if (!workingTrain) {
@@ -341,6 +299,9 @@ function EnableSetStopLocation() {
 
 }
 
+/**
+ * 열차 출차 위치 설정
+ */
 function EnableSetExitLocation() {
 
     if (!workingTrain) {
@@ -354,7 +315,10 @@ function EnableSetExitLocation() {
 
 }
 
-function Finish(): Interfaces.SubwayImportOption | undefined {
+/**
+ * 작업 완료
+ */
+function Finish(): Interfaces.SubwayImportOption {
     if (!workingTrain) {
         console.error('작업중인 지하철 없음');
         return;
@@ -366,16 +330,16 @@ function Finish(): Interfaces.SubwayImportOption | undefined {
 
     // 내부 통지
     const exportData = workingTrain?.ExportData;
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onSubwayTrainCreateFinished',
         target: workingTrain
     });
-    workingTrain = undefined;
+    workingTrain = null;
 
     // DisableTrainOffsetControl();
     unregisterPointerEvents();
 
-    return exportData!;
+    return exportData;
 }
 
 export {

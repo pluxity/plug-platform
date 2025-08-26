@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import * as Effect from '../effect';
@@ -28,6 +27,12 @@ function initialize(_engine: Engine3D) {
     engine.RootScene.add(objSelGroup);
 
     // 이벤트 등록
+    engine.EventHandler.addEventListener('onPoiCreate' as never, clearHoverObjects);
+    engine.EventHandler.addEventListener('onPoiStartEdit' as never, clearHoverObjects);
+    engine.EventHandler.addEventListener('onLabel3DCreateStarted' as never, clearHoverObjects);
+    engine.EventHandler.addEventListener('onLabel3DEditStarted' as never, clearHoverObjects);
+
+    // 마우스 이벤트 등록
     engine.Dom.addEventListener('pointerdown', onPointerDown);
     engine.Dom.addEventListener('pointermove', onPointerMove);
     engine.Dom.addEventListener('pointerup', onPointerUp);
@@ -41,39 +46,16 @@ function dispose() {
     engine.Dom.removeEventListener('pointermove', onPointerMove);
     engine.Dom.removeEventListener('pointerup', onPointerUp);
     
+    engine.EventHandler.removeEventListener('onPoiCreate' as never, clearHoverObjects);
+    engine.EventHandler.removeEventListener('onPoiStartEdit' as never, clearHoverObjects);
+    engine.EventHandler.removeEventListener('onLabel3DCreateStarted' as never, clearHoverObjects);
+    engine.EventHandler.removeEventListener('onLabel3DEditStarted' as never, clearHoverObjects);
+
     clearHoverObjects();
-    hoverObjects = null;
+    hoverObjects = [];
     objSelGroup = null;
     engine = null;
 }
-
-/**
- * Poi 생성 이벤트 처리
- */
-Event.InternalHandler.addEventListener('onPoiCreate' as never, () => {
-    clearHoverObjects();
-});
-
-/**
- * Poi 편집 시작 이벤트 처리
- */
-Event.InternalHandler.addEventListener('onPoiStartEdit' as never, () => {
-    clearHoverObjects();
-});
-
-/**
- * 라벨 생성 시작 이벤트 처리
- */
-Event.InternalHandler.addEventListener('onLabel3DCreateStarted' as never, () => {
-    clearHoverObjects();
-});
-
-/**
- * 라벨 편집 시작 이벤트 처리
- */
-Event.InternalHandler.addEventListener('onLabel3DEditStarted' as never, () => {
-    clearHoverObjects();
-});
 
 /**
  * 호버링 객체 해제
@@ -234,7 +216,7 @@ function onPointerUp(evt: PointerEvent) {
                 if (pickObjects[0].poi) {
                     const poi = pickObjects[0].poi;
                     // 이벤트 통지
-                    Event.ExternalHandler.dispatchEvent({
+                    engine.EventHandler.dispatchEvent({
                         type: 'onPoiPointerUp',
                         target: poi.ExportData,
                         pointerEvent: evt,
@@ -244,7 +226,7 @@ function onPointerUp(evt: PointerEvent) {
                     const label = pickObjects[0].label;
 
                     // 이벤트 통지
-                    Event.ExternalHandler.dispatchEvent({
+                    engine.EventHandler.dispatchEvent({
                         type: 'onLabel3DPointerUp',
                         target: label.ExportData,
                         pointerEvent: evt,

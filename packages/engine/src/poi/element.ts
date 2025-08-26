@@ -28,7 +28,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
     private lineVisibleState: boolean = true;
     private textVisibleState: boolean = true;
 
-    private mixer: THREE.AnimationMixer | undefined;
+    private mixer: THREE.AnimationMixer;
     private actions: Record<string, THREE.AnimationAction>;
 
     /**
@@ -55,7 +55,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         };
 
         this.visibleState = true;
-        this.mixer = undefined;
+        this.mixer = null;
         this.actions = {};
     }
 
@@ -299,19 +299,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
                 }
             }
         });
-        this.pointMeshData.animMeshRef = undefined;
+        this.pointMeshData.animMeshRef = null;
 
         // 아이콘 제거
         this.iconObj?.parent?.remove(this.iconObj);
 
         // 텍스트 제거
         this.disposeTextObject();
-
-        // 내부 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
-            type: 'onPoiElementDisposed',
-            id: this.id,
-        });
     }
 
     /**

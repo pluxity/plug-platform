@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
+import * as Util from '../util';
 import { Engine3D } from '../engine';
 
 let engine: Engine3D;
@@ -19,10 +19,39 @@ function initialize(_engine: Engine3D) {
  * 메모리 해제
  */
 function dispose() {
+
+    disposeSourceModel(headModelSrc);
+    disposeSourceModel(bodyModelSrc);
+    disposeSourceModel(tailModelSrc);
+
     headModelSrc = null;
     bodyModelSrc = null;
     tailModelSrc = null;
     engine = null;
+}
+
+/**
+ * 원본객체 메모리 해제
+ */
+function disposeSourceModel(target: THREE.Object3D) {
+
+    if (target === undefined || target === null)
+        return;
+
+    target.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+            child.geometry.dispose();
+            if (Array.isArray(child.material)) {
+                child.material.forEach(materialItem => {
+                    materialItem.map?.dispose();
+                    materialItem.dispose();
+                });
+            } else {
+                child.material.map?.dispose();
+                child.material.dispose();
+            }
+        }
+    });
 }
 
 /**
@@ -31,12 +60,16 @@ function dispose() {
  * @param onLoad - 로드 완료 후 호출 콜백
  */
 function LoadTrainHead(url: string, onLoad: Function) {
+
+    if (!Util.isValidUrl(url))
+        return;
+
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         headModelSrc = gltf.scene;
 
         // 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onSubwayModelLoader_HeadModelLoaded',
             target: headModelSrc
         });
@@ -52,12 +85,16 @@ function LoadTrainHead(url: string, onLoad: Function) {
  * @param onLoad - 로드 완료 후 호출 콜백
  */
 function LoadTrainBody(url: string, onLoad: Function) {
+
+    if (!Util.isValidUrl(url))
+        return;
+
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         bodyModelSrc = gltf.scene;
 
         // 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onSubwayModelLoader_BodyModelLoaded',
             target: bodyModelSrc
         });
@@ -73,12 +110,16 @@ function LoadTrainBody(url: string, onLoad: Function) {
  * @param onLoad - 로드 완료 후 호출 콜백
  */
 function LoadTrainTail(url: string, onLoad: Function) {
+
+    if (!Util.isValidUrl(url))
+        return;
+
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         tailModelSrc = gltf.scene;
 
         // 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onSubwayModelLoader_TailModelLoaded',
             target: tailModelSrc
         });

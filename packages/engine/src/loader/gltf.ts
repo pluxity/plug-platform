@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import { Engine3D } from '../engine';
 import * as ModelInternal from '../model/model';
+import * as Util from '../util';
 
 let engine: Engine3D;
 
@@ -27,6 +27,10 @@ function dispose() {
  * @param onLoad - 로드 완료 후 호출될 콜백함수
  */
 function LoadGltf(url: string, onLoad: Function) {
+
+    if (!Util.isValidUrl(url))
+        return;
+
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         // 객체 그림자 설정
@@ -59,19 +63,19 @@ function LoadGltf(url: string, onLoad: Function) {
         ModelInternal.ModelGroup.add(gltf.scene);
 
         // 로드 완료 내부 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onGltfLoaded',
             target: gltf.scene,
         });
         // 그림자맵 업데이트 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onShadowMapNeedsUpdate',
             shadowMapTarget: ModelInternal.ModelGroup,
         });
 
         // 로드 완료 콜백 호출
         onLoad?.();
-    }, undefined, (error: unknown) => console.error(error));
+    }, null, (error: unknown) => console.error(error));
 }
 
 /**
@@ -81,10 +85,10 @@ function LoadGltf(url: string, onLoad: Function) {
  */
 async function getGltfWithAnimation(url: string) {
 
-    if (url === undefined || url === 'undefined') {
+    if (!Util.isValidUrl(url)) {
         return {
             animations: [],
-            scene: undefined,
+            scene: null,
         }
     };
 

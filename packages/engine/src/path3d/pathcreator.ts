@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as Camera from '../camera';
 import * as Interfaces from '../interfaces';
-import * as Event from '../eventDispatcher';
 import * as Util from '../util';
 import { Path3DObject } from './path3dobject';
 import { Path3DLineObject } from './path3dlineobject';
@@ -12,7 +11,7 @@ let engine: Engine3D;
 let workingPath: Path3DObject;
 let pathRenderGroup: THREE.Group;
 let bLeftBtnDown: boolean = false;
-let controlPoint: THREE.Vector3 | undefined;
+let controlPoint: THREE.Vector3;
 let mouseDownPickData: any;
 let cursor: THREE.Mesh;
 let previewLine: Path3DLineObject;
@@ -44,7 +43,7 @@ function initialize(_engine: Engine3D) {
     rayCast.layers.set(Interfaces.CustomLayer.Pickable);
 
     // pathcreator.ts 초기화 완료 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPathCreatorInitialized',
         pathRenderGroup: pathRenderGroup,
     });
@@ -58,12 +57,13 @@ function dispose() {
 
     workingPath = null;
     pathRenderGroup = null;
-    bLeftBtnDown = null;
+    bLeftBtnDown = false;
     controlPoint = null;
     mouseDownPickData = null;
     cursor = null;
+    previewLine?.dispose();
     previewLine = null;
-    isStraightLine = null;
+    isStraightLine = false;
 
     engine = null;
 }
@@ -115,7 +115,7 @@ function getPickPoint(mousePos: THREE.Vector2) {
         }
     }
 
-    return undefined;
+    return null;
 }
 
 /**
@@ -146,7 +146,7 @@ function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Ve
         };
     }
 
-    return undefined;
+    return null;
 }
 
 /**
@@ -159,7 +159,7 @@ function onPointerDown(evt: PointerEvent) {
         mouseDownPos.y = evt.offsetY;
 
         mouseDownPickData = getPickPoint(mouseDownPos);
-        controlPoint = undefined;
+        controlPoint = null;
 
         bLeftBtnDown = true;
     }
@@ -328,7 +328,7 @@ function Finish(): Interfaces.Path3DData {
     Camera.SetRotateButton(Interfaces.MouseButton.Left);
 
     // 작업 완료 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPathCreatorFinished',
         target: workingPath
     });

@@ -13,9 +13,9 @@ export { Clear, DoEnter, DoExit, Export, Hide, HideAll, Import, Show, ShowAll } 
  * 초기화
  */
 function initialize(engine: Engine3D) {
-    createInitialize(engine);
-    subwayModelLoaderInitialize(engine);
     dataInitialize(engine);
+    subwayModelLoaderInitialize(engine);
+    createInitialize(engine);
 }
 
 /**

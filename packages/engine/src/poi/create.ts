@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
-import * as Event from '../eventDispatcher';
 import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
@@ -46,7 +45,7 @@ function initialize(_engine: Engine3D) {
     poiRootGroup.add(pointMeshGroup);
 
     // poi 관련 씬그룹 생성 이벤트 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPoiSceneGroupCreated',
         poiRootGroup: poiRootGroup,
         iconGroup: iconGroup,
@@ -65,6 +64,7 @@ function dispose() {
     lineGroup = null;
     textGroup = null;
     pointMeshGroup = null;
+    engine = null;
 }
 
 /**
@@ -98,7 +98,7 @@ function Create(option: Interfaces.PoiCreateOption, onComplete?: Function) {
     element.TextObject = textMesh;
 
     // poi 생성 이벤트 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPoiCreate',
         target: element,
         onCompleteCallback: onComplete,

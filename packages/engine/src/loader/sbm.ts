@@ -1,10 +1,8 @@
 import * as THREE from 'three';
-import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
-import * as Interfaces from '../interfaces';
 import { Engine3D } from '../engine';
 import { SbmBinaryReader } from './sbmBinaryReader';
 import * as ModelInternal from '../model/model';
+import * as Util from '../util';
 
 let engine: Engine3D;
 
@@ -51,6 +49,9 @@ function setEnvMap(target: THREE.Object3D) {
  */
 async function LoadSbm(url: string, onLoad: Function) {
 
+    if (!Util.isValidUrl(url))
+        return;
+
     const urlFull = url;
     const dirName = urlFull.substring(0, urlFull.lastIndexOf('/')) + '/';
     const fileName = urlFull.substring(urlFull.lastIndexOf('/') + 1);
@@ -92,12 +93,12 @@ async function LoadSbm(url: string, onLoad: Function) {
     }
 
     // 로드 완료 내부 이벤트 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onGltfLoaded',
         target: sbmRootGroup,
     });
     // 그림자맵 업데이트 이벤트 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onShadowMapNeedsUpdate',
         shadowMapTarget: ModelInternal.ModelGroup,
     });
@@ -109,6 +110,6 @@ async function LoadSbm(url: string, onLoad: Function) {
 export {
     initialize,
     dispose,
-    
+
     LoadSbm,
 }

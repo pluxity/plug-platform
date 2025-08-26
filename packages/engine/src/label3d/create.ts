@@ -1,14 +1,13 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import { Engine3D } from '../engine';
 import { Label3DElement } from './element';
 
 let engine: Engine3D;
-let workingLabel: Label3DElement | undefined;
-let onCompleteCallback: Function | undefined;
-let currentPicktarget: THREE.Object3D | undefined;
+let workingLabel: Label3DElement;
+let onCompleteCallback: Function;
+let currentPicktarget: THREE.Object3D;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 let enabled: boolean = false;
 
@@ -29,7 +28,7 @@ function dispose() {
     workingLabel = null;
     onCompleteCallback = null;
     currentPicktarget = null;
-    enabled = null;
+    enabled = false;
     engine = null;
 }
 
@@ -77,7 +76,7 @@ function onPointerMove(evt: PointerEvent) {
         rayCast.layers.set(Interfaces.CustomLayer.Pickable);
         rayCast.setFromCamera(mousePos, engine.Camera);
 
-        currentPicktarget = undefined;
+        currentPicktarget = null;
         const intersects = rayCast.intersectObjects(engine.RootScene.children, true);
         if (intersects.length > 0) {
             workingLabel.position.copy(intersects[0].point);
@@ -101,7 +100,7 @@ function onPointerUp(evt: PointerEvent) {
             floorObj.attach(workingLabel!);
 
             // 생성 이벤트 내부 통지
-            Event.InternalHandler.dispatchEvent({
+            engine.EventHandler.dispatchEvent({
                 type: 'onLabel3DCreated',
                 target: workingLabel
             });
@@ -135,7 +134,7 @@ function Create(option: Interfaces.Label3DCreateOption, onComplete?: Function) {
     registerPointerEvents();
 
     // 라벨생성 시작 이벤트 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onLabel3DCreateStarted',
     });
 
@@ -148,7 +147,7 @@ function Create(option: Interfaces.Label3DCreateOption, onComplete?: Function) {
 function Cancel() {
     if (workingLabel) {
         workingLabel.dispose();
-        workingLabel = undefined;
+        workingLabel = null;
     }
 
     unregisterPointerEvents();

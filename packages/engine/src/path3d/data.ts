@@ -1,94 +1,113 @@
 import * as THREE from 'three';
 import { Engine3D } from '../engine';
 import { Path3DObject } from './path3dobject';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as ModelInternal from '../model/model';
 
 let pathObjectList: Record<string, Path3DObject> = {};
 let pathRenderGroup: THREE.Group;
+let engine: Engine3D;
 
 /**
  * 초기화
  */
 function initialize(_engine: Engine3D) {
+    engine = _engine;
 
+    // 이벤트 등록
+    engine.EventHandler.addEventListener('onPathCreatorInitialized' as never, onPathCreatorInitialized);
+    engine.EventHandler.addEventListener('onPathCreatorFinished' as never, onPathCreatorFinished);
+    engine.EventHandler.addEventListener('onModelBeforeMove' as never, onModelBeforeMove);
+    engine.EventHandler.addEventListener('onModelAfterMove' as never, onModelAfterMove);
+    engine.EventHandler.addEventListener('onModelShow' as never, onModelShow);
+    engine.EventHandler.addEventListener('onModelHide' as never, onModelHide);
+    engine.EventHandler.addEventListener('onModelShowAll' as never, onModelShowAll);
+    engine.EventHandler.addEventListener('onModelHideAll' as never, onModelHideAll);
 }
 
 /**
  * 메모리 해제
  */
 function dispose() {
+    
+    engine.EventHandler.removeEventListener('onPathCreatorInitialized' as never, onPathCreatorInitialized);
+    engine.EventHandler.removeEventListener('onPathCreatorFinished' as never, onPathCreatorFinished);
+    engine.EventHandler.removeEventListener('onModelBeforeMove' as never, onModelBeforeMove);
+    engine.EventHandler.removeEventListener('onModelAfterMove' as never, onModelAfterMove);
+    engine.EventHandler.removeEventListener('onModelShow' as never, onModelShow);
+    engine.EventHandler.removeEventListener('onModelHide' as never, onModelHide);
+    engine.EventHandler.removeEventListener('onModelShowAll' as never, onModelShowAll);
+    engine.EventHandler.removeEventListener('onModelHideAll' as never, onModelHideAll);
+
     Clear();
-    pathObjectList = null;
+    pathObjectList = {};
     pathRenderGroup = null;
+    engine = null;
 }
 
 /**
  * pathcreator.ts 초기화 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onPathCreatorInitialized' as never, (evt: any) => {
+function onPathCreatorInitialized(evt: any) {
     pathRenderGroup = evt.pathRenderGroup;
-});
+}
 
 /**
  * 경로 그리기 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onPathCreatorFinished' as never, (evt: any) => {
+function onPathCreatorFinished(evt: any) {
     const createdPath: Path3DObject = evt.target;
     pathObjectList[createdPath.name] = createdPath;
-});
+}
 
 /**
  * 층 펼치기/접기 이동 전 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelBeforeMove' as never, (evt: any) => {
-
+function onModelBeforeMove(evt: any) {
     Object.values(pathObjectList).forEach(path => {
         path.visible = false;
     });
-});
+}
 
 /**
  * 층 펼치기/접기 이동 후 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelAfterMove' as never, (evt: any) => {
-
+function onModelAfterMove(evt: any) {
     Object.values(pathObjectList).forEach(path => {
         path.updateLine();
         path.visible = true;
     });
-});
+}
 
 /**
  * 특정 층 가시화 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelShow' as never, (evt: any) => {
+function onModelShow(evt: any) {
     const floorId: string = evt.floorId;
     Object.values(pathObjectList).forEach(path => path.showLine(floorId));
-});
+}
 
 /**
  * 특정 층 숨김 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelHide' as never, (evt: any) => {
+function onModelHide(evt: any) {
     const floorId: string = evt.floorId;
     Object.values(pathObjectList).forEach(path => path.hideLine(floorId));
-});
+}
 
 /**
  * 모든 층 가시화 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelShowAll' as never, (evt: any) => {
+function onModelShowAll(evt: any) {
     Object.values(pathObjectList).forEach(path => path.showAllLine());
-});
+}
 
 /**
  * 모든 층 숨김 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onModelHideAll' as never, (evt: any) => {
+function onModelHideAll(evt: any) {
     Object.values(pathObjectList).forEach(path => path.hideAllLine());
-});
+}
 
 /**
  * id에 해당하는 경로 객체가 생성되어 있는지 확인
@@ -115,9 +134,11 @@ function getPathObjects(): Path3DObject[] {
  * @param id - 경로 id값
  * @returns - 경로 객체
  */
-function getPathObject(id: string): Path3DObject | undefined {
+function getPathObject(id: string): Path3DObject {
     if (pathObjectList.hasOwnProperty(id))
         return pathObjectList[id];
+
+    return null;
 }
 
 /**
