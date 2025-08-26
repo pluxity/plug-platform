@@ -859,6 +859,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         Event.AddEventListener('onPoiTransformChange' as never, (evt: any) => {
             console.log('onPoiTransformChange', evt);
         });
+        // poi 편집 완료 이벤트 등록
+        Event.AddEventListener('onPoiFinishEdit' as never, (evt: any)=>{
+            console.log('onPoiFinishEdit', evt);
+        });
         // poi 객체 포인터업 이벤트 등록
         Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {
             console.log('onPoiPointerUp', evt);
