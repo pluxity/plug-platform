@@ -8,7 +8,7 @@ export interface FacilityInfoDialogProps {
   hole?: { x?: string; y?: string; w?: string; h?: string } | false
 }
 
-const FacilityInfoDialog: React.FC<FacilityInfoDialogProps> = ({ facility, onClose, onEnterIndoor, hole }) => {
+const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: FacilityInfoDialogProps) => {
   if (!facility) return null
 
   const badges = (
@@ -28,7 +28,7 @@ const FacilityInfoDialog: React.FC<FacilityInfoDialogProps> = ({ facility, onClo
 
   const headerActions = onEnterIndoor && (
     <button
-      onClick={() => facility && onEnterIndoor(facility)}
+      onClick={() => onEnterIndoor(facility)}
       className="mt-1 inline-flex items-center gap-1.5 px-[1rem] py-2 rounded-xl text-[0.75rem] font-semibold tracking-wide bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white shadow shadow-indigo-900/30 hover:shadow-pink-900/30 transition focus:outline-none focus:ring-2 focus:ring-pink-300/40"
     >
       <span>실내로 진입</span>
@@ -77,7 +77,7 @@ const FacilityInfoDialog: React.FC<FacilityInfoDialogProps> = ({ facility, onClo
       open={!!facility}
       title={facility.name || '시설 정보'}
       onClose={onClose}
-      hole={hole === undefined ? undefined : hole}
+      hole={hole}
       headerActions={headerActions}
       badges={badges}
       footer={footer}

@@ -30,7 +30,9 @@ const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className, onDevice
   const handleSelect = useCallback((device: DeviceResponse) => {
     setQuery('')
     formRef.current?.close()
-    Camera.MoveToPoi(String(device.featureId), 0.5, 1);
+    if (device.featureId) {
+      Camera.MoveToPoi(String(device.featureId), 0.5, 1)
+    }
     onDeviceSelect?.(device)
   }, [onDeviceSelect])
 

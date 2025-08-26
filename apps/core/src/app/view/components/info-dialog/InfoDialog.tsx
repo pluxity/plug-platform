@@ -6,25 +6,18 @@ export interface InfoDialogProps {
   open: boolean
   title: string
   onClose?: () => void
-  /** Optional masked hole (media area) top-left (x,y) and size (w,h) in css units (defaults for facility variant). */
   hole?: InfoDialogHoleConfig | false
-  /** Optional actions placed next to the title (e.g. 진입 button). */
   headerActions?: React.ReactNode
-  /** Badges / chips row under title. */
   badges?: React.ReactNode
-  /** Main scrollable content (below title area, above footer). */
   children?: React.ReactNode
-  /** Footer actions area (bottom right). */
   footer?: React.ReactNode
-  /** Override total dialog width (defaults to 2/3 screen for facility style). */
   className?: string
-  /** Left placeholder width (space reserved for media hole). Supply CSS width value. */
   leftPlaceholderWidth?: string
 }
 
 const defaultHole: Required<InfoDialogHoleConfig> = { x: '2rem', y: '2rem', w: '45rem', h: '35rem' }
 
-export const InfoDialog: React.FC<InfoDialogProps> = ({
+export const InfoDialog = ({
   open,
   title,
   onClose,
@@ -35,7 +28,7 @@ export const InfoDialog: React.FC<InfoDialogProps> = ({
   footer,
   className,
   leftPlaceholderWidth
-}) => {
+}: InfoDialogProps) => {
   if (!open) return null
 
   const appliedHole = hole && { ...defaultHole, ...hole }

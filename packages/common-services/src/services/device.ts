@@ -80,5 +80,5 @@ export const useUpdateDevice = useUpdateGsDevice;
 export const deleteDevice = deleteGsDevice;
 export const useAssignDeviceCategory = useAssignGsDeviceCategory;
 export const useRemoveDeviceCategory = useRemoveGsDeviceCategory;
-export const useDevicesSWR = useGsDevicesSWR;
+export const useDevicesSWR = useAllDevicesSWR;
 export const useDeviceDetailSWR = useGsDeviceDetail;

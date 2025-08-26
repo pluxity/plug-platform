@@ -12,7 +12,7 @@ export interface FacilityPOIsProps {
 const MODEL_COLOR = Cesium.Color.WHITE
 const SILHOUETTE_COLOR = Cesium.Color.YELLOW
 
-export const FacilityPOIs: React.FC<FacilityPOIsProps> = React.memo(({ onFacilitySelect, onViewerReady }) => {
+export const FacilityPOIs = React.memo(({ onFacilitySelect, onViewerReady }: FacilityPOIsProps) => {
   const { viewer } = useCesium()
   const facilities = useFacilityStore(s => s.facilities)
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
