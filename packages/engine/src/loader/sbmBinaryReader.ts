@@ -266,7 +266,7 @@ class SbmBinaryReader {
                 side: (usedMaterialInfo.facing === 0) ? THREE.FrontSide : THREE.DoubleSide,
                 map: (usedMaterialInfo.textureMapPath.length > 0) ? new THREE.TextureLoader().load(usedMaterialInfo.textureMapPath) : null,
             });
-            if (material.map !== undefined && material.map !== null) {
+            if (material.map) {
                 material.map.wrapS = THREE.RepeatWrapping;
                 material.map.wrapT = THREE.RepeatWrapping;
                 material.map.flipY = false;

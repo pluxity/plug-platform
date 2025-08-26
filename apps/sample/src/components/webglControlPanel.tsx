@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine/src';
+import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine';
+import * as EngineAll from '@plug/engine';
 
 // 컴포넌트 상태 타입 정의
 interface WebGLControlPanelState {
@@ -74,6 +75,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         //         Subway.DoExit('b83eacbc-feea-47f7-bed3-68f01f8cbdec', 5.0, () => console.log('비동기 이동 테스트'));
         //     }
         // });
+        console.log('engine All', EngineAll);
     }
 
     /**
@@ -375,7 +377,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              */
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
-                const iconUrl: string = 'SamplePoiIcon.png';
+                const iconUrl: string = '';//'SamplePoiIcon.png';
                 const displayText: string = id.substring(0, 8) + '테스트__-';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
@@ -692,8 +694,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              * Test
              */
             case 'Test': {
-                Model.HideAll();
-                Model.Show('0');
+                // Model.HideAll();
+                // Model.Show('0');
             } break;
         }
     }
@@ -856,6 +858,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         // poi 편집 이벤트 등록
         Event.AddEventListener('onPoiTransformChange' as never, (evt: any) => {
             console.log('onPoiTransformChange', evt);
+        });
+        // poi 편집 완료 이벤트 등록
+        Event.AddEventListener('onPoiFinishEdit' as never, (evt: any)=>{
+            console.log('onPoiFinishEdit', evt);
         });
         // poi 객체 포인터업 이벤트 등록
         Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {

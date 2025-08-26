@@ -1,9 +1,7 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
-import * as ModelInternal from '../model/model';
 import * as LabelDataInternal from './data';
 import * as Camera from '../camera';
 import { Engine3D } from '../engine';
@@ -19,11 +17,31 @@ let editMode: Addon.TransformControlsMode = 'translate';
 let enabled: boolean = false;
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    unregisterPointerEvents();
+
+    if (gizmo) {
+        const helper = gizmo.getHelper();
+        engine.RootScene.remove(helper);
+        gizmo.dispose();
+        gizmo = null;
+    }
+
+    editMode = 'translate';
+    
+    enabled = false;
+    target = null;
+    engine = null;
+}
 
 /**
  * 포인터 다운 이벤트 처리
@@ -70,7 +88,7 @@ function onPointerUp(evt: MouseEvent) {
                 });
                 gizmo.addEventListener('mouseUp', (event) => {
                     // 외부 이벤트 통지
-                    Event.ExternalHandler.dispatchEvent({
+                    engine.EventHandler.dispatchEvent({
                         type: 'onLabel3DTransformChange',
                         target: target.ExportData
                     });
@@ -116,7 +134,7 @@ function StartEdit(_editMode: string) {
     labelArray.forEach(label => Util.setObjectLayer(label, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable));
 
     // 라벨편집 시작 이벤트 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onLabel3DEditStarted',
     });
     enabled = true;
@@ -140,6 +158,9 @@ function FinishEdit() {
 }
 
 export {
+    initialize,
+    dispose,
+
     enabled as Enabled,
 
     StartEdit,

@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
 import * as ModelInternal from '../model/model';
@@ -11,16 +10,16 @@ let engine: Engine3D;
 let target: PoiElement;
 let previewLine: THREE.LineSegments;
 let previewPointMesh: THREE.Object3D;
-let completeCallback: Function | undefined = undefined;
-let currentPicktarget: THREE.Object3D | undefined;
+let completeCallback: Function;
+let currentPicktarget: THREE.Object3D;
 let bPlacerEnabled: boolean = false;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 이동시 미리보기용 라인 객체
     let geometry = new THREE.BufferGeometry().setFromPoints([
@@ -34,19 +33,43 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
 
     previewLine.visible = false;
     previewLine.layers.set(Interfaces.CustomLayer.Invisible);
-});
+
+    // 이벤트
+    engine.EventHandler.addEventListener('onPoiCreate' as never, onPoiCreate);
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    engine.EventHandler.removeEventListener('onPoiCreate' as never, onPoiCreate);
+
+    // 이벤트 등록 해제
+    unRegisterPointerEvents();
+
+    target?.dispose();
+    target = null;
+
+    previewLine = null;
+    previewPointMesh = null;
+    completeCallback = null;
+    currentPicktarget = null;
+    bPlacerEnabled = false;
+    engine = null;
+}
+
 
 /**
  * poi 데이터 추가 이벤트 콜백
  */
-Event.InternalHandler.addEventListener('onPoiCreate' as never, async (evt: any) => {
+async function onPoiCreate(evt: any) {
     target = evt.target as PoiElement;
     completeCallback = evt.onCompleteCallback;
 
     previewLine.scale.y = target.LineHeight;
 
     // 미리보기용 위치점 메시
-    if (target.modelUrl !== undefined) {
+    if (target.modelUrl) {
         const loader = new Addon.GLTFLoader();
         const gltf = await loader.loadAsync(target.modelUrl);
         previewPointMesh = gltf.scene;
@@ -61,7 +84,7 @@ Event.InternalHandler.addEventListener('onPoiCreate' as never, async (evt: any) 
     }
 
     registerPointerEvents();
-});
+}
 
 /**
  * 포인터 이벤트 등록
@@ -102,7 +125,7 @@ function onPointerDown(evt: PointerEvent) {
  */
 function onPointerMove(evt: PointerEvent) {
 
-    if (target !== undefined) {
+    if (target) {
         const mousePos = new THREE.Vector2(
             (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
             -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
@@ -112,7 +135,7 @@ function onPointerMove(evt: PointerEvent) {
         rayCast.layers.set(Interfaces.CustomLayer.Pickable);
         rayCast.setFromCamera(mousePos, engine.Camera);
 
-        currentPicktarget = undefined;
+        currentPicktarget = null;
         const intersects = rayCast.intersectObjects(engine.RootScene.children, true);
         if (intersects.length > 0) {
             // poi 위치
@@ -163,7 +186,7 @@ function onPointerUp(evt: PointerEvent) {
             target.FloorId = floorObj?.userData['floorId'];
 
             // poi 배치 이벤트 내부 통지
-            Event.InternalHandler.dispatchEvent({
+            engine.EventHandler.dispatchEvent({
                 type: 'onPoiPlaced',
                 target: target,
             });
@@ -189,10 +212,10 @@ function onPointerUp(evt: PointerEvent) {
  */
 function getFloorObject(): THREE.Object3D | undefined {
 
-    if (currentPicktarget !== undefined) {
-        let floorObj: THREE.Object3D | undefined = undefined;
+    if (currentPicktarget) {
+        let floorObj: THREE.Object3D = null;
         currentPicktarget.traverseAncestors(parent => {
-            if (floorObj === undefined && parent.userData.hasOwnProperty('type')) {
+            if (floorObj && parent.userData.hasOwnProperty('type')) {
                 const parentType: string = parent.userData['type'];
                 if (parentType.toLowerCase() === 'floor') {
                     floorObj = parent;
@@ -200,7 +223,7 @@ function getFloorObject(): THREE.Object3D | undefined {
             }
         });
 
-        if (floorObj !== undefined) {
+        if (floorObj) {
             return floorObj;
         }
     }
@@ -231,5 +254,8 @@ function releasePreviewPointMesh() {
 }
 
 export {
-    bPlacerEnabled as Enabled
+    bPlacerEnabled as Enabled,
+
+    initialize,
+    dispose,
 }

@@ -1,19 +1,25 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import { Engine3D } from '../engine';
 import * as ModelInternal from '../model/model';
+import * as Util from '../util';
 
 let engine: Engine3D;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    engine = null;
+}
 
 /**
  * Gltf모델 로드
@@ -21,6 +27,10 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
  * @param onLoad - 로드 완료 후 호출될 콜백함수
  */
 function LoadGltf(url: string, onLoad: Function) {
+
+    if (!Util.isValidUrl(url))
+        return;
+
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         // 객체 그림자 설정
@@ -53,19 +63,19 @@ function LoadGltf(url: string, onLoad: Function) {
         ModelInternal.ModelGroup.add(gltf.scene);
 
         // 로드 완료 내부 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onGltfLoaded',
             target: gltf.scene,
         });
         // 그림자맵 업데이트 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onShadowMapNeedsUpdate',
             shadowMapTarget: ModelInternal.ModelGroup,
         });
 
         // 로드 완료 콜백 호출
         onLoad?.();
-    }, undefined, (error: unknown) => console.error(error));
+    }, null, (error: unknown) => console.error(error));
 }
 
 /**
@@ -75,10 +85,10 @@ function LoadGltf(url: string, onLoad: Function) {
  */
 async function getGltfWithAnimation(url: string) {
 
-    if (url === undefined || url === 'undefined') {
+    if (!Util.isValidUrl(url)) {
         return {
             animations: [],
-            scene: undefined,
+            scene: null,
         }
     };
 
@@ -89,11 +99,11 @@ async function getGltfWithAnimation(url: string) {
 
         // 그림자, 재질 설정
         gltf.scene.traverse((child) => {
-            if( child instanceof THREE.Mesh ) {
+            if (child instanceof THREE.Mesh) {
                 child.receiveShadow = true;
                 child.castShadow = true;
 
-                if( Array.isArray(child.material) ) {
+                if (Array.isArray(child.material)) {
                     child.material.forEach(mat => {
                         mat.envMap = engine.GeneratedCubeRenderTarget.texture;
                         mat.envMapIntensity = 0.1;
@@ -120,6 +130,8 @@ async function getGltfWithAnimation(url: string) {
 }
 
 export {
+    initialize,
+    dispose,
     getGltfWithAnimation,
 
     LoadGltf,

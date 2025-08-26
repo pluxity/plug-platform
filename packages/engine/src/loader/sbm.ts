@@ -1,20 +1,24 @@
 import * as THREE from 'three';
-import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
-import * as Interfaces from '../interfaces';
 import { Engine3D } from '../engine';
 import { SbmBinaryReader } from './sbmBinaryReader';
 import * as ModelInternal from '../model/model';
+import * as Util from '../util';
 
 let engine: Engine3D;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    engine = null;
+}
 
 /**
  * 대상 객체의 재질에 환경맵을 적용한다.
@@ -44,6 +48,9 @@ function setEnvMap(target: THREE.Object3D) {
  * @param onLoad - 로드 완료 후 호출될 콜백 함수
  */
 async function LoadSbm(url: string, onLoad: Function) {
+
+    if (!Util.isValidUrl(url))
+        return;
 
     const urlFull = url;
     const dirName = urlFull.substring(0, urlFull.lastIndexOf('/')) + '/';
@@ -86,12 +93,12 @@ async function LoadSbm(url: string, onLoad: Function) {
     }
 
     // 로드 완료 내부 이벤트 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onGltfLoaded',
         target: sbmRootGroup,
     });
     // 그림자맵 업데이트 이벤트 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onShadowMapNeedsUpdate',
         shadowMapTarget: ModelInternal.ModelGroup,
     });
@@ -101,5 +108,8 @@ async function LoadSbm(url: string, onLoad: Function) {
 }
 
 export {
+    initialize,
+    dispose,
+
     LoadSbm,
 }

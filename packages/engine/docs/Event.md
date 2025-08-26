@@ -5,6 +5,7 @@ Event
 ## Px.Event.AddEventListener(type: string, callback: Function)
 - type: 처리할 이벤트명
   - 'onPoiTransformChange': poi 편집시 위치, 회전, 스케일에 값변화가 일어날때 호출
+  - 'onPoiFinishEdit': poi 편집 완료 함수([Px.Poi.FinishEdit](./Poi.md#pxpoifinishedit)) 호출시 콜백 함수 호출
   - 'onPoiPointerUp': poi에 포인터 업 발생할때 호출
   - 'onLabel3DTransformChange': Label3D 편집시 위치, 회전, 스케일에 값변화가 일어날때 호출
   - 'onLabel3DPointerUp': Label3D 포인터 업 발생할떄 호출

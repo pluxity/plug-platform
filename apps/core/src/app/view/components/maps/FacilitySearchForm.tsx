@@ -1,16 +1,18 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { GroupSearchForm, type GroupSearchGroup, type GroupSearchFormRef } from '@/app/view/components/GroupSearchForm'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { GroupSearchForm, type GroupSearchGroup, type GroupSearchFormRef } from '@/app/view/components/group-search-form'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { FacilityResponse } from '@plug/common-services'
-import { domainUtils } from '@plug/common-services'
 import * as Cesium from 'cesium'
 
 interface FacilitySearchFormProps {
   viewer: Cesium.Viewer | null
+  onFacilitySelectInfo?: (facility: FacilityResponse) => void
+  /** 새 시설 선택 즉시(비행 시작 전) 기존 Dialog 닫기 위해 호출 */
+  onFacilityPreSelect?: () => void
 }
 
-const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
-  const [value, setValue] = useState('')
+const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacilitySelectInfo, onFacilityPreSelect }) => {
+  const [searchQuery, setSearchQuery] = useState('')
   const formRef = useRef<GroupSearchFormRef>(null)
   const facilities = useFacilityStore(s => s.facilities)
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
@@ -20,63 +22,100 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
     if (!facilitiesFetched) loadFacilities()
   }, [facilitiesFetched, loadFacilities])
 
-  const match = (f: FacilityResponse, q: string) => {
-    const name = f.name?.toLowerCase() ?? ''
-    const code = f.code?.toLowerCase() ?? ''
-    const desc = f.description?.toLowerCase() ?? ''
-    return name.includes(q) || code.includes(q) || desc.includes(q)
+  const [pendingFacility, setPendingFacility] = useState<FacilityResponse | null>(null)
+
+  const matchesSearch = (facility: FacilityResponse, query: string) => {
+    const name = facility.name?.toLowerCase() ?? ''
+    const code = facility.code?.toLowerCase() ?? ''
+    const description = facility.description?.toLowerCase() ?? ''
+    return name.includes(query) || code.includes(query) || description.includes(query)
   }
 
   const groups: GroupSearchGroup<FacilityResponse>[] = useMemo(() => {
-    const q = value.trim().toLowerCase()
-    if (!q) return []
-    return domainUtils.getAllDomains().map(domain => {
-      const { endpoint, displayName } = domainUtils.getConfig(domain)
-      const list = Array.isArray(facilities[endpoint]) ? facilities[endpoint] : []
-      const filtered = (list as FacilityResponse[]).filter(f => match(f, q))
-      return { heading: displayName, items: filtered }
-    }).filter(g => g.items.length > 0)
-  }, [value, facilities])
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return []
+    const filtered = facilities.filter(f => matchesSearch(f as FacilityResponse, query)) as FacilityResponse[]
+    return [{ heading: '시설', items: filtered }]
+  }, [searchQuery, facilities])
 
-  const handleSelectFacility = (facility: FacilityResponse) => {
-    setValue('')
-    formRef.current?.close()
-
+  const flyToFacility = useCallback((facility: FacilityResponse, done?: () => void) => {
     if (!viewer) return
+    try {
+      const entityId = `facility-${facility.id}`
+      const entity = viewer.entities.getById(entityId)
 
-    const entityId = `facility-${facility.id}`
-    const entity = viewer.entities.getById(entityId)
-    if (entity && entity.position) {
-      const pos = entity.position.getValue(Cesium.JulianDate.now())
-      if (pos) {
-        viewer.camera.flyToBoundingSphere(
-          new Cesium.BoundingSphere(pos, 1000),
-          {
-            duration: 2.0,
-            offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-15), 2000)
-          }
-        )
+      let targetCartesian: Cesium.Cartesian3 | undefined
+      if (entity?.position) {
+        targetCartesian = entity.position.getValue(Cesium.JulianDate.now()) as Cesium.Cartesian3 | undefined
+      }
+      if (!targetCartesian && facility.lat && facility.lon) {
+        targetCartesian = Cesium.Cartesian3.fromDegrees(facility.lon, facility.lat, 0)
+      }
+      if (!targetCartesian) return
+
+      // 현재와 매우 가깝다면 이동 생략 (불필요한 비행 방지)
+      const dist = Cesium.Cartesian3.distance(viewer.camera.position, targetCartesian)
+      if (dist < 30) { // already near – skip flight, just run callback
+        done?.()
         return
       }
-    }
+      
+      (viewer.camera as unknown as (Cesium.Camera & { cancelFlight?: () => void })).cancelFlight?.()
 
-    if (facility.lat && facility.lon) {
-      const targetPosition = Cesium.Cartesian3.fromDegrees(facility.lon, facility.lat, 0)
-      viewer.camera.flyToBoundingSphere(
-        new Cesium.BoundingSphere(targetPosition, 1000),
-        {
-          duration: 2.0,
-          offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-15), 2000)
-        }
-      )
+      const desiredAltitude = 750
+      const pitch = -20
+      const range = desiredAltitude / Math.sin(Math.abs(pitch) * Math.PI / 180)
+      const offset = new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(pitch), range)
+
+      let lookCenter = targetCartesian
+      try {
+        const enu = Cesium.Transforms.eastNorthUpToFixedFrame(targetCartesian)
+        const eastCol = Cesium.Matrix4.getColumn(enu, 0, new Cesium.Cartesian4()) // Cartesian4
+        const east = new Cesium.Cartesian3(eastCol.x, eastCol.y, eastCol.z)
+        Cesium.Cartesian3.normalize(east, east)
+        const lateral = range * 0.125
+        const shift = Cesium.Cartesian3.multiplyByScalar(east, lateral, new Cesium.Cartesian3())
+        lookCenter = Cesium.Cartesian3.add(targetCartesian, shift, new Cesium.Cartesian3())
+      } catch {
+        /* fallback: ignore */
+      }
+
+      const sphere = new Cesium.BoundingSphere(lookCenter, Math.min(Math.max(dist * 0.1, 80), 1200))
+      viewer.camera.flyToBoundingSphere(sphere, {
+        duration: 0.5,
+        offset,
+        maximumHeight: 20000,
+        complete: () => done?.()
+      })
+    } catch {
+      /* noop */
     }
+  }, [viewer])
+
+  const handleSelectFacility = (facility: FacilityResponse) => {
+    setSearchQuery('')
+    formRef.current?.close()
+  onFacilityPreSelect?.()
+    // 대기 상태에 두고, 카메라 이동 완료 후 Dialog 표시
+    setPendingFacility(facility)
   }
+
+  // viewer 준비되었고 대기중인 시설이 있으면 이동
+  useEffect(() => {
+    if (viewer && pendingFacility) {
+      const fac = pendingFacility
+      flyToFacility(fac, () => {
+        onFacilitySelectInfo?.(fac)
+        setPendingFacility(null)
+      })
+    }
+  }, [viewer, pendingFacility, flyToFacility, onFacilitySelectInfo])
 
   return (
     <GroupSearchForm<FacilityResponse>
       ref={formRef}
-      value={value}
-      onValueChange={setValue}
+      value={searchQuery}
+      onValueChange={setSearchQuery}
       groups={groups}
       placeholder={facilitiesFetched ? '시설명 또는 코드를 검색하세요...' : '시설 데이터를 불러오는 중...'}
       disabled={!facilitiesFetched}
@@ -95,7 +134,7 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer }) => {
         </div>
       )}
       onSelect={handleSelectFacility}
-      getItemKey={(f) => f.id}
+      getItemKey={(facility) => facility.id}
     />
   )
 }
