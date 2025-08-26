@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as Camera from '../camera';
 import * as Interfaces from '../interfaces';
-import * as Event from '../eventDispatcher';
 import * as Util from '../util';
 import { Path3DObject } from './path3dobject';
 import { Path3DLineObject } from './path3dlineobject';
@@ -12,7 +11,7 @@ let engine: Engine3D;
 let workingPath: Path3DObject;
 let pathRenderGroup: THREE.Group;
 let bLeftBtnDown: boolean = false;
-let controlPoint: THREE.Vector3 | undefined;
+let controlPoint: THREE.Vector3;
 let mouseDownPickData: any;
 let cursor: THREE.Mesh;
 let previewLine: Path3DLineObject;
@@ -21,10 +20,11 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 const rayCast: THREE.Raycaster = new THREE.Raycaster();
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+
+    engine = _engine;
 
     // 경로 객체 렌더링 그룹
     pathRenderGroup = new THREE.Group();
@@ -43,11 +43,30 @@ Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any
     rayCast.layers.set(Interfaces.CustomLayer.Pickable);
 
     // pathcreator.ts 초기화 완료 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPathCreatorInitialized',
         pathRenderGroup: pathRenderGroup,
     });
-});
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    Cancel();
+
+    workingPath = null;
+    pathRenderGroup = null;
+    bLeftBtnDown = false;
+    controlPoint = null;
+    mouseDownPickData = null;
+    cursor = null;
+    previewLine?.dispose();
+    previewLine = null;
+    isStraightLine = false;
+
+    engine = null;
+}
 
 /**
  * 마우스 좌표에 대해 공간상의 픽킹 좌표 계산
@@ -96,7 +115,7 @@ function getPickPoint(mousePos: THREE.Vector2) {
         }
     }
 
-    return undefined;
+    return null;
 }
 
 /**
@@ -127,7 +146,7 @@ function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Ve
         };
     }
 
-    return undefined;
+    return null;
 }
 
 /**
@@ -140,7 +159,7 @@ function onPointerDown(evt: PointerEvent) {
         mouseDownPos.y = evt.offsetY;
 
         mouseDownPickData = getPickPoint(mouseDownPos);
-        controlPoint = undefined;
+        controlPoint = null;
 
         bLeftBtnDown = true;
     }
@@ -289,12 +308,12 @@ function Cancel() {
     cursor.layers.set(Interfaces.CustomLayer.Invisible);
 
     // 작업객체
-    pathRenderGroup.add(workingPath);
-    workingPath.dispose();
+    pathRenderGroup.remove(workingPath);
+    workingPath?.dispose();
 
     // 미리보기 선객체    
     pathRenderGroup.remove(previewLine);
-    previewLine.dispose();
+    previewLine?.dispose();
 
     // 이벤트 등록 해제
     unregisterEventListeners();
@@ -309,7 +328,7 @@ function Finish(): Interfaces.Path3DData {
     Camera.SetRotateButton(Interfaces.MouseButton.Left);
 
     // 작업 완료 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPathCreatorFinished',
         target: workingPath
     });
@@ -328,6 +347,9 @@ function Finish(): Interfaces.Path3DData {
 }
 
 export {
+    initialize,
+    dispose,
+
     CreatePath,
     Cancel,
     Finish,

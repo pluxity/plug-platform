@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
 import * as Camera from '../camera';
@@ -16,13 +15,45 @@ let gizmo: Addon.TransformControls;
 let previewObject: THREE.Object3D;
 let _editMode: Addon.TransformControlsMode = 'translate';
 let bPoiEditEnabled: boolean = false;
+let edittedPoiList: string[] = [];
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+
+    edittedPoiList = [];
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+
+    bPoiEditEnabled = false;
+
+    unregisterPointerEvents();
+    disposePreviewObject();
+
+    if (gizmo) {
+        const helper = gizmo.getHelper();
+        engine.RootScene.remove(helper);
+        gizmo.dispose();
+        gizmo = null;
+    }
+
+    target?.dispose();
+    target = null;
+
+    previewObject = null;
+    _editMode = 'translate';
+    bPoiEditEnabled = false;
+
+    edittedPoiList = [];
+
+    engine = null;
+}
 
 /**
  * 포인터 다운 이벤트 처리
@@ -56,7 +87,7 @@ function onPointerUp(evt: MouseEvent) {
             rayCast.setFromCamera(mousePos, engine.Camera);
 
             const result = Util.getPoiFromRaycast(rayCast);
-            if (result !== undefined) {
+            if (result) {
                 target = result.poi;
                 createEditPreviewObject();
                 unregisterPointerEvents();
@@ -140,7 +171,7 @@ async function createEditPreviewObject() {
     disposePreviewObject();
 
     // 편집 대상 poi의 modelUrl을 기준으로 편집용 임시 객체를 생성한다.
-    if (target.modelUrl !== undefined) {
+    if (target.modelUrl) {
         const loader = new Addon.GLTFLoader();
         const gltf = await loader.loadAsync(target.modelUrl);
 
@@ -179,8 +210,12 @@ async function createEditPreviewObject() {
         PoiData.updatePoiLine();
         PoiData.updatePoiMesh();
 
+        // 기즈모에서 버튼업 이벤트 발생시 편집했던 Poi의 id값을 저장
+        if (edittedPoiList.indexOf(target.id) === -1)
+            edittedPoiList.push(target.id);
+
         // 외부 이벤트 통지
-        Event.ExternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onPoiTransformChange',
             target: target.ExportData
         });
@@ -204,9 +239,11 @@ function StartEdit(editMode: string) {
 
     bPoiEditEnabled = true;
 
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onPoiStartEdit',
     });
+
+    edittedPoiList = [];
 }
 
 /**
@@ -219,16 +256,30 @@ function FinishEdit() {
     unregisterPointerEvents();
     disposePreviewObject();
 
+    // 외부 이벤트 통지
+    const result: any[] = [];
+    edittedPoiList.forEach(id => result.push(PoiData.Export(id)));
+
+    engine.EventHandler.dispatchEvent({
+        type: 'onPoiFinishEdit',
+        targets: result,
+    });
+
     if (gizmo) {
         const helper = gizmo.getHelper();
         engine.RootScene.remove(helper);
         gizmo.dispose();
     }
+
+    edittedPoiList = [];
 }
 
 export {
 
     bPoiEditEnabled as Enabled,
+
+    initialize,
+    dispose,
 
     StartEdit,
     FinishEdit,

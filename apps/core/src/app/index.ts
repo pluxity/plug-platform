@@ -1,4 +1,3 @@
-export * from './model'
 export * from './view'
 
 export { default as MapView } from './view/pages/MapView'

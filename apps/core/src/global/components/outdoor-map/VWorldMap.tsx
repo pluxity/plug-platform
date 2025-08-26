@@ -8,11 +8,6 @@ interface VWorldMapProps {
   className?: string;
   children?: React.ReactNode;
   mapProvider?: MapProvider;
-  initialPosition?: {
-    longitude: number;
-    latitude: number;
-    altitude: number;
-  };
   preventCameraReset?: boolean;
   onMapInitialized?: () => void;
 }
@@ -21,7 +16,6 @@ export default function VWorldMap({
   className = "w-full h-full", 
   children, 
   mapProvider = 'vworld',
-  initialPosition,
   preventCameraReset = false,
   onMapInitialized
 }: VWorldMapProps) {
@@ -94,7 +88,6 @@ export default function VWorldMap({
         <Scene />
         
         <InitialCameraSetup 
-          initialPosition={initialPosition}
           hasInitialized={preventCameraReset}
           onInitialSetupComplete={onMapInitialized}
         />

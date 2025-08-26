@@ -2,9 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import IndoorMap from './IndoorMap'
 import OutdoorMap from './OutdoorMap'
-import { MapMode } from '@/app/model/types/MapTypes'
 import type { FacilityType } from '@plug/common-services'
 import { useFacilityStore } from '@/app/store/facilityStore'
+
+enum MapMode {
+  OUTDOOR = 'outdoor',
+  INDOOR = 'indoor'
+}
 
 const MainMap: React.FC = () => {
   const [mapMode, setMapMode] = useState<MapMode>(MapMode.OUTDOOR)
@@ -20,14 +24,12 @@ const MainMap: React.FC = () => {
     }
   }, [facilitiesFetched, loadFacilities])
 
-  // location.state 통한 초기 실내 지도 진입 지원
   useEffect(() => {
     const state = location.state as { facilityId?: number; facilityType?: FacilityType; mode?: string } | null
     if (state?.mode === 'indoor' && state.facilityId && state.facilityType) {
       setSelectedFacilityId(state.facilityId)
       setSelectedFacilityType(state.facilityType)
       setMapMode(MapMode.INDOOR)
-      // 일회성 처리를 위해 history state 제거 (URL / state 정리)
       navigate(location.pathname, { replace: true })
     }
   }, [location, navigate])

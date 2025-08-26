@@ -1,16 +1,19 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import type { GsDeviceResponse } from '@plug/common-services'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import type { DeviceResponse } from '@plug/common-services'
 import { useDeviceStore } from '@/app/store/deviceStore'
-import { GroupSearchForm } from '@/app/view/components/GroupSearchForm'
-import type { GroupSearchGroup } from '@/app/view/components/GroupSearchForm'
+import { GroupSearchForm } from '@/app/view/components/group-search-form'
+import type { GroupSearchGroup, GroupSearchFormRef } from '@/app/view/components/group-search-form'
+import { Camera } from '@plug/engine'
 
 interface DeviceSearchFormProps {
   className?: string
+  onDeviceSelect?: (device: DeviceResponse) => void
 }
 
-const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className }) => {
+const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className, onDeviceSelect }) => {
   const [query, setQuery] = useState('')
   const searchRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<GroupSearchFormRef>(null)
 
   const loadAllDevices = useDeviceStore(s => s.loadAll)
   const searchDevices = useDeviceStore(s => s.searchDevices)
@@ -19,14 +22,24 @@ const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className }) => {
     loadAllDevices()
   }, [loadAllDevices])
 
-  const groups = useMemo<GroupSearchGroup<GsDeviceResponse>[]>(() => {
+  const groups = useMemo<GroupSearchGroup<DeviceResponse>[]>(() => {
     const result = searchDevices(query)
     return result.map(({ category, items }) => ({ heading: category, items }))
   }, [searchDevices, query])
 
+  const handleSelect = useCallback((device: DeviceResponse) => {
+    setQuery('')
+    formRef.current?.close()
+    if (device.featureId) {
+      Camera.MoveToPoi(String(device.featureId), 0.5, 1)
+    }
+    onDeviceSelect?.(device)
+  }, [onDeviceSelect])
+
   return (
-  <div ref={searchRef} className={["relative w-96", className || ''].join(' ').trim()}>
-      <GroupSearchForm<GsDeviceResponse>
+    <div ref={searchRef} className={['relative w-96', className || ''].join(' ').trim()}>
+      <GroupSearchForm<DeviceResponse>
+        ref={formRef}
         value={query}
         onValueChange={setQuery}
         groups={groups}
@@ -38,7 +51,7 @@ const DeviceSearchForm: React.FC<DeviceSearchFormProps> = ({ className }) => {
             <span className="text-xs text-blue-600">{String(device.id)}</span>
           </div>
         )}
-    onSelect={() => setQuery('')}
+        onSelect={handleSelect}
       />
     </div>
   )

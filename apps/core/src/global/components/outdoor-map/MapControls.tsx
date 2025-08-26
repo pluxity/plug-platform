@@ -1,86 +1,35 @@
-import React, { useEffect } from 'react';
-import { useCesium } from 'resium';
-import * as Cesium from 'cesium';
-import { Button } from '@plug/ui';
+import React from 'react'
+import { useCesium } from 'resium'
+import { Button } from '@plug/ui'
+import { flyToHome } from './camera-settings'
 
-interface MapControlsProps {
-  onInitialLoadComplete?: () => void;
-}
+type MapControlsProps = Record<string, never>
 
-const MapControls: React.FC<MapControlsProps> = ({ onInitialLoadComplete }) => {
-  const { viewer } = useCesium();
-
-  const DEFAULT_COORDS = {
-    latitude: 37.459722, 
-    longitude: 127.023556,
-    altitude: 1000
-  };
-
-  useEffect(() => {
-    if (!viewer) return;
-
-    const camera = viewer.scene.camera;
-    camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(
-        DEFAULT_COORDS.longitude, 
-        DEFAULT_COORDS.latitude, 
-        DEFAULT_COORDS.altitude
-      ),
-      orientation: {
-        heading: Cesium.Math.toRadians(0),
-        pitch: Cesium.Math.toRadians(-5),
-        roll: 0
-      },
-      duration: 0,
-      complete: () => {
-        onInitialLoadComplete?.();
-      }
-    });
-  }, [viewer, onInitialLoadComplete, DEFAULT_COORDS.longitude, DEFAULT_COORDS.latitude, DEFAULT_COORDS.altitude]);
+const MapControls: React.FC<MapControlsProps> = () => {
+  const { viewer } = useCesium()
 
   const fnZoomIn = () => {
-    if (viewer?.scene?.camera) {
-      const camera = viewer.scene.camera;
-      const direction = camera.direction;
-      const moveDistance = camera.positionCartographic.height * 0.1;
-      
-      camera.move(direction, moveDistance);
-    }
+  if (!viewer) return
+  const camera = viewer.scene.camera
+  const direction = camera.direction
+  const moveDistance = camera.positionCartographic.height * 0.1
+  camera.move(direction, moveDistance)
   };
 
   const fnZoomOut = () => {
-    if (viewer?.scene?.camera) {
-      const camera = viewer.scene.camera;
-      const direction = camera.direction;
-      const moveDistance = camera.positionCartographic.height * -0.1;
-      
-      camera.move(direction, moveDistance);
-    }
+  if (!viewer) return
+  const camera = viewer.scene.camera
+  const direction = camera.direction
+  const moveDistance = camera.positionCartographic.height * -0.1
+  camera.move(direction, moveDistance)
   };
 
-  const fnFlyToHome = () => {
-    if (viewer?.scene?.camera) {
-      const camera = viewer.scene.camera;
-      camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(
-          DEFAULT_COORDS.longitude, 
-          DEFAULT_COORDS.latitude, 
-          DEFAULT_COORDS.altitude
-        ),
-        orientation: {
-          heading: Cesium.Math.toRadians(0),
-          pitch: Cesium.Math.toRadians(-15),
-          roll: 0
-        },
-        duration: 2.0
-      });
-    }
-  };
+  const fnFlyToHome = () => flyToHome(viewer!, { duration: 1.5 })
 
-  const btnClassName = 'hover:bg-transparent text-gray-100 hover:text-gray-800 cursor-pointer w-9 h-9 hover:scale-150 transition-transform duration-200 rounded-full flex items-center justify-center';
+  const btnClassName = 'hover:bg-transparent text-gray-100 hover:text-gray-800 cursor-pointer w-9 h-9 hover:scale-150 transition-transform duration-200 rounded-full flex items-center justify-center'
 
   return (
-    <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-1.5 z-10 p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
+  <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-1.5 z-10 p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
       <Button
         onClick={fnZoomIn}
         variant="ghost"

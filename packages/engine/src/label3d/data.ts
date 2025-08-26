@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import * as ModelInternal from '../model/model';
@@ -10,19 +9,33 @@ let engine: Engine3D;
 let labels: Record<string, Label3DElement> = {};
 
 /**
- * Engine3D 초기화 이벤트 콜백
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+
+    engine.EventHandler.addEventListener('onLabel3DCreated' as never, onLabel3DCreated);
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    engine.EventHandler.removeEventListener('onLabel3DCreated' as never, onLabel3DCreated);
+
+    Clear();
+
+    labels = {};
+    engine = null;
+}
 
 /**
  * 라벨 생성 완료 콜백
  */
-Event.InternalHandler.addEventListener('onLabel3DCreated' as never, (evt: any) => {
+function onLabel3DCreated(evt: any) {
     const label: Label3DElement = evt.target;
     labels[label.name] = label;
-});
+}
 
 /**
  * 레이캐스트 대상 얻기
@@ -140,6 +153,8 @@ function Import(data: Interfaces.Label3DImportOption | Interfaces.Label3DImportO
 }
 
 export {
+    initialize,
+    dispose,
     getPickableObjects,
 
     Hide,

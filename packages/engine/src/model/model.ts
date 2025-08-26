@@ -1,34 +1,53 @@
 import * as THREE from 'three';
 import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
-import * as Event from '../eventDispatcher';
 import * as TWEEN from '@tweenjs/tween.js';
 import * as Util from '../util';
 import { Engine3D } from '../engine';
 
-const floorObjects: Record<string, THREE.Object3D> = {};
-let posTween: TWEEN.Tween | undefined | null = undefined;
+let floorObjects: Record<string, THREE.Object3D> = {};
+let posTween: TWEEN.Tween = null;
 let engine: Engine3D;
 let modelGroup: THREE.Group;
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
+function initialize(_engine: Engine3D) {
+    engine = _engine;
 
     // 배경 모델 그룹 생성
     modelGroup = new THREE.Group();
     modelGroup.name = '#ModelGroup';
     engine.RootScene.add(modelGroup);
-});
+
+    // 이벤트 등록
+    engine.EventHandler.addEventListener('onGltfLoaded' as never, onGltfLoaded);
+}
 
 /**
- * gltf 로드 완료후 콜백 초기화 이벤트 콜백
- * 
+ * 메모리 해제
  */
-Event.InternalHandler.addEventListener('onGltfLoaded' as never, (evt: any) => {
+function dispose() {
+    engine.EventHandler.removeEventListener('onGltfLoaded' as never, onGltfLoaded);
+
+    if (posTween) {
+        posTween.stop();
+        engine.TweenUpdateGroups.remove(posTween as TWEEN.Tween);
+        posTween = null;
+    }
+
+    modelGroup = null;
+    engine = null;
+
+    floorObjects = {};
+}
+
+/**
+ * gltf 로드 완료후 콜백
+ *  
+ */
+function onGltfLoaded(evt: any) {
     // gltf 모델 로드 완료후 층객체만 따로 저장
     const target: THREE.Object3D = evt.target;
     target.traverse(child => {
@@ -40,7 +59,8 @@ Event.InternalHandler.addEventListener('onGltfLoaded' as never, (evt: any) => {
             }
         }
     });
-});
+}
+
 
 /**
  * 월드좌표를 지정한 층기준 로컬 좌표로 변환한다.
@@ -130,6 +150,9 @@ function getFloorObject(id: string): THREE.Object3D | undefined {
  */
 function GetModelHierarchyFromUrl(url: string, onComplete: Function) {
 
+    if (!Util.isValidUrl(url))
+        return;
+
     new Addon.GLTFLoader().load(url, (gltf) => {
 
         const result: Interfaces.ModelInfo[] = [];
@@ -155,7 +178,7 @@ function GetModelHierarchyFromUrl(url: string, onComplete: Function) {
         // 콜백 호출
         onComplete?.(result);
 
-    }, undefined, (err) => console.error(err));
+    }, null, (err) => console.error(err));
 }
 
 function GetModelHierarchy(): Interfaces.ModelInfo[] {
@@ -193,7 +216,7 @@ function Show(id: string) {
         Util.setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
 
         // 층가시화 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onModelShow',
             floorId: id,
         });
@@ -210,7 +233,7 @@ function Hide(id: string) {
         Util.setObjectLayer(floorObjects[id], Interfaces.CustomLayer.Invisible);
 
         // 층 숨기기 이벤트 내부 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onModelHide',
             floorId: id,
         });
@@ -228,7 +251,7 @@ function ShowAll() {
     });
 
     // 층가시화 이벤트 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onModelShowAll',
     });
 }
@@ -244,7 +267,7 @@ function HideAll() {
     });
 
     // 층 숨기기 이벤트 내부 통지
-    Event.InternalHandler.dispatchEvent({
+    engine.EventHandler.dispatchEvent({
         type: 'onModelHideAll',
     });
 }
@@ -258,10 +281,10 @@ function HideAll() {
 function Expand(transitionTime: number, interval: number, onComplete?: Function) {
 
     // 트윈이 진행중이면 수행하지 않음
-    if (posTween === undefined || posTween === null) {
+    if (!posTween) {
 
         // 이동시작전 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onModelBeforeMove',
             floorObjects: floorObjects,
         });
@@ -280,7 +303,7 @@ function Expand(transitionTime: number, interval: number, onComplete?: Function)
         });
 
         // 펼치기 트윈 데이터 생성
-        const expandData = {
+        const expandData: { ratio: number; floors: any[] } = {
             ratio: 0.0,
             floors: []
         };
@@ -310,7 +333,7 @@ function Expand(transitionTime: number, interval: number, onComplete?: Function)
                 posTween = null;
 
                 // 이동 완료 후 이벤트 통지
-                Event.InternalHandler.dispatchEvent({
+                engine.EventHandler.dispatchEvent({
                     type: 'onModelAfterMove',
                     floorObjects: floorObjects,
                 });
@@ -333,16 +356,16 @@ function Expand(transitionTime: number, interval: number, onComplete?: Function)
  */
 function Collapse(transitionTime: number, onComplete?: Function) {
     // 트윈이 진행중일땐 수행하지 않음
-    if (posTween === undefined || posTween === null) {
+    if (!posTween) {
 
         // 이동시작전 이벤트 통지
-        Event.InternalHandler.dispatchEvent({
+        engine.EventHandler.dispatchEvent({
             type: 'onModelBeforeMove',
             floorObjects: floorObjects,
         });
 
         // 접기 트윈 데이터 생성
-        const collapseData = {
+        const collapseData: { ratio: number; floors: any[] } = {
             ratio: 0.0,
             floors: []
         };
@@ -372,7 +395,7 @@ function Collapse(transitionTime: number, onComplete?: Function) {
                 posTween = null;
 
                 // 이동 완료 후 이벤트 통지
-                Event.InternalHandler.dispatchEvent({
+                engine.EventHandler.dispatchEvent({
                     type: 'onModelAfterMove',
                     floorObjects: floorObjects,
                 });
@@ -389,6 +412,9 @@ function Collapse(transitionTime: number, onComplete?: Function) {
 
 export {
     modelGroup as ModelGroup,
+
+    initialize,
+    dispose,
 
     convertWorldToFloorLocal,
     convertFloorLocalToWorld,

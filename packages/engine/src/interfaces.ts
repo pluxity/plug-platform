@@ -218,6 +218,14 @@ interface Label3DImportOption {
     scale: Vector3;
 }
 
+/**
+ * 엔진 인스턴스 초기화전의 이벤트 등록함수를 처리할 인터페이스
+ */
+interface DeferredRegisterationCallbackData {
+    type: string;
+    callback: Function;
+}
+
 export {
     Vector3Custom,
     Vector3,
@@ -240,4 +248,5 @@ export {
     SubwayImportOption,
     Label3DCreateOption,
     Label3DImportOption,
+    DeferredRegisterationCallbackData,
 }

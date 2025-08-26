@@ -1,15 +1,15 @@
 import { create } from 'zustand'
-import type { GsDeviceResponse } from '@plug/common-services'
+import type { DeviceResponse } from '@plug/common-services'
 import { getDevices } from '@plug/common-services'
 
 interface DeviceState {
-  devices: GsDeviceResponse[]
+  devices: DeviceResponse[]
 }
 
 interface DeviceActions {
-  setDevices: (devices: GsDeviceResponse[]) => void
+  setDevices: (devices: DeviceResponse[]) => void
   loadAll: () => Promise<void>
-  searchDevices: (query: string) => { category: string; items: GsDeviceResponse[] }[]
+  searchDevices: (query: string) => { category: string; items: DeviceResponse[] }[]
 }
 
 type DeviceStore = DeviceState & DeviceActions
@@ -27,9 +27,7 @@ export const useDeviceStore = create<DeviceStore>()((set, get) => ({
       .trim()
       .toLowerCase()
       .normalize('NFC')
-
   const q = normalizeText(query)
-  // Require at least 2 characters to start searching
   if (q.length < 2) return []
 
     const deviceList = get().devices
@@ -41,7 +39,7 @@ export const useDeviceStore = create<DeviceStore>()((set, get) => ({
       return name.includes(q) || id.includes(q) || category.includes(q)
     })
 
-    const grouped = new Map<string, GsDeviceResponse[]>()
+  const grouped = new Map<string, DeviceResponse[]>()
     for (const device of filtered) {
       const category = device.deviceCategory?.name || '미분류'
       if (!grouped.has(category)) grouped.set(category, [])
