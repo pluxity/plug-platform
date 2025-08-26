@@ -14,3 +14,4 @@ export * from './role';
 export * from './user-admin';
 export * from './user';
 export * from './permission';
+export * from './cctv';

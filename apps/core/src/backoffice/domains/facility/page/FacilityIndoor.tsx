@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility } from '@plug/common-services'
+import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, assignDeviceToFeature, FeatureAssignDto } from '@plug/common-services'
 import { IndoorMapViewer } from '@/global/components'
 import { FloorControl } from '@/global/components/indoor-map/FloorControl'
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
 import { ArrowLeft } from "lucide-react"
 import { IndoorMapEditTools } from '../components'
+import { FeatureAssignModal } from '../components/FeatureAssignModal'
 import { useAssets } from '@/global/store/assetStore'
 import { Poi, Event, Interfaces } from '@plug/engine'
 import { convertFloors } from '@/global/utils/floorUtils'
@@ -70,13 +71,17 @@ const FacilityIndoor: React.FC = () => {
   
   const { assets } = useAssets()
 
+  // POI 임포트 상태 
   const importedRef = useRef(false);
   const engineReadyRef = useRef(false);
 
-  // 삭제 모드 상태 추가
+  // 삭제 모드 상태 
   const [isDeleteMode, setIsDeleteMode] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<PoiData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  // 장비 할당 모달 상태 
+  const [showFeatureAssignDialog, setShowFeatureAssignDialog] = useState(false)
 
   // 삭제 모드 변경 핸들러
   const handleDeleteModeChange = (deleteMode: boolean) => {
@@ -110,9 +115,12 @@ const FacilityIndoor: React.FC = () => {
     const handleFeatureClick = (eventData: PoiClickEvent) => {
       const poiData = eventData.target;
       if (isDeleteMode) {
-        // 삭제 모드일 때는 기존 삭제 로직
+        // 삭제 모드일 때는 
         setSelectedFeature(poiData);
         setShowDeleteDialog(true);
+      } else {
+        setSelectedFeature(poiData);
+        setShowFeatureAssignDialog(true);
       }
     };
 
@@ -128,6 +136,7 @@ const FacilityIndoor: React.FC = () => {
       Event.RemoveEventListener('onPoiPointerUp' as never, handleFeatureClick);
     };
   }, [isDeleteMode]);
+ 
 
   // Features 로드를 위한 함수
   const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
@@ -171,7 +180,7 @@ const FacilityIndoor: React.FC = () => {
         id: f.id,
         iconUrl: '',
         modelUrl,
-        displayText: f.deviceId ? f.deviceId : '장치 할당 필요', 
+        displayText: f.id, 
         floorId: f.floorId,
         property: {
           assetId: f.assetId,
@@ -369,22 +378,28 @@ const FacilityIndoor: React.FC = () => {
       {showDeleteDialog && selectedFeature && (
         <Dialog open={showDeleteDialog} onOpenChange={handleDeleteCancel}>
           <DialogContent title="삭제 확인">
-          <DialogDescription>
-            선택된 POI를 삭제하겠습니까? <br/>
-            id: {selectedFeature.id} <br/>
-            name: {selectedFeature.displayText}
-          </DialogDescription>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleDeleteCancel}>
-              취소
-            </Button>
-            <Button onClick={() => handleFeatureDelete(selectedFeature.id)}>
-              삭제
-            </Button>
-          </DialogFooter>
+            <DialogDescription>
+              선택된 POI를 삭제하겠습니까? <br/>
+              id: {selectedFeature.id} <br/>
+              name: {selectedFeature.displayText}
+            </DialogDescription>
+            <DialogFooter>
+              <Button variant="outline" onClick={handleDeleteCancel}>
+                취소
+              </Button>
+              <Button onClick={() => handleFeatureDelete(selectedFeature.id)}>
+                삭제
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
+
+      <FeatureAssignModal
+        open={showFeatureAssignDialog}
+        onOpenChange={setShowFeatureAssignDialog}
+        featureId={selectedFeature?.id}
+      />
     </PageContainer>
   )
 }

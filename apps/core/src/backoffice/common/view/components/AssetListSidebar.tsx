@@ -255,7 +255,7 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
           id: crypto.randomUUID(),
           iconUrl: "",
           modelUrl: asset.file.url,
-          displayText: '장치 할당 필요',
+          displayText: '장비 할당 필요',
           property: {
             assetId: assetId,
             assetCode: asset.code,
