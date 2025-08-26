@@ -12,6 +12,20 @@
 
 업데이트 내역
 ============
+# 2025-08-26
+- [Engine3D](./docs/Engine3D.md) 엔진 초기화 호출부 수정 및 메모리 해제 함수 추가
+```javascript
+import { Core } from '@plug/engine';
+
+// 초기화
+const container = document.getElementById('webglContainer');
+Core.Initialize(container); // WebGL 초기화
+
+// 메모리 해제
+// 메모리 해제시 WebGL 초기화떄 생성되는 Canvas까지 제거됨(Canvas를 포함하는 컨테이너는 제거X)
+Core.Dispose();
+```
+
 # 2025-06-17
 - [Path3D](./docs/Path3D.md) Api 문서 추가
 - [Subway](./docs/Subway.md) Api 문서 추가

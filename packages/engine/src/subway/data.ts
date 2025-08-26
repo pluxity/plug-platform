@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as Event from '../eventDispatcher';
 import * as Interfaces from '../interfaces';
 import * as PathData from '../path3d/data';
 import { SubwayTrain } from './subwaytrain';
@@ -13,48 +12,74 @@ let tailModelSrc: THREE.Group;
 let trains: Record<string, SubwayTrain> = {};
 
 /**
- * Engine3D 초기화 이벤트 콜백
- * 
+ * 초기화
  */
-Event.InternalHandler.addEventListener('onEngineInitialized' as never, (evt: any) => {
-    engine = evt.engine as Engine3D;
-});
+function initialize(_engine: Engine3D) {
+    engine = _engine;
+
+    // 이벤트
+    engine.EventHandler.addEventListener('onSubwayTrainRenderGroupCreated' as never, onSubwayTrainRenderGroupCreated);
+    engine.EventHandler.addEventListener('onSubwayModelLoader_HeadModelLoaded' as never, onSubwayModelLoader_HeadModelLoaded);
+    engine.EventHandler.addEventListener('onSubwayModelLoader_BodyModelLoaded' as never, onSubwayModelLoader_BodyModelLoaded);
+    engine.EventHandler.addEventListener('onSubwayModelLoader_TailModelLoaded' as never, onSubwayModelLoader_TailModelLoaded);
+    engine.EventHandler.addEventListener('onSubwayTrainCreateFinished' as never, onSubwayTrainCreateFinished);
+}
+
+/**
+ * 메모리 해제
+ */
+function dispose() {
+    // 이벤트
+    engine.EventHandler.removeEventListener('onSubwayTrainRenderGroupCreated' as never, onSubwayTrainRenderGroupCreated);
+    engine.EventHandler.removeEventListener('onSubwayModelLoader_HeadModelLoaded' as never, onSubwayModelLoader_HeadModelLoaded);
+    engine.EventHandler.removeEventListener('onSubwayModelLoader_BodyModelLoaded' as never, onSubwayModelLoader_BodyModelLoaded);
+    engine.EventHandler.removeEventListener('onSubwayModelLoader_TailModelLoaded' as never, onSubwayModelLoader_TailModelLoaded);
+    engine.EventHandler.removeEventListener('onSubwayTrainCreateFinished' as never, onSubwayTrainCreateFinished);
+
+    Clear();
+    subwayTrainRenderGroup = null;
+    headModelSrc = null;
+    bodyModelSrc = null;
+    tailModelSrc = null;
+    trains = {};
+    engine = null;
+}
 
 /**
  * 열차 렌더링 그룹 생성 이벤트 콜백
  */
-Event.InternalHandler.addEventListener('onSubwayTrainRenderGroupCreated' as never, (evt: any) => {
+function onSubwayTrainRenderGroupCreated(evt: any) {
     subwayTrainRenderGroup = evt.target;
-});
+}
 
 /**
  * 머리 모델 로드 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onSubwayModelLoader_HeadModelLoaded' as never, (evt: any) => {
+function onSubwayModelLoader_HeadModelLoaded(evt: any) {
     headModelSrc = evt.target;
-});
+}
 
 /**
  * 몸체 모델 로드 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onSubwayModelLoader_BodyModelLoaded' as never, (evt: any) => {
+function onSubwayModelLoader_BodyModelLoaded(evt: any) {
     bodyModelSrc = evt.target;
-});
+}
 
 /**
  * 꼬리 모델 로드 완료 이벤트 처리
  */
-Event.InternalHandler.addEventListener('onSubwayModelLoader_TailModelLoaded' as never, (evt: any) => {
+function onSubwayModelLoader_TailModelLoaded(evt: any) {
     tailModelSrc = evt.target;
-});
+}
 
 /**
  * 열차 생성 완료 콜백
  */
-Event.InternalHandler.addEventListener('onSubwayTrainCreateFinished' as never, (evt: any) => {
+function onSubwayTrainCreateFinished(evt: any) {
     const train = evt.target;
     trains[train.name] = train;
-});
+}
 
 /**
  * 열차 숨기기
@@ -175,6 +200,9 @@ function Import(data: Interfaces.SubwayImportOption | Interfaces.SubwayImportOpt
 }
 
 export {
+    initialize,
+    dispose,
+
     Hide,
     Show,
     HideAll,

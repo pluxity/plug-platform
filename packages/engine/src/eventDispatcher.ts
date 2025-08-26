@@ -29,13 +29,15 @@ class CustomEventDispatcher extends THREE.EventDispatcher {
         }
 
     }
-}
 
-const internalHandler = new CustomEventDispatcher(); // 내부 이벤트 핸들러
-const externalHandler = new CustomEventDispatcher(); // 외부 노출용 이벤트 핸들러
+    /**
+     * 메모리 해제
+     */
+    dispose() {
+        this._listeners = null;
+    }
+}
 
 export {
     CustomEventDispatcher,
-    internalHandler as InternalHandler,
-    externalHandler as ExternalHandler,
 }
