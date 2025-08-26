@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { FacilityType } from '@plug/common-services'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import { useAssets } from '@/global/store/assetStore'
@@ -7,6 +7,8 @@ import { useIndoorFacilityData } from '@/app/view/hooks/useIndoorFacilityData'
 import MapScene from '@/global/components/indoor-map/MapScene'
 import DeviceSearchForm from './DeviceSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
+import { DeviceInfoDialog } from '../info-dialog'
+import type { GsDeviceResponse } from '@plug/common-services'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -19,6 +21,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const handleOutdoorClick = useCallback(() => { handleOutdoor() }, [handleOutdoor])
 
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
+
+  const [selectedDevice, setSelectedDevice] = useState<GsDeviceResponse | null>(null)
 
   if (!facilitiesFetched || isLoading || has3DDrawing === null) {
     return (
@@ -56,14 +60,28 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     )
   }
 
+  // state moved above early returns
+
   const overlays = (
     <div className='absolute top-4 left-4 z-20 flex flex-row gap-3 items-start'>
-      <DeviceSearchForm className='pointer-events-auto' />
+      <DeviceSearchForm
+        className='pointer-events-auto'
+        features={features}
+        onDeviceSelect={(device) => setSelectedDevice(device)}
+      />
       <DeviceCategoryChips />
     </div>
   )
 
-  return <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
+  return (
+    <>
+      <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
+      <DeviceInfoDialog
+        device={selectedDevice}
+        onClose={() => setSelectedDevice(null)}
+      />
+    </>
+  )
 };
 
 export default IndoorMap;

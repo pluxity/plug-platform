@@ -5,7 +5,7 @@ import type { FacilityType, FacilityResponse } from '@plug/common-services'
 import { VWorldMap, MapControls, CameraSetup } from '@/global/components/outdoor-map'
 import FacilityPOIs from './FacilityPOIs'
 import FacilitySearchForm from './FacilitySearchForm'
-import FacilityInfoDialog from './FacilityInfoDialog'
+import FacilityInfoDialog from '../info-dialog/FacilityInfoDialog'
 
 interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void;
