@@ -377,7 +377,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
              */
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
-                const iconUrl: string = 'SamplePoiIcon.png';
+                const iconUrl: string = '';//'SamplePoiIcon.png';
                 const displayText: string = id.substring(0, 8) + '테스트__-';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',

@@ -25,6 +25,7 @@ Core.Initialize(container); // WebGL 초기화
 // 메모리 해제시 WebGL 초기화떄 생성되는 Canvas까지 제거됨(Canvas를 포함하는 컨테이너는 제거X)
 Core.Dispose();
 ```
+- [Poi](./docs/Poi.md) 아이콘 URL 유효성 체크 제외
 
 # 2025-06-17
 - [Path3D](./docs/Path3D.md) Api 문서 추가

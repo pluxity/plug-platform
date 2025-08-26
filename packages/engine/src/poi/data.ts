@@ -274,9 +274,6 @@ function getPoiElement(id: string): PoiElement {
  */
 function getIcon(url: string): THREE.SpriteMaterial {
 
-    if (!Util.isValidUrl(url))
-        return null;
-
     if (iconStorage.hasOwnProperty(url) === false) {
         iconStorage[url] = new THREE.SpriteMaterial({
             map: new THREE.TextureLoader().load(url),
