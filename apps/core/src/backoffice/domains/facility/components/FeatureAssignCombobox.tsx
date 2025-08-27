@@ -15,18 +15,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@plug/ui';
-import { CctvResponse } from '@plug/common-services';
+import { CctvResponse, DeviceResponse } from '@plug/common-services';
 
 interface FeatureAssignComboboxProps {
   selectedId?: string;
   onSelect: (id: string) => void;
   placeholder?: string;
   className?: string;
-  items: CctvResponse[];
+  items: CctvResponse[] | DeviceResponse[];
   groups?: {
     key: string;
     title: string;
-    filterFn?: (item: CctvResponse) => boolean;
+    filterFn?: (item: CctvResponse | DeviceResponse) => boolean;
     maxItems?: number;
   }[];
   showSeparator?: boolean;
@@ -37,7 +37,7 @@ export function FeatureAssignCombobox({
   onSelect,
   placeholder = "검색어를 입력하거나 선택하세요",
   className,
-  items = [],
+  items = [] as CctvResponse[] | DeviceResponse[],
   groups = [], 
   showSeparator = true
 }: FeatureAssignComboboxProps) {

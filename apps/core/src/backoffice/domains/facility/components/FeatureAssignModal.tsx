@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem } from '@plug/ui';
 import { FeatureAssignCombobox } from './FeatureAssignCombobox';
 import { useCctvData } from '../hooks/useCctvData';
-import { CctvResponse, assignDeviceToFeature } from '@plug/common-services';
+import { useDeviceData } from '../hooks/useDeviceData';
+import { CctvResponse, DeviceResponse, assignDeviceToFeature } from '@plug/common-services';
 import { toast } from 'sonner';
 
 interface FeatureAssignModalProps {
@@ -20,6 +21,10 @@ export function FeatureAssignModal({
   const [selectedId, setSelectedId] = useState<string>('');
 
   const { getAllCctvs, isLoading: cctvsLoading } = useCctvData(); 
+  const { getAllDevices, isLoading: devicesLoading } = useDeviceData();
+
+  const currentItems = selectedType === 'CCTV' ? getAllCctvs : getAllDevices;
+  const isLoading = selectedType === 'CCTV' ? cctvsLoading : devicesLoading;
 
   useEffect(() => {
     if (open) {
@@ -85,7 +90,7 @@ export function FeatureAssignModal({
         <div className="grid gap-2 mt-4">
           <Label>장비 할당</Label>
           
-          {cctvsLoading ? (
+          {isLoading ? (
             <div className="flex items-center justify-center py-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
               <span className="ml-2 text-sm text-gray-600">데이터를 불러오는 중...</span>
@@ -96,17 +101,33 @@ export function FeatureAssignModal({
               onSelect={setSelectedId}
               placeholder={`할당할 장비를 선택하세요`}
               className="w-full"
-              items={getAllCctvs}
+              items={currentItems}
               groups={[
                 {
                   key: 'available',
                   title: `미할당 장비`,
-                  filterFn: (item: CctvResponse) => Boolean(!item.feature?.id || item.feature?.id === ""), 
+                  filterFn: (item: CctvResponse | DeviceResponse) => {
+                    if (selectedType === 'CCTV') {
+                      const cctvItem = item as CctvResponse;
+                      return !Boolean(cctvItem.feature?.id); 
+                    } else {
+                      const deviceItem = item as DeviceResponse;
+                      return !Boolean(deviceItem.featureId); 
+                    }
+                  }
                 },
                 {
                   key: 'unavailable',
                   title: `이미 할당된 장비`,
-                  filterFn: (item: CctvResponse) => Boolean(item.feature?.id && item.feature?.id !== ""), 
+                  filterFn: (item: CctvResponse | DeviceResponse) => {
+                    if (selectedType === 'CCTV') {
+                      const cctvItem = item as CctvResponse;
+                      return Boolean(cctvItem.feature?.id); 
+                    } else {
+                      const deviceItem = item as DeviceResponse;
+                      return Boolean(deviceItem.featureId); 
+                    }
+                  }
                 }
               ]}
             />
@@ -121,9 +142,9 @@ export function FeatureAssignModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={cctvsLoading}
+            disabled={isLoading}
           >
-            {cctvsLoading ? '할당 중...' : '확인'}
+            {isLoading ? '할당 중...' : '확인'}
           </Button>
         </DialogFooter>
       </DialogContent>
