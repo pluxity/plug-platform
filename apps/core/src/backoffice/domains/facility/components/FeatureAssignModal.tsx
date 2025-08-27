@@ -56,12 +56,6 @@ export function FeatureAssignModal({
     setSelectedId(''); 
   };
 
-  console.log('CCTV 데이터:', {
-    getAllCctvs,
-    selectedType,
-    cctvsLoading
-  });
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent title="장비 할당">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, assignDeviceToFeature, FeatureAssignDto } from '@plug/common-services'
+import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
 import { IndoorMapViewer } from '@/global/components'
 import { FloorControl } from '@/global/components/indoor-map/FloorControl'
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
@@ -110,7 +110,7 @@ const FacilityIndoor: React.FC = () => {
     setSelectedFeature(null)
   }
 
-  // POI 클릭 이벤트 리스너 등록
+  // POI 클릭 이벤트 (삭제/할당)
   useEffect(() => {
     const handleFeatureClick = (eventData: PoiClickEvent) => {
       const poiData = eventData.target;
@@ -125,17 +125,41 @@ const FacilityIndoor: React.FC = () => {
     };
 
     Event.AddEventListener('onPoiPointerUp' as never, handleFeatureClick);
-    // Event.AddEventListener('onEditFinish' as never, (evt: any) => {
-    // 수정된 Feature 정보
-    // PromiseAll
-    //   console.log('onPoiTransformChange', evt);
-    // });
-
 
     return () => {
       Event.RemoveEventListener('onPoiPointerUp' as never, handleFeatureClick);
     };
   }, [isDeleteMode]);
+
+
+  // POI 편집 이벤트
+  useEffect(() => {
+    const handleTransformChange = async (evt: any) => {
+      try {
+        const editedPois = evt.targets || [];
+        if (!editedPois.length) return;
+       
+        await Promise.all(
+          editedPois.map((poi: PoiData) => {
+            return updateFeatureTransform(poi.id, {
+              position: poi.position,
+              rotation: poi.rotation,
+              scale: poi.scale
+            });
+          })
+        )
+        toast.success('POI 편집이 완료되었습니다.');
+      } catch (error) {
+        console.error('POI 정보 업데이트 중 오류:', error);
+      }
+    };
+
+    Event.AddEventListener('onPoiFinishEdit' as never, handleTransformChange);
+
+    return () => {
+      Event.RemoveEventListener('onPoiFinishEdit' as never, handleTransformChange);
+    };
+  }, []);
  
 
   // Features 로드를 위한 함수
@@ -395,11 +419,13 @@ const FacilityIndoor: React.FC = () => {
         </Dialog>
       )}
 
-      <FeatureAssignModal
-        open={showFeatureAssignDialog}
-        onOpenChange={setShowFeatureAssignDialog}
-        featureId={selectedFeature?.id}
-      />
+      {!isDeleteMode && showFeatureAssignDialog && (
+        <FeatureAssignModal
+          open={showFeatureAssignDialog}
+          onOpenChange={setShowFeatureAssignDialog}
+          featureId={selectedFeature?.id}
+        />
+      )}
     </PageContainer>
   )
 }
