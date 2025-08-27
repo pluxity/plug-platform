@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { Engine3D, Loader } from '@plug/engine';
+import { Core, Loader } from '@plug/engine';
 
 interface IndoorMapViewerProps {
   modelUrl: string;
   className?: string;
   onLoadComplete?: () => void;
-  // 엔진 정리를 외부(@plug/engine)에서 수행할 수 있도록 언마운트 시 호출되는 훅
-  onDispose?: (engine: Engine3D) => void;
+  // 언마운트 시 호출되는 훅 (엔진 인스턴스는 Core 내부관리로 더 이상 노출하지 않음)
+  onDispose?: () => void;
 }
 
-export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({ 
+export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   modelUrl,
-  className = "w-full h-full", 
+  className = 'w-full h-full',
   onLoadComplete,
   onDispose
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const engine3DRef = useRef<Engine3D | null>(null);
+  const initializedRef = useRef(false);
   const loadedModelUrlRef = useRef<string | null>(null);
   const loadTimeoutRef = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,13 +31,13 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       return;
     }
 
-    // 엔진이 없으면 생성
-    if (!engine3DRef.current) {
+    // 엔진 초기화 (한 번만)
+    if (!initializedRef.current) {
       setIsLoading(true);
       setError(null);
       try {
-        const engine = new Engine3D(currentContainer);
-        engine3DRef.current = engine;
+        Core.Initialize(currentContainer);
+        initializedRef.current = true;
       } catch (err) {
         setIsLoading(false);
         setError(err instanceof Error ? err : new Error('3D 엔진 초기화 실패'));
@@ -91,16 +91,15 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
         loadTimeoutRef.current = null;
       }
       // 외부 엔진 정리 훅 호출 및 향후 엔진 clear 지원과의 연동
-      const engine = engine3DRef.current;
-      if (engine) {
-        // 인스턴스 메서드 형태를 우선 시도 (향후 engine.clear() 제공 시)
-        (engine as unknown as { clear?: () => void }).clear?.();
-        // 선택적 외부 콜백 제공
-        onDispose?.(engine);
-        // 레퍼런스 해제
-        engine3DRef.current = null;
-        loadedModelUrlRef.current = null;
+      // 엔진 메모리 해제 (Canvas 포함 제거) - README 2025-08-26 업데이트 참고
+      if (initializedRef.current) {
+        try {
+          Core.Dispose();
+        } catch { /* ignore */ }
+        initializedRef.current = false;
       }
+      loadedModelUrlRef.current = null;
+      onDispose?.();
     };
   }, [onDispose]);
   
