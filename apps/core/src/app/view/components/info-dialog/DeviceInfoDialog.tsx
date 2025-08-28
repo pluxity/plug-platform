@@ -4,10 +4,17 @@ import InfoDialog from './InfoDialog'
 export interface DeviceInfoDialogProps {
   device: GsDeviceResponse | null
   onClose?: () => void
+  /**
+   * hole 을 전달하지 않으면 이 컴포넌트만의 컴팩트 기본 hole (작은 사이즈) 사용.
+   * hole={false} 면 mask/hole 제거.
+   */
   hole?: { x?: string; y?: string; w?: string; h?: string } | false
 }
 
-const DeviceInfoDialog = ({ device, onClose, hole = undefined }: DeviceInfoDialogProps) => {
+// DeviceInfoDialog 전용 기본 Hole (InfoDialog 의 기본보다 작게)
+const DEFAULT_DEVICE_HOLE = { x: '1.25rem', y: '1.25rem', w: '28rem', h: '22rem' }
+
+const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
   if (!device) return null
 
   const badges = (
@@ -43,12 +50,7 @@ const DeviceInfoDialog = ({ device, onClose, hole = undefined }: DeviceInfoDialo
   )
 
   const footer = (
-    <button
-      onClick={onClose}
-      className="inline-flex items-center gap-2 px-[1.25rem] py-2.5 rounded-xl text-sm font-semibold tracking-wide bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white shadow-lg shadow-indigo-900/40 hover:shadow-pink-900/40 transition focus:outline-none focus:ring-2 focus:ring-pink-300/50"
-    >
-      닫기
-    </button>
+    <></>
   )
 
   return (
@@ -58,8 +60,8 @@ const DeviceInfoDialog = ({ device, onClose, hole = undefined }: DeviceInfoDialo
       onClose={onClose}
       badges={badges}
       footer={footer}
-      hole={hole}
-      className={hole === false ? 'w-[36rem] max-w-[90vw]' : undefined}
+      hole={hole === undefined ? DEFAULT_DEVICE_HOLE : (hole === false ? false : { ...DEFAULT_DEVICE_HOLE, ...hole })}
+      className={hole === false ? 'w-[32rem] max-w-[90vw]' : 'w-[70rem]'}
     >
       {body}
     </InfoDialog>

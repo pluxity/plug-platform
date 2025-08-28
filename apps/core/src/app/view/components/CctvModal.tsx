@@ -1,120 +1,122 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { X } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+// 공유 UI 라이브러리의 Dialog 컴포넌트 활용
+import { Dialog, DialogContent } from '@plug/ui'
 
 export interface CctvModalProps {
-  open: boolean;
-  url: string;
-  title?: string;
-  onClose: () => void;
-  autoPlay?: boolean;
-  muted?: boolean;
-  controls?: boolean;
-  poster?: string;
+  open: boolean
+  host: string
+  onClose: () => void
+  title?: string
+  path?: string
 }
 
-const CctvModal: React.FC<CctvModalProps> = ({
-  open,
-  url,
-  title = 'CCTV',
-  onClose,
-  autoPlay = true,
-  muted = true,
-  controls = true,
-  poster,
-}) => {
-  const [mounted, setMounted] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path = 'cctv' }) => {
+  const [mounted, setMounted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const pcRef = useRef<RTCPeerConnection | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
+  const PATH = path
 
   useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
 
   useEffect(() => {
-    if (!open) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [open]);
+    if (!open) return
+    const original = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = original }
+  }, [open])
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose?.();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  const cleanup = useCallback(() => {
+    abortRef.current?.abort()
+    abortRef.current = null
+    if (pcRef.current) {
+      try { pcRef.current.getSenders().forEach(s => { try { s.track?.stop() } catch { /* noop */ } }) } catch { /* noop */ }
+      try { pcRef.current.close() } catch { /* noop */ }
+    }
+    pcRef.current = null
+    if (videoRef.current) videoRef.current.srcObject = null
+  }, [])
 
-  const content = useMemo(() => {
-    if (!open) return null;
-    return (
-      <div className="fixed inset-0 z-[1000]">
-        <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"
-          onClick={onClose}
-        />
-        <div className="absolute inset-0 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-5xl bg-gray-900 text-white rounded-lg shadow-xl border border-gray-700">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-              <h3 className="text-lg font-semibold truncate pr-4">{title}</h3>
-              <button
-                aria-label="Close"
-                onClick={onClose}
-                className="inline-flex items-center justify-center rounded-md p-1.5 text-gray-300 hover:text-white hover:bg-gray-700/60 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+  const start = useCallback(async () => {
+    if (!open) return
+    cleanup()
+    setError(null)
 
-            <div className="w-full aspect-video bg-black">
-              <video
-                ref={videoRef}
-                src={url}
-                className="w-full h-full object-contain bg-black"
-                controls={controls}
-                autoPlay={autoPlay}
-                muted={muted}
-                playsInline
-                poster={poster}
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
+    const MAX_RETRIES = 3
 
-            <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-gray-700">
-              <button
-                onClick={() => {
-                  const v = videoRef.current;
-                  if (v) {
-                    v.pause();
-                    v.currentTime = 0;
-                    void v.play().catch(() => {});
-                  }
-                }}
-                className="px-3 py-1.5 text-sm rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700"
-              >
-                다시 재생
-              </button>
-              <button
-                onClick={onClose}
-                className="px-3 py-1.5 text-sm rounded-md bg-blue-600 hover:bg-blue-700"
-              >
-                닫기
-              </button>
-            </div>
-          </div>
+    const delay = (ms: number) => new Promise(r => setTimeout(r, ms))
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      if (!open) return // 모달 닫힘 중단
+      // 이전 시도 정리
+      cleanup()
+      try {
+        const pc = new RTCPeerConnection()
+        pcRef.current = pc
+        abortRef.current = new AbortController()
+        pc.addEventListener('track', ev => {
+          if (ev.track.kind === 'video') {
+            const el = videoRef.current
+            if (el && !el.srcObject) {
+              el.srcObject = ev.streams[0]
+              try { el.play?.() } catch { /* noop */ }
+            }
+          }
+        })
+        pc.addTransceiver('video', { direction: 'recvonly' })
+        pc.addTransceiver('audio', { direction: 'recvonly' })
+
+        const offer = await pc.createOffer()
+        await pc.setLocalDescription(offer)
+        const url = `http://${host}:8889/${encodeURIComponent(PATH)}/whep`
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/sdp' },
+          body: offer.sdp || '',
+          signal: abortRef.current.signal
+        })
+        if (!res.ok) throw new Error(`WHEP 실패 (${res.status}) (시도 ${attempt}/${MAX_RETRIES})`)
+        const answerSdp = await res.text()
+        await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp })
+        // 성공 시 루프 종료
+        return
+      } catch (e) {
+        if (attempt === MAX_RETRIES) {
+          cleanup()
+          setError(e instanceof Error ? e.message : String(e))
+          return
+        }
+        // 다음 재시도 전 지수/선형 Backoff (여기선 간단히 400ms * attempt)
+        await delay(400 * attempt)
+      }
+    }
+  }, [cleanup, host, open, PATH])
+
+  useEffect(() => { if (open) start(); else cleanup() }, [open, PATH, start, cleanup])
+  useEffect(() => () => cleanup(), [cleanup])
+
+  if (!mounted || !open) return null
+
+  return (
+    <Dialog open={open && mounted} onOpenChange={(o) => { if (!o) onClose() }}>
+      <DialogContent
+          title={title || `CCTV / ${PATH}`}
+      >
+        <div className='aspect-video bg-black'>
+          <video ref={videoRef} className='w-full h-full object-contain bg-black' autoPlay muted playsInline controls />
         </div>
-      </div>
-    );
-  }, [open, onClose, title, url, controls, autoPlay, muted, poster]);
+        {error && (
+          <div className='px-4 py-3 text-sm text-red-400 border-t border-gray-700 break-all'>
+            {error}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-  if (!mounted) return null;
-  const portalTarget = document.getElementById('modal-root') ?? document.body;
-  return ReactDOM.createPortal(content, portalTarget);
-};
-
-export default CctvModal;
+export default CctvModal
