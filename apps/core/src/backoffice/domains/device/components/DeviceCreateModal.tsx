@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { DeviceCreateModalProps } from '@/backoffice/domains/device/types/device';
 import { Input, Button, Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from '@plug/ui';
-import { deviceFormSchema, type DeviceFormData } from '@/backoffice/domains/device/schemas/deviceSchemas';
+import { deviceCreateFormSchema, DeviceCreateFormData } from '@/backoffice/domains/device/schemas/deviceSchemas';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCreateDevice, useDeviceCategoriesSWR, useDeviceCompanyTypesSWR, useDeviceTypesSWR } from '@plug/common-services';
@@ -15,8 +15,8 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
     const { data: companyTypeList } = useDeviceCompanyTypesSWR();
     const { data: deviceTypeList } = useDeviceTypesSWR();
     
-    const modalForm = useForm<DeviceFormData>({
-        resolver: zodResolver(deviceFormSchema),
+    const modalForm = useForm<DeviceCreateFormData>({
+        resolver: zodResolver(deviceCreateFormSchema),
         defaultValues: {
             categoryId: '',
             id: '',
@@ -59,7 +59,7 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
         onClose();
     }, [modalForm, onClose]);
 
-    const handleSubmit = useCallback(async (data: DeviceFormData) => {
+    const handleSubmit = useCallback(async (data: DeviceCreateFormData) => {
         try {
             await createDevice({
                 categoryId: Number(data.categoryId),
@@ -102,8 +102,7 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
                                         </Select>
                                     </ModalFormItem>
                                 )}
-                            >
-                            </ModalFormField>
+                            />
                             <ModalFormField 
                                 control={modalForm.control}
                                 name="id"

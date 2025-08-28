@@ -3,7 +3,7 @@ import { Button, Input, Dialog, DialogContent, DialogFooter,ModalForm, ModalForm
 import { DeviceEditModalProps } from '@/backoffice/domains/device/types/device';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { deviceFormSchema, type DeviceFormData } from '@/backoffice/domains/device/schemas/deviceSchemas';
+import { deviceEditFormSchema, DeviceEditFormData } from '@/backoffice/domains/device/schemas/deviceSchemas';
 import { useDeviceCategoriesSWR, useDeviceCompanyTypesSWR, useDeviceDetailSWR, useDeviceTypesSWR, useUpdateDevice } from '@plug/common-services';
 import { toast } from 'sonner';
 
@@ -14,11 +14,10 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
     const { data, mutate } = useDeviceDetailSWR(deviceId);
     const { execute: updateDevice, isLoading: isDeviceUpdating } = useUpdateDevice(deviceId);
     
-    const modalForm = useForm<DeviceFormData>({
-        resolver: zodResolver(deviceFormSchema),
+    const modalForm = useForm<DeviceEditFormData>({
+        resolver: zodResolver(deviceEditFormSchema),
         defaultValues: {
             categoryId: '',
-            id: '',
             name: '',
             companyType: '',
             deviceType: '',
@@ -50,7 +49,6 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
         if(isOpen && data && !modalForm.formState.isDirty){
             modalForm.reset({
                 categoryId: data.deviceCategory?.id.toString() ?? '',
-                id: data.id,
                 name: data.name,
                 companyType: data.companyType,
                 deviceType: data.deviceType,
@@ -61,16 +59,15 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
     const resetForm = useCallback(() => {
         modalForm.reset({
             categoryId: data?.deviceCategory?.id.toString() || '',
-            id: data?.id || '',
             name: data?.name || '',
             companyType: data?.companyType || '',
             deviceType: data?.deviceType || '',
         });
         onClose();
         mutate();
-    }, [modalForm, onClose, mutate]);
+    }, [modalForm, onClose, mutate, data]);
 
-   const handleSubmit = useCallback(async (data: DeviceFormData) => {
+   const handleSubmit = useCallback(async (data: DeviceEditFormData) => {
         try{
             await updateDevice({
                 categoryId: Number(data.categoryId),
@@ -112,8 +109,7 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
                                         </Select>
                                     </ModalFormItem>
                                 )}
-                            >
-                            </ModalFormField>
+                            />
                             <ModalFormField 
                                 control={modalForm.control}
                                 name="name"
