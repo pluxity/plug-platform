@@ -9,6 +9,10 @@ export const useUsers = () => {
   return useGet<UserProfile[]>(END_POINT, { requireAuth: true });
 };
 
+export const useUsersWithIsLoggedIn = () => {
+  return useGet<UserProfile[]>(`${END_POINT}/with-is-logged-in`, { requireAuth: true });
+};
+
 // 사용자 상세 조회
 export const useUserDetail = (userId: number) => {
   return useGet<UserProfile>(`${END_POINT}/${userId}`, { requireAuth: true });

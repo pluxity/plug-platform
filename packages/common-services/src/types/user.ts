@@ -31,6 +31,8 @@ export interface UserProfile {
     department: string;
     shouldChangePassword: boolean;
     roles: Set<RoleResponse>;
+    // 로그인 상태 (with-is-logged-in 파라미터 사용 시 포함)
+    isLoggedIn?: boolean;
 }
 
 export interface UserPasswordRequest {
