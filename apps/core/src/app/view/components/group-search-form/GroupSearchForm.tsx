@@ -1,26 +1,22 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import type { GroupSearchFormProps, GroupSearchFormRef, GroupSearchGroup } from './GroupSearchForm.types'
 
-function clsx(...classes: Array<string | undefined | false>) {
-  return classes.filter(Boolean).join(' ')
+function clsx(...classNames: Array<string | undefined | false>) {
+  return classNames.filter(Boolean).join(' ')
 }
 
 function flattenCount<T>(groups: GroupSearchGroup<T>[]) {
-  return groups.reduce((acc, g) => acc + (g.items?.length ?? 0), 0)
+  return groups.reduce((total, group) => total + (group.items?.length ?? 0), 0)
 }
 
-function DefaultEmpty({ text }: { text: string }) {
-  return (
-  <div className="px-4 py-3 text-gray-500 text-center">{text}</div>
-  )
-}
+function DefaultEmpty({ text }: { text: string }) { return (<div className="px-4 py-3 text-gray-500 text-center">{text}</div>) }
 
 function useControlledOpen({ isOpen, defaultOpen, onOpenChange }: { isOpen?: boolean, defaultOpen?: boolean, onOpenChange?: (open: boolean) => void }) {
-  const [uncontrolled, setUncontrolled] = useState<boolean>(!!defaultOpen)
-  const open = isOpen ?? uncontrolled
-  const setOpen = (v: boolean) => {
-    if (isOpen === undefined) setUncontrolled(v)
-    onOpenChange?.(v)
+  const [internalOpenState, setInternalOpenState] = useState<boolean>(!!defaultOpen)
+  const open = isOpen ?? internalOpenState
+  const setOpen = (nextOpen: boolean) => {
+    if (isOpen === undefined) setInternalOpenState(nextOpen)
+    onOpenChange?.(nextOpen)
   }
   return [open, setOpen] as const
 }
@@ -68,21 +64,21 @@ const GroupSearchFormInner = <T,>(
     blur: () => inputRef.current?.blur(),
   }), [onValueChange, setOpen])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const next = e.target.value
-  onValueChange(next)
-  const hasMin = next.trim().length >= 2
-  if (!open && hasMin) setOpen(true)
-  if (open && !hasMin) setOpen(false)
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextValue = event.target.value
+    onValueChange(nextValue)
+    const meetsMinLength = nextValue.trim().length >= 2
+    if (!open && meetsMinLength) setOpen(true)
+    if (open && !meetsMinLength) setOpen(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') setOpen(false)
+  const handleKeyDown = (keyboardEvent: React.KeyboardEvent) => {
+    if (keyboardEvent.key === 'Escape') setOpen(false)
   }
 
   const handleFocus = () => {
-    const hasMin = value.trim().length >= 2
-    if (hasMin && totalCount > 0) setOpen(true)
+    const meetsMinLength = value.trim().length >= 2
+    if (meetsMinLength && totalCount > 0) setOpen(true)
   }
 
   return (
@@ -129,10 +125,10 @@ const GroupSearchFormInner = <T,>(
             <div key={`${group.heading}-${groupIndex}`} className="py-1">
               <div className="px-3 py-1 text-xs text-gray-500 uppercase tracking-wide">{group.heading}</div>
               {group.items.map((item, itemIndex) => {
-                const key = (getItemKey?.(item, groupIndex, itemIndex)) ?? `${group.heading}-${itemIndex}`
+        const itemKey = (getItemKey?.(item, groupIndex, itemIndex)) ?? `${group.heading}-${itemIndex}`
                 return (
                   <button
-                    key={key}
+          key={itemKey}
                     onClick={() => onSelect?.(item, { group, groupIndex, itemIndex })}
                     className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
                   >
