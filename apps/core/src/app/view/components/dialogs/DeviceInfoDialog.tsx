@@ -1,8 +1,8 @@
-import type { GsDeviceResponse } from '@plug/common-services'
+import type { DeviceResponse } from '@plug/common-services'
 import InfoDialog from './InfoDialog'
 
 export interface DeviceInfoDialogProps {
-  device: GsDeviceResponse | null
+  device: DeviceResponse | null
   onClose?: () => void
   hole?: { x?: string; y?: string; w?: string; h?: string } | false
 }

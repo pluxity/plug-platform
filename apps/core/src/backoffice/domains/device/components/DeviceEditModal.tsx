@@ -3,21 +3,24 @@ import { Button, Input, Dialog, DialogContent, DialogFooter,ModalForm, ModalForm
 import { DeviceEditModalProps } from '@/backoffice/domains/device/types/device';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { deviceFormSchema, type DeviceFormData } from '@/backoffice/domains/device/schemas/deviceSchemas';
-import { useDeviceCategoriesSWR, useDeviceDetailSWR, useUpdateDevice } from '@plug/common-services';
+import { deviceEditFormSchema, DeviceEditFormData } from '@/backoffice/domains/device/schemas/deviceSchemas';
+import { useDeviceCategoriesSWR, useDeviceCompanyTypesSWR, useDeviceDetailSWR, useDeviceTypesSWR, useUpdateDevice } from '@plug/common-services';
 import { toast } from 'sonner';
 
 export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClose, onSuccess, deviceId }) => {
     const { data: categoryList } = useDeviceCategoriesSWR();
+    const { data: companyTypeList } = useDeviceCompanyTypesSWR();
+    const { data: deviceTypeList } = useDeviceTypesSWR();
     const { data, mutate } = useDeviceDetailSWR(deviceId);
     const { execute: updateDevice, isLoading: isDeviceUpdating } = useUpdateDevice(deviceId);
     
-    const modalForm = useForm<DeviceFormData>({
-        resolver: zodResolver(deviceFormSchema),
+    const modalForm = useForm<DeviceEditFormData>({
+        resolver: zodResolver(deviceEditFormSchema),
         defaultValues: {
             categoryId: '',
-            id: '',
             name: '',
+            companyType: '',
+            deviceType: '',
         },
         mode: 'onChange',
     });
@@ -28,12 +31,27 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
         })) || [];
     }, [categoryList]);
 
+    const companyTypeOptions = useMemo(() => {
+        return companyTypeList?.map((companyType) => ({
+            label: companyType.label,
+            value: companyType.key,
+        })) || [];
+    }, [companyTypeList]);
+
+    const deviceTypeOptions = useMemo(() => {
+        return deviceTypeList?.map((deviceType) => ({
+            label: deviceType.label,
+            value: deviceType.key,
+        })) || [];
+    }, [deviceTypeList]);
+
     useEffect(() => {
         if(isOpen && data && !modalForm.formState.isDirty){
             modalForm.reset({
                 categoryId: data.deviceCategory?.id.toString() ?? '',
-                id: data.id,
                 name: data.name,
+                companyType: data.companyType,
+                deviceType: data.deviceType,
             });
         }
     }, [data, isOpen, modalForm]);
@@ -41,23 +59,27 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
     const resetForm = useCallback(() => {
         modalForm.reset({
             categoryId: data?.deviceCategory?.id.toString() || '',
-            id: data?.id || '',
             name: data?.name || '',
+            companyType: data?.companyType || '',
+            deviceType: data?.deviceType || '',
         });
         onClose();
         mutate();
-    }, [modalForm, onClose, mutate]);
+    }, [modalForm, onClose, mutate, data]);
 
-   const handleSubmit = useCallback(async (data: DeviceFormData) => {
+   const handleSubmit = useCallback(async (data: DeviceEditFormData) => {
         try{
             await updateDevice({
                 categoryId: Number(data.categoryId),
                 name: data.name,
+                companyType: data.companyType,
+                deviceType: data.deviceType,
             })
             toast.success('디바이스 수정 완료');
             onSuccess?.();
             resetForm();
         }catch(error){
+            console.error('디바이스 수정 실패:', error);
             toast.error((error as Error).message || '디바이스 수정에 실패했습니다.');
         }
    }, [updateDevice, onSuccess, resetForm]);
@@ -87,14 +109,53 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
                                         </Select>
                                     </ModalFormItem>
                                 )}
-                            >
-                            </ModalFormField>
+                            />
                             <ModalFormField 
                                 control={modalForm.control}
                                 name="name"
                                 render={({ field }) => (
                                     <ModalFormItem label="디바이스 이름" message={modalForm.formState.errors.name?.message}>
                                         <Input {...field} />
+                                    </ModalFormItem>
+                                )}
+                            />
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="companyType"
+                                render={({ field }) => (
+                                    <ModalFormItem label="디바이스 회사 타입" message={modalForm.formState.errors.companyType?.message}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="디바이스 회사를 선택해주세요." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {companyTypeOptions.map((companyType) => (
+                                                    <SelectItem key={companyType.value} value={companyType.value}>
+                                                        {companyType.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </ModalFormItem>
+                                )}
+                            />
+                            <ModalFormField
+                                control={modalForm.control}
+                                name="deviceType"
+                                render={({ field }) => (
+                                    <ModalFormItem label="디바이스 타입" message={modalForm.formState.errors.deviceType?.message}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="디바이스 타입을 선택해주세요." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {deviceTypeOptions.map((deviceType) => (
+                                                    <SelectItem key={deviceType.value} value={deviceType.value}>
+                                                        {deviceType.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </ModalFormItem>
                                 )}
                             />

@@ -8,7 +8,7 @@ import MapScene from '@/global/components/indoor-map/MapScene'
 import DeviceSearchForm from './DeviceSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
 import { DeviceInfoDialog, CctvDialog } from '../dialogs'
-import type { GsDeviceResponse } from '@plug/common-services'
+import type { DeviceResponse } from '@plug/common-services'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -33,7 +33,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
 
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
 
-  const [selectedDevice, setSelectedDevice] = useState<GsDeviceResponse | null>(null)
+  const [selectedDevice, setSelectedDevice] = useState<DeviceResponse | null>(null)
 
   if (!facilitiesFetched || isLoading || has3DDrawing === null) {
     return (
