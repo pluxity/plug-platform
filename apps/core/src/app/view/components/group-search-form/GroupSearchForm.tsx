@@ -72,9 +72,14 @@ const GroupSearchFormInner = <T,>(
     if (open && !meetsMinLength) setOpen(false)
   }
 
-  const handleKeyDown = (keyboardEvent: React.KeyboardEvent) => { if (keyboardEvent.key === 'Escape') setOpen(false) }
+  const handleKeyDown = (keyboardEvent: React.KeyboardEvent) => {
+    if (keyboardEvent.key === 'Escape') setOpen(false)
+  }
 
-  const handleFocus = () => { const meetsMinLength = value.trim().length >= 2; if (meetsMinLength && totalCount > 0) setOpen(true) }
+  const handleFocus = () => {
+    const meetsMinLength = value.trim().length >= 2
+    if (meetsMinLength && totalCount > 0) setOpen(true)
+  }
 
   return (
     <div ref={rootRef} className={clsx('relative w-80', className)}>

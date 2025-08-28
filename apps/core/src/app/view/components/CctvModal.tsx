@@ -15,7 +15,6 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const pcRef = useRef<RTCPeerConnection | null>(null)
   const abortRef = useRef<AbortController | null>(null)
-  const PATH = path
 
   useEffect(() => {
     setMounted(true)
@@ -46,11 +45,10 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
     setError(null)
 
     const MAX_RETRIES = 3
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-  const delay = (milliseconds: number) => new Promise(resolve => setTimeout(resolve, milliseconds))
-
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-  if (!open) return
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      if (!open) return
       cleanup()
       try {
         const pc = new RTCPeerConnection()
@@ -61,7 +59,7 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
             const videoElement = videoRef.current
             if (videoElement && !videoElement.srcObject) {
               videoElement.srcObject = trackEvent.streams[0]
-              try { videoElement.play?.() } catch { void 0 }
+              try { videoElement.play?.() } catch { /* noop */ }
             }
           }
         })
@@ -70,38 +68,36 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
 
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
-        const url = `http://${host}:8889/${encodeURIComponent(PATH)}/whep`
-  const response = await fetch(url, {
+        const url = `http://${host}:8889/${encodeURIComponent(path)}/whep`
+        const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/sdp' },
           body: offer.sdp || '',
           signal: abortRef.current.signal
         })
-  if (!response.ok) throw new Error(`WHEP 실패 (${response.status}) (시도 ${attempt}/${MAX_RETRIES})`)
-  const answerSdp = await response.text()
+        if (!response.ok) throw new Error(`WHEP 실패 (${response.status}) (시도 ${attempt}/${MAX_RETRIES})`)
+        const answerSdp = await response.text()
         await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp })
         return
       } catch (e) {
         if (attempt === MAX_RETRIES) {
           cleanup()
-          setError(e instanceof Error ? e.message : String(e))
+            setError(e instanceof Error ? e.message : String(e))
           return
         }
         await delay(400 * attempt)
       }
     }
-  }, [cleanup, host, open, PATH])
+  }, [cleanup, host, open, path])
 
-  useEffect(() => { if (open) start(); else cleanup() }, [open, PATH, start, cleanup])
+  useEffect(() => { if (open) start(); else cleanup() }, [open, path, start, cleanup])
   useEffect(() => () => cleanup(), [cleanup])
 
   if (!mounted || !open) return null
 
   return (
     <Dialog open={open && mounted} onOpenChange={(o) => { if (!o) onClose() }}>
-      <DialogContent
-          title={title || `CCTV / ${PATH}`}
-      >
+  <DialogContent title={title || `CCTV / ${path}`}>
         <div className='aspect-video bg-black'>
           <video ref={videoRef} className='w-full h-full object-contain bg-black' autoPlay muted playsInline controls />
         </div>
