@@ -88,7 +88,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
       <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
       <CctvModal
         open={cctvOpen}
-        host={import.meta.env.VITE_CCTV_HOST || '192.168.4.8'}
+        host={import.meta.env.VITE_WEBRTC_HOST || import.meta.env.VITE_CCTV_HOST || '192.168.4.8'}
         onClose={() => setCctvOpen(false)}
       />
     </>

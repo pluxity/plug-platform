@@ -32,7 +32,11 @@ export function useIndoorEngine({
   
   const poiPointerUpListener = useCallback((event: unknown) => {
     for (const callback of poiPointerUpCallbacksRef.current) {
-      try { callback(event) } catch { void 0 }
+      try { 
+        callback(event) 
+      } catch (e) { 
+        console.error('Error in onPoiPointerUp callback:', e) 
+      }
     }
   }, [])
 
