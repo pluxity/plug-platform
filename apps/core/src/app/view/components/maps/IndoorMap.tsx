@@ -7,9 +7,8 @@ import { useIndoorFacilityData } from '@/app/view/hooks/useIndoorFacilityData'
 import MapScene from '@/global/components/indoor-map/MapScene'
 import DeviceSearchForm from './DeviceSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
-import { DeviceInfoDialog } from '../info-dialog'
+import { DeviceInfoDialog, CctvDialog } from '../dialogs'
 import type { GsDeviceResponse } from '@plug/common-services'
-import CctvModal from '@/app/view/components/CctvModal'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -86,7 +85,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     <>
       <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
       <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
-      <CctvModal
+  <CctvDialog
         open={cctvOpen}
         host={import.meta.env.VITE_WEBRTC_HOST || import.meta.env.VITE_CCTV_HOST || '192.168.4.8'}
         onClose={() => setCctvOpen(false)}
