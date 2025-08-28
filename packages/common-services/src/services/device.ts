@@ -1,84 +1,68 @@
-import { useGet, usePost, usePatch, useDelete, useSWRApi, usePut } from '@plug/api-hooks';
+import { useGet, usePost, useSWRApi, usePut, usePatch } from '@plug/api-hooks';
 import { api } from '@plug/api-hooks/core';
 import type {
-  GsDeviceResponse,
-  GsDeviceCreateRequest,
-  GsDeviceUpdateRequest,
-  GsDeviceCctvUpdateRequest,
-  DeviceResponse
+  DeviceResponse,
+  DeviceTypeResponse,
+  DeviceCompanyTypeResponse,
+  DeviceCreateRequest,
+  DeviceUpdateRequest,
 } from '../types/device';
 const DEVICES_ROOT = 'devices';
-const GS_DEVICES_ENDPOINT = `${DEVICES_ROOT}/gs-devices`;
 const DEVICE_TYPES_ENDPOINT = `${DEVICES_ROOT}/types`;
-export const getAllDevices = async (): Promise<DeviceResponse[]> => {
+const COMPANY_TYPES_ENDPOINT = `${DEVICES_ROOT}/company-types`;
+
+export const getDevices = async (): Promise<DeviceResponse[]> => {
   const resp = await api.get<DeviceResponse[]>(DEVICES_ROOT, { requireAuth: true });
-  return (resp as any)?.data ?? (resp as any);
+  return (resp as any)?.data ?? (resp as any) ?? [];
 };
 
-export const getDevices = getAllDevices;
-
-export const useAllDevices = () => useGet<DeviceResponse[]>(DEVICES_ROOT, { requireAuth: true });
-
-export const useAllDevicesSWR = () => useSWRApi<DeviceResponse[]>(DEVICES_ROOT, 'GET', { requireAuth: true });
-export const getGsDevices = async (): Promise<GsDeviceResponse[]> => {
-  const resp = await api.get<GsDeviceResponse[]>(GS_DEVICES_ENDPOINT, { requireAuth: true });
-  return (resp as any)?.data ?? (resp as any);
+export const useDevices = () => {
+  return useGet<DeviceResponse[]>(DEVICES_ROOT, { requireAuth: true });
 };
 
-export const useGsDevices = () => {
-  return useGet<GsDeviceResponse[]>(GS_DEVICES_ENDPOINT, { requireAuth: true });
+export const useDeviceDetail = (deviceId: string) => {
+  return useGet<DeviceResponse>(`${DEVICES_ROOT}/${deviceId}`, { requireAuth: true });
 };
 
-export const useGsDevicesSWR = () => {
-  return useSWRApi<GsDeviceResponse[]>(GS_DEVICES_ENDPOINT, 'GET', { requireAuth: true });
+export const useCreateDevice = () => {
+  return usePost<DeviceCreateRequest>(DEVICES_ROOT, { requireAuth: true });
 };
 
-export const useGsDeviceDetail = (deviceId: string | undefined) => {
-  const url = deviceId ? `${GS_DEVICES_ENDPOINT}/${deviceId}` : '';
-  return useSWRApi<GsDeviceResponse>(url, 'GET', { requireAuth: true }, { isPaused: () => !deviceId });
+export const useUpdateDevice = (deviceId: string) => {
+  return usePut<DeviceUpdateRequest>(`${DEVICES_ROOT}/${deviceId}`, { requireAuth: true });
 };
 
-export const useCreateGsDevice = () => {
-  return usePost<GsDeviceCreateRequest>(GS_DEVICES_ENDPOINT, { requireAuth: true });
+export const useAssignDeviceCategory = (deviceId: string, categoryId: number) => {
+  return usePatch<null>(`${DEVICES_ROOT}/${deviceId}/category/${categoryId}`, { requireAuth: true });
 };
 
-export const useUpdateGsDevice = (deviceId: string) => {
-  return usePut<GsDeviceUpdateRequest>(`${GS_DEVICES_ENDPOINT}/${deviceId}`, { requireAuth: true });
-};
-export const deleteGsDevice = async (deviceId: string) => {
-  return api.delete(`${GS_DEVICES_ENDPOINT}/${deviceId}`, { requireAuth: true });
-};
-export const useAssignGsDeviceCategory = (deviceId: string, categoryId: number) => {
-  return usePatch<null>(`${GS_DEVICES_ENDPOINT}/${deviceId}/category/${categoryId}`, { requireAuth: true });
-};
-export const useRemoveGsDeviceCategory = (deviceId: string) => {
-  return useDelete(`${GS_DEVICES_ENDPOINT}/${deviceId}/category`, { requireAuth: true });
-};
-export const assignCctvsToGsDevice = async (deviceId: string, data: GsDeviceCctvUpdateRequest) => {
-  return api.put(`${GS_DEVICES_ENDPOINT}/${deviceId}/cctvs`, data, { requireAuth: true });
-};
-export const getCctvsOfGsDevice = async (deviceId: string) => {
-  const resp = await api.get<any>(`${GS_DEVICES_ENDPOINT}/${deviceId}/cctvs`, { requireAuth: true });
-  return (resp as any)?.data ?? (resp as any);
-};
-export const getDeviceTypes = async (): Promise<string[]> => {
-  const resp = await api.get<string[]>(DEVICE_TYPES_ENDPOINT, { requireAuth: true });
-  return (resp as any)?.data ?? (resp as any);
+export const deleteDevice = async (deviceId: string) => {
+  return api.delete(`${DEVICES_ROOT}/${deviceId}`, { requireAuth: true });
 };
 
 export const useDeviceTypes = () => {
-  return useGet<string[]>(DEVICE_TYPES_ENDPOINT, { requireAuth: true });
+  return useGet<DeviceTypeResponse[]>(DEVICE_TYPES_ENDPOINT, { requireAuth: true });
+};
+
+export const useCompanyTypes = () => {
+  return useGet<DeviceCompanyTypeResponse[]>(COMPANY_TYPES_ENDPOINT, { requireAuth: true });
+};
+
+export const useDevicesSWR = () => {
+  return useSWRApi<DeviceResponse[]>(DEVICES_ROOT, 'GET', { requireAuth: true });
+};
+
+export const useDeviceCompanyTypesSWR = () => {
+  return useSWRApi<DeviceCompanyTypeResponse[]>(COMPANY_TYPES_ENDPOINT, 'GET', { requireAuth: true });
 };
 
 export const useDeviceTypesSWR = () => {
-  return useSWRApi<string[]>(DEVICE_TYPES_ENDPOINT, 'GET', { requireAuth: true });
+  return useSWRApi<DeviceTypeResponse[]>(DEVICE_TYPES_ENDPOINT, 'GET', { requireAuth: true });
 };
-export const useDevices = useAllDevices;
-export const useDeviceDetail = (deviceId: string) => useGet<GsDeviceResponse>(`${GS_DEVICES_ENDPOINT}/${deviceId}`, { requireAuth: true });
-export const useCreateDevice = useCreateGsDevice;
-export const useUpdateDevice = useUpdateGsDevice;
-export const deleteDevice = deleteGsDevice;
-export const useAssignDeviceCategory = useAssignGsDeviceCategory;
-export const useRemoveDeviceCategory = useRemoveGsDeviceCategory;
-export const useDevicesSWR = useAllDevicesSWR;
-export const useDeviceDetailSWR = useGsDeviceDetail;
+
+export const useDeviceDetailSWR = (deviceId: string) => {
+  const url = deviceId ? `${DEVICES_ROOT}/${deviceId}` : '';
+  return useSWRApi<DeviceResponse>(url, 'GET', { requireAuth: true }, {
+    isPaused: () => !deviceId,
+  });
+};
