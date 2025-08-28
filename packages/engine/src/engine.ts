@@ -19,6 +19,7 @@ class Engine3D {
     private dom: HTMLElement | null;
 
     private renderer: THREE.WebGLRenderer;
+    private cssRenderer: Addon.CSS2DRenderer;
     private composer: Addon.EffectComposer;
     private camera: THREE.PerspectiveCamera;
     private clock: THREE.Clock;
@@ -58,7 +59,18 @@ class Engine3D {
         // 톤매핑
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.0;
+        // 포인터 작동 x
+        this.renderer.domElement.id = 'WebGLCanvas';
+        this.renderer.domElement.style.pointerEvents = 'none';
         this.dom.appendChild(this.renderer.domElement);
+
+        // css렌더러
+        this.cssRenderer = new Addon.CSS2DRenderer();
+        this.cssRenderer.setSize(this.dom.clientWidth, this.dom.clientHeight);
+        this.cssRenderer.domElement.id = 'CSSCanvas';
+        this.cssRenderer.domElement.style.position = 'absolute';
+        this.cssRenderer.domElement.style.top = '0px';
+        this.dom.appendChild(this.cssRenderer.domElement);
 
         // 카메라
         this.camera = new THREE.PerspectiveCamera(75, this.dom.clientWidth / this.dom.clientHeight, 0.1, 5000);
@@ -140,6 +152,7 @@ class Engine3D {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.cssRenderer.setSize(container.clientWidth, container.clientHeight);
         this.composer.setSize(container.clientWidth, container.clientHeight);
     }
 
@@ -161,6 +174,7 @@ class Engine3D {
 
         // 업데이트 및 렌더링
         this.composer.render();
+        this.cssRenderer.render(this.rootScene, this.camera);
 
         // 렌더링 후 이벤트 통지
         this.eventHandler.dispatchEvent({
@@ -264,6 +278,9 @@ class Engine3D {
         this.clock = null;
 
         // 렌더러 정리
+        this.dom.removeChild(this.cssRenderer.domElement);
+        this.cssRenderer = null;
+
         this.dom.removeChild(this.renderer.domElement);
         this.renderer.dispose();
         this.renderer.forceContextLoss();

@@ -3,6 +3,7 @@ import * as Interfaces from './interfaces';
 import * as TWEEN from '@tweenjs/tween.js';
 import * as PoiDataInternal from './poi/data';
 import * as ModelInternal from './model/model';
+import * as Util from './util';
 import { Engine3D } from './engine';
 
 let engine: Engine3D;
@@ -244,8 +245,9 @@ function onPointerDown(evt: PointerEvent) {
 
     // 회전
     if (evt.button === rotateBtnId) {
-        mouseDownPos['rotate'].x = evt.offsetX;
-        mouseDownPos['rotate'].y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos['rotate'].x = pointerOffsetPoint.x;
+        mouseDownPos['rotate'].y = pointerOffsetPoint.y;
 
         // 월드상 픽킹 지점 얻기
         const pickPos = getPickPoint(mouseDownPos['rotate']);
@@ -273,8 +275,9 @@ function onPointerDown(evt: PointerEvent) {
         mouseBtnState['rotate'] = true;
     } else if (evt.button === panBtnId) {
         // 패닝
-        mouseDownPos['pan'].x = evt.offsetX;
-        mouseDownPos['pan'].y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos['pan'].x = pointerOffsetPoint.x;
+        mouseDownPos['pan'].y = pointerOffsetPoint.y;
 
         // 스크린패닝 평면 설정을 위해 카메라방향의 반대 벡터를 얻어둠
         const cameraDirection = new THREE.Vector3();
@@ -311,7 +314,8 @@ function onPointerDown(evt: PointerEvent) {
         // 마우스 상태
         mouseBtnState['pan'] = true;
     } else if (evt.button === dragZoomBtnId) {
-        const mousePos = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        const mousePos = new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y);
         pickPoint = getPickPoint(mousePos);
         if (pickPoint) {
             // 회전 중심점 위치 설정 및 가시화
@@ -334,7 +338,8 @@ function onPointerMove(evt: any) {
     // 회전
     if (mouseBtnState['rotate']) {
         const prevPos = mouseDownPos['rotate'].clone();
-        const currPos = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        const currPos = new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y);
         const offset = new THREE.Vector2().subVectors(currPos, prevPos);
         const delta = new THREE.Vector2(
             -(2 * Math.PI * offset.x / engine.Dom.clientHeight),
@@ -350,7 +355,8 @@ function onPointerMove(evt: any) {
         // 스크린패닝일 경우
         if (evt[screenPanKey]) {
             const prevScreenPanPos = getPickPoint(mouseDownPos['pan'], screenPlane);
-            const currScreenPanPos = getPickPoint(new THREE.Vector2(evt.offsetX, evt.offsetY), screenPlane);
+            const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+            const currScreenPanPos = getPickPoint(new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y), screenPlane);
             if (prevScreenPanPos && currScreenPanPos) {
                 const offset = new THREE.Vector3().subVectors(prevScreenPanPos, currScreenPanPos);
                 panDelta.add(offset.clone());
@@ -358,15 +364,17 @@ function onPointerMove(evt: any) {
         } else {
             // 일반 패닝일 경우
             const prevPos = getPickPoint(mouseDownPos['pan'], groundPlane);
-            const currPos = getPickPoint(new THREE.Vector2(evt.offsetX, evt.offsetY), groundPlane);
+            const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+            const currPos = getPickPoint(new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y), groundPlane);
             if (prevPos && currPos) {
                 const offset = new THREE.Vector3().subVectors(prevPos, currPos);
                 panDelta.add(offset.clone());
             }
         }
 
-        mouseDownPos['pan'].x = evt.offsetX;
-        mouseDownPos['pan'].y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos['pan'].x = pointerOffsetPoint.x;
+        mouseDownPos['pan'].y = pointerOffsetPoint.y;
     } else if (mouseBtnState['dragZoom']) {
         // 레이캐스트 지점을 향하는 방향, 거리 계산
         const dirToPick = cursor.position.clone().sub(engine.Camera.position).normalize();
@@ -375,7 +383,8 @@ function onPointerMove(evt: any) {
             distance = 1.0;
 
         // 마우스 Y축이동을 기준으로 줌인/아웃 방향 결정
-        const currPos = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        const currPos = new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y);
         const zoomDirection = (currPos.y > mouseDownPos['dragZoom'].y) ? -1.0 : 1.0;
 
         // 카메라 위치 이동
@@ -417,7 +426,8 @@ function onMouseWheel(evt: WheelEvent) {
     const zoomDirection = (evt.deltaY < 0) ? 1.0 : -1.0;
 
     // 마우스 픽킹 지점을 향해 전후진 처리
-    const mousePos = new THREE.Vector2(evt.offsetX, evt.offsetY);
+    const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+    const mousePos = new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y);
     pickPoint = getPickPoint(mousePos);
     if (pickPoint) {
         const dirToPick = pickPoint.clone().sub(engine.Camera.position).normalize();
