@@ -19,8 +19,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
   const [cctvOpen, setCctvOpen] = useState(false)
   
-  const handlePoiPointerUp = useCallback((evt: unknown) => {
-    console.log(evt);
+  const handlePoiPointerUp = useCallback(() => {
     setCctvOpen(true)
   }, [])
 
@@ -87,9 +86,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     <>
       <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
       <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
-      {/* TODO: 하드코딩된 CCTV 호스트 IP(192.168.4.8) 제거
-          - 시설별/환경별로 달라질 수 있으므로 추후 설정값, 환경변수(.env), 또는 서버에서 내려주는 메타데이터로 치환
-          - 여러 CCTV 지원 시 선택된 디바이스 정보(예: selectedDevice)에서 host/path를 가져와 동적으로 전달하도록 개선 */}
       <CctvModal
         open={cctvOpen}
         host='192.168.4.8'

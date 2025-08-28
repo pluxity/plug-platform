@@ -21,8 +21,7 @@ export function useIndoorEngine({
   const engineReadyRef = useRef(false)
   const poiPointerUpCallbacksRef = useRef<Array<(evt: unknown) => void>>([])
   const listenerRegisteredRef = useRef(false)
-
-  // 최신 콜백 배열 유지
+  
   useEffect(() => {
     if (!onPoiPointerUp) {
       poiPointerUpCallbacksRef.current = []
@@ -30,11 +29,10 @@ export function useIndoorEngine({
       poiPointerUpCallbacksRef.current = Array.isArray(onPoiPointerUp) ? onPoiPointerUp : [onPoiPointerUp]
     }
   }, [onPoiPointerUp])
-
-  // 단일 리스너 (엔진 이벤트 그대로 전달)
-  const poiPointerUpListener = useCallback((evt: unknown) => {
-    for (const cb of poiPointerUpCallbacksRef.current) {
-      try { cb(evt) } catch { /* ignore single callback failure */ }
+  
+  const poiPointerUpListener = useCallback((event: unknown) => {
+    for (const callback of poiPointerUpCallbacksRef.current) {
+      try { callback(event) } catch { void 0 }
     }
   }, [])
 
@@ -65,7 +63,7 @@ export function useIndoorEngine({
     try {
       Poi.Import(poiData)
       importedRef.current = true
-  } catch {
+    } catch {
       return
     }
   }, [buildPoiData])
@@ -84,8 +82,7 @@ export function useIndoorEngine({
     importedRef.current = false
     tryImportPois()
   }, [features, assets, tryImportPois])
-
-  // 언마운트 시 리스너 제거
+  
   useEffect(() => () => {
     if (listenerRegisteredRef.current) {
       Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)

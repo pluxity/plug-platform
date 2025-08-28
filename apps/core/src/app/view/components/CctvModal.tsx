@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-// 공유 UI 라이브러리의 Dialog 컴포넌트 활용
 import { Dialog, DialogContent } from '@plug/ui'
 
 export interface CctvModalProps {
@@ -48,22 +47,21 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
 
     const MAX_RETRIES = 3
 
-    const delay = (ms: number) => new Promise(r => setTimeout(r, ms))
+  const delay = (milliseconds: number) => new Promise(resolve => setTimeout(resolve, milliseconds))
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      if (!open) return // 모달 닫힘 중단
-      // 이전 시도 정리
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  if (!open) return
       cleanup()
       try {
         const pc = new RTCPeerConnection()
         pcRef.current = pc
         abortRef.current = new AbortController()
-        pc.addEventListener('track', ev => {
-          if (ev.track.kind === 'video') {
-            const el = videoRef.current
-            if (el && !el.srcObject) {
-              el.srcObject = ev.streams[0]
-              try { el.play?.() } catch { /* noop */ }
+        pc.addEventListener('track', trackEvent => {
+          if (trackEvent.track.kind === 'video') {
+            const videoElement = videoRef.current
+            if (videoElement && !videoElement.srcObject) {
+              videoElement.srcObject = trackEvent.streams[0]
+              try { videoElement.play?.() } catch { void 0 }
             }
           }
         })
@@ -73,16 +71,15 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
         const url = `http://${host}:8889/${encodeURIComponent(PATH)}/whep`
-        const res = await fetch(url, {
+  const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/sdp' },
           body: offer.sdp || '',
           signal: abortRef.current.signal
         })
-        if (!res.ok) throw new Error(`WHEP 실패 (${res.status}) (시도 ${attempt}/${MAX_RETRIES})`)
-        const answerSdp = await res.text()
+  if (!response.ok) throw new Error(`WHEP 실패 (${response.status}) (시도 ${attempt}/${MAX_RETRIES})`)
+  const answerSdp = await response.text()
         await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp })
-        // 성공 시 루프 종료
         return
       } catch (e) {
         if (attempt === MAX_RETRIES) {
@@ -90,7 +87,6 @@ const CctvModal: React.FC<CctvModalProps> = ({ open, host, onClose, title, path 
           setError(e instanceof Error ? e.message : String(e))
           return
         }
-        // 다음 재시도 전 지수/선형 Backoff (여기선 간단히 400ms * attempt)
         await delay(400 * attempt)
       }
     }

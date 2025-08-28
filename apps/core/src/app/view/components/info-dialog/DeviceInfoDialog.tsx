@@ -4,14 +4,9 @@ import InfoDialog from './InfoDialog'
 export interface DeviceInfoDialogProps {
   device: GsDeviceResponse | null
   onClose?: () => void
-  /**
-   * hole 을 전달하지 않으면 이 컴포넌트만의 컴팩트 기본 hole (작은 사이즈) 사용.
-   * hole={false} 면 mask/hole 제거.
-   */
   hole?: { x?: string; y?: string; w?: string; h?: string } | false
 }
 
-// DeviceInfoDialog 전용 기본 Hole (InfoDialog 의 기본보다 작게)
 const DEFAULT_DEVICE_HOLE = { x: '1.25rem', y: '1.25rem', w: '28rem', h: '22rem' }
 
 const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
