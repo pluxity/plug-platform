@@ -2,7 +2,8 @@ export interface DeviceData {
     id?: string;
     name?: string;
     categoryName?: string;
-    thumbnailFile?: string;
+    companyType?: string;
+    deviceType?: string;
 }
 
 export interface DeviceCreateModalProps {
