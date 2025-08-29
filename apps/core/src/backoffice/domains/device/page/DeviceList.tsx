@@ -97,13 +97,12 @@ const DeviceList: React.FC = () => {
             header: '디바이스 이름',
         },  
         {
-            accessorKey: 'thumbnailFile',
-            header: '썸네일 파일',
-            cell: ({ row }: { row: { original: DeviceData } }) => (
-                <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-                    <img src={row.original.thumbnailFile} alt="썸네일 파일" className="w-full h-full object-cover" />
-                </div>
-            ),
+            accessorKey: 'companyType',
+            header: '디바이스 회사 타입',
+        },  
+        {
+            accessorKey: 'deviceType',
+            header: '디바이스 타입',
         },
         {
             id: 'actions',

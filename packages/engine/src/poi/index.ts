@@ -17,7 +17,7 @@ export {
     HideLine,
     Import,
     PlayAnimation,
-    SetDisplayText,
+    SetTextInnerHtml,
     Show,
     ShowAll,
     ShowAllDisplayText,

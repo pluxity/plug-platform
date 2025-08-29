@@ -5,7 +5,6 @@ import type {
   DeviceCategoryRequest,
 } from '../types/device-category';
 import type { DeviceCategoryDepthResponse } from '../types/device-category';
-import type { GsDeviceResponse } from '../types/device';
 
 const DEVICE_CATEGORY_END_POINT = `device-categories`;
 const DEVICE_CATEGORY_DEPTH_END_POINT = `${DEVICE_CATEGORY_END_POINT}/max-depth`;
@@ -55,19 +54,6 @@ export const useDeviceCategoryTree = () => {
     mutate: async () => { await Promise.all([mutateList(), mutateDepth()]); },
     refresh: async () => { await Promise.all([mutateList(), mutateDepth()]); },
   };
-};
-
-export const getDevicesByCategory = async (
-  categoryId: number,
-  facilityId: number
-): Promise<GsDeviceResponse[]> => {
-  const qs = `?facilityId=${facilityId}`;
-  try {
-    const resp = await api.get<GsDeviceResponse[]>(`${DEVICE_CATEGORY_END_POINT}/${categoryId}/devices${qs}`, { requireAuth: true });
-    return (resp as any)?.data ?? (resp as any) ?? [];
-  } catch (_) {
-    return [];
-  }
 };
 
 export const getAllDeviceCategories = async (): Promise<DeviceCategoryResponse[]> => {

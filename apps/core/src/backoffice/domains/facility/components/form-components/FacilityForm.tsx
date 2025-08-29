@@ -127,7 +127,7 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
               onFileChange={handleDrawingChange}
               onFileRemoved={handleDrawingRemoved}
               onFileUploaded={handleDrawingUploaded}
-              maxSizeInMB={200} // 도면은 200MB 제한 (필요 시 조정)
+              maxSizeInMB={500} // 도면은 200MB 제한 (필요 시 조정)
             />
             <p className="text-xs text-gray-500 mt-2">업로드 후 자동으로 층 정보가 추출됩니다.</p>
           </div>

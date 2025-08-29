@@ -17,7 +17,7 @@ interface MapSceneProps {
 export const MapScene: React.FC<MapSceneProps> = ({ modelUrl, floors, onLoadComplete, onOutdoor, overlays, className = 'w-full h-full relative', showFloorControl = true, showOutdoorButton = true }) => {
   return (
     <div className={className}>
-      <IndoorMapViewer modelUrl={modelUrl} onLoadComplete={onLoadComplete} onDispose={engine => (engine as unknown as { clear?: () => void })?.clear?.()} />
+      <IndoorMapViewer modelUrl={modelUrl} onLoadComplete={onLoadComplete} />
       {overlays}
       {showFloorControl && floors.length > 0 && (
         <div className='absolute bottom-6 right-6 z-20 max-w-xs'>

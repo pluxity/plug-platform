@@ -195,12 +195,12 @@ Px.Poi.ShowDisplayText('TestPoi');
 Px.Poi.ShowAllDisplayText();
 ```
 
-## SetDisplayText(id: string, text: string)
-- id: 표시명을 변경할 poi id값
-- text: 변경할 텍스트 문자열
-- poi의 표시명 텍스트(displayText)를 설정한다.
+## SetTextInnerHtml(id: string, htmlString: string)
+- id: HTML을 변경할 poi id값
+- htmlString: 변경할 HTML 문자열
+- poi의 표시명 텍스트의 HTML 내용을 설정한다.
 ```javascript
-Px.Poi.SetDisplayText('TestPoi', '변경된텍스트');
+Px.Poi.SetTextInnerHtml('TestPoi', '<label style="color: red";>변경텍스트</label>');
 ```
 
 ## Px.Poi.GetAnimationList()

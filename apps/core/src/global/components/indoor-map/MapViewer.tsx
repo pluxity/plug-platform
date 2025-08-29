@@ -16,45 +16,42 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   onDispose
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const initializedRef = useRef(false);
   const loadedModelUrlRef = useRef<string | null>(null);
   const loadTimeoutRef = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // 컴포넌트 마운트 시 엔진 초기화 (매 마운트마다 수행)
   useEffect(() => {
     const currentContainer = containerRef.current;
-    let canceled = false; // 이 이펙트 수명 종료 후 콜백 가드
-    
+    if (!currentContainer) return; // 다음 렌더에서 재시도 (일반적으로 최초 마운트 직후 존재)
+    try {
+      Core.Initialize(currentContainer);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('3D 엔진 초기화 실패'));
+    }
+  }, []);
+
+  // 모델 로딩 이펙트 (엔진 초기화 이후 동작 가정)
+  useEffect(() => {
+    const currentContainer = containerRef.current; // 존재 여부 확인 (안전)
+    let canceled = false;
+
     if (!modelUrl || !currentContainer) {
       setIsLoading(false);
-      return;
+      return () => { /* no-op */ };
     }
 
-    // 엔진 초기화 (한 번만)
-    if (!initializedRef.current) {
-      setIsLoading(true);
-      setError(null);
-      try {
-        Core.Initialize(currentContainer);
-        initializedRef.current = true;
-      } catch (err) {
-        setIsLoading(false);
-        setError(err instanceof Error ? err : new Error('3D 엔진 초기화 실패'));
-        return () => { /* no-op */ };
-      }
-    }
-
-    // 이미 동일한 모델이 로드되어 있으면 콜백만
+    // 이미 동일 모델이라면 재요청 방지
     if (loadedModelUrlRef.current === modelUrl) {
       setIsLoading(false);
       onLoadComplete?.();
       return () => { /* no-op */ };
     }
 
-    // 모델 로드
     setIsLoading(true);
     setError(null);
+
     loadTimeoutRef.current = window.setTimeout(() => {
       if (canceled) return;
       setIsLoading(false);
@@ -62,7 +59,7 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
     }, 10000);
 
     Loader.LoadGltf(modelUrl, () => {
-      if (canceled) return; // 언마운트/변경 후 콜백 무시
+      if (canceled) return;
       if (loadTimeoutRef.current) {
         clearTimeout(loadTimeoutRef.current);
         loadTimeoutRef.current = null;
@@ -72,7 +69,6 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       onLoadComplete?.();
     });
 
-    // 이 이펙트의 클린업: 로더 타임아웃 해제 및 콜백 가드 설정
     return () => {
       canceled = true;
       if (loadTimeoutRef.current) {
@@ -92,12 +88,9 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       }
       // 외부 엔진 정리 훅 호출 및 향후 엔진 clear 지원과의 연동
       // 엔진 메모리 해제 (Canvas 포함 제거) - README 2025-08-26 업데이트 참고
-      if (initializedRef.current) {
-        try {
-          Core.Dispose();
-        } catch { /* ignore */ }
-        initializedRef.current = false;
-      }
+      try {
+        Core.Dispose();
+      } catch { /* ignore */ }
       loadedModelUrlRef.current = null;
       onDispose?.();
     };
