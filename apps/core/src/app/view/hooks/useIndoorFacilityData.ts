@@ -37,41 +37,36 @@ export function useIndoorFacilityData(
     }
   }, [onGoOutdoor])
 
-  const loadFeatures = useCallback(async (id: number) => {
+  const loadFeatures = useCallback(async (facilityIdParam: number) => {
     try {
-      const list = await getFeaturesByFacility(id)
-      setFeatures(list || [])
+      const featureList = await getFeaturesByFacility(facilityIdParam)
+      setFeatures(featureList || [])
     } catch {
       setFeatures([])
     }
   }, [])
 
   useEffect(() => {
-    let timer: number | undefined
+  let countdownTimer: number | undefined
 
     const load = async () => {
       try {
         setIsLoading(true)
-        const response = await FacilityService.getById(facilityType, facilityId)
+  const response = await FacilityService.getById(facilityType, facilityId)
   setFacilityData(response.data?.facility as FacilityResponse)
-
   interface RawFacilityBundle { facility?: FacilityResponse & { drawing?: { url?: string } }; floors?: { name: string; floorId: string }[] }
   const bundle = response.data as unknown as RawFacilityBundle
   const drawingUrl = bundle?.facility?.drawing?.url?.trim() || ''
-        const has = drawingUrl !== ''
-        setHas3DDrawing(has)
+  const hasDrawing = drawingUrl !== ''
+  setHas3DDrawing(hasDrawing)
 
-        if (bundle?.floors) {
-          setFloors(convertFloors(bundle.floors))
-        }
+  if (bundle?.floors) setFloors(convertFloors(bundle.floors))
 
-        if (!has) {
-          timer = window.setInterval(() => {
+        if (!hasDrawing) {
+          countdownTimer = window.setInterval(() => {
             setCountdown(prev => {
               if (prev <= 1) {
-                if (timer) {
-                  window.clearInterval(timer)
-                }
+                if (countdownTimer) window.clearInterval(countdownTimer)
                 handleOutdoor()
                 return 0
               }
@@ -88,11 +83,7 @@ export function useIndoorFacilityData(
 
     load()
 
-    return () => {
-      if (timer) {
-        window.clearInterval(timer)
-      }
-    }
+  return () => { if (countdownTimer) window.clearInterval(countdownTimer) }
   }, [facilityType, facilityId, handleOutdoor])
 
   useEffect(() => {

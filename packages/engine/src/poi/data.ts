@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
 import * as ModelInternal from '../model/model';
@@ -15,7 +16,6 @@ let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
-let sharedTextGeometry: THREE.PlaneGeometry;
 let poiDummies: THREE.Object3D[] = [];
 let bNeedsUpdate: boolean = false;
 
@@ -24,15 +24,6 @@ let bNeedsUpdate: boolean = false;
  */
 function initialize(_engine: Engine3D) {
     engine = _engine;
-
-    // 공용 텍스트 geometry
-    sharedTextGeometry = new THREE.PlaneGeometry(1, 1.10, 1, 1);
-    sharedTextGeometry.translate(0, 2.0, 0);
-
-    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(0, 1.5);
-    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(1, 1.5);
-    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(2, -1.0);
-    // (sharedTextGeometry.attributes.uv as THREE.BufferAttribute).setY(3, -1.0);
 
     // 이벤트
     engine.EventHandler.addEventListener('onBeforeRender' as never, onBeforeRender);
@@ -86,7 +77,6 @@ function dispose() {
     pointMeshGroup = null;
     pointMeshStorage = {};
     iconStorage = {};
-    sharedTextGeometry = null;
     poiDummies = [];
     bNeedsUpdate = false;
     engine = null;
@@ -289,13 +279,14 @@ function getIcon(url: string): THREE.SpriteMaterial {
  * 텍스트 문자열을 three.js 메시로 생성
  * @param displayText - 표시명 텍스트 문자열
  */
-function createTextMesh(displayText: string): THREE.Mesh {
-    const textSize = new THREE.Vector2();
-    const textMaterial = Util.createTextMaterial(displayText, textSize);
-    const textMesh = new THREE.Mesh(sharedTextGeometry, textMaterial);
-    textMesh.scale.set(textSize.x * 0.0015, textSize.y * 0.0015, 1);
+function createTextMesh(displayText: string): Addon.CSS2DObject {
+    // 빈 div 생성
+    const emptyDiv = document.createElement('div');
+    emptyDiv.innerHTML = displayText;
 
-    return textMesh;
+    const textObj = new Addon.CSS2DObject(emptyDiv);    
+
+    return textObj;
 }
 
 /**
@@ -705,18 +696,12 @@ function HideAllDisplayText() {
  * @param id - 변경할 poi id값
  * @param text - 표시명 텍스트
  */
-function SetDisplayText(id: string, text: string) {
+function SetTextInnerHtml(id: string, htmlString: string) {
     if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
-        poi.disposeTextObject();
 
-        const textMesh = createTextMesh(text);
-        poiTextGroup.add(textMesh);
-
-        poi.TextObject = textMesh;
-        poi.WorldPosition = poi.WorldPosition;
-
-        poi.displayText = text;
+        poi.TextObject.element.innerHTML = htmlString;
+        //poi.WorldPosition = poi.WorldPosition;
     }
 }
 
@@ -788,7 +773,7 @@ export {
     ShowAllDisplayText,
     HideAllDisplayText,
 
-    SetDisplayText,
+    SetTextInnerHtml,
 
     GetAnimationList,
     PlayAnimation,

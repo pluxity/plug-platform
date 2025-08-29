@@ -399,6 +399,18 @@ function isValidUrl(url: string): boolean {
 }
 
 /**
+ * WebGL 컨테이너 기준 포인터 오프셋 좌표 얻기
+ */
+function getPointerOffsetPoint(clientX: number, clientY: number): THREE.Vector2 {
+    const rect = engine.Dom.getBoundingClientRect();
+
+    return new THREE.Vector2(
+        clientX - rect.left,
+        clientY - rect.top
+    );
+}
+
+/**
  * 색상이나 이미지로 배경 설정
  * @param backgroundData - 배경색상 숫자일경우 0xff0000의 형식으로 판단하고, 문자열일 경우 이미지 주소로 판단하여 배경을 설정한다.
  */
@@ -424,6 +436,7 @@ export {
     getClosestPointOnCurvePath,
     addDeferredEventCallback,
     isValidUrl,
+    getPointerOffsetPoint,
 
     // 외부노출
     SetBackground,

@@ -12,6 +12,11 @@
 
 업데이트 내역
 ============
+# 2025-08-28
+- [Poi](./docs/Poi.md) SetDisplayText 함수 제거
+- [Poi](./docs/Poi.md#settextinnerhtmlid-string-htmlstring-string) SetTextInnerHtml 함수 추가
+- [Camera](./docs/Camera.md) 포인터 이벤트 좌표 처리 방식 수정
+
 # 2025-08-26
 - [Engine3D](./docs/Engine3D.md) 엔진 초기화 호출부 수정 및 메모리 해제 함수 추가
 ```javascript

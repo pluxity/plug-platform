@@ -159,9 +159,9 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllDisplayText')}>Show All DisplayText</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllDisplayText')}>Hide All DisplayText</button><br /><br />
 
-                    <input type='text' value={this.state.poiDisplayTextIdValue} onChange={this.onPoiDisplayTextIdInputValueChanged.bind(this)} placeholder='표시명 변경할 poi id'></input>
-                    <input type='text' value={this.state.poiDisplayTextValue} onChange={this.onPoiDisplayTextInputValueChanged.bind(this)} placeholder='표시명 입력'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetDisplayText')}>SetDisplayText</button><br /><br />
+                    <input type='text' value={this.state.poiDisplayTextIdValue} onChange={this.onPoiDisplayTextIdInputValueChanged.bind(this)} placeholder='텍스트 HTML 변경할 poi id'></input>
+                    <input type='text' value={this.state.poiDisplayTextValue} onChange={this.onPoiDisplayTextInputValueChanged.bind(this)} placeholder='HTML 문자열 입력'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetTextInnerHtml')}>SetTextInnerHtml</button><br /><br />
 
                     <input type='text' value={this.state.getAnimlistPoiIdValue} onChange={this.onGetAnimListTextInputValueChanged.bind(this)} placeholder='Animation Poi Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.GetAnimationList')}>GetAnimationList</button><br />
@@ -534,8 +534,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.HideAllDisplayText': {
                 Poi.HideAllDisplayText();
             } break;
-            case 'Poi.SetDisplayText': {
-                Poi.SetDisplayText(this.state.poiDisplayTextIdValue, this.state.poiDisplayTextValue);
+            case 'Poi.SetTextInnerHtml': {
+                Poi.SetTextInnerHtml(this.state.poiDisplayTextIdValue, this.state.poiDisplayTextValue);
             } break;
             case 'Poi.GetAnimationList': {
                 const data = Poi.GetAnimationList(this.state.getAnimlistPoiIdValue);

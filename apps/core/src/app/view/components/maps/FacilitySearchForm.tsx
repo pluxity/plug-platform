@@ -7,7 +7,6 @@ import * as Cesium from 'cesium'
 interface FacilitySearchFormProps {
   viewer: Cesium.Viewer | null
   onFacilitySelectInfo?: (facility: FacilityResponse) => void
-  /** 새 시설 선택 즉시(비행 시작 전) 기존 Dialog 닫기 위해 호출 */
   onFacilityPreSelect?: () => void
 }
 
