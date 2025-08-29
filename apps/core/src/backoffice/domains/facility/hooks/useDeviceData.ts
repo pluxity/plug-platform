@@ -1,8 +1,8 @@
-import { useAllDevicesSWR } from "@plug/common-services";
+import { useDevicesSWR } from "@plug/common-services";
 import { useMemo } from "react";
 
 export const useDeviceData = () => {
-    const { data: devicesArray, error, isLoading, mutate } = useAllDevicesSWR();
+    const { data: devicesArray, error, isLoading, mutate } = useDevicesSWR();
 
     const getAllDevices = useMemo(() => {
         if (!Array.isArray(devicesArray)) return [];
@@ -10,11 +10,11 @@ export const useDeviceData = () => {
     }, [devicesArray]);
 
     const assignedDevices = useMemo(() => {
-        return getAllDevices.filter(device => Boolean(device.featureId));
+        return getAllDevices.filter(device => Boolean(device.feature?.id));
     }, [getAllDevices]);
 
     const unassignedDevices = useMemo(() => {
-        return getAllDevices.filter(device => !Boolean(device.featureId));
+        return getAllDevices.filter(device => !Boolean(device.feature?.id));
     }, [getAllDevices]);
 
     return {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem } from '@plug/ui';
+import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
 import { FeatureAssignCombobox } from './FeatureAssignCombobox';
 import { useCctvData } from '../hooks/useCctvData';
 import { useDeviceData } from '../hooks/useDeviceData';
@@ -33,7 +33,7 @@ export function FeatureAssignModal({
     if (selectedType === 'CCTV') {
       return Boolean((selectedItem as CctvResponse)?.feature?.id);
     } else{
-      return Boolean((selectedItem as DeviceResponse)?.featureId);
+      return Boolean((selectedItem as DeviceResponse)?.feature?.id);
     }
   };
 
@@ -156,7 +156,7 @@ export function FeatureAssignModal({
                         return !Boolean(cctvItem.feature?.id); 
                       } else {
                         const deviceItem = item as DeviceResponse;
-                        return !Boolean(deviceItem.featureId); 
+                        return !Boolean(deviceItem.feature?.id); 
                       }
                     }
                   },
@@ -169,7 +169,7 @@ export function FeatureAssignModal({
                         return Boolean(cctvItem.feature?.id); 
                       } else {
                         const deviceItem = item as DeviceResponse;
-                        return Boolean(deviceItem.featureId); 
+                          return Boolean(deviceItem.feature?.id); 
                       }
                     }
                   }
@@ -194,16 +194,21 @@ export function FeatureAssignModal({
         </DialogContent>
       </Dialog>
 
-    {isConfirmOpen && (
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent title="장비 교체" dimmed disableBackground>
-          {`${selectedType}의 ${selectedId} 장비가 이미 할당되어 있습니다. 교체하시겠습니까?`}
-          <DialogFooter>
-            <Button variant="outline" onClick={handleConfirmCancel}>취소</Button>
-            <Button onClick={handleConfirm}>확인</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isConfirmOpen && (
+        <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <h2 className="text-lg font-bold">장비 교체</h2>
+              <AlertDialogDescription>
+                {`${selectedType}의 ${selectedId} 장비가 이미 할당되어 있습니다. 교체하시겠습니까?`}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleConfirmCancel}>취소</AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirm}>확인</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </>
   );
