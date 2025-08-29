@@ -6,7 +6,7 @@ import ProtectedRoute from '@/global/components/ProtectedRoute'
 
 import { BackofficeLayout, DashboardLayout, IndoorLayout } from '@/backoffice/common/view/layouts'
 
-import { Dashboard, FacilityList, FacilityEdit, FacilityIndoor, Role, User, Permission, AssetList, AssetCategory, DeviceCategory, DeviceList } from '@/backoffice/domains'
+import { Dashboard, FacilityList, FacilityEdit, FacilityIndoor, Role, User, Permission, AssetList, AssetCategory, DeviceCategory, DeviceList, CctvList } from '@/backoffice/domains'
 
 import AppLayout from '@/app/view/layouts/AppLayout'
 import MapView from '@/app/view/pages/MapView'
@@ -41,6 +41,7 @@ const AppRouter: React.FC = () => {
               <Route path="asset-list" element={<AssetList />} />
               <Route path="device-category" element={<DeviceCategory />} />
               <Route path="device-list" element={<DeviceList />} />
+              <Route path="cctv-list" element={<CctvList />} />
             </Route>
 
             {/* 실내지도 편집을 위한 별도 레이아웃 */}
