@@ -1,34 +1,60 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { Camera, Poi, Interfaces } from '@plug/engine'
+import { Camera, Poi, Interfaces, Event } from '@plug/engine'
 import type { FeatureResponse } from '@plug/common-services'
 
 interface UseIndoorEngineParams {
   features: FeatureResponse[]
   assets: { id: number; file?: { url?: string } }[] | undefined
   autoExtendView?: boolean
+  onPoiPointerUp?: ((evt: unknown) => void) | Array<(evt: unknown) => void>
 }
 
 interface UseIndoorEngineReturn { handleLoadComplete: () => void }
 
-export function useIndoorEngine({ features, assets, autoExtendView = true }: UseIndoorEngineParams): UseIndoorEngineReturn {
+export function useIndoorEngine({
+  features,
+  assets,
+  autoExtendView = true,
+  onPoiPointerUp
+}: UseIndoorEngineParams): UseIndoorEngineReturn {
   const importedRef = useRef(false)
   const engineReadyRef = useRef(false)
+  const poiPointerUpCallbacksRef = useRef<Array<(evt: unknown) => void>>([])
+  const listenerRegisteredRef = useRef(false)
+  
+  useEffect(() => {
+    if (!onPoiPointerUp) {
+      poiPointerUpCallbacksRef.current = []
+    } else {
+      poiPointerUpCallbacksRef.current = Array.isArray(onPoiPointerUp) ? onPoiPointerUp : [onPoiPointerUp]
+    }
+  }, [onPoiPointerUp])
+  
+  const poiPointerUpListener = useCallback((event: unknown) => {
+    for (const callback of poiPointerUpCallbacksRef.current) {
+      try { 
+        callback(event) 
+      } catch (e) { 
+        console.error('Error in onPoiPointerUp callback:', e) 
+      }
+    }
+  }, [])
 
   const buildPoiData = useCallback((): Interfaces.PoiImportOption[] => {
     if (!features?.length || !assets?.length) return []
-    const assetById = new Map(assets.map(a => [a.id, a]))
-    return features.map(f => {
-      const asset = assetById.get(f.assetId)
+    const assetById = new Map(assets.map(assetItem => [assetItem.id, assetItem]))
+    return features.map(feature => {
+      const assetRecord = assetById.get(feature.assetId)
       return {
-        id: f.id,
+        id: feature.id,
         iconUrl: '',
-        modelUrl: asset?.file?.url || '',
-        displayText: f.id,
-        floorId: f.floorId,
-        property: { assetId: f.assetId, deviceId: f.deviceId ?? null },
-        position: { x: f.position?.x ?? 0, y: f.position?.y ?? 0, z: f.position?.z ?? 0 },
-        rotation: { x: f.rotation?.x ?? 0, y: f.rotation?.y ?? 0, z: f.rotation?.z ?? 0 },
-        scale: { x: f.scale?.x ?? 1, y: f.scale?.y ?? 1, z: f.scale?.z ?? 1 }
+        modelUrl: assetRecord?.file?.url || '',
+        displayText: feature.id,
+        floorId: feature.floorId,
+        property: { assetId: feature.assetId, deviceId: feature.deviceId ?? null },
+        position: { x: feature.position?.x ?? 0, y: feature.position?.y ?? 0, z: feature.position?.z ?? 0 },
+        rotation: { x: feature.rotation?.x ?? 0, y: feature.rotation?.y ?? 0, z: feature.rotation?.z ?? 0 },
+        scale: { x: feature.scale?.x ?? 1, y: feature.scale?.y ?? 1, z: feature.scale?.z ?? 1 }
       }
     })
   }, [features, assets])
@@ -36,12 +62,12 @@ export function useIndoorEngine({ features, assets, autoExtendView = true }: Use
   const tryImportPois = useCallback(() => {
     if (importedRef.current) return
     if (!engineReadyRef.current) return
-    const data = buildPoiData()
-    if (!data.length) return
+    const poiData = buildPoiData()
+    if (!poiData.length) return
     try {
-      Poi.Import(data)
+      Poi.Import(poiData)
       importedRef.current = true
-  } catch {
+    } catch {
       return
     }
   }, [buildPoiData])
@@ -49,13 +75,24 @@ export function useIndoorEngine({ features, assets, autoExtendView = true }: Use
   const handleLoadComplete = useCallback(() => {
     engineReadyRef.current = true
     if (autoExtendView) Camera.ExtendView(1)
+    if (!listenerRegisteredRef.current) {
+      Event.AddEventListener('onPoiPointerUp', poiPointerUpListener)
+      listenerRegisteredRef.current = true
+    }
     tryImportPois()
-  }, [autoExtendView, tryImportPois])
+  }, [autoExtendView, tryImportPois, poiPointerUpListener])
 
   useEffect(() => {
     importedRef.current = false
     tryImportPois()
   }, [features, assets, tryImportPois])
+  
+  useEffect(() => () => {
+    if (listenerRegisteredRef.current) {
+      Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)
+      listenerRegisteredRef.current = false
+    }
+  }, [poiPointerUpListener])
 
   return { handleLoadComplete }
 }

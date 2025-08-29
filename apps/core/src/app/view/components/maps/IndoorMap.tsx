@@ -7,8 +7,8 @@ import { useIndoorFacilityData } from '@/app/view/hooks/useIndoorFacilityData'
 import MapScene from '@/global/components/indoor-map/MapScene'
 import DeviceSearchForm from './DeviceSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
-import { DeviceInfoDialog } from '../info-dialog'
-import type { GsDeviceResponse } from '@plug/common-services'
+import { DeviceInfoDialog, CctvDialog } from '../dialogs'
+import type { DeviceResponse } from '@plug/common-services'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -16,13 +16,24 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const { assets } = useAssets()
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
-  const { handleLoadComplete } = useIndoorEngine({ features, assets, autoExtendView: true })
+  const [cctvOpen, setCctvOpen] = useState(false)
+  
+  const handlePoiPointerUp = useCallback(() => {
+    setCctvOpen(true)
+  }, [])
+
+  const { handleLoadComplete } = useIndoorEngine({
+    features,
+    assets,
+    autoExtendView: true,
+    onPoiPointerUp: handlePoiPointerUp
+  })
 
   const handleOutdoorClick = useCallback(() => { handleOutdoor() }, [handleOutdoor])
 
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
 
-  const [selectedDevice, setSelectedDevice] = useState<GsDeviceResponse | null>(null)
+  const [selectedDevice, setSelectedDevice] = useState<DeviceResponse | null>(null)
 
   if (!facilitiesFetched || isLoading || has3DDrawing === null) {
     return (
@@ -60,8 +71,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     )
   }
 
-  // state moved above early returns
-
   const overlays = (
     <div className='absolute top-4 left-4 z-20 flex flex-row gap-3 items-start'>
       <DeviceSearchForm
@@ -75,9 +84,11 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   return (
     <>
       <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
-      <DeviceInfoDialog
-        device={selectedDevice}
-        onClose={() => setSelectedDevice(null)}
+      <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
+  <CctvDialog
+        open={cctvOpen}
+        host={import.meta.env.VITE_WEBRTC_HOST || import.meta.env.VITE_CCTV_HOST || '192.168.4.8'}
+        onClose={() => setCctvOpen(false)}
       />
     </>
   )
