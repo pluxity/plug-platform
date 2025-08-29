@@ -9,7 +9,7 @@ import { ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Dialog, D
 
 export const CctvEditModal: React.FC<CctvEditModalProps> = ({ isOpen, onClose, onSuccess, cctvId }) => {
 
-    const { data, mutate } = useCctvDetailSWR(cctvId);
+    const { data } = useCctvDetailSWR(cctvId);
 
     const { execute: cctvUpdate, isLoading: isCctvUpdating } = useUpdateCctv(cctvId);
 
@@ -37,8 +37,7 @@ export const CctvEditModal: React.FC<CctvEditModalProps> = ({ isOpen, onClose, o
             url: '',
         });
         onClose();
-        mutate();
-    }, [modalForm, onClose, mutate]);
+    }, [modalForm, onClose]);
 
     const handleSubmit = useCallback(async (data: CctvEditFormData) => {
         try {
@@ -47,7 +46,7 @@ export const CctvEditModal: React.FC<CctvEditModalProps> = ({ isOpen, onClose, o
                 url: data.url,
             });
         } catch (error) {
-            console.error('CCTV 수정 실패');
+            console.error('CCTV 수정 실패', error);
             toast.error('CCTV 수정에 실패했습니다.');
             return;
         }

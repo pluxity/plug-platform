@@ -14,7 +14,7 @@ const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'DeviceCategory', label: '장치 분류', to: '/admin/device-category', depth: 2, showToggle: false, parentId: 'Device'},
   { id: 'DeviceList', label: '장치 목록', to: '/admin/device-list', depth: 2, showToggle: false, parentId: 'Device'},
 
-  { id: 'Cctv', label: 'cctv', depth: 1, showToggle: true},
+  { id: 'Cctv', label: 'CCTV', depth: 1, showToggle: true},
   { id: 'CctvList', label: 'cctv 목록', to: '/admin/cctv-list', depth: 2, showToggle: false, parentId: 'Cctv'},
 
   { id: 'Users', label: '사용자', depth: 1, showToggle: true},

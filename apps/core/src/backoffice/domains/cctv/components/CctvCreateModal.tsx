@@ -38,7 +38,7 @@ export const CctvCreateModal: React.FC<CctvCreateModalProps> = ({ isOpen, onClos
                 url: data.url,
             });
         } catch (error) {
-            console.error('CCTV 생성 실패');
+            console.error('CCTV 생성 실패', error);
             toast.error('CCTV 생성에 실패했습니다.');
             return;
         }
