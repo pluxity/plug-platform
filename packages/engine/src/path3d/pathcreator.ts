@@ -155,8 +155,9 @@ function getPickPointFromPlane(mousePos: THREE.Vector2, planeBasePoint: THREE.Ve
  */
 function onPointerDown(evt: PointerEvent) {
     if (evt.button === 0) {
-        mouseDownPos.x = evt.offsetX;
-        mouseDownPos.y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos.x = pointerOffsetPoint.x;
+        mouseDownPos.y = pointerOffsetPoint.y;
 
         mouseDownPickData = getPickPoint(mouseDownPos);
         controlPoint = null;
@@ -171,7 +172,7 @@ function onPointerDown(evt: PointerEvent) {
  */
 function onPointerMove(evt: PointerEvent) {
 
-    const currMousePos = new THREE.Vector2(evt.offsetX, evt.offsetY);
+    const currMousePos = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
 
     let pickData = getPickPoint(currMousePos);
 
@@ -189,7 +190,8 @@ function onPointerMove(evt: PointerEvent) {
             if (mouseDistance <= 10.0)
                 return;
 
-            let currPickData = getPickPointFromPlane(new THREE.Vector2(evt.offsetX, evt.offsetY), lastPoint.WorldPosition);
+            const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+            let currPickData = getPickPointFromPlane(new THREE.Vector2(pointerOffsetPoint.x, pointerOffsetPoint.y), lastPoint.WorldPosition);
             const distance = mouseDownPickData!.worldPoint.distanceTo(currPickData!.worldPoint);
             const direction = new THREE.Vector3().subVectors(mouseDownPickData!.worldPoint, currPickData!.worldPoint).normalize();
             controlPoint = mouseDownPickData!.worldPoint.clone().addScaledVector(direction, distance);
@@ -220,7 +222,7 @@ function onPointerMove(evt: PointerEvent) {
  */
 function onPointerUp(evt: PointerEvent) {
     if (evt.button === 0) {
-        const mouseUpPos = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const mouseUpPos = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
         const pickData = getPickPoint(mouseUpPos);
 
         if (pickData) {

@@ -62,8 +62,9 @@ function dispose() {
 function onPointerDown(evt: MouseEvent) {
 
     if (evt.button === 0) {
-        mouseDownPos.x = evt.offsetX;
-        mouseDownPos.y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos.x = pointerOffsetPoint.x;
+        mouseDownPos.y = pointerOffsetPoint.y;
     }
 }
 
@@ -74,12 +75,12 @@ function onPointerDown(evt: MouseEvent) {
 function onPointerUp(evt: MouseEvent) {
 
     if (evt.button === 0) {
-        const currMousePos: THREE.Vector2 = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const currMousePos: THREE.Vector2 = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
         if (currMousePos.distanceTo(mouseDownPos) < 5.0) {
 
             const mousePos = new THREE.Vector2(
-                (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
-                -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+                (currMousePos.x / engine.Dom.clientWidth) * 2 - 1,
+                -(currMousePos.y / engine.Dom.clientHeight) * 2 + 1
             );
 
             const rayCast = new THREE.Raycaster();

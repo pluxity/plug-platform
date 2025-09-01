@@ -45,7 +45,7 @@ function dispose() {
     engine.Dom.removeEventListener('pointerdown', onPointerDown);
     engine.Dom.removeEventListener('pointermove', onPointerMove);
     engine.Dom.removeEventListener('pointerup', onPointerUp);
-    
+
     engine.EventHandler.removeEventListener('onPoiCreate' as never, clearHoverObjects);
     engine.EventHandler.removeEventListener('onPoiStartEdit' as never, clearHoverObjects);
     engine.EventHandler.removeEventListener('onLabel3DCreateStarted' as never, clearHoverObjects);
@@ -83,8 +83,9 @@ function onPointerDown(evt: PointerEvent) {
         return;
 
     if (evt.button === 0) {
-        mouseDownPos.x = evt.offsetX;
-        mouseDownPos.y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos.x = pointerOffsetPoint.x;
+        mouseDownPos.y = pointerOffsetPoint.y;
     }
 }
 
@@ -97,9 +98,10 @@ function onPointerMove(evt: PointerEvent) {
     if (PoiPlacer.Enabled || PoiEditor.Enabled || LabelCreator.Enabled || LabelEditor.Enabled)
         return;
 
+    const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
     const mousePos = new THREE.Vector2(
-        (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
-        -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+        (pointerOffsetPoint.x / engine.Dom.clientWidth) * 2 - 1,
+        -(pointerOffsetPoint.y / engine.Dom.clientHeight) * 2 + 1
     );
 
     const rayCast = new THREE.Raycaster();
@@ -172,12 +174,12 @@ function onPointerUp(evt: PointerEvent) {
         return;
 
     if (evt.button === 0) {
-        const currMousePos: THREE.Vector2 = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const currMousePos: THREE.Vector2 = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
         if (currMousePos.distanceTo(mouseDownPos) < 5.0) {
 
             const mousePos = new THREE.Vector2(
-                (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
-                -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+                (currMousePos.x / engine.Dom.clientWidth) * 2 - 1,
+                -(currMousePos.y / engine.Dom.clientHeight) * 2 + 1
             );
 
             const rayCast = new THREE.Raycaster();

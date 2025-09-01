@@ -3,6 +3,7 @@ import * as Addon from 'three/addons';
 import * as Interfaces from '../interfaces';
 import * as PoiData from './data';
 import * as ModelInternal from '../model/model';
+import * as Util from '../util'
 import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 
@@ -97,8 +98,9 @@ function unRegisterPointerEvents() {
  */
 function onPointerDown(evt: PointerEvent) {
     if (evt.button === 0) {
-        mouseDownPos.x = evt.offsetX;
-        mouseDownPos.y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos.x = pointerOffsetPoint.x;
+        mouseDownPos.y = pointerOffsetPoint.y;
     }
 }
 
@@ -109,9 +111,10 @@ function onPointerDown(evt: PointerEvent) {
 function onPointerMove(evt: PointerEvent) {
 
     if (target) {
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
         const mousePos = new THREE.Vector2(
-            (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
-            -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+            (pointerOffsetPoint.x / engine.Dom.clientWidth) * 2 - 1,
+            -(pointerOffsetPoint.y / engine.Dom.clientHeight) * 2 + 1
         );
 
         const rayCast = new THREE.Raycaster();
@@ -153,7 +156,7 @@ function onPointerMove(evt: PointerEvent) {
  */
 function onPointerUp(evt: PointerEvent) {
     if (evt.button === 0) {
-        const currMousePos: THREE.Vector2 = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const currMousePos: THREE.Vector2 = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
         if (currMousePos.distanceTo(mouseDownPos) < 5.0) {
 
             // 층 id, 층기준 로컬좌표 값
