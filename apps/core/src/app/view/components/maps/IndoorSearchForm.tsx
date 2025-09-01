@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import type { DeviceResponse, CctvResponse } from '@plug/common-services'
 import { useIndoorStore, type IndoorSearchItem, useSyncCctvs } from '@/app/store/indoorStore'
 import { GroupSearchForm } from '@/app/view/components/group-search-form'
 import type { GroupSearchGroup, GroupSearchFormRef } from '@/app/view/components/group-search-form'
@@ -7,8 +6,7 @@ import { Camera } from '@plug/engine'
 
 interface IndoorSearchFormProps {
   className?: string
-  // Now also passes CCTV. Keep name for backward compatibility.
-  onDeviceSelect?: (item: DeviceResponse | (CctvResponse & { __kind?: 'cctv' })) => void
+  onDeviceSelect?: (item: IndoorSearchItem) => void
 }
 
 const IndoorSearchForm: React.FC<IndoorSearchFormProps> = ({ className, onDeviceSelect }) => {
@@ -42,7 +40,7 @@ const IndoorSearchForm: React.FC<IndoorSearchFormProps> = ({ className, onDevice
       Camera.MoveToPoi(String(item.feature.id), 0.5, 1)
     }
     // item may be device or cctv; ensure shape matches callback union
-    onDeviceSelect?.(item.__kind === 'cctv' ? item : item as DeviceResponse)
+  onDeviceSelect?.(item)
   }, [onDeviceSelect])
 
   return (

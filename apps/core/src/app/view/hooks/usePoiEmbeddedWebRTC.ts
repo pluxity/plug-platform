@@ -2,41 +2,47 @@ import { useCallback, useEffect, useRef } from 'react'
 import { Poi } from '@plug/engine'
 
 export interface UsePoiEmbeddedWebRTCOptions {
-  /** Called when a WebRTC session fails to start (network / WHEP error). */
   onError?: (poiId: string, error: unknown) => void
-  /** Resolve streaming path (WHEP endpoint path) from POI event target. */
   resolvePath?: (event: unknown) => string | null | undefined
-  /** Width of the embedded video element. */
   width?: number
-  /** Aspect ratio (width / height). */
   aspect?: number
-  /** Auto-mute video (default true). */
   muted?: boolean
-  /** Include controls attribute (default true). */
   controls?: boolean
 }
 
 export interface UsePoiEmbeddedWebRTCResult {
-  /** Pass this to useIndoorEngine's onPoiPointerUp. */
   onPoiPointerUp: (evt: unknown) => void
-  /** Stop & cleanup a single POI video session. */
+  startPoi: (poiId: string, pathOrDeviceId?: string | number | null) => void
   stopPoi: (poiId: string) => void
-  /** Stop & cleanup every active POI video session. */
   stopAll: () => void
 }
 
 interface PoiEventTarget { id?: string; property?: { deviceId?: string | number | null; deviceID?: string | number | null } }
 
 export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}): UsePoiEmbeddedWebRTCResult {
-  const { onError, resolvePath, width = 200, aspect = 16 / 9, muted = true, controls = true } = options
+  const { onError, width = 280, aspect = 16 / 9, muted = true, controls = true } = options
   const poiSessionsRef = useRef<Record<string, { pc: RTCPeerConnection, abort?: AbortController }>>({})
 
   const stopPoi = useCallback((poiId: string) => {
     const session = poiSessionsRef.current[poiId]
     if (!session) return
-    try { session.abort?.abort() } catch { /* ignore */ }
-    try { session.pc.getSenders().forEach(s => { try { s.track?.stop() } catch { /* ignore */ } }) } catch { /* ignore */ }
-    try { session.pc.close() } catch { /* ignore */ }
+    try {
+      session.abort?.abort()
+    } catch (e) {
+      console.error('[usePoiEmbeddedWebRTC] abort error', poiId, e)
+    }
+    try {
+      session.pc.getSenders().forEach(s => {
+        try { s.track?.stop() } catch (e) { console.error('[usePoiEmbeddedWebRTC] track stop error', poiId, e) }
+      })
+    } catch (e) {
+      console.error('[usePoiEmbeddedWebRTC] sender iteration error', poiId, e)
+    }
+    try {
+      session.pc.close()
+    } catch (e) {
+      console.error('[usePoiEmbeddedWebRTC] pc close error', poiId, e)
+    }
     delete poiSessionsRef.current[poiId]
   }, [])
 
@@ -44,12 +50,24 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     Object.keys(poiSessionsRef.current).forEach(stopPoi)
   }, [stopPoi])
 
-  const startPoiVideo = useCallback(async (poiId: string, path: string) => {
+  const startPoiVideo = useCallback(async (poiId: string, streamKey?: string | number | null) => {
     if (!poiId) return
+    const path = (streamKey ?? poiId)?.toString()
     stopPoi(poiId)
     const videoId = `poi-video-${poiId}`
     const height = Math.round(width / aspect)
-    Poi.SetTextInnerHtml(poiId, `\n<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">\n  <video id="${videoId}" ${muted ? 'muted' : ''} ${controls ? 'controls' : ''} autoplay playsinline style="width:${width}px;height:${height}px;background:#000;border:1px solid #666;border-radius:4px;object-fit:contain;"></video>\n  <div style="font-size:10px;color:#fff;background:rgba(0,0,0,.5);padding:2px 4px;border-radius:3px;">${poiId}</div>\n</div>`)
+    const html = `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <video
+              id="${videoId}"
+              ${muted ? 'muted' : ''}
+              ${controls ? 'controls' : ''}
+              autoplay
+              playsinline
+              style="width:${width}px;height:${height}px;background:#000;border:1px solid #666;border-radius:4px;object-fit:contain;"
+            ></video>
+          </div>`
+    Poi.SetTextInnerHtml(poiId, html)
 
     await new Promise(r => setTimeout(r, 0))
     const videoEl = document.getElementById(videoId) as HTMLVideoElement | null
@@ -66,7 +84,7 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     pc.addEventListener('track', evt => {
       if (evt.track.kind === 'video' && videoEl && !videoEl.srcObject && evt.streams[0]) {
         videoEl.srcObject = evt.streams[0]
-        try { videoEl.play() } catch { /* ignore */ }
+        try { videoEl.play() } catch (e) { console.error('[usePoiEmbeddedWebRTC] video play error', poiId, e) }
       }
     })
     pc.addTransceiver('video', { direction: 'recvonly' })
@@ -91,13 +109,22 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     const target = (evt as { target?: PoiEventTarget } | undefined)?.target
     const poiId = target?.id
     if (!poiId) return
-    const path = resolvePath?.(evt) || target?.property?.deviceId || target?.property?.deviceID || 'cctv'
-    startPoiVideo(poiId, String(path))
-  }, [resolvePath, startPoiVideo])
+    // Prefer deviceId/deviceID if present; fallback to poiId
+    const deviceId = target?.property?.deviceId ?? target?.property?.deviceID ?? null
+    startPoiVideo(poiId, deviceId)
+  }, [startPoiVideo])
 
   useEffect(() => () => { stopAll() }, [stopAll])
 
-  return { onPoiPointerUp, stopPoi, stopAll }
+  const startPoi = (poiId: string, pathOrDeviceId?: string | number | null) => {
+    if (!poiId) return
+    startPoiVideo(poiId, pathOrDeviceId).catch(err => {
+      console.error('[usePoiEmbeddedWebRTC] manual start error', poiId, err)
+      onError?.(poiId, err)
+    })
+  }
+
+  return { onPoiPointerUp, stopPoi, stopAll, startPoi }
 }
 
 export default usePoiEmbeddedWebRTC

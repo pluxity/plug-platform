@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useEffect } from 'react'
 import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services'
 import { getFeaturesByFacility } from '@plug/common-services'
 import { getDevices } from '@plug/common-services'
@@ -132,12 +133,14 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
 export const useSyncCctvs = () => {
   const { data } = useCctvSWR()
   const setCctvs = useIndoorStore(s => s.setCctvs)
-  if (Array.isArray(data)) {
-    setCctvs(data as CctvResponse[])
-  } else if (data && typeof data === 'object') {
-    const maybe = data as { data?: unknown }
-    if (Array.isArray(maybe.data)) {
-      setCctvs(maybe.data as CctvResponse[])
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      setCctvs(data as CctvResponse[])
+    } else if (data && typeof data === 'object') {
+      const maybe = data as { data?: unknown }
+      if (Array.isArray(maybe.data)) {
+        setCctvs(maybe.data as CctvResponse[])
+      }
     }
-  }
+  }, [data, setCctvs])
 }

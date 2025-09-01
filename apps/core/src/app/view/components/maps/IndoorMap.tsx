@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import type { DeviceResponse, FacilityType } from '@plug/common-services'
+import type { IndoorSearchItem } from '@/app/store/indoorStore'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import { useIndoorStore, useSyncCctvs } from '@/app/store/indoorStore'
 import { useAssets } from '@/global/store/assetStore'
@@ -7,7 +8,7 @@ import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPoi
 import MapScene from '@/global/components/indoor-map/MapScene'
 import IndoorSearchForm from './IndoorSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
-import { DeviceInfoDialog, CctvDialog } from '../dialogs'
+import { DeviceInfoDialog } from '../dialogs'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -15,22 +16,17 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const { assets } = useAssets()
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
-  const [cctvOpen, setCctvOpen] = useState(false)
-
-  const devices = useIndoorStore(s => s.devices)
-  const cctvs = useIndoorStore(s => s.cctvs)
   const loadFacilityData = useIndoorStore(s => s.loadFacilityData)
   const storedFacilityId = useIndoorStore(s => s.facilityId)
   useSyncCctvs()
 
-  // Ensure indoor data (features + devices) loaded for current facility
   useEffect(() => {
     if (facilityId && facilityId !== storedFacilityId) {
       loadFacilityData(facilityId)
     }
   }, [facilityId, storedFacilityId, loadFacilityData])
   const { onPoiPointerUp: embeddedHandler } = usePoiEmbeddedWebRTC({
-    onError: () => setCctvOpen(true),
+    onError: () => { /* 추후 에러 처리 추가 */ },
     resolvePath: evt => {
       const target = (evt as { target?: { property?: { deviceId?: string | number | null; deviceID?: string | number | null } } }).target
       const raw = target?.property?.deviceId ?? target?.property?.deviceID
@@ -38,34 +34,27 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     }
   })
 
-  const isEmbeddedMode = false
   const listeners: PoiPointerUpListener[] = [
     {
       id: 'embeddedCctv',
-      test: context => !!context.deviceId && isEmbeddedMode,
-      run: context => embeddedHandler({ target: { id: context.poiId, property: { deviceId: context.deviceId } } })
-    },
-    {
-      id: 'dialogCctv',
-      test: context => !!context.deviceId && !isEmbeddedMode,
+      test: context => !!context.cctv,
       run: context => {
-        // If CCTV with same deviceId exists open dialog
-        const cctv = cctvs.find(c => c.id === String(context.deviceId))
-        if (cctv) setCctvOpen(true)
+        const path = context.deviceId ? String(context.deviceId) : context.cctv?.id
+        if (path) embeddedHandler({ target: { id: context.poiId, property: { deviceId: path } } })
       }
     },
     {
       id: 'deviceInfo',
-      test: context => !!context.deviceId,
+      test: context => !!context.device,
       run: context => {
-        const device = devices.find(d => d.id === String(context.deviceId)) || null
-        setSelectedDevice(device)
+        setSelectedDevice(context.device || null)
       },
       stopOnHandled: false
     }
   ]
 
-  const { onPoiPointerUp: handlePoiPointerUp } = usePoiPointerUpListeners({ features, listeners })
+  const { onPoiPointerUp: firePoiPointerUp } = usePoiPointerUpListeners({ features, listeners })
+  const handlePoiPointerUp = firePoiPointerUp
 
   const { handleLoadComplete } = useIndoorEngine({
     features,
@@ -79,6 +68,23 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
 
   const [selectedDevice, setSelectedDevice] = useState<DeviceResponse | null>(null)
+
+  const handleSearchSelect = useCallback((item: IndoorSearchItem) => {
+    const featureId = item.feature?.id
+    if (featureId) {
+      const synthetic = { target: { id: featureId, property: { deviceId: item.id } } }
+      firePoiPointerUp(synthetic)
+      return
+    }
+    if (item.__kind === 'cctv') {
+      if (featureId) {
+        return
+      }
+      console.warn('[IndoorMap] CCTV has no feature mapping; cannot embed stream:', item.id)
+    } else {
+      setSelectedDevice(item as DeviceResponse)
+    }
+  }, [firePoiPointerUp])
 
   if (!facilitiesFetched || isLoading || has3DDrawing === null) {
     return (
@@ -120,13 +126,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     <div className='absolute top-4 left-4 z-20 flex flex-row gap-3 items-start'>
       <IndoorSearchForm
         className='pointer-events-auto'
-        onDeviceSelect={(item) => {
-          if ('__kind' in item && item.__kind === 'cctv') {
-            setCctvOpen(true)
-            return
-          }
-          setSelectedDevice(item as DeviceResponse)
-        }}
+        onDeviceSelect={handleSearchSelect}
       />
       <DeviceCategoryChips />
     </div>
@@ -136,11 +136,6 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     <>
       <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
       <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
-  <CctvDialog
-        open={cctvOpen}
-        host={import.meta.env.VITE_WEBRTC_HOST || import.meta.env.VITE_CCTV_HOST || '192.168.4.8'}
-        onClose={() => setCctvOpen(false)}
-      />
     </>
   )
 };

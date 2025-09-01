@@ -1,5 +1,31 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDeviceCategoryTree } from '@plug/common-services'
+import { useIndoorStore } from '@/app/store/indoorStore'
+import type { DeviceCategoryResponse } from '@plug/common-services/types'
+
+// CCTV 카테고리는 특별 취급
+const CCTV_CATEGORY_SENTINEL_ID = -1 as const
+const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
+  id: CCTV_CATEGORY_SENTINEL_ID,
+  name: 'CCTV',
+  depth: 0,
+  thumbnailFile: {
+    id: CCTV_CATEGORY_SENTINEL_ID,
+    url: '/images/icons/cctv.png',
+    originalFileName: 'cctv.png',
+    contentType: 'image/png',
+    fileStatus: 'LOCAL',
+    createdAt: '',
+    createdBy: '',
+    updatedAt: '',
+    updatedBy: ''
+  }
+})
+const injectCctvCategory = (categories: DeviceCategoryResponse[] | undefined, cctvCount: number) => {
+  const base = (categories || []).filter(c => !c.parentId)
+  if (cctvCount <= 0) return base
+  return [createCctvPseudoCategory(), ...base]
+}
 
 interface DeviceCategoryChipsProps {
   selectedId?: number | null;
@@ -8,6 +34,7 @@ interface DeviceCategoryChipsProps {
 
 const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = null, onSelect }) => {
   const { categories, isLoading } = useDeviceCategoryTree()
+  const cctvCount = useIndoorStore(s => s.cctvs.length)
   const [internalSelected, setInternalSelected] = useState<number | null>(selectedId)
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -17,9 +44,10 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
   const startScrollLeftRef = useRef(0)
   const dragDistanceRef = useRef(0)
 
-  const topLevel = useMemo(() => (categories || []).filter(category => !category.parentId), [categories])
+  const topLevel = useMemo(() => injectCctvCategory(categories, cctvCount), [categories, cctvCount])
 
-  const handleSelect = (id: number | null) => { setInternalSelected(id); onSelect?.(id) }
+  const handleSelect = (id: number | null) => { 
+    setInternalSelected(id); onSelect?.(id) }
 
   useEffect(() => { setInternalSelected(selectedId ?? null) }, [selectedId])
 
@@ -116,7 +144,7 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
             <div className="h-8 w-16 rounded-full bg-gray-200 animate-pulse" />
           </div>
         )}
-        {!isLoading && topLevel.map(category => (
+  {!isLoading && topLevel.map(category => (
           <button
             key={category.id}
             type="button"
