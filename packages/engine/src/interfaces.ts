@@ -226,6 +226,18 @@ interface DeferredRegisterationCallbackData {
     callback: Function;
 }
 
+/**
+ * 외각선 옵션
+ */
+interface OutlineOptions {
+    edgeStrength?: number; // 10.0
+    edgeGlow?: number; // 0.0
+    edgeThickness?: number; // 5.0
+    pulsePeriod?: number; // 0.0
+    visibleEdgeColor?: number | string | THREE.Color; // 0xffffff
+    hiddenEdgeColor?: number | string | THREE.Color; // 0xffffff
+}
+
 export {
     Vector3Custom,
     Vector3,
@@ -249,4 +261,5 @@ export {
     Label3DCreateOption,
     Label3DImportOption,
     DeferredRegisterationCallbackData,
+    OutlineOptions,
 }

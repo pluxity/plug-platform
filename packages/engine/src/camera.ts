@@ -578,7 +578,7 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
         bounding.getSize(boundSize);
 
         const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
-        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
+        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.PointMeshData.localSize.y);
 
         bounding.expandByPoint(p);
         const sphere = new THREE.Sphere();
@@ -597,7 +597,7 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
         bounding?.getSize(boundSize);
 
         const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
-        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
+        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.PointMeshData.localSize.y);
 
         bounding?.expandByPoint(p);
         const sphere = new THREE.Sphere();

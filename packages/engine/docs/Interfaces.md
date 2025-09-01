@@ -145,3 +145,15 @@ interface Label3DImportOption {
     scale: Vector3; // 스케일값
 }
 ```
+
+## OutlineOptions
+```typescript
+interface OutlineOptions{
+    edgeStrength?: number; // 기본값: 10.0
+    edgeGlow?: number; // 기본값: 0.0
+    edgeThickness?: number; // 기본값: 5.0
+    pulsePeriod?: number; // 기본값: 0.0 -> 초당 깜박임 속도
+    visibleEdgeColor?: number | string; // 기본값: 0xffffff 
+    hiddenEdgeColor?: number | string; // 기본값: 0xffffff -> 다른 객체에 가려졌을때의 외각선 색상
+}
+```

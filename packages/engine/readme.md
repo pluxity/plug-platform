@@ -6,6 +6,7 @@
 - [Event](./docs/Event.md)
 - [Util](./docs/Util.md)
 - [Path3D](./docs/Path3D.md)
+- [Effect](./docs/Effect.md)
 - [Subway](./docs/Subway.md)
 - [Label3D](./docs/Label3D.md)
 - [Interfaces](./docs/Interfaces.md)
@@ -15,6 +16,8 @@
 # 2025-09-01
 - [Poi](./docs/Poi.md) Poi 선관련 Api 제거
   - HideAllLine, HideLine, ShowAllLine, ShowLine
+- [Effect](./docs/Effect.md) 효과(외각선) Api 추가
+- [Interfaces](./docs/Interfaces.md#outlineoptions) 외각선 옵션 인터페이스 추가
 
 # 2025-08-28
 - [Poi](./docs/Poi.md) SetDisplayText 함수 제거

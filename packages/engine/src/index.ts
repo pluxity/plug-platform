@@ -41,3 +41,12 @@ export const Event = {
             engine.EventHandler.removeEventListener(type as never, callback as never);
     }
 };
+
+import * as EffectInternal from './effect';
+export const Effect = {
+    Outline: {
+        SetPoiOutline: EffectInternal.SetPoiOutline,
+        Clear: EffectInternal.clearOutlineObjects,
+        SetOutlineOptions: EffectInternal.SetOutlineOptions,
+    },
+};
