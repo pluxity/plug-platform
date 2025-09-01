@@ -81,7 +81,7 @@ function onPointerUp(evt: MouseEvent) {
                 unregisterPointerEvents();
 
                 // 기즈모 생성
-                gizmo = new Addon.TransformControls(engine.Camera, engine.Renderer.domElement);
+                gizmo = new Addon.TransformControls(engine.Camera, engine.CSSRenderer.domElement);
                 gizmo.setMode(editMode); // "translate" | "rotate" | "scale"
                 gizmo.addEventListener('dragging-changed', (event) => {
                     Camera.SetEnabled(!event.value);
