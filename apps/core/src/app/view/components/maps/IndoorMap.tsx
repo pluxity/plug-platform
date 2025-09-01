@@ -1,14 +1,13 @@
 import React, { useEffect, useCallback, useState } from 'react'
-import { FacilityType } from '@plug/common-services'
+import type { DeviceResponse, FacilityType } from '@plug/common-services'
 import { useFacilityStore } from '@/app/store/facilityStore'
+import { useDeviceStore } from '@/app/store/deviceStore'
 import { useAssets } from '@/global/store/assetStore'
-import { useIndoorEngine } from '@/app/view/hooks/useIndoorEngine'
-import { useIndoorFacilityData } from '@/app/view/hooks/useIndoorFacilityData'
+import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPointerUpListeners, type PoiPointerUpListener } from '@/app/view/hooks'
 import MapScene from '@/global/components/indoor-map/MapScene'
 import DeviceSearchForm from './DeviceSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
 import { DeviceInfoDialog, CctvDialog } from '../dialogs'
-import type { DeviceResponse } from '@plug/common-services'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -17,10 +16,41 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const { assets } = useAssets()
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
   const [cctvOpen, setCctvOpen] = useState(false)
-  
-  const handlePoiPointerUp = useCallback(() => {
-    setCctvOpen(true)
-  }, [])
+
+  const devices = useDeviceStore(s => s.devices)
+  const { onPoiPointerUp: embeddedHandler } = usePoiEmbeddedWebRTC({
+    onError: () => setCctvOpen(true),
+    resolvePath: evt => {
+      const target = (evt as { target?: { property?: { deviceId?: string | number | null; deviceID?: string | number | null } } }).target
+      const raw = target?.property?.deviceId ?? target?.property?.deviceID
+      return raw != null ? String(raw) : undefined
+    }
+  })
+
+  const isEmbeddedMode = false
+  const listeners: PoiPointerUpListener[] = [
+    {
+      id: 'embeddedCctv',
+      test: context => !!context.deviceId && isEmbeddedMode,
+      run: context => embeddedHandler({ target: { id: context.poiId, property: { deviceId: context.deviceId } } })
+    },
+    {
+      id: 'dialogCctv',
+      test: context => !!context.deviceId && !isEmbeddedMode,
+      run: () => setCctvOpen(true)
+    },
+    {
+      id: 'deviceInfo',
+      test: context => !!context.deviceId,
+      run: context => {
+        const device = devices.find(d => d.id === String(context.deviceId)) || null
+        setSelectedDevice(device)
+      },
+      stopOnHandled: false
+    }
+  ]
+
+  const { onPoiPointerUp: handlePoiPointerUp } = usePoiPointerUpListeners({ features, listeners })
 
   const { handleLoadComplete } = useIndoorEngine({
     features,
