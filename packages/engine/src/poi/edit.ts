@@ -207,7 +207,6 @@ async function createEditPreviewObject() {
         target.Rotation = previewObject.rotation.clone();
         target.Scale = previewObject.scale.clone();
 
-        PoiData.updatePoiLine();
         PoiData.updatePoiMesh();
 
         // 기즈모에서 버튼업 이벤트 발생시 편집했던 Poi의 id값을 저장

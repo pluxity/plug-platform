@@ -12,18 +12,14 @@ export {
     Hide,
     HideAll,
     HideAllDisplayText,
-    HideAllLine,
     HideDisplayText,
-    HideLine,
     Import,
     PlayAnimation,
     SetTextInnerHtml,
     Show,
     ShowAll,
     ShowAllDisplayText,
-    ShowAllLine,
     ShowDisplayText,
-    ShowLine,
     StopAnimation
 } from './data';
 

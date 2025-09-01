@@ -9,10 +9,8 @@ import { Engine3D } from '../engine';
 
 let engine: Engine3D;
 let poiDataList: Record<string, PoiElement> = {};
-let poiLine: THREE.LineSegments;
 let poiIconGroup: THREE.Group;
 let poiTextGroup: THREE.Group;
-let poiLineGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
@@ -70,10 +68,8 @@ function dispose() {
     pointMeshStorage = {};
 
     poiDataList = {};
-    poiLine = null;
     poiIconGroup = null;
     poiTextGroup = null;
-    poiLineGroup = null;
     pointMeshGroup = null;
     pointMeshStorage = {};
     iconStorage = {};
@@ -95,7 +91,6 @@ async function onBeforeRender(evt: any) {
     if (bNeedsUpdate) {
         bNeedsUpdate = false;
         await updatePoiMesh();
-        updatePoiLine();
     }
 }
 
@@ -105,7 +100,6 @@ async function onBeforeRender(evt: any) {
 function onPoiSceneGroupCreated(evt: any) {
     poiIconGroup = evt.iconGroup as THREE.Group;
     poiTextGroup = evt.textGroup as THREE.Group;
-    poiLineGroup = evt.lineGroup as THREE.Group;
     pointMeshGroup = evt.pointMeshGroup as THREE.Group;
 }
 
@@ -131,9 +125,6 @@ function onModelBeforeMove(evt: any) {
 
     poiTextGroup.visible = false;
     poiTextGroup.layers.set(Interfaces.CustomLayer.Invisible);
-
-    poiLineGroup.visible = false;
-    poiLineGroup.layers.set(Interfaces.CustomLayer.Invisible);
 
     pointMeshGroup.visible = false;
     pointMeshGroup.layers.set(Interfaces.CustomLayer.Invisible);
@@ -185,9 +176,6 @@ function onModelAfterMove(evt: any) {
 
     poiTextGroup.visible = true;
     poiTextGroup.layers.set(Interfaces.CustomLayer.Default);
-
-    poiLineGroup.visible = true;
-    poiLineGroup.layers.set(Interfaces.CustomLayer.Default);
 
     pointMeshGroup.visible = true;
     pointMeshGroup.layers.set(Interfaces.CustomLayer.Default);
@@ -284,72 +272,9 @@ function createTextMesh(displayText: string): Addon.CSS2DObject {
     const emptyDiv = document.createElement('div');
     emptyDiv.innerHTML = displayText;
 
-    const textObj = new Addon.CSS2DObject(emptyDiv);    
+    const textObj = new Addon.CSS2DObject(emptyDiv);
 
     return textObj;
-}
-
-/**
- * poi 선 업데이트
- */
-function updatePoiLine() {
-
-    // 이전에 생성된 라인 제거
-    if (poiLine) {
-        poiLineGroup.remove(poiLine);
-        poiLine.geometry.dispose();
-        (poiLine.material as THREE.Material).dispose();
-        poiLine = null;
-    }
-
-    // 라인 버텍스 수집
-    const linePoints: THREE.Vector3[] = [];
-    Object.values(poiDataList).forEach(element => {
-        if (element.Visible && element.LineVisible) {
-
-            if (element.PointMeshData.animMeshRef) {
-
-                // 애니메이션 메시가 있는 경우
-                const center = new THREE.Vector3();
-                const size = new THREE.Vector3();
-                const bounding = new THREE.Box3().setFromObject(element.PointMeshData.animMeshRef);
-                bounding.getSize(size);
-                bounding.getCenter(center);
-
-                const p0 = center.clone().addScaledVector(new THREE.Vector3(0, 1, 0), size.y * 0.5);
-                const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
-
-                linePoints.push(p0, p1);
-
-                element.MeshBoundingHeight = p1.y - element.WorldPosition.y;
-
-            } else {
-
-                const bounding = element.PointMeshData.instanceMeshRef?.geometry.boundingBox?.clone();
-                const matrix = new THREE.Matrix4().compose(element.WorldPosition, new THREE.Quaternion().setFromEuler(element.Rotation), element.Scale);
-                bounding?.applyMatrix4(matrix);
-
-                const center = new THREE.Vector3();
-                const size = new THREE.Vector3();
-                bounding?.getCenter(center);
-                bounding?.getSize(size);
-
-                const p0 = center.clone().addScaledVector(new THREE.Vector3(0, 1, 0), size.y * 0.5);
-                const p1 = p0.clone().addScaledVector(new THREE.Vector3(0, 1, 0), element.LineHeight);
-
-                linePoints.push(p0, p1);
-
-                element.MeshBoundingHeight = p1.y - element.WorldPosition.y;;
-            }
-        }
-    });
-
-    // 라인 메시
-    const geometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-    const material = new THREE.LineBasicMaterial({ color: 'red' });
-    poiLine = new THREE.LineSegments(geometry, material);
-    poiLine.name = '#PoiLine';
-    poiLineGroup.add(poiLine);
 }
 
 /**
@@ -413,6 +338,11 @@ async function updatePoiMesh() {
                 poi.PointMeshData.animMeshRef?.rotation.copy(poi.Rotation);
                 poi.PointMeshData.animMeshRef?.scale.copy(poi.Scale);
 
+                // 바운딩
+                const bounds = new THREE.Box3().setFromObject(poi.PointMeshData.animMeshRef);
+                bounds.getSize(poi.PointMeshData.localSize);
+                poi.WorldPosition = poi.WorldPosition;
+
                 // 레이어 설정
                 Util.setObjectLayer(poi.PointMeshData.animMeshRef as THREE.Object3D, Interfaces.CustomLayer.Default | Interfaces.CustomLayer.Pickable);
             });
@@ -450,6 +380,11 @@ async function updatePoiMesh() {
                 dummy.updateMatrix();
 
                 mesh.setMatrixAt(index, dummy.matrix);
+
+                // 바운딩
+                const bounds = mergedGeometry.boundingBox.clone();
+                bounds.getSize(poi.PointMeshData.localSize);
+                poi.WorldPosition = poi.WorldPosition;
 
                 // poi 위치점 메시 데이터에 연결
                 poi.PointMeshData.instanceMeshRef = mesh;
@@ -620,46 +555,6 @@ function HideAll() {
 }
 
 /**
- * poi 선 보이기
- * @param id - poi id값
- */
-function ShowLine(id: string) {
-    if (poiDataList.hasOwnProperty(id)) {
-        poiDataList[id].LineVisible = true;
-    }
-
-    updatePoiLine();
-}
-
-/**
- * poi 선 숨기기
- * @param id - poi id값
- */
-function HideLine(id: string) {
-    if (poiDataList.hasOwnProperty(id)) {
-        poiDataList[id].LineVisible = false;
-    }
-
-    updatePoiLine();
-}
-
-/**
- * 모든 poi 선 보이기
- */
-function ShowAllLine() {
-    Object.values(poiDataList).forEach(poi => poi.LineVisible = true);
-    updatePoiLine();
-}
-
-/**
- * 모든 poi 선 숨기기
- */
-function HideAllLine() {
-    Object.values(poiDataList).forEach(poi => poi.LineVisible = false);
-    updatePoiLine();
-}
-
-/**
  * poi 표시명 보이기
  * @param id - poi id값
  */
@@ -749,7 +644,6 @@ export {
     createTextMesh,
     exists,
     getPoiElement,
-    updatePoiLine,
     updatePoiMesh,
 
     Export,
@@ -762,11 +656,6 @@ export {
     Hide,
     ShowAll,
     HideAll,
-
-    ShowLine,
-    HideLine,
-    ShowAllLine,
-    HideAllLine,
 
     ShowDisplayText,
     HideDisplayText,

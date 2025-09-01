@@ -9,7 +9,6 @@ import * as PoiData from './data';
 let engine: Engine3D;
 let poiRootGroup: THREE.Group;
 let iconGroup: THREE.Group;
-let lineGroup: THREE.Group;
 let textGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 
@@ -29,11 +28,6 @@ function initialize(_engine: Engine3D) {
     iconGroup.name = '#IconGroup';
     poiRootGroup.add(iconGroup);
 
-    // 라인 그룹
-    lineGroup = new THREE.Group();
-    lineGroup.name = '#LineGroup';
-    poiRootGroup.add(lineGroup);
-
     // 텍스트 그룹
     textGroup = new THREE.Group();
     textGroup.name = '#TextGroup';
@@ -50,7 +44,6 @@ function initialize(_engine: Engine3D) {
         poiRootGroup: poiRootGroup,
         iconGroup: iconGroup,
         textGroup: textGroup,
-        lineGroup: lineGroup,
         pointMeshGroup: pointMeshGroup,
     });
 }
@@ -61,7 +54,6 @@ function initialize(_engine: Engine3D) {
 function dispose() {
     poiRootGroup = null;
     iconGroup = null;
-    lineGroup = null;
     textGroup = null;
     pointMeshGroup = null;
     engine = null;

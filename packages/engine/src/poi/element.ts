@@ -19,14 +19,12 @@ class PoiElement implements Interfaces.PoiCreateOption {
     public position: Interfaces.Vector3Custom;
     private iconObj?: THREE.Sprite;
     private textObj: Addon.CSS2DObject;
-    private lineHeight: number;
 
     private floorId?: string;
 
     private pointMeshData: PoiPointMeshData;
 
     private visibleState: boolean;
-    private lineVisibleState: boolean = true;
     private textVisibleState: boolean = true;
 
     private mixer: THREE.AnimationMixer;
@@ -45,7 +43,6 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.property = option.property;
 
         this.position = new Interfaces.Vector3Custom();
-        this.lineHeight = 1.0;
 
         this.pointMeshData = {
             instanceMeshRef: undefined,
@@ -53,6 +50,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
             rotation: new Interfaces.EulerCustom,
             scale: new Interfaces.Vector3Custom(1, 1, 1),
             animMeshRef: undefined,
+            localSize: new THREE.Vector3(),
         };
 
         this.visibleState = true;
@@ -89,10 +87,10 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.position?.copy(value);
 
         // 아이콘
-        this.iconObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.lineHeight));
+        this.iconObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.pointMeshData.localSize.y));
 
         // 텍스트
-        this.textObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.lineHeight));
+        this.textObj?.position.copy(value.clone().addScaledVector(new THREE.Vector3(0, 1, 0), this.pointMeshData.localSize.y));
 
         // 위치점 애니메이션 메시
         this.pointMeshData.animMeshRef?.position.copy(value);
@@ -150,13 +148,6 @@ class PoiElement implements Interfaces.PoiCreateOption {
      */
     get FloorId(): string {
         return this.floorId as string;
-    }
-
-    /**
-     * 선길이
-     */
-    get LineHeight(): number {
-        return this.lineHeight;
     }
 
     /**
@@ -218,20 +209,6 @@ class PoiElement implements Interfaces.PoiCreateOption {
 
         // poi 표시명 텍스트 가시화 상태 설정
         this.textObj.visible = this.textVisibleState;
-    }
-
-    /**
-     * 선 가시화 여부
-     */
-    get LineVisible(): boolean {
-        return this.lineVisibleState;
-    }
-
-    /**
-     * 선 가시화 여부
-     */
-    set LineVisible(value: boolean) {
-        this.lineVisibleState = value;
     }
 
     /**
@@ -340,6 +317,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
  * poi 위치점 메시 데이터
  */
 interface PoiPointMeshData {
+    localSize: THREE.Vector3;
     instanceMeshRef: THREE.InstancedMesh | undefined;
     instanceIndex: number;
     rotation: Interfaces.EulerCustom;

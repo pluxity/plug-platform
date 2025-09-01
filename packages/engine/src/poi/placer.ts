@@ -8,7 +8,6 @@ import { PoiElement } from './element';
 
 let engine: Engine3D;
 let target: PoiElement;
-let previewLine: THREE.LineSegments;
 let previewPointMesh: THREE.Object3D;
 let completeCallback: Function;
 let currentPicktarget: THREE.Object3D;
@@ -20,19 +19,6 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
  */
 function initialize(_engine: Engine3D) {
     engine = _engine;
-
-    // 이동시 미리보기용 라인 객체
-    let geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, 1, 0),
-    ]);
-    let material: THREE.Material = new THREE.LineBasicMaterial({ color: 'red' });
-    previewLine = new THREE.LineSegments(geometry, material);
-    previewLine.name = '#PoiPlacerPreviewLine';
-    engine.RootScene.add(previewLine);
-
-    previewLine.visible = false;
-    previewLine.layers.set(Interfaces.CustomLayer.Invisible);
 
     // 이벤트
     engine.EventHandler.addEventListener('onPoiCreate' as never, onPoiCreate);
@@ -50,7 +36,6 @@ function dispose() {
     target?.dispose();
     target = null;
 
-    previewLine = null;
     previewPointMesh = null;
     completeCallback = null;
     currentPicktarget = null;
@@ -65,8 +50,6 @@ function dispose() {
 async function onPoiCreate(evt: any) {
     target = evt.target as PoiElement;
     completeCallback = evt.onCompleteCallback;
-
-    previewLine.scale.y = target.LineHeight;
 
     // 미리보기용 위치점 메시
     if (target.modelUrl) {
@@ -141,10 +124,6 @@ function onPointerMove(evt: PointerEvent) {
             // poi 위치
             target.WorldPosition = intersects[0].point.clone();
 
-            // 미리보기선
-            previewLine.position.copy(target.WorldPosition);
-            previewLine.visible = true;
-            previewLine.layers.set(Interfaces.CustomLayer.Default);
             // 미리보기 위치점 메시
             previewPointMesh.position.copy(target.WorldPosition);
             previewPointMesh.visible = true;
@@ -159,10 +138,6 @@ function onPointerMove(evt: PointerEvent) {
                 // Poi 위치
                 target.WorldPosition = point.clone();
 
-                // 미리보기선
-                previewLine.position.copy(target.WorldPosition);
-                previewLine.visible = true;
-                previewLine.layers.set(Interfaces.CustomLayer.Default);
                 // 미리보기 위치점 메시
                 previewPointMesh.position.copy(target.WorldPosition);
                 previewPointMesh.visible = true;
@@ -197,9 +172,6 @@ function onPointerUp(evt: PointerEvent) {
             // 이벤트 등록 해제
             unRegisterPointerEvents();
 
-            // 미리보기선 숨기기
-            previewLine.visible = false;
-            previewLine.layers.set(Interfaces.CustomLayer.Invisible);
             // 미리보기 위치점 메시 제거
             releasePreviewPointMesh();
         }

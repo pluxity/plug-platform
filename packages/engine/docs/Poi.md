@@ -143,32 +143,6 @@ Px.Poi.Show('TestPoi');
 Px.Poi.ShowAll();
 ```
 
-## Px.Poi.HideLine(id: string)
-- id: 선을 숨길 poi id값
-- id에 해당하는 poi의 선을 숨김
-```javascript
-Px.Poi.HideLine('TestPoi');
-```
-
-## Px.Poi.HideAllLine()
-- 모든 poi의 선을 숨김
-```javascript
-Px.Poi.HideAllLine();
-```
-
-## Px.Poi.ShowLine(id: string)
-- id: 선을 가시화할 poi id값
-- id에 해당하는 poi의 선을 가시화
-```javascript
-Px.Poi.ShowLine('TestPoi');
-```
-
-## Px.Poi.ShowAllLine()
-- 모든 poi의 선을 가시화
-```javascript
-Px.Poi.ShowAllLine();
-```
-
 ## HideDisplayText(id: string)
 - id: 표시명 텍스트를 숨길 poi id값
 - id에 해당하는 poi의 표시명 텍스트를 숨김
