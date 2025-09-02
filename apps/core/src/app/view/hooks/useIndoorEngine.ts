@@ -49,7 +49,7 @@ export function useIndoorEngine({
         id: feature.id,
         iconUrl: '',
         modelUrl: assetRecord?.file?.url || '',
-        displayText: feature.id,
+        displayText: '',
         floorId: feature.floorId,
         property: { assetId: feature.assetId, deviceId: feature.deviceId ?? null },
         position: { x: feature.position?.x ?? 0, y: feature.position?.y ?? 0, z: feature.position?.z ?? 0 },

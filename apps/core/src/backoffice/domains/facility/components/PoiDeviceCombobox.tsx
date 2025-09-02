@@ -25,6 +25,7 @@ interface PoiDeviceComboboxProps {
   groups?: {
     key: string;
     title: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filterFn?: (device: any) => boolean;
     maxItems?: number;
   }[];
@@ -45,8 +46,8 @@ export function PoiDeviceCombobox({
   const selectedDevice = devices?.find(device => device.id === selectedDeviceId);
 
   const groupedDevices = groups.length > 0 ? groups.map(group => {
-    let filteredDevices = devices?.filter(group.filterFn || (() => true)) || [];
-    
+    const filteredDevices = devices?.filter(group.filterFn || (() => true)) || [];
+
     return {
       ...group,
       devices: filteredDevices

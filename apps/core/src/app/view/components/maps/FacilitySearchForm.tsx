@@ -52,16 +52,15 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacil
       }
       if (!targetCartesian) return
 
-      // 현재와 매우 가깝다면 이동 생략 (불필요한 비행 방지)
       const dist = Cesium.Cartesian3.distance(viewer.camera.position, targetCartesian)
-      if (dist < 30) { // already near – skip flight, just run callback
+      if (dist < 30) {
         done?.()
         return
       }
       
-      (viewer.camera as unknown as (Cesium.Camera & { cancelFlight?: () => void })).cancelFlight?.()
+  (viewer.camera as unknown as (Cesium.Camera & { cancelFlight?: () => void })).cancelFlight?.()
 
-      const desiredAltitude = 750
+      const desiredAltitude = 650
       const pitch = -20
       const range = desiredAltitude / Math.sin(Math.abs(pitch) * Math.PI / 180)
       const offset = new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(pitch), range)
@@ -69,15 +68,19 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacil
       let lookCenter = targetCartesian
       try {
         const enu = Cesium.Transforms.eastNorthUpToFixedFrame(targetCartesian)
-        const eastCol = Cesium.Matrix4.getColumn(enu, 0, new Cesium.Cartesian4()) // Cartesian4
+        const eastCol = Cesium.Matrix4.getColumn(enu, 0, new Cesium.Cartesian4())
+        const northCol = Cesium.Matrix4.getColumn(enu, 1, new Cesium.Cartesian4())
         const east = new Cesium.Cartesian3(eastCol.x, eastCol.y, eastCol.z)
+        const north = new Cesium.Cartesian3(northCol.x, northCol.y, northCol.z)
         Cesium.Cartesian3.normalize(east, east)
-        const lateral = range * 0.125
-        const shift = Cesium.Cartesian3.multiplyByScalar(east, lateral, new Cesium.Cartesian3())
-        lookCenter = Cesium.Cartesian3.add(targetCartesian, shift, new Cesium.Cartesian3())
-      } catch {
-        /* fallback: ignore */
-      }
+        Cesium.Cartesian3.normalize(north, north)
+        const horizontalFactor = -0.1
+        const verticalFactor = 0.12
+        const horizShift = Cesium.Cartesian3.multiplyByScalar(east, -range * horizontalFactor, new Cesium.Cartesian3())
+        const vertShift = Cesium.Cartesian3.multiplyByScalar(north, range * verticalFactor, new Cesium.Cartesian3())
+        const combined = Cesium.Cartesian3.add(horizShift, vertShift, new Cesium.Cartesian3())
+        lookCenter = Cesium.Cartesian3.add(targetCartesian, combined, new Cesium.Cartesian3())
+  } catch { /* noop */ }
 
       const sphere = new Cesium.BoundingSphere(lookCenter, Math.min(Math.max(dist * 0.1, 80), 1200))
       viewer.camera.flyToBoundingSphere(sphere, {
@@ -94,12 +97,10 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacil
   const handleSelectFacility = (facility: FacilityResponse) => {
     setSearchQuery('')
     formRef.current?.close()
-  onFacilityPreSelect?.()
-    // 대기 상태에 두고, 카메라 이동 완료 후 Dialog 표시
+    onFacilityPreSelect?.()
     setPendingFacility(facility)
   }
 
-  // viewer 준비되었고 대기중인 시설이 있으면 이동
   useEffect(() => {
     if (viewer && pendingFacility) {
       const fac = pendingFacility
@@ -120,14 +121,22 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacil
       disabled={!facilitiesFetched}
       renderItem={(facility) => (
         <div>
-          <div className="flex items-center justify-between">
-            <div className="font-medium text-gray-900">{facility.name}</div>
-            <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{facility.code}</div>
+          <div className="flex w-full items-start gap-2">
+            <div className="w-3/5 break-words font-medium text-gray-900">
+              {facility.name}
+            </div>
+            <div className="w-2/5 break-all whitespace-pre-wrap text-right">
+              {facility.code && (
+                <span className="inline-block text-[10px] leading-4 bg-blue-100 text-blue-800 px-2 py-1 rounded break-all">
+                  {facility.code}
+                </span>
+              )}
+            </div>
           </div>
           {facility.description && (
-            <div className="text-sm text-gray-500 mt-1">{facility.description}</div>
+            <div className="text-xs text-gray-500 mt-1 break-words">{facility.description}</div>
           )}
-          <div className="text-xs text-blue-600 mt-1">
+          <div className="text-[10px] text-blue-600 mt-1">
             위도: {facility.lat?.toFixed(6)}, 경도: {facility.lon?.toFixed(6)}
           </div>
         </div>

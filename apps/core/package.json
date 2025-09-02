@@ -24,7 +24,9 @@
   },
   "peerDependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "plotly.js": "^3.1.0",
     "react-hook-form": "^7.58.1",
+    "react-plotly.js": "^2.6.0",
     "sonner": "^2.0.5",
     "zod": "^3.25.67"
   },
