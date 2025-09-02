@@ -135,7 +135,9 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   return (
     <>
       <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
-      <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
+      {selectedDevice && (
+        <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
+      )}
     </>
   )
 };

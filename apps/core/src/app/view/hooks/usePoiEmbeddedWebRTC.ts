@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { Poi } from '@plug/engine'
+import { buildWhepUrl, performWhepNegotiation, prepareReceiverPeerConnection } from '@/global/webrtc/whep'
 
 export interface UsePoiEmbeddedWebRTCOptions {
   onError?: (poiId: string, error: unknown) => void
@@ -55,49 +56,52 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     const path = (streamKey ?? poiId)?.toString()
     stopPoi(poiId)
     const videoId = `poi-video-${poiId}`
+    const closeBtnId = `poi-video-close-${poiId}`
     const height = Math.round(width / aspect)
     const html = `
-          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-            <video
-              id="${videoId}"
-              ${muted ? 'muted' : ''}
-              ${controls ? 'controls' : ''}
-              autoplay
-              playsinline
-              style="width:${width}px;height:${height}px;background:#000;border:1px solid #666;border-radius:4px;object-fit:contain;"
-            ></video>
-          </div>`
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <button id="${closeBtnId}" title="닫기" aria-label="닫기"
+          style="position:absolute;top:-10px;right:-10px;width:28px;height:28px;border:none;border-radius:999px;background:rgba(15,23,42,0.85);color:#e2e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;font-weight:600;box-shadow:0 2px 4px rgba(0,0,0,0.4);backdrop-filter:blur(6px);z-index:100;"
+          onmouseenter="this.style.background='rgba(30,41,59,0.9)'" onmouseleave="this.style.background='rgba(15,23,42,0.85)'"
+        >×</button>
+        <video
+          id="${videoId}"
+          ${muted ? 'muted' : ''}
+          ${controls ? 'controls' : ''}
+          autoplay
+          playsinline
+          style="width:${width}px;height:${height}px;background:#000;border:1px solid #475569;border-radius:6px;object-fit:contain;"
+        ></video>
+      </div>`
     Poi.SetTextInnerHtml(poiId, html)
 
     await new Promise(r => setTimeout(r, 0))
     const videoEl = document.getElementById(videoId) as HTMLVideoElement | null
+    const closeBtn = document.getElementById(closeBtnId) as HTMLButtonElement | null
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        stopPoi(poiId)
+        try { Poi.SetTextInnerHtml(poiId, '') } catch { /* ignore */ }
+      }, { once: true })
+    }
     if (!videoEl) return
 
     const metaEnv = (import.meta as unknown as { env: Record<string, string | undefined> }).env
     const host = metaEnv.VITE_WEBRTC_HOST || metaEnv.VITE_CCTV_HOST || '192.168.4.8'
     const port = metaEnv.VITE_WEBRTC_PORT || metaEnv.VITE_CCTV_PORT || '8889'
 
-    const pc = new RTCPeerConnection()
-    const abort = new AbortController()
-    poiSessionsRef.current[poiId] = { pc, abort }
-
-    pc.addEventListener('track', evt => {
-      if (evt.track.kind === 'video' && videoEl && !videoEl.srcObject && evt.streams[0]) {
-        videoEl.srcObject = evt.streams[0]
+    const pc = prepareReceiverPeerConnection(stream => {
+      if (videoEl && !videoEl.srcObject) {
+        videoEl.srcObject = stream
         try { videoEl.play() } catch (e) { console.error('[usePoiEmbeddedWebRTC] video play error', poiId, e) }
       }
     })
-    pc.addTransceiver('video', { direction: 'recvonly' })
-    pc.addTransceiver('audio', { direction: 'recvonly' })
+    const abort = new AbortController()
+    poiSessionsRef.current[poiId] = { pc, abort }
     try {
-      const offer = await pc.createOffer()
-      await pc.setLocalDescription(offer)
-      const url = `http://${host}:${port}/${encodeURIComponent(path)}/whep`
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/sdp' }, body: offer.sdp || '', signal: abort.signal })
-      if (!res.ok) throw new Error(`WHEP ${res.status}`)
-      const answerSdp = await res.text()
+      const url = buildWhepUrl(host, port, path)
+  await performWhepNegotiation(pc, url, abort.signal)
       if (poiSessionsRef.current[poiId]?.pc !== pc) return
-      await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp })
     } catch (err) {
       console.error('POI WebRTC failed', err)
       stopPoi(poiId)

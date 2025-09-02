@@ -13,12 +13,11 @@ export interface InfoDialogProps {
   footer?: React.ReactNode
   className?: string
   leftPlaceholderWidth?: string
-  /** visual density preset. default = legacy large layout */
   variant?: 'default' | 'compact'
-  /** override h2 title class (appended) */
   titleClassName?: string
-  /** extra class on inner body wrapper */
   bodyClassName?: string
+  dialogHeightClass?: string
+  dialogWidthClass?: string
 }
 
 const defaultHole: Required<InfoDialogHoleConfig> = { x: '2rem', y: '2rem', w: '45rem', h: '35rem' }
@@ -31,12 +30,13 @@ export const InfoDialog = ({
   headerActions,
   badges,
   children,
-  footer,
   className,
   leftPlaceholderWidth,
   variant = 'default',
   titleClassName,
-  bodyClassName
+  bodyClassName,
+  dialogHeightClass,
+  dialogWidthClass
 }: InfoDialogProps) => {
   if (!open) return null
 
@@ -56,11 +56,19 @@ export const InfoDialog = ({
 
   const isCompact = variant === 'compact'
 
+  const sizeClass = isCompact
+    ? 'max-h-[92vh] w-auto'
+    : [
+        dialogHeightClass || 'h-[32rem]',
+        dialogWidthClass || 'w-[80rem]',
+        'max-w-[96rem] max-h-[90vh]'
+      ].join(' ')
+
   const containerBase = [
     'relative flex text-slate-100 bg-gradient-to-br',
     'from-slate-900/90 via-slate-800/80 to-slate-700/70 backdrop-blur-sm',
     'border border-white/10 shadow-2xl rounded-2xl',
-    isCompact ? 'max-h-[92vh] w-auto' : 'h-[25rem] w-2/3 max-w-[96rem] max-h-[90vh]'
+    sizeClass
   ].join(' ')
 
   const bodyWrapperClass = isCompact
@@ -106,9 +114,6 @@ export const InfoDialog = ({
             </div>
           </div>
           {children}
-          {footer && (
-            <div className={isCompact ? 'mt-2 pt-2 flex items-center justify-end gap-3' : 'mt-auto pt-4 flex items-center justify-end gap-4'}>{footer}</div>
-          )}
         </div>
       </div>
     </div>
