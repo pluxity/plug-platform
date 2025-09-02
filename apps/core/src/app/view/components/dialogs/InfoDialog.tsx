@@ -73,14 +73,14 @@ export const InfoDialog = ({
 
   const bodyWrapperClass = isCompact
     ? 'flex flex-col flex-1 p-4 gap-4 pointer-events-auto overflow-hidden relative'
-    : 'flex flex-col flex-1 p-10 pl-14 gap-8 pointer-events-auto overflow-hidden relative'
+    : 'flex flex-col flex-1 p-6 gap-8 pointer-events-auto overflow-hidden relative'
 
   const closeBtnClass = isCompact
     ? 'absolute top-2 right-2 w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
     : 'absolute top-4 right-4 w-16 h-16 rounded-2xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
 
   const titleClass = [
-    isCompact ? 'text-lg font-semibold tracking-tight text-white' : 'text-[2.75rem] leading-[1.05] font-semibold tracking-tight text-white drop-shadow',
+    isCompact ? 'text-lg font-semibold tracking-tight text-white' : 'text-[2rem] leading-[1.05] font-semibold tracking-tight text-white drop-shadow',
     'break-words',
     titleClassName || ''
   ].join(' ')

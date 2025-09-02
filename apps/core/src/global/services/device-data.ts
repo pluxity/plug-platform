@@ -1,5 +1,11 @@
 import { api, useSWRApi } from '@plug/api-hooks';
-import { DeviceLatestValueResponse, DeviceMetricSeriesResponse } from './types/device-data';
+import {
+  DeviceLatestValueResponse,
+  DeviceMetricSeriesResponse,
+  DeviceLatestMultiResponse,
+  DeviceLatestNormalizedMap,
+  DeviceLatestMultiMetricEntry
+} from './types/device-data';
 
 const buildDeviceBase = (companyType: string, deviceType: string, deviceId: string) =>
   `devices/${encodeURIComponent(companyType)}/${encodeURIComponent(deviceType)}/${encodeURIComponent(deviceId)}`;
@@ -104,6 +110,84 @@ export const useDeviceLatestSWR = (
     refreshInterval: 5000,
     isPaused: () => !isReady,
   });
+};
+
+// --- Extended latest (normalization) ----------------------------------------------------
+// The backend latest endpoint may evolve to return either:
+// 1) Single metric shape (DeviceLatestValueResponse)
+// 2) Multi metric shape (DeviceLatestMultiResponse)
+// Provide helpers to always give UI a map of metrics.
+
+const isMultiLatest = (data: unknown): data is DeviceLatestMultiResponse => {
+  if (!data || typeof data !== 'object') return false;
+  const maybe = data as { metrics?: unknown; meta?: unknown; timestamp?: unknown; metric?: unknown };
+  return !!maybe.metrics && !!maybe.meta && !!maybe.timestamp && typeof maybe.metrics === 'object' && !('metric' in maybe);
+};
+
+const isSingleLatest = (data: unknown): data is DeviceLatestValueResponse => {
+  if (!data || typeof data !== 'object') return false;
+  return 'metric' in data && 'value' in data && 'timestamp' in data;
+};
+
+export const normalizeLatest = (
+  data: DeviceLatestValueResponse | DeviceLatestMultiResponse | unknown | null
+): DeviceLatestNormalizedMap => {
+  if (!data) return {};
+  if (isMultiLatest(data)) {
+    // Add top-level timestamp to each metric if per-metric timestamp missing.
+    const ts = data.timestamp;
+    const out: DeviceLatestNormalizedMap = {};
+    Object.entries(data.metrics).forEach(([k, v]) => {
+      const entry = v as { value: number | string | null; unit?: string };
+      out[k] = { value: entry.value, unit: entry.unit, timestamp: ts };
+    });
+    return out;
+  }
+  if (isSingleLatest(data)) {
+    const entry: DeviceLatestMultiMetricEntry = {
+      value: data.value,
+      timestamp: data.timestamp
+    };
+    return { [data.metric]: entry };
+  }
+  return {};
+};
+
+export const getDeviceLatestNormalized = async (
+  companyType: string,
+  deviceType: string,
+  deviceId: string
+): Promise<DeviceLatestNormalizedMap> => {
+  try {
+    const url = `${buildDeviceBase(companyType, deviceType, deviceId)}/latest`;
+  const resp = await api.get<unknown>(url, { requireAuth: true });
+  const raw = (resp as { data?: unknown })?.data ?? resp;
+  return normalizeLatest(raw);
+  } catch {
+    return {};
+  }
+};
+
+export const useDeviceLatestNormalizedSWR = (
+  companyType?: string,
+  deviceType?: string,
+  deviceId?: string
+) => {
+  const isReady = Boolean(companyType && deviceType && deviceId);
+  const url = isReady && companyType && deviceType && deviceId
+    ? `${buildDeviceBase(companyType, deviceType, deviceId)}/latest`
+    : '';
+  // Fetch raw, then transform via select
+  return useSWRApi<DeviceLatestMultiResponse | DeviceLatestValueResponse>(
+    url,
+    'GET',
+    { requireAuth: true },
+    {
+      refreshInterval: 5000,
+      isPaused: () => !isReady,
+      // SWR API hook may support a middleware or select; if not, consumer can call normalizeLatest.
+    }
+  );
 };
 
 interface PlotlyTrace {
