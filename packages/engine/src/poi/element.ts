@@ -13,7 +13,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
     public id: string;
     public iconUrl: string;
     public modelUrl?: string;
-    public displayText: string;
+    public htmlString: string;
     public property: { [key: string]: any };
 
     public position: Interfaces.Vector3Custom;
@@ -39,7 +39,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
         this.id = option.id;
         this.modelUrl = option.modelUrl;
         this.iconUrl = option.iconUrl;
-        this.displayText = option.displayText;
+        this.htmlString = option.htmlString;
         this.property = option.property;
 
         this.position = new Interfaces.Vector3Custom();
@@ -165,7 +165,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
             id: this.id,
             iconUrl: this.iconUrl,
             modelUrl: this.modelUrl,
-            displayText: this.displayText,
+            htmlString: this.htmlString,
             property: this.property,
             floorId: this.floorId,
             position: ModelInternal.convertWorldToFloorLocal(this.position.clone(), this.floorId as string),

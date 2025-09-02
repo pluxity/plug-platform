@@ -143,36 +143,36 @@ Px.Poi.Show('TestPoi');
 Px.Poi.ShowAll();
 ```
 
-## HideDisplayText(id: string)
-- id: 표시명 텍스트를 숨길 poi id값
-- id에 해당하는 poi의 표시명 텍스트를 숨김
+## HideHtmlObject(id: string)
+- id: html객체를 숨길 poi id값
+- id에 해당하는 poi의 html객체를 숨김
 ```javascript
-Px.Poi.HideDisplayText('TestPoi');
+Px.Poi.HideHtmlObject('TestPoi');
 ```
 
-## HideAllDisplayText()
-- 모든 표시명 텍스트 숨김처리
+## HideAllHtmlObject()
+- 모든 html객체 숨김처리
 ```javascript
-Px.Poi.HideAllDisplayText();
+Px.Poi.HideAllHtmlObject();
 ```
 
-## ShowDisplayText(id: string)
-- id: 표시명 텍스트를 가시화할 poi id값
-- id에 해당하는 poi의 표시명 텍스트를 가시화
+## ShowHtmlObject(id: string)
+- id: html객체 가시화할 poi id값
+- id에 해당하는 poi의 html객체를 가시화
 ```javascript
-Px.Poi.ShowDisplayText('TestPoi');
+Px.Poi.ShowHtmlObject('TestPoi');
 ```
 
-## ShowAllDisplayText()
-- 모든 표시명 텍스트 가시화
+## ShowAllHtmlObject()
+- 모든 html객체 가시화
 ```javascript
-Px.Poi.ShowAllDisplayText();
+Px.Poi.ShowAllHtmlObject();
 ```
 
 ## SetTextInnerHtml(id: string, htmlString: string)
 - id: HTML을 변경할 poi id값
 - htmlString: 변경할 HTML 문자열
-- poi의 표시명 텍스트의 HTML 내용을 설정한다.
+- poi의 html객체의 내용을 설정한다.
 ```javascript
 Px.Poi.SetTextInnerHtml('TestPoi', '<label style="color: red";>변경텍스트</label>');
 ```

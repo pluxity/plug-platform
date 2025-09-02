@@ -13,11 +13,21 @@
 
 업데이트 내역
 ============
-# 2025-09-01
+# 2025-09-02
+- [Engine](./docs/Engine3D.md#pxcoreresize) WebGL 캔버스 Resize Api 추가
 - [Poi](./docs/Poi.md) Poi 선관련 Api 제거
   - HideAllLine, HideLine, ShowAllLine, ShowLine
+- [Poi](./docs/Poi.md) Poi DisplayText관련 명칭 수정
+  - [ShowDisplayText->ShowHtmlObject](./docs/Poi.md#showhtmlobjectid-string)
+  - [ShowAllDisplayText->ShowAllHtmlObject](./docs/Poi.md#showallhtmlobject)
+  - [HideDisplayText->HideHtmlObject](./docs/Poi.md#hidehtmlobjectid-string)
+  - [HideAllDisplayText->HideAllHtmlObject](./docs/Poi.md#hideallhtmlobject)
+- [Poi](./docs/Poi.md) 마우스 입력 처리 수정
+- [Poi](./docs/Poi.md#pxpoistartediteditmode-string) Poi 편집 모드 기능 개선
 - [Effect](./docs/Effect.md) 효과(외각선) Api 추가
 - [Interfaces](./docs/Interfaces.md#outlineoptions) 외각선 옵션 인터페이스 추가
+- [Interfaces](./docs/Interfaces.md#poicreateoption) PoiCreateOption, displayText 명칭 수정
+- [Interfaces](./docs/Interfaces.md#poiimportoption) PoiImportOption, displayText 명칭 수정
 
 # 2025-08-28
 - [Poi](./docs/Poi.md) SetDisplayText 함수 제거

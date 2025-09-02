@@ -103,7 +103,7 @@ interface PoiCreateOption {
     id: string;
     iconUrl: string;
     modelUrl?: string;
-    displayText: string;
+    htmlString: string;
     property: { [key: string]: any };
 }
 
@@ -114,7 +114,7 @@ interface PoiImportOption {
     id: string;
     iconUrl: string;
     modelUrl?: string;
-    displayText: string;
+    htmlString: string;
     floorId: string;
     property: { [key: string]: any };
     position: Vector3;

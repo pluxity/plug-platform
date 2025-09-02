@@ -156,10 +156,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br /><br />
 
                     <input type='text' value={this.state.setTextVisiblePoiId} onChange={this.onSetPoiTextVisibleInputValueChanged.bind(this)} placeholder='DisplayText Show/Hide Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowDisplayText')}>Show DisplayText</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideDisplayText')}>Hide DisplayText</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllDisplayText')}>Show All DisplayText</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllDisplayText')}>Hide All DisplayText</button><br /><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowHtmlObject')}>ShowHtmlObject</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideHtmlObject')}>HideHtmlObject</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllHtmlObject')}>ShowAllHtmlObject</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllHtmlObject')}>HideAllHtmlObject</button><br /><br />
 
                     <input type='text' value={this.state.poiDisplayTextIdValue} onChange={this.onPoiDisplayTextIdInputValueChanged.bind(this)} placeholder='텍스트 HTML 변경할 poi id'></input>
                     <input type='text' value={this.state.poiDisplayTextValue} onChange={this.onPoiDisplayTextInputValueChanged.bind(this)} placeholder='HTML 문자열 입력'></input>
@@ -401,7 +401,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = '';//'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8) + '테스트__-';
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '테스트__-</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -411,14 +411,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
             } break;
             case 'Poi.Create(MonkeyHead.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -428,7 +428,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'monkeyhead.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(MonkeyHead.glb) Callback', data));
@@ -436,7 +436,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create(ScreenDoor.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -446,7 +446,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'ScreenDoor.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
@@ -454,7 +454,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create(head.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -464,7 +464,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'subway_train/head.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
@@ -472,7 +472,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create(body.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -482,7 +482,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'subway_train/body.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
@@ -503,7 +503,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 });
             } break;
             case 'Poi.ImportSingle': {
-                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
+                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "htmlString": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
             } break;
             case 'Poi.ExportAll(LocalStorage)': {
                 const data = Poi.ExportAll();
@@ -533,17 +533,17 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.HideAll': {
                 Poi.HideAll();
             } break;
-            case 'Poi.ShowDisplayText': {
-                Poi.ShowDisplayText(this.state.setTextVisiblePoiId);
+            case 'Poi.ShowHtmlObject': {
+                Poi.ShowHtmlObject(this.state.setTextVisiblePoiId);
             } break;
-            case 'Poi.HideDisplayText': {
-                Poi.HideDisplayText(this.state.setTextVisiblePoiId);
+            case 'Poi.HideHtmlObject': {
+                Poi.HideHtmlObject(this.state.setTextVisiblePoiId);
             } break;
-            case 'Poi.ShowAllDisplayText': {
-                Poi.ShowAllDisplayText();
+            case 'Poi.ShowAllHtmlObject': {
+                Poi.ShowAllHtmlObject();
             } break;
-            case 'Poi.HideAllDisplayText': {
-                Poi.HideAllDisplayText();
+            case 'Poi.HideAllHtmlObject': {
+                Poi.HideAllHtmlObject();
             } break;
             case 'Poi.SetTextInnerHtml': {
                 Poi.SetTextInnerHtml(this.state.poiDisplayTextIdValue, this.state.poiDisplayTextValue);

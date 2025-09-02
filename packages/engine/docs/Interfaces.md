@@ -24,7 +24,7 @@ interface PoiCreateOption {
     id: string; // poi id값
     iconUrl: string; // 아이콘 이미지 주소
     modelUrl?: string; // 모델링 파일 주소
-    displayText: string; // 표시명 텍스트
+    htmlString: string; // 표시명 텍스트
     property: { [key: string]: any }; // 속성
 }
 ```
@@ -38,7 +38,7 @@ interface PoiImportOption {
     id: string; // poi id값
     iconUrl: string; // 아이콘 이미지 주소
     modelUrl?: string; // 모델링 파일 주소
-    displayText: string; // 표시명 텍스트
+    htmlString: string; // 표시명 텍스트
     floorId: string; // poi가 배치된 층 id값
     property: { [key: string]: any }; // 속성
     position: Vector3; // 위치 x,y,z
@@ -50,7 +50,7 @@ Px.Poi.Import({
     "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e",
     "iconUrl": "SamplePoiIcon.png",
     "modelUrl": "monkeyhead.glb",
-    "displayText": "ff8419ab",
+    "htmlString": "ff8419ab",
     "property": {
         "testText": "테스트 속성",
         "testInt": 11,

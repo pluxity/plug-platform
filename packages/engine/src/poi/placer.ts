@@ -190,7 +190,7 @@ function getFloorObject(): THREE.Object3D | undefined {
     if (currentPicktarget) {
         let floorObj: THREE.Object3D = null;
         currentPicktarget.traverseAncestors(parent => {
-            if (floorObj && parent.userData.hasOwnProperty('type')) {
+            if (!floorObj && parent.userData.hasOwnProperty('type')) {
                 const parentType: string = parent.userData['type'];
                 if (parentType.toLowerCase() === 'floor') {
                     floorObj = parent;

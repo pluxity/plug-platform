@@ -10,7 +10,7 @@ import { Engine3D } from '../engine';
 let engine: Engine3D;
 let poiDataList: Record<string, PoiElement> = {};
 let poiIconGroup: THREE.Group;
-let poiTextGroup: THREE.Group;
+let poiHtmlObjGroup: THREE.Group;
 let pointMeshGroup: THREE.Group;
 let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
@@ -69,7 +69,7 @@ function dispose() {
 
     poiDataList = {};
     poiIconGroup = null;
-    poiTextGroup = null;
+    poiHtmlObjGroup = null;
     pointMeshGroup = null;
     pointMeshStorage = {};
     iconStorage = {};
@@ -99,7 +99,7 @@ async function onBeforeRender(evt: any) {
  */
 function onPoiSceneGroupCreated(evt: any) {
     poiIconGroup = evt.iconGroup as THREE.Group;
-    poiTextGroup = evt.textGroup as THREE.Group;
+    poiHtmlObjGroup = evt.htmlObjGroup as THREE.Group;
     pointMeshGroup = evt.pointMeshGroup as THREE.Group;
 }
 
@@ -123,8 +123,8 @@ function onModelBeforeMove(evt: any) {
     poiIconGroup.visible = false;
     poiIconGroup.layers.set(Interfaces.CustomLayer.Invisible);
 
-    poiTextGroup.visible = false;
-    poiTextGroup.layers.set(Interfaces.CustomLayer.Invisible);
+    poiHtmlObjGroup.visible = false;
+    poiHtmlObjGroup.layers.set(Interfaces.CustomLayer.Invisible);
 
     pointMeshGroup.visible = false;
     pointMeshGroup.layers.set(Interfaces.CustomLayer.Invisible);
@@ -174,8 +174,8 @@ function onModelAfterMove(evt: any) {
     poiIconGroup.visible = true;
     poiIconGroup.layers.set(Interfaces.CustomLayer.Default);
 
-    poiTextGroup.visible = true;
-    poiTextGroup.layers.set(Interfaces.CustomLayer.Default);
+    poiHtmlObjGroup.visible = true;
+    poiHtmlObjGroup.layers.set(Interfaces.CustomLayer.Default);
 
     pointMeshGroup.visible = true;
     pointMeshGroup.layers.set(Interfaces.CustomLayer.Default);
@@ -189,6 +189,7 @@ function onModelShow(evt: any) {
     Object.values(poiDataList).forEach(poi => {
         if (poi.FloorId === floorId) {
             poi.Visible = true;
+            poi.TextVisible = true;
         }
     });
 
@@ -203,6 +204,7 @@ function onModelHide(evt: any) {
     Object.values(poiDataList).forEach(poi => {
         if (poi.FloorId === floorId) {
             poi.Visible = false;
+            poi.TextVisible = false;
         }
     });
 
@@ -214,7 +216,10 @@ function onModelHide(evt: any) {
  */
 function onModelShowAll(evt: any) {
 
-    Object.values(poiDataList).forEach(poi => poi.Visible = true);
+    Object.values(poiDataList).forEach(poi => {
+        poi.Visible = true;
+        poi.TextVisible = true;
+    });
 
     bNeedsUpdate = true;
 }
@@ -224,7 +229,10 @@ function onModelShowAll(evt: any) {
  */
 function onModelHideAll(evt: any) {
 
-    Object.values(poiDataList).forEach(poi => poi.Visible = false);
+    Object.values(poiDataList).forEach(poi => {
+        poi.Visible = false;
+        poi.TextVisible = false;
+    });
 
     bNeedsUpdate = true;
 }
@@ -264,13 +272,13 @@ function getIcon(url: string): THREE.SpriteMaterial {
 }
 
 /**
- * 텍스트 문자열을 three.js 메시로 생성
- * @param displayText - 표시명 텍스트 문자열
+ * Html 객체 생성
+ * @param htmlString - 표시명 텍스트 문자열
  */
-function createTextMesh(displayText: string): Addon.CSS2DObject {
+function createHtmlObject(htmlString: string): Addon.CSS2DObject {
     // 빈 div 생성
     const emptyDiv = document.createElement('div');
-    emptyDiv.innerHTML = displayText;
+    emptyDiv.innerHTML = htmlString;
 
     const textObj = new Addon.CSS2DObject(emptyDiv);
 
@@ -453,8 +461,8 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
         iconObj.scale.setScalar(0.05);
         poiIconGroup.add(iconObj);
 
-        const textMesh = createTextMesh(item.displayText);
-        poiTextGroup.add(textMesh);
+        const textMesh = createHtmlObject(item.htmlString);
+        poiHtmlObjGroup.add(textMesh);
 
         // poi element 익스포트시 내보내지는 위치값은 층기준 로컬좌표이므로, 초기 생성을 위해 월드좌표로 변환한다.
         const convertedPosition = ModelInternal.convertFloorLocalToWorld(new THREE.Vector3(item.position.x, item.position.y, item.position.z), item.floorId);
@@ -463,7 +471,7 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
             id: item.id,
             iconUrl: item.iconUrl,
             modelUrl: item.modelUrl,
-            displayText: item.displayText,
+            htmlString: item.htmlString,
             property: item.property,
         });
         element.position = new Interfaces.Vector3Custom();
@@ -555,10 +563,10 @@ function HideAll() {
 }
 
 /**
- * poi 표시명 보이기
+ * poi html 객체 보이기
  * @param id - poi id값
  */
-function ShowDisplayText(id: string) {
+function ShowHtmlObject(id: string) {
     if (poiDataList.hasOwnProperty(id))
         poiDataList[id].TextVisible = true;
 }
@@ -567,7 +575,7 @@ function ShowDisplayText(id: string) {
  * poi 표시명 숨기기
  * @param id - poi id값
  */
-function HideDisplayText(id: string) {
+function HideHtmlObject(id: string) {
     if (poiDataList.hasOwnProperty(id))
         poiDataList[id].TextVisible = false;
 }
@@ -575,14 +583,14 @@ function HideDisplayText(id: string) {
 /**
  * 모든 poi 표시명 보이기
  */
-function ShowAllDisplayText() {
+function ShowAllHtmlObject() {
     Object.values(poiDataList).forEach(poi => poi.TextVisible = true);
 }
 
 /**
  * 모든 poi 표시명 숨기기
  */
-function HideAllDisplayText() {
+function HideAllHtmlObject() {
     Object.values(poiDataList).forEach(poi => poi.TextVisible = false);
 }
 
@@ -641,7 +649,7 @@ export {
     dispose,
 
     getIcon,
-    createTextMesh,
+    createHtmlObject,
     exists,
     getPoiElement,
     updatePoiMesh,
@@ -657,10 +665,10 @@ export {
     ShowAll,
     HideAll,
 
-    ShowDisplayText,
-    HideDisplayText,
-    ShowAllDisplayText,
-    HideAllDisplayText,
+    ShowHtmlObject,
+    HideHtmlObject,
+    ShowAllHtmlObject,
+    HideAllHtmlObject,
 
     SetTextInnerHtml,
 

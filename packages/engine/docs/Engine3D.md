@@ -22,5 +22,5 @@ Core.Dispose();
 ## Px.Core.Resize()
 - WebGL Canvas크기 재조정
 ```javascript
-Core.Resize()
+Core.Resize();
 ```
