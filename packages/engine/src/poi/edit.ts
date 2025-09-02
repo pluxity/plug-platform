@@ -8,7 +8,7 @@ import { Engine3D } from '../engine';
 import { PoiElement } from './element';
 
 let engine: Engine3D;
-let target: PoiElement;
+let editTarget: PoiElement;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 let gizmo: Addon.TransformControls;
@@ -43,8 +43,8 @@ function dispose() {
         gizmo = null;
     }
 
-    target?.dispose();
-    target = null;
+    editTarget?.dispose();
+    editTarget = null;
 
     previewObject = null;
     _editMode = 'translate';
@@ -89,9 +89,10 @@ function onPointerUp(evt: MouseEvent) {
 
             const result = Util.getPoiFromRaycast(rayCast);
             if (result) {
-                target = result.poi;
+
+                editTarget = result.poi;
                 createEditPreviewObject();
-                unregisterPointerEvents();
+                //unregisterPointerEvents();
             }
         }
     }
@@ -172,26 +173,26 @@ async function createEditPreviewObject() {
     disposePreviewObject();
 
     // 편집 대상 poi의 modelUrl을 기준으로 편집용 임시 객체를 생성한다.
-    if (target.modelUrl) {
+    if (editTarget.modelUrl) {
         const loader = new Addon.GLTFLoader();
-        const gltf = await loader.loadAsync(target.modelUrl);
+        const gltf = await loader.loadAsync(editTarget.modelUrl);
 
         // 현재 poi의 상태를 적용
         previewObject = gltf.scene;
         engine.RootScene.add(previewObject);
 
-        previewObject.position.copy(target.position);
-        previewObject.rotation.copy(target.PointMeshData.rotation);
-        previewObject.scale.copy(target.PointMeshData.scale);
+        previewObject.position.copy(editTarget.position);
+        previewObject.rotation.copy(editTarget.PointMeshData.rotation);
+        previewObject.scale.copy(editTarget.PointMeshData.scale);
     } else {
         const geometry = new THREE.SphereGeometry(0.1, 32, 32);
         const material = new THREE.MeshStandardMaterial({ color: 'red' });
         previewObject = new THREE.Mesh(geometry, material);
         engine.RootScene.add(previewObject);
 
-        previewObject.position.copy(target.position);
-        previewObject.rotation.copy(target.PointMeshData.rotation);
-        previewObject.scale.copy(target.PointMeshData.scale);
+        previewObject.position.copy(editTarget.position);
+        previewObject.rotation.copy(editTarget.PointMeshData.rotation);
+        previewObject.scale.copy(editTarget.PointMeshData.scale);
     }
 
     // 재질 변경
@@ -204,20 +205,20 @@ async function createEditPreviewObject() {
         Camera.SetEnabled(!event.value);
     });
     gizmo.addEventListener('mouseUp', (event) => {
-        target.WorldPosition = previewObject.position.clone();
-        target.Rotation = previewObject.rotation.clone();
-        target.Scale = previewObject.scale.clone();
+        editTarget.WorldPosition = previewObject.position.clone();
+        editTarget.Rotation = previewObject.rotation.clone();
+        editTarget.Scale = previewObject.scale.clone();
 
         PoiData.updatePoiMesh();
 
         // 기즈모에서 버튼업 이벤트 발생시 편집했던 Poi의 id값을 저장
-        if (edittedPoiList.indexOf(target.id) === -1)
-            edittedPoiList.push(target.id);
+        if (edittedPoiList.indexOf(editTarget.id) === -1)
+            edittedPoiList.push(editTarget.id);
 
         // 외부 이벤트 통지
         engine.EventHandler.dispatchEvent({
             type: 'onPoiTransformChange',
-            target: target.ExportData
+            target: editTarget.ExportData
         });
     });
     gizmo.attach(previewObject);
