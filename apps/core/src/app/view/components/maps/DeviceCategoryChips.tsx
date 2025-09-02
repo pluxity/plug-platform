@@ -12,6 +12,11 @@ const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
   thumbnailFile: {
     id: CCTV_CATEGORY_SENTINEL_ID,
     url: '/images/icons/cctv.png',
+    originalFileName: 'cctv.png',
+    contentType: 'image/png',
+    fileStatus: 'uploaded',
+    createdAt: new Date().toISOString(),
+    createdBy: 'System',    
   }
 })
 const injectCctvCategory = (categories: DeviceCategoryResponse[] | undefined, cctvCount: number) => {
