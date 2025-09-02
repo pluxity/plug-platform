@@ -51,7 +51,7 @@ export function useIndoorEngine({
         modelUrl: assetRecord?.file?.url || '',
         displayText: '',
         floorId: feature.floorId,
-        property: { assetId: feature.assetId, deviceId: feature.deviceId ?? null },
+        property: { assetId: feature.assetId },
         position: { x: feature.position?.x ?? 0, y: feature.position?.y ?? 0, z: feature.position?.z ?? 0 },
         rotation: { x: feature.rotation?.x ?? 0, y: feature.rotation?.y ?? 0, z: feature.rotation?.z ?? 0 },
         scale: { x: feature.scale?.x ?? 1, y: feature.scale?.y ?? 1, z: feature.scale?.z ?? 1 }

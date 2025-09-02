@@ -14,7 +14,7 @@ export interface DeviceMetricChartsProps {
 
 export const DeviceMetricCharts = ({
   series,
-  heightClass = 'h-[22rem]',
+  heightClass = 'h-[14rem]',
   className,
   hideModeBar = false
 }: DeviceMetricChartsProps) => {
@@ -27,7 +27,7 @@ export const DeviceMetricCharts = ({
         <Tabs defaultValue={metricKeys[0]} className="flex flex-col flex-1 min-h-0">
           <TabsList
             unstyled
-            className="w-full overflow-x-auto flex-nowrap flex gap-2 pb-1 border-b border-slate-600/50 text-white bg-transparent"
+            className="w-full h-8 overflow-x-auto flex-nowrap flex gap-2 pb-1 border-b border-slate-600/50 text-white bg-transparent"
           >
             {metricKeys.map(metricName => (
               <TabsTrigger
@@ -49,9 +49,9 @@ export const DeviceMetricCharts = ({
             const step = timestamps.length > maxTicks ? Math.ceil(timestamps.length / maxTicks) : 1
             const tickvals = timestamps.filter((_, i) => i % step === 0)
             return (
-              <TabsContent key={metricName} value={metricName} className="flex-1 mt-2">
-                <div className="flex flex-col w-full h-[calc(100%-0.5rem)] min-h-0">
-                  <div className="text-[11px] text-white/80 mb-1 select-none">단위: {rawUnit || '-'}</div>
+              <TabsContent key={metricName} value={metricName} className="mt-1 flex-1 min-h-0">
+                <div className="flex flex-col w-full h-80 min-h-0">
+                  <div className="text-[11px] text-white/80 mb-0.5 select-none leading-none">단위: {rawUnit || '-'}</div>
                   <div className="relative flex-1 min-h-0">
                     <Plot
                       data={[
@@ -71,7 +71,7 @@ export const DeviceMetricCharts = ({
                         ...buildTimeSeriesLayout(`${metricName}${unitSuffix}`),
                         autosize: true,
                         dragmode: 'pan',
-                        margin: { t: 18, r: 12, b: 44, l: 50 },
+                        margin: { t: 12, r: 8, b: 32, l: 44 },
                         xaxis: {
                           title: 'Time',
                           tickangle: 0,

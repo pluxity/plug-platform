@@ -89,23 +89,20 @@ export const getDeviceLatest = async (
 export const useDeviceLatestSWR = (
   companyType?: string,
   deviceType?: string,
-  deviceId?: string
+  deviceId?: string,
+  options?: { refreshInterval?: number }
 ) => {
   const isReady = Boolean(companyType && deviceType && deviceId);
   const url = isReady && companyType && deviceType && deviceId
     ? `${buildDeviceBase(companyType, deviceType, deviceId)}/latest`
     : '';
   return useSWRApi<DeviceLatestValueResponse>(url, 'GET', { requireAuth: true }, {
-    refreshInterval: 5000,
+    refreshInterval: options?.refreshInterval ?? 60000,
     isPaused: () => !isReady,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
   });
 };
-
-// --- Extended latest (normalization) ----------------------------------------------------
-// The backend latest endpoint may evolve to return either:
-// 1) Single metric shape (DeviceLatestValueResponse)
-// 2) Multi metric shape (DeviceLatestMultiResponse)
-// Provide helpers to always give UI a map of metrics.
 
 const isMultiLatest = (data: unknown): data is DeviceLatestMultiResponse => {
   if (!data || typeof data !== 'object') return false;
@@ -123,7 +120,6 @@ export const normalizeLatest = (
 ): DeviceLatestNormalizedMap => {
   if (!data) return {};
   if (isMultiLatest(data)) {
-    // Add top-level timestamp to each metric if per-metric timestamp missing.
     const ts = data.timestamp;
     const out: DeviceLatestNormalizedMap = {};
     Object.entries(data.metrics).forEach(([k, v]) => {
@@ -160,21 +156,22 @@ export const getDeviceLatestNormalized = async (
 export const useDeviceLatestNormalizedSWR = (
   companyType?: string,
   deviceType?: string,
-  deviceId?: string
+  deviceId?: string,
+  options?: { refreshInterval?: number }
 ) => {
   const isReady = Boolean(companyType && deviceType && deviceId);
   const url = isReady && companyType && deviceType && deviceId
     ? `${buildDeviceBase(companyType, deviceType, deviceId)}/latest`
     : '';
-  // Fetch raw, then transform via select
   return useSWRApi<DeviceLatestMultiResponse | DeviceLatestValueResponse>(
     url,
     'GET',
     { requireAuth: true },
     {
-      refreshInterval: 5000,
+    refreshInterval: options?.refreshInterval ?? 60000,
       isPaused: () => !isReady,
-      // SWR API hook may support a middleware or select; if not, consumer can call normalizeLatest.
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
     }
   );
 };

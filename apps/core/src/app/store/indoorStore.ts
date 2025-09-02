@@ -25,6 +25,7 @@ export interface IndoorActions {
   findFeatureByDeviceId: (deviceId: string) => FeatureResponse | undefined
   findCctvByFeatureId: (featureId: string) => CctvResponse | undefined
   searchDevices: (query: string) => { category: string; items: IndoorSearchItem[] }[]
+  findByCategoryId: (categoryId: number | null) => IndoorSearchItem[]
   reset: () => void
 }
 
@@ -51,20 +52,10 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
       try {
         const [features, devices] = await Promise.all([
           getFeaturesByFacility(facilityId),
-          getDevices(),
+          getDevices(facilityId),
         ])
-        const featureList = features ?? []
-        const deviceIdSet = new Set(
-          featureList
-            .map(f => f.deviceId)
-            .filter((v): v is string => typeof v === 'string' && v.length > 0)
-        )
-        const allDevices = devices ?? []
-        let scopedDevices = allDevices.filter(d => deviceIdSet.has(d.id))
-        if (scopedDevices.length === 0 && allDevices.length > 0) {
-          scopedDevices = allDevices
-        }
-        set({ features: featureList, devices: scopedDevices })
+        set({ features: features, devices: devices })
+
       } catch (e) {
         set({ error: e instanceof Error ? e.message : 'Failed to load indoor data' })
       } finally {
@@ -78,7 +69,18 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
   setFeatures: (features) => set({ features }),
   setCctvs: (cctvs) => set({ cctvs }),
   findDeviceByFeatureId: (featureId) => get().devices.find(d => d.feature?.id === featureId),
-  findFeatureByDeviceId: (deviceId) => get().features.find(f => f.deviceId === deviceId),
+  findFeatureByDeviceId: (deviceId) => {
+    if (!deviceId) return undefined
+    const devices = get().devices.filter(d => d.id === deviceId)
+    if (!devices.length) return undefined
+    for (const dev of devices) {
+      const fid = dev.feature?.id
+      if (!fid) continue
+      const feature = get().features.find(f => f.id === fid)
+      if (feature) return feature
+    }
+    return undefined
+  },
   findCctvByFeatureId: (featureId) => get().cctvs.find(c => c.feature?.id === featureId),
   searchDevices: (query: string) => {
     const normalizeText = (value: unknown) => (value ?? '')
@@ -118,6 +120,16 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
     return Array.from(grouped.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([category, items]) => ({ category, items }))
+  },
+  findByCategoryId: (categoryId: number | null) => {
+    if (categoryId == null) return []
+    // Sentinel -1 => CCTV 전체
+    if (categoryId === -1) {
+      return get().cctvs.map(c => ({ ...c, __kind: 'cctv' as const }))
+    }
+    return get().devices
+      .filter(d => d.deviceCategory?.id === categoryId)
+      .map(d => ({ ...d, __kind: 'device' as const }))
   },
   reset: () => set({ facilityId: null, features: [], devices: [], cctvs: [], error: null, loading: false })
 }))

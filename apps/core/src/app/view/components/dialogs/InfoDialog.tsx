@@ -59,10 +59,10 @@ export const InfoDialog = ({
   const isCompact = variant === 'compact'
 
   const sizeClass = isCompact
-    ? 'max-h-[92vh] w-auto'
+    ? 'w-auto'
     : [
         dialogWidthClass || 'w-[52rem]', // width only; height becomes dynamic
-        'max-w-[72rem] max-h-[90vh]'
+        'max-w-[72rem]'
       ].join(' ')
 
   const dynamicSizingStyle: React.CSSProperties = {}
@@ -101,19 +101,18 @@ export const InfoDialog = ({
   return (
     <div className="pointer-events-none fixed inset-0 flex items-center justify-center z-[70] p-2">
       <div
-  className={[containerBase, className || ''].join(' ')}
-  style={{ ...(maskStyle || {}), ...dynamicSizingStyle }}
-      >
+        className={[containerBase, className || ''].join(' ')}
+        style={{ ...(maskStyle || {}), ...dynamicSizingStyle }}
+        >
         {appliedHole && !isCompact && (
           <div
-            className="shrink-0 h-full"
-            // Align content start exactly to the right edge of the visual hole (x + w)
+            className="shrink-0"
             style={{
               width: leftPlaceholderWidth || `calc(${appliedHole.x} + ${appliedHole.w})`
             }}
           />
         )}
-  <div className={[bodyWrapperClass, bodyClassName || ''].join(' ')} style={bodyInlineStyle}>
+        <div className={[bodyWrapperClass, bodyClassName || ''].join(' ')} style={bodyInlineStyle}>
           <button
             onClick={onClose}
             className={closeBtnClass}

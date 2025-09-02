@@ -1,11 +1,17 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useRef } from 'react'
 import type { DeviceResponse, FacilityType } from '@plug/common-services'
-import type { IndoorSearchItem } from '@/app/store/indoorStore'
+import { Poi } from '@plug/engine'
+
+import { MapScene } from '@/global/components/indoor-map'
+import { useAssets } from '@/global/store/assetStore'
+
 import { useFacilityStore } from '@/app/store/facilityStore'
 import { useIndoorStore, useSyncCctvs } from '@/app/store/indoorStore'
-import { useAssets } from '@/global/store/assetStore'
-import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPointerUpListeners, type PoiPointerUpListener } from '@/app/view/hooks'
-import MapScene from '@/global/components/indoor-map/MapScene'
+import type { IndoorSearchItem } from '@/app/store/indoorStore'
+
+import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPointerUpListeners } from '@/app/view/hooks'
+import type { PoiPointerUpListener } from '@/app/view/hooks'
+
 import IndoorSearchForm from './IndoorSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
 import { DeviceInfoDialog } from '../dialogs'
@@ -68,6 +74,48 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
 
   const [selectedDevice, setSelectedDevice] = useState<DeviceResponse | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const findByCategoryId = useIndoorStore(s => s.findByCategoryId)
+  const highlightedFeatureIdsRef = useRef<string[]>([])
+
+  const clearHighlights = useCallback(() => {
+    // 기존 하이라이트 제거
+    highlightedFeatureIdsRef.current.forEach(fid => {
+      Poi.SetTextInnerHtml(fid, '')
+    })
+    highlightedFeatureIdsRef.current = []
+  }, [])
+
+  const applyCategoryHighlight = useCallback((categoryId: number | null) => {
+    // 새로운 하이라이트 적용 전 기존 제거
+    clearHighlights()
+    if (categoryId == null) return
+    const items = findByCategoryId(categoryId)
+    const featureIds: string[] = []
+    items.forEach(item => {
+      const featureId = item.feature?.id
+      if (!featureId) return
+      featureIds.push(featureId)
+      const safeName = item.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      const html = `
+        <span class="bg-blue-600 text-white p-1 text-xs rounded">
+          ${safeName}
+        </span>
+      `
+      Poi.SetTextInnerHtml(featureId, html)
+    })
+    highlightedFeatureIdsRef.current = featureIds
+  }, [findByCategoryId, clearHighlights])
+
+  const handleCategorySelect = useCallback((id: number | null) => {
+    setSelectedCategoryId(id)
+    applyCategoryHighlight(id)
+  }, [applyCategoryHighlight])
+
+  const handleCategoryDeselect = useCallback(() => {
+    setSelectedCategoryId(null)
+    clearHighlights()
+  }, [clearHighlights])
 
   const handleSearchSelect = useCallback((item: IndoorSearchItem) => {
     const featureId = item.feature?.id
@@ -128,7 +176,11 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
         className='pointer-events-auto'
         onDeviceSelect={handleSearchSelect}
       />
-      <DeviceCategoryChips />
+      <DeviceCategoryChips
+        selectedId={selectedCategoryId}
+        onSelect={handleCategorySelect}
+        onDeselect={handleCategoryDeselect}
+      />
     </div>
   )
 

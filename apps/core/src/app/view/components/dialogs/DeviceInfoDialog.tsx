@@ -1,6 +1,6 @@
 import type { DeviceResponse } from '@plug/common-services'
 import InfoDialog from './InfoDialog'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services'
 import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device'
 import { formatKoreanDateTime } from '@/global/util/date'
@@ -30,9 +30,18 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
     return { from: fromDate, to: toDate, interval: preset.interval }
   }, [selectedPeriod])
 
-  const timeSeriesParams = { from, to, interval }
+  const timeSeriesParams = useMemo(() => ({ from, to, interval }), [from, to, interval])
   const { data: deviceMetricSeries, isLoading } = useDeviceTimeSeriesSWR(device.companyType, device.deviceType, device.id, timeSeriesParams)
-  const { data: latestRaw, isLoading: isLatestLoading } = useDeviceLatestNormalizedSWR(device.companyType, device.deviceType, device.id)
+  // Refresh interval adjusted to 1 minute (from previous 6 seconds)
+  const { data: latestRaw, isLoading: isLatestLoading } = useDeviceLatestNormalizedSWR(
+    device.companyType,
+    device.deviceType,
+    device.id,
+    { refreshInterval: 60000 }
+  )
+  const lastSeriesRef = useRef<typeof deviceMetricSeries | null>(null)
+  if (deviceMetricSeries) lastSeriesRef.current = deviceMetricSeries
+  const effectiveSeries = deviceMetricSeries || lastSeriesRef.current
   const latestMap = useMemo(() => normalizeLatest(latestRaw), [latestRaw])
 
 
@@ -58,8 +67,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
 
   const body = (
     <div className="flex flex-col gap-5 flex-1 overflow-hidden">
-      {/* Latest Metrics Section */}
-  <section className="rounded-lg border border-slate-600/60 bg-gradient-to-br from-slate-800/70 to-slate-800/40 backdrop-blur-sm p-4">
+      <section className="rounded-lg border border-slate-600/60 bg-gradient-to-br from-slate-800/70 to-slate-800/40 backdrop-blur-sm p-4">
         <div className="flex items-start gap-3 mb-3">
           <h4 className="text-sm font-semibold text-slate-100 tracking-wide">현재값</h4>
           <div className="ml-auto text-[11px] text-slate-400 flex items-center gap-1">
@@ -115,14 +123,19 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
           </div>
         </div>
     <div className="rounded-lg border border-slate-600/60 p-3 flex-1 overflow-hidden text-white bg-slate-800/40 backdrop-blur-sm min-h-0 flex flex-col">
-          {isLoading && !deviceMetricSeries && (
+      {isLoading && !effectiveSeries && (
             <div className="text-slate-400 text-sm">불러오는 중...</div>
           )}
-          {!isLoading && !deviceMetricSeries && (
+      {!isLoading && !effectiveSeries && (
             <div className="text-slate-500 text-sm">데이터가 없습니다.</div>
           )}
-          {deviceMetricSeries && (
-      <DeviceMetricCharts series={deviceMetricSeries} heightClass="h-full" className="flex-1 min-h-0" />
+      {effectiveSeries && (
+            <DeviceMetricCharts
+        series={effectiveSeries}
+              // 차트 세로 높이 축소 (full -> 18rem) 으로 전체 Dialog 높이 감소
+              heightClass="h-[18rem]"
+              className="flex-1 min-h-0"
+            />
           )}
         </div>
       </section>
@@ -140,7 +153,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
       // hole={hole === undefined ? { ...DEFAULT_DEVICE_HOLE, w: '40rem', h: '30rem' } : (hole === false ? false : { ...DEFAULT_DEVICE_HOLE, ...hole })}
       hole={hole}
       dialogWidthClass={"w-[48rem]"}
-      className={"h-[40rem]"}
+      className={"h-[24rem]"}
     >
       {body}
     </InfoDialog>
