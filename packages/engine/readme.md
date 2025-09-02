@@ -28,6 +28,7 @@
 - [Interfaces](./docs/Interfaces.md#outlineoptions) 외각선 옵션 인터페이스 추가
 - [Interfaces](./docs/Interfaces.md#poicreateoption) PoiCreateOption, displayText 명칭 수정
 - [Interfaces](./docs/Interfaces.md#poiimportoption) PoiImportOption, displayText 명칭 수정
+- [Camera](./docs//Camera.md#pxcameramovetopoiid-string-transitiontime-number-offset-interfacesvector3) MoveToPoi 최종위치 offset 파라미터 추가
 
 # 2025-08-28
 - [Poi](./docs/Poi.md) SetDisplayText 함수 제거

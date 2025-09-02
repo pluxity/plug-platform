@@ -22,6 +22,7 @@ interface WebGLControlPanelState {
     floorData: Interfaces.FloorInfo[];
     poiOutlineId: string;
     poiOutlineOption: string;
+    moveToPoiOffset: string;
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -58,6 +59,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             floorData: [],
             poiOutlineId: '',
             poiOutlineOption: '',
+            moveToPoiOffset: '{ "x": 0, "y": 0, "z": 0 }',
         };
 
         this.registerViewerEvents();
@@ -85,7 +87,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if( this.state.selectedApiName === 'Core' ) {
+        if (this.state.selectedApiName === 'Core') {
             return (
                 <span>
                     <button onClick={this.onApiBtnClick.bind(this, 'Core.Resize')}>Resize</button>
@@ -98,8 +100,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={() => Camera.ExtendView(1.0)}>ExtendView</button><br />
                     <button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</button><br />
-                    <input type='text' value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br />
+                    <fieldset>
+                        <legend>MoveToPoi</legend>
+                        <input type='text' value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input><br></br>
+                        <textarea value={this.state.moveToPoiOffset} onChange={this.onMoveToPoiOffsetTextAreaValueChanged.bind(this)}></textarea>
+                        <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br />
+                    </fieldset>
+
                     <input type='text' value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</button>
                 </span>
@@ -340,7 +347,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Camera.MoveToPoi': {
                 if (this.state.moveToPoiIdValue !== '') {
-                    Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0);
+                    const offset = JSON.parse(this.state.moveToPoiOffset);
+                    Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0, offset);
                 }
             } break;
             case 'Camera.MoveToFloor': {
@@ -763,6 +771,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onMoveToPoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ moveToPoiIdValue: evt.target.value });
+    }
+
+    /**
+     * poi로 카메라 이동시 오프셋 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onMoveToPoiOffsetTextAreaValueChanged(evt: React.ChangeEvent<HTMLTextAreaElement>) {
+        this.setState({ moveToPoiOffset: evt.target.value });
     }
 
     /**
