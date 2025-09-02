@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as Interfaces from '../interfaces';
 import * as Util from '../util';
-import * as Effect from '../effect';
 import * as PoiPlacer from '../poi/placer';
 import * as PoiEditor from '../poi/edit';
 import * as LabelCreator from '../label3d/create';
@@ -11,8 +10,8 @@ import { Engine3D } from '../engine';
 import { Label3DElement } from '../label3d/element';
 
 let engine: Engine3D;
-let hoverObjects: THREE.Object3D[] = [];
-let objSelGroup: THREE.Group;
+// let hoverObjects: THREE.Object3D[] = [];
+// let objSelGroup: THREE.Group;
 const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 
 /**
@@ -21,10 +20,10 @@ const mouseDownPos: THREE.Vector2 = new THREE.Vector2();
 function initialize(_engine: Engine3D) {
     engine = _engine;
 
-    // poi 이벤트 처리에서 사용할 그룹 객체
-    objSelGroup = new THREE.Group();
-    objSelGroup.name = '#ObjectSelectorGroup';
-    engine.RootScene.add(objSelGroup);
+    // // poi 이벤트 처리에서 사용할 그룹 객체
+    // objSelGroup = new THREE.Group();
+    // objSelGroup.name = '#ObjectSelectorGroup';
+    // engine.RootScene.add(objSelGroup);
 
     // 이벤트 등록
     engine.EventHandler.addEventListener('onPoiCreate' as never, clearHoverObjects);
@@ -45,15 +44,15 @@ function dispose() {
     engine.Dom.removeEventListener('pointerdown', onPointerDown);
     engine.Dom.removeEventListener('pointermove', onPointerMove);
     engine.Dom.removeEventListener('pointerup', onPointerUp);
-    
+
     engine.EventHandler.removeEventListener('onPoiCreate' as never, clearHoverObjects);
     engine.EventHandler.removeEventListener('onPoiStartEdit' as never, clearHoverObjects);
     engine.EventHandler.removeEventListener('onLabel3DCreateStarted' as never, clearHoverObjects);
     engine.EventHandler.removeEventListener('onLabel3DEditStarted' as never, clearHoverObjects);
 
     clearHoverObjects();
-    hoverObjects = [];
-    objSelGroup = null;
+    // hoverObjects = [];
+    // objSelGroup = null;
     engine = null;
 }
 
@@ -62,15 +61,14 @@ function dispose() {
  */
 function clearHoverObjects() {
 
-    hoverObjects.forEach(item => {
-        if (item instanceof THREE.Mesh && item.userData['IsPoiObject']) {
-            objSelGroup.remove(item);
-            item.geometry.dispose();
-            item.material.dispose();
-        }
-    });
-    hoverObjects = [];
-    Effect.Outline.setOutlineObjects(hoverObjects);
+    // hoverObjects.forEach(item => {
+    //     if (item instanceof THREE.Mesh && item.userData['IsPoiObject']) {
+    //         // objSelGroup.remove(item);
+    //         item.geometry.dispose();
+    //         item.material.dispose();
+    //     }
+    // });
+    // hoverObjects = [];
 }
 
 /**
@@ -83,8 +81,9 @@ function onPointerDown(evt: PointerEvent) {
         return;
 
     if (evt.button === 0) {
-        mouseDownPos.x = evt.offsetX;
-        mouseDownPos.y = evt.offsetY;
+        const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
+        mouseDownPos.x = pointerOffsetPoint.x;
+        mouseDownPos.y = pointerOffsetPoint.y;
     }
 }
 
@@ -97,9 +96,10 @@ function onPointerMove(evt: PointerEvent) {
     if (PoiPlacer.Enabled || PoiEditor.Enabled || LabelCreator.Enabled || LabelEditor.Enabled)
         return;
 
+    const pointerOffsetPoint = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
     const mousePos = new THREE.Vector2(
-        (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
-        -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+        (pointerOffsetPoint.x / engine.Dom.clientWidth) * 2 - 1,
+        -(pointerOffsetPoint.y / engine.Dom.clientHeight) * 2 + 1
     );
 
     const rayCast = new THREE.Raycaster();
@@ -140,23 +140,22 @@ function onPointerMove(evt: PointerEvent) {
         if (pickObjects[0].poi) {
             const poi = pickObjects[0].poi;
             if (poi.PointMeshData.instanceMeshRef) {
-                const instanceCopyMesh = new THREE.Mesh(poi.PointMeshData.instanceMeshRef.geometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
-                instanceCopyMesh.position.copy(poi.WorldPosition);
-                instanceCopyMesh.rotation.copy(poi.Rotation);
-                instanceCopyMesh.scale.copy(poi.Scale);
-                instanceCopyMesh.userData['IsPoiObject'] = true; // Poi 객체임을 표시
-                objSelGroup.attach(instanceCopyMesh);
-                hoverObjects.push(instanceCopyMesh);
+                // const instanceCopyMesh = new THREE.Mesh(poi.PointMeshData.instanceMeshRef.geometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
+                // instanceCopyMesh.position.copy(poi.WorldPosition);
+                // instanceCopyMesh.rotation.copy(poi.Rotation);
+                // instanceCopyMesh.scale.copy(poi.Scale);
+                // instanceCopyMesh.userData['IsPoiObject'] = true; // Poi 객체임을 표시
+                // objSelGroup.attach(instanceCopyMesh);
+                // hoverObjects.push(instanceCopyMesh);
             }
-            else if (poi.PointMeshData.animMeshRef)
-                hoverObjects.push(poi.PointMeshData.animMeshRef);
+            else if (poi.PointMeshData.animMeshRef) {
+                // hoverObjects.push(poi.PointMeshData.animMeshRef);
+            }
 
-            Effect.Outline.setOutlineObjects(hoverObjects);
         } else if (pickObjects[0].label) {
             const label = pickObjects[0].label;
             if (label instanceof Label3DElement) {
-                hoverObjects.push(label);
-                Effect.Outline.setOutlineObjects(hoverObjects);
+                // hoverObjects.push(label);
             }
         }
     }
@@ -172,12 +171,12 @@ function onPointerUp(evt: PointerEvent) {
         return;
 
     if (evt.button === 0) {
-        const currMousePos: THREE.Vector2 = new THREE.Vector2(evt.offsetX, evt.offsetY);
+        const currMousePos: THREE.Vector2 = Util.getPointerOffsetPoint(evt.clientX, evt.clientY);
         if (currMousePos.distanceTo(mouseDownPos) < 5.0) {
 
             const mousePos = new THREE.Vector2(
-                (evt.offsetX / engine.Dom.clientWidth) * 2 - 1,
-                -(evt.offsetY / engine.Dom.clientHeight) * 2 + 1
+                (currMousePos.x / engine.Dom.clientWidth) * 2 - 1,
+                -(currMousePos.y / engine.Dom.clientHeight) * 2 + 1
             );
 
             const rayCast = new THREE.Raycaster();
@@ -233,6 +232,19 @@ function onPointerUp(evt: PointerEvent) {
                         screenPos: Util.toScreenPos(label.position.clone()),
                     });
                 }
+            } else {
+                engine.EventHandler.dispatchEvent({
+                    type: 'onPoiPointerUp',
+                    target: null,
+                    pointerEvent: evt,
+                    screenPos: null,
+                });
+                engine.EventHandler.dispatchEvent({
+                    type: 'onLabel3DPointerUp',
+                    target: null,
+                    pointerEvent: evt,
+                    screenPos: null,
+                });
             }
         }
     }

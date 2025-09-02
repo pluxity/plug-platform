@@ -58,10 +58,11 @@ Px.Camera.SetState(state, 1.0);
 Px.Camera.MoveToFloor('1', 1.0);
 ```
 
-## Px.Camera.MoveToPoi(id: string, transitionTime: number)
+## Px.Camera.MoveToPoi(id: string, transitionTime: number, offset: [Interfaces.Vector3](./Interfaces.md#vector3))
 - id: poi id값
 - transitionTime: 이동시칸(초)
+- offset: 최종위치에서의 이동 오프셋값
 - id에 해당하는 poi로 카메라를 이동시킨다.
 ```javascript
-Px.Camera.MoveToPoi('TestPoi', 1.0);
+Px.Camera.MoveToPoi('TestPoi', 1.0, { x: 1.5, y: -2, z: 3 });
 ```

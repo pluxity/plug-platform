@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util } from '@plug/engine';
+import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util, Effect, Core } from '@plug/engine';
 import * as EngineAll from '@plug/engine';
 
 // 컴포넌트 상태 타입 정의
@@ -7,7 +7,6 @@ interface WebGLControlPanelState {
     selectedApiName: string;
     deletePoiId: string;
     setVisiblePoiId: string;
-    setLineVisiblePoiId: string;
     setTextVisiblePoiId: string;
     poiDisplayTextIdValue: string;
     poiDisplayTextValue: string;
@@ -21,6 +20,9 @@ interface WebGLControlPanelState {
     subwayId: string;
     label3DId: string;
     floorData: Interfaces.FloorInfo[];
+    poiOutlineId: string;
+    poiOutlineOption: string;
+    moveToPoiOffset: string;
 }
 
 // 컴포넌트 프롭스 타입 정의
@@ -42,7 +44,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             selectedApiName: 'None',
             deletePoiId: '',
             setVisiblePoiId: '',
-            setLineVisiblePoiId: '',
             setTextVisiblePoiId: '',
             poiDisplayTextIdValue: '',
             poiDisplayTextValue: '',
@@ -55,7 +56,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             subwayCreateBodyCount: '',
             subwayId: '',
             label3DId: '',
-            floorData: []
+            floorData: [],
+            poiOutlineId: '',
+            poiOutlineOption: '',
+            moveToPoiOffset: '{ "x": 0, "y": 0, "z": 0 }',
         };
 
         this.registerViewerEvents();
@@ -83,15 +87,26 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if (this.state.selectedApiName === 'Camera') {
+        if (this.state.selectedApiName === 'Core') {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Core.Resize')}>Resize</button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Camera') {
             return (
                 <span>
                     <button disabled>SetEnabled</button>
                     <button onClick={() => Camera.ExtendView(1.0)}>ExtendView</button><br />
                     <button onClick={this.onApiBtnClick.bind(this, 'Camera.GetState')}>GetState</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Camera.SetState')}>SetState</button><br />
-                    <input type='text' value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br />
+                    <fieldset>
+                        <legend>MoveToPoi</legend>
+                        <input type='text' value={this.state.moveToPoiIdValue} onChange={this.onMoveToPoiTextInputValueChanged.bind(this)} placeholder='이동할 Poi Id'></input><br></br>
+                        <textarea value={this.state.moveToPoiOffset} onChange={this.onMoveToPoiOffsetTextAreaValueChanged.bind(this)}></textarea>
+                        <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToPoi')}>MoveToPoi</button><br />
+                    </fieldset>
+
                     <input type='text' value={this.state.moveToFloorIdValue} onChange={this.onMoveToFloorTextInputValueChanged.bind(this)} placeholder='이동할 층 Id'></input>
                     <button onClick={this.onApiBtnClick.bind(this, 'Camera.MoveToFloor')}>MoveToFloor</button>
                 </span>
@@ -147,17 +162,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAll')}>Show All</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAll')}>Hide All</button><br /><br />
 
-                    <input type='text' value={this.state.setLineVisiblePoiId} onChange={this.onSetLineVisibleTextInputValueChanged.bind(this)} placeholder='Line Show/Hide Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowLine')}>Show Line</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideLine')}>Hide Line</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllLine')}>Show All Line</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllLine')}>Hide All Line</button><br /><br />
-
                     <input type='text' value={this.state.setTextVisiblePoiId} onChange={this.onSetPoiTextVisibleInputValueChanged.bind(this)} placeholder='DisplayText Show/Hide Poi Id'></input>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowDisplayText')}>Show DisplayText</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideDisplayText')}>Hide DisplayText</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllDisplayText')}>Show All DisplayText</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllDisplayText')}>Hide All DisplayText</button><br /><br />
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowHtmlObject')}>ShowHtmlObject</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideHtmlObject')}>HideHtmlObject</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.ShowAllHtmlObject')}>ShowAllHtmlObject</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.HideAllHtmlObject')}>HideAllHtmlObject</button><br /><br />
 
                     <input type='text' value={this.state.poiDisplayTextIdValue} onChange={this.onPoiDisplayTextIdInputValueChanged.bind(this)} placeholder='텍스트 HTML 변경할 poi id'></input>
                     <input type='text' value={this.state.poiDisplayTextValue} onChange={this.onPoiDisplayTextInputValueChanged.bind(this)} placeholder='HTML 문자열 입력'></input>
@@ -230,21 +239,33 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Create')}>Create</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Cancel')}>Cancel</button><br /><br />
 
-                    <input type='text' value={this.state.label3DId} onChange={this.onLabel3DIdInputValueChanged.bind(this)} placeholder='라벨3did'></input><br/>
+                    <input type='text' value={this.state.label3DId} onChange={this.onLabel3DIdInputValueChanged.bind(this)} placeholder='라벨3did'></input><br />
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Hide')}>Hide</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Show')}>Show</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.HideAll')}>HideAll</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.ShowAll')}>ShowAll</button><br/><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.ShowAll')}>ShowAll</button><br /><br />
 
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Delete')}>Delete</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Clear')}>Clear</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Export')}>Export</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Import')}>Import</button><br/><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.Import')}>Import</button><br /><br />
 
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(translate)')}>StartEdit(translate)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(rotate)')}>StartEdit(rotate)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Label3D.StartEdit(scale)')}>StartEdit(scale)</button>
-                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.FinishEdit')}>FinishEdit</button><br/><br/>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Label3D.FinishEdit')}>FinishEdit</button><br /><br />
+                </span>
+            );
+
+        } else if (this.state.selectedApiName === 'Effect') {
+            return (
+                <span>
+                    <input type='text' style={{ width: '300px' }} value={this.state.poiOutlineId} onChange={this.onPoiOutlineInputValueChanged.bind(this)} placeholder='Poi id혹은 쉼표로 구분된 식별자 배열'></input>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Effect.Outline.SetPoiOutline')}>SetPoiOutline</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Effect.Outline.Clear')}>Clear</button><br></br>
+
+                    <textarea value={this.state.poiOutlineOption} onChange={this.onPoiOutlineOptionTextAreaValueChanged.bind(this)}></textarea>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Effect.Outline.SetOutlineOptions')}>SetOutlineOptions</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Test') {
@@ -269,6 +290,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <label htmlFor='ApiList'>Api List:</label>
                     <select id='ApiList' defaultValue='None' onChange={this.onApiSelectChange.bind(this)}>
                         <option value='None' disabled>Api 선택</option>
+                        <option value='Core'>Core</option>
                         <option value='Loader'>Loader</option>
                         <option value='Camera'>Camera</option>
                         <option value='Model'>Model</option>
@@ -277,6 +299,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                         <option value='Util'>Util</option>
                         <option value='Subway'>Subway</option>
                         <option value='Label3D'>Label3D</option>
+                        <option value='Effect'>Effect</option>
                         <option value='Test'>Test</option>
                     </select>
                     <br />
@@ -301,6 +324,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     onApiBtnClick(apiName: string) {
         switch (apiName) {
             /**
+             * Core
+             */
+            case 'Core.Resize': {
+                Core.Resize();
+            } break;
+
+            /**
              * Camera
              */
             case 'Camera.GetState': {
@@ -317,7 +347,8 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Camera.MoveToPoi': {
                 if (this.state.moveToPoiIdValue !== '') {
-                    Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0);
+                    const offset = JSON.parse(this.state.moveToPoiOffset);
+                    Camera.MoveToPoi(this.state.moveToPoiIdValue, 1.0, offset);
                 }
             } break;
             case 'Camera.MoveToFloor': {
@@ -378,7 +409,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = '';//'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8) + '테스트__-';
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '테스트__-</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -388,14 +419,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     property: property
                 }, (data: unknown) => console.log('Poi.Create Callback', data));
             } break;
             case 'Poi.Create(MonkeyHead.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -405,7 +436,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'monkeyhead.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(MonkeyHead.glb) Callback', data));
@@ -413,7 +444,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create(ScreenDoor.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -423,7 +454,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'ScreenDoor.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
@@ -431,7 +462,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create(head.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -441,7 +472,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'subway_train/head.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
@@ -449,7 +480,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Create(body.glb)': {
                 const id: string = window.crypto.randomUUID();
                 const iconUrl: string = 'SamplePoiIcon.png';
-                const displayText: string = id.substring(0, 8);
+                const htmlString: string = '<label style="color: white;">' + id.substring(0, 8) + '</label>';
                 const property: { [key: string]: unknown } = {
                     testText: '테스트 속성',
                     testInt: 11,
@@ -459,7 +490,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 Poi.Create({
                     id: id,
                     iconUrl: iconUrl,
-                    displayText: displayText,
+                    htmlString: htmlString,
                     modelUrl: 'subway_train/body.glb',
                     property: property
                 }, (data: unknown) => console.log('Poi.Create(ScreenDoor.glb) Callback', data));
@@ -480,7 +511,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 });
             } break;
             case 'Poi.ImportSingle': {
-                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "displayText": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
+                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "htmlString": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
             } break;
             case 'Poi.ExportAll(LocalStorage)': {
                 const data = Poi.ExportAll();
@@ -510,29 +541,17 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.HideAll': {
                 Poi.HideAll();
             } break;
-            case 'Poi.ShowLine': {
-                Poi.ShowLine(this.state.setLineVisiblePoiId);
+            case 'Poi.ShowHtmlObject': {
+                Poi.ShowHtmlObject(this.state.setTextVisiblePoiId);
             } break;
-            case 'Poi.HideLine': {
-                Poi.HideLine(this.state.setLineVisiblePoiId);
+            case 'Poi.HideHtmlObject': {
+                Poi.HideHtmlObject(this.state.setTextVisiblePoiId);
             } break;
-            case 'Poi.ShowAllLine': {
-                Poi.ShowAllLine();
+            case 'Poi.ShowAllHtmlObject': {
+                Poi.ShowAllHtmlObject();
             } break;
-            case 'Poi.HideAllLine': {
-                Poi.HideAllLine();
-            } break;
-            case 'Poi.ShowDisplayText': {
-                Poi.ShowDisplayText(this.state.setTextVisiblePoiId);
-            } break;
-            case 'Poi.HideDisplayText': {
-                Poi.HideDisplayText(this.state.setTextVisiblePoiId);
-            } break;
-            case 'Poi.ShowAllDisplayText': {
-                Poi.ShowAllDisplayText();
-            } break;
-            case 'Poi.HideAllDisplayText': {
-                Poi.HideAllDisplayText();
+            case 'Poi.HideAllHtmlObject': {
+                Poi.HideAllHtmlObject();
             } break;
             case 'Poi.SetTextInnerHtml': {
                 Poi.SetTextInnerHtml(this.state.poiDisplayTextIdValue, this.state.poiDisplayTextValue);
@@ -691,11 +710,35 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
 
             /**
+             * Effect
+             */
+            case 'Effect.Outline.SetPoiOutline': {
+                const idSplits = this.state.poiOutlineId.split(',');
+                Effect.Outline.SetPoiOutline(idSplits);
+            } break;
+            case 'Effect.Outline.Clear': {
+                Effect.Outline.Clear();
+            } break;
+            case 'Effect.Outline.SetOutlineOptions': {
+                const outlineOption = JSON.parse(this.state.poiOutlineOption);
+                console.log('outlineOption ->', outlineOption);
+                Effect.Outline.SetOutlineOptions(outlineOption);
+            } break;
+
+            /**
              * Test
              */
             case 'Test': {
                 // Model.HideAll();
                 // Model.Show('0');
+                // Effect.Outline.SetOutlineOptions({
+                //     edgeStrength: 20.0,
+                // });
+                Effect.Outline.SetOutlineOptions({
+                    edgeStrength: 20.0,
+                    pulsePeriod: 0.5,
+                    visibleEdgeColor: 0xff0000
+                });
             } break;
         }
     }
@@ -731,6 +774,14 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     }
 
     /**
+     * poi로 카메라 이동시 오프셋 입력창 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onMoveToPoiOffsetTextAreaValueChanged(evt: React.ChangeEvent<HTMLTextAreaElement>) {
+        this.setState({ moveToPoiOffset: evt.target.value });
+    }
+
+    /**
      * 층으로 카메라 이동 입력창 값변경 처리
      * @param evt - 이벤트 정보
      */
@@ -752,14 +803,6 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onSetVisiblePoiTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ setVisiblePoiId: evt.target.value });
-    }
-
-    /**
-     * poi 선 가시화 설정 텍스트 입력창 값변경 처리
-     * @param evt - 이벤트 정보
-     */
-    onSetLineVisibleTextInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ setLineVisiblePoiId: evt.target.value });
     }
 
     /**
@@ -852,6 +895,22 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
     }
 
     /**
+     * 외각선 poi id값 변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPoiOutlineInputValueChanged(evt: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ poiOutlineId: evt.target.value });
+    }
+
+    /**
+     * 외각선 옵션 텍스트에어리어 값변경 처리
+     * @param evt - 이벤트 정보
+     */
+    onPoiOutlineOptionTextAreaValueChanged(evt: React.ChangeEvent<HTMLTextAreaElement>) {
+        this.setState({ poiOutlineOption: evt.target.value });
+    }
+
+    /**
      * 뷰어 이벤트 등록
      */
     registerViewerEvents() {
@@ -860,12 +919,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             console.log('onPoiTransformChange', evt);
         });
         // poi 편집 완료 이벤트 등록
-        Event.AddEventListener('onPoiFinishEdit' as never, (evt: any)=>{
+        Event.AddEventListener('onPoiFinishEdit' as never, (evt: any) => {
             console.log('onPoiFinishEdit', evt);
         });
         // poi 객체 포인터업 이벤트 등록
         Event.AddEventListener('onPoiPointerUp' as never, (evt: any) => {
             console.log('onPoiPointerUp', evt);
+            if (evt.target)
+                Effect.Outline.SetPoiOutline(evt.target.id);
+            else
+                Effect.Outline.Clear();
         });
         // 라벨 3d 편집 이벤트 등록
         Event.AddEventListener('onLabel3DTransformChange' as never, (evt: any) => {
