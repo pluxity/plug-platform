@@ -81,10 +81,10 @@ export function FeatureAssignCombobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" onWheel={(e) => e.stopPropagation()}>
         <Command>
           <CommandInput placeholder={placeholder} />
-          <CommandList>
+          <CommandList className="max-h-48">
             {items.length === 0 ? (
               <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
             ) : (    
@@ -93,7 +93,11 @@ export function FeatureAssignCombobox({
                   <div key={group.key}>
                     <CommandGroup heading={group.title}>
                       {group.items?.map((item) => (
-                        <CommandItem key={item.name} value={item.name} onSelect={() => {
+                        <CommandItem 
+                        key={item.name} 
+                        value={item.name} 
+                        keywords={[item.name, item.id]}
+                        onSelect={() => {
                           onSelect(item.id);
                           setOpen(false);
                         }}>

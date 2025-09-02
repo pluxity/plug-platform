@@ -2,13 +2,11 @@ import { useCctvSWR } from '@plug/common-services';
 import { useMemo } from 'react';
 
 export const useCctvData = () => {
-    const { data: cctvsArray, error, isLoading, mutate } = useCctvSWR();
+    const { data: cctvsArray, isLoading, mutate } = useCctvSWR();
 
     const getAllCctvs = useMemo(() => {
         if(!Array.isArray(cctvsArray)) return [];
-        return cctvsArray.map((cctv) => ({
-            ...cctv,
-        }))
+        return cctvsArray;
     }, [cctvsArray]);
 
     const assignedCctvs = useMemo(() => {
@@ -24,7 +22,6 @@ export const useCctvData = () => {
         assignedCctvs,
         unassignedCctvs,
         isLoading, 
-        error: error?.message || null,
         refetch: mutate 
     };
 }

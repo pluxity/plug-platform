@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
 import { FeatureAssignCombobox } from './FeatureAssignCombobox';
 import { useCctvData } from '../hooks/useCctvData';
 import { useDeviceData } from '../hooks/useDeviceData';
@@ -10,12 +10,14 @@ interface FeatureAssignModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   featureId?: string;
+  onSuccess?: (featureId: string, device: { id: string, type: string, name: string }) => void;
 }
 
 export function FeatureAssignModal({
   open,
   onOpenChange,
   featureId,
+  onSuccess,
 }: FeatureAssignModalProps) {
   const [selectedType, setSelectedType] = useState<'CCTV' | 'DEVICE'>('CCTV'); 
   const [selectedId, setSelectedId] = useState<string>('');
@@ -27,8 +29,10 @@ export function FeatureAssignModal({
   const currentItems = selectedType === 'CCTV' ? getAllCctvs : getAllDevices;
   const isLoading = selectedType === 'CCTV' ? cctvsLoading : devicesLoading;
 
-  const isSelectedItemAssigned = (selectedId: string): boolean => {
-    const selectedItem = currentItems.find(item => item.id === selectedId);
+  const selectedItem = currentItems.find(item => item.id === selectedId);
+  
+  const isSelectedItemAssigned = (): boolean => {
+    if (!selectedItem) return false;
     
     if (selectedType === 'CCTV') {
       return Boolean((selectedItem as CctvResponse)?.feature?.id);
@@ -45,14 +49,14 @@ export function FeatureAssignModal({
   }, [open]);
 
   useEffect(() => {
-    if (isSelectedItemAssigned(selectedId)) {
+    if (selectedId &&isSelectedItemAssigned()) {
       setIsConfirmOpen(true);
       }
-  }, [selectedId]);
+  }, [selectedItem, selectedId]);
 
   const handleSubmit = async () => {
-    if (!selectedId || !featureId) return;
-    
+    if (!selectedId || !featureId || !selectedItem) return;
+
     try {
       await assignDeviceToFeature(featureId, { 
         id: selectedId,  
@@ -60,6 +64,9 @@ export function FeatureAssignModal({
       });
       
       toast.success('장비가 성공적으로 할당되었습니다.');
+
+      onSuccess?.(featureId, { id: selectedId, type: selectedType, name: selectedItem.name });
+
       onOpenChange(false);
       setSelectedId('');
     } catch (error) {
@@ -70,7 +77,7 @@ export function FeatureAssignModal({
 
   // 교체 할당
   const handleConfirm = async () => {
-    if (!featureId || !selectedId) return;
+    if (!featureId || !selectedId || !selectedItem) return;
 
     try {
       await assignDeviceToFeature(featureId, { 
@@ -79,6 +86,9 @@ export function FeatureAssignModal({
       }, true);
 
       toast.success('장비가 성공적으로 교체되었습니다.');
+
+      onSuccess?.(featureId, { id: selectedId, type: selectedType, name: selectedItem.name });
+      
       setIsConfirmOpen(false);
       setSelectedId('');
       onOpenChange(false);
@@ -107,7 +117,7 @@ export function FeatureAssignModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent title="장비 할당">
+        <DialogContent title="장비 할당" disableBackground={true}>
           <div className="grid gap-2">
             <Label>연결 대상 타입</Label>
             <RadioGroup
@@ -198,9 +208,9 @@ export function FeatureAssignModal({
         <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <h2 className="text-lg font-bold">장비 교체</h2>
+              <AlertDialogTitle>장비 교체</AlertDialogTitle>
               <AlertDialogDescription>
-                {`${selectedType}의 ${selectedId} 장비가 이미 할당되어 있습니다. 교체하시겠습니까?`}
+                {`${selectedType} 장비 "${selectedItem?.name}" 가 이미 할당되어 있습니다. 교체하시겠습니까?`}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

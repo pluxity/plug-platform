@@ -2,7 +2,7 @@ import { useDevicesSWR } from "@plug/common-services";
 import { useMemo } from "react";
 
 export const useDeviceData = () => {
-    const { data: devicesArray, error, isLoading, mutate } = useDevicesSWR();
+    const { data: devicesArray, isLoading, mutate } = useDevicesSWR();
 
     const getAllDevices = useMemo(() => {
         if (!Array.isArray(devicesArray)) return [];
@@ -22,7 +22,6 @@ export const useDeviceData = () => {
         assignedDevices,
         unassignedDevices,
         isLoading,
-        error: error?.message || null,
         refetch: mutate
     }
 }

@@ -13,7 +13,9 @@ import { Poi, Event, Interfaces } from '@plug/engine'
 import { convertFloors } from '@/global/utils/floorUtils'
 import type { Floor } from '@/global/types'
 import { toast } from "sonner"
-import DeviceSearchForm from "@/app/view/components/maps/DeviceSearchForm"
+import { useCctvData } from '../hooks/useCctvData'
+import { useDeviceData } from '../hooks/useDeviceData'
+import { poiUnassignedText, poiAssignedText } from '@/global/utils/displayUtils'
 
 type FacilityData = {
   facility?: {
@@ -79,7 +81,7 @@ const FacilityIndoor: React.FC = () => {
   const [isDeleteMode, setIsDeleteMode] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<PoiData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
+  
   // 장비 할당 모달 상태 
   const [showFeatureAssignDialog, setShowFeatureAssignDialog] = useState(false)
 
@@ -111,25 +113,25 @@ const FacilityIndoor: React.FC = () => {
   }
 
   // POI 클릭 이벤트 (삭제/할당)
-  useEffect(() => {
-    const handleFeatureClick = (eventData: PoiClickEvent) => {
-      const poiData = eventData.target;
-      if (isDeleteMode) {
-        // 삭제 모드일 때는 
-        setSelectedFeature(poiData);
-        setShowDeleteDialog(true);
-      } else {
-        setSelectedFeature(poiData);
-        setShowFeatureAssignDialog(true);
-      }
-    };
+  const handleFeatureClick = useCallback((eventData: PoiClickEvent) => {
+    const poiData = eventData.target;
+    
+    if (isDeleteMode) {
+      setSelectedFeature(poiData);
+      setShowDeleteDialog(true);
+    } else {
+      setSelectedFeature(poiData);
+      setShowFeatureAssignDialog(true);
+    }
+  }, [isDeleteMode]);
 
+  useEffect(() => {
     Event.AddEventListener('onPoiPointerUp' as never, handleFeatureClick);
 
     return () => {
       Event.RemoveEventListener('onPoiPointerUp' as never, handleFeatureClick);
     };
-  }, [isDeleteMode]);
+  }, [handleFeatureClick]); 
 
 
   // POI 편집 이벤트
@@ -138,7 +140,7 @@ const FacilityIndoor: React.FC = () => {
       try {
         const editedPois = evt.targets || [];
         if (!editedPois.length) return;
-       
+                
         await Promise.all(
           editedPois.map((poi: PoiData) => {
             return updateFeatureTransform(poi.id, {
@@ -173,17 +175,53 @@ const FacilityIndoor: React.FC = () => {
     }
   }, []);
 
+  const { getAllCctvs, refetch: mutateCctvs } = useCctvData(); 
+  const { getAllDevices, refetch: mutateDevices } = useDeviceData();
 
-  // POI Import 함수 
+  const getPoiDisplayText = useCallback((featureId: string) => {
+    if(!featureId) return "장치 할당 필요";
+
+    const cctv = getAllCctvs.find(cctv => cctv.feature?.id === featureId);
+    const device = getAllDevices.find(device => device.feature?.id === featureId);
+
+    return cctv?.name || device?.name || "장치 할당 필요";
+  }, [getAllCctvs, getAllDevices]);
+
+  const handleFeatureSuccess = useCallback(async (featureId: string, device: { id: string, type: string, name: string }) => {
+    
+    const previousFeatureId = (device.type === 'CCTV' ? getAllCctvs : getAllDevices)
+      .find(item => item.id === device.id)?.feature?.id;
+
+    if(previousFeatureId && previousFeatureId !== featureId){
+      Poi.SetTextInnerHtml(previousFeatureId, poiUnassignedText("장치 할당 필요"));
+    }
+ 
+    try{
+      Poi.SetTextInnerHtml(featureId, poiAssignedText(device.name));
+
+      if(device.type === "CCTV"){
+        await mutateCctvs();
+      } else {
+        await mutateDevices();
+      }
+
+    } catch(error){
+      console.error("장비 할당 중 오류가 발생했습니다.", error);
+    }
+  }, [getAllCctvs, getAllDevices, mutateCctvs, mutateDevices, getPoiDisplayText]);
+
+  // POI Import 함수 수정
   const tryImportPois = useCallback(() => {
     if (importedRef.current) return;
     if (!engineReadyRef.current) return;
     if (!featuresData || featuresData.length === 0 || !assets || assets.length === 0) return;
 
     const assetById = new Map(assets.map(a => [a.id, a]));
+
     const poiData: Interfaces.PoiImportOption[] = featuresData.map((f) => {
       const asset = assetById.get(f.assetId);
       const modelUrl = asset?.file?.url || '';
+
       const position: Interfaces.Vector3 = {
         x: f.position?.x ?? 0,
         y: f.position?.y ?? 0,
@@ -200,11 +238,15 @@ const FacilityIndoor: React.FC = () => {
         z: f.scale?.z ?? 1,
       };
 
+      const deviceText = getPoiDisplayText(f.id);
+      const isAssigned = deviceText !== "장치 할당 필요";
+      const displayText = isAssigned ? poiAssignedText(deviceText) : poiUnassignedText(deviceText);
+
       return {
         id: f.id,
         iconUrl: '',
         modelUrl,
-        displayText: f.id, 
+        displayText, 
         floorId: f.floorId,
         property: {
           assetId: f.assetId,
@@ -222,7 +264,7 @@ const FacilityIndoor: React.FC = () => {
     } catch {
       void 0;
     }
-  }, [featuresData, assets]);
+  }, [featuresData, assets, getPoiDisplayText]); 
 
   const handleLoadComplete = useCallback(() => {
     engineReadyRef.current = true;
@@ -378,11 +420,7 @@ const FacilityIndoor: React.FC = () => {
                 className="w-full h-full"
                 onLoadComplete={handleLoadComplete}
               />
-
-            <div className="absolute top-4 left-4 z-20">
-              <DeviceSearchForm className="pointer-events-auto" />
-            </div>
-              
+         
               {/* Floor Control - 우측 하단 */}
               {floors.length > 0 && (
                 <div className="absolute bottom-6 right-6 z-20 max-w-xs">
@@ -403,9 +441,8 @@ const FacilityIndoor: React.FC = () => {
         <Dialog open={showDeleteDialog} onOpenChange={handleDeleteCancel}>
           <DialogContent title="삭제 확인">
             <DialogDescription>
-              선택된 POI를 삭제하겠습니까? <br/>
-              id: {selectedFeature.id} <br/>
-              name: {selectedFeature.displayText}
+              선택된 POI "{getPoiDisplayText(selectedFeature.id)}"를 삭제하겠습니까? <br/>
+              (ID: {selectedFeature.id})
             </DialogDescription>
             <DialogFooter>
               <Button variant="outline" onClick={handleDeleteCancel}>
@@ -424,6 +461,7 @@ const FacilityIndoor: React.FC = () => {
           open={showFeatureAssignDialog}
           onOpenChange={setShowFeatureAssignDialog}
           featureId={selectedFeature?.id}
+          onSuccess={handleFeatureSuccess}
         />
       )}
     </PageContainer>
