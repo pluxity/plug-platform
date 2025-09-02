@@ -20,7 +20,8 @@ export interface InfoDialogProps {
   dialogWidthClass?: string
 }
 
-const defaultHole: Required<InfoDialogHoleConfig> = { x: '2rem', y: '2rem', w: '45rem', h: '35rem' }
+// Reduced default hole size for a more compact layout
+const defaultHole: Required<InfoDialogHoleConfig> = { x: '1.75rem', y: '1.75rem', w: '32rem', h: '24rem' }
 
 export const InfoDialog = ({
   open,
@@ -32,6 +33,7 @@ export const InfoDialog = ({
   children,
   className,
   leftPlaceholderWidth,
+  footer,
   variant = 'default',
   titleClassName,
   bodyClassName,
@@ -59,11 +61,18 @@ export const InfoDialog = ({
   const sizeClass = isCompact
     ? 'max-h-[92vh] w-auto'
     : [
-        dialogHeightClass || 'h-[32rem]',
-        dialogWidthClass || 'w-[80rem]',
-        'max-w-[96rem] max-h-[90vh]'
+        dialogWidthClass || 'w-[52rem]', // width only; height becomes dynamic
+        'max-w-[72rem] max-h-[90vh]'
       ].join(' ')
 
+  const dynamicSizingStyle: React.CSSProperties = {}
+  if (!isCompact && appliedHole) {
+    dynamicSizingStyle.minHeight = `calc(${appliedHole.y} + ${appliedHole.h} + 1.5rem)`
+  }
+  if (!isCompact && !dialogHeightClass) {
+    dynamicSizingStyle.height = 'auto'
+  } 
+  
   const containerBase = [
     'relative flex text-slate-100 bg-gradient-to-br',
     'from-slate-900/90 via-slate-800/80 to-slate-700/70 backdrop-blur-sm',
@@ -72,15 +81,19 @@ export const InfoDialog = ({
   ].join(' ')
 
   const bodyWrapperClass = isCompact
-    ? 'flex flex-col flex-1 p-4 gap-4 pointer-events-auto overflow-hidden relative'
-    : 'flex flex-col flex-1 p-6 gap-8 pointer-events-auto overflow-hidden relative'
+    ? 'flex flex-col flex-1 p-3 gap-3 pointer-events-auto overflow-hidden relative'
+    : 'flex flex-col flex-1 p-5 gap-6 pointer-events-auto overflow-hidden relative'
+
+  const bodyInlineStyle: React.CSSProperties | undefined = (!isCompact && appliedHole)
+    ? { paddingTop: appliedHole.y }
+    : undefined
 
   const closeBtnClass = isCompact
-    ? 'absolute top-2 right-2 w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
-    : 'absolute top-4 right-4 w-16 h-16 rounded-2xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
+    ? 'absolute top-2 right-2 w-7 h-7 rounded-md flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
+    : 'absolute top-3 right-3 w-12 h-12 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
 
   const titleClass = [
-    isCompact ? 'text-lg font-semibold tracking-tight text-white' : 'text-[2rem] leading-[1.05] font-semibold tracking-tight text-white drop-shadow',
+    isCompact ? 'text-base font-semibold tracking-tight text-white' : 'text-[1.5rem] leading-snug font-semibold tracking-tight text-white drop-shadow',
     'break-words',
     titleClassName || ''
   ].join(' ')
@@ -88,13 +101,19 @@ export const InfoDialog = ({
   return (
     <div className="pointer-events-none fixed inset-0 flex items-center justify-center z-[70] p-2">
       <div
-        className={[containerBase, className || ''].join(' ')}
-        style={maskStyle}
+  className={[containerBase, className || ''].join(' ')}
+  style={{ ...(maskStyle || {}), ...dynamicSizingStyle }}
       >
         {appliedHole && !isCompact && (
-          <div className="shrink-0 h-full" style={{ width: leftPlaceholderWidth || `calc(${appliedHole.w} + 0.5rem)` }} />
+          <div
+            className="shrink-0 h-full"
+            // Align content start exactly to the right edge of the visual hole (x + w)
+            style={{
+              width: leftPlaceholderWidth || `calc(${appliedHole.x} + ${appliedHole.w})`
+            }}
+          />
         )}
-        <div className={[bodyWrapperClass, bodyClassName || ''].join(' ')}>
+  <div className={[bodyWrapperClass, bodyClassName || ''].join(' ')} style={bodyInlineStyle}>
           <button
             onClick={onClose}
             className={closeBtnClass}
@@ -102,18 +121,23 @@ export const InfoDialog = ({
           >
             <span className={isCompact ? 'text-base font-light' : 'text-2xl font-light tracking-tight'}>✕</span>
           </button>
-          <div className={isCompact ? 'flex items-center gap-3 pr-8' : 'flex items-start gap-5 pr-16'}>
+          <div className={isCompact ? 'flex items-center gap-2 pr-6' : 'flex items-start gap-4 pr-12'}>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-4 flex-wrap">
                 <h4 className={titleClass}>{title}</h4>
                 {headerActions}
               </div>
               {!isCompact && badges && (
-                <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-medium">{badges}</div>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-medium">{badges}</div>
               )}
             </div>
           </div>
           {children}
+          {footer && (
+            <div className={isCompact ? 'pt-2 border-t border-white/10 flex flex-wrap gap-2' : 'mt-auto pt-2 border-t border-white/10 flex flex-wrap gap-3'}>
+              {footer}
+            </div>
+          )}
         </div>
       </div>
     </div>

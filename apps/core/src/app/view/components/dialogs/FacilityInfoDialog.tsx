@@ -35,55 +35,77 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
     </button>
   )
 
-  const descriptionBlock = facility.description && (
-    <p className="text-sm leading-relaxed text-slate-200/90">{facility.description}</p>
-  )
+  // 위치 블록 (맨 위)
+  const locationBlock = (facility.lat && facility.lon) ? (
+    <div className="flex flex-wrap gap-x-6 gap-y-2 text-[0.8125rem] bg-white/5 px-4 py-3 rounded-xl border border-white/10">
+      <div className="font-semibold tracking-wide text-[11px] text-slate-400">위치</div>
+      <div className="font-mono">Lat: {facility.lat.toFixed(6)}</div>
+      <div className="font-mono">Lon: {facility.lon.toFixed(6)}</div>
+    </div>
+  ) : null
 
-  const grid = (
-    <div className="grid grid-cols-3 gap-5 text-sm mt-2 text-slate-200">
-      {facility.lat && facility.lon && (
-        <div className="col-span-3 flex flex-wrap gap-x-6 gap-y-2 text-[0.8125rem] bg-white/5 px-[1rem] py-3 rounded-xl border border-white/10">
-          <div className="font-semibold tracking-wide text-[11px] text-slate-400">위치</div>
-          <div className="font-mono">Lat: {facility.lat.toFixed(6)}</div>
-          <div className="font-mono">Lon: {facility.lon.toFixed(6)}</div>
-        </div>
-      )}
+  // 상세 설명 블록 (헤더 포함)
+  const descriptionBlock = facility.description ? (
+    <div className="flex flex-col gap-2">
+      <h5 className="text-xs font-semibold tracking-wide text-slate-400">상세 설명</h5>
+      <p className="text-sm leading-relaxed text-slate-200/90 whitespace-pre-wrap break-words">{facility.description}</p>
+    </div>
+  ) : null
+
+  // Footer 로 이동한 생성/수정일 메타 정보
+  const metaDates = (facility.createdAt || facility.updatedAt) ? (
+    <div className="flex flex-wrap gap-4 text-[10px] text-slate-300/80 leading-tight">
       {facility.createdAt && (
-        <div className="bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm">
-          <div className="text-[10px] uppercase tracking-wide text-slate-400 mb-1">생성일</div>
-          <div className="text-[13px] text-slate-100">{new Date(facility.createdAt).toLocaleDateString()}</div>
+        <div className="flex flex-col min-w-[6rem]">
+          <span className="uppercase tracking-wide text-slate-500 mb-0.5">생성일</span>
+          <span className="text-[11px]">{new Date(facility.createdAt).toLocaleDateString()}</span>
         </div>
       )}
       {facility.updatedAt && (
-        <div className="bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm">
-          <div className="text-[10px] uppercase tracking-wide text-slate-400 mb-1">수정일</div>
-          <div className="text-[13px] text-slate-100">{new Date(facility.updatedAt).toLocaleDateString()}</div>
+        <div className="flex flex-col min-w-[6rem]">
+          <span className="uppercase tracking-wide text-slate-500 mb-0.5">수정일</span>
+          <span className="text-[11px]">{new Date(facility.updatedAt).toLocaleDateString()}</span>
         </div>
       )}
     </div>
-  )
+  ) : null
 
-  const footer = onEnterIndoor && (
+  const indoorBtn = onEnterIndoor ? (
     <button
       onClick={() => facility && onEnterIndoor(facility)}
-      className="inline-flex items-center gap-2 px-[1.75rem] py-3 rounded-xl text-sm font-semibold tracking-wide bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white shadow-lg shadow-indigo-900/40 hover:shadow-pink-900/40 transition focus:outline-none focus:ring-2 focus:ring-pink-300/50"
+      className="inline-flex items-center gap-2 px-[1.25rem] py-2.5 rounded-xl text-[13px] font-semibold tracking-wide bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white shadow-lg shadow-indigo-900/40 hover:shadow-pink-900/40 transition focus:outline-none focus:ring-2 focus:ring-pink-300/50"
     >
       <span className="relative pr-1">실내로 진입하기</span>
     </button>
-  )
+  ) : null
+
+  const footer = (indoorBtn || metaDates) ? (
+    <div className="w-full flex flex-wrap items-start justify-between gap-6">
+      {indoorBtn}
+      <div className="ml-auto flex items-start gap-6">{metaDates}</div>
+    </div>
+  ) : undefined
+
+  // hole 사이즈 기본 축소 + 여백 확보
+  // Further reduce default hole size when not explicitly provided
+  const effectiveHole = hole === undefined ? { x: '1.5rem', y: '1.5rem', w: '26rem', h: '20rem' } : hole
+  const leftPlaceholderWidth = (effectiveHole && typeof effectiveHole === 'object') ? `calc(${effectiveHole.x || '1.5rem'} + ${effectiveHole.w || '26rem'})` : undefined
 
   return (
     <InfoDialog
       open={!!facility}
-      title={facility.name || '시설 정보'}
+  title={facility.name || '시설 정보'}
       onClose={onClose}
-      hole={hole}
+      hole={effectiveHole}
       headerActions={headerActions}
       badges={badges}
       footer={footer}
+      leftPlaceholderWidth={leftPlaceholderWidth}
     >
-      {descriptionBlock}
-      {grid}
+      <div className="flex flex-col gap-6">
+        {locationBlock}
+        {descriptionBlock}
+      </div>
     </InfoDialog>
   )
 }

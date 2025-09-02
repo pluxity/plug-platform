@@ -55,9 +55,13 @@ const IndoorSearchForm: React.FC<IndoorSearchFormProps> = ({ className, onDevice
         renderItem={(item) => {
           const isCctv = item.__kind === 'cctv'
           return (
-            <div className="flex w-full items-center justify-between">
-              <span className="truncate max-w-[70%]">{String(item.name ?? item.id)}</span>
-              <span className={['text-xs', isCctv ? 'text-red-500' : 'text-blue-600'].join(' ')}>
+            <div className="flex w-full items-start gap-2">
+              <span className="w-3/5 break-words font-medium text-gray-900">
+                {String(item.name ?? item.id)}
+              </span>
+              <span
+                className={`w-2/5 text-xs break-all whitespace-pre-wrap text-right ${isCctv ? 'text-red-500' : 'text-blue-600'}`}
+              >
                 {isCctv ? 'CCTV' : String(item.id)}
               </span>
             </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import * as Cesium from 'cesium'
 import { useFacilityStore } from '@/app/store/facilityStore'
 import type { FacilityType, FacilityResponse } from '@plug/common-services'
-import { VWorldMap, MapControls, CameraSetup } from '@/global/components/outdoor-map'
+import { OSMBuildingsMap, MapControls, CameraSetup } from '@/global/components/outdoor-map'
 import FacilityPOIs from './FacilityPOIs'
 import FacilitySearchForm from './FacilitySearchForm'
 import FacilityInfoDialog from '../dialogs/FacilityInfoDialog'
@@ -55,7 +55,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
         onClose={() => setSelectedFacility(null)}
       />
       
-    <VWorldMap className="w-full h-full">
+    <OSMBuildingsMap className="w-full h-full">
       <CameraSetup onInitialSetupComplete={handleInitialLoadComplete} />
       <MapControls />
           {facilitiesFetched && (
@@ -66,7 +66,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
               onViewerReady={setCesiumViewer}
             />
           )}
-      </VWorldMap>
+      </OSMBuildingsMap>
     </div>
   )
 }
