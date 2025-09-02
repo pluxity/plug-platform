@@ -10,6 +10,19 @@ import {
 const buildDeviceBase = (companyType: string, deviceType: string, deviceId: string) =>
   `devices/${encodeURIComponent(companyType)}/${encodeURIComponent(deviceType)}/${encodeURIComponent(deviceId)}`;
 
+const formatDateParam = (value: string) => {
+  if (/^\d{14}$/.test(value)) return value;
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  const yyyy = d.getFullYear();
+  const MM = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const HH = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  return `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
+};
+
 export interface TimeSeriesParams {
   from: string;
   to: string;
@@ -22,18 +35,6 @@ export const getDeviceTimeSeries = async (
   deviceId: string,
   params: TimeSeriesParams
 ): Promise<DeviceMetricSeriesResponse | null> => {
-  const formatDateParam = (value: string) => {
-    if (/^\d{14}$/.test(value)) return value;
-    const d = new Date(value);
-    if (isNaN(d.getTime())) return value;
-    const yyyy = d.getFullYear();
-    const MM = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const HH = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    const ss = String(d.getSeconds()).padStart(2, '0');
-    return `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
-  };
   const queryInit: Record<string, string> = {
     from: formatDateParam(params.from),
     to: formatDateParam(params.to),
@@ -57,18 +58,6 @@ export const useDeviceTimeSeriesSWR = (
   params?: TimeSeriesParams
 ) => {
   const isReady = Boolean(companyType && deviceType && deviceId && params);
-  const formatDateParam = (value: string) => {
-    if (/^\d{14}$/.test(value)) return value;
-    const d = new Date(value);
-    if (isNaN(d.getTime())) return value;
-    const yyyy = d.getFullYear();
-    const MM = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const HH = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    const ss = String(d.getSeconds()).padStart(2, '0');
-    return `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
-  };
   const query = isReady && params
     ? new URLSearchParams({
       from: formatDateParam(params.from),

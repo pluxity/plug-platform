@@ -53,25 +53,18 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
           getFeaturesByFacility(facilityId),
           getDevices(),
         ])
-  const featureList = features ?? []
-  console.debug('[indoorStore] fetched features', featureList.length)
-  console.debug('[indoorStore] fetched devices', (devices ?? []).length)
-  // facility-specific devices: normalize all feature.deviceId values to string
-  const deviceIdSet = new Set(
-    featureList
-      .map(f => f.deviceId)
-      .filter((v): v is string => typeof v === 'string' && v.length > 0)
-  )
-  const allDevices = devices ?? []
-  let scopedDevices = allDevices.filter(d => deviceIdSet.has(d.id))
-  if (scopedDevices.length === 0 && allDevices.length > 0) {
-    // Fallback: keep all devices if no mapping yet
-    console.debug('[indoorStore] no devices matched feature mapping; using full device list')
-    scopedDevices = allDevices
-  }
-  console.debug('[indoorStore] feature deviceId set', Array.from(deviceIdSet))
-  console.debug('[indoorStore] scoped devices after filter', scopedDevices.length)
-  set({ features: featureList, devices: scopedDevices })
+        const featureList = features ?? []
+        const deviceIdSet = new Set(
+          featureList
+            .map(f => f.deviceId)
+            .filter((v): v is string => typeof v === 'string' && v.length > 0)
+        )
+        const allDevices = devices ?? []
+        let scopedDevices = allDevices.filter(d => deviceIdSet.has(d.id))
+        if (scopedDevices.length === 0 && allDevices.length > 0) {
+          scopedDevices = allDevices
+        }
+        set({ features: featureList, devices: scopedDevices })
       } catch (e) {
         set({ error: e instanceof Error ? e.message : 'Failed to load indoor data' })
       } finally {
@@ -134,13 +127,16 @@ export const useSyncCctvs = () => {
   const { data } = useCctvSWR()
   const setCctvs = useIndoorStore(s => s.setCctvs)
   useEffect(() => {
-    if (Array.isArray(data)) {
-      setCctvs(data as CctvResponse[])
-    } else if (data && typeof data === 'object') {
-      const maybe = data as { data?: unknown }
-      if (Array.isArray(maybe.data)) {
-        setCctvs(maybe.data as CctvResponse[])
+    const normalize = (input: unknown): CctvResponse[] => {
+      if (Array.isArray(input)) return input as CctvResponse[]
+      if (input && typeof input === 'object') {
+        const inner = (input as { data?: unknown }).data
+        if (Array.isArray(inner)) return inner as CctvResponse[]
       }
+      return []
+    }
+    if (data !== undefined) {
+      setCctvs(normalize(data))
     }
   }, [data, setCctvs])
 }

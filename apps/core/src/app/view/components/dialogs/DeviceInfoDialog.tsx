@@ -2,6 +2,8 @@ import type { DeviceResponse } from '@plug/common-services'
 import InfoDialog from './InfoDialog'
 import { useState, useEffect, useMemo } from 'react'
 import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services'
+import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device'
+import { formatKoreanDateTime } from '@/global/util/date'
 import DeviceMetricCharts from './DeviceMetricCharts'
 
 export interface DeviceInfoDialogProps {
@@ -20,12 +22,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
   }, [device?.id])
 
   const { from, to, interval } = useMemo(() => {
-    const PERIOD_PRESETS: Record<'day' | 'week' | 'month', { days: number; interval: 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' }> = {
-      day: { days: 30, interval: 'DAY' },     // 기본: 최근 30일 일별
-      week: { days: 84, interval: 'WEEK' },   // 최근 12주 주별
-      month: { days: 365, interval: 'MONTH' } // 최근 12개월 월별
-    }
-    const preset = PERIOD_PRESETS[selectedPeriod]
+    const preset = DEVICE_PERIOD_PRESETS[selectedPeriod]
     const end = new Date()
     end.setMinutes(0, 0, 0)
     const toDate = end.toISOString()
@@ -38,21 +35,6 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
   const { data: latestRaw, isLoading: isLatestLoading } = useDeviceLatestNormalizedSWR(device.companyType, device.deviceType, device.id)
   const latestMap = useMemo(() => normalizeLatest(latestRaw), [latestRaw])
 
-  const formatKoreanDateTime = (ts?: string) => {
-    if (!ts) return ''
-    const d = new Date(ts)
-    if (isNaN(d.getTime())) return ts
-    const fmt = new Intl.DateTimeFormat('ko-KR', {
-      timeZone: 'Asia/Seoul',
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-    }).format(d)
-    return fmt
-      .replace(/\s*오전\s*/g, ' ')
-      .replace(/\s*오후\s*/, ' ')
-      .replace(/\.\s/g, '.')
-      .replace(/\.$/, '')
-  }
 
   const firstTimestamp = useMemo(() => {
     const first = Object.values(latestMap)[0]

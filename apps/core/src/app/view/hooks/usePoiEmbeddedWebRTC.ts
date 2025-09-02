@@ -29,22 +29,13 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     if (!session) return
     try {
       session.abort?.abort()
-    } catch (e) {
-      console.error('[usePoiEmbeddedWebRTC] abort error', poiId, e)
-    }
-    try {
-      session.pc.getSenders().forEach(s => {
-        try { s.track?.stop() } catch (e) { console.error('[usePoiEmbeddedWebRTC] track stop error', poiId, e) }
-      })
-    } catch (e) {
-      console.error('[usePoiEmbeddedWebRTC] sender iteration error', poiId, e)
-    }
-    try {
+      session.pc.getSenders().forEach(s => { s.track?.stop() })
       session.pc.close()
     } catch (e) {
-      console.error('[usePoiEmbeddedWebRTC] pc close error', poiId, e)
+      console.error('[usePoiEmbeddedWebRTC] stopPoi error', poiId, e)
+    } finally {
+      delete poiSessionsRef.current[poiId]
     }
-    delete poiSessionsRef.current[poiId]
   }, [])
 
   const stopAll = useCallback(() => {
@@ -58,20 +49,26 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     const videoId = `poi-video-${poiId}`
     const closeBtnId = `poi-video-close-${poiId}`
     const height = Math.round(width / aspect)
+    const containerStyle = {
+      position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
+    }
+    const closeBtnStyle = {
+      position: 'absolute', top: '-10px', right: '-10px', width: '28px', height: '28px', border: 'none', borderRadius: '999px',
+      background: 'rgba(15,23,42,0.85)', color: '#e2e8f0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: '14px', lineHeight: '1', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.4)', backdropFilter: 'blur(6px)', zIndex: 100
+    }
+    const videoStyle = {
+      width: `${width}px`, height: `${height}px`, background: '#000', border: '1px solid #475569', borderRadius: '6px', objectFit: 'contain'
+    }
+    const styleToString = (styleObj: Record<string, string | number>) => Object.entries(styleObj)
+      .map(([k, v]) => `${k.replace(/([A-Z])/g, '-$1').toLowerCase()}:${v}`).join(';')
     const html = `
-      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div style="${styleToString(containerStyle)}">
         <button id="${closeBtnId}" title="닫기" aria-label="닫기"
-          style="position:absolute;top:-10px;right:-10px;width:28px;height:28px;border:none;border-radius:999px;background:rgba(15,23,42,0.85);color:#e2e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;font-weight:600;box-shadow:0 2px 4px rgba(0,0,0,0.4);backdrop-filter:blur(6px);z-index:100;"
+          style="${styleToString(closeBtnStyle)}"
           onmouseenter="this.style.background='rgba(30,41,59,0.9)'" onmouseleave="this.style.background='rgba(15,23,42,0.85)'"
         >×</button>
-        <video
-          id="${videoId}"
-          ${muted ? 'muted' : ''}
-          ${controls ? 'controls' : ''}
-          autoplay
-          playsinline
-          style="width:${width}px;height:${height}px;background:#000;border:1px solid #475569;border-radius:6px;object-fit:contain;"
-        ></video>
+        <video id="${videoId}" ${muted ? 'muted' : ''} ${controls ? 'controls' : ''} autoplay playsinline style="${styleToString(videoStyle)}"></video>
       </div>`
     Poi.SetTextInnerHtml(poiId, html)
 
