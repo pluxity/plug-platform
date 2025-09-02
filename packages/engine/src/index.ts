@@ -20,6 +20,10 @@ export const Core = {
     Dispose: () => {
         if (engine)
             engine.dispose();
+    },
+    Resize: () => {
+        if (engine)
+            engine.onResize();
     }
 };
 

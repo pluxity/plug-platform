@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util, Effect } from '@plug/engine';
+import { Camera, Event, Interfaces, Label3D, Model, Path3D, Poi, Subway, Util, Effect, Core } from '@plug/engine';
 import * as EngineAll from '@plug/engine';
 
 // 컴포넌트 상태 타입 정의
@@ -85,7 +85,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      * @returns - 메뉴항목
      */
     renderMenu() {
-        if (this.state.selectedApiName === 'Camera') {
+        if( this.state.selectedApiName === 'Core' ) {
+            return (
+                <span>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Core.Resize')}>Resize</button>
+                </span>
+            );
+        } else if (this.state.selectedApiName === 'Camera') {
             return (
                 <span>
                     <button disabled>SetEnabled</button>
@@ -277,6 +283,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <label htmlFor='ApiList'>Api List:</label>
                     <select id='ApiList' defaultValue='None' onChange={this.onApiSelectChange.bind(this)}>
                         <option value='None' disabled>Api 선택</option>
+                        <option value='Core'>Core</option>
                         <option value='Loader'>Loader</option>
                         <option value='Camera'>Camera</option>
                         <option value='Model'>Model</option>
@@ -309,6 +316,13 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
      */
     onApiBtnClick(apiName: string) {
         switch (apiName) {
+            /**
+             * Core
+             */
+            case 'Core.Resize': {
+                Core.Resize();
+            } break;
+
             /**
              * Camera
              */
