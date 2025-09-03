@@ -13,6 +13,10 @@
 
 업데이트 내역
 ============
+# 2025-09-03
+- [Event](./docs/Event.md#pxeventaddeventlistenertype-string-callback-function) 이벤트 타입 추가
+  - onPoiPointerMove
+
 # 2025-09-02
 - [Engine](./docs/Engine3D.md#pxcoreresize) WebGL 캔버스 Resize Api 추가
 - [Poi](./docs/Poi.md) Poi 선관련 Api 제거
