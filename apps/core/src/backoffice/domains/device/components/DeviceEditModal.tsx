@@ -90,7 +90,8 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
                 <ModalForm {...modalForm}>
                     <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
                         <ModalFormContainer>
-                         <ModalFormField 
+                            {/* 1. 카테고리 */}
+                            <ModalFormField 
                                 control={modalForm.control}
                                 name="categoryId"
                                 render={({ field }) => (
@@ -110,15 +111,7 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
                                     </ModalFormItem>
                                 )}
                             />
-                            <ModalFormField 
-                                control={modalForm.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <ModalFormItem label="디바이스 이름" message={modalForm.formState.errors.name?.message}>
-                                        <Input {...field} />
-                                    </ModalFormItem>
-                                )}
-                            />
+                            {/* 2. 회사 타입 */}
                             <ModalFormField
                                 control={modalForm.control}
                                 name="companyType"
@@ -139,6 +132,7 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
                                     </ModalFormItem>
                                 )}
                             />
+                            {/* 3. 디바이스 타입 */}
                             <ModalFormField
                                 control={modalForm.control}
                                 name="deviceType"
@@ -156,6 +150,16 @@ export const DeviceEditModal: React.FC<DeviceEditModalProps> = ({ isOpen, onClos
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                    </ModalFormItem>
+                                )}
+                            />
+                            {/* 4. 디바이스 이름 */}
+                            <ModalFormField 
+                                control={modalForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <ModalFormItem label="디바이스 이름" message={modalForm.formState.errors.name?.message}>
+                                        <Input {...field} />
                                     </ModalFormItem>
                                 )}
                             />

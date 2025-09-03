@@ -83,6 +83,7 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
                 <ModalForm {...modalForm}>
                     <form onSubmit={modalForm.handleSubmit(handleSubmit)}>
                         <ModalFormContainer>
+                            {/* 1. 카테고리 */}
                             <ModalFormField 
                                 control={modalForm.control}
                                 name="categoryId"
@@ -103,24 +104,7 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
                                     </ModalFormItem>
                                 )}
                             />
-                            <ModalFormField 
-                                control={modalForm.control}
-                                name="id"
-                                render={({ field }) => (
-                                    <ModalFormItem label="디바이스 아이디" message={modalForm.formState.errors.id?.message}>
-                                        <Input {...field} />
-                                    </ModalFormItem>
-                                )}
-                            />
-                            <ModalFormField 
-                                control={modalForm.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <ModalFormItem label="디바이스 이름" message={modalForm.formState.errors.name?.message}>
-                                        <Input {...field} />
-                                    </ModalFormItem>
-                                )}
-                            />
+                            {/* 2. 회사 타입 */}
                             <ModalFormField
                                 control={modalForm.control}
                                 name="companyType"
@@ -141,6 +125,7 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
                                     </ModalFormItem>
                                 )}
                             />
+                            {/* 3. 디바이스 타입 */}
                             <ModalFormField
                                 control={modalForm.control}
                                 name="deviceType"
@@ -158,6 +143,26 @@ export const DeviceCreateModal: React.FC<DeviceCreateModalProps> = ({ isOpen, on
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                    </ModalFormItem>
+                                )}
+                            />
+                            {/* 4. 디바이스 아이디 */}
+                            <ModalFormField 
+                                control={modalForm.control}
+                                name="id"
+                                render={({ field }) => (
+                                    <ModalFormItem label="디바이스 아이디" message={modalForm.formState.errors.id?.message}>
+                                        <Input {...field} />
+                                    </ModalFormItem>
+                                )}
+                            />
+                            {/* 5. 디바이스 이름 */}
+                            <ModalFormField 
+                                control={modalForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <ModalFormItem label="디바이스 이름" message={modalForm.formState.errors.name?.message}>
+                                        <Input {...field} />
                                     </ModalFormItem>
                                 )}
                             />
