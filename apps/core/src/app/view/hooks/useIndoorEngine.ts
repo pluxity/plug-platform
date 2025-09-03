@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Camera, Poi, Interfaces, Event } from '@plug/engine'
-import type { FeatureResponse } from '@plug/common-services'
+import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services'
 import { useIndoorStore } from '@/app/store/indoorStore'
 
 interface UseIndoorEngineParams {
@@ -8,45 +8,77 @@ interface UseIndoorEngineParams {
   features?: FeatureResponse[] // Optional external override (e.g., pre-fetched)
   assets: { id: number; file?: { url?: string } }[] | undefined
   autoExtendView?: boolean
-  onPoiPointerUp?: ((evt: unknown) => void) | Array<(evt: unknown) => void>
+  // onShowCctv: full enriched target( feature / device / cctv 포함 )을 그대로 전달
+  onShowCctv?: (target: PoiTarget & { feature?: FeatureResponse; device?: DeviceResponse | null; cctv?: CctvResponse | null }) => void
+  onShowDevice?: (device: DeviceResponse, context: { poiId: string; feature?: FeatureResponse }) => void
 }
 
-interface UseIndoorEngineReturn { handleLoadComplete: () => void }
+interface UseIndoorEngineReturn {
+  handleLoadComplete: () => void
+  handlePoiSelect: (target: PoiTarget | undefined | null) => void
+}
+
+interface PoiTargetProperty {
+  deviceId?: string | number | null
+  deviceID?: string | number | null
+  [k: string]: unknown
+}
+
+interface PoiTarget { id?: string; property?: PoiTargetProperty }
 
 export function useIndoorEngine({
   facilityId,
   features: externalFeatures,
   assets,
   autoExtendView = true,
-  onPoiPointerUp
+  onShowCctv,
+  onShowDevice
 }: UseIndoorEngineParams): UseIndoorEngineReturn {
   const importedRef = useRef(false)
   const engineReadyRef = useRef(false)
-  const poiPointerUpCallbacksRef = useRef<Array<(evt: unknown) => void>>([])
-  const listenerRegisteredRef = useRef(false)
   const storeFeatures = useIndoorStore(s => s.features)
   const loadFeatures = useIndoorStore(s => s.loadFeatures)
-  // Note: device & CCTV 로딩은 외부(UI) 컴포넌트에서 수행 (검색/임베딩 용도)
-  
-  useEffect(() => {
-    if (!onPoiPointerUp) {
-      poiPointerUpCallbacksRef.current = []
-    } else {
-      poiPointerUpCallbacksRef.current = Array.isArray(onPoiPointerUp) ? onPoiPointerUp : [onPoiPointerUp]
-    }
-  }, [onPoiPointerUp])
-  
-  const poiPointerUpListener = useCallback((event: unknown) => {
-    for (const callback of poiPointerUpCallbacksRef.current) {
-      try { 
-        callback(event) 
-      } catch (e) { 
-        console.error('Error in onPoiPointerUp callback:', e) 
-      }
-    }
-  }, [])
+  const devices = useIndoorStore(s => s.devices)
+  const cctvs = useIndoorStore(s => s.cctvs)
 
   const activeFeatures = externalFeatures && externalFeatures.length ? externalFeatures : storeFeatures
+
+  // Precompute maps for quick lookup
+  const featureMap = useMemo(() => new Map(activeFeatures.map(f => [f.id, f])), [activeFeatures])
+  const deviceByFeatureId = useMemo(() => new Map(devices.filter(d => d.feature?.id).map(d => [d.feature!.id, d])), [devices])
+  const cctvByFeatureId = useMemo(() => new Map(cctvs.filter(c => c.feature?.id).map(c => [c.feature!.id, c])), [cctvs])
+
+  const handlePoiSelect = useCallback((target: PoiTarget | undefined | null) => {
+    const poiId = target?.id
+    if (!poiId) return
+    const feature = featureMap.get(poiId)
+    const device = feature ? deviceByFeatureId.get(feature.id) || null : null
+    const cctv = feature ? cctvByFeatureId.get(feature.id) || null : null
+    // 사용 path 결정 (deviceId 우선, 없으면 CCTV id)
+    const explicitDeviceId = target?.property?.deviceId ?? target?.property?.deviceID ?? null
+    const path = explicitDeviceId != null ? String(explicitDeviceId) : (cctv ? String(cctv.id) : null)
+    // onShowCctv 우선 처리: path 가 확보되었으면 target.property.deviceId 로 보정
+    if (cctv && onShowCctv && path) {
+      const enriched: PoiTarget & { feature?: FeatureResponse; device?: DeviceResponse | null; cctv?: CctvResponse | null } = {
+        ...(target || {}),
+        id: poiId,
+        property: { ...(target?.property || {}), deviceId: path },
+        feature,
+        device,
+        cctv
+      }
+      try { onShowCctv(enriched) } catch (e) { console.error('onShowCctv error', e) }
+      return
+    }
+    if (device && onShowDevice) {
+      try { onShowDevice(device, { poiId, feature }) } catch (e) { console.error('onShowDevice error', e) }
+    }
+  }, [featureMap, deviceByFeatureId, cctvByFeatureId, onShowCctv, onShowDevice])
+
+  const poiPointerUpListener = useCallback((event: unknown) => {
+    const target = (event as { target?: PoiTarget } | null | undefined)?.target
+    handlePoiSelect(target)
+  }, [handlePoiSelect])
 
   const buildPoiData = useCallback((): Interfaces.PoiImportOption[] => {
     if (!activeFeatures?.length || !assets?.length) return []
@@ -87,15 +119,10 @@ export function useIndoorEngine({
   }, [autoExtendView, tryImportPois])
 
   useEffect(() => {
-    if (!listenerRegisteredRef.current) {
-      Event.AddEventListener('onPoiPointerUp', poiPointerUpListener)
-      listenerRegisteredRef.current = true
-    }
+    // 동일한 함수 참조를 등록/해제해야 누적되지 않음
+    Event.AddEventListener('onPoiPointerUp', poiPointerUpListener)
     return () => {
-      if (listenerRegisteredRef.current) {
-        Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)
-        listenerRegisteredRef.current = false
-      }
+      Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)
     }
   }, [poiPointerUpListener])
 
@@ -104,7 +131,6 @@ export function useIndoorEngine({
     tryImportPois()
   }, [activeFeatures, assets, tryImportPois])
 
-  // Ensure features loaded before attempting import
   useEffect(() => {
     if (!facilityId) return
     if (!externalFeatures?.length && !storeFeatures.length) {
@@ -112,7 +138,5 @@ export function useIndoorEngine({
     }
   }, [facilityId, externalFeatures, storeFeatures.length, loadFeatures])
   
-  // (cleanup moved into listener registration effect above)
-
-  return { handleLoadComplete }
+  return { handleLoadComplete, handlePoiSelect }
 }

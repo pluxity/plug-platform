@@ -9,8 +9,7 @@ import { useFacilityStore } from '@/app/store/facilityStore'
 import { useIndoorStore } from '@/app/store/indoorStore'
 import type { IndoorSearchItem } from '@/app/store/indoorStore'
 
-import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPointerUpListeners } from '@/app/view/hooks'
-import type { PoiPointerUpListener } from '@/app/view/hooks'
+import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC } from '@/app/view/hooks'
 
 import IndoorSearchForm from './IndoorSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
@@ -41,34 +40,18 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     }
   })
 
-  const listeners: PoiPointerUpListener[] = [
-    {
-      id: 'embeddedCctv',
-      test: context => !!context.cctv,
-      run: context => {
-        const path = context.deviceId ? String(context.deviceId) : context.cctv?.id
-        if (path) embeddedHandler({ target: { id: context.poiId, property: { deviceId: path } } })
-      }
-    },
-    {
-      id: 'deviceInfo',
-      test: context => !!context.device,
-      run: context => {
-        setSelectedDevice(context.device || null)
-      },
-      stopOnHandled: false
-    }
-  ]
-
-  const { onPoiPointerUp: firePoiPointerUp } = usePoiPointerUpListeners({ features, listeners })
-  const handlePoiPointerUp = firePoiPointerUp
-
-  const { handleLoadComplete } = useIndoorEngine({
+  const { handleLoadComplete, handlePoiSelect } = useIndoorEngine({
     facilityId,
     features, // pass through in case already prefetched higher in tree
     assets,
-  autoExtendView: true,
-  onPoiPointerUp: handlePoiPointerUp
+    autoExtendView: true,
+    onShowCctv: (target) => {
+      // target.property.deviceId 에 path 이미 세팅됨
+      embeddedHandler({ target })
+    },
+    onShowDevice: (device) => {
+      setSelectedDevice(device)
+    }
   })
 
   const handleOutdoorClick = useCallback(() => { handleOutdoor() }, [handleOutdoor])
@@ -122,19 +105,15 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const handleSearchSelect = useCallback((item: IndoorSearchItem) => {
     const featureId = item.feature?.id
     if (featureId) {
-      const synthetic = { target: { id: featureId, property: { deviceId: item.id } } }
-      firePoiPointerUp(synthetic)
+      handlePoiSelect({ id: featureId, property: { deviceId: item.id } })
       return
     }
     if (item.__kind === 'cctv') {
-      if (featureId) {
-        return
-      }
       console.warn('[IndoorMap] CCTV has no feature mapping; cannot embed stream:', item.id)
-    } else {
-      setSelectedDevice(item as DeviceResponse)
+      return
     }
-  }, [firePoiPointerUp])
+    setSelectedDevice(item as DeviceResponse)
+  }, [handlePoiSelect])
 
   if (!facilitiesFetched || isLoading || has3DDrawing === null) {
     return (
