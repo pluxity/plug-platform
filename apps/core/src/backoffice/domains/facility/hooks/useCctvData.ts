@@ -14,7 +14,7 @@ export const useCctvData = () => {
     }, [getAllCctvs]);
 
     const unassignedCctvs = useMemo(() => {
-        return getAllCctvs.filter(cctv => !Boolean(cctv.feature?.id));
+        return getAllCctvs.filter(cctv => !cctv.feature?.id);
     }, [getAllCctvs]);
 
     return { 

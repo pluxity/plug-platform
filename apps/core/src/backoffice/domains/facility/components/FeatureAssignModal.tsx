@@ -163,10 +163,10 @@ export function FeatureAssignModal({
                     filterFn: (item: CctvResponse | DeviceResponse) => {
                       if (selectedType === 'CCTV') {
                         const cctvItem = item as CctvResponse;
-                        return !Boolean(cctvItem.feature?.id); 
+                        return !cctvItem.feature?.id; 
                       } else {
                         const deviceItem = item as DeviceResponse;
-                        return !Boolean(deviceItem.feature?.id); 
+                        return !deviceItem.feature?.id; 
                       }
                     }
                   },

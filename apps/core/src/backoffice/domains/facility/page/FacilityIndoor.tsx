@@ -32,6 +32,10 @@ type FacilityData = {
   boundary?: string
 }
 
+interface PoiTransformEvent {
+  targets: PoiData[]
+}
+
 export interface PoiData {
   id: string;
   displayText: string;
@@ -52,6 +56,7 @@ export interface PoiData {
 }
 
 type PoiClickEvent = {
+  type: string;
   target: PoiData
 }
 
@@ -136,7 +141,7 @@ const FacilityIndoor: React.FC = () => {
 
   // POI 편집 이벤트
   useEffect(() => {
-    const handleTransformChange = async (evt: any) => {
+    const handleTransformChange = async (evt: PoiTransformEvent) => {
       try {
         const editedPois = evt.targets || [];
         if (!editedPois.length) return;
@@ -240,17 +245,16 @@ const FacilityIndoor: React.FC = () => {
 
       const deviceText = getPoiDisplayText(f.id);
       const isAssigned = deviceText !== "장치 할당 필요";
-      const displayText = isAssigned ? poiAssignedText(deviceText) : poiUnassignedText(deviceText);
+      const htmlString = isAssigned ? poiAssignedText(deviceText) : poiUnassignedText(deviceText);
 
       return {
         id: f.id,
         iconUrl: '',
         modelUrl,
-        displayText, 
+        htmlString, 
         floorId: f.floorId,
         property: {
           assetId: f.assetId,
-          deviceId: f.deviceId ?? null,
         },
         position,
         rotation,

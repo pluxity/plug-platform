@@ -14,7 +14,7 @@ export const useDeviceData = () => {
     }, [getAllDevices]);
 
     const unassignedDevices = useMemo(() => {
-        return getAllDevices.filter(device => !Boolean(device.feature?.id));
+        return getAllDevices.filter(device => !device.feature?.id);
     }, [getAllDevices]);
 
     return {

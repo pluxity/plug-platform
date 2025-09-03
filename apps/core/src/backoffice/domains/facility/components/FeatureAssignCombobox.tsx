@@ -46,7 +46,7 @@ export function FeatureAssignCombobox({
   const selectedItem = items.find(item => item.id === selectedId);
 
   const groupedItems = groups.length > 0 ? groups.map(group => {
-    let filteredItems = items.filter(group.filterFn || (() => true));
+    const filteredItems = items.filter(group.filterFn || (() => true));
     
     return {  
       ...group,
