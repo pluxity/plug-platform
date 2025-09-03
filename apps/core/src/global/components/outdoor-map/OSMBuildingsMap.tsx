@@ -4,17 +4,13 @@ import { Viewer as ResiumViewer, Scene, Cesium3DTileset } from 'resium';
 import InitialCameraSetup from './CameraSetup';
 import { CESIUM_ION_ASSET_ID, CESIUM_ION_ACCESS_TOKEN } from './constants';
 
+Cesium.Ion.defaultAccessToken = CESIUM_ION_ACCESS_TOKEN;
 interface OSMBuildingsMapProps {
   className?: string;
   children?: React.ReactNode;
 }
 
 export default function OSMBuildingsMap({ className, children }: OSMBuildingsMapProps) {
-  
-  // Cesium Ion 설정
-  React.useEffect(() => {
-    Cesium.Ion.defaultAccessToken = CESIUM_ION_ACCESS_TOKEN;
-  }, []);
 
   const osmBuildingsTilesetUrl = React.useMemo(() => {
     return Cesium.IonResource.fromAssetId(CESIUM_ION_ASSET_ID);
