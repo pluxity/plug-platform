@@ -54,43 +54,82 @@ const CctvList: React.FC = () => {
         setDeleteCctvData(null);
     }
 
+    const headerClassName = "h-10 px-3 flex flex-1 justify-center items-center font-medium";
+    const cellClassName = "h-10 px-3 flex flex-1  items-center justify-center text-sm truncate";
+
+    // Tailwind 폭을 rem/프리셋으로 재정의 (px 제거)
+    // 목표 폭: ID(~110px)->w-28(7rem), 이름(~170px)->w-44(11rem), URL(~480px)->min-w-[30rem] w-[30rem], 관리(~110px의 절반)->w-14(3.5rem)
     const columns = [
         {
             accessorKey: 'id',
-            header: 'ID',
+            header: () => (
+                <div className={`w-28 ${headerClassName}`}>ID</div>
+            ),
+            cell: ({ row }: { row: { original: CctvData } }) => (
+                <div
+                    className={`w-28 ${cellClassName}`}
+                    title={row.original.id}
+                >
+                    {row.original.id}
+                </div>
+            ),
         },
         {
             accessorKey: 'name',
-            header: 'CCTV 이름',
+            header: () => (
+                <div className={`w-44 ${headerClassName}`}>CCTV 이름</div>
+            ),
+            cell: ({ row }: { row: { original: CctvData } }) => (
+                <div
+                    className={`w-44 ${cellClassName}`}
+                    title={row.original.name}
+                >
+                    {row.original.name}
+                </div>
+            ),
         },
         {
             accessorKey: 'url',
-            header: 'CCTV URL',
+            header: () => (
+                <div className={`w-192 ${headerClassName}`}>CCTV URL</div>
+            ),
+            cell: ({ row }: { row: { original: CctvData } }) => (
+                <div
+                    className={`w-192 ${cellClassName}`}
+                    title={row.original.url}
+                >
+                    {row.original.url}
+                </div>
+            ),
         },
         {
             id: 'actions',
-            header: '관리',
+            header: () => (
+                <div className={`w-10 ${headerClassName}`}>관리</div>
+            ),
             cell: ({row}: {row: {original: CctvData}}) => (
-                <div className="flex space-x-2">
+                <div className={`w-10 ${cellClassName}`}>
                     <Button variant="secondary" size="sm" onClick={() => handleEdit(row.original.id)}>수정</Button>
                     <Button variant="outline" size="sm" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
             ), 
         }
-    ]
+    ];
     
     return (
         <PageContainer title="CCTV 관리">
             <Card>
                 <CardContent>
-                    <DataTable
-                        columns={columns}
-                        data={cctvData}
-                        pageSize={12}
-                        filterPlaceholder="CCTV 이름으로 검색하세요."
-                        filterColumnKey="name"
-                        buttons={<Button onClick={handleCreate}>등록</Button>}
-                    />
+                    <div>
+                        <DataTable
+                            columns={columns}
+                            data={cctvData}
+                            pageSize={12}
+                            filterPlaceholder="CCTV 이름으로 검색하세요."
+                            filterColumnKey="name"
+                            buttons={<Button onClick={handleCreate}>등록</Button>}
+                        />
+                    </div>
                 </CardContent>
             </Card>
 
