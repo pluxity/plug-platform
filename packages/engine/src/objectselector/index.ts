@@ -152,12 +152,41 @@ function onPointerMove(evt: PointerEvent) {
                 // hoverObjects.push(poi.PointMeshData.animMeshRef);
             }
 
+            // 이벤트 통지
+            engine.EventHandler.dispatchEvent({
+                type: 'onPoiPointerMove',
+                target: poi.ExportData,
+                pointerEvent: evt,
+                screenPos: Util.toScreenPos(poi.WorldPosition.clone()),
+            });
+
         } else if (pickObjects[0].label) {
             const label = pickObjects[0].label;
             if (label instanceof Label3DElement) {
                 // hoverObjects.push(label);
             }
+
+            // 이벤트 통지
+            engine.EventHandler.dispatchEvent({
+                type: 'onLabel3DPointerMove',
+                target: label.ExportData,
+                pointerEvent: evt,
+                screenPos: Util.toScreenPos(label.position.clone()),
+            });
         }
+    } else {
+        engine.EventHandler.dispatchEvent({
+            type: 'onPoiPointerMove',
+            target: null,
+            pointerEvent: evt,
+            screenPos: null,
+        });
+        engine.EventHandler.dispatchEvent({
+            type: 'onLabel3DPointerMove',
+            target: null,
+            pointerEvent: evt,
+            screenPos: null,
+        });
     }
 }
 
