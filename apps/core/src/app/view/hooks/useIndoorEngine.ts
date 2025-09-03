@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { Camera, Poi, Interfaces, Event } from '@plug/engine'
 import type { FeatureResponse } from '@plug/common-services'
+import { useIndoorStore } from '@/app/store/indoorStore'
 
 interface UseIndoorEngineParams {
-  features: FeatureResponse[]
+  facilityId?: number | null
+  features?: FeatureResponse[] // Optional external override (e.g., pre-fetched)
   assets: { id: number; file?: { url?: string } }[] | undefined
   autoExtendView?: boolean
   onPoiPointerUp?: ((evt: unknown) => void) | Array<(evt: unknown) => void>
@@ -12,7 +14,8 @@ interface UseIndoorEngineParams {
 interface UseIndoorEngineReturn { handleLoadComplete: () => void }
 
 export function useIndoorEngine({
-  features,
+  facilityId,
+  features: externalFeatures,
   assets,
   autoExtendView = true,
   onPoiPointerUp
@@ -21,6 +24,9 @@ export function useIndoorEngine({
   const engineReadyRef = useRef(false)
   const poiPointerUpCallbacksRef = useRef<Array<(evt: unknown) => void>>([])
   const listenerRegisteredRef = useRef(false)
+  const storeFeatures = useIndoorStore(s => s.features)
+  const loadFeatures = useIndoorStore(s => s.loadFeatures)
+  // Note: device & CCTV 로딩은 외부(UI) 컴포넌트에서 수행 (검색/임베딩 용도)
   
   useEffect(() => {
     if (!onPoiPointerUp) {
@@ -40,10 +46,12 @@ export function useIndoorEngine({
     }
   }, [])
 
+  const activeFeatures = externalFeatures && externalFeatures.length ? externalFeatures : storeFeatures
+
   const buildPoiData = useCallback((): Interfaces.PoiImportOption[] => {
-    if (!features?.length || !assets?.length) return []
+    if (!activeFeatures?.length || !assets?.length) return []
     const assetById = new Map(assets.map(assetItem => [assetItem.id, assetItem]))
-    return features.map(feature => {
+    return activeFeatures.map(feature => {
       const assetRecord = assetById.get(feature.assetId)
       return {
         id: feature.id,
@@ -57,7 +65,7 @@ export function useIndoorEngine({
         scale: { x: feature.scale?.x ?? 1, y: feature.scale?.y ?? 1, z: feature.scale?.z ?? 1 }
       }
     })
-  }, [features, assets])
+  }, [activeFeatures, assets])
 
   const tryImportPois = useCallback(() => {
     if (importedRef.current) return
@@ -75,24 +83,36 @@ export function useIndoorEngine({
   const handleLoadComplete = useCallback(() => {
     engineReadyRef.current = true
     if (autoExtendView) Camera.ExtendView(1)
+    tryImportPois()
+  }, [autoExtendView, tryImportPois])
+
+  useEffect(() => {
     if (!listenerRegisteredRef.current) {
       Event.AddEventListener('onPoiPointerUp', poiPointerUpListener)
       listenerRegisteredRef.current = true
     }
-    tryImportPois()
-  }, [autoExtendView, tryImportPois, poiPointerUpListener])
+    return () => {
+      if (listenerRegisteredRef.current) {
+        Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)
+        listenerRegisteredRef.current = false
+      }
+    }
+  }, [poiPointerUpListener])
 
   useEffect(() => {
     importedRef.current = false
     tryImportPois()
-  }, [features, assets, tryImportPois])
-  
-  useEffect(() => () => {
-    if (listenerRegisteredRef.current) {
-      Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)
-      listenerRegisteredRef.current = false
+  }, [activeFeatures, assets, tryImportPois])
+
+  // Ensure features loaded before attempting import
+  useEffect(() => {
+    if (!facilityId) return
+    if (!externalFeatures?.length && !storeFeatures.length) {
+      loadFeatures(facilityId)
     }
-  }, [poiPointerUpListener])
+  }, [facilityId, externalFeatures, storeFeatures.length, loadFeatures])
+  
+  // (cleanup moved into listener registration effect above)
 
   return { handleLoadComplete }
 }

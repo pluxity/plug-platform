@@ -6,7 +6,7 @@ import { MapScene } from '@/global/components/indoor-map'
 import { useAssets } from '@/global/store/assetStore'
 
 import { useFacilityStore } from '@/app/store/facilityStore'
-import { useIndoorStore, useSyncCctvs } from '@/app/store/indoorStore'
+import { useIndoorStore } from '@/app/store/indoorStore'
 import type { IndoorSearchItem } from '@/app/store/indoorStore'
 
 import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPointerUpListeners } from '@/app/view/hooks'
@@ -22,15 +22,16 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const { assets } = useAssets()
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
-  const loadFacilityData = useIndoorStore(s => s.loadFacilityData)
-  const storedFacilityId = useIndoorStore(s => s.facilityId)
-  useSyncCctvs()
-
+  const loadCctvs = useIndoorStore(s => s.loadCctvs)
+  const loadDevices = useIndoorStore(s => s.loadDevices)
   useEffect(() => {
-    if (facilityId && facilityId !== storedFacilityId) {
-      loadFacilityData(facilityId)
+    if (facilityId) {
+      loadDevices(facilityId)
+      loadCctvs(facilityId)
     }
-  }, [facilityId, storedFacilityId, loadFacilityData])
+  }, [facilityId, loadDevices, loadCctvs])
+
+  // Feature/device loading now handled inside useIndoorEngine
   const { onPoiPointerUp: embeddedHandler } = usePoiEmbeddedWebRTC({
     onError: () => { /* 추후 에러 처리 추가 */ },
     resolvePath: evt => {
@@ -63,10 +64,11 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const handlePoiPointerUp = firePoiPointerUp
 
   const { handleLoadComplete } = useIndoorEngine({
-    features,
+    facilityId,
+    features, // pass through in case already prefetched higher in tree
     assets,
-    autoExtendView: true,
-    onPoiPointerUp: handlePoiPointerUp
+  autoExtendView: true,
+  onPoiPointerUp: handlePoiPointerUp
   })
 
   const handleOutdoorClick = useCallback(() => { handleOutdoor() }, [handleOutdoor])

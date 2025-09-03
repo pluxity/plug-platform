@@ -9,6 +9,13 @@ interface FacilityState {
   selectedFacility: FacilityResponse | null
   facilitiesFetched: boolean
   isLoading: boolean
+  lastFetched: number | null
+  staleAfterMs: number
+}
+
+interface LoadFacilitiesOptions {
+  force?: boolean      // force re-fetch regardless of cache
+  ignoreStale?: boolean // if true, don't re-fetch even if stale
 }
 
 interface FacilityActions {
@@ -19,7 +26,9 @@ interface FacilityActions {
   getAllFacilities: () => FacilityResponse[]
   getFacilityById: (id: number) => FacilityResponse | undefined
   getFacilitiesByType: (type: FacilityType) => FacilityResponse[]
-  loadFacilities: () => Promise<void>
+  loadFacilities: (options?: LoadFacilitiesOptions) => Promise<void> | undefined
+  refreshFacilities: () => Promise<void> | undefined
+  isStale: () => boolean
 }
 
 type FacilityStore = FacilityState & FacilityActions
@@ -29,11 +38,13 @@ let loadFacilitiesPromise: Promise<void> | null = null
 export const useFacilityStore = create<FacilityStore>()(
   devtools(
     (set, get) => ({
-      facilities: [],
-      error: null,
-      selectedFacility: null,
-      facilitiesFetched: false,
-      isLoading: false,
+  facilities: [],
+  error: null,
+  selectedFacility: null,
+  facilitiesFetched: false,
+  isLoading: false,
+  lastFetched: null,
+  staleAfterMs: 5 * 60 * 1000, // 5분 후 stale
 
       setFacilities: (facilities) => set({ facilities }),
       setError: (error) => set({ error }),
@@ -43,10 +54,21 @@ export const useFacilityStore = create<FacilityStore>()(
       getAllFacilities: () => get().facilities,
       getFacilityById: (id) => get().facilities.find(f => f.id === id),
       getFacilitiesByType: (type: FacilityType) => get().facilities.filter(f => (f as FacilityResponse & { type?: FacilityType }).type === type),
+      isStale: () => {
+        const { lastFetched, staleAfterMs, facilitiesFetched } = get()
+        if (!facilitiesFetched || !lastFetched) return true
+        return Date.now() - lastFetched > staleAfterMs
+      },
 
-      loadFacilities: async () => {
+      loadFacilities: async (options?: LoadFacilitiesOptions) => {
         const { facilitiesFetched, isLoading } = get()
-        if (facilitiesFetched) return
+        const stale = get().isStale()
+        const force = options?.force === true
+        const ignoreStale = options?.ignoreStale === true
+
+        if (!force) {
+          if (facilitiesFetched && (!stale || ignoreStale)) return
+        }
         if (isLoading && loadFacilitiesPromise) return loadFacilitiesPromise
 
         set({ isLoading: true, error: null })
@@ -55,7 +77,7 @@ export const useFacilityStore = create<FacilityStore>()(
           try {
             const response = await facilityService.getAllFacilities()
             const list = Array.isArray(response.data) ? (response.data as FacilityResponse[]) : []
-            set({ facilities: list, facilitiesFetched: true })
+            set({ facilities: list, facilitiesFetched: true, lastFetched: Date.now() })
           } catch (error) {
             set({ error: error instanceof Error ? error.message : 'Failed to load facilities' })
           } finally {
@@ -65,7 +87,8 @@ export const useFacilityStore = create<FacilityStore>()(
         })()
 
         return loadFacilitiesPromise
-      }
+      },
+      refreshFacilities: () => get().loadFacilities({ force: true })
     }),
     { name: 'facility-store' }
   )

@@ -1,9 +1,8 @@
 import { create } from 'zustand'
-import { useEffect } from 'react'
 import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services'
 import { getFeaturesByFacility } from '@plug/common-services'
 import { getDevices } from '@plug/common-services'
-import { useCctvSWR } from '@plug/common-services'
+import { getCctvsByFacility } from '@plug/common-services'
 
 // Indoor related aggregated data (features + devices + cctvs) per facility
 
@@ -18,6 +17,9 @@ export interface IndoorState {
 
 export interface IndoorActions {
   loadFacilityData: (facilityId: number) => Promise<void>
+  loadFeatures: (facilityId: number) => Promise<void>
+  loadDevices: (facilityId: number, options?: { force?: boolean }) => Promise<void>
+  loadCctvs: (facilityId: number, options?: { force?: boolean }) => Promise<void>
   setDevices: (devices: DeviceResponse[]) => void
   setFeatures: (features: FeatureResponse[]) => void
   setCctvs: (cctvs: CctvResponse[]) => void
@@ -34,6 +36,8 @@ export type IndoorSearchItem = (DeviceResponse & { __kind?: 'device' }) | (CctvR
 export type IndoorStore = IndoorState & IndoorActions
 
 let loadingPromise: Promise<void> | null = null
+let devicesLoadingPromise: Promise<void> | null = null
+let cctvsLoadingPromise: Promise<void> | null = null
 
 export const useIndoorStore = create<IndoorStore>()((set, get) => ({
   facilityId: null,
@@ -50,11 +54,12 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
     set({ loading: true, error: null, facilityId })
     loadingPromise = (async () => {
       try {
-        const [features, devices] = await Promise.all([
-          getFeaturesByFacility(facilityId),
-          getDevices(facilityId),
-        ])
-        set({ features: features, devices: devices })
+        // Load features first so 3D POIs can render ASAP, then devices (can be slower)
+        const features = await getFeaturesByFacility(facilityId)
+        set({ features })
+        // Fire & forget devices (still awaited for overall load to mirror previous semantics)
+        const devices = await getDevices(facilityId)
+        set({ devices })
 
       } catch (e) {
         set({ error: e instanceof Error ? e.message : 'Failed to load indoor data' })
@@ -64,6 +69,54 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
       }
     })()
     return loadingPromise
+  },
+  async loadFeatures(facilityId: number) {
+    // If facility changed or no features yet, fetch
+    if (get().facilityId !== facilityId) set({ facilityId })
+    if (get().features.length && get().facilityId === facilityId) return
+    try {
+      const features = await getFeaturesByFacility(facilityId)
+      set({ features })
+    } catch (e) {
+      set({ error: e instanceof Error ? e.message : 'Failed to load features' })
+    }
+  },
+  async loadDevices(facilityId: number, options?: { force?: boolean }) {
+    const { force } = options || {}
+    const state = get()
+    if (devicesLoadingPromise) return devicesLoadingPromise
+    // Skip if already loaded for same facility unless force specified
+    if (!force && state.facilityId === facilityId && state.devices.length) return
+    if (state.facilityId !== facilityId) set({ facilityId })
+    devicesLoadingPromise = (async () => {
+      try {
+        const devices = await getDevices(facilityId)
+        set({ devices })
+      } catch (e) {
+        set({ error: e instanceof Error ? e.message : 'Failed to load devices' })
+      } finally {
+        devicesLoadingPromise = null
+      }
+    })()
+    return devicesLoadingPromise
+  },
+  async loadCctvs(facilityId: number, options?: { force?: boolean }) {
+    const { force } = options || {}
+    const state = get()
+    if (cctvsLoadingPromise) return cctvsLoadingPromise
+    if (!force && state.facilityId === facilityId && state.cctvs.length) return
+    if (state.facilityId !== facilityId) set({ facilityId })
+    cctvsLoadingPromise = (async () => {
+      try {
+        const cctvs = await getCctvsByFacility(facilityId)
+        set({ cctvs })
+      } catch (e) {
+        set({ error: e instanceof Error ? e.message : 'Failed to load cctvs' })
+      } finally {
+        cctvsLoadingPromise = null
+      }
+    })()
+    return cctvsLoadingPromise
   },
   setDevices: (devices) => set({ devices }),
   setFeatures: (features) => set({ features }),
@@ -135,20 +188,4 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
 }))
 
 // Optional helper hook to sync CCTV list via SWR when needed
-export const useSyncCctvs = () => {
-  const { data } = useCctvSWR()
-  const setCctvs = useIndoorStore(s => s.setCctvs)
-  useEffect(() => {
-    const normalize = (input: unknown): CctvResponse[] => {
-      if (Array.isArray(input)) return input as CctvResponse[]
-      if (input && typeof input === 'object') {
-        const inner = (input as { data?: unknown }).data
-        if (Array.isArray(inner)) return inner as CctvResponse[]
-      }
-      return []
-    }
-    if (data !== undefined) {
-      setCctvs(normalize(data))
-    }
-  }, [data, setCctvs])
-}
+// useSyncCctvs 제거: 이제 명시적으로 loadCctvs 사용

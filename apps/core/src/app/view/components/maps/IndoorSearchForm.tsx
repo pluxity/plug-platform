@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { useIndoorStore, type IndoorSearchItem, useSyncCctvs } from '@/app/store/indoorStore'
+import React, { useMemo, useRef, useState, useCallback } from 'react'
+import { useIndoorStore, type IndoorSearchItem } from '@/app/store/indoorStore'
 import { GroupSearchForm } from '@/app/view/components/group-search-form'
 import type { GroupSearchGroup, GroupSearchFormRef } from '@/app/view/components/group-search-form'
 import { Camera } from '@plug/engine'
@@ -15,18 +15,11 @@ const IndoorSearchForm: React.FC<IndoorSearchFormProps> = ({ className, onDevice
   const formRef = useRef<GroupSearchFormRef>(null)
 
   const searchDevices = useIndoorStore(s => s.searchDevices)
-  const facilityId = useIndoorStore(s => s.facilityId)
-  const loadFacilityData = useIndoorStore(s => s.loadFacilityData)
+  // facilityId not needed locally; parent ensures data loaded
+  // Device & CCTV는 상위 IndoorMap에서 선 로딩
 
-  // Keep CCTV list synced (no-op if already loaded)
-  useSyncCctvs()
-
-  // Ensure indoor data loaded if facility context exists but store empty
-  useEffect(() => {
-    if (facilityId && !useIndoorStore.getState().features.length) {
-      loadFacilityData(facilityId)
-    }
-  }, [facilityId, loadFacilityData])
+  // Ensure device & CCTV data loaded for searching
+  // 상위에서 로드되므로 여기서는 추가 fetch 없음
 
   const groups = useMemo<GroupSearchGroup<IndoorSearchItem>[]>(() => {
     const result = searchDevices(query)
@@ -37,7 +30,7 @@ const IndoorSearchForm: React.FC<IndoorSearchFormProps> = ({ className, onDevice
     setQuery('')
     formRef.current?.close()
     if (item.feature?.id) {
-      Camera.MoveToPoi(String(item.feature.id), 0.5, 1)
+      Camera.MoveToPoi(String(item.feature.id), 1, {x: 0, y: 0, z: 0});
     }
     // item may be device or cctv; ensure shape matches callback union
   onDeviceSelect?.(item)

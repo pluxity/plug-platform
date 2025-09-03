@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { GroupSearchForm, type GroupSearchGroup, type GroupSearchFormRef } from '@/app/view/components/group-search-form'
 import { useFacilityStore } from '@/app/store/facilityStore'
+import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities'
 import type { FacilityResponse } from '@plug/common-services'
 import * as Cesium from 'cesium'
 
@@ -15,11 +16,8 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacil
   const formRef = useRef<GroupSearchFormRef>(null)
   const facilities = useFacilityStore(s => s.facilities)
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
-  const loadFacilities = useFacilityStore(s => s.loadFacilities)
-
-  useEffect(() => {
-    if (!facilitiesFetched) loadFacilities()
-  }, [facilitiesFetched, loadFacilities])
+  // Ensure facilities are available (revalidate if stale silently)
+  useEnsureFacilities({ revalidateIfStale: true })
 
   const [pendingFacility, setPendingFacility] = useState<FacilityResponse | null>(null)
 

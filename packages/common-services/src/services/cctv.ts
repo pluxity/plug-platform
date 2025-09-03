@@ -40,3 +40,9 @@ export const useCctvDetailSWR = (cctvId: string) => {
         isPaused: () => !cctvId,
     });
 }
+
+export const getCctvsByFacility = async (facilityId: number) => {
+    const qs = facilityId != null ? `?facilityId=${facilityId}` : '';
+    const resp = await api.get<CctvResponse[]>(`${END_POINT}${qs}`, { requireAuth: true });
+    return (resp as any)?.data ?? (resp as any) ?? [];
+}

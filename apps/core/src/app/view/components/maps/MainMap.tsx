@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import IndoorMap from './IndoorMap'
 import OutdoorMap from './OutdoorMap'
 import type { FacilityType } from '@plug/common-services'
-import { useFacilityStore } from '@/app/store/facilityStore'
+import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities'
 
 enum MapMode {
   OUTDOOR = 'outdoor',
@@ -19,14 +19,10 @@ const MainMap: React.FC = () => {
   const [mapMode, setMapMode] = useState<MapMode>(initialIsIndoor ? MapMode.INDOOR : MapMode.OUTDOOR)
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(initialIsIndoor ? navState?.facilityId ?? null : null)
   const [selectedFacilityType, setSelectedFacilityType] = useState<FacilityType | null>(initialIsIndoor ? navState?.facilityType ?? null : null)
-  const { facilitiesFetched, loadFacilities } = useFacilityStore()
+  useEnsureFacilities({ revalidateIfStale: true })
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (!facilitiesFetched) {
-      loadFacilities()
-    }
-  }, [facilitiesFetched, loadFacilities])
+  // Facilities ensured via hook above.
 
   // location.state 를 초기화(히스토리 정리) - 첫 렌더에서 이미 반영했다면 한 번만 replace
   useEffect(() => {

@@ -4,17 +4,21 @@ export const TEXT_STYLE = {
     UNASSIGNED: 'color: white; background-color: black;',
 } as const;
 
-export type PoiDisplayTextStyle = keyof typeof TEXT_STYLE;
+export type getPoiHtmlStringStyle = keyof typeof TEXT_STYLE;
 
 // 범용 텍스트 스타일
-export const poiDisplayText = (text: string, style: PoiDisplayTextStyle = 'DEFAULT') => {
-    return `<span style="${TEXT_STYLE[style]}">${text}</span>`;
+export const getPoiHtmlString = (text: string, style: getPoiHtmlStringStyle = 'DEFAULT') => {
+    return `
+    <div style="transform: translateY(-2rem);">
+        <span style="${TEXT_STYLE[style]}">${text}</span>
+    </div>
+    `;
 }
 
 export const poiAssignedText = (text: string) => {
-    return poiDisplayText(text, 'ASSIGNED');
+    return getPoiHtmlString(text, 'ASSIGNED');
 }
 
 export const poiUnassignedText = (text: string) => {
-    return poiDisplayText(text, 'UNASSIGNED');
+    return getPoiHtmlString(text, 'UNASSIGNED');
 }
