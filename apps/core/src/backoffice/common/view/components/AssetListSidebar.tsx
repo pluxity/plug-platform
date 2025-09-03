@@ -3,17 +3,18 @@ import { useParams } from 'react-router-dom'
 import { Button } from '@plug/ui'
 import { toast } from 'sonner'
 
-
 import { 
   useAssets, 
   useAssetCategories, 
   useAssetCategoryNavigation, 
   useCurrentCategoryContent,
-  useAssetStore
+  useAssetStore,
 } from '@/global/store'
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services'
 import { createFeature } from '@plug/common-services'
 import { Poi } from '@plug/engine'
+
+import { poiUnassignedText } from '@/global/utils/displayUtils'
 
 interface AssetListSideBarProps {
   onAssetClick?: (assetId: number) => void
@@ -255,7 +256,7 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
           id: crypto.randomUUID(),
           iconUrl: "",
           modelUrl: asset.file.url,
-          displayText: '장치 할당 필요',
+          htmlString: poiUnassignedText('장비 할당 필요'),
           property: {
             assetId: assetId,
             assetCode: asset.code,

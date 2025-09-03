@@ -22,6 +22,7 @@ export interface FeatureUpdateRequest {
 
 export interface FeatureAssignDto {
   id: string;
+  type?: string;
 }
 
 export interface FeatureResponse {

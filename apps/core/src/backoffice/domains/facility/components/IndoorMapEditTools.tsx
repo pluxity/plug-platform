@@ -23,6 +23,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
       if (isDeleteMode) {
         // 삭제 모드 종료
         setIsDeleteMode(false)
+        onDeleteMode?.(false)
       } else if (isEditing) {
         // 일반 편집 모드 종료
         Poi.FinishEdit()
@@ -100,7 +101,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
   }
 
   return (
-    <div className={`flex gap-2 bg-transparent ${className}`}>
+    <div className={`flex items-center gap-2 ${className}`}>
       <Button
         variant="ghost"
         size="sm"
@@ -188,7 +189,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
           onClick={handleFinishEdit}
           className="
             h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
-            bg-gradient-to-br from-rose-400 via-red-500 to-pink-600 text-white shadow-xl shadow-red-500/40 hover:from-rose-500 hover:via-red-600 hover:to-pink-700 hover:scale-105 ring-2 ring-red-300/50
+            bg-gradient-to-br from-rose-500 via-red-600 to-pink-700 text-white shadow-xl shadow-rose-500/50 hover:from-rose-600 hover:via-red-700 hover:to-pink-800 hover:scale-105 ring-2 ring-rose-300/60
           "
           title="편집 종료 (ESC)"
         >

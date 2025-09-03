@@ -66,7 +66,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
         className="cursor-pointer" 
         onClick={handleCardClick}
       >
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg font-semibold text-gray-900 truncate flex">
               {facility.name}
@@ -75,7 +75,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
               </Badge>
             </CardTitle>
           </div>
-          <CardAction>
+          <CardAction className="self-center">
             <code className="px-2 py-1 text-xs font-mono bg-gray-100 text-gray-700 rounded border">
               {facility.code}
             </code>
