@@ -3,7 +3,7 @@ import InfoDialog from './InfoDialog'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services'
 import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device'
-import { formatKoreanDateTime } from '@/global/util/date'
+import { formatKoreanDateTime } from '@/global/utils/date'
 import DeviceMetricCharts from './DeviceMetricCharts'
 
 export interface DeviceInfoDialogProps {

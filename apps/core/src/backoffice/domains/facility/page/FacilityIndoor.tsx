@@ -1,21 +1,23 @@
 import React, { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
-import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
-import { IndoorMapViewer } from '@/global/components'
-import { FloorControl } from '@/global/components/indoor-map/FloorControl'
-import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
 import { ArrowLeft } from "lucide-react"
-import { IndoorMapEditTools } from '../components'
-import { FeatureAssignModal } from '../components/FeatureAssignModal'
-import { useAssets } from '@/global/store/assetStore'
-import { Poi, Event, Interfaces } from '@plug/engine'
-import { convertFloors } from '@/global/utils/floorUtils'
-import type { Floor } from '@/global/types'
 import { toast } from "sonner"
-import { useCctvData } from '../hooks/useCctvData'
-import { useDeviceData } from '../hooks/useDeviceData'
-import { poiUnassignedText, poiAssignedText } from '@/global/utils/displayUtils'
+
+import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
+
+import { Poi, Event, Interfaces, Camera } from '@plug/engine'
+
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
+
+import { useAssets } from '@/global/store'
+import { convertFloors, poiUnassignedText, poiAssignedText } from '@/global/utils'
+import { IndoorMapViewer, FloorControl } from '@/global/components'
+import type { Floor } from '@/global/types'
+
+import { PageContainer } from '@/backoffice/common/view/layouts'
+
+import { IndoorMapEditTools, FeatureAssignModal } from '../components'
+import { useCctvData, useDeviceData } from '../hooks'
 
 type FacilityData = {
   facility?: {
@@ -272,6 +274,7 @@ const FacilityIndoor: React.FC = () => {
 
   const handleLoadComplete = useCallback(() => {
     engineReadyRef.current = true;
+    Camera.ExtendView(1);
     tryImportPois();
   }, [tryImportPois]);
 
@@ -418,7 +421,7 @@ const FacilityIndoor: React.FC = () => {
           )}
           
           {has3DDrawing === true && facilityType && (
-            <div className="h-168 relative">
+            <div className="h-180 relative">
               <IndoorMapViewer 
                 modelUrl={facilityData?.facility?.drawing?.url || ''}
                 className="w-full h-full"
