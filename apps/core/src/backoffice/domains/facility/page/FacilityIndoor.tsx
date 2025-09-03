@@ -121,6 +121,8 @@ const FacilityIndoor: React.FC = () => {
 
   // POI 클릭 이벤트 (삭제/할당)
   const handleFeatureClick = useCallback((eventData: PoiClickEvent) => {
+
+    console.log(eventData);
     const poiData = eventData.target;
     
     if (isDeleteMode) {
@@ -215,7 +217,7 @@ const FacilityIndoor: React.FC = () => {
     } catch(error){
       console.error("장비 할당 중 오류가 발생했습니다.", error);
     }
-  }, [getAllCctvs, getAllDevices, mutateCctvs, mutateDevices, getPoiDisplayText]);
+  }, [getAllCctvs, getAllDevices, mutateCctvs, mutateDevices]);
 
   // POI Import 함수 수정
   const tryImportPois = useCallback(() => {
@@ -275,6 +277,7 @@ const FacilityIndoor: React.FC = () => {
   const handleLoadComplete = useCallback(() => {
     engineReadyRef.current = true;
     Camera.ExtendView(1);
+    console.log('Load Complete');
     tryImportPois();
   }, [tryImportPois]);
 

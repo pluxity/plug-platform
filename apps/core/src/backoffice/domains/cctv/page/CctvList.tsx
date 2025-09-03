@@ -108,7 +108,7 @@ const CctvList: React.FC = () => {
                 <div className={`w-10 ${headerClassName}`}>관리</div>
             ),
             cell: ({row}: {row: {original: CctvData}}) => (
-                <div className={`w-10 ${cellClassName}`}>
+                <div className={`w-10 ${cellClassName} gap-1`}>
                     <Button variant="secondary" size="sm" onClick={() => handleEdit(row.original.id)}>수정</Button>
                     <Button variant="outline" size="sm" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
