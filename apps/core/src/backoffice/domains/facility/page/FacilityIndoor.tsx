@@ -38,7 +38,7 @@ interface PoiTransformEvent {
 
 export interface PoiData {
   id: string;
-  displayText: string;
+  htmlString: string;
   iconUrl: string;
   modelUrl: string;
   property?: {
