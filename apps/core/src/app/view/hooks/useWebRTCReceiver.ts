@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { buildWhepUrl, performWhepNegotiation, prepareReceiverPeerConnection } from '@/global/webrtc/whep'
 
 export interface UseWebRTCReceiverOptions {
   host: string
@@ -54,33 +55,18 @@ export function useWebRTCReceiver (options: UseWebRTCReceiverOptions): UseWebRTC
       setStatus('connecting')
       setError(null)
       try {
-        const peerConnection = new RTCPeerConnection()
-        peerConnectionRef.current = peerConnection
-        fetchAbortControllerRef.current = new AbortController()
-        peerConnection.addEventListener('track', evt => {
-          if (evt.track.kind === 'video') {
-            const element = videoRef.current
+        const peerConnection = prepareReceiverPeerConnection(stream => {
+          const element = videoRef.current
             if (element && !element.srcObject) {
-              element.srcObject = evt.streams[0]
+              element.srcObject = stream
               try { element.play?.() } catch (err) { console.error(err) }
             }
-          }
         })
-        peerConnection.addTransceiver('video', { direction: 'recvonly' })
-        peerConnection.addTransceiver('audio', { direction: 'recvonly' })
-        const offer = await peerConnection.createOffer()
-        await peerConnection.setLocalDescription(offer)
-        const url = `http://${host}:${resolvedPort}/${encodeURIComponent(path)}/whep`
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/sdp' },
-          body: offer.sdp || '',
-          signal: fetchAbortControllerRef.current.signal
-        })
-        if (!response.ok) throw new Error(`WHEP 실패 (${response.status}) (시도 ${attemptIndex}/${retries})`)
-        const answerSdp = await response.text()
+        peerConnectionRef.current = peerConnection
+        fetchAbortControllerRef.current = new AbortController()
+        const url = buildWhepUrl(host, resolvedPort, path)
+        await performWhepNegotiation(peerConnection, url, fetchAbortControllerRef.current.signal)
         if (connectionGenerationRef.current !== generation) return
-        await peerConnection.setRemoteDescription({ type: 'answer', sdp: answerSdp })
         setStatus('connected')
         return
       } catch (err) {

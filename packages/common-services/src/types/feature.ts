@@ -27,10 +27,9 @@ export interface FeatureAssignDto {
 
 export interface FeatureResponse {
   id: string;
+  assetId: number;
+  floorId: string;
   position?: Spatial;
   rotation?: Spatial;
   scale?: Spatial;
-  assetId: number;
-  floorId: string;
-  deviceId?: string;
 }

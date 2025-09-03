@@ -361,6 +361,13 @@ class Engine3D {
     }
 
     /**
+     * CSS 렌더러
+     */
+    get CSSRenderer() {
+        return this.cssRenderer;
+    }
+
+    /**
      * 렌더링 이펙트 컴포저
      */
     get Composer(): Addon.EffectComposer {

@@ -18,3 +18,9 @@ Core.Initialize(container); // WebGL 초기화
 ```javascript
 Core.Dispose();
 ```
+
+## Px.Core.Resize()
+- WebGL Canvas크기 재조정
+```javascript
+Core.Resize();
+```

@@ -82,7 +82,7 @@ const GroupSearchFormInner = <T,>(
   }
 
   return (
-    <div ref={rootRef} className={clsx('relative w-80', className)}>
+    <div ref={rootRef} className={clsx('relative w-96', className)}>
       <div className="relative">
         <input
           ref={inputRef}
@@ -125,10 +125,10 @@ const GroupSearchFormInner = <T,>(
             <div key={`${group.heading}-${groupIndex}`} className="py-1">
               <div className="px-3 py-1 text-xs text-gray-500 uppercase tracking-wide">{group.heading}</div>
               {group.items.map((item, itemIndex) => {
-        const itemKey = (getItemKey?.(item, groupIndex, itemIndex)) ?? `${group.heading}-${itemIndex}`
+                const itemKey = (getItemKey?.(item, groupIndex, itemIndex)) ?? `${group.heading}-${itemIndex}`
                 return (
                   <button
-          key={itemKey}
+                    key={itemKey}
                     onClick={() => onSelect?.(item, { group, groupIndex, itemIndex })}
                     className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
                   >

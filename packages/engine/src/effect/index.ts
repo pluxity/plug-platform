@@ -1,5 +1,5 @@
 import { Engine3D } from '../engine';
-import { initialize as OutlineInitialize, dispose as OutlineDispose } from './outline';
+import { initialize as OutlineInitialize, dispose as OutlineDispose, SetPoiOutline, clearOutlineObjects, SetOutlineOptions } from './outline';
 
 export * as Outline from './outline';
 
@@ -22,4 +22,8 @@ function dispose() {
 export {
     initialize,
     dispose,
+
+    SetPoiOutline,
+    clearOutlineObjects,
+    SetOutlineOptions,
 }

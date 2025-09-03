@@ -10,8 +10,8 @@ export interface FileResponse {
     fileStatus: string;
     createdAt: string;
     createdBy: string;
-    updatedAt: string;
-    updatedBy: string;
+    updatedAt?: string;
+    updatedBy?: string;
 }
 
 export interface FileError {

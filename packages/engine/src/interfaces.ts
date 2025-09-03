@@ -103,7 +103,7 @@ interface PoiCreateOption {
     id: string;
     iconUrl: string;
     modelUrl?: string;
-    displayText: string;
+    htmlString: string;
     property: { [key: string]: any };
 }
 
@@ -114,7 +114,7 @@ interface PoiImportOption {
     id: string;
     iconUrl: string;
     modelUrl?: string;
-    displayText: string;
+    htmlString: string;
     floorId: string;
     property: { [key: string]: any };
     position: Vector3;
@@ -226,6 +226,18 @@ interface DeferredRegisterationCallbackData {
     callback: Function;
 }
 
+/**
+ * 외각선 옵션
+ */
+interface OutlineOptions {
+    edgeStrength?: number; // 10.0
+    edgeGlow?: number; // 0.0
+    edgeThickness?: number; // 5.0
+    pulsePeriod?: number; // 0.0
+    visibleEdgeColor?: number | string | THREE.Color; // 0xffffff
+    hiddenEdgeColor?: number | string | THREE.Color; // 0xffffff
+}
+
 export {
     Vector3Custom,
     Vector3,
@@ -249,4 +261,5 @@ export {
     Label3DCreateOption,
     Label3DImportOption,
     DeferredRegisterationCallbackData,
+    OutlineOptions,
 }

@@ -11,19 +11,15 @@ export {
     GetAnimationList,
     Hide,
     HideAll,
-    HideAllDisplayText,
-    HideAllLine,
-    HideDisplayText,
-    HideLine,
+    HideAllHtmlObject,
+    HideHtmlObject,
     Import,
     PlayAnimation,
     SetTextInnerHtml,
     Show,
     ShowAll,
-    ShowAllDisplayText,
-    ShowAllLine,
-    ShowDisplayText,
-    ShowLine,
+    ShowAllHtmlObject,
+    ShowHtmlObject,
     StopAnimation
 } from './data';
 

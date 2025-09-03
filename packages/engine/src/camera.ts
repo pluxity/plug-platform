@@ -558,7 +558,9 @@ function SetState(state: Record<string, any>, transitionTime: number) {
  * @param id - poi id
  * @param transitionTime - 이동시간
  */
-function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset: number = 5.0) {
+function MoveToPoi(id: string, transitionTime: number, offset: Interfaces.Vector3) {
+
+    let offsetValue = { ...{ x: 0, y: 0, z: 0 }, ...offset };
 
     // poi데이터
     const poiElement = PoiDataInternal.getPoiElement(id);
@@ -578,7 +580,7 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
         bounding.getSize(boundSize);
 
         const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
-        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
+        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.PointMeshData.localSize.y);
 
         bounding.expandByPoint(p);
         const sphere = new THREE.Sphere();
@@ -597,7 +599,7 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
         bounding?.getSize(boundSize);
 
         const p = boundCenter.clone().addScaledVector(new THREE.Vector3(0, 1, 0), boundSize.y * 0.5);
-        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.LineHeight);
+        p.addScaledVector(new THREE.Vector3(0, 1, 0), poiElement.PointMeshData.localSize.y);
 
         bounding?.expandByPoint(p);
         const sphere = new THREE.Sphere();
@@ -610,13 +612,28 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
     // 카메라 방향
     const cameraDir = new THREE.Vector3();
     engine.Camera.getWorldDirection(cameraDir);
+    const cameraRightDir = new THREE.Vector3(1, 0, 0);
+    cameraRightDir.applyQuaternion(engine.Camera.quaternion);
 
     // poi 방향
     const poiDir = new THREE.Vector3(0, 1, 1).normalize();
     poiDir.applyEuler(poiElement.Rotation);
+    cameraRightDir.applyEuler(poiElement.Rotation);
 
     // 카메라 이동대상 위치점
-    const camPos = center.clone().addScaledVector(poiDir, radius + additionalDistanceOffset);
+    const camPos = center.clone().addScaledVector(poiDir, radius + 5.0);
+
+    // 최종위치에서 위치 오프셋 조정
+    const cameraUp = new THREE.Vector3().crossVectors(poiDir, cameraRightDir);
+    camPos.addScaledVector(cameraRightDir, offsetValue.x);
+    camPos.addScaledVector(cameraUp, offsetValue.y);
+    camPos.addScaledVector(poiDir, offsetValue.z);
+
+    const lookAtCurrent = engine.Camera.position.clone().addScaledVector(cameraDir, 1.0);
+    const lookAtFinal = center.clone();
+    lookAtFinal.addScaledVector(cameraRightDir, offsetValue.x);
+    lookAtFinal.addScaledVector(cameraUp, offsetValue.y);
+    lookAtFinal.addScaledVector(poiDir, offsetValue.z);
 
     // 이전 트윈 중지
     if (posTween instanceof TWEEN.Tween) {
@@ -639,17 +656,16 @@ function MoveToPoi(id: string, transitionTime: number, additionalDistanceOffset:
         .start();
 
     // 보는 위치
-    const lookAtPos = engine.Camera.position.clone().addScaledVector(cameraDir, 1.0);
-    rotTween = new TWEEN.Tween(lookAtPos)
+    rotTween = new TWEEN.Tween(lookAtCurrent)
         .to({
-            x: center.x,
-            y: center.y,
-            z: center.z,
+            x: lookAtFinal.x,
+            y: lookAtFinal.y,
+            z: lookAtFinal.z,
         }, transitionTime * 1000)
         .easing(TWEEN.Easing.Quartic.Out)
         .onUpdate(() => {
             // 카메라 바라보는 위치 업데이트
-            engine.Camera.lookAt(lookAtPos);
+            engine.Camera.lookAt(lookAtCurrent);
         })
         .start();
 
