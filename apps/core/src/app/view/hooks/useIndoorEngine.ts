@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { Camera, Poi, Interfaces, Event } from '@plug/engine'
+import { Camera, Poi, Interfaces } from '@plug/engine'
+import { useIndoorPoiEvents } from './useIndoorPoiEvents'
 import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services'
 import { useIndoorStore } from '@/app/store/indoorStore'
 
@@ -74,11 +75,7 @@ export function useIndoorEngine({
       try { onShowDevice(device, { poiId, feature }) } catch (e) { console.error('onShowDevice error', e) }
     }
   }, [featureMap, deviceByFeatureId, cctvByFeatureId, onShowCctv, onShowDevice])
-
-  const poiPointerUpListener = useCallback((event: unknown) => {
-    const target = (event as { target?: PoiTarget } | null | undefined)?.target
-    handlePoiSelect(target)
-  }, [handlePoiSelect])
+  useIndoorPoiEvents({ onPoiSelect: handlePoiSelect })
 
   const buildPoiData = useCallback((): Interfaces.PoiImportOption[] => {
     if (!activeFeatures?.length || !assets?.length) return []
@@ -118,13 +115,7 @@ export function useIndoorEngine({
     tryImportPois()
   }, [autoExtendView, tryImportPois])
 
-  useEffect(() => {
-    // 동일한 함수 참조를 등록/해제해야 누적되지 않음
-    Event.AddEventListener('onPoiPointerUp', poiPointerUpListener)
-    return () => {
-      Event.RemoveEventListener('onPoiPointerUp', poiPointerUpListener)
-    }
-  }, [poiPointerUpListener])
+  // (Pointer events moved out) – this hook now only exposes imperative handlers.
 
   useEffect(() => {
     importedRef.current = false
