@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@plug/ui'
 import { Move, RotateCcw, Scale, Square, Trash } from 'lucide-react'
 import { Poi } from '@plug/engine'
@@ -18,14 +18,14 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
   const [editMode, setEditMode] = useState<EditMode>(null)
   const [isDeleteMode, setIsDeleteMode] = useState(false)
 
-  const handleFinishEdit = () => {
+  const handleFinishEdit = useCallback(() => {
     try {
       if (isDeleteMode) {
-        // 삭제 모드 종료
         setIsDeleteMode(false)
         onDeleteMode?.(false)
-      } else if (isEditing) {
-        // 일반 편집 모드 종료
+        return
+      }
+      if (isEditing) {
         Poi.FinishEdit()
         setIsEditing(false)
         setEditMode(null)
@@ -33,49 +33,43 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
     } catch (error) {
       console.error('편집 종료 중 오류:', error)
     }
-  }
+  }, [isDeleteMode, isEditing, onDeleteMode])
 
-  const handleStartEdit = (mode: 'translate' | 'rotate' | 'scale') => {
+  const handleStartEdit = useCallback((mode: 'translate' | 'rotate' | 'scale') => {
     try {
-      // 현재 편집 중이면 먼저 종료
       if (isEditing) {
         Poi.FinishEdit()
       }
-      
-      // 현재 삭제 모드 중이면 종료
       if (isDeleteMode) {
-        setIsDeleteMode(false) 
+        setIsDeleteMode(false)
         onDeleteMode?.(false)
       }
-      
-      // 새로운 편집 시작
       Poi.StartEdit(mode)
       setIsEditing(true)
       setEditMode(mode)
     } catch (error) {
       console.error('편집 시작 중 오류:', error)
     }
-  }
+  }, [isEditing, isDeleteMode, onDeleteMode])
 
-  const handleDeleteMode = () => {
+  const handleDeleteMode = useCallback(() => {
     try {
       if (isDeleteMode) {
-        setIsDeleteMode(false);
-        onDeleteMode?.(false);
-      } else {
-        if (isEditing) {
-          Poi.FinishEdit();
-          setIsEditing(false);
-          setEditMode(null);
-        }
-        
-        setIsDeleteMode(true);
-        onDeleteMode?.(true);
+        setIsDeleteMode(false)
+        onDeleteMode?.(false)
+        return
       }
+      if (isEditing) {
+        Poi.FinishEdit()
+        setIsEditing(false)
+        setEditMode(null)
+      }
+      setIsDeleteMode(true)
+      onDeleteMode?.(true)
     } catch (error) {
-      console.error('삭제 모드 중 오류:', error);
+      console.error('삭제 모드 중 오류:', error)
     }
-  };
+  }, [isDeleteMode, isEditing, onDeleteMode])
 
   // ESC 키로 편집 종료
   useEffect(() => {
@@ -94,7 +88,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isEditing, isDeleteMode]) // 변경될 때마다 effect 재실행
+  }, [isEditing, isDeleteMode, handleFinishEdit]) 
 
   const isActiveMode = (mode: 'translate' | 'rotate' | 'scale') => {
     return isEditing && editMode === mode

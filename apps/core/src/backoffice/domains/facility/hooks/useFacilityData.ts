@@ -1,8 +1,18 @@
 import { useFacilitiesSWR, FacilityType, FacilityResponse, domainUtils, FacilityService } from '@plug/common-services';
+
+interface UseFacilityDataResult {
+  facilitiesByType: Record<FacilityType, FacilityResponse[]>;
+  isLoading: boolean;
+  error: string | null;
+  getFacilityCount: Record<FacilityType, number>;
+  getAllFacilities: (FacilityResponse & { facilityType: FacilityType })[];
+  deleteFacility: (id: number, facilityType: FacilityType) => Promise<void>;
+  refetch: () => Promise<unknown> | void;
+}
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 
-export const useFacilityData = () => {
+export const useFacilityData = (): UseFacilityDataResult => {
   const { data: facilitiesArray, error, isLoading, mutate } = useFacilitiesSWR();
 
   const getFacilityCount = useMemo(() => {
