@@ -1,8 +1,18 @@
 import { useFacilitiesSWR, FacilityType, FacilityResponse, domainUtils, FacilityService } from '@plug/common-services';
+
+interface UseFacilityDataResult {
+  facilitiesByType: Record<FacilityType, FacilityResponse[]>;
+  isLoading: boolean;
+  error: string | null;
+  getFacilityCount: Record<FacilityType, number>;
+  getAllFacilities: (FacilityResponse & { facilityType: FacilityType })[];
+  deleteFacility: (id: number, facilityType: FacilityType) => Promise<void>;
+  refetch: () => Promise<unknown> | void;
+}
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 
-export const useFacilityData = () => {
+export const useFacilityData = (): UseFacilityDataResult => {
   const { data: facilitiesArray, error, isLoading, mutate } = useFacilitiesSWR();
 
   const getFacilityCount = useMemo(() => {
@@ -19,7 +29,7 @@ export const useFacilityData = () => {
     if (!Array.isArray(facilitiesArray)) return [];
     return facilitiesArray.map((f) => ({
       ...f,
-      facilityType: (f as FacilityResponse & { type?: FacilityType }).type ?? 'BUILDING'
+  facilityType: (f as FacilityResponse & { type?: FacilityType }).type ?? 'BUILDING',
     }));
   }, [facilitiesArray]);
 
@@ -32,15 +42,15 @@ export const useFacilityData = () => {
       const errorObj = error as { status?: number; message?: string };
       if (errorObj?.status === 400) {
         toast.error('시설을 삭제할 수 없습니다', {
-          description: '다른 데이터에서 사용 중인 시설입니다.'
+          description: '다른 데이터에서 사용 중인 시설입니다.',
         });
       } else if (errorObj?.status === 409) {
         toast.error('시설을 삭제할 수 없습니다', {
-          description: '관련된 데이터가 있어 삭제할 수 없습니다.'
+          description: '관련된 데이터가 있어 삭제할 수 없습니다.',
         });
       } else {
         toast.error('시설 삭제에 실패했습니다', {
-          description: errorObj?.message || '알 수 없는 오류가 발생했습니다.'
+          description: errorObj?.message || '알 수 없는 오류가 발생했습니다.',
         });
       }
       throw error;
@@ -57,6 +67,6 @@ export const useFacilityData = () => {
     getFacilityCount,
     getAllFacilities,
     deleteFacility: handleDeleteFacility,
-    refetch: mutate
+  refetch: mutate,
   };
 };

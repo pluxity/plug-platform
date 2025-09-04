@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Model } from '@plug/engine';
 import type { Floor } from '@/global/types';
 
+import { useState, useEffect, useMemo } from 'react';
+
+import { Model } from '@plug/engine';
 interface FloorControlProps {
   floors?: Floor[];
   className?: string;

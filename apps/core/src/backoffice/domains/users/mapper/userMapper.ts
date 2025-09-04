@@ -1,6 +1,6 @@
-import { UserProfile } from '@plug/common-services/types';
 import { UserData } from '../types/user';
 
+import { UserProfile } from '@plug/common-services/types';
 export const UserMapper = (user: UserProfile): UserData => ({
     id: user.id,
     username: user.username,

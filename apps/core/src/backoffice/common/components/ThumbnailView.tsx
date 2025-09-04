@@ -1,6 +1,6 @@
-import React from 'react';
 import { Card, CardContent } from '@plug/ui';
 
+import React from 'react';
 interface ThumbnailViewProps {
   imageUrl?: string;
   title?: string;
@@ -12,7 +12,7 @@ export const ThumbnailView: React.FC<ThumbnailViewProps> = ({
   imageUrl,
   title,
   subtitle,
-  className = ""
+  className = '',
 }) => {
   return (
     <Card className={`overflow-hidden ${className}`}>

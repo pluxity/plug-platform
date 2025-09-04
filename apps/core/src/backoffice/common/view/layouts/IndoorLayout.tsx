@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Outlet } from 'react-router-dom'
 import { AssetListSideBar } from '@/backoffice/common/view/components/AssetListSidebar'
 
+import React, { useState } from 'react'
+import { Outlet } from 'react-router-dom'
 const IndoorLayout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   

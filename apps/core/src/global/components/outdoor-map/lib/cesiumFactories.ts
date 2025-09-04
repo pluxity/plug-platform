@@ -1,6 +1,6 @@
-import * as Cesium from 'cesium';
 import { VWORLD_API_KEY, VWORLD_MAP_URL, MapProvider } from '../constants';
 
+import * as Cesium from 'cesium';
 export function createImageryProvider(provider: MapProvider): Cesium.ImageryProvider {
   switch (provider) {
     case 'vworld':

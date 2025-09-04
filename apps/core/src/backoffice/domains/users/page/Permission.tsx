@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
-import { PageContainer } from '@/backoffice/common/view/layouts';
-import { PermissionData } from '@/backoffice/domains/users/types/permisson';
-import { usePermissions } from '@plug/common-services/services';
-import { PermissionMapper } from '@/backoffice/domains/users/mapper/permissionMapper';
-import { deletePermission } from '@plug/common-services/services';
-import { toast } from 'sonner';
-import { PermissionCreateModal } from '@/backoffice/domains/users/components/PermisstionCreateModal';
-import { PermissionEditModal } from '@/backoffice/domains/users/components/PermissionEditModal';
 import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 
+import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+
+import { usePermissions } from '@plug/common-services/services';
+import { deletePermission } from '@plug/common-services/services';
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+
+import { PageContainer } from '@/backoffice/common/view/layouts';
+import { PermissionEditModal } from '@/backoffice/domains/users/components/PermissionEditModal';
+import { PermissionCreateModal } from '@/backoffice/domains/users/components/PermisstionCreateModal';
+import { PermissionMapper } from '@/backoffice/domains/users/mapper/permissionMapper';
+import { PermissionData } from '@/backoffice/domains/users/types/permisson';
 const Permission: React.FC = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [deletePermissionData, setDeletePermissionData] = useState<PermissionData>();

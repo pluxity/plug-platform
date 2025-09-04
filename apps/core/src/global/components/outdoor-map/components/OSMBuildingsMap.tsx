@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
-import * as Cesium from 'cesium';
-import { Scene, Cesium3DTileset } from 'resium';
-import InitialCameraSetup from './CameraSetup';
-import { CESIUM_ION_ACCESS_TOKEN, CESIUM_ION_ASSET_ID } from '../constants';
-import { BaseCesiumViewer } from './BaseCesiumViewer';
 import { optimizeTileset, createTerrainProvider } from '../lib/cesiumFactories';
 
+import * as Cesium from 'cesium';
+import React, { useMemo } from 'react';
+import { Scene, Cesium3DTileset } from 'resium';
+
+import { CESIUM_ION_ACCESS_TOKEN, CESIUM_ION_ASSET_ID } from '../constants';
+import { BaseCesiumViewer } from './BaseCesiumViewer';
+import InitialCameraSetup from './CameraSetup';
 Cesium.Ion.defaultAccessToken = CESIUM_ION_ACCESS_TOKEN;
 
 interface OSMBuildingsMapProps {

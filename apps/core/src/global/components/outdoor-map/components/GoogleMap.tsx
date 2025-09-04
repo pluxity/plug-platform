@@ -1,11 +1,12 @@
-import React from 'react';
-import * as Cesium from 'cesium';
-import { Scene, Cesium3DTileset } from 'resium';
-import InitialCameraSetup from './CameraSetup';
-import { GOOGLE_MAPS_API_KEY } from '../constants';
-import { BaseCesiumViewer } from './BaseCesiumViewer';
 import { optimizeTileset } from '../lib/cesiumFactories';
 
+import * as Cesium from 'cesium';
+import React from 'react';
+import { Scene, Cesium3DTileset } from 'resium';
+
+import { GOOGLE_MAPS_API_KEY } from '../constants';
+import { BaseCesiumViewer } from './BaseCesiumViewer';
+import InitialCameraSetup from './CameraSetup';
 interface GoogleMapProps {
   className?: string;
   children?: React.ReactNode;

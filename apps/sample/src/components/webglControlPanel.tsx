@@ -930,6 +930,16 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             else
                 Effect.Outline.Clear();
         });
+        // poi 객체 포인터 이동 이벤트 등록
+        Event.AddEventListener('onPoiPointerMove' as never, (evt: any) => {
+
+            if (evt.target) {
+                Effect.Outline.SetPoiOutline(evt.target.id);
+                console.log('onPoiPointerMove', evt);
+            }
+            else
+                Effect.Outline.Clear();
+        });
         // 라벨 3d 편집 이벤트 등록
         Event.AddEventListener('onLabel3DTransformChange' as never, (evt: any) => {
             console.log('onLabel3DTransformChange', evt);
@@ -937,6 +947,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         // 라벨 3d 포인터업 이벤트 등록
         Event.AddEventListener('onLabel3DPointerUp' as never, (evt: any) => {
             console.log('onLabel3DPointerUp', evt);
+        });
+        // 라벨 3d 포인터이동 이벤트 등록
+        Event.AddEventListener('onLabel3DPointerMove' as never, (evt: any) => {
+            // console.log('onLabel3DPointerMove', evt);
         });
     }
 }

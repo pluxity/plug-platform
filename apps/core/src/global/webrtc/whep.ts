@@ -1,6 +1,4 @@
-export const buildWhepUrl = (host: string, port: string | number, path: string) => {
-  return `http://${host}:${port}/${encodeURIComponent(path)}/whep`;
-};
+export const buildWhepUrl = (host: string, port: string | number, path: string) => `http://${host}:${port}/${encodeURIComponent(path)}/whep`;
 
 export interface WhepNegotiationResult {
   answerSdp: string;
@@ -9,7 +7,7 @@ export interface WhepNegotiationResult {
 export async function performWhepNegotiation(
   pc: RTCPeerConnection,
   url: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<WhepNegotiationResult> {
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);

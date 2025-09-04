@@ -1,9 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input } from '@plug/ui';
-import { Upload, X, FileText, Image } from 'lucide-react';
-import { useFileUploadWithInfo, FileResponse } from '@plug/common-services';
 import { toast } from 'sonner';
 
+import { Upload, X, FileText, Image } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+
+import { useFileUploadWithInfo, FileResponse } from '@plug/common-services';
+import { Button, Input } from '@plug/ui';
 interface FileUploadProps {
   label: string;
   accept?: string;

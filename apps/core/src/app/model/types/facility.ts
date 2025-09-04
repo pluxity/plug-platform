@@ -1,4 +1,4 @@
-import { FileResponse } from "@plug/common-services";
+import { FileResponse } from '@plug/common-services';
 
 export interface PathInfo {
   id: number;
@@ -25,5 +25,5 @@ export interface Facility {
 }
 
 export interface FacilityResponse {
-  [key: string]: Facility[]
+  [key: string]: Facility[];
 }

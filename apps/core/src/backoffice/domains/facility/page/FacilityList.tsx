@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@plug/ui';
-import { 
-  FacilityResponse, 
-  FacilityType
-} from '@plug/common-services';
+
+import { FacilityResponse, FacilityType } from '@plug/common-services';
+
 import { PageContainer } from '@/backoffice/common/view/layouts';
+
+import { useFacilityData } from '../hooks/useFacilityData';
+
+import { Button } from '@plug/ui';
+
+import { CreateFacilityModal } from '../components/CreateFacilityModal';
 import FacilityCard from '../components/FacilityCard';
 import FacilityTypeFilter from '../components/FacilityTypeFilter';
 import Pagination from '../components/Pagination';
-import { CreateFacilityModal } from '../components/CreateFacilityModal';
-import { useFacilityData } from '../hooks/useFacilityData';
-
 const ITEMS_PER_PAGE = 8;
 
 const FacilityList: React.FC = () => {

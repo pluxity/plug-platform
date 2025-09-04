@@ -1,6 +1,6 @@
-import { AssetCategoryResponse } from "@plug/common-services/types";
 import { CategoryItem } from "@/backoffice/common/view/components/category";
 
+import { AssetCategoryResponse } from "@plug/common-services/types";
 export const assetCategoryMapper = (apiData: AssetCategoryResponse[]): CategoryItem[] => {
     return apiData.map(item => ({
       id: item.id.toString(),

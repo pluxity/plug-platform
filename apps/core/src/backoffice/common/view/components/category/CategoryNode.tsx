@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import { 
   Button, 
   Input, 
@@ -13,9 +14,11 @@ import {
   AlertDialogTitle, 
   AlertDialogTrigger 
 } from '@plug/ui'
+
 import { CategoryItem, DragState } from '@/backoffice/common/services/types/category'
-import { ThumbnailUploader } from './ThumbnailUploader'
 import { getChildrenCount } from '@/backoffice/common/services/hooks/useCategory'
+
+import { ThumbnailUploader } from './ThumbnailUploader'
 
 export interface CategoryNodeProps {
   item: CategoryItem

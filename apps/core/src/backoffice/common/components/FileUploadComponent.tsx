@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
-import { Upload, X, File, Image } from 'lucide-react';
-import { Button, Card, CardContent } from '@plug/ui';
 import { useFileUploadWithInfo } from '@plug/common-services';
 
+import { Upload, X, File, Image } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+
+import { Button, Card, CardContent } from '@plug/ui';
 interface FileItem {
   id: string;
   name: string;

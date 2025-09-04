@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef, useState } from 'react';
 import { CESIUM_CREDIT_CONTAINER_ID } from '../constants';
 
+import { useLayoutEffect, useRef, useState } from 'react';
 export function useCesiumCreditContainer(id: string = CESIUM_CREDIT_CONTAINER_ID) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [resolvedId, setResolvedId] = useState<string | null>(null);

@@ -1,7 +1,8 @@
-import React, { useMemo, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, Badge } from '@plug/ui'
 import { useUsersWithIsLoggedIn, useFacilities, domainUtils } from '@plug/common-services'
 
+import React, { useMemo, useEffect } from 'react'
+
+import { Card, CardContent, CardHeader, CardTitle, Badge } from '@plug/ui'
 const Dashboard: React.FC = () => {
   const { data: users, isLoading: isUsersLoading, execute: loadUsers } = useUsersWithIsLoggedIn();
   const activeUserCount = useMemo(() => {
