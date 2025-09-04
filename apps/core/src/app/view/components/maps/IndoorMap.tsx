@@ -242,7 +242,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
 
   return (
     <>
-      <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
+  {/* 실외로 나가기 버튼은 MainMap 에서 커스텀 레이아웃과 함께 표시하기 위해 비활성화 */}
+  <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} showOutdoorButton={false} />
       {selectedDevice && (
         <DeviceInfoDialog device={selectedDevice} hole={false} onClose={() => setSelectedDevice(null)} />
       )}

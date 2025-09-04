@@ -4,6 +4,7 @@ import IndoorMap from './IndoorMap';
 import OutdoorMap from './OutdoorMap';
 import type { FacilityType } from '@plug/common-services';
 import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities';
+import { UserProfile } from '@/global/components';
 
 enum MapMode {
   OUTDOOR = 'outdoor',
@@ -14,7 +15,6 @@ const MainMap: React.FC = () => {
   const location = useLocation();
   const navState = location.state as { facilityId?: number; facilityType?: FacilityType; mode?: string } | null;
 
-  // 초기 렌더에서 바로 실내 진입 요청이 들어온 경우(뒤로가기 등) OutdoorMap → IndoorMap 빠른 unmount race를 방지
   const initialIsIndoor = !!(navState?.mode === 'indoor' && navState.facilityId && navState.facilityType);
   const [mapMode, setMapMode] = useState<MapMode>(initialIsIndoor ? MapMode.INDOOR : MapMode.OUTDOOR);
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(initialIsIndoor ? navState?.facilityId ?? null : null);
@@ -22,16 +22,11 @@ const MainMap: React.FC = () => {
   useEnsureFacilities({ revalidateIfStale: true });
   const navigate = useNavigate();
 
-  // Facilities ensured via hook above.
-
-  // location.state 를 초기화(히스토리 정리) - 첫 렌더에서 이미 반영했다면 한 번만 replace
   useEffect(() => {
     if (initialIsIndoor && location.state) {
       navigate(location.pathname, { replace: true });
     }
-    // initialIsIndoor, location.pathname, navigate 만 의존 (location.state 사용 시 무한 루프 가능)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialIsIndoor, location.pathname, navigate]);
+  }, [initialIsIndoor, location.state, location.pathname, navigate]);
 
   const goOutdoor = useCallback(() => {
     setMapMode(MapMode.OUTDOOR);
@@ -54,13 +49,42 @@ const MainMap: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="w-full h-full relative">
+      {mapMode === MapMode.OUTDOOR && (
+        <div className="absolute top-4 right-4 z-50 pointer-events-auto">
+          <UserProfile />
+        </div>
+      )}
+      {mapMode === MapMode.INDOOR && (
+        <div className="absolute top-4 right-4 z-50 flex items-center gap-3 pointer-events-auto">
+          <button
+            type="button"
+            onClick={goOutdoor}
+            className="group relative h-11 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-cyan-600 text-white shadow-lg shadow-cyan-600/30 hover:from-sky-500 hover:to-cyan-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300/70 transition-all duration-300 px-0 pl-0 pr-0 overflow-hidden cursor-pointer"
+            title="실외 지도로 나가기"
+            aria-label="실외 지도로 나가기"
+          >
+            <div className="flex items-center">
+              <span className="flex items-center justify-center w-11">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </span>
+              <span className="whitespace-nowrap text-sm font-medium opacity-0 w-0 group-hover:opacity-100 group-hover:w-auto group-hover:pr-4 group-hover:pl-1 transition-all duration-300">
+                실외로 나가기
+              </span>
+            </div>
+          </button>
+          <UserProfile />
+        </div>
+      )}
+
       {mapMode === MapMode.OUTDOOR && (
         <OutdoorMap
           onFacilitySelect={handleFacilitySelect}
         />
       )}
-      
+
       {mapMode === MapMode.INDOOR && selectedFacilityId && selectedFacilityType && (
         <IndoorMap
           facilityId={selectedFacilityId}
@@ -68,7 +92,7 @@ const MainMap: React.FC = () => {
           onGoOutdoor={goOutdoor}
         />
       )}
-    </>
+    </div>
   );
 };
 
