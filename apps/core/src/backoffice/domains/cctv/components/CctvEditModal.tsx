@@ -1,12 +1,14 @@
-import React, { useCallback, useEffect } from 'react';
-import { toast } from 'sonner';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { baseCctvFormSchema, type CctvEditFormData } from '../schemas/cctvSchemas';
-import { CctvEditModalProps } from '../types/cctv';
-import { useForm } from 'react-hook-form';
-import { useCctvDetailSWR, useUpdateCctv } from '@plug/common-services';
 import { ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Dialog, DialogContent, DialogFooter, Input, Button } from '@plug/ui';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useCallback, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+import { useCctvDetailSWR, useUpdateCctv } from '@plug/common-services';
+
+import { baseCctvFormSchema, type CctvEditFormData } from '../schemas/cctvSchemas';
+import { CctvEditModalProps } from '../types/cctv';
 export const CctvEditModal: React.FC<CctvEditModalProps> = ({ isOpen, onClose, onSuccess, cctvId }) => {
 
     const { data } = useCctvDetailSWR(cctvId);

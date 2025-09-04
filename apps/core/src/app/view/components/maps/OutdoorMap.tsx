@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import * as Cesium from 'cesium'
-import { useFacilityStore } from '@/app/store/facilityStore'
-import type { FacilityType, FacilityResponse } from '@plug/common-services'
-import { OSMBuildingsMap, MapControls, CameraSetup } from '@/global/components/outdoor-map'
-import FacilityPOIs from './FacilityPOIs'
-import FacilitySearchForm from './FacilitySearchForm'
 import FacilityInfoDialog from '../dialogs/FacilityInfoDialog'
 
+import * as Cesium from 'cesium'
+import React, { useState } from 'react'
+
+import type { FacilityType, FacilityResponse } from '@plug/common-services'
+
+import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities'
+import { useFacilityStore } from '@/app/store/facilityStore'
+import { OSMBuildingsMap, MapControls, CameraSetup } from '@/global/components/outdoor-map'
+
+import FacilityPOIs from './FacilityPOIs'
+import FacilitySearchForm from './FacilitySearchForm'
 interface OutdoorMapProps {
   onFacilitySelect?: (facilityId: number, facilityType: FacilityType) => void;
 }
@@ -17,12 +21,7 @@ const OutdoorMap: React.FC<OutdoorMapProps> = ({ onFacilitySelect }) => {
   const [selectedFacility, setSelectedFacility] = useState<FacilityResponse | null>(null)
 
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
-  const loadFacilities = useFacilityStore(s => s.loadFacilities)
-  useEffect(() => {
-    if (!facilitiesFetched) {
-      loadFacilities()
-    }
-  }, [facilitiesFetched, loadFacilities])
+  useEnsureFacilities({ revalidateIfStale: true })
 
   const handleInitialLoadComplete = () => {
     setIsLoading(false)

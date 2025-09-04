@@ -1,22 +1,25 @@
+import { toast } from "sonner"
+
+import { Poi, Interfaces, Camera } from '@plug/engine'
+
+import { PageContainer } from '@/backoffice/common/view/layouts'
+
+import { usePoiEvents, PoiData } from '../hooks/usePoiEvents'
+
+import { ArrowLeft } from "lucide-react"
 import React, { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
-import { PageContainer } from '@/backoffice/common/view/layouts'
-import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
-import { IndoorMapViewer } from '@/global/components'
-import { FloorControl } from '@/global/components/indoor-map/FloorControl'
-import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
-import { ArrowLeft } from "lucide-react"
-import { IndoorMapEditTools } from '../components'
-import { FeatureAssignModal } from '../components/FeatureAssignModal'
-import { useAssets } from '@/global/store/assetStore'
-import { Poi, Event, Interfaces } from '@plug/engine'
-import { convertFloors } from '@/global/utils/floorUtils'
-import type { Floor } from '@/global/types'
-import { toast } from "sonner"
-import { useCctvData } from '../hooks/useCctvData'
-import { useDeviceData } from '../hooks/useDeviceData'
-import { poiUnassignedText, poiAssignedText } from '@/global/utils/displayUtils'
 
+import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
+
+import { IndoorMapViewer, FloorControl } from '@/global/components'
+import { useAssets } from '@/global/store'
+import type { Floor } from '@/global/types'
+import { convertFloors, poiUnassignedText, poiAssignedText } from '@/global/utils'
+
+import { IndoorMapEditTools, FeatureAssignModal } from '../components'
+import { useCctvData, useDeviceData } from '../hooks'
 type FacilityData = {
   facility?: {
     id: number
@@ -32,33 +35,10 @@ type FacilityData = {
   boundary?: string
 }
 
-interface PoiTransformEvent {
-  targets: PoiData[]
-}
+// 이벤트 타입은 usePoiEvents 훅 내부 정의 사용
 
-export interface PoiData {
-  id: string;
-  htmlString: string;
-  iconUrl: string;
-  modelUrl: string;
-  property?: {
-    assetId: number;
-    assetCode: string;
-    assetName: string;
-    categoryId: number;
-    categoryName?: string;
-    deviceId?: string;
-  };
-  floorId: string;
-  position: { x: number; y: number; z: number };
-  rotation: { x: number; y: number; z: number };
-  scale: { x: number; y: number; z: number };
-}
 
-type PoiClickEvent = {
-  type: string;
-  target: PoiData
-}
+// 클릭 이벤트 타입도 훅 내부 정의 사용
 
 const FacilityIndoor: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -117,56 +97,39 @@ const FacilityIndoor: React.FC = () => {
     setSelectedFeature(null)
   }
 
-  // POI 클릭 이벤트 (삭제/할당)
-  const handleFeatureClick = useCallback((eventData: PoiClickEvent) => {
-    const poiData = eventData.target;
-    
-    if (isDeleteMode) {
-      setSelectedFeature(poiData);
-      setShowDeleteDialog(true);
-    } else {
-      setSelectedFeature(poiData);
-      setShowFeatureAssignDialog(true);
-    }
-  }, [isDeleteMode]);
-
-  useEffect(() => {
-    Event.AddEventListener('onPoiPointerUp' as never, handleFeatureClick);
-
-    return () => {
-      Event.RemoveEventListener('onPoiPointerUp' as never, handleFeatureClick);
-    };
-  }, [handleFeatureClick]); 
-
-
-  // POI 편집 이벤트
-  useEffect(() => {
-    const handleTransformChange = async (evt: PoiTransformEvent) => {
-      try {
-        const editedPois = evt.targets || [];
-        if (!editedPois.length) return;
-                
-        await Promise.all(
-          editedPois.map((poi: PoiData) => {
-            return updateFeatureTransform(poi.id, {
-              position: poi.position,
-              rotation: poi.rotation,
-              scale: poi.scale
-            });
-          })
-        )
-        toast.success('POI 편집이 완료되었습니다.');
-      } catch (error) {
-        console.error('POI 정보 업데이트 중 오류:', error);
-      }
-    };
-
-    Event.AddEventListener('onPoiFinishEdit' as never, handleTransformChange);
-
-    return () => {
-      Event.RemoveEventListener('onPoiFinishEdit' as never, handleTransformChange);
-    };
+  // POI 이벤트 콜백 (삭제 모드 / 할당 모드 구분)
+  const handlePointerDelete = useCallback((poi: PoiData) => {
+    setSelectedFeature(poi);
+    setShowDeleteDialog(true);
   }, []);
+
+  const handlePointerAssign = useCallback((poi: PoiData) => {
+    setSelectedFeature(poi);
+    setShowFeatureAssignDialog(true);
+  }, []);
+
+  const handleTransformFinished = useCallback(async (targets: PoiData[]) => {
+    try {
+      await Promise.all(
+        targets.map((poi: PoiData) => updateFeatureTransform(poi.id, {
+          position: poi.position,
+          rotation: poi.rotation,
+          scale: poi.scale
+        }))
+      );
+      toast.success('POI 편집이 완료되었습니다.');
+    } catch (error) {
+      console.error('POI 정보 업데이트 중 오류:', error);
+    }
+  }, []);
+
+  // 공통 엔진 이벤트 등록 훅
+  usePoiEvents({
+    isDeleteMode,
+    onPointerDelete: handlePointerDelete,
+    onPointerAssign: handlePointerAssign,
+    onTransformFinished: handleTransformFinished,
+  });
  
 
   // Features 로드를 위한 함수
@@ -213,7 +176,7 @@ const FacilityIndoor: React.FC = () => {
     } catch(error){
       console.error("장비 할당 중 오류가 발생했습니다.", error);
     }
-  }, [getAllCctvs, getAllDevices, mutateCctvs, mutateDevices, getPoiDisplayText]);
+  }, [getAllCctvs, getAllDevices, mutateCctvs, mutateDevices]);
 
   // POI Import 함수 수정
   const tryImportPois = useCallback(() => {
@@ -272,6 +235,8 @@ const FacilityIndoor: React.FC = () => {
 
   const handleLoadComplete = useCallback(() => {
     engineReadyRef.current = true;
+    Camera.ExtendView(1);
+    console.log('Load Complete');
     tryImportPois();
   }, [tryImportPois]);
 
@@ -418,7 +383,7 @@ const FacilityIndoor: React.FC = () => {
           )}
           
           {has3DDrawing === true && facilityType && (
-            <div className="h-168 relative">
+            <div className="h-180 relative">
               <IndoorMapViewer 
                 modelUrl={facilityData?.facility?.drawing?.url || ''}
                 className="w-full h-full"

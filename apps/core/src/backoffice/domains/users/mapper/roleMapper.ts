@@ -1,6 +1,6 @@
-import { RoleResponse } from '@plug/common-services/types';
 import { RoleData } from '../types/role';
 
+import { RoleResponse } from '@plug/common-services/types';
 export const RoleMapper = (role: RoleResponse): RoleData => ({
     id: role.id,
     name: role.name,

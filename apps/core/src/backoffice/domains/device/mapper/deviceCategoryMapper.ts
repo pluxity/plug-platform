@@ -1,6 +1,6 @@
-import { DeviceCategoryResponse } from '@plug/common-services/types';
 import { CategoryItem } from '@/backoffice/common/view/components/category';
 
+import { DeviceCategoryResponse } from '@plug/common-services/types';
 export const DeviceCategoryMapper = (deviceCategory: DeviceCategoryResponse[]): CategoryItem[] => {
     return deviceCategory.map(item => ({
         id: item.id.toString(),

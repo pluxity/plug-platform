@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
-import { PageContainer } from '@/backoffice/common/view/layouts'
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
-import { toast } from 'sonner';
-import { UserData } from '@/backoffice/domains/users/types/user'
-import { UserMapper } from '@/backoffice/domains/users/mapper/userMapper'
-import { useUsersSWR, deleteUser, initUserPassword } from '@plug/common-services/services'
-import { UserCreateModal } from '../components/UserCreateModal'
-import { UserEditModal } from '../components/UserEditModal'
 import { useRolesSWR } from '@plug/common-services/services';
 
+import React, { useState } from 'react'
+import { toast } from 'sonner';
+
+import { useUsersSWR, deleteUser, initUserPassword } from '@plug/common-services/services'
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
+
+import { PageContainer } from '@/backoffice/common/view/layouts'
+import { UserMapper } from '@/backoffice/domains/users/mapper/userMapper'
+import { UserData } from '@/backoffice/domains/users/types/user'
+
+import { UserCreateModal } from '../components/UserCreateModal'
+import { UserEditModal } from '../components/UserEditModal'
 const User: React.FC = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);

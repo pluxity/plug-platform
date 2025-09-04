@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import { Core, Loader } from '@plug/engine';
 
+import { useEffect, useRef, useState } from 'react';
 interface IndoorMapViewerProps {
   modelUrl: string;
   className?: string;
@@ -20,6 +20,9 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
   const loadTimeoutRef = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  // Keep latest onLoadComplete without causing re-run of model load effect
+  const onLoadCompleteRef = useRef<typeof onLoadComplete>(undefined);
+  useEffect(() => { onLoadCompleteRef.current = onLoadComplete; }, [onLoadComplete]);
 
   // 컴포넌트 마운트 시 엔진 초기화 (매 마운트마다 수행)
   useEffect(() => {
@@ -42,10 +45,11 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       return () => { /* no-op */ };
     }
 
-    // 이미 동일 모델이라면 재요청 방지
+    // 이미 동일 모델이라면 재요청 방지 (onLoadComplete 변경만으로 재호출 방지)
     if (loadedModelUrlRef.current === modelUrl) {
       setIsLoading(false);
-      onLoadComplete?.();
+      // call latest callback once if model already loaded
+      onLoadCompleteRef.current?.();
       return () => { /* no-op */ };
     }
 
@@ -66,7 +70,7 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
       }
       setIsLoading(false);
       loadedModelUrlRef.current = modelUrl;
-      onLoadComplete?.();
+      onLoadCompleteRef.current?.();
     });
 
     return () => {
@@ -76,21 +80,15 @@ export const IndoorMapViewer: React.FC<IndoorMapViewerProps> = ({
         loadTimeoutRef.current = null;
       }
     };
-  }, [modelUrl, onLoadComplete]);
+  }, [modelUrl]);
 
-  // 컴포넌트 언마운트 시 엔진 정리
   useEffect(() => {
     return () => {
-      // 남아있는 타임아웃 해제
       if (loadTimeoutRef.current) {
         clearTimeout(loadTimeoutRef.current);
         loadTimeoutRef.current = null;
       }
-      // 외부 엔진 정리 훅 호출 및 향후 엔진 clear 지원과의 연동
-      // 엔진 메모리 해제 (Canvas 포함 제거) - README 2025-08-26 업데이트 참고
-      try {
-        Core.Dispose();
-      } catch { /* ignore */ }
+      Core.Dispose();
       loadedModelUrlRef.current = null;
       onDispose?.();
     };

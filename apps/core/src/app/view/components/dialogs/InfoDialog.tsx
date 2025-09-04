@@ -1,27 +1,27 @@
-import React from 'react'
+import React from 'react';
 
 export interface InfoDialogHoleConfig { x?: string; y?: string; w?: string; h?: string }
 
 export interface InfoDialogProps {
-  open: boolean
-  title: string
-  onClose?: () => void
-  hole?: InfoDialogHoleConfig | false
-  headerActions?: React.ReactNode
-  badges?: React.ReactNode
-  children?: React.ReactNode
-  footer?: React.ReactNode
-  className?: string
-  leftPlaceholderWidth?: string
-  variant?: 'default' | 'compact'
-  titleClassName?: string
-  bodyClassName?: string
-  dialogHeightClass?: string
-  dialogWidthClass?: string
+  open: boolean;
+  title: string;
+  onClose?: () => void;
+  hole?: InfoDialogHoleConfig | false;
+  headerActions?: React.ReactNode;
+  badges?: React.ReactNode;
+  children?: React.ReactNode;
+  footer?: React.ReactNode;
+  className?: string;
+  leftPlaceholderWidth?: string;
+  variant?: 'default' | 'compact';
+  titleClassName?: string;
+  bodyClassName?: string;
+  dialogHeightClass?: string;
+  dialogWidthClass?: string;
 }
 
 // Reduced default hole size for a more compact layout
-const defaultHole: Required<InfoDialogHoleConfig> = { x: '1.75rem', y: '1.75rem', w: '32rem', h: '24rem' }
+const defaultHole: Required<InfoDialogHoleConfig> = { x: '1.75rem', y: '1.75rem', w: '32rem', h: '24rem' };
 
 export const InfoDialog = ({
   open,
@@ -38,11 +38,11 @@ export const InfoDialog = ({
   titleClassName,
   bodyClassName,
   dialogHeightClass,
-  dialogWidthClass
+  dialogWidthClass,
 }: InfoDialogProps) => {
-  if (!open) return null
+  if (!open) return null;
 
-  const appliedHole = hole && { ...defaultHole, ...hole }
+  const appliedHole = hole && { ...defaultHole, ...hole };
   const maskStyle: React.CSSProperties | undefined = appliedHole ? {
     WebkitMask: 'linear-gradient(#000 0 0), linear-gradient(#000 0 0)',
     mask: 'linear-gradient(#000 0 0), linear-gradient(#000 0 0)',
@@ -54,23 +54,23 @@ export const InfoDialog = ({
     maskPosition: `0 0, ${appliedHole.x} ${appliedHole.y}`,
     WebkitMaskSize: `100% 100%, ${appliedHole.w} ${appliedHole.h}`,
     maskSize: `100% 100%, ${appliedHole.w} ${appliedHole.h}`
-  } : undefined
+  } : undefined;
 
-  const isCompact = variant === 'compact'
+  const isCompact = variant === 'compact';
 
   const sizeClass = isCompact
     ? 'w-auto'
     : [
         dialogWidthClass || 'w-[52rem]', // width only; height becomes dynamic
         'max-w-[72rem]'
-      ].join(' ')
+  ].join(' ');
 
-  const dynamicSizingStyle: React.CSSProperties = {}
+  const dynamicSizingStyle: React.CSSProperties = {};
   if (!isCompact && appliedHole) {
-    dynamicSizingStyle.minHeight = `calc(${appliedHole.y} + ${appliedHole.h} + 1.5rem)`
+  dynamicSizingStyle.minHeight = `calc(${appliedHole.y} + ${appliedHole.h} + 1.5rem)`;
   }
   if (!isCompact && !dialogHeightClass) {
-    dynamicSizingStyle.height = 'auto'
+  dynamicSizingStyle.height = 'auto';
   } 
   
   const containerBase = [
@@ -78,25 +78,25 @@ export const InfoDialog = ({
     'from-slate-900/90 via-slate-800/80 to-slate-700/70 backdrop-blur-sm',
     'border border-white/10 shadow-2xl rounded-2xl',
     sizeClass
-  ].join(' ')
+  ].join(' ');
 
   const bodyWrapperClass = isCompact
     ? 'flex flex-col flex-1 p-3 gap-3 pointer-events-auto overflow-hidden relative'
-    : 'flex flex-col flex-1 p-5 gap-6 pointer-events-auto overflow-hidden relative'
+  : 'flex flex-col flex-1 p-5 gap-6 pointer-events-auto overflow-hidden relative';
 
   const bodyInlineStyle: React.CSSProperties | undefined = (!isCompact && appliedHole)
     ? { paddingTop: appliedHole.y }
-    : undefined
+  : undefined;
 
   const closeBtnClass = isCompact
     ? 'absolute top-2 right-2 w-7 h-7 rounded-md flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
-    : 'absolute top-3 right-3 w-12 h-12 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
+  : 'absolute top-3 right-3 w-12 h-12 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition';
 
   const titleClass = [
     isCompact ? 'text-base font-semibold tracking-tight text-white' : 'text-[1.5rem] leading-snug font-semibold tracking-tight text-white drop-shadow',
     'break-words',
     titleClassName || ''
-  ].join(' ')
+  ].join(' ');
 
   return (
     <div className="pointer-events-none fixed inset-0 flex items-center justify-center z-[70] p-2">
@@ -140,7 +140,7 @@ export const InfoDialog = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default InfoDialog
+export default InfoDialog;

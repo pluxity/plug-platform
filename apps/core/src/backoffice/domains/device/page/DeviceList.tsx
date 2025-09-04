@@ -1,15 +1,17 @@
-import React, {useState} from 'react';
-import { PageContainer } from '@/backoffice/common/view/layouts';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
-import { useDevicesSWR } from '@plug/common-services/services';
-import { DeviceMapper } from '@/backoffice/domains/device/mapper/deviceMapper';
-import { deleteDevice, useDeviceCategoryTree } from '@plug/common-services';
-import { DeviceCategoryResponse } from '@plug/common-services/types';
-import { DeviceCreateModal } from '@/backoffice/domains/device/components/DeviceCreateModal';
-import { DeviceEditModal } from '@/backoffice/domains/device/components/DeviceEditModal';
-import { DeviceData } from '@/backoffice/domains/device/types/device';
 import { toast } from 'sonner';
 
+import React, {useState} from 'react';
+
+import { deleteDevice, useDeviceCategoryTree } from '@plug/common-services';
+import { useDevicesSWR } from '@plug/common-services/services';
+import { DeviceCategoryResponse } from '@plug/common-services/types';
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+
+import { PageContainer } from '@/backoffice/common/view/layouts';
+import { DeviceCreateModal } from '@/backoffice/domains/device/components/DeviceCreateModal';
+import { DeviceEditModal } from '@/backoffice/domains/device/components/DeviceEditModal';
+import { DeviceMapper } from '@/backoffice/domains/device/mapper/deviceMapper';
+import { DeviceData } from '@/backoffice/domains/device/types/device';
 const DeviceList: React.FC = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [category, setCategory] = useState("all");
@@ -87,53 +89,73 @@ const DeviceList: React.FC = () => {
         }
     ]
 
+    const headerClassName = "h-10 px-3 flex flex-1 justify-center items-center font-medium";
+    const cellClassName = "h-10 px-3 flex flex-1 items-center justify-center text-sm truncate";
+
     const columns = [
         {
-            accessorKey: 'id',
-            header: 'ID',
+            accessorKey: 'companyType',
+            header: () => <div className={`w-36 ${headerClassName}`}>회사 타입</div>,
+            cell: ({ row }: { row: { original: DeviceData } }) => (
+                <div className={`w-36 ${cellClassName}`} title={row.original.companyType}>{row.original.companyType}</div>
+            )
+        },
+        {
+            accessorKey: 'deviceType',
+            header: () => <div className={`w-36 ${headerClassName}`}>디바이스 타입</div>,
+            cell: ({ row }: { row: { original: DeviceData } }) => (
+                <div className={`w-36 ${cellClassName}`} title={row.original.deviceType}>{row.original.deviceType}</div>
+            )
         },
         {
             accessorKey: 'categoryName',
-            header: '디바이스 카테고리',
-        },    
+            header: () => <div className={`w-36 ${headerClassName}`}>카테고리</div>,
+            cell: ({ row }: { row: { original: DeviceData } }) => (
+                <div className={`w-36 ${cellClassName}`} title={row.original.categoryName}>{row.original.categoryName}</div>
+            )
+        },
+        {
+            accessorKey: 'id',
+            header: () => <div className={`w-96 ${headerClassName}`}>ID</div>,
+            cell: ({ row }: { row: { original: DeviceData } }) => (
+                <div className={`w-96 ${cellClassName}`} title={row.original.id}>{row.original.id}</div>
+            )
+        },
         {
             accessorKey: 'name',
-            header: '디바이스 이름',
-        },  
-        {
-            accessorKey: 'companyType',
-            header: '디바이스 회사 타입',
-        },  
-        {
-            accessorKey: 'deviceType',
-            header: '디바이스 타입',
+            header: () => <div className={`w-36 ${headerClassName}`}>디바이스 이름</div>,
+            cell: ({ row }: { row: { original: DeviceData } }) => (
+                <div className={`w-36 ${cellClassName}`} title={row.original.name}>{row.original.name}</div>
+            )
         },
         {
             id: 'actions',
-            header: '관리',
+            header: () => <div className={`w-10 ${headerClassName}`}>관리</div>,
             cell: ({ row }: { row: { original: DeviceData } }) => (
-                <div className="flex space-x-2">
+                <div className={`w-10 ${cellClassName} gap-1`}>
                     <Button variant="secondary" size="sm" onClick={() => row.original.id && handleEdit(row.original.id)}>수정</Button>
                     <Button variant="outline" size="sm" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
             ),
         },
-    ]
+    ];
 
     return (
         <PageContainer title="디바이스 관리">
             <Card>
                 <CardContent>
-                    <DataTable
-                        columns={columns}
-                        data={filteredDeviceData}
-                        pageSize={12}
-                        showFilter={true}
-                        filterPlaceholder="디바이스 이름으로 검색하세요."
-                        filterColumnKey="name"
-                        selects={selects}
-                        buttons={<Button onClick={handleCreate}>등록</Button>}
-                    />
+                    <div className="overflow-x-auto">
+                        <DataTable
+                            columns={columns}
+                            data={filteredDeviceData}
+                            pageSize={12}
+                            showFilter={true}
+                            filterPlaceholder="디바이스 이름으로 검색하세요."
+                            filterColumnKey="name"
+                            selects={selects}
+                            buttons={<Button onClick={handleCreate}>등록</Button>}
+                        />
+                    </div>
                 </CardContent>
             </Card>
 

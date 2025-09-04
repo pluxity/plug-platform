@@ -1,54 +1,57 @@
-import type { DeviceResponse } from '@plug/common-services'
-import InfoDialog from './InfoDialog'
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services'
-import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device'
-import { formatKoreanDateTime } from '@/global/util/date'
-import DeviceMetricCharts from './DeviceMetricCharts'
+import DeviceMetricCharts from './DeviceMetricCharts';
 
+import { useState, useEffect, useMemo, useRef } from 'react';
+
+import type { DeviceResponse } from '@plug/common-services';
+
+import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device';
+import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services';
+import { formatKoreanDateTime } from '@/global/utils/date';
+
+import InfoDialog from './InfoDialog';
 export interface DeviceInfoDialogProps {
-  device: DeviceResponse
-  onClose?: () => void
-  hole?: { x?: string; y?: string; w?: string; h?: string } | false
+  device: DeviceResponse;
+  onClose?: () => void;
+  hole?: { x?: string; y?: string; w?: string; h?: string } | false;
 }
 
 // const DEFAULT_DEVICE_HOLE = { x: '1.25rem', y: '1.25rem', w: '28rem', h: '22rem' }
 
 const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
-  const [selectedPeriod, setSelectedPeriod] = useState<'day' | 'week' | 'month'>('day')
+  const [selectedPeriod, setSelectedPeriod] = useState<'day' | 'week' | 'month'>('day');
 
   useEffect(() => {
-    setSelectedPeriod('day')
-  }, [device?.id])
+    setSelectedPeriod('day');
+  }, [device?.id]);
 
   const { from, to, interval } = useMemo(() => {
-    const preset = DEVICE_PERIOD_PRESETS[selectedPeriod]
-    const end = new Date()
-    end.setMinutes(0, 0, 0)
-    const toDate = end.toISOString()
-    const fromDate = new Date(end.getTime() - preset.days * 24 * 60 * 60 * 1000).toISOString()
-    return { from: fromDate, to: toDate, interval: preset.interval }
-  }, [selectedPeriod])
+    const preset = DEVICE_PERIOD_PRESETS[selectedPeriod];
+    const end = new Date();
+    end.setMinutes(0, 0, 0);
+    const toDate = end.toISOString();
+    const fromDate = new Date(end.getTime() - preset.days * 24 * 60 * 60 * 1000).toISOString();
+    return { from: fromDate, to: toDate, interval: preset.interval };
+  }, [selectedPeriod]);
 
-  const timeSeriesParams = useMemo(() => ({ from, to, interval }), [from, to, interval])
-  const { data: deviceMetricSeries, isLoading } = useDeviceTimeSeriesSWR(device.companyType, device.deviceType, device.id, timeSeriesParams)
+  const timeSeriesParams = useMemo(() => ({ from, to, interval }), [from, to, interval]);
+  const { data: deviceMetricSeries, isLoading } = useDeviceTimeSeriesSWR(device.companyType, device.deviceType, device.id, timeSeriesParams);
   // Refresh interval adjusted to 1 minute (from previous 6 seconds)
   const { data: latestRaw, isLoading: isLatestLoading } = useDeviceLatestNormalizedSWR(
     device.companyType,
     device.deviceType,
     device.id,
     { refreshInterval: 60000 }
-  )
-  const lastSeriesRef = useRef<typeof deviceMetricSeries | null>(null)
-  if (deviceMetricSeries) lastSeriesRef.current = deviceMetricSeries
-  const effectiveSeries = deviceMetricSeries || lastSeriesRef.current
-  const latestMap = useMemo(() => normalizeLatest(latestRaw), [latestRaw])
+  );
+  const lastSeriesRef = useRef<typeof deviceMetricSeries | null>(null);
+  if (deviceMetricSeries) lastSeriesRef.current = deviceMetricSeries;
+  const effectiveSeries = deviceMetricSeries || lastSeriesRef.current;
+  const latestMap = useMemo(() => normalizeLatest(latestRaw), [latestRaw]);
 
 
   const firstTimestamp = useMemo(() => {
-    const first = Object.values(latestMap)[0]
-    return first?.timestamp
-  }, [latestMap])
+    const first = Object.values(latestMap)[0];
+    return first?.timestamp;
+  }, [latestMap]);
 
   const badges = (
     <>
@@ -63,7 +66,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
         </span>
       )}
     </>
-  )
+  );
 
   const body = (
     <div className="flex flex-col gap-5 flex-1 overflow-hidden">
@@ -140,7 +143,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
         </div>
       </section>
     </div>
-  )
+  );
 
   return (
     <InfoDialog
@@ -157,7 +160,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
     >
       {body}
     </InfoDialog>
-  )
-}
+  );
+};
 
-export default DeviceInfoDialog
+export default DeviceInfoDialog;

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button } from '@plug/ui';
 import { Check, ChevronsUpDown } from 'lucide-react';
+
 import {
+  Button,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -9,8 +10,6 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@plug/ui';
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,

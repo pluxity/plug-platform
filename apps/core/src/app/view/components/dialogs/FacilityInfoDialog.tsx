@@ -1,15 +1,15 @@
-import type { FacilityResponse } from '@plug/common-services'
-import InfoDialog from './InfoDialog'
+import InfoDialog from './InfoDialog';
 
+import type { FacilityResponse } from '@plug/common-services';
 export interface FacilityInfoDialogProps {
-  facility: FacilityResponse | null
-  onClose?: () => void
-  onEnterIndoor?: (facility: FacilityResponse) => void
-  hole?: { x?: string; y?: string; w?: string; h?: string } | false
+  facility: FacilityResponse | null;
+  onClose?: () => void;
+  onEnterIndoor?: (facility: FacilityResponse) => void;
+  hole?: { x?: string; y?: string; w?: string; h?: string } | false;
 }
 
 const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: FacilityInfoDialogProps) => {
-  if (!facility) return null
+  if (!facility) return null;
 
   const badges = (
     <>
@@ -24,7 +24,7 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
         </span>
       )}
     </>
-  )
+  );
 
   const headerActions = onEnterIndoor && (
     <button
@@ -33,7 +33,7 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
     >
       <span>실내로 진입</span>
     </button>
-  )
+  );
 
   // 위치 블록 (맨 위)
   const locationBlock = (facility.lat && facility.lon) ? (
@@ -42,7 +42,7 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
       <div className="font-mono">Lat: {facility.lat.toFixed(6)}</div>
       <div className="font-mono">Lon: {facility.lon.toFixed(6)}</div>
     </div>
-  ) : null
+  ) : null;
 
   // 상세 설명 블록 (헤더 포함)
   const descriptionBlock = facility.description ? (
@@ -68,7 +68,7 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
         </div>
       )}
     </div>
-  ) : null
+  ) : null;
 
   const indoorBtn = onEnterIndoor ? (
     <button
@@ -77,19 +77,19 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
     >
       <span className="relative pr-1">실내로 진입하기</span>
     </button>
-  ) : null
+  ) : null;
 
   const footer = (indoorBtn || metaDates) ? (
     <div className="w-full flex flex-wrap items-start justify-between gap-6">
       {indoorBtn}
       <div className="ml-auto flex items-start gap-6">{metaDates}</div>
     </div>
-  ) : undefined
+  ) : undefined;
 
   // hole 사이즈 기본 축소 + 여백 확보
   // Further reduce default hole size when not explicitly provided
-  const effectiveHole = hole === undefined ? { x: '1.5rem', y: '1.5rem', w: '26rem', h: '20rem' } : hole
-  const leftPlaceholderWidth = (effectiveHole && typeof effectiveHole === 'object') ? `calc(${effectiveHole.x || '1.5rem'} + ${effectiveHole.w || '26rem'})` : undefined
+  const effectiveHole = hole === undefined ? { x: '1.5rem', y: '1.5rem', w: '26rem', h: '20rem' } : hole;
+  const leftPlaceholderWidth = (effectiveHole && typeof effectiveHole === 'object') ? `calc(${effectiveHole.x || '1.5rem'} + ${effectiveHole.w || '26rem'})` : undefined;
 
   return (
     <InfoDialog
@@ -107,7 +107,7 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
         {descriptionBlock}
       </div>
     </InfoDialog>
-  )
-}
+  );
+};
 
-export default FacilityInfoDialog
+export default FacilityInfoDialog;

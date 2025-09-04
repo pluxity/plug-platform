@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { buildWhepUrl, performWhepNegotiation, prepareReceiverPeerConnection } from '@/global/webrtc/whep'
 
+import { useCallback, useEffect, useRef, useState } from 'react'
 export interface UseWebRTCReceiverOptions {
   host: string
   path: string

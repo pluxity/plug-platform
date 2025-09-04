@@ -1,6 +1,6 @@
-import { AssetResponse } from '@plug/common-services/types';
 import { AssetData } from '../types/asset';
 
+import { AssetResponse } from '@plug/common-services/types';
 export const AssetMapper = (asset: AssetResponse): AssetData => ({
   categoryId: asset.categoryId,
   categoryName: asset.categoryName || '',

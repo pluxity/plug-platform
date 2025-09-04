@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
-import { FeatureAssignCombobox } from './FeatureAssignCombobox';
-import { useCctvData } from '../hooks/useCctvData';
-import { useDeviceData } from '../hooks/useDeviceData';
-import { CctvResponse, DeviceResponse, assignDeviceToFeature } from '@plug/common-services';
 import { toast } from 'sonner';
 
+import { CctvResponse, DeviceResponse, assignDeviceToFeature } from '@plug/common-services';
+
+import { useDeviceData } from '../hooks/useDeviceData';
+
+import { useState, useEffect, useCallback } from 'react';
+
+import { Button, Label, Dialog, DialogContent, DialogFooter, RadioGroup, RadioGroupItem, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+
+import { useCctvData } from '../hooks/useCctvData';
+import { FeatureAssignCombobox } from './FeatureAssignCombobox';
 interface FeatureAssignModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,7 +35,7 @@ export function FeatureAssignModal({
 
   const selectedItem = currentItems.find(item => item.id === selectedId);
   
-  const isSelectedItemAssigned = (): boolean => {
+  const isSelectedItemAssigned = useCallback((): boolean => {
     if (!selectedItem) return false;
     
     if (selectedType === 'CCTV') {
@@ -39,7 +43,7 @@ export function FeatureAssignModal({
     } else{
       return Boolean((selectedItem as DeviceResponse)?.feature?.id);
     }
-  };
+  }, [selectedItem, selectedType]);
 
   useEffect(() => {
     if (open) {
@@ -49,10 +53,10 @@ export function FeatureAssignModal({
   }, [open]);
 
   useEffect(() => {
-    if (selectedId &&isSelectedItemAssigned()) {
+    if (selectedId && isSelectedItemAssigned()) {
       setIsConfirmOpen(true);
-      }
-  }, [selectedItem, selectedId]);
+    }
+  }, [selectedItem, selectedId, isSelectedItemAssigned]);
 
   const handleSubmit = async () => {
     if (!selectedId || !featureId || !selectedItem) return;

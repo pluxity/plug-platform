@@ -1,4 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner'; 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Dialog,
   DialogContent,
@@ -15,12 +19,9 @@ import {
   SelectContent,
   SelectItem,
 } from '@plug/ui';
-import { toast } from 'sonner'; 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAssetDetailSWR, useUpdateAsset, useFileUploadWithInfo } from '@plug/common-services/services';
+import { useAssetDetailSWR, useUpdateAsset, useFileUploadWithInfo, useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
+
 import { AssetEditModalProps } from '@/backoffice/domains/asset/types/asset';
-import { useAssetCategoryTree, AssetCategoryResponse } from '@plug/common-services'; 
 import { assetFormSchema, type AssetFormData } from '@/backoffice/domains/asset/schemas/assetSchemas';
 
 export const AssetEditModal: React.FC<AssetEditModalProps> = ({
@@ -90,7 +91,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         setThumbnailPreview(null);
       }
     }
-  }, [isOpen, assetId, data]);
+  }, [isOpen, assetId, data, modalForm, clearModelInfo, clearThumbnailInfo]);
 
   const handleModelChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,7 +157,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     clearThumbnailInfo();
     onClose();
     mutate();
-  }, [data, onClose, mutate]);
+  }, [data, onClose, mutate, modalForm, clearModelInfo, clearThumbnailInfo]);
 
   const handleSubmit = useCallback(async (data: AssetFormData) => {
       try {

@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import { Dialog, DialogContent } from '@plug/ui'
-import { useWebRTCReceiver } from '@/app/view/hooks/useWebRTCReceiver'
+import { useWebRTCReceiver } from '@/app/view/hooks/useWebRTCReceiver';
 
+import { useEffect, useState } from 'react';
+
+import { Dialog, DialogContent } from '@plug/ui';
 export interface CctvDialogProps {
-  open: boolean
-  host: string
-  onClose: () => void
-  title?: string
-  path?: string
-  width?: number
-  aspect?: number
-  autoFocusVideo?: boolean
+  open: boolean;
+  host: string;
+  onClose: () => void;
+  title?: string;
+  path?: string;
+  width?: number;
+  aspect?: number;
+  autoFocusVideo?: boolean;
 }
 
-const CctvDialog: React.FC<CctvDialogProps> = ({
+const CctvDialog = ({
   open,
   host,
   onClose,
@@ -21,41 +22,41 @@ const CctvDialog: React.FC<CctvDialogProps> = ({
   path = 'cctv',
   width = 480,
   aspect = 16 / 9,
-  autoFocusVideo = false
-}) => {
-  const [mounted, setMounted] = useState(false)
+  autoFocusVideo = false,
+}: CctvDialogProps) => {
+  const [mounted, setMounted] = useState(false);
 
   const { videoRef, error, stop } = useWebRTCReceiver({
     host,
     path,
-    enabled: open
-  })
+    enabled: open,
+  });
 
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
-    if (!open) return
-    const orig = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = orig }
-  }, [open])
+    if (!open) return;
+    const orig = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = orig; };
+  }, [open]);
 
-  useEffect(() => () => { stop() }, [stop])
+  useEffect(() => () => { stop(); }, [stop]);
   useEffect(() => {
     if (open && autoFocusVideo && videoRef.current) {
-      videoRef.current.focus()
+      videoRef.current.focus();
     }
-  }, [open, autoFocusVideo, videoRef])
+  }, [open, autoFocusVideo, videoRef]);
 
-  if (!mounted || !open) return null
+  if (!mounted || !open) return null;
 
-  const height = Math.round(width / aspect)
+  const height = Math.round(width / aspect);
 
   return (
-    <Dialog open={open && mounted} onOpenChange={(o) => { if (!o) onClose() }}>
+    <Dialog open={open && mounted} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent title={title || `CCTV / ${path}`} className="w-auto">
         <div
           className="bg-black rounded-md overflow-hidden"
@@ -77,7 +78,7 @@ const CctvDialog: React.FC<CctvDialogProps> = ({
         )}
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default CctvDialog
+export default CctvDialog;

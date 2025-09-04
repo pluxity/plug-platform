@@ -186,6 +186,7 @@ class PoiElement implements Interfaces.PoiCreateOption {
      */
     set Visible(value: boolean) {
         this.visibleState = value;
+        this.textVisibleState = this.visibleState;
 
         if (this.visibleState) {
             (this.iconObj as THREE.Sprite).visible = true;

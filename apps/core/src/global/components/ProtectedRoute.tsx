@@ -1,7 +1,7 @@
-import React from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/global/store'
 
+import React from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
 interface ProtectedRouteProps {
   children: React.ReactNode
   requiredRole?: string // 필요한 역할 추가
