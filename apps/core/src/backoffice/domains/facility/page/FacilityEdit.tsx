@@ -391,6 +391,7 @@ const FacilityEdit: React.FC = () => {
             className="text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft size={18} />
+            목록으로
           </Button>
         </div>
       </div>

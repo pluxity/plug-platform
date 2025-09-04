@@ -11,13 +11,15 @@ const DEVICES_ROOT = 'devices';
 const DEVICE_TYPES_ENDPOINT = `${DEVICES_ROOT}/types`;
 const COMPANY_TYPES_ENDPOINT = `${DEVICES_ROOT}/company-types`;
 
-export const getDevices = async (): Promise<DeviceResponse[]> => {
-  const resp = await api.get<DeviceResponse[]>(DEVICES_ROOT, { requireAuth: true });
+export const getDevices = async (facilityId?: number): Promise<DeviceResponse[]> => {
+  const qs = facilityId != null ? `?facilityId=${facilityId}` : '';
+  const resp = await api.get<DeviceResponse[]>(`${DEVICES_ROOT}${qs}`, { requireAuth: true });
   return (resp as any)?.data ?? (resp as any) ?? [];
 };
 
-export const useDevices = () => {
-  return useGet<DeviceResponse[]>(DEVICES_ROOT, { requireAuth: true });
+export const useDevices = (facilityId?: number) => {
+  const qs = facilityId != null ? `?facilityId=${facilityId}` : '';
+  return useGet<DeviceResponse[]>(`${DEVICES_ROOT}${qs}`, { requireAuth: true });
 };
 
 export const useDeviceDetail = (deviceId: string) => {
@@ -48,8 +50,9 @@ export const useCompanyTypes = () => {
   return useGet<DeviceCompanyTypeResponse[]>(COMPANY_TYPES_ENDPOINT, { requireAuth: true });
 };
 
-export const useDevicesSWR = () => {
-  return useSWRApi<DeviceResponse[]>(DEVICES_ROOT, 'GET', { requireAuth: true });
+export const useDevicesSWR = (facilityId?: number) => {
+  const qs = facilityId != null ? `?facilityId=${facilityId}` : '';
+  return useSWRApi<DeviceResponse[]>(`${DEVICES_ROOT}${qs}`, 'GET', { requireAuth: true });
 };
 
 export const useDeviceCompanyTypesSWR = () => {

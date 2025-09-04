@@ -1,13 +1,39 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useDeviceCategoryTree } from '@plug/common-services'
+import { useIndoorStore } from '@/app/store/indoorStore'
+import type { DeviceCategoryResponse } from '@plug/common-services/types'
+
+// CCTV 카테고리는 특별 취급
+const CCTV_CATEGORY_SENTINEL_ID = -1 as const
+const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
+  id: CCTV_CATEGORY_SENTINEL_ID,
+  name: 'CCTV',
+  depth: 0,
+  thumbnailFile: {
+    id: CCTV_CATEGORY_SENTINEL_ID,
+    url: '/images/icons/cctv.png',
+    originalFileName: 'cctv.png',
+    contentType: 'image/png',
+    fileStatus: 'uploaded',
+    createdAt: new Date().toISOString(),
+    createdBy: 'System',    
+  }
+})
+const injectCctvCategory = (categories: DeviceCategoryResponse[] | undefined, cctvCount: number) => {
+  const base = (categories || []).filter(c => !c.parentId)
+  if (cctvCount <= 0) return base
+  return [createCctvPseudoCategory(), ...base]
+}
 
 interface DeviceCategoryChipsProps {
   selectedId?: number | null;
   onSelect?: (id: number | null) => void;
+  onDeselect?: (id: number) => void;
 }
 
-const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = null, onSelect }) => {
+const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = null, onSelect, onDeselect }) => {
   const { categories, isLoading } = useDeviceCategoryTree()
+  const cctvCount = useIndoorStore(s => s.cctvs.length)
   const [internalSelected, setInternalSelected] = useState<number | null>(selectedId)
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -17,9 +43,19 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
   const startScrollLeftRef = useRef(0)
   const dragDistanceRef = useRef(0)
 
-  const topLevel = useMemo(() => (categories || []).filter(category => !category.parentId), [categories])
+  const topLevel = useMemo(() => injectCctvCategory(categories, cctvCount), [categories, cctvCount])
 
-  const handleSelect = (id: number | null) => { setInternalSelected(id); onSelect?.(id) }
+  const selectCategory = useCallback((clickedId: number) => {
+    setInternalSelected(prev => {
+      if (prev === clickedId) {
+        onDeselect?.(clickedId)
+        onSelect?.(null)
+        return null
+      }
+      onSelect?.(clickedId)
+      return clickedId
+    })
+  }, [onSelect, onDeselect])
 
   useEffect(() => { setInternalSelected(selectedId ?? null) }, [selectedId])
 
@@ -121,7 +157,7 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
             key={category.id}
             type="button"
             data-chip="true"
-            onClick={() => { if (dragDistanceRef.current > 10) return; handleSelect(category.id) }}
+            onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id) }}
             className={[
               'inline-flex items-center px-3 py-1.5 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
               internalSelected === category.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'

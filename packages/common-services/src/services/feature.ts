@@ -51,12 +51,13 @@ export const updateFeatureTransform = async (featureId: string, data: FeatureUpd
   await api.patch(`${END_POINT}/${featureId}/transform`, data, { requireAuth: true });
 };
 
-export const assignDeviceToFeature = async (featureId: string, data: FeatureAssignDto): Promise<void> => {
-  await api.patch(`${END_POINT}/${featureId}/assign-device`, data, { requireAuth: true });
+export const assignDeviceToFeature = async (featureId: string, data: FeatureAssignDto, force?: boolean): Promise<void> => {
+  const url = force ? `${END_POINT}/${featureId}/assign?force=true` : `${END_POINT}/${featureId}/assign`;
+  await api.patch(url, data, { requireAuth: true });
 };
 
 export const removeDeviceFromFeature = async (featureId: string): Promise<void> => {
-  await api.delete(`${END_POINT}/${featureId}/revoke-device`, { requireAuth: true });
+  await api.delete(`${END_POINT}/${featureId}/revoke`, { requireAuth: true });
 };
 
 export const useFeaturesSWR = (facilityId: number, queryParams?: Record<string, any>) => {

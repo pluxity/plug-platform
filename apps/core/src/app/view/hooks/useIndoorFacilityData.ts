@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
-import { FacilityService, getFeaturesByFacility, FacilityType, FeatureResponse, FacilityResponse } from '@plug/common-services'
+import { FacilityService, FacilityType, FeatureResponse, FacilityResponse } from '@plug/common-services'
 import type { Floor } from '@/global/types'
 import { convertFloors } from '@/global/utils/floorUtils'
+import { useIndoorStore } from '@/app/store/indoorStore'
 
 interface UseIndoorFacilityDataParams {
   facilityId: number
@@ -23,7 +24,8 @@ export function useIndoorFacilityData(
   { facilityId, facilityType, onGoOutdoor }: UseIndoorFacilityDataParams
 ): UseIndoorFacilityDataReturn {
   const [facilityData, setFacilityData] = useState<FacilityResponse | null>(null)
-  const [features, setFeatures] = useState<FeatureResponse[]>([])
+  // 중복 호출 제거: features 는 IndoorStore 에서만 관리
+  const features = useIndoorStore(s => s.features)
   const [floors, setFloors] = useState<Floor[]>([])
   const [has3DDrawing, setHas3DDrawing] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -37,14 +39,14 @@ export function useIndoorFacilityData(
     }
   }, [onGoOutdoor])
 
-  const loadFeatures = useCallback(async (facilityIdParam: number) => {
-    try {
-      const featureList = await getFeaturesByFacility(facilityIdParam)
-      setFeatures(featureList || [])
-    } catch {
-      setFeatures([])
-    }
-  }, [])
+  // 이전에는 여기서 getFeaturesByFacility 로 별도 호출했으나,
+  // IndoorStore.loadFacilityData 가 이미 features 를 로드하므로 제거.
+  // 필요 시(스토어 비어있을 때 자동 로드) 아래 로직을 활성화할 수 있음:
+  // const loadFacilityIfNeeded = useCallback(() => {
+  //   if (!useIndoorStore.getState().features.length) {
+  //     useIndoorStore.getState().loadFacilityData(facilityId)
+  //   }
+  // }, [facilityId])
 
   useEffect(() => {
   let countdownTimer: number | undefined
@@ -86,9 +88,7 @@ export function useIndoorFacilityData(
   return () => { if (countdownTimer) window.clearInterval(countdownTimer) }
   }, [facilityType, facilityId, handleOutdoor])
 
-  useEffect(() => {
-    loadFeatures(facilityId)
-  }, [facilityId, loadFeatures])
+  // features 는 store 를 통해 주입되므로 추가 effect 불필요
 
   const modelUrl = facilityData?.drawing?.url || ''
 

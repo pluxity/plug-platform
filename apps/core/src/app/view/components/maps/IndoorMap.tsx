@@ -1,14 +1,20 @@
-import React, { useEffect, useCallback, useState } from 'react'
-import { FacilityType } from '@plug/common-services'
-import { useFacilityStore } from '@/app/store/facilityStore'
+import React, { useEffect, useCallback, useState, useRef } from 'react'
+import type { DeviceResponse, FacilityType } from '@plug/common-services'
+import { Poi } from '@plug/engine'
+
+import { MapScene } from '@/global/components/indoor-map'
 import { useAssets } from '@/global/store/assetStore'
-import { useIndoorEngine } from '@/app/view/hooks/useIndoorEngine'
-import { useIndoorFacilityData } from '@/app/view/hooks/useIndoorFacilityData'
-import MapScene from '@/global/components/indoor-map/MapScene'
-import DeviceSearchForm from './DeviceSearchForm'
+
+import { useFacilityStore } from '@/app/store/facilityStore'
+import { useIndoorStore, useSyncCctvs } from '@/app/store/indoorStore'
+import type { IndoorSearchItem } from '@/app/store/indoorStore'
+
+import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC, usePoiPointerUpListeners } from '@/app/view/hooks'
+import type { PoiPointerUpListener } from '@/app/view/hooks'
+
+import IndoorSearchForm from './IndoorSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
-import { DeviceInfoDialog, CctvDialog } from '../dialogs'
-import type { DeviceResponse } from '@plug/common-services'
+import { DeviceInfoDialog } from '../dialogs'
 
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
@@ -16,11 +22,45 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const { assets } = useAssets()
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
-  const [cctvOpen, setCctvOpen] = useState(false)
-  
-  const handlePoiPointerUp = useCallback(() => {
-    setCctvOpen(true)
-  }, [])
+  const loadFacilityData = useIndoorStore(s => s.loadFacilityData)
+  const storedFacilityId = useIndoorStore(s => s.facilityId)
+  useSyncCctvs()
+
+  useEffect(() => {
+    if (facilityId && facilityId !== storedFacilityId) {
+      loadFacilityData(facilityId)
+    }
+  }, [facilityId, storedFacilityId, loadFacilityData])
+  const { onPoiPointerUp: embeddedHandler } = usePoiEmbeddedWebRTC({
+    onError: () => { /* 추후 에러 처리 추가 */ },
+    resolvePath: evt => {
+      const target = (evt as { target?: { property?: { deviceId?: string | number | null; deviceID?: string | number | null } } }).target
+      const raw = target?.property?.deviceId ?? target?.property?.deviceID
+      return raw != null ? String(raw) : undefined
+    }
+  })
+
+  const listeners: PoiPointerUpListener[] = [
+    {
+      id: 'embeddedCctv',
+      test: context => !!context.cctv,
+      run: context => {
+        const path = context.deviceId ? String(context.deviceId) : context.cctv?.id
+        if (path) embeddedHandler({ target: { id: context.poiId, property: { deviceId: path } } })
+      }
+    },
+    {
+      id: 'deviceInfo',
+      test: context => !!context.device,
+      run: context => {
+        setSelectedDevice(context.device || null)
+      },
+      stopOnHandled: false
+    }
+  ]
+
+  const { onPoiPointerUp: firePoiPointerUp } = usePoiPointerUpListeners({ features, listeners })
+  const handlePoiPointerUp = firePoiPointerUp
 
   const { handleLoadComplete } = useIndoorEngine({
     features,
@@ -34,6 +74,65 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
 
   const [selectedDevice, setSelectedDevice] = useState<DeviceResponse | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const findByCategoryId = useIndoorStore(s => s.findByCategoryId)
+  const highlightedFeatureIdsRef = useRef<string[]>([])
+
+  const clearHighlights = useCallback(() => {
+    // 기존 하이라이트 제거
+    highlightedFeatureIdsRef.current.forEach(fid => {
+      Poi.SetTextInnerHtml(fid, '')
+    })
+    highlightedFeatureIdsRef.current = []
+  }, [])
+
+  const applyCategoryHighlight = useCallback((categoryId: number | null) => {
+    // 새로운 하이라이트 적용 전 기존 제거
+    clearHighlights()
+    if (categoryId == null) return
+    const items = findByCategoryId(categoryId)
+    const featureIds: string[] = []
+    items.forEach(item => {
+      const featureId = item.feature?.id
+      if (!featureId) return
+      featureIds.push(featureId)
+      const safeName = item.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      const html = `
+        <span class="bg-blue-600 text-white p-1 text-xs rounded">
+          ${safeName}
+        </span>
+      `
+      Poi.SetTextInnerHtml(featureId, html)
+    })
+    highlightedFeatureIdsRef.current = featureIds
+  }, [findByCategoryId, clearHighlights])
+
+  const handleCategorySelect = useCallback((id: number | null) => {
+    setSelectedCategoryId(id)
+    applyCategoryHighlight(id)
+  }, [applyCategoryHighlight])
+
+  const handleCategoryDeselect = useCallback(() => {
+    setSelectedCategoryId(null)
+    clearHighlights()
+  }, [clearHighlights])
+
+  const handleSearchSelect = useCallback((item: IndoorSearchItem) => {
+    const featureId = item.feature?.id
+    if (featureId) {
+      const synthetic = { target: { id: featureId, property: { deviceId: item.id } } }
+      firePoiPointerUp(synthetic)
+      return
+    }
+    if (item.__kind === 'cctv') {
+      if (featureId) {
+        return
+      }
+      console.warn('[IndoorMap] CCTV has no feature mapping; cannot embed stream:', item.id)
+    } else {
+      setSelectedDevice(item as DeviceResponse)
+    }
+  }, [firePoiPointerUp])
 
   if (!facilitiesFetched || isLoading || has3DDrawing === null) {
     return (
@@ -73,23 +172,24 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
 
   const overlays = (
     <div className='absolute top-4 left-4 z-20 flex flex-row gap-3 items-start'>
-      <DeviceSearchForm
+      <IndoorSearchForm
         className='pointer-events-auto'
-        onDeviceSelect={(device) => setSelectedDevice(device)}
+        onDeviceSelect={handleSearchSelect}
       />
-      <DeviceCategoryChips />
+      <DeviceCategoryChips
+        selectedId={selectedCategoryId}
+        onSelect={handleCategorySelect}
+        onDeselect={handleCategoryDeselect}
+      />
     </div>
   )
 
   return (
     <>
       <MapScene modelUrl={modelUrl} floors={floors} onLoadComplete={handleLoadComplete} onOutdoor={handleOutdoorClick} overlays={overlays} />
-      <DeviceInfoDialog device={selectedDevice} onClose={() => setSelectedDevice(null)} />
-  <CctvDialog
-        open={cctvOpen}
-        host={import.meta.env.VITE_WEBRTC_HOST || import.meta.env.VITE_CCTV_HOST || '192.168.4.8'}
-        onClose={() => setCctvOpen(false)}
-      />
+      {selectedDevice && (
+        <DeviceInfoDialog device={selectedDevice} hole={false} onClose={() => setSelectedDevice(null)} />
+      )}
     </>
   )
 };

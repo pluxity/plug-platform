@@ -22,14 +22,14 @@ export interface FeatureUpdateRequest {
 
 export interface FeatureAssignDto {
   id: string;
+  type?: string;
 }
 
 export interface FeatureResponse {
   id: string;
+  assetId: number;
+  floorId: string;
   position?: Spatial;
   rotation?: Spatial;
   scale?: Spatial;
-  assetId: number;
-  floorId: string;
-  deviceId?: string;
 }

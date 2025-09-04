@@ -89,6 +89,10 @@ const DeviceList: React.FC = () => {
 
     const columns = [
         {
+            accessorKey: 'id',
+            header: 'ID',
+        },
+        {
             accessorKey: 'categoryName',
             header: '디바이스 카테고리',
         },    
