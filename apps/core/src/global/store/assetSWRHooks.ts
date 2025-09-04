@@ -1,9 +1,10 @@
 import { useMemo, useState, useCallback } from 'react';
 // NOTE: Adjusted relative import paths to reference shared service hooks correctly inside monorepo.
-import { useAssetsSWR, useAssetCategoryTree } from '@plug/common-services/services';
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services';
 
 // Lightweight navigation state separated from data fetching (SWR handles data)
+
+import { useAssetsSWR, useAssetCategoryTree } from '@plug/common-services/services';
 export function useAssetDataWithNavigation() {
   // Fetching (SWR) – cached & revalidated independently
   const { data: assets, isLoading: assetsLoading, error: assetsError, mutate: mutateAssets } = useAssetsSWR();

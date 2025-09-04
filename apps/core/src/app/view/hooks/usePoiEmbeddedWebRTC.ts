@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { Poi } from '@plug/engine';
 import { buildWhepUrl, performWhepNegotiation, prepareReceiverPeerConnection } from '@/global/webrtc/whep';
 
+import { useCallback, useEffect, useRef } from 'react';
+
+import { Poi } from '@plug/engine';
 export interface UsePoiEmbeddedWebRTCOptions {
   onError?: (poiId: string, error: unknown) => void;
   resolvePath?: (event: unknown) => string | null | undefined;

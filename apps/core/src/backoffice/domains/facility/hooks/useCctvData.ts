@@ -1,6 +1,6 @@
-import { useCctvSWR } from '@plug/common-services';
 import { useMemo } from 'react';
 
+import { useCctvSWR } from '@plug/common-services';
 export const useCctvData = () => {
     const { data: cctvsArray, isLoading, mutate } = useCctvSWR();
 

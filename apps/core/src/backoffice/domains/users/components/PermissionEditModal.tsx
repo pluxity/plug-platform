@@ -1,14 +1,16 @@
-import { useCallback, useEffect } from 'react';
-import { Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Button, Checkbox, Label } from '@plug/ui';
-import { PermissionEditModalProps } from '@/backoffice/domains/users/types/permisson';
-import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
-import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
-import { usePermissionDetail, useUpdatePermission } from '@plug/common-services';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';
 import { toast } from 'sonner';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useCallback, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { usePermissionDetail, useUpdatePermission } from '@plug/common-services';
+import { Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Button, Checkbox, Label } from '@plug/ui';
+
+import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
+import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';
+import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
+import { PermissionEditModalProps } from '@/backoffice/domains/users/types/permisson';
 export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpen, onClose, onSuccess, permissionId }) => {
     const { data: detailData, execute: detailPermission } = usePermissionDetail(permissionId);
     const { execute: updatePermission, isLoading: isPermissionUpdating } = useUpdatePermission(permissionId);

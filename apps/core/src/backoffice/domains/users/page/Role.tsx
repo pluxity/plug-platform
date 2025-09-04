@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
-import { PageContainer } from '@/backoffice/common/view/layouts'
-import { RoleData } from '@/backoffice/domains/users/types/role';
-import { RoleMapper } from '@/backoffice/domains/users/mapper/roleMapper';
-import { useRolesSWR, deleteRole } from '@plug/common-services/services'
-import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal';
-import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal';
 import { toast } from 'sonner';
 
+import React, { useState } from 'react'
+
+import { useRolesSWR, deleteRole } from '@plug/common-services/services'
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
+
+import { PageContainer } from '@/backoffice/common/view/layouts'
+import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal';
+import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal';
+import { RoleMapper } from '@/backoffice/domains/users/mapper/roleMapper';
+import { RoleData } from '@/backoffice/domains/users/types/role';
 const Role: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);

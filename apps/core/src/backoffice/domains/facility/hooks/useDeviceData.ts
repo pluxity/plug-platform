@@ -1,6 +1,6 @@
-import { useDevicesSWR } from '@plug/common-services';
 import { useMemo } from 'react';
 
+import { useDevicesSWR } from '@plug/common-services';
 export const useDeviceData = () => {
     const { data: devicesArray, isLoading, mutate } = useDevicesSWR();
 

@@ -1,25 +1,25 @@
-import React, { useEffect, useState, useCallback, useRef } from "react"
-import { useParams, useNavigate, useLocation } from "react-router-dom"
-import { ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
-
-import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
 
 import { Poi, Interfaces, Camera } from '@plug/engine'
 
+import { PageContainer } from '@/backoffice/common/view/layouts'
+
+import { usePoiEvents, PoiData } from '../hooks/usePoiEvents'
+
+import { ArrowLeft } from "lucide-react"
+import React, { useEffect, useState, useCallback, useRef } from "react"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
+
+import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
 
-import { useAssets } from '@/global/store'
-import { convertFloors, poiUnassignedText, poiAssignedText } from '@/global/utils'
 import { IndoorMapViewer, FloorControl } from '@/global/components'
+import { useAssets } from '@/global/store'
 import type { Floor } from '@/global/types'
-
-import { PageContainer } from '@/backoffice/common/view/layouts'
+import { convertFloors, poiUnassignedText, poiAssignedText } from '@/global/utils'
 
 import { IndoorMapEditTools, FeatureAssignModal } from '../components'
 import { useCctvData, useDeviceData } from '../hooks'
-import { usePoiEvents, PoiData } from '../hooks/usePoiEvents'
-
 type FacilityData = {
   facility?: {
     id: number

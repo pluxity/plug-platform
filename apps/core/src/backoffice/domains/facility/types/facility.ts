@@ -1,4 +1,5 @@
 // 1. Domain Models --------------------------------
+
 import { FacilityResponse, FacilityType } from '@plug/common-services';
 
 export interface LocationData {

@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@plug/ui'
 
+import React, { useState, useRef, useEffect } from 'react';
 export interface ThumbnailUploaderProps {
   currentThumbnailUrl?: string
   onThumbnailChange: (fileId: number | undefined) => void

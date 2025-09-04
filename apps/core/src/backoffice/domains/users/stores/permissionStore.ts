@@ -1,8 +1,10 @@
-import { create } from 'zustand';
-import { PermissionResourceType } from '@plug/common-services/types';
-import { PermissionResourceData } from '@/backoffice/domains/users/types/permisson';
 import { api } from '@plug/api-hooks';
 
+import { create } from 'zustand';
+
+import { PermissionResourceType } from '@plug/common-services/types';
+
+import { PermissionResourceData } from '@/backoffice/domains/users/types/permisson';
 interface TreeNode {
     id: number | string;
     name: string;

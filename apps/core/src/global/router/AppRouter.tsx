@@ -1,16 +1,17 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import LoginPage from '@/global/pages/LoginPage';
 import ProtectedRoute from '@/global/components/ProtectedRoute';
 
 import { BackofficeLayout, DashboardLayout, IndoorLayout } from '@/backoffice/common/view/layouts';
 
 import { Dashboard, FacilityList, FacilityEdit, FacilityIndoor, Role, User, Permission, AssetList, AssetCategory, DeviceCategory, DeviceList, CctvList } from '@/backoffice/domains';
 
-import AppLayout from '@/app/view/layouts/AppLayout';
 import MapView from '@/app/view/pages/MapView';
 
+import React from 'react';
+
+import AppLayout from '@/app/view/layouts/AppLayout';
+import LoginPage from '@/global/pages/LoginPage';
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>

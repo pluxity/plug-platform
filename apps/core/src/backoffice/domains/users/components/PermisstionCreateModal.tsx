@@ -1,14 +1,16 @@
-import React, { useCallback } from 'react';
-import { PermissionCreateModalProps } from '@/backoffice/domains/users/types/permisson';
-import { Dialog, DialogContent, DialogFooter, Button, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Checkbox, Label } from '@plug/ui';
-import { useCreatePermission } from '@plug/common-services/services';
-import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
-import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';  
 import { toast } from 'sonner';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { useCreatePermission } from '@plug/common-services/services';
+import { Dialog, DialogContent, DialogFooter, Button, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Checkbox, Label } from '@plug/ui';
+
+import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
+import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
+import { PermissionCreateModalProps } from '@/backoffice/domains/users/types/permisson';
 export const PermissionCreateModal: React.FC<PermissionCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
     const { execute: createPermission, isLoading: isPermissionCreating } = useCreatePermission();
     const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();

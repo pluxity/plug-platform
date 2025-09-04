@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { Event, Effect } from '@plug/engine';
 import { useIndoorStore } from '@/app/store/indoorStore';
 
+import { useEffect, useRef } from 'react';
+
+import { Event, Effect } from '@plug/engine';
 export interface IndoorPoiTarget { id?: string; property?: Record<string, unknown> }
 interface PoiPointerUpEvent { target?: IndoorPoiTarget | null }
 interface PoiPointerMoveEvent { target?: IndoorPoiTarget | null }

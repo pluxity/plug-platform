@@ -1,15 +1,17 @@
-import React, {useState} from 'react';
-import { PageContainer } from '@/backoffice/common/view/layouts';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
-import { useDevicesSWR } from '@plug/common-services/services';
-import { DeviceMapper } from '@/backoffice/domains/device/mapper/deviceMapper';
-import { deleteDevice, useDeviceCategoryTree } from '@plug/common-services';
-import { DeviceCategoryResponse } from '@plug/common-services/types';
-import { DeviceCreateModal } from '@/backoffice/domains/device/components/DeviceCreateModal';
-import { DeviceEditModal } from '@/backoffice/domains/device/components/DeviceEditModal';
-import { DeviceData } from '@/backoffice/domains/device/types/device';
 import { toast } from 'sonner';
 
+import React, {useState} from 'react';
+
+import { deleteDevice, useDeviceCategoryTree } from '@plug/common-services';
+import { useDevicesSWR } from '@plug/common-services/services';
+import { DeviceCategoryResponse } from '@plug/common-services/types';
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+
+import { PageContainer } from '@/backoffice/common/view/layouts';
+import { DeviceCreateModal } from '@/backoffice/domains/device/components/DeviceCreateModal';
+import { DeviceEditModal } from '@/backoffice/domains/device/components/DeviceEditModal';
+import { DeviceMapper } from '@/backoffice/domains/device/mapper/deviceMapper';
+import { DeviceData } from '@/backoffice/domains/device/types/device';
 const DeviceList: React.FC = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [category, setCategory] = useState("all");

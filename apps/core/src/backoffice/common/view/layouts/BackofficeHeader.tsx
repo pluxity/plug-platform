@@ -1,7 +1,7 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { UserProfile } from '@/global/components';
 
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 const BackofficeHeader: React.FC = () => {
   const navigate = useNavigate();
 

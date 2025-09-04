@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import IndoorMap from './IndoorMap';
-import OutdoorMap from './OutdoorMap';
-import type { FacilityType } from '@plug/common-services';
-import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities';
 import { UserProfile } from '@/global/components';
 
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import type { FacilityType } from '@plug/common-services';
+
+import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities';
+
+import IndoorMap from './IndoorMap';
+import OutdoorMap from './OutdoorMap';
 enum MapMode {
   OUTDOOR = 'outdoor',
   INDOOR = 'indoor',

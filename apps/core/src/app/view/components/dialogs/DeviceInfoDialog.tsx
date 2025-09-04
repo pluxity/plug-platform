@@ -1,11 +1,14 @@
-import type { DeviceResponse } from '@plug/common-services';
-import InfoDialog from './InfoDialog';
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services';
-import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device';
-import { formatKoreanDateTime } from '@/global/utils/date';
 import DeviceMetricCharts from './DeviceMetricCharts';
 
+import { useState, useEffect, useMemo, useRef } from 'react';
+
+import type { DeviceResponse } from '@plug/common-services';
+
+import { DEVICE_PERIOD_PRESETS } from '@/global/constants/device';
+import { useDeviceTimeSeriesSWR, useDeviceLatestNormalizedSWR, normalizeLatest } from '@/global/services';
+import { formatKoreanDateTime } from '@/global/utils/date';
+
+import InfoDialog from './InfoDialog';
 export interface DeviceInfoDialogProps {
   device: DeviceResponse;
   onClose?: () => void;

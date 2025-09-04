@@ -1,4 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Dialog,
   DialogContent,
@@ -11,11 +15,9 @@ import {
   ModalFormItem,
   MultiSelect,
 } from '@plug/ui';
-import { toast } from 'sonner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useUpdateUser, useUserDetailSWR, useRolesSWR } from '@plug/common-services';
+
 import { userEditFormSchema, type UserEditFormData } from '@/backoffice/domains/users/schemas/userSchemas';
-import { useUpdateUser, useUserDetailSWR, useRolesSWR } from '@plug/common-services/services';
 import { UserEditModalProps } from '@/backoffice/domains/users/types/user';
 
 export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, onSuccess, userId }) => {

@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
 import { Event, Effect } from '@plug/engine';
 
 // 공용 POI 타입 (필요 필드만 선언)
+import { useEffect } from 'react';
 export interface PoiData {
   id: string;
   htmlString: string;

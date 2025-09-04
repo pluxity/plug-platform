@@ -1,21 +1,24 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react'
-import type { DeviceResponse, FacilityType } from '@plug/common-services'
 import { Poi } from '@plug/engine'
 
-import { MapScene } from '@/global/components/indoor-map'
 import { useAssets } from '@/global/store/assetStore'
+
+import type { IndoorSearchItem } from '@/app/store/indoorStore'
+
+import { getDeviceLatestNormalized } from '@/global/services'
+
+import { DeviceInfoDialog } from '../dialogs'
+
+import React, { useEffect, useCallback, useState, useRef } from 'react'
+
+import type { DeviceResponse, FacilityType } from '@plug/common-services'
 
 import { useFacilityStore } from '@/app/store/facilityStore'
 import { useIndoorStore } from '@/app/store/indoorStore'
-import type { IndoorSearchItem } from '@/app/store/indoorStore'
-
 import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC } from '@/app/view/hooks'
-import { getDeviceLatestNormalized } from '@/global/services'
+import { MapScene } from '@/global/components/indoor-map'
 
-import IndoorSearchForm from './IndoorSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
-import { DeviceInfoDialog } from '../dialogs'
-
+import IndoorSearchForm from './IndoorSearchForm'
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
 const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOutdoor }) => {

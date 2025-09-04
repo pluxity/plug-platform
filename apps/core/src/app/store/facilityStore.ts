@@ -1,8 +1,9 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { facilityService } from '@plug/common-services';
 import type { FacilityResponse, FacilityType } from '@plug/common-services';
 
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+
+import { facilityService } from '@plug/common-services';
 interface FacilityState {
   facilities: FacilityResponse[];
   error: string | null;

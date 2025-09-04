@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { UserProfile } from '@plug/common-services/types';
 
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 interface AuthStore {
   user: UserProfile | null;
   isAuthenticated: boolean;

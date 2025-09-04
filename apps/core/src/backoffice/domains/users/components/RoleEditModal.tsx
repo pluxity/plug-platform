@@ -1,4 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { toast } from 'sonner'; 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Dialog,
   DialogContent,
@@ -11,11 +15,9 @@ import {
   ModalFormItem,
   MultiSelect,
 } from '@plug/ui';
-import { toast } from 'sonner'; 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { roleFormSchema, type RoleFormData } from '@/backoffice/domains/users/schemas/roleSchemas';
 import { useRoleDetailSWR, useUpdateRole, usePermissionsSWR } from '@plug/common-services';
+
+import { roleFormSchema, type RoleFormData } from '@/backoffice/domains/users/schemas/roleSchemas';
 import { RoleEditModalProps } from '@/backoffice/domains/users/types/role';
 
 export const RoleEditModal: React.FC<RoleEditModalProps> = ({

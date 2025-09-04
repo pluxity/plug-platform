@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
 import { CategoryItem, CategoryOperations } from '../types/category';
 
 // 삭제 결과 타입 정의
+import { useState, useCallback } from 'react';
 export type DeleteResult =
   | { success: true }
   | { success: false; error: 'NOT_FOUND' | 'HAS_CHILDREN' | 'USER_CANCELLED' };

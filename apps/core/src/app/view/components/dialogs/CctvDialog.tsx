@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent } from '@plug/ui';
 import { useWebRTCReceiver } from '@/app/view/hooks/useWebRTCReceiver';
 
+import { useEffect, useState } from 'react';
+
+import { Dialog, DialogContent } from '@plug/ui';
 export interface CctvDialogProps {
   open: boolean;
   host: string;

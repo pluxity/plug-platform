@@ -1,11 +1,12 @@
-import { create } from 'zustand';
-import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services';
-import { getFeaturesByFacility } from '@plug/common-services';
-import { getDevices } from '@plug/common-services';
 import { getCctvsByFacility } from '@plug/common-services';
 
 // Indoor related aggregated data (features + devices + cctvs) per facility
 
+import { create } from 'zustand';
+
+import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services';
+import { getFeaturesByFacility } from '@plug/common-services';
+import { getDevices } from '@plug/common-services';
 export interface IndoorState {
   facilityId: number | null;
   features: FeatureResponse[];

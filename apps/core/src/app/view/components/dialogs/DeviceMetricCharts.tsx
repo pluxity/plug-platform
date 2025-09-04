@@ -1,8 +1,10 @@
-import { Suspense, lazy, useMemo } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@plug/ui';
-import { buildTimeSeriesLayout } from '@/global/services';
 import type { DeviceMetricSeriesResponse } from '@/global/services/types/device-data';
 
+import { Suspense, lazy, useMemo } from 'react';
+
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@plug/ui';
+
+import { buildTimeSeriesLayout } from '@/global/services';
 const Plot = lazy(() => import('react-plotly.js'));
 
 export interface DeviceMetricChartsProps {

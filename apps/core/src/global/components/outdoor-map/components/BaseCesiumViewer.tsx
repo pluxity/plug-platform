@@ -1,7 +1,7 @@
-import React from 'react';
-import { Viewer as ResiumViewer, type ViewerProps } from 'resium';
 import { useCesiumCreditContainer } from '../hooks/useCesiumCreditContainer';
 
+import React from 'react';
+import { Viewer as ResiumViewer, type ViewerProps } from 'resium';
 const disabled: Partial<ViewerProps> = {
   animation: false,
   timeline: false,

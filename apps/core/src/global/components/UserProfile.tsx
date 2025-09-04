@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Profile } from '@plug/ui';
-import { useAuthStore } from '@/global/store';
-import { useSignOut, getUserProfile } from '@plug/common-services/services';
-import type { UserProfile as UserProfileType  } from '@plug/common-services';
 import { useNavigate } from 'react-router-dom';
 
+import React, { useEffect, useState, useCallback } from 'react';
+
+import type { UserProfile as UserProfileType  } from '@plug/common-services';
+import { useSignOut, getUserProfile } from '@plug/common-services/services';
+import { Profile } from '@plug/ui';
+
+import { useAuthStore } from '@/global/store';
 interface UserProfileProps {
   showAdminPortal?: boolean; // 관리자 페이지(백오피스) 진입 버튼 표시 여부
   className?: string;        // 아바타 트리거 커스터마이징

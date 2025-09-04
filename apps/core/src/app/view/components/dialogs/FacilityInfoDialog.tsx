@@ -1,6 +1,6 @@
-import type { FacilityResponse } from '@plug/common-services';
 import InfoDialog from './InfoDialog';
 
+import type { FacilityResponse } from '@plug/common-services';
 export interface FacilityInfoDialogProps {
   facility: FacilityResponse | null;
   onClose?: () => void;

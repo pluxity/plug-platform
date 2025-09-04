@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Controller, Control, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
-import { Button, Input } from '@plug/ui';
-import { MapLocationSelector } from './MapLocationSelector';
 import { FacilityCreateFormData } from '../../../types';
 
+import React, { useState } from 'react';
+import { Controller, Control, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+
+import { Button, Input } from '@plug/ui';
+
+import { MapLocationSelector } from './MapLocationSelector';
 interface LocationSelectorFieldProps {
   control: Control<FacilityCreateFormData>;
   setValue: UseFormSetValue<FacilityCreateFormData>;

@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { Button, Input, Toast, Dialog, DialogContent, DialogFooter, LoginForm, type LoginFormData } from '@plug/ui'
-import { useSignInWithInfo, useChangePassword } from '@plug/common-services/services'
-import type { SignInRequest } from '@plug/common-services'
-import { useAuthStore } from '@/global/store'
 import { toast } from 'sonner'
 
+import React, { useState } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
+
+import type { SignInRequest } from '@plug/common-services'
+import { useSignInWithInfo, useChangePassword } from '@plug/common-services/services'
+import { Button, Input, Toast, Dialog, DialogContent, DialogFooter, LoginForm, type LoginFormData } from '@plug/ui'
+
+import { useAuthStore } from '@/global/store'
 const LoginPage: React.FC = () => {
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false)
   const [newPassword, setNewPassword] = useState('')

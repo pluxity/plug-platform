@@ -1,57 +1,45 @@
-import { create } from 'zustand'
 import { useEffect } from 'react'
-import { getAssetCategoryList, getAssetCategoryMaxDepth } from '@plug/common-services/services'
-import { api, type DataResponseBody } from '@plug/api-hooks'
-import type { 
-  AssetResponse, 
-  AssetCategoryResponse
-} from '@plug/common-services'
+import { create } from 'zustand'
 
-// Asset Store Data Interface
+import { getAssetCategoryList, getAssetCategoryMaxDepth } from '@plug/common-services'
+import type {  AssetResponse, AssetCategoryResponse } from '@plug/common-services'
+import { api, type DataResponseBody } from '@plug/api-hooks'
+
+
 interface AssetStoreData {
-  // Asset data
   assets: AssetResponse[]
   assetsFetched: boolean
   isLoadingAssets: boolean
   assetError: string | null
 
-  // Asset Category data
   categories: AssetCategoryResponse[]
   categoriesFetched: boolean
   isLoadingCategories: boolean
   categoryError: string | null
   maxDepth: number
 
-  // Current selected category for navigation
   selectedCategoryId: number | null
   currentCategoryPath: AssetCategoryResponse[]
 
-  // Assets filtered by current category
   filteredAssets: AssetResponse[]
 }
-
-// Asset Store Actions Interface
 interface AssetStoreActions {
-  // Actions for assets
   setAssets: (assets: AssetResponse[]) => void
   setAssetsLoading: (loading: boolean) => void
   setAssetError: (error: string | null) => void
   setAssetsFetched: (fetched: boolean) => void
 
-  // Actions for categories
   setCategories: (categories: AssetCategoryResponse[]) => void
   setCategoriesLoading: (loading: boolean) => void
   setCategoryError: (error: string | null) => void
   setCategoriesFetched: (fetched: boolean) => void
   setMaxDepth: (depth: number) => void
 
-  // Navigation actions
   setSelectedCategoryId: (categoryId: number | null) => void
   navigateToCategory: (categoryId: number | null) => void
   goToParentCategory: () => void
   goToRootCategory: () => void
 
-  // Utility functions
   getAllAssets: () => AssetResponse[]
   getAssetById: (id: number) => AssetResponse | undefined
   getAssetsByCategory: (categoryId: number) => AssetResponse[]
@@ -62,18 +50,15 @@ interface AssetStoreActions {
   getRootCategories: () => AssetCategoryResponse[]
   getCategoryPath: (categoryId: number) => AssetCategoryResponse[]
 
-  // Data loading functions
   loadAssets: () => Promise<void>
   loadCategories: () => Promise<void>
   refreshData: () => Promise<void>
 }
 
-// Combined Asset Store State
 type AssetState = AssetStoreData & AssetStoreActions
 
 export const useAssetStore = create<AssetState>()(
   (set, get) => ({
-    // Initial state
     assets: [],
     assetsFetched: false,
     isLoadingAssets: false,
@@ -89,7 +74,6 @@ export const useAssetStore = create<AssetState>()(
     currentCategoryPath: [],
     filteredAssets: [],
 
-    // Asset actions
     setAssets: (assets: AssetResponse[]) => {
       const { selectedCategoryId } = get()
       const filteredAssets = selectedCategoryId 
@@ -102,14 +86,12 @@ export const useAssetStore = create<AssetState>()(
     setAssetError: (assetError: string | null) => set({ assetError }),
     setAssetsFetched: (assetsFetched: boolean) => set({ assetsFetched }),
 
-    // Category actions
     setCategories: (categories: AssetCategoryResponse[]) => set({ categories }),
     setCategoriesLoading: (isLoadingCategories: boolean) => set({ isLoadingCategories }),
     setCategoryError: (categoryError: string | null) => set({ categoryError }),
     setCategoriesFetched: (categoriesFetched: boolean) => set({ categoriesFetched }),
     setMaxDepth: (maxDepth: number) => set({ maxDepth }),
 
-    // Navigation actions
     setSelectedCategoryId: (selectedCategoryId: number | null) => {
       const { assets } = get()
       const filteredAssets = selectedCategoryId 

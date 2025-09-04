@@ -1,8 +1,9 @@
-import React from 'react'
-import { IndoorMapViewer } from '@/global/components/indoor-map/MapViewer'
-import { FloorControl } from '@/global/components/indoor-map/FloorControl'
 import type { Floor } from '@/global/types'
 
+import React from 'react'
+
+import { FloorControl } from '@/global/components/indoor-map/FloorControl'
+import { IndoorMapViewer } from '@/global/components/indoor-map/MapViewer'
 interface MapSceneProps {
   modelUrl: string
   floors: Floor[]

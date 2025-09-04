@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { PageContainerProps } from '@/backoffice/common/services/types/layout'
 
 const PageContainer: React.FC<PageContainerProps> = ({ title, children }) => {

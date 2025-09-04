@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { GroupSearchForm, type GroupSearchGroup, type GroupSearchFormRef } from '@/app/view/components/group-search-form';
-import { useFacilityStore } from '@/app/store/facilityStore';
-import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities';
-import type { FacilityResponse } from '@plug/common-services';
 import * as Cesium from 'cesium';
 
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+
+import type { FacilityResponse } from '@plug/common-services';
+
+import { useEnsureFacilities } from '@/app/hooks/useEnsureFacilities';
+import { useFacilityStore } from '@/app/store/facilityStore';
+import { GroupSearchForm, type GroupSearchGroup, type GroupSearchFormRef } from '@/app/view/components/group-search-form';
 interface FacilitySearchFormProps {
   viewer: Cesium.Viewer | null;
   onFacilitySelectInfo?: (facility: FacilityResponse) => void;

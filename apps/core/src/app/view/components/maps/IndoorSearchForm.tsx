@@ -1,9 +1,10 @@
+import { Camera } from '@plug/engine';
+
 import React, { useMemo, useRef, useState, useCallback } from 'react';
+
 import { useIndoorStore, type IndoorSearchItem } from '@/app/store/indoorStore';
 import { GroupSearchForm } from '@/app/view/components/group-search-form';
 import type { GroupSearchGroup, GroupSearchFormRef } from '@/app/view/components/group-search-form';
-import { Camera } from '@plug/engine';
-
 interface IndoorSearchFormProps {
   className?: string;
   onDeviceSelect?: (item: IndoorSearchItem) => void;

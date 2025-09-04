@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { useDeviceCategoryTree } from '@plug/common-services';
-import { useIndoorStore } from '@/app/store/indoorStore';
 import type { DeviceCategoryResponse } from '@plug/common-services/types';
 
 // CCTV 카테고리는 특별 취급
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+
+import { useDeviceCategoryTree } from '@plug/common-services';
+
+import { useIndoorStore } from '@/app/store/indoorStore';
 const CCTV_CATEGORY_SENTINEL_ID = -1 as const;
 const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
   id: CCTV_CATEGORY_SENTINEL_ID,

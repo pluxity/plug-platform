@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { PageContainer } from '@/backoffice/common/view/layouts';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
-import { CctvData } from '../types/cctv';
-import { useCctvSWR, deleteCctv } from '@plug/common-services';
-import { CctvMapper } from '../mapper/cctvMapper';
-import { toast } from 'sonner';
-import { CctvCreateModal } from '../components/CctvCreateModal';
 import { CctvEditModal } from '../components/CctvEditModal';
 
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+
+import { useCctvSWR, deleteCctv } from '@plug/common-services';
+import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+
+import { PageContainer } from '@/backoffice/common/view/layouts';
+
+import { CctvCreateModal } from '../components/CctvCreateModal';
+import { CctvMapper } from '../mapper/cctvMapper';
+import { CctvData } from '../types/cctv';
 const CctvList: React.FC = () => {
     const [ createModalOpen, setCreateModalOpen ] = useState(false);
     const [ editModalOpen, setEditModalOpen ] = useState(false);

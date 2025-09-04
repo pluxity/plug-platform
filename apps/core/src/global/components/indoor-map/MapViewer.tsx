@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import { Core, Loader } from '@plug/engine';
 
+import { useEffect, useRef, useState } from 'react';
 interface IndoorMapViewerProps {
   modelUrl: string;
   className?: string;

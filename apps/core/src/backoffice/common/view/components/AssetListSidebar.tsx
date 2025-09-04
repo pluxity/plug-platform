@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button } from '@plug/ui';
 import { toast } from 'sonner';
 
 // SWR 기반 훅 사용 (데이터 + 네비게이션). 3D 영역 리렌더 최소화를 위해 zustand 전역 데이터 의존 제거.
-import { useAssetDataWithNavigation } from '@/global/store/assetSWRHooks';
+import { poiUnassignedText } from '@/global/utils/displayUtils';
+
+import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services';
 import { createFeature } from '@plug/common-services';
 import { Poi } from '@plug/engine';
-import { poiUnassignedText } from '@/global/utils/displayUtils';
+import { Button } from '@plug/ui';
 
+import { useAssetDataWithNavigation } from '@/global/store/assetSWRHooks';
 interface AssetListSideBarProps {
   onAssetClick?: (assetId: number) => void;
   className?: string;

@@ -1,8 +1,10 @@
 import React from 'react';
-import { Badge } from '@plug/ui';
+
 import { domainUtils, FacilityType } from '@plug/common-services';
+
 import { useFacilityData } from '../hooks/useFacilityData';
 
+import { Badge } from '@plug/ui';
 interface FacilityTypeFilterProps {
   selectedTypes: FacilityType[];
   onTypeToggle: (type: FacilityType) => void;
