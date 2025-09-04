@@ -91,7 +91,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         setThumbnailPreview(null);
       }
     }
-  }, [isOpen, assetId, data]);
+  }, [isOpen, assetId, data, modalForm, clearModelInfo, clearThumbnailInfo]);
 
   const handleModelChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,7 +157,7 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     clearThumbnailInfo();
     onClose();
     mutate();
-  }, [data, onClose, mutate]);
+  }, [data, onClose, mutate, modalForm, clearModelInfo, clearThumbnailInfo]);
 
   const handleSubmit = useCallback(async (data: AssetFormData) => {
       try {
