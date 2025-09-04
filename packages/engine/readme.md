@@ -13,6 +13,9 @@
 
 업데이트 내역
 ============
+# 2025-09-04
+- [Poi] Poi 가시화 상태를 Html객체에 연계
+
 # 2025-09-03
 - [Event](./docs/Event.md#pxeventaddeventlistenertype-string-callback-function) 이벤트 타입 추가
   - onPoiPointerMove
