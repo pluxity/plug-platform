@@ -10,6 +10,7 @@ import { useIndoorStore } from '@/app/store/indoorStore'
 import type { IndoorSearchItem } from '@/app/store/indoorStore'
 
 import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC } from '@/app/view/hooks'
+import { getDeviceLatestNormalized } from '@/global/services'
 
 import IndoorSearchForm from './IndoorSearchForm'
 import DeviceCategoryChips from './DeviceCategoryChips'
@@ -30,9 +31,8 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     }
   }, [facilityId, loadDevices, loadCctvs])
 
-  // Feature/device loading now handled inside useIndoorEngine
   const { onPoiPointerUp: embeddedHandler } = usePoiEmbeddedWebRTC({
-    onError: () => { /* 추후 에러 처리 추가 */ },
+  onError: () => {},
     resolvePath: evt => {
       const target = (evt as { target?: { property?: { deviceId?: string | number | null; deviceID?: string | number | null } } }).target
       const raw = target?.property?.deviceId ?? target?.property?.deviceID
@@ -42,13 +42,10 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
 
   const { handleLoadComplete, handlePoiSelect } = useIndoorEngine({
     facilityId,
-    features, // pass through in case already prefetched higher in tree
+  features,
     assets,
     autoExtendView: true,
-    onShowCctv: (target) => {
-      // target.property.deviceId 에 path 이미 세팅됨
-      embeddedHandler({ target })
-    },
+  onShowCctv: (target) => { embeddedHandler({ target }) },
     onShowDevice: (device) => {
       setSelectedDevice(device)
     }
@@ -62,45 +59,123 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const findByCategoryId = useIndoorStore(s => s.findByCategoryId)
   const highlightedFeatureIdsRef = useRef<string[]>([])
+  const latestCacheRef = useRef<Record<string, { metrics: Record<string, { value: number | string | null; unit?: string }>; ts: number }>>({})
+
+  interface DeviceLatestLike { value?: number | string | null; val?: number | string | null; unit?: string }
+  interface DeviceLike extends Partial<DeviceResponse> { data?: { latest?: DeviceLatestLike; latestValue?: number | string | null }; latest?: DeviceLatestLike; latestValue?: number | string | null; unit?: string }
+  const buildDeviceLabelHtml = useCallback((device: DeviceLike) => {
+    const cache = device.id ? latestCacheRef.current[device.id] : undefined
+    const metrics = cache?.metrics && Object.keys(cache.metrics).length ? cache.metrics : null
+    if (!metrics) {
+      const fallback = (device.name || '—').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      return `<span class="inline-block select-none pointer-events-none transform -translate-y-6 text-[11px] font-medium tracking-wide text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)] whitespace-nowrap px-1.5 py-0.5 rounded bg-black/20 backdrop-blur-[2px]">${fallback}</span>`
+    }
+    const entries = Object.entries(metrics)
+    const picked = entries.slice(0, 3)
+    const parts = picked.map(([, v]) => {
+      const val = v.value == null ? '-' : (typeof v.value === 'number' ? (Number.isFinite(v.value) ? v.value.toFixed(1).replace(/\.0$/, '') : String(v.value)) : String(v.value))
+      const unit = v.unit ? v.unit : ''
+      return (val + unit).replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    })
+    const label = parts.join(' / ') || (device.name || '—')
+    return `<span class="inline-block select-none pointer-events-none transform -translate-y-6 text-[11px] font-medium tracking-wide text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)] whitespace-nowrap px-1.5 py-0.5 rounded bg-black/30 backdrop-blur-[2px]">${label}</span>`
+  }, [])
 
   const clearHighlights = useCallback(() => {
-    // 기존 하이라이트 제거
     highlightedFeatureIdsRef.current.forEach(fid => {
       Poi.SetTextInnerHtml(fid, '')
     })
     highlightedFeatureIdsRef.current = []
   }, [])
 
-  const applyCategoryHighlight = useCallback((categoryId: number | null) => {
-    // 새로운 하이라이트 적용 전 기존 제거
+  const fetchLatestForDevices = useCallback(async (devices: DeviceLike[]) => {
+    const now = Date.now()
+  const freshThreshold = 55_000
+    const toFetch = devices.filter(d => {
+      const id = d.id || ''
+      if (!id) return false
+      const cached = latestCacheRef.current[id]
+      return !cached || (now - cached.ts) > freshThreshold
+    })
+    if (!toFetch.length) return
+    const limit = 5
+    let index = 0
+    const runBatch = async () => {
+      while (index < toFetch.length) {
+        const slice = toFetch.slice(index, index + limit)
+        index += limit
+        await Promise.all(slice.map(async d => {
+          if (!d.id || !d.companyType || !d.deviceType) return
+          try {
+            const latestMap = await getDeviceLatestNormalized(d.companyType, d.deviceType, d.id)
+      const prev = latestCacheRef.current[d.id]
+            // shallow compare first three metric entries to decide if changed
+            let changed = false
+            const newKeys = Object.keys(latestMap)
+            if (!prev) {
+              changed = true
+            } else {
+              const prevMetrics = prev.metrics
+              for (let i = 0; i < Math.min(newKeys.length, 3); i++) {
+                const k = newKeys[i]
+        const latestEntry = (latestMap as Record<string, { value: number | string | null; unit?: string } >)[k]
+        if (!prevMetrics[k] || prevMetrics[k].value !== latestEntry?.value || prevMetrics[k].unit !== latestEntry?.unit) {
+                  changed = true; break
+                }
+              }
+              if (!changed && Object.keys(prevMetrics).length !== newKeys.length) changed = true
+            }
+            latestCacheRef.current[d.id] = { metrics: latestMap, ts: Date.now() }
+            if (changed) {
+              const featureId = d.feature?.id
+              if (featureId) {
+                try { Poi.SetTextInnerHtml(featureId, buildDeviceLabelHtml(d)) } catch { /* ignore */ }
+              }
+            }
+          } catch { /* ignore fetch error */ }
+        }))
+      }
+    }
+    await runBatch()
+  }, [buildDeviceLabelHtml])
+
+  const applyCategoryHighlight = useCallback(async (categoryId: number | null) => {
     clearHighlights()
     if (categoryId == null) return
-    const items = findByCategoryId(categoryId)
+    const items = findByCategoryId(categoryId) as DeviceLike[]
     const featureIds: string[] = []
     items.forEach(item => {
       const featureId = item.feature?.id
       if (!featureId) return
       featureIds.push(featureId)
-      const safeName = item.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      const html = `
-        <span class="bg-blue-600 text-white p-1 text-xs rounded">
-          ${safeName}
-        </span>
-      `
-      Poi.SetTextInnerHtml(featureId, html)
+      Poi.SetTextInnerHtml(featureId, buildDeviceLabelHtml(item))
     })
     highlightedFeatureIdsRef.current = featureIds
-  }, [findByCategoryId, clearHighlights])
+    await fetchLatestForDevices(items)
+    items.forEach(item => {
+      const featureId = item.feature?.id
+      if (!featureId) return
+      Poi.SetTextInnerHtml(featureId, buildDeviceLabelHtml(item))
+    })
+  }, [findByCategoryId, clearHighlights, buildDeviceLabelHtml, fetchLatestForDevices])
 
   const handleCategorySelect = useCallback((id: number | null) => {
     setSelectedCategoryId(id)
-    applyCategoryHighlight(id)
+    applyCategoryHighlight(id) // single immediate fetch + render
   }, [applyCategoryHighlight])
 
   const handleCategoryDeselect = useCallback(() => {
     setSelectedCategoryId(null)
     clearHighlights()
   }, [clearHighlights])
+
+  useEffect(() => {
+    if (selectedCategoryId == null) return
+    const interval = setInterval(() => {
+      applyCategoryHighlight(selectedCategoryId)
+    }, 60_000)
+    return () => clearInterval(interval)
+  }, [selectedCategoryId, applyCategoryHighlight])
 
   const handleSearchSelect = useCallback((item: IndoorSearchItem) => {
     const featureId = item.feature?.id

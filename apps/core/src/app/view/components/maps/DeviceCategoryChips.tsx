@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { useDeviceCategoryTree } from '@plug/common-services'
-import { useIndoorStore } from '@/app/store/indoorStore'
-import type { DeviceCategoryResponse } from '@plug/common-services/types'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useDeviceCategoryTree } from '@plug/common-services';
+import { useIndoorStore } from '@/app/store/indoorStore';
+import type { DeviceCategoryResponse } from '@plug/common-services/types';
 
 // CCTV 카테고리는 특별 취급
-const CCTV_CATEGORY_SENTINEL_ID = -1 as const
+const CCTV_CATEGORY_SENTINEL_ID = -1 as const;
 const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
   id: CCTV_CATEGORY_SENTINEL_ID,
   name: 'CCTV',
@@ -16,14 +16,14 @@ const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
     contentType: 'image/png',
     fileStatus: 'uploaded',
     createdAt: new Date().toISOString(),
-    createdBy: 'System',    
-  }
-})
+    createdBy: 'System',
+  },
+});
 const injectCctvCategory = (categories: DeviceCategoryResponse[] | undefined, cctvCount: number) => {
-  const base = (categories || []).filter(c => !c.parentId)
-  if (cctvCount <= 0) return base
-  return [createCctvPseudoCategory(), ...base]
-}
+  const base = (categories || []).filter((c) => !c.parentId);
+  if (cctvCount <= 0) return base;
+  return [createCctvPseudoCategory(), ...base];
+};
 
 interface DeviceCategoryChipsProps {
   selectedId?: number | null;
@@ -32,104 +32,104 @@ interface DeviceCategoryChipsProps {
 }
 
 const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = null, onSelect, onDeselect }) => {
-  const { categories, isLoading } = useDeviceCategoryTree()
-  const cctvCount = useIndoorStore(s => s.cctvs.length)
-  const [internalSelected, setInternalSelected] = useState<number | null>(selectedId)
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(false)
-  const isDraggingRef = useRef(false)
-  const dragStartClientXRef = useRef(0)
-  const startScrollLeftRef = useRef(0)
-  const dragDistanceRef = useRef(0)
+  const { categories, isLoading } = useDeviceCategoryTree();
+  const cctvCount = useIndoorStore((s) => s.cctvs.length);
+  const [internalSelected, setInternalSelected] = useState<number | null>(selectedId);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const isDraggingRef = useRef(false);
+  const dragStartClientXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+  const dragDistanceRef = useRef(0);
 
-  const topLevel = useMemo(() => injectCctvCategory(categories, cctvCount), [categories, cctvCount])
+  const topLevel = useMemo(() => injectCctvCategory(categories, cctvCount), [categories, cctvCount]);
 
   const selectCategory = useCallback((clickedId: number) => {
-    setInternalSelected(prev => {
+    setInternalSelected((prev) => {
       if (prev === clickedId) {
-        onDeselect?.(clickedId)
-        onSelect?.(null)
-        return null
+        onDeselect?.(clickedId);
+        onSelect?.(null);
+        return null;
       }
-      onSelect?.(clickedId)
-      return clickedId
-    })
-  }, [onSelect, onDeselect])
+      onSelect?.(clickedId);
+      return clickedId;
+    });
+  }, [onSelect, onDeselect]);
 
-  useEffect(() => { setInternalSelected(selectedId ?? null) }, [selectedId])
+  useEffect(() => { setInternalSelected(selectedId ?? null); }, [selectedId]);
 
   const updateScrollState = () => {
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement) return
-    const { scrollLeft, scrollWidth, clientWidth } = scrollElement
-    setCanScrollLeft(scrollLeft > 0)
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1)
-  }
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollElement;
+    setCanScrollLeft(scrollLeft > 0);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
+  };
 
-  const handleScroll = () => updateScrollState()
+  const handleScroll = () => updateScrollState();
 
   const scrollByAmount = (amount: number) => {
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement) return
-    scrollElement.scrollBy({ left: amount, behavior: 'smooth' })
-  }
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
+    scrollElement.scrollBy({ left: amount, behavior: 'smooth' });
+  };
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement) return
-    isDraggingRef.current = true
-    dragStartClientXRef.current = event.clientX
-    startScrollLeftRef.current = scrollElement.scrollLeft
-    dragDistanceRef.current = 0
-  }
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
+    isDraggingRef.current = true;
+    dragStartClientXRef.current = event.clientX;
+    startScrollLeftRef.current = scrollElement.scrollLeft;
+    dragDistanceRef.current = 0;
+  };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement || !isDraggingRef.current) return
-    const deltaX = event.clientX - dragStartClientXRef.current
-    dragDistanceRef.current = Math.max(dragDistanceRef.current, Math.abs(deltaX))
-    scrollElement.scrollLeft = startScrollLeftRef.current - deltaX
-  }
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement || !isDraggingRef.current) return;
+    const deltaX = event.clientX - dragStartClientXRef.current;
+    dragDistanceRef.current = Math.max(dragDistanceRef.current, Math.abs(deltaX));
+    scrollElement.scrollLeft = startScrollLeftRef.current - deltaX;
+  };
 
   const endDrag = () => {
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement) return
-    isDraggingRef.current = false
-    dragDistanceRef.current = 0
-  }
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
+    isDraggingRef.current = false;
+    dragDistanceRef.current = 0;
+  };
 
   useEffect(() => {
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement) return
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
     const onWheel = (event: WheelEvent) => {
-      const absDeltaX = Math.abs(event.deltaX)
-      const absDeltaY = Math.abs(event.deltaY)
+      const absDeltaX = Math.abs(event.deltaX);
+      const absDeltaY = Math.abs(event.deltaY);
       if (absDeltaY > absDeltaX) {
-        if (event.cancelable) event.preventDefault()
-        scrollElement.scrollBy({ left: event.deltaY, behavior: 'auto' })
+        if (event.cancelable) event.preventDefault();
+        scrollElement.scrollBy({ left: event.deltaY, behavior: 'auto' });
       }
-    }
-    scrollElement.addEventListener('wheel', onWheel, { passive: false })
-    return () => { scrollElement.removeEventListener('wheel', onWheel) }
-  }, [])
+    };
+    scrollElement.addEventListener('wheel', onWheel, { passive: false });
+    return () => { scrollElement.removeEventListener('wheel', onWheel); };
+  }, []);
 
   useEffect(() => {
-    updateScrollState()
-    const scrollElement = scrollContainerRef.current
-    if (!scrollElement) return
-    const onResize = () => updateScrollState()
-    window.addEventListener('resize', onResize)
-    let resizeObserver: ResizeObserver | null = null
+    updateScrollState();
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
+    const onResize = () => updateScrollState();
+    window.addEventListener('resize', onResize);
+    let resizeObserver: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => updateScrollState())
-      resizeObserver.observe(scrollElement)
+      resizeObserver = new ResizeObserver(() => updateScrollState());
+      resizeObserver.observe(scrollElement);
     }
     return () => {
-      window.removeEventListener('resize', onResize)
-      resizeObserver?.disconnect()
-    }
-  }, [topLevel.length, isLoading])
+      window.removeEventListener('resize', onResize);
+      resizeObserver?.disconnect();
+    };
+  }, [topLevel.length, isLoading]);
 
   return (
     <div className="relative">
@@ -145,22 +145,22 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
         role="tablist"
         aria-label="장치 카테고리"
       >
-        {isLoading && (
+  {isLoading && (
           <div className="flex items-center gap-2">
             <div className="h-8 w-20 rounded-full bg-gray-200 animate-pulse" />
             <div className="h-8 w-24 rounded-full bg-gray-200 animate-pulse" />
             <div className="h-8 w-16 rounded-full bg-gray-200 animate-pulse" />
           </div>
         )}
-        {!isLoading && topLevel.map(category => (
+  {!isLoading && topLevel.map((category) => (
           <button
             key={category.id}
             type="button"
             data-chip="true"
-            onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id) }}
+            onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id); }}
             className={[
               'inline-flex items-center px-3 py-1.5 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
-              internalSelected === category.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              internalSelected === category.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
             ].join(' ')}
             title={category.name}
           >
@@ -177,8 +177,8 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
           </button>
         ))}
       </div>
-      {canScrollLeft && (<div className="pointer-events-none absolute left-0 w-8" />)}
-      {canScrollRight && (<div className="pointer-events-none absolute right-0 w-8" />)}
+  {canScrollLeft && (<div className="pointer-events-none absolute left-0 w-8" />)}
+  {canScrollRight && (<div className="pointer-events-none absolute right-0 w-8" />)}
       {canScrollLeft && (
         <button
           type="button"
@@ -204,7 +204,7 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default DeviceCategoryChips;
