@@ -5,23 +5,19 @@ export const useCctvData = () => {
     const { data: cctvsArray, isLoading, mutate } = useCctvSWR();
 
     const getAllCctvs = useMemo(() => {
-        if(!Array.isArray(cctvsArray)) return [];
+        if (!Array.isArray(cctvsArray)) return [];
         return cctvsArray;
     }, [cctvsArray]);
 
-    const assignedCctvs = useMemo(() => {
-        return getAllCctvs.filter(cctv => Boolean(cctv.feature?.id));
-    }, [getAllCctvs]);
+    const assignedCctvs = useMemo(() => getAllCctvs.filter((cctv) => Boolean(cctv.feature?.id)), [getAllCctvs]);
 
-    const unassignedCctvs = useMemo(() => {
-        return getAllCctvs.filter(cctv => !cctv.feature?.id);
-    }, [getAllCctvs]);
+    const unassignedCctvs = useMemo(() => getAllCctvs.filter((cctv) => !cctv.feature?.id), [getAllCctvs]);
 
-    return { 
-        getAllCctvs, 
+    return {
+        getAllCctvs,
         assignedCctvs,
         unassignedCctvs,
-        isLoading, 
-        refetch: mutate 
+        isLoading,
+        refetch: mutate,
     };
-}
+};

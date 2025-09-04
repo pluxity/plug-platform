@@ -12,21 +12,21 @@ interface ThumbnailUploadComponentProps {
 export const ThumbnailUploadComponent: React.FC<ThumbnailUploadComponentProps> = ({
   currentFile,
   onFileUpload,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const { execute: uploadFile } = useFileUploadWithInfo();
 
   const handleFileSelect = async (file: File) => {
-    if (isUploading || isLoading) return;
+  if (isUploading || isLoading) return;
 
     try {
       setIsUploading(true);
       const uploadedFile = await uploadFile(file);
       onFileUpload(uploadedFile);
     } catch (error) {
-      console.error('썸네일 업로드 실패:', error);
-      alert('썸네일 업로드에 실패했습니다.');
+  console.error('썸네일 업로드 실패:', error);
+  alert('썸네일 업로드에 실패했습니다.');
     } finally {
       setIsUploading(false);
     }

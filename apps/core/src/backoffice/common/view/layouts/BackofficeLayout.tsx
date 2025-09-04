@@ -1,7 +1,7 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import { Toast } from '@plug/ui'
-import { BackofficeHeader } from '@/backoffice/common/view/layouts'
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import { Toast } from '@plug/ui';
+import { BackofficeHeader } from '@/backoffice/common/view/layouts';
 
 const BackofficeLayout: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const BackofficeLayout: React.FC = () => {
       </main>
       <Toast />
     </div>
-  )
-}
+  );
+};
 
-export default BackofficeLayout
+export default BackofficeLayout;

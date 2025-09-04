@@ -44,7 +44,15 @@ export interface UsePoiEventsOptions {
  * - onPoiFinishEdit
  */
 export const usePoiEvents = (options: UsePoiEventsOptions) => {
-  const { isDeleteMode, onPointerDelete, onPointerAssign, onTransformFinished, enableHoverOutline = true, hoverCursor = 'pointer', cursorTargetElement } = options;
+  const {
+    isDeleteMode,
+    onPointerDelete,
+    onPointerAssign,
+    onTransformFinished,
+    enableHoverOutline = true,
+    hoverCursor = 'pointer',
+    cursorTargetElement,
+  } = options;
 
   useEffect(() => {
     const handlePointerUp = (evt: PoiClickEvent) => {
@@ -82,7 +90,7 @@ export const usePoiEvents = (options: UsePoiEventsOptions) => {
     if (!enableHoverOutline) return;
 
     let currentOutlined: string | undefined;
-    const cursorEl: HTMLElement | null = cursorTargetElement ?? (typeof document !== 'undefined' ? document.body : null);
+  const cursorEl: HTMLElement | null = cursorTargetElement ?? (typeof document !== 'undefined' ? document.body : null);
     const originalCursor = cursorEl?.style.cursor;
 
     const setCursor = (val: string | null) => {

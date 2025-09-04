@@ -12,7 +12,7 @@ export const ThumbnailView: React.FC<ThumbnailViewProps> = ({
   imageUrl,
   title,
   subtitle,
-  className = ""
+  className = '',
 }) => {
   return (
     <Card className={`overflow-hidden ${className}`}>
