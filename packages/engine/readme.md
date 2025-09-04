@@ -14,7 +14,9 @@
 업데이트 내역
 ============
 # 2025-09-04
-- [Poi] Poi 가시화 상태를 Html객체에 연계
+- [Poi](./docs/Poi.md) Poi 가시화 상태를 Html객체에 연계
+- [Poi](./docs/Poi.md) Poi Html객체 가시성 체크 처리 및 On/Off Api추가
+  - [SetHtmlObjectVisibilityCheck](./docs/Poi.md#pxpoisethtmlobjectvisibilitychecknewcheckstate-boolean)
 
 # 2025-09-03
 - [Event](./docs/Event.md#pxeventaddeventlistenertype-string-callback-function) 이벤트 타입 추가

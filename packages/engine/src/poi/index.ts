@@ -20,7 +20,8 @@ export {
     ShowAll,
     ShowAllHtmlObject,
     ShowHtmlObject,
-    StopAnimation
+    StopAnimation,
+    SetHtmlObjectVisibilityCheck,
 } from './data';
 
 import { initialize as createInitialize, dispose as createDispose } from './create';

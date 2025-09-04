@@ -132,7 +132,8 @@ export const Poi = {
     StopAnimation: PoiInternal.StopAnimation,
     Create: PoiInternal.Create,
     StartEdit: PoiInternal.StartEdit,
-    FinishEdit: PoiInternal.FinishEdit
+    FinishEdit: PoiInternal.FinishEdit,
+    SetHtmlObjectVisibilityCheck: PoiInternal.SetHtmlObjectVisibilityCheck,
 };
 
 import * as SubwayInternal from './subway';

@@ -16,6 +16,7 @@ let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
 let poiDummies: THREE.Object3D[] = [];
 let bNeedsUpdate: boolean = false;
+let htmlVisibilityCheck: boolean = true;
 
 /**
  * 초기화
@@ -86,6 +87,26 @@ async function onBeforeRender(evt: any) {
     // 애니메이션 믹서 업데이트
     const animPoiList = Object.values(poiDataList).filter(poi => poi.Mixer !== undefined && poi.Mixer !== null);
     animPoiList.forEach(animPoi => animPoi.Mixer?.update(deltaTime));
+
+    // Poi Html 객체 가시성 체크
+    if (htmlVisibilityCheck) {
+        Object.values(poiDataList).forEach(poi => {
+            if (poi.Visible) {
+                // 광선 방향
+                const rayDir = new THREE.Vector3().subVectors(poi.TextWorldPosition, engine.Camera.position);
+                const rayDistance = engine.Camera.position.distanceTo(poi.TextWorldPosition);
+                rayDir.normalize();
+
+                // 광선
+                const rayCaster = new THREE.Raycaster(engine.Camera.position, rayDir, 0.1, rayDistance);
+                const intersects = rayCaster.intersectObjects(ModelInternal.ModelGroup.children, true);
+                if (intersects.length > 0) // 카메라투영점과 위치점에 걸리는것이 있으면 가시화 비활성화
+                    poi.TextVisible = false;
+                else
+                    poi.TextVisible = true;
+            }
+        });
+    }
 
     // 업데이트가 필요한경우
     if (bNeedsUpdate) {
@@ -642,6 +663,19 @@ function StopAnimation(id: string) {
     }
 }
 
+/**
+ * Html 가시성 체크 여부 설정
+ * @param newCheckState - Html 가시성 체크 여부
+ */
+function SetHtmlObjectVisibilityCheck(newCheckState: boolean) {
+    htmlVisibilityCheck = newCheckState;
+
+    // false인경우 각 poi 가시화 상태에 따라 html 객체 가시화 설정
+    if (!htmlVisibilityCheck) {
+        Object.values(poiDataList).forEach(poi => poi.TextVisible = poi.Visible);
+    }
+}
+
 export {
     poiDataList as PoiDataList,
 
@@ -674,5 +708,6 @@ export {
 
     GetAnimationList,
     PlayAnimation,
-    StopAnimation
+    StopAnimation,
+    SetHtmlObjectVisibilityCheck,
 }

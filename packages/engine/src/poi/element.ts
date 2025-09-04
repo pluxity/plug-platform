@@ -104,6 +104,13 @@ class PoiElement implements Interfaces.PoiCreateOption {
     }
 
     /**
+     * Html 객체 월드위치
+     */
+    get TextWorldPosition(): THREE.Vector3 {
+        return this.textObj.position;
+    }
+
+    /**
      * 로컬 회전
      */
     set Rotation(value: THREE.Euler) {
