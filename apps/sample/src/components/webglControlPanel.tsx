@@ -932,9 +932,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         });
         // poi 객체 포인터 이동 이벤트 등록
         Event.AddEventListener('onPoiPointerMove' as never, (evt: any) => {
-            console.log('onPoiPointerMove', evt);
-            if (evt.target)
+
+            if (evt.target) {
                 Effect.Outline.SetPoiOutline(evt.target.id);
+                console.log('onPoiPointerMove', evt);
+            }
             else
                 Effect.Outline.Clear();
         });
@@ -948,7 +950,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
         });
         // 라벨 3d 포인터이동 이벤트 등록
         Event.AddEventListener('onLabel3DPointerMove' as never, (evt: any) => {
-            console.log('onLabel3DPointerMove', evt);
+            // console.log('onLabel3DPointerMove', evt);
         });
     }
 }
