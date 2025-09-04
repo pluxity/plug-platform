@@ -3,13 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@plug/ui';
 import { toast } from 'sonner';
 
-import {
-  useAssets,
-  useAssetCategories,
-  useAssetCategoryNavigation,
-  useCurrentCategoryContent,
-  useAssetStore,
-} from '@/global/store';
+// SWR 기반 훅 사용 (데이터 + 네비게이션). 3D 영역 리렌더 최소화를 위해 zustand 전역 데이터 의존 제거.
+import { useAssetDataWithNavigation } from '@/global/store/assetSWRHooks';
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services';
 import { createFeature } from '@plug/common-services';
 import { Poi } from '@plug/engine';
@@ -32,7 +27,7 @@ interface AssetItemProps {
   onClick: (assetId: number) => void;
 }
 
-const AssetCategoryItem: React.FC<AssetCategoryItemProps> = ({ category, onClick }) => {
+function AssetCategoryItem({ category, onClick }: AssetCategoryItemProps) {
   const thumbnailChar = category.name.charAt(0).toUpperCase();
   
   return (
@@ -84,7 +79,7 @@ const AssetCategoryItem: React.FC<AssetCategoryItemProps> = ({ category, onClick
   );
 };
 
-const AssetItem: React.FC<AssetItemProps> = ({ asset, onClick }) => {
+function AssetItem({ asset, onClick }: AssetItemProps) {
   const thumbnailChar = asset.name.charAt(0).toUpperCase();
   
   const handleClick = () => {
@@ -144,9 +139,15 @@ const AssetItem: React.FC<AssetItemProps> = ({ asset, onClick }) => {
   );
 };
 
-const AssetCategoryBreadcrumb: React.FC = () => {
-  const { currentCategoryPath, navigateToCategory, goToRootCategory } = useAssetCategoryNavigation();
-  
+function AssetCategoryBreadcrumb({
+  currentCategoryPath,
+  navigateToCategory,
+  goToRootCategory,
+}: {
+  currentCategoryPath: AssetCategoryResponse[];
+  navigateToCategory: (id: number | null) => void;
+  goToRootCategory: () => void;
+}) {
   return (
     <div className="px-2">
       <div className="flex items-center space-x-1 text-xs">
@@ -158,8 +159,7 @@ const AssetCategoryBreadcrumb: React.FC = () => {
         >
           전체
         </Button>
-        
-        {currentCategoryPath.map((category) => (
+        {currentCategoryPath.map((category: AssetCategoryResponse) => (
           <React.Fragment key={category.id}>
             <span className="text-gray-400">/</span>
             <Button
@@ -175,12 +175,9 @@ const AssetCategoryBreadcrumb: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
-const AssetCategoryEmptyState: React.FC<{ selectedCategoryId?: number | null; isRootLevel?: boolean }> = ({
-  selectedCategoryId,
-  isRootLevel,
-}) => {
+function AssetCategoryEmptyState({ selectedCategoryId, isRootLevel }: { selectedCategoryId?: number | null; isRootLevel?: boolean }) {
   if (isRootLevel) {
     return (
       <div className="flex flex-col items-center justify-center h-32 text-gray-500 px-4">
@@ -210,39 +207,41 @@ const AssetCategoryEmptyState: React.FC<{ selectedCategoryId?: number | null; is
   );
 };
 
-export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
+export function AssetListSideBar({
   className = '',
   isCollapsed = false,
   // onToggleCollapse
-}) => {
+}: AssetListSideBarProps) {
   // facilityId 가져오기
   const { id: facilityId } = useParams<{ id: string }>();
   // Asset Store hooks
-  const { isLoading: assetsLoading, error: assetsError } = useAssets();
-  const { isLoading: categoriesLoading, error: categoriesError } = useAssetCategories();
-  const { selectedCategoryId, navigateToCategory } = useAssetCategoryNavigation();
-  const { childCategories, hasChildCategories, isRootLevel } = useCurrentCategoryContent();
+  const {
+    isLoading,
+    error,
+    selectedCategoryId,
+    navigateToCategory,
+    childCategories,
+    hasChildCategories,
+    isRootLevel,
+    currentAssets,
+  assets,
+  currentCategoryPath,
+  goToRootCategory,
+  } = useAssetDataWithNavigation();
 
   // 루트 카테고리로 초기화 
   useEffect(() => {
     navigateToCategory(null);
   }, [navigateToCategory]);
 
-  // 현재 선택된 카테고리의 asset들을 직접 가져오기
-  const store = useAssetStore();
-  const currentAssets = selectedCategoryId && !hasChildCategories
-    ? store.getAssetsByCategory(selectedCategoryId)
-    : [];
-
-  const isLoading = assetsLoading || categoriesLoading;
-  const error = assetsError || categoriesError;
+  // 기존 store.getAssetsByCategory 대체: 훅에서 필터된 currentAssets 제공
 
   const handleCategoryClick = (categoryId: number) => {
     navigateToCategory(categoryId);
   };
 
   const handleAssetClick = (assetId: number) => {
-    const asset = store.getAssetById(assetId);
+  const asset = assets.find(a => a.id === assetId);
     if (asset && asset.file?.url) {
       const poiOption = {
         id: crypto.randomUUID(),
@@ -300,12 +299,12 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
   );
     }
 
-    if (error) {
+  if (error) {
       return (
         <div className="flex items-center justify-center h-64">
           <div className="text-red-500 text-sm text-center">
             오류가 발생했습니다<br />
-            {error || '알 수 없는 오류'}
+      {error instanceof Error ? error.message : '알 수 없는 오류'}
           </div>
         </div>
   );
@@ -317,7 +316,11 @@ export const AssetListSideBar: React.FC<AssetListSideBarProps> = ({
         <div className="flex items-center gap-2">
           {/* 브레드크럼 네비게이션 */}
           <div className="flex-1">
-            <AssetCategoryBreadcrumb />
+            <AssetCategoryBreadcrumb
+              currentCategoryPath={currentCategoryPath}
+              navigateToCategory={navigateToCategory}
+              goToRootCategory={goToRootCategory}
+            />
           </div>
 
           {/* 현재 상태 표시 */}
