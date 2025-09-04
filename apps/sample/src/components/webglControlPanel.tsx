@@ -180,7 +180,10 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(translate)')}>StartEdit(translate)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(rotate)')}>StartEdit(rotate)</button>
                     <button onClick={this.onApiBtnClick.bind(this, 'Poi.StartEdit(scale)')}>StartEdit(scale)</button>&nbsp;
-                    <button onClick={() => Poi.FinishEdit()}>Finish</button>
+                    <button onClick={() => Poi.FinishEdit()}>Finish</button><br></br><br></br>
+
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetHtmlObjectVisibilityCheck(true)')}>SetHtmlObjectVisibilityCheck(true)</button>
+                    <button onClick={this.onApiBtnClick.bind(this, 'Poi.SetHtmlObjectVisibilityCheck(false)')}>SetHtmlObjectVisibilityCheck(false)</button>
                 </span>
             );
         } else if (this.state.selectedApiName === 'Path') {
@@ -574,6 +577,12 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             } break;
             case 'Poi.StartEdit(scale)': {
                 Poi.StartEdit('scale');
+            } break;
+            case 'Poi.SetHtmlObjectVisibilityCheck(true)': {
+                Poi.SetHtmlObjectVisibilityCheck(true);
+            } break;
+            case 'Poi.SetHtmlObjectVisibilityCheck(false)': {
+                Poi.SetHtmlObjectVisibilityCheck(false);
             } break;
 
             /**
