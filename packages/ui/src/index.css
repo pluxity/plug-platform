@@ -1,53 +1,101 @@
 @import "./base.css";
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "./typography.css";
 
+/* dark variant helper */
 @custom-variant dark (&:is(.dark *));
 
+/* =========================================================
+ * 1) 컬러 스케일 등록 (100~1000)
+ *    - 관리자/다크 공용 팔레트
+ *    - primary(블루), secondary(그레이), accent(그린),
+ *      danger(레드), warning(옐로우)
+ * =======================================================*/
 @theme {
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
-    --color-primary-foreground: #ffffff;
+    /* Primary – Blue (Coolors 톤, 로고 계열) */
+    --color-primary-100: #F5F9FF;
+    --color-primary-200: #E8F1FC;
+    --color-primary-300: #D1E3FA;
+    --color-primary-400: #A9CBF6;
+    --color-primary-500: #7EACF0;
+    --color-primary-600: #528DE8;
+    --color-primary-700: #2E61E6; /* Brand Core */
+    --color-primary-800: #1E4FC2;
+    --color-primary-900: #153A91;
+    --color-primary-1000: #0F275F;
+    --color-primary-foreground: #FFFFFF;
 
-    --color-secondary-100: #e0f2f1;
-    --color-secondary-200: #b2dfdb;
-    --color-secondary-300: #80cbc4;
-    --color-secondary-400: #4db6ac;
-    --color-secondary-500: #26a69a;
-    --color-secondary-600: #009688;
-    --color-secondary-700: #00897b;
-    --color-secondary-800: #00796b;
-    --color-secondary-900: #00695c;
-    --color-secondary-foreground: #ffffff;
+    /* Secondary – Neutral Gray (UI 배경/라인/본문) */
+    --color-secondary-100: #FFFFFF;
+    --color-secondary-200: #F9FAFB;
+    --color-secondary-300: #F3F4F6;
+    --color-secondary-400: #E5E7EB;
+    --color-secondary-500: #D1D5DB;
+    --color-secondary-600: #9CA3AF;
+    --color-secondary-700: #6B7280;
+    --color-secondary-800: #4B5563;
+    --color-secondary-900: #374151;
+    --color-secondary-1000: #1F2937;
+    --color-secondary-foreground: #111827;
 
-    --color-destructive-100: #ffe5e5;
-    --color-destructive-200: #fdb8b8;
-    --color-destructive-300: #fa8b8b;
-    --color-destructive-400: #f95d5d;
-    --color-destructive-500: #f82f2f;
-    --color-destructive-600: #f70c0c;
-    --color-destructive-700: #d00909;
-    --color-destructive-800: #b00606;
-    --color-destructive-900: #8a0404;
-    --color-destructive-foreground: #ffffff;
+    /* Accent – Success Green */
+    --color-accent-100:  #F0FDF4;
+    --color-accent-200:  #DCFCE7;
+    --color-accent-300:  #BBF7D0;
+    --color-accent-400:  #86EFAC;
+    --color-accent-500:  #4ADE80;
+    --color-accent-600:  #22C55E;
+    --color-accent-700:  #16A34A;
+    --color-accent-800:  #15803D;
+    --color-accent-900:  #166534;
+    --color-accent-1000: #14532D;
+    --color-accent-foreground: #052e16;
 
-    /*----- 디자인 시스템 -----*/
+    /* Danger – Red/Pink (에러/삭제) */
+    --color-danger-100:  #FFF5F5;
+    --color-danger-200:  #FEE2E2;
+    --color-danger-300:  #FECACA;
+    --color-danger-400:  #FCA5A5;
+    --color-danger-500:  #F87171;
+    --color-danger-600:  #EF4444;
+    --color-danger-700:  #DC2626;
+    --color-danger-800:  #B91C1C;
+    --color-danger-900:  #991B1B;
+    --color-danger-1000: #7F1D1D;
+    --color-danger-foreground: #fff;
 
-    /* 기본 텍스트 컬러 */
+    /* Warning – Yellow/Amber (주의/알림) */
+    --color-warning-100:  #FFFBEB;
+    --color-warning-200:  #FEF3C7;
+    --color-warning-300:  #FDE68A;
+    --color-warning-400:  #FCD34D;
+    --color-warning-500:  #FBBF24;
+    --color-warning-600:  #F59E0B;
+    --color-warning-700:  #D97706;
+    --color-warning-800:  #B45309;
+    --color-warning-900:  #92400E;
+    --color-warning-1000: #78350F;
+    --color-warning-foreground: #3b2f08;
+
+    /* ====== (레거시 alias 유지: destructive → danger) ====== */
+    --color-destructive-100:  var(--color-danger-100);
+    --color-destructive-200:  var(--color-danger-200);
+    --color-destructive-300:  var(--color-danger-300);
+    --color-destructive-400:  var(--color-danger-400);
+    --color-destructive-500:  var(--color-danger-500);
+    --color-destructive-600:  var(--color-danger-600);
+    --color-destructive-700:  var(--color-danger-700);
+    --color-destructive-800:  var(--color-danger-800);
+    --color-destructive-900:  var(--color-danger-900);
+    --color-destructive-foreground: var(--color-danger-foreground);
+
+    /* ----- 디자인 시스템(요청값 유지 + 일부 정돈) ----- */
     --color-black: #313843;
     --color-gray: #6B7482;
     --color-gray2: #C2C6CC;
     --color-light-gray: #9CA8BA;
 
-    /* 배경 색상 */
     --color-content: #F1F3F5;
     --color-gray-point: #9CA8BA;
     --color-muted-blue-gray: #EBEFF5;
@@ -56,51 +104,59 @@
     --color-muted-light-blue1: #EEF5FF;
     --color-muted-light-blue2: #C7DDFD;
     --color-muted-light-gray2: #EFEFEF;
-
-    /* 포인트 컬러 */
-    --color-point-blue: #06F;
+    --color-point-blue: #0066FF;
     --color-point-blue-dark: #0054D1;
     --color-point-blue-disable: #ECEDEF;
     --color-point-error: #CF0000;
-
 }
 
-.scrollbar-thin::-webkit-scrollbar {
-    width: 2px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #cbd5e0;
-    border-radius: 9999px;
-}
+/* 얇은 스크롤바 */
+.scrollbar-thin::-webkit-scrollbar { width: 2px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 9999px; }
 
+/* =========================================================
+ * 2) Shadcn/Tailwind semantic 매핑 (inline theme)
+ *    - semantic → 위에서 정의한 스케일로 연결
+ * =======================================================*/
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
+
+    /* shadcn semantic tokens */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
+
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
+
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
+
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
+
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
+
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
+
     --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
+
     --color-destructive: var(--destructive);
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -111,80 +167,136 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* =========================================================
+ * 3) 라이트 테마 (관리자 페이지 기본)
+ *    - 화이트 베이스 + 블루/그레이
+ * =======================================================*/
 :root {
     --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.141 0.005 285.823);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.141 0.005 285.823);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.141 0.005 285.823);
-    --primary: oklch(0.21 0.006 285.885);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.967 0.001 286.375);
-    --secondary-foreground: oklch(0.21 0.006 285.885);
-    --muted: oklch(0.967 0.001 286.375);
-    --muted-foreground: oklch(0.552 0.016 285.938);
-    --accent: oklch(0.967 0.001 286.375);
-    --accent-foreground: oklch(0.21 0.006 285.885);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.92 0.004 286.32);
-    --input: oklch(0.92 0.004 286.32);
-    --ring: oklch(0.705 0.015 286.067);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.141 0.005 285.823);
-    --sidebar-primary: oklch(0.21 0.006 285.885);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.967 0.001 286.375);
-    --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-    --sidebar-border: oklch(0.92 0.004 286.32);
-    --sidebar-ring: oklch(0.705 0.015 286.067);
+
+    /* Base surfaces */
+    --background: var(--color-secondary-100);   /* #FFFFFF */
+    --foreground: #111827;                      /* Gray-900 */
+
+    --card: var(--color-secondary-100);
+    --card-foreground: #111827;
+
+    --popover: var(--color-secondary-100);
+    --popover-foreground: #111827;
+
+    /* Semantics */
+    --primary: var(--color-primary-700);                /* #2E61E6 */
+    --primary-foreground: var(--color-primary-foreground);
+
+    --secondary: var(--color-secondary-200);            /* #F9FAFB */
+    --secondary-foreground: #111827;
+
+    --muted: var(--color-secondary-300);                /* #F3F4F6 */
+    --muted-foreground: var(--color-secondary-700);     /* #6B7280 */
+
+    --accent: var(--color-accent-600);                  /* #22C55E */
+    --accent-foreground: var(--color-accent-foreground);
+
+    --destructive: var(--color-danger-600);             /* #EF4444 */
+    --border: var(--color-secondary-400);               /* #E5E7EB */
+    --input: var(--color-secondary-400);
+    --ring: var(--color-primary-600);                   /* #528DE8 */
+
+    /* Charts (임의 예시) */
+    --chart-1: #64748B;  /* slate-500 */
+    --chart-2: #22C55E;  /* green-600 */
+    --chart-3: #0EA5E9;  /* sky-500 */
+    --chart-4: #F59E0B;  /* amber-600 */
+    --chart-5: #EF4444;  /* red-600 */
+
+    /* Sidebar */
+    --sidebar: var(--color-secondary-100);
+    --sidebar-foreground: #111827;
+    --sidebar-primary: var(--color-primary-700);
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: var(--color-secondary-200);
+    --sidebar-accent-foreground: #111827;
+    --sidebar-border: var(--color-secondary-300);
+    --sidebar-ring: var(--color-primary-500);
 }
 
+/* =========================================================
+ * 4) 다크 테마 (서비스 페이지) – 글래스모피즘
+ *    - 배경은 딥 네이비/블랙
+ *    - 카드/팝오버는 유리질감 토큰 사용
+ * =======================================================*/
 .dark {
-    --background: oklch(0.141 0.005 285.823);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.21 0.006 285.885);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.21 0.006 285.885);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.92 0.004 286.32);
-    --primary-foreground: oklch(0.21 0.006 285.885);
-    --secondary: oklch(0.274 0.006 286.033);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.274 0.006 286.033);
-    --muted-foreground: oklch(0.705 0.015 286.067);
-    --accent: oklch(0.274 0.006 286.033);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.552 0.016 285.938);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.21 0.006 285.885);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.274 0.006 286.033);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.552 0.016 285.938);
+    /* Glass tokens */
+    --glass-surface: color-mix(in srgb, #ffffff 6%, transparent);   /* rgba(255,255,255,0.06) */
+    --glass-border:  color-mix(in srgb, #ffffff 14%, transparent);  /* rgba(255,255,255,0.14) */
+    --glass-highlight: color-mix(in srgb, #ffffff 10%, transparent);/* rgba(255,255,255,0.10) */
+
+    /* Base surfaces */
+    --background: #0A0F1C;        /* 다크 베이스 (Terminus 1984 느낌) */
+    --foreground: #EAEFF7;
+
+    /* 유리질감: 카드/팝오버 */
+    --card: var(--glass-surface);
+    --card-foreground: #EAF2FF;
+
+    --popover: var(--glass-surface);
+    --popover-foreground: #EAF2FF;
+
+    /* Semantics (같은 팔레트 사용, 대비 최적화) */
+    --primary: var(--color-primary-600);      /* #528DE8 */
+    --primary-foreground: #0A0F1C;
+
+    --secondary: #121826;                     /* 다크 중간 배경 */
+    --secondary-foreground: #EAF2FF;
+
+    --muted: #1a2436;
+    --muted-foreground: #9CB3D1;
+
+    --accent: var(--color-accent-600);        /* #22C55E */
+    --accent-foreground: #071b0f;
+
+    --destructive: var(--color-danger-600);   /* #EF4444 */
+    --border: var(--glass-border);
+    --input: color-mix(in srgb, #ffffff 15%, transparent);
+    --ring: #4C7CEB;
+
+    /* Charts (다크 대비) */
+    --chart-1: #91A4C3;   /* slate light */
+    --chart-2: #57D18A;   /* green */
+    --chart-3: #5DBAF2;   /* sky */
+    --chart-4: #F2C15D;   /* amber */
+    --chart-5: #F07A7A;   /* red */
+
+    /* Sidebar (유리톤) */
+    --sidebar: var(--glass-surface);
+    --sidebar-foreground: #EAF2FF;
+    --sidebar-primary: var(--color-primary-600);
+    --sidebar-primary-foreground: #0A0F1C;
+    --sidebar-accent: color-mix(in srgb, #ffffff 8%, transparent);
+    --sidebar-accent-foreground: #EAF2FF;
+    --sidebar-border: var(--glass-border);
+    --sidebar-ring: #4C7CEB;
 }
 
+/* =========================================================
+ * 5) Base Layer (shadcn reset 느낌)
+ * =======================================================*/
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
+    * { @apply border-border outline-ring/50; }
+    body { @apply bg-background text-foreground; }
+}
+
+/* =========================================================
+ * 6) (선택) 글래스 유틸리티 – 다크에서 자동 어울림
+ *    - 필요하면 클래스만 추가해서 사용
+ * =======================================================*/
+@layer utilities {
+    .glass {
+        background: var(--card);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(12px) saturate(120%);
+        -webkit-backdrop-filter: blur(12px) saturate(120%);
+        box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 var(--glass-highlight);
+        border-radius: var(--radius);
     }
 }
