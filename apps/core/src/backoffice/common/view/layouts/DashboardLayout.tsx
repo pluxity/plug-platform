@@ -29,18 +29,28 @@ const DashboardLayout: React.FC = () => {
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
-  const handleClick = (id: string) => {setActiveItem(id);};
+  const handleClick = (id: string) => {
+    const clickedItem = AsideMenuItems.find(item => item.id === id);
 
-  const handleToggle = (id: string) => setExpandedItems((prev) => (prev.includes(id) ? [] : [id]));
+    if (clickedItem?.depth === 1) {
+      const hasChildren = AsideMenuItems.some(item => item.parentId === id);
+      if (hasChildren) {
+        setExpandedItems(prev =>
+          prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+        );
+      }
+    }
+
+    setActiveItem(id);
+  };
 
   return (
     <div className="flex h-full overflow-hidden">
       <Sidebar
         items={AsideMenuItems}
         activeItemId={activeItem}
-        expandedItemIds={expandedItems}
+        expandedItems={expandedItems}
         onItemClick={handleClick}
-        onToggleExpand={handleToggle}
       />
 
       <main className="flex-1 p-6 overflow-auto">

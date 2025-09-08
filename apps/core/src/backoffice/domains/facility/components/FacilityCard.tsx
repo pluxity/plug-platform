@@ -72,13 +72,13 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg font-semibold text-gray-900 truncate flex">
               {facility.name}
-              <Badge variant="outline" className="ml-2">
+              <Badge className="ml-2 rounded-full bg-primary-300 text-primary-900 border ">
                 {typeConfig?.displayName || '알 수 없음'}
               </Badge>
             </CardTitle>
           </div>
           <CardAction className="self-center">
-            <code className="px-2 py-1 text-xs font-mono bg-gray-100 text-gray-700 rounded border">
+            <code className="px-2 py-1 text-xs font-mono bg-gray-200 text-gray-700 rounded border">
               {facility.code}
             </code>
           </CardAction>

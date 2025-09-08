@@ -21,7 +21,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
   const isAllSelected = selectedTypes.length === 0;
 
   return (
-    <div className="flex items-centers justify-evenly rounded-sm gap-2 mb-6 py-1 ">
+    <div className="flex items-centers justify-evenly rounded-sm gap-1 mb-6 py-1 ">
       <div
         className={`
           relative px-4 py-2 cursor-pointer transition-all duration-200 rounded-md w-full flex justify-center
@@ -51,9 +51,9 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
           >
             {totalCount}
           </span>
-          {isAllSelected && (
+          {isAllSelected ? (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-full"></div>
-          )}
+          ) : (<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary-400 rounded-full"></div>)}
         </div>
       </div>
 
@@ -92,9 +92,9 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
                 </span>
               )}
             </div>
-            {isSelected && (
+            {isSelected? (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-full"></div>
-            )}
+            ) : (<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary-400 rounded-full"></div>)}
           </div>
         );
       })}
