@@ -40,6 +40,8 @@ function LoadGltf(url: string, onLoad: Function) {
 
             // 메시 객체면 그림자 설정
             if (child instanceof THREE.Mesh) {
+                child.geometry.computeBoundsTree();
+
                 child.receiveShadow = true;
                 child.castShadow = true;
 
@@ -100,6 +102,8 @@ async function getGltfWithAnimation(url: string) {
         // 그림자, 재질 설정
         gltf.scene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
+                child.geometry.computeBoundsTree();
+
                 child.receiveShadow = true;
                 child.castShadow = true;
 

@@ -236,6 +236,9 @@ importers:
       three:
         specifier: ^0.173.0
         version: 0.173.0
+      three-mesh-bvh:
+        specifier: ^0.9.1
+        version: 0.9.1(three@0.173.0)
     devDependencies:
       '@tweenjs/tween.js':
         specifier: ^25.0.0
@@ -3107,6 +3110,11 @@ packages:
 
   three-mesh-bvh@0.8.3:
     resolution: {integrity: sha512-4G5lBaF+g2auKX3P0yqx+MJC6oVt6sB5k+CchS6Ob0qvH0YIhuUk1eYr7ktsIpY+albCqE80/FVQGV190PmiAg==}
+    peerDependencies:
+      three: '>= 0.159.0'
+
+  three-mesh-bvh@0.9.1:
+    resolution: {integrity: sha512-WNT+m9jGQgtp4YdtwEnl4oFylNVifRf7iphlwWdJ4bJu7oNkY0xHIyntep9OzHuR1hpe/pyAP840gB/EsYDJfg==}
     peerDependencies:
       three: '>= 0.159.0'
 
@@ -6345,6 +6353,10 @@ snapshots:
   tapable@2.2.1: {}
 
   three-mesh-bvh@0.8.3(three@0.173.0):
+    dependencies:
+      three: 0.173.0
+
+  three-mesh-bvh@0.9.1(three@0.173.0):
     dependencies:
       three: 0.173.0
 

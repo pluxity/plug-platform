@@ -99,6 +99,7 @@ async function onBeforeRender(evt: any) {
 
                 // 광선
                 const rayCaster = new THREE.Raycaster(engine.Camera.position, rayDir, 0.1, rayDistance);
+                rayCaster.layers.set(Interfaces.CustomLayer.Pickable);
                 const intersects = rayCaster.intersectObjects(ModelInternal.ModelGroup.children, true);
                 if (intersects.length > 0) // 카메라투영점과 위치점에 걸리는것이 있으면 가시화 비활성화
                     poi.TextVisible = false;
