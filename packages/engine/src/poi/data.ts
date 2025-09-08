@@ -624,6 +624,7 @@ function SetTextInnerHtml(id: string, htmlString: string) {
     if (poiDataList.hasOwnProperty(id)) {
         const poi = poiDataList[id];
 
+        poi.htmlString = htmlString;
         poi.TextObject.element.innerHTML = htmlString;
         //poi.WorldPosition = poi.WorldPosition;
     }
