@@ -1,18 +1,18 @@
 [
     {
-        "id": "0",
+        "id": "1c875673-e659-4feb-a9eb-ec8109317ad6",
         "iconUrl": "",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "0",
+        "htmlString": "<label style='color: white;'>1c875673</label>",
         "property": {
-            "code": ""
+            "assetId": 26
         },
         "position": {
-            "x": 23.21199645825625,
-            "y": -22.09000015258789,
-            "z": -17.388035008406575
+            "x": -69.59484528414828,
+            "y": 12.479780766353821,
+            "z": -0.2685278956625572
         },
+        "floorId": "7",
         "rotation": {
             "x": 0,
             "y": 0,
@@ -23,21 +23,20 @@
             "y": 1,
             "z": 1
         }
-    },
-    {
-        "id": "1",
+    },{
+        "id": "721d30f4-ad1a-4edf-a6f2-4beca584ae0d",
         "iconUrl": "",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "0",
+        "htmlString": "<label style='color: white;'>721d30f4</label>",
         "property": {
-            "code": ""
+            "assetId": 7
         },
         "position": {
-            "x": 29.986910463638367,
-            "y": -22.09000015258789,
-            "z": -16.352419125385314
+            "x": -81.62152047338131,
+            "y": 5.5299945673724835,
+            "z": 38.667720943282376
         },
+        "floorId": "17",
         "rotation": {
             "x": 0,
             "y": 0,
@@ -48,21 +47,20 @@
             "y": 1,
             "z": 1
         }
-    },
-    {
-        "id": "2",
+    },{
+        "id": "a195fcdb-bf1e-434b-9053-bacd450a4820",
         "iconUrl": "",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "0",
+        "htmlString": "<label style='color: white;'>a195fcdb</label>",
         "property": {
-            "code": ""
+            "assetId": 26
         },
         "position": {
-            "x": 26.22677555845108,
-            "y": -22.09000015258789,
-            "z": -15.715936937513948
+            "x": -75.74597303188611,
+            "y": 8.799556308112704,
+            "z": 24.80371030095112
         },
+        "floorId": "6",
         "rotation": {
             "x": 0,
             "y": 0,
@@ -73,21 +71,20 @@
             "y": 1,
             "z": 1
         }
-    },
-    {
-        "id": "3",
+    },{
+        "id": "e488b490-4e49-4eb6-86d3-23893bc9a3b3",
         "iconUrl": "",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "0",
+        "htmlString": "<label style='color: white;'>e488b490</label>",
         "property": {
-            "code": ""
+            "assetId": 39
         },
         "position": {
-            "x": 34.3362501022759,
-            "y": -22.09000015258789,
-            "z": -16.86207701996457
+            "x": -67.19443645412495,
+            "y": 11.675652670683915,
+            "z": -0.7126761666919602
         },
+        "floorId": "7",
         "rotation": {
             "x": 0,
             "y": 0,
@@ -98,21 +95,20 @@
             "y": 1,
             "z": 1
         }
-    },
-    {
-        "id": "4",
+    },{
+        "id": "dcb2b088-6b1e-4e44-bec2-c872f24883a3",
         "iconUrl": "",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "1",
+        "htmlString": "<label style='color: white;'>dcb2b088</label>",
         "property": {
-            "code": ""
+            "assetId": 26
         },
         "position": {
-            "x": 110.65126130889549,
-            "y": -18.09000015258789,
-            "z": -19.507101840210666
+            "x": -70.83184409323717,
+            "y": 13.642394310701183,
+            "z": 5.2113299517919485
         },
+        "floorId": "7",
         "rotation": {
             "x": 0,
             "y": 0,
@@ -123,246 +119,20 @@
             "y": 1,
             "z": 1
         }
-    },
-    {
-        "id": "5",
+    }, {
+        "id": "29b57e3a-51aa-49f8-99a5-0686616e8e7c",
         "iconUrl": "",
         "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "1",
+        "htmlString": "<label style='color: white;'>29b57e3a</label>",
         "property": {
-            "code": ""
+            "assetId": 26
         },
         "position": {
-            "x": 144.45617466430525,
-            "y": -14.89000129699707,
-            "z": -19.099669510901677
+            "x": -65.15339273307339,
+            "y": 13.85531816002026,
+            "z": -1.3198858335130303
         },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "6",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "2",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 130.65612304537183,
-            "y": -8.389999389648438,
-            "z": -19.06777188466323
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "7",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "2",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 130.14887278126886,
-            "y": -8.389999389648438,
-            "z": -17.43530914737883
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "8",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "0",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 35.16754316943609,
-            "y": -22.09000015258789,
-            "z": -15.3348384121488
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "9",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "0",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 27.82215179190071,
-            "y": -22.09000015258789,
-            "z": -16.035682167911027
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "10",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "2",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 126.38249747731955,
-            "y": -8.389999389648438,
-            "z": -16.676356881603795
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "11",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "2",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 139.77347558541982,
-            "y": -8.389999389648438,
-            "z": -16.36226081832556
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "12",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "2",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 75.40088342290247,
-            "y": -11.59000015258789,
-            "z": -18.20129063135486
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "13",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "1",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 60.01943707067808,
-            "y": -18.09000015258789,
-            "z": -22.39654441976389
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-        }
-    },
-    {
-        "id": "14",
-        "iconUrl": "",
-        "modelUrl": "monkeyhead.glb",
-        "displayText": "테스트",
-        "floorId": "1",
-        "property": {
-            "code": ""
-        },
-        "position": {
-            "x": 61.32168214762251,
-            "y": -18.09000015258789,
-            "z": -22.174928722368108
-        },
+        "floorId": "7",
         "rotation": {
             "x": 0,
             "y": 0,
