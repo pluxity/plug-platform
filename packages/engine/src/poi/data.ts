@@ -16,7 +16,7 @@ let pointMeshStorage: Record<string, THREE.InstancedMesh> = {};
 let iconStorage: Record<string, THREE.SpriteMaterial> = {};
 let poiDummies: THREE.Object3D[] = [];
 let bNeedsUpdate: boolean = false;
-let htmlVisibilityCheck: boolean = true;
+let htmlVisibilityCheck: boolean = false;
 
 /**
  * 초기화
