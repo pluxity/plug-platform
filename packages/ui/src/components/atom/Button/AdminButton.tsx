@@ -1,0 +1,65 @@
+import { Slot } from "@radix-ui/react-slot";
+import { ButtonProps } from "./Button.types";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "../../../utils/utils";
+
+export const adminButtonVariants = cva(
+  `inline-flex items-center justify-center gap-2 font-medium
+  whitespace-nowrap transition-all disabled:text-gray2 disabled:cursor-not-allowed 
+  [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive px-2.5 rounded-sm`,
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary-250 text-primary-800 hover:bg-primary-300 disabled:bg-point-blue-disable",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 disabled:bg-gray2 disabled:text-white",
+        outline:
+          "border bg-secondary-100 border border-secondary-500 text-secondary-700 hover:bg-secondary-200 hover:text-black disabled:border-gray2 disabled:text-gray2",
+        secondary:
+          "bg-muted-light-blue1 border border-point-blue text-point-blue hover:bg-muted-light-blue2 disabled:border-gray2 disabled:bg-point-blue-disable",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:text-point-blue underline active:text-black disabled:text-gray2",
+      },
+      size: {
+        default: "h-9 min-w-25 has-[>svg]:px-3 text-[14px]",
+        sm: "h-6 min-w-12 has-[>svg]:px-2 text-[12px]",
+        lg: "h-12 min-w-38 has-[>svg]:px-4 text-[20px]",
+        icon: "w-[var(--cell-size)] h-[var(--cell-size)] p-0",
+      },
+      onBackground: {
+        true: "text-gray2 hover:text-muted-light-blue1 active:text-gray2 disabled:text-light-gray w-full",
+        false: "",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+      onBackground: false,
+    },
+  }
+)
+
+function AdminButton({
+  className,
+  variant,
+  size,
+  asChild = false,
+  onBackground,
+  ...props
+}: ButtonProps & VariantProps<typeof adminButtonVariants>) {
+  const Comp = asChild ? Slot : "button"
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(adminButtonVariants({ variant, size, onBackground, className }))}
+      {...props}
+    />
+  )
+}
+
+AdminButton.displayName = "AdminButton";
+
+export { AdminButton }

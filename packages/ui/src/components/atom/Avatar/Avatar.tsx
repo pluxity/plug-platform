@@ -1,8 +1,7 @@
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import ProfileSvg from "../../../assets/icons/Avatar/profile.svg";
 import { AvatarProps, AvatarImageProps, AvatarFallbackProps } from "./Avatar.types";
-
 import { cn } from "../../../utils/utils";
+import Profile from "../../../assets/icons/Avatar/Profile";
 
 function Avatar({
   className,
@@ -12,7 +11,7 @@ function Avatar({
     <AvatarPrimitive.Root
       data-slot="avatar"
       className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
+        "relative flex",
         className
       )}
       {...props}
@@ -31,9 +30,14 @@ function AvatarImage({
     return (
       <div
         data-slot="avatar-image"
-        className={cn("aspect-square size-full bg-muted-blue-gray flex items-center justify-center", className)}
+        className={cn(
+          "aspect-square size-10 grid place-items-center rounded-full",
+          "bg-primary-200 backdrop-blur-[0.5px]",
+          className
+        )}
       >
-        <ProfileSvg />
+        <Profile className="size-6" aria-hidden="true" />
+         <span className="sr-only">사용자 프로필</span>
       </div>
     )
   }

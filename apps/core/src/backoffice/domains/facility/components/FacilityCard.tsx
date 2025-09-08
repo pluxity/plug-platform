@@ -63,7 +63,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 pt-4">
+    <Card className="duration-200 pt-4">
       <CardHeader 
         className="cursor-pointer" 
         onClick={handleCardClick}

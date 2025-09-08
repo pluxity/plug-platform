@@ -6,8 +6,8 @@ const BackofficeHeader: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 z-10">
-      <div className="px-6 py-4">
+    <header className="bg-white border-b z-10 shadow-xs">
+      <div className="px-2 pl-6 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-900">

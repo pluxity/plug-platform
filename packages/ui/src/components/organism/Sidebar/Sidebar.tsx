@@ -30,7 +30,7 @@ function Sidebar({ items, activeItemId, expandedItemIds, onItemClick, onToggleEx
         className={cn(
           "self-stretch inline-flex justify-start items-center gap-1.5 cursor-pointer",
           depth === 1 ? "pl-1.5 py-1.5" : "pl-2.5 py-1.5 h-7",
-          isActive ? "bg-blue-50" : "bg-white",
+          isActive ? "bg-blue-50" : "bg-secondary-200",
           "rounded-[3px] hover:bg-blue-50"
         )}
           onClick={() => {
@@ -66,7 +66,7 @@ function Sidebar({ items, activeItemId, expandedItemIds, onItemClick, onToggleEx
   };
 
   return (
-    <div className="w-64 h-screen p-5 bg-white border-r border-slate-200 overflow-hidden">
+    <div className="w-64 h-screen p-5 bg-secondary-200 border-r border-slate-200 overflow-hidden shadow-[1px_0_2px_rgba(0,0,0,0.05 )]">
       <div className="w-full flex flex-col justify-start items-start gap-1.5">
         {items.map(renderItem)}
       </div>

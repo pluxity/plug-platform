@@ -7,6 +7,7 @@ export * from "./components/atom/Avatar/Avatar";
 export * from "./components/atom/Badge/Badge";
 export * from "./components/atom/Breadcrumb/Breadcrumb";
 export * from "./components/atom/Button/Button";
+export * from "./components/atom/Button/AdminButton"
 export * from "./components/atom/Calendar/Calendar";
 export * from "./components/atom/Card/Card";
 export * from "./components/atom/Carousel/Carousel";
