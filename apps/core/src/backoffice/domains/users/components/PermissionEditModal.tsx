@@ -1,21 +1,20 @@
-import { toast } from 'sonner';
-
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { usePermissionDetail, useUpdatePermission } from '@plug/common-services';
 import { Dialog, DialogContent, DialogFooter, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Button, Checkbox, Label } from '@plug/ui';
 
 import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
-import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';
 import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 import { PermissionEditModalProps } from '@/backoffice/domains/users/types/permisson';
-export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpen, onClose, onSuccess, permissionId }) => {
+import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';
+export const PermissionEditModal = ({ isOpen, onClose, onSuccess, permissionId }: PermissionEditModalProps) => {
     const { data: detailData, execute: detailPermission } = usePermissionDetail(permissionId);
     const { execute: updatePermission, isLoading: isPermissionUpdating } = useUpdatePermission(permissionId);
     const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();
-    const { isResourceSelected, handleCheckboxChange } = usePermissionCheckbox();
+    const { isResourceSelected, handleCheckboxChange, isCCTVAllSelected, handleCCTVAllToggle } = usePermissionCheckbox();
 
     const modalForm = useForm<PermissionFormData>({
         resolver: zodResolver(permissionFormSchema),
@@ -113,31 +112,49 @@ export const PermissionEditModal : React.FC<PermissionEditModalProps> = ({ isOpe
                                                         <div key={resourceType.key} className="flex flex-col gap-2">
                                                             <div className="font-semibold">{resourceType.name}</div>
                                                             <div className="flex flex-wrap gap-x-6 gap-y-2">
-                                                                {resources.length > 0 ? (
-                                                                    resources.map((resource) => {
-                                                                        const checkboxId = `${resourceType.key}-${resource.id}`;
-                                                                        return (
-                                                                            <div key={resource.id} className="flex items-center gap-2">
-                                                                                <Checkbox 
-                                                                                    variant="square" 
-                                                                                    id={checkboxId}
-                                                                                    checked={isResourceSelected(field.value || [], resourceType.key, resource.id)}
-                                                                                    onCheckedChange={(checked) => 
-                                                                                        handleCheckboxChange(
-                                                                                            field.value || [], 
-                                                                                            field.onChange, 
-                                                                                            resourceType.key, 
-                                                                                            resource.id, 
-                                                                                            !!checked
-                                                                                        )
-                                                                                    }
-                                                                                />
-                                                                                <Label htmlFor={checkboxId}>{resource.name}</Label>
-                                                                            </div>
-                                                                        );
-                                                                    })
+                                                                {resourceType.key === 'CCTV' ? (
+                                                                    <div className="flex items-center gap-2">
+                                                                        <Checkbox 
+                                                                            variant="square" 
+                                                                            id="cctv-all"
+                                                                            checked={isCCTVAllSelected(field.value || [])}
+                                                                            onCheckedChange={(checked) => 
+                                                                                handleCCTVAllToggle(
+                                                                                    field.value || [], 
+                                                                                    field.onChange, 
+                                                                                    !!checked
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                        <Label htmlFor="cctv-all">CCTV</Label>
+                                                                    </div>
                                                                 ) : (
-                                                                    <div className="text-gray-500 text-sm">사용 가능한 리소스가 없습니다.</div>
+                                                                    resources.length > 0 ? (
+                                                                        resources.map((resource) => {
+                                                                            const checkboxId = `${resourceType.key}-${resource.id}`;
+                                                                            return (
+                                                                                <div key={resource.id} className="flex items-center gap-2">
+                                                                                    <Checkbox 
+                                                                                        variant="square" 
+                                                                                        id={checkboxId}
+                                                                                        checked={isResourceSelected(field.value || [], resourceType.key, resource.id)}
+                                                                                        onCheckedChange={(checked) => 
+                                                                                            handleCheckboxChange(
+                                                                                                field.value || [], 
+                                                                                                field.onChange, 
+                                                                                                resourceType.key, 
+                                                                                                resource.id, 
+                                                                                                !!checked
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                    <Label htmlFor={checkboxId}>{resource.name}</Label>
+                                                                                </div>
+                                                                            );
+                                                                        })
+                                                                    ) : (
+                                                                        <div className="text-gray-500 text-sm">사용 가능한 리소스가 없습니다.</div>
+                                                                    )
                                                                 )}
                                                             </div>
                                                         </div>

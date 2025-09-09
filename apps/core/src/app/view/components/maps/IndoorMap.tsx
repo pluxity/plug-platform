@@ -1,32 +1,36 @@
+import { useEffect, useCallback, useState, useRef } from 'react'
+
+import type { DeviceResponse, FacilityType } from '@plug/common-services'
 import { Poi } from '@plug/engine'
 
+import { MapScene } from '@/global/components/indoor-map'
 import { useAssets } from '@/global/store/assetStore'
-
-import type { IndoorSearchItem } from '@/app/store/indoorStore'
-
 import { getDeviceLatestNormalized } from '@/global/services'
 
 import { DeviceInfoDialog } from '../dialogs'
 
-import React, { useEffect, useCallback, useState, useRef } from 'react'
-
-import type { DeviceResponse, FacilityType } from '@plug/common-services'
-
 import { useFacilityStore } from '@/app/store/facilityStore'
 import { useIndoorStore } from '@/app/store/indoorStore'
+import type { IndoorSearchItem } from '@/app/store/indoorStore'
+
 import { useIndoorEngine, useIndoorFacilityData, usePoiEmbeddedWebRTC } from '@/app/view/hooks'
-import { MapScene } from '@/global/components/indoor-map'
 
 import DeviceCategoryChips from './DeviceCategoryChips'
 import IndoorSearchForm from './IndoorSearchForm'
-interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
-const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOutdoor }) => {
+interface IndoorMapProps { 
+  facilityId: number; 
+  facilityType: FacilityType; 
+  onGoOutdoor?: () => void 
+}
+
+const IndoorMap = ({ facilityId, facilityType, onGoOutdoor }: IndoorMapProps) => {
   const facilitiesFetched = useFacilityStore(s => s.facilitiesFetched)
   const { assets } = useAssets()
   const { features, floors, has3DDrawing, isLoading, countdown, modelUrl, handleOutdoor } = useIndoorFacilityData({ facilityId, facilityType, onGoOutdoor })
   const loadCctvs = useIndoorStore(s => s.loadCctvs)
   const loadDevices = useIndoorStore(s => s.loadDevices)
+  
   useEffect(() => {
     if (facilityId) {
       loadDevices(facilityId)
