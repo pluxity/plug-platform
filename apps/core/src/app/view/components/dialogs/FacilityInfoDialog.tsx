@@ -14,12 +14,12 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
   const badges = (
     <>
       {facility.code && (
-        <span className="px-[0.625rem] py-1 rounded-full bg-blue-500/20 text-blue-200 border border-blue-400/30 backdrop-blur-sm">
+        <span className="px-[0.625rem] py-1 rounded-full bg-primary-500/20 text-primary-200 border border-primary-400/30 backdrop-blur-sm">
           {facility.code}
         </span>
       )}
       {facility.type && (
-        <span className="px-[0.625rem] py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 backdrop-blur-sm">
+        <span className="px-[0.625rem] py-1 rounded-full bg-accent-500/20 text-accent-200 border border-accent-400/30 backdrop-blur-sm">
           {facility.type}
         </span>
       )}
@@ -37,8 +37,8 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
 
   // 위치 블록 (맨 위)
   const locationBlock = (facility.lat && facility.lon) ? (
-    <div className="flex flex-wrap gap-x-6 gap-y-2 text-[0.8125rem] bg-white/5 px-4 py-3 rounded-xl border border-white/10">
-      <div className="font-semibold tracking-wide text-[11px] text-slate-400">위치</div>
+    <div className="flex flex-wrap gap-x-6 gap-y-2 text-[0.8125rem] bg-secondary-100/10 px-4 py-3 rounded-xl border border-secondary-100/10">
+      <div className="font-semibold tracking-wide text-[11px] text-secondary-500">위치</div>
       <div className="font-mono">Lat: {facility.lat.toFixed(6)}</div>
       <div className="font-mono">Lon: {facility.lon.toFixed(6)}</div>
     </div>
@@ -47,23 +47,23 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
   // 상세 설명 블록 (헤더 포함)
   const descriptionBlock = facility.description ? (
     <div className="flex flex-col gap-2">
-      <h5 className="text-xs font-semibold tracking-wide text-slate-400">상세 설명</h5>
-      <p className="text-sm leading-relaxed text-slate-200/90 whitespace-pre-wrap break-words">{facility.description}</p>
+      <h5 className="text-xs font-semibold tracking-wide text-secondary-500">상세 설명</h5>
+      <p className="text-sm leading-relaxed text-secondary-100/90 whitespace-pre-wrap break-words">{facility.description}</p>
     </div>
   ) : null
 
   // Footer 로 이동한 생성/수정일 메타 정보
   const metaDates = (facility.createdAt || facility.updatedAt) ? (
-    <div className="flex flex-wrap gap-4 text-[10px] text-slate-300/80 leading-tight">
+    <div className="flex flex-wrap gap-4 text-[10px] text-secondary-300/70 leading-tight">
       {facility.createdAt && (
         <div className="flex flex-col min-w-[6rem]">
-          <span className="uppercase tracking-wide text-slate-500 mb-0.5">생성일</span>
+          <span className="uppercase tracking-wide text-secondary-500 mb-0.5">생성일</span>
           <span className="text-[11px]">{new Date(facility.createdAt).toLocaleDateString()}</span>
         </div>
       )}
       {facility.updatedAt && (
         <div className="flex flex-col min-w-[6rem]">
-          <span className="uppercase tracking-wide text-slate-500 mb-0.5">수정일</span>
+          <span className="uppercase tracking-wide text-secondary-500 mb-0.5">수정일</span>
           <span className="text-[11px]">{new Date(facility.updatedAt).toLocaleDateString()}</span>
         </div>
       )}

@@ -55,15 +55,15 @@ const MainMap: React.FC = () => {
     <div className="w-full h-full relative">
       {mapMode === MapMode.OUTDOOR && (
         <div className="absolute top-4 right-4 z-50 pointer-events-auto">
-          <UserProfile />
-        </div>
+        <UserProfile />
+      </div>
       )}
       {mapMode === MapMode.INDOOR && (
         <div className="absolute top-4 right-4 z-50 flex items-center gap-3 pointer-events-auto">
           <button
             type="button"
             onClick={goOutdoor}
-            className="group relative h-11 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-cyan-600 text-white shadow-lg shadow-cyan-600/30 hover:from-sky-500 hover:to-cyan-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300/70 transition-all duration-300 px-0 pl-0 pr-0 overflow-hidden cursor-pointer"
+            className="group relative h-11 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500/60 to-primary-600/70 text-white shadow-lg shadow-primary-600/30 hover:from-primary-400/60 hover:to-primary-500/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-300/70 transition-all duration-300 px-0 pl-0 pr-0 overflow-hidden cursor-pointer"
             title="실외 지도로 나가기"
             aria-label="실외 지도로 나가기"
           >

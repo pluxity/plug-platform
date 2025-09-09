@@ -65,20 +65,17 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
   if (floors.length === 0) return null;
 
   return (
-    <div className={`${className} relative bg-white/5 backdrop-blur-xxs border border-white/30 shadow-lg overflow-hidden`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-white/10 to-white/15 "></div>
-
+    <div className={`${className} liquid-glass relative overflow-hidden`}>
       {isExpanded && (
         <div className="relative z-10 border-b border-white/20">
           {/* Header row */}
           <div className="flex items-center justify-between mb-3 pt-2 px-2">
             <div className="flex items-center space-x-2 select-none">
-              <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-              <h3 className="text-sm font-semibold text-gray-100">층별 보기</h3>
+              <h3 className="text-sm font-semibold text-secondary-100">층별 보기</h3>
             </div>
             <button
               onClick={toggleAllFloors}
-              className="text-xs px-3 py-1 bg-white/20 hover:bg-white/30 text-gray-100 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/20 cursor-pointer select-none"
+              className="liquid-glass text-xs px-3 py-1 text-secondary-500 cursor-pointer select-none"
             >
               {allVisible ? '모두 숨기기' : '모두 보기'}
             </button>
@@ -90,14 +87,14 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
               <input
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
-                className="w-full bg-white/10 placeholder:text-gray-300/70 text-gray-100 text-xs px-3 py-2 rounded-md outline-none border border-white/20 focus:border-white/40"
+                className=" w-full bg-white/10 placeholder:text-secondary-500 text-secondary-100 text-xs px-3 py-2 rounded-md outline-none border border-secondary-100/20"
                 placeholder="층 검색 (예: 3, B1, 로비)"
                 aria-label="층 검색"
               />
               {filterText && (
                 <button
                   onClick={() => setFilterText('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-secondary-500 hover:text-secondary-100"
                   aria-label="검색 지우기"
                 >
                   ×
@@ -107,100 +104,101 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
           </div>
 
           {/* Content: grid for many floors, list for fewer */}
-          <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
             {floors.length > 15 && (
-              <div className="sticky top-0 bg-blue-400/20 border border-blue-300/30 backdrop-blur-sm p-3 z-10">
+              <div className="sticky top-0 bg-primary-1000/60 border border-primary-700/30 p-3 z-10">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-blue-100 font-medium">🏢 총 {floors.length}개 층</p>
-                  <div className="text-xs text-blue-200">{visibleFloors.size}개 표시 중</div>
+                  <p className="text-xs text-secondary-100 font-medium">총 {floors.length}개 층</p>
+                  <div className="text-xs text-primary-400">{visibleFloors.size}개 표시 중</div>
                 </div>
               </div>
             )}
-
-            {filteredFloors.length === 0 ? (
-              <div className="px-3 py-8 text-center text-xs text-gray-300">검색 결과가 없습니다</div>
-            ) : filteredFloors.length > 14 ? (
-              <div className="p-2 grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {filteredFloors.map((floor: Floor) => {
-                  const isOn = visibleFloors.has(floor.floorId);
-                  return (
-                    <div key={floor.floorId} className="group relative">
-                      <button
-                        onClick={() => toggleFloor(floor.floorId)}
-                        className={`w-full px-3 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer select-none text-left ${
-                          isOn
-                            ? 'bg-emerald-500/20 border-emerald-300/40 text-white hover:bg-emerald-500/30'
-                            : 'bg-white/10 border-white/20 text-gray-100 hover:bg-white/20'
-                        }`}
-                        title={isOn ? '층 숨기기' : '층 보이기'}
-                      >
-                        <span className="block truncate">{floor.name}</span>
-                        <span className="text-[10px] opacity-70">ID: {floor.floorId}</span>
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="space-y-1 px-1 pb-2">
-                {filteredFloors.map((floor: Floor) => (
-                  <div
-                    key={floor.floorId}
-                    className="flex items-center justify-between p-2 hover:bg-white/10 transition-all duration-200 group rounded"
-                  >
-                    <div className="flex items-center space-x-3 select-none">
-                      <div
-                        className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
-                          visibleFloors.has(floor.floorId) ? 'bg-green-400 shadow-md' : 'bg-gray-400'
-                        }`}
-                      ></div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-100 group-hover:text-white select-none">
-                          {floor.name}
-                        </span>
-                        {floors.length > 10 && (
-                          <span className="text-[11px] text-gray-300 select-none">ID: {floor.floorId}</span>
-                        )}
+            <div className="min-h-60 min-w-60 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+              {filteredFloors.length === 0 ? (
+                <div className="h-60 flex items-center justify-center">
+                  <div className="text-center text-xs text-secondary-100">검색 결과가 없습니다</div>
+                </div>
+              ) : filteredFloors.length > 14 ? (
+                <div className="p-2 grid grid-cols-3 sm:grid-cols-3 gap-2">
+                  {filteredFloors.map((floor: Floor) => {
+                    const isOn = visibleFloors.has(floor.floorId);
+                    return (
+                      <div key={floor.floorId} className="group relative">
+                        <button
+                          onClick={() => toggleFloor(floor.floorId)}
+                          className={`w-full px-3 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer select-none text-left ${
+                            isOn
+                              ? 'bg-accent-700/30 border-accent-1000 text-secondary-100 hover:bg-accent-800/40'
+                              : 'bg-secondary-100/20 border-secondary-100/20 text-secondary-100 hover:bg-secondary-100/20'
+                          }`}
+                          title={isOn ? '층 숨기기' : '층 보이기'}
+                        >
+                          <span className="block truncate">{floor.name}</span>
+                          <span className="text-[10px] opacity-70">ID: {floor.floorId}</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-1 px-1 pb-2">
+                  {filteredFloors.map((floor: Floor) => (
+                    <div
+                      key={floor.floorId}
+                      className="flex items-center justify-between p-2 hover:bg-secondary-100/10 transition-all duration-200 group rounded"
+                    >
+                      <div className="flex items-center space-x-3 select-none">
+                        <div
+                          className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
+                            visibleFloors.has(floor.floorId) ? 'bg-accent-700/60 shadow-md' : 'bg-secondary-100/20'
+                          }`}
+                        ></div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-secondary-100 group-hover:text-secondary-100 select-none">
+                            {floor.name}
+                          </span>
+                          {floors.length > 10 && (
+                            <span className="text-[11px] text-secondary-500 select-none">ID: {floor.floorId}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => toggleFloor(floor.floorId)}
+                          className={`w-8 h-8 flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                            visibleFloors.has(floor.floorId)
+                              ? 'text-accent-700/80 hover:text-accent-600/80'
+                              : 'text-secondary-100/40 hover:text-secondary-100/60'
+                          }`}
+                          aria-pressed={visibleFloors.has(floor.floorId)}
+                          aria-label={visibleFloors.has(floor.floorId) ? '층 숨기기' : '층 보이기'}
+                        >
+                          {visibleFloors.has(floor.floorId) ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                              />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                              />
+                            </svg>
+                          )}
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => toggleFloor(floor.floorId)}
-                        className={`w-8 h-8 flex items-center justify-center transition-all duration-200 cursor-pointer ${
-                          visibleFloors.has(floor.floorId)
-                            ? 'text-green-400 hover:text-green-300'
-                            : 'text-gray-400 hover:text-gray-300'
-                        }`}
-                        aria-pressed={visibleFloors.has(floor.floorId)}
-                        aria-label={visibleFloors.has(floor.floorId) ? '층 숨기기' : '층 보이기'}
-                      >
-                        {visibleFloors.has(floor.floorId) ? (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
         </div>
       )}
 
@@ -211,7 +209,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
           className="w-full flex items-center justify-between px-3 py-2 hover:bg-white/10 transition-all duration-200 group cursor-pointer"
         >
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-500/60 to-primary-600/70 flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -222,8 +220,8 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
               </svg>
             </div>
             <div className="flex flex-col items-start select-none">
-              <span className="text-sm font-semibold text-gray-100 group-hover:text-white transition-colors">층 선택</span>
-              <span className="text-xs text-gray-300">
+              <span className="text-sm font-semibold text-secondary-100 group-hover:text-secondary-100 transition-colors">층 선택</span>
+              <span className="text-xs text-secondary-500">
                 {floors.length > 15
                   ? `${floors.length}층 건물 · ${visibleFloors.size}개 표시`
                   : `${visibleFloors.size}개 층 표시`}
@@ -232,7 +230,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
           </div>
           <div className="ml-2">
             <svg
-              className={`w-4 h-4 text-gray-300 group-hover:text-gray-100 transition-all duration-200 ${
+              className={`w-4 h-4 text-secondary-300 group-hover:text-secondary-100 transition-all duration-200 ${
                 isExpanded ? 'rotate-180' : 'rotate-0'
               }`}
               fill="none"

@@ -124,21 +124,21 @@ const FacilitySearchForm: React.FC<FacilitySearchFormProps> = ({ viewer, onFacil
   renderItem={(facility) => (
         <div>
           <div className="flex w-full items-start gap-2">
-            <div className="w-3/5 break-words font-medium text-gray-900">
+            <div className="w-3/5 break-words font-medium text-secondary-100">
               {facility.name}
             </div>
             <div className="w-2/5 break-all whitespace-pre-wrap text-right">
               {facility.code && (
-                <span className="inline-block text-[10px] leading-4 bg-blue-100 text-blue-800 px-2 py-1 rounded break-all">
+                <span className="inline-block text-[10px] leading-4 bg-primary-300 text-primary-800 px-2 py-1 rounded break-all">
                   {facility.code}
                 </span>
               )}
             </div>
           </div>
           {facility.description && (
-            <div className="text-xs text-gray-500 mt-1 break-words">{facility.description}</div>
+            <div className="text-xs text-secondary-500 mt-1 break-words">{facility.description}</div>
           )}
-          <div className="text-[10px] text-blue-600 mt-1">
+          <div className="text-[10px] text-primary-400 mt-1">
             위도: {facility.lat?.toFixed(6)}, 경도: {facility.lon?.toFixed(6)}
           </div>
         </div>

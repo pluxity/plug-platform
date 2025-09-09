@@ -161,8 +161,8 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
             data-chip="true"
             onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id); }}
             className={[
-              'inline-flex items-center px-3 py-1.5 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
-              internalSelected === category.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+              'liquid-glass inline-flex items-center px-3 py-1 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
+              internalSelected === category.id ? 'bg-primary-400 text-secondary-100 border-primary-400' : 'bg-primary-1000/60 border-primary-700/30 text-secondary-100 hover:bg-primary-1000/60',
             ].join(' ')}
             title={category.name}
           >

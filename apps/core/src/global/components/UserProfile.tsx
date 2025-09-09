@@ -81,15 +81,15 @@ const UserProfile: React.FC<UserProfileProps> = ({
           ) : (
             <div className="text-xs space-y-1">
               <div className="flex justify-between">
-                <span className="text-gray-500">이름</span>
+                <span className="text-secondary-800">이름</span>
                 <span className={`font-medium truncate max-w-[60%] ${valueAlignCls}`}>{userProfile?.name || '-'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">부서</span>
+                <span className="text-secondary-800">부서</span>
                 <span className={`truncate max-w-[60%] ${valueAlignCls}`}>{userProfile?.department || '-'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">연락처</span>
+                <span className="text-secondary-800">연락처</span>
                 <span className={`truncate max-w-[60%] ${valueAlignCls}`}>{userProfile?.phoneNumber || '-'}</span>
               </div>
             </div>
@@ -100,14 +100,14 @@ const UserProfile: React.FC<UserProfileProps> = ({
             <button
               type="button"
               onClick={() => navigate('/admin')}
-              className="w-full text-left px-2 py-1.5 rounded hover:bg-gray-100 text-sm text-sky-600 hover:text-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-sky-300/70"
+              className="w-full text-left px-2 py-1.5 rounded hover:bg-secondary-300 text-sm text-primary-600 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary-300/70"
             >관리자 페이지로 이동</button>
           )}
           <button
             type="button"
             disabled={isSigningOut}
             onClick={handleLogout}
-            className="w-full text-left px-2 py-1.5 rounded hover:bg-red-50 text-sm text-red-600 disabled:opacity-60"
+            className="w-full text-left px-2 py-1.5 rounded hover:bg-danger-100 text-sm text-danger-600 disabled:opacity-60"
           >{isSigningOut ? '로그아웃 중...' : '로그아웃'}</button>
         </div>
       </div>
