@@ -60,11 +60,6 @@ const DeviceCategoryChips = ({
       thumbnailFile: {
         id: -1,
         url: '/images/icons/cctv.png',
-        originalFileName: 'cctv.png',
-        contentType: 'image/png',
-        fileStatus: 'uploaded' as const,
-        createdAt: new Date().toISOString(),
-        createdBy: 'System',
       },
     };
     
