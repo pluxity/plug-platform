@@ -4,7 +4,7 @@ import { TextareaProps } from "./Textarea.types";
 function Textarea({ className, error, placeholder = "텍스트를 입력하세요", ...props }: TextareaProps) {
   return (
     <div className={cn(
-      "w-56 h-20 min-w-24 p-2.5 bg-white rounded-[2px] outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-start items-start",
+      "w-56 h-20 min-w-24 p-2.5 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-secondary-500 inline-flex justify-start items-start",
       error && "outline-red-700",
       props.disabled && "bg-gray-200 outline-neutral-300",
       className

@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
   Button,
   Dialog,
   DialogContent,
@@ -117,10 +113,18 @@ export const DrawingFileHistory: React.FC<DrawingFileHistoryProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader className="pt-2">
+    <div className="space-y-4">
+      <div className="text-2xl font-bold text-gray-700" data-testid="facility-form-title">
+        도면 정보
+      </div>
+      <div className="space-y-4 border rounded-lg p-10">
         <div className="flex items-center justify-between">
-          <CardTitle>도면 파일 이력</CardTitle>
+          <div className="flex items-center space-x-2" >
+            <div className="w-0.5 h-6 rounded-full bg-primary-600 inline-block mr-3"/>
+            <label className="block font-bold">
+              <span>도면 파일 수정 이력</span>
+            </label>
+          </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">새 도면 업로드</Button>
@@ -204,52 +208,52 @@ export const DrawingFileHistory: React.FC<DrawingFileHistoryProps> = ({
             </DialogContent>
           </Dialog>
         </div>
-      </CardHeader>
-      <CardContent className="py-2">
-        {history.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">도면 파일 이력이 없습니다.</p>
-        ) : (
-          <div className="space-y-3">
-            {history.map((item, index) => (
-              <div 
-                key={item.id} 
-                className="border rounded-lg p-3 bg-gray-50"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      {index === 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                          현재
-                        </Badge>
-                      )}
-                      <span className="font-medium text-sm">
+        <div>
+          {history.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">도면 파일 이력이 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {history.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="border rounded-lg p-3 bg-gray-50"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        {index === 0 && (
+                          <Badge variant="secondary" className="text-xs">
+                            현재
+                          </Badge>
+                        )}
+                        <span className="font-medium text-sm">
                         {item.file.originalFileName}
                       </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{item.comment}</p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{item.comment}</p>
+                      <div className="flex items-center space-x-4 text-xs text-gray-500">
                       <span>
-                        {new Date(item.createdAt).toLocaleString('ko-KR')}
+                        {new Date(item.createdAt).toLocaleString("ko-KR")}
                       </span>
-                      <span>작성자: {item.createdBy}</span>
+                        <span>작성자: {item.createdBy}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(item.file.url, '_blank')}
-                    >
-                      다운로드
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(item.file.url, "_blank")}
+                      >
+                        다운로드
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };

@@ -49,32 +49,46 @@ const Sidebar = ({
                   ? "bg-primary-50 text-primary-900"
                   : "text-[#6B7482] hover:bg-primary-50/50",
                 "rounded-[3px]",
+                "transform transition-transform duration-200 hover:scale-[1.01]",
               )}
               onClick={() => handleItemClick(item)}
             >
               {isActive && (
-                <div className="w-1 h-full bg-primary-600 rounded-r-sm mr-3 transition-all duration-300" />
+                <div
+                  className={cn(
+                    "w-1 h-full bg-primary-600 rounded-r-sm mr-3",
+                    "transform transition-all duration-300",
+                    "animate-fadeIn"
+                  )}
+                />
               )}
 
-              <div className="flex items-center gap-2.5 px-4">
+              <div className={cn(
+                "flex items-center gap-2.5 px-4",
+                "transform transition-all duration-200",
+                isActive && "translate-x-1"
+              )}>
                 {item.depth === 1 ? (
                   <FirstDepthIcon
                     className={cn(
-                      "w-5 h-5 transition-colors duration-300",
-                      isActive ? "text-primary-600" : "text-secondary-600"
+                      "w-5 h-5",
+                      "transition-all duration-300",
+                      isActive ? "text-primary-600 scale-110" : "text-secondary-600",
                     )}
                   />
                 ) : (
                   <SecondDepthIcon
                     className={cn(
-                      "w-4 h-4 transition-colors duration-300",
-                      isActive ? "text-primary-600" : "text-secondary-600"
+                      "w-4 h-4",
+                      "transition-all duration-300",
+                      isActive ? "text-primary-600 scale-110" : "text-secondary-600",
                     )}
                   />
                 )}
 
                 <span className={cn(
-                  "text-sm transition-colors duration-300",
+                  "text-sm",
+                  "transition-all duration-300",
                   item.depth === 1 && "font-bold",
                   isActive ? "text-primary-900" : "text-[#6B7482]",
                 )}>
@@ -83,11 +97,14 @@ const Sidebar = ({
               </div>
             </button>
 
-            {hasChildren && isExpanded && (
+            {hasChildren && (
               <div
                 className={cn(
-                  "overflow-hidden transition-all duration-300 ease-in-out",
-                  isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+                  "overflow-hidden",
+                  "transition-all duration-300 ease-in-out",
+                  isExpanded
+                    ? "max-h-[500px] opacity-100 transform translate-y-0"
+                    : "max-h-0 opacity-0 transform -translate-y-2"
                 )}
               >
                 {renderItems(item.id)}
@@ -97,6 +114,7 @@ const Sidebar = ({
         );
       });
   };
+
 
   return (
     <nav

@@ -31,7 +31,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
   facilityName = '시설'
 }) => {
   return (
-    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+    <div className="absolute inset-0 bg-black/60 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
       {onView && (
         <button
           type="button"
@@ -39,7 +39,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
             e.stopPropagation();
             onView();
           }}
-          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          className="p-2 bg-white rounded-full shadow-lg hover:bg-primary-300 transition-colors cursor-pointer"
           title="상세보기"
         >
           <Eye size={16} className="text-green-600" />
@@ -52,7 +52,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
             e.stopPropagation();
             onIndoorEdit();
           }}
-          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          className="p-2 bg-white rounded-full shadow-lg hover:bg-primary-300 transition-colors cursor-pointer"
           title="실내지도 편집"
         >
           <Edit2 size={16} className="text-purple-600" />
@@ -65,7 +65,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
             e.stopPropagation();
             onIndoorView();
           }}
-          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          className="p-2 bg-white rounded-full shadow-lg hover:bg-primary-300 transition-colors cursor-pointer"
           title="실내보기로 이동"
         >
           <Map size={16} className="text-amber-600" />
@@ -79,7 +79,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
               }}
-              className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              className="p-2 bg-white rounded-full shadow-lg hover:bg-primary-300 transition-colors cursor-pointer"
               title="삭제"
             >
               <Trash2 size={16} className="text-red-600" />

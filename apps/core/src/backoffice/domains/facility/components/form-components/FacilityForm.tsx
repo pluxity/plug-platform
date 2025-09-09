@@ -1,10 +1,6 @@
 import React from 'react';
 
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
   Input,
   Textarea,
 } from '@plug/ui';
@@ -37,9 +33,7 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
     setValue?.('facility.thumbnailFileId', undefined);
   };
 
-  // 도면 파일 업로드 핸들러
   const handleDrawingChange = (fileId: number | null) => {
-    // 생성 단계에서는 삭제 시 undefined 세팅 (null 허용하지 않음)
     if (!isEditMode || fileId !== null) {
       setValue?.('facility.drawingFileId', fileId || undefined);
     }
@@ -55,43 +49,49 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
     }
   };
   return (
-    <Card>
-      <CardHeader className="pt-2">
-        <CardTitle>기본 정보</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 py-2">
+    <div className="space-y-4">
+      <div className="text-2xl font-bold text-gray-700" data-testid="facility-form-title">
+        시설 기본 정보
+      </div>
+      <div className="space-y-8  border rounded-lg  p-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              시설명 <span className="text-red-500">*</span>
-            </label>
+          <div className='space-y-4' data-testid="facility-name-input">
+            <div className="flex items-center space-x-2" >
+              <div className="w-0.5 h-6 rounded-full bg-primary-600 inline-block mr-3"/>
+              <label className="block font-bold">
+                <span>시설명</span> <span className="text-red-500">*</span>
+              </label>
+            </div>
+
             <Input
               {...register('facility.name')}
               placeholder="시설명을 입력하세요"
             />
-            {errors.facility?.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.facility.name.message}</p>
-            )}
+            {errors.facility?.name && (<p className="text-red-500 text-sm mt-1">{errors.facility.name.message}</p>)}
           </div>
           
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              시설 코드 <span className="text-red-500">*</span>
-            </label>
+          <div className='space-y-4' data-testid="facility-code-input">
+            <div className="flex items-center space-x-2">
+       <div className="w-0.5 h-6 rounded-full bg-primary-600 inline-block mr-3"/>
+              <label className="block font-bold">
+                시설 코드 <span className="text-red-500">*</span>
+              </label>
+            </div>
             <Input
               {...register('facility.code')}
               placeholder="시설 코드를 입력하세요"
             />
-            {errors.facility?.code && (
-              <p className="text-red-500 text-sm mt-1">{errors.facility.code.message}</p>
-            )}
+            {errors.facility?.code && (<p className="text-red-500 text-sm mt-1">{errors.facility.code.message}</p>)}
           </div>
         </div>
 
-        <div className="w-full">
-          <label className="block text-sm font-medium mb-2">
-            설명
-          </label>
+        <div className="w-full space-y-4" data-testid="facility-description-input">
+          <div className="flex items-center space-x-2">
+            <div className="w-0.5 h-6 rounded-sm bg-primary-600 inline-block mr-3"/>
+            <label className="block font-bold">
+              설명
+            </label>
+          </div>
           <Textarea
             {...register('facility.description')}
             placeholder="시설에 대한 설명을 입력하세요"
@@ -100,10 +100,14 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
           />
         </div>
 
-          {/* 파일 업로드 섹션 */}
-        <div className="w-full">
+        <div className="w-full space-y-4" data-testid="facility-thumbnail-input">
+          <div className="flex items-center space-x-2">
+            <div className="w-0.5 h-6 rounded-full bg-primary-600 inline-block mr-3"/>
+            <label className="block font-bold">
+              썸네일 이미지 업로드
+            </label>
+          </div>
           <FileUpload
-            label="썸네일 이미지"
             accept="image/*"
             fileType="image"
             placeholder="썸네일 이미지를 업로드하세요"
@@ -112,11 +116,10 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
             onFileChange={handleThumbnailChange}
             onFileRemoved={handleThumbnailRemoved}
             isEditMode={isEditMode}
-            maxSizeInMB={10} // 이미지는 10MB 제한
+            maxSizeInMB={10}
           />
         </div>
 
-        {/* 도면 파일 업로드 (생성 시에만 노출, 수정은 별도 이력 관리 컴포넌트 사용) */}
         {!isEditMode && (
           <div className="w-full">
             <FileUpload
@@ -141,7 +144,7 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
           watch={watch}
           errors={errors}
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

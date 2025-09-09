@@ -25,7 +25,6 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
   const watchedLon = watch('facility.lon');
 
   const handleLocationSelect = (lat: number, lon: number) => {
-    // 값이 실제로 변경된 경우에만 setValue 호출
     if (watchedLat !== lat) {
       setValue('facility.lat', lat, { shouldDirty: false, shouldTouch: false });
     }
@@ -36,15 +35,17 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          위치 정보
-        </label>
+      <div className="space-y-4" data-testid="location-selector-input">
+        <div className="flex items-center space-x-2">
+          <div className="w-0.5 h-6 rounded-sm bg-primary-600 inline-block mr-3"/>
+          <label className="block font-bold">
+            위치 정보
+          </label>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* 위도 입력 */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">위도 (Latitude)</label>
+            <label className="block text-sm text-gray-500 mb-2">위도 (Latitude)</label>
             <Controller
               name="facility.lat"
               control={control}
@@ -64,9 +65,8 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
             />
           </div>
 
-          {/* 경도 입력 */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">경도 (Longitude)</label>
+            <label className="block text-sm text-gray-500 mb-2">경도 (Longitude)</label>
             <Controller
               name="facility.lon"
               control={control}
@@ -86,7 +86,6 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
             />
           </div>
 
-          {/* 버튼들 */}
           <div className="flex flex-col justify-end gap-2">
             <Button
               type="button"
@@ -99,16 +98,14 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
           </div>
         </div>
 
-        {/* 현재 선택된 위치 표시 */}
         {watchedLat && watchedLon && (
-          <div className="mt-3 p-3 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-600">
+          <div className="mt-3 p-3 bg-secondary-300 rounded-md">
+            <p className="text-sm text-secondary-900">
               선택된 위치: 위도 {watchedLat.toFixed(6)}, 경도 {watchedLon.toFixed(6)}
             </p>
           </div>
         )}
 
-        {/* 에러 메시지 */}
         {errors.facility?.lat && (
           <p className="text-red-500 text-sm mt-1">{errors.facility.lat.message}</p>
         )}
@@ -117,7 +114,6 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
         )}
       </div>
 
-      {/* 지도 모달 */}
       <MapLocationSelector
         isOpen={isMapOpen}
         initialLat={watchedLat || 37.5665}

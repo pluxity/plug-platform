@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Separator } from '@plug/ui';
+import { Button} from '@plug/ui';
 import { 
   FacilityService, 
   domainUtils,
@@ -309,7 +309,6 @@ const FacilityEdit: React.FC = () => {
 
       components.push(
         <div key={component}>
-          <Separator className="my-6" />
           {renderComponentForm(component)}
         </div>
       );
@@ -357,7 +356,7 @@ const FacilityEdit: React.FC = () => {
       <PageContainer title="시설 편집">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">시설 정보를 불러오는 중...</p>
           </div>
         </div>
@@ -383,33 +382,30 @@ const FacilityEdit: React.FC = () => {
   const domainConfig = domainUtils.getConfig(facilityType);
 
   return (
-    <PageContainer title={`${facility.facility?.name || '시설'} 편집`}>
-      <div className="mb-6">
+    <PageContainer title={`${facility.facility?.name || '시설'} 수정`} >
+      <div className="space-y-6">
+        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-primary-800">
+            시설 유형:
+          </span>
+          <span className="text-sm bg-primary-200 text-primary-800 px-2 py-1 rounded">
+            {domainConfig.displayName}
+          </span>
+        </div>
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
-            size="sm"
             onClick={handleGoBack}
-            className="text-gray-600 hover:text-gray-800"
+            className="text-secondary-800 hover:text-gray-800 rounded-md border"
           >
             <ArrowLeft size={18} />
             목록으로
           </Button>
         </div>
       </div>
-      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-blue-800">
-              시설 유형: {domainConfig.displayName}
-            </span>
-            <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">
-              {facilityType}
-            </span>
-          </div>
-        </div>
 
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 border-t p-10">
         <FacilityForm
           register={register}
           errors={errors}
@@ -447,6 +443,7 @@ const FacilityEdit: React.FC = () => {
           </Button>
         </div>
       </form>
+      </div>
     </PageContainer>
   );
 };

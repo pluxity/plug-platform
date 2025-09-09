@@ -2,10 +2,6 @@ import React, { useEffect } from 'react';
 import { useFieldArray } from 'react-hook-form';
 
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
   Input,
 } from '@plug/ui';
 
@@ -30,11 +26,25 @@ export const FloorsForm: React.FC<FloorsFormProps> = ({
   }, [onFloorsReplaceReady, replace]);
 
   return (
-    <Card>
-      <CardHeader className="pt-2">
-        <CardTitle>층 정보</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 py-2">
+    <div className="space-y-4">
+      <div className="text-2xl font-bold text-gray-700" data-testid="facility-form-title">
+        층 정보
+      </div>
+      <div className="space-y-4 border rounded-lg p-10">
+        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          {isProcessingDrawing ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+              <p className="text-sm text-blue-700">
+                도면 파일에서 층 정보를 추출하는 중입니다...
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-blue-700">
+              📋 층 정보는 업로드된 도면 파일(GLB/GLTF)에서 자동으로 추출됩니다.
+            </p>
+          )}
+        </div>
         {fields.length > 0 ? (
           <div className="space-y-4">
             {fields.map((field, index) => (
@@ -85,23 +95,8 @@ export const FloorsForm: React.FC<FloorsFormProps> = ({
             </div>
           </div>
         )}
-
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          {isProcessingDrawing ? (
-            <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-              <p className="text-sm text-blue-700">
-                도면 파일에서 층 정보를 추출하는 중입니다...
-              </p>
-            </div>
-          ) : (
-            <p className="text-sm text-blue-700">
-              📋 층 정보는 업로드된 도면 파일(GLB/GLTF)에서 자동으로 추출됩니다.
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
