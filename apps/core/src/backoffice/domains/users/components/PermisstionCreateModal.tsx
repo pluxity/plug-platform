@@ -1,9 +1,7 @@
-import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';  
-import { toast } from 'sonner';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { useCreatePermission } from '@plug/common-services/services';
 import { Dialog, DialogContent, DialogFooter, Button, ModalForm, ModalFormContainer, ModalFormField, ModalFormItem, Input, Checkbox, Label } from '@plug/ui';
@@ -11,7 +9,8 @@ import { Dialog, DialogContent, DialogFooter, Button, ModalForm, ModalFormContai
 import { usePermissionCheckbox } from '@/backoffice/domains/users/hooks/usePermissionCheckbox';
 import { usePermissionStore } from '@/backoffice/domains/users/stores/permissionStore';
 import { PermissionCreateModalProps } from '@/backoffice/domains/users/types/permisson';
-export const PermissionCreateModal: React.FC<PermissionCreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
+import { permissionFormSchema, type PermissionFormData } from '@/backoffice/domains/users/schemas/permissionSchemas';
+export const PermissionCreateModal = ({ isOpen, onClose, onSuccess }: PermissionCreateModalProps) => {
     const { execute: createPermission, isLoading: isPermissionCreating } = useCreatePermission();
     const { resourceTypes, resourceData, isLoading: isResourceDataLoading, error: resourceError } = usePermissionStore();
     const { isResourceSelected, handleCheckboxChange, isCCTVAllSelected, handleCCTVAllToggle } = usePermissionCheckbox();
@@ -95,7 +94,6 @@ export const PermissionCreateModal: React.FC<PermissionCreateModalProps> = ({ is
                                                             <div className="font-semibold">{resourceType.name}</div>
                                                             <div className="flex flex-wrap gap-x-6 gap-y-2">
                                                                 {resourceType.key === 'CCTV' ? (
-                                                                    // CCTV는 전체 선택/해제만 제공
                                                                     <div className="flex items-center gap-2">
                                                                         <Checkbox 
                                                                             variant="square" 
@@ -112,7 +110,6 @@ export const PermissionCreateModal: React.FC<PermissionCreateModalProps> = ({ is
                                                                         <Label htmlFor="cctv-all">CCTV</Label>
                                                                     </div>
                                                                 ) : (
-                                                                    // 다른 리소스 타입은 기존처럼 개별 선택
                                                                     resources.length > 0 ? (
                                                                         resources.map((resource) => {
                                                                             const checkboxId = `${resourceType.key}-${resource.id}`;

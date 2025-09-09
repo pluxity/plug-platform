@@ -1,31 +1,7 @@
-import type { DeviceCategoryResponse } from '@plug/common-services/types';
-
-// CCTV 카테고리는 특별 취급
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 import { useDeviceCategoryTree } from '@plug/common-services';
-
-import { useIndoorStore } from '@/app/store/indoorStore';
-const CCTV_CATEGORY_SENTINEL_ID = -1 as const;
-const createCctvPseudoCategory = (): DeviceCategoryResponse => ({
-  id: CCTV_CATEGORY_SENTINEL_ID,
-  name: 'CCTV',
-  depth: 0,
-  thumbnailFile: {
-    id: CCTV_CATEGORY_SENTINEL_ID,
-    url: '/images/icons/cctv.png',
-    originalFileName: 'cctv.png',
-    contentType: 'image/png',
-    fileStatus: 'uploaded',
-    createdAt: new Date().toISOString(),
-    createdBy: 'System',
-  },
-});
-const injectCctvCategory = (categories: DeviceCategoryResponse[] | undefined, cctvCount: number) => {
-  const base = (categories || []).filter((c) => !c.parentId);
-  if (cctvCount <= 0) return base;
-  return [createCctvPseudoCategory(), ...base];
-};
+import { useAuthStore } from '@/global/store/authStore';
 
 interface DeviceCategoryChipsProps {
   selectedId?: number | null;
@@ -33,9 +9,13 @@ interface DeviceCategoryChipsProps {
   onDeselect?: (id: number) => void;
 }
 
-const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = null, onSelect, onDeselect }) => {
+const DeviceCategoryChips = ({ 
+  selectedId = null, 
+  onSelect, 
+  onDeselect
+}: DeviceCategoryChipsProps) => {
   const { categories, isLoading } = useDeviceCategoryTree();
-  const cctvCount = useIndoorStore((s) => s.cctvs.length);
+  const getUserPermissions = useAuthStore(s => s.getUserPermissions);
   const [internalSelected, setInternalSelected] = useState<number | null>(selectedId);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -45,7 +25,51 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
   const startScrollLeftRef = useRef(0);
   const dragDistanceRef = useRef(0);
 
-  const topLevel = useMemo(() => injectCctvCategory(categories, cctvCount), [categories, cctvCount]);
+  // 권한에 따라 필터링된 카테고리 생성
+  const topLevel = useMemo(() => {
+    const baseCategories = (categories || []).filter((c) => !c.parentId);
+    const permissions = getUserPermissions();
+    
+    // DEVICE-CATEGORY 권한 확인
+    const deviceCategoryPermission = permissions.find(p => p.resourceType === 'DEVICE_CATEGORY');
+    let filteredCategories = baseCategories;
+    
+    if (deviceCategoryPermission) {
+      // ALL이 아니면 특정 카테고리만 필터링
+      if (!deviceCategoryPermission.resourceIds.includes('ALL')) {
+        const allowedIds = deviceCategoryPermission.resourceIds
+          .map(id => parseInt(id, 10))
+          .filter(id => !isNaN(id));
+        filteredCategories = baseCategories.filter(c => allowedIds.includes(c.id));
+      }
+    } else {
+      // DEVICE-CATEGORY 권한이 없으면 빈 배열
+      filteredCategories = [];
+    }
+    
+    // CCTV 권한 확인
+    const cctvPermission = permissions.find(p => p.resourceType === 'CCTV');
+    const hasCctvPermission = cctvPermission?.resourceIds.includes('ALL') || false;
+    
+    if (!hasCctvPermission) return filteredCategories;
+    
+    const cctvCategory = {
+      id: -1,
+      name: 'CCTV',
+      depth: 0,
+      thumbnailFile: {
+        id: -1,
+        url: '/images/icons/cctv.png',
+        originalFileName: 'cctv.png',
+        contentType: 'image/png',
+        fileStatus: 'uploaded' as const,
+        createdAt: new Date().toISOString(),
+        createdBy: 'System',
+      },
+    };
+    
+    return [cctvCategory, ...filteredCategories];
+  }, [categories, getUserPermissions]);
 
   const selectCategory = useCallback((clickedId: number) => {
     setInternalSelected((prev) => {

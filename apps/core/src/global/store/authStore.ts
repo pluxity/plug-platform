@@ -1,7 +1,7 @@
-import { UserProfile } from '@plug/common-services/types';
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { UserProfile } from '@plug/common-services/types';
 interface AuthStore {
   user: UserProfile | null;
   isAuthenticated: boolean;
@@ -17,6 +17,8 @@ interface AuthStore {
   hasRole: (roleName: string) => boolean;
   // 간단한 사용자 정보 업데이트 (로컬 상태만)
   updateLocalUserInfo: (updates: Partial<UserProfile>) => void;
+  // 권한 정보 조회
+  getUserPermissions: () => Array<{ resourceType: string; resourceIds: string[] }>;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -43,6 +45,21 @@ export const useAuthStore = create<AuthStore>()(
         if (currentUser) {
           set({ user: { ...currentUser, ...updates } });
         }
+      },
+      // 사용자의 모든 권한 정보를 평면화해서 반환
+      getUserPermissions: () => {
+        const user = get().user;
+        if (!user?.roles) return [];
+        
+        const allPermissions: Array<{ resourceType: string; resourceIds: string[] }> = [];
+        
+        for (const role of user.roles) {
+          for (const permission of role.permissions) {
+            allPermissions.push(...permission.permissions);
+          }
+        }
+        
+        return allPermissions;
       },
     }),
     {
