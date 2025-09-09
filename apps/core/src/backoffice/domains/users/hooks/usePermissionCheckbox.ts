@@ -13,6 +13,14 @@ export const usePermissionCheckbox = () => {
         );
     }, []);
 
+    // CCTV 전체 권한 체크 함수
+    const isCCTVAllSelected = useCallback((permissions: PermissionItem[]) => {
+        return permissions.some(permission => 
+            permission.resourceType === 'CCTV' && 
+            permission.resourceIds.includes('ALL')
+        );
+    }, []);
+
     const handleCheckboxChange = useCallback((
         permissions: PermissionItem[], 
         onChange: (value: PermissionItem[]) => void, 
@@ -47,8 +55,39 @@ export const usePermissionCheckbox = () => {
         onChange(newPermissions);
     }, []);
 
+    // CCTV 전체 권한 토글 함수
+    const handleCCTVAllToggle = useCallback((
+        permissions: PermissionItem[],
+        onChange: (value: PermissionItem[]) => void,
+        checked: boolean
+    ) => {
+        const newPermissions = [...permissions];
+        const existingPermissionIndex = newPermissions.findIndex(p => p.resourceType === 'CCTV');
+        
+        if (checked) {
+            if (existingPermissionIndex >= 0) {
+                newPermissions[existingPermissionIndex] = {
+                    resourceType: 'CCTV',
+                    resourceIds: ['ALL']
+                };
+            } else {
+                newPermissions.push({
+                    resourceType: 'CCTV',
+                    resourceIds: ['ALL']
+                });
+            }
+        } else {
+            if (existingPermissionIndex >= 0) {
+                newPermissions.splice(existingPermissionIndex, 1);
+            }
+        }
+        onChange(newPermissions);
+    }, []);
+
     return {
         isResourceSelected,
-        handleCheckboxChange
+        handleCheckboxChange,
+        isCCTVAllSelected,
+        handleCCTVAllToggle
     };
 }; 
