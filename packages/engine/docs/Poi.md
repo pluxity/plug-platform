@@ -214,7 +214,7 @@ Px.Poi.FinishEdit();
 ```
 
 ## Px.Poi.SetHtmlObjectVisibilityCheck(newCheckState: boolean)
-- newCheckState: true인경우 Html객체의 가시성 체크(벽뒤등)를 수행, 기본값 true
+- newCheckState: true인경우 Html객체의 가시성 체크(벽뒤등)를 수행, 기본값 false
 ```javascript
 Px.Poi.SetHtmlObjectVisibilityCheck(true);
 ```

@@ -13,6 +13,12 @@
 
 업데이트 내역
 ============
+# 2025-09-08
+- [Poi](./docs/Poi.md) SetHtmlObjectVisibilityCheck 기본값 false로 설정
+- [Poi](./docs/Poi.md) Poi Html객체 가시성 체크 광선 레이어 설정
+- [Loader](./docs/Loader.md) BVH 적용
+  - https://github.com/gkjohnson/three-mesh-bvh
+
 # 2025-09-04
 - [Poi](./docs/Poi.md) Poi 가시화 상태를 Html객체에 연계
 - [Poi](./docs/Poi.md) Poi Html객체 가시성 체크 처리 및 On/Off Api추가
