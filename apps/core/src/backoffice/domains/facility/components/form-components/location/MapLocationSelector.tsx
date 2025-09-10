@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { 
   Button, 
@@ -10,6 +10,7 @@ import {
 import { VWorldMap } from '@/global/components/outdoor-map';
 import { LocationData } from '../../../types/form';
 import { LocationPicker } from './LocationPicker';
+import { CameraController } from './CameraController';
 
 interface MapLocationSelectorProps {
   isOpen: boolean;
@@ -39,8 +40,8 @@ export const MapLocationSelector: React.FC<MapLocationSelectorProps> = ({
   // 선택 모드 상태
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   
-  // 카메라 초기화를 한 번만 실행하기 위한 ref
-  const isInitializedRef = useRef(false);
+  // 지도 초기화 상태
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
   const handleLocationSelect = useCallback((location: LocationData) => {
     setSelectedLocation(location);
@@ -59,8 +60,18 @@ export const MapLocationSelector: React.FC<MapLocationSelectorProps> = ({
     }
   };
 
+  const handleMapInitialized = () => {
+    setIsMapInitialized(true);
+  };
+
+  // Dialog가 닫힐 때 상태 초기화
+  const handleClose = () => {
+    setIsMapInitialized(false);
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent 
         title="지도에서 위치 선택" 
         className="max-w-[90vw] h-[90vh] w-[90vw]"
@@ -68,19 +79,31 @@ export const MapLocationSelector: React.FC<MapLocationSelectorProps> = ({
         disableBackground
       >
         <div className="flex flex-col h-[calc(100%-6rem)]">
+          {/* 로딩 표시 */}
+          {!isMapInitialized && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 shadow-lg flex items-center space-x-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span className="text-lg font-medium">지도 로딩 중...</span>
+              </div>
+            </div>
+          )}
+          
           {/* 지도 영역 */}
           <div className="flex-1 relative">
             <div 
               className={`w-full h-[calc(100%-10rem)] ${isSelectionMode ? 'cursor-crosshair' : 'cursor-default'}`}
             >
               <VWorldMap 
-                className="w-full "
-                mapProvider="vworld"
-                preventCameraReset={isInitializedRef.current}
-                onMapInitialized={() => {
-                  isInitializedRef.current = true;
-                }}
+                className="w-full"
+                enableTerrain={true}
               >
+                <CameraController 
+                  latitude={initialLat}
+                  longitude={initialLon}
+                  isOpen={isOpen}
+                  onInitialSetupComplete={handleMapInitialized}
+                />
                 <LocationPicker
                   onLocationSelect={handleLocationSelect}
                   initialLocation={
@@ -88,7 +111,7 @@ export const MapLocationSelector: React.FC<MapLocationSelectorProps> = ({
                       ? {
                           latitude: initialLat,
                           longitude: initialLon,
-                          altitude: 100
+                          altitude: 0
                         }
                       : undefined
                   }
@@ -163,7 +186,7 @@ export const MapLocationSelector: React.FC<MapLocationSelectorProps> = ({
         </div>
         
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={handleClose}>
             취소
           </Button>
           <Button 
