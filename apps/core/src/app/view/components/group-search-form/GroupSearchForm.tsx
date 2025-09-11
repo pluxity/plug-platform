@@ -114,7 +114,7 @@ const GroupSearchFormInner = <T,>(
       </div>
 
       {open && (
-        <div className={clsx('absolute z-50 w-full mt-2 liquid-glass rounded-2xl border-secondary-100/10 max-h-60 overflow-y-auto', dropdownClassName)}>
+        <div className={clsx('absolute z-50 w-full mt-2 liquid-glass rounded-2xl border-secondary-100/10', dropdownClassName)}>
           {showCount && totalCount > 0 && (
             <div className="px-4 py-3 border-b border-white/10 text-xs text-secondary-100 font-medium">
               {totalCount}개의 결과가 있습니다
@@ -122,7 +122,7 @@ const GroupSearchFormInner = <T,>(
           )}
 
           {groups.map((group, groupIndex) => (
-            <div key={`${group.heading}-${groupIndex}`} className="py-1 px-2">
+            <div key={`${group.heading}-${groupIndex}`} className="pt-2 pb-3 px-2 max-h-70 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-600">
               <div className="px-2 py-2 text-xs text-secondary-100 uppercase tracking-wide font-medium">
                 {group.heading}
               </div>
@@ -132,7 +132,7 @@ const GroupSearchFormInner = <T,>(
                   <button
                     key={itemKey}
                     onClick={() => onSelect?.(item, { group, groupIndex, itemIndex })}
-                    className="w-full px-4 py-3 text-left bg-primary-1000/60 focus:outline-none border-b border-primary-1000/30 rounded-md"
+                    className="w-full mt-2 px-4 py-3 text-left liquid-glass liquid-glass-secondary focus:outline-none rounded-md"
                   >
                     {renderItem(item, { group, groupIndex, itemIndex })}
                   </button>

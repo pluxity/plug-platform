@@ -54,7 +54,7 @@ const IndoorSearchForm: React.FC<IndoorSearchFormProps> = ({ className, onDevice
                 {String(item.name ?? item.id)}
               </span>
               <span
-                className={`w-2/5 text-xs break-all whitespace-pre-wrap text-right ${isCctv ? 'text-danger-400' : 'text-primary-400'}`}
+                className={`w-2/5 text-xs break-all whitespace-pre-wrap text-right ${isCctv ? 'text-accent-400' : 'text-primary-400'}`}
               >
                 {isCctv ? 'CCTV' : String(item.id)}
               </span>

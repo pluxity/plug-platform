@@ -19,6 +19,8 @@ import { MapScene } from '@/global/components/indoor-map'
 
 import DeviceCategoryChips from './DeviceCategoryChips'
 import IndoorSearchForm from './IndoorSearchForm'
+import { getPoiHtmlString } from '@/global/utils/displayUtils';
+
 interface IndoorMapProps { facilityId: number; facilityType: FacilityType; onGoOutdoor?: () => void }
 
 const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOutdoor }) => {
@@ -71,7 +73,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
     const metrics = cache?.metrics && Object.keys(cache.metrics).length ? cache.metrics : null
     if (!metrics) {
       const fallback = (device.name || '—').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      return `<span class="inline-block select-none pointer-events-none transform -translate-y-6 text-[11px] font-medium tracking-wide text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)] whitespace-nowrap px-1.5 py-0.5 rounded bg-black/20 backdrop-blur-[2px]">${fallback}</span>`
+      return getPoiHtmlString(fallback, 'UNASSIGNED')
     }
     const entries = Object.entries(metrics)
     const picked = entries.slice(0, 3)
@@ -81,7 +83,7 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
       return (val + unit).replace(/</g, '&lt;').replace(/>/g, '&gt;')
     })
     const label = parts.join(' / ') || (device.name || '—')
-    return `<span class="inline-block select-none pointer-events-none transform -translate-y-6 text-[11px] font-medium tracking-wide text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)] whitespace-nowrap px-1.5 py-0.5 rounded bg-black/30 backdrop-blur-[2px]">${label}</span>`
+    return getPoiHtmlString(label, 'ASSIGNED')
   }, [])
 
   const clearHighlights = useCallback(() => {
@@ -230,16 +232,18 @@ const IndoorMap: React.FC<IndoorMapProps> = ({ facilityId, facilityType, onGoOut
   }
 
   const overlays = (
-    <div className='absolute top-4 left-4 z-20 flex flex-row gap-3 items-start'>
+    <div className='absolute top-4 left-4 right-30 z-20 flex flex-row gap-3 items-start'>
       <IndoorSearchForm
         className='pointer-events-auto'
         onDeviceSelect={handleSearchSelect}
       />
-      <DeviceCategoryChips
-        selectedId={selectedCategoryId}
-        onSelect={handleCategorySelect}
-        onDeselect={handleCategoryDeselect}
-      />
+      <div className="flex-1 min-w-0">
+        <DeviceCategoryChips
+          selectedId={selectedCategoryId}
+          onSelect={handleCategorySelect}
+          onDeselect={handleCategoryDeselect}
+        />
+      </div>
     </div>
   )
 

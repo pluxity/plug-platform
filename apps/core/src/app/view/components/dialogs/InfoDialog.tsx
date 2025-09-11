@@ -74,9 +74,8 @@ export const InfoDialog = ({
   } 
   
   const containerBase = [
-    'relative flex text-secondary-100 bg-gradient-to-br',
-    'bg-primary-1000/60 backdrop-blur-sm',
-    'border border-primary-1000/30 rounded-2xl',
+    'relative flex text-secondary-100 rounded-2xl',
+    'liquid-glass liquid-glass-secondary',
     sizeClass
   ].join(' ');
 
@@ -93,7 +92,7 @@ export const InfoDialog = ({
   : 'absolute top-3 right-3 w-12 h-12 rounded-xl flex items-center justify-center text-secondary-100 hover:text-secondary-100 hover:bg-secondary-100/10 active:scale-[0.95] transition';
 
   const titleClass = [
-    isCompact ? 'text-base font-semibold tracking-tight text-secondary-100' : 'text-[1.5rem] leading-snug font-semibold tracking-tight text-secondary-100 drop-shadow',
+    isCompact ? 'text-base font-semibold tracking-tight text-secondary-100' : 'text-2xl font-semibold tracking-tight text-secondary-100',
     'break-words',
     titleClassName || ''
   ].join(' ');

@@ -56,12 +56,12 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
   const badges = (
     <>
       {device.deviceCategory?.name && (
-        <span className="px-[0.625rem] py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 backdrop-blur-sm">
+        <span className="px-[0.625rem] py-1 rounded-full bg-accent-500/20 text-accent-200 border border-accent-400/30 backdrop-blur-sm">
           {device.deviceCategory.name}
         </span>
       )}
       {device.id && (
-        <span className="px-2 py-1 rounded-full bg-slate-600/40 text-slate-200 border border-slate-500/40 font-mono text-[11px] max-w-[14rem] truncate" title={device.id}>
+        <span className="px-[0.625rem] py-1 rounded-full bg-primary-500/20 text-primary-200 border border-primary-400/30 backdrop-blur-sm" title={device.id}>
           {device.id}
         </span>
       )}
@@ -70,34 +70,34 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
 
   const body = (
     <div className="flex flex-col gap-5 flex-1 overflow-hidden">
-      <section className="rounded-lg border border-slate-600/60 bg-gradient-to-br from-slate-800/70 to-slate-800/40 backdrop-blur-sm p-4">
+      <section className="rounded-lg bg-secondary-100/10 px-4 py-3 rounded-xl border border-secondary-100/10 p-4">
         <div className="flex items-start gap-3 mb-3">
-          <h4 className="text-sm font-semibold text-slate-100 tracking-wide">현재값</h4>
-          <div className="ml-auto text-[11px] text-slate-400 flex items-center gap-1">
+          <h4 className="text-sm font-semibold text-secondary-100 tracking-wide">현재값</h4>
+          <div className="ml-auto text-[11px] text-secondary-400 flex items-center gap-1">
             {firstTimestamp && (
               <>
-                <span className="text-slate-500">측정시각</span>
-                <span className="font-medium text-slate-300">{formatKoreanDateTime(firstTimestamp)}</span>
+                <span className="text-secondary-400">측정시각</span>
+                <span className="font-medium text-secondary-300/70">{formatKoreanDateTime(firstTimestamp)}</span>
               </>
             )}
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
           {isLatestLoading && !Object.keys(latestMap).length && (
-            <div className="text-slate-400 text-xs">불러오는 중...</div>
+            <div className="text-secondary-400 text-xs">불러오는 중...</div>
           )}
           {!isLatestLoading && !Object.keys(latestMap).length && (
-            <div className="text-slate-500 text-xs">현재값 없음</div>
+            <div className="text-secondary-500 text-xs">현재값 없음</div>
           )}
           {Object.entries(latestMap).map(([k, v]) => (
             <div
               key={k}
-              className="group relative px-3 py-2 rounded-md bg-slate-700/50 border border-slate-600/50 hover:border-slate-500/60 transition-colors min-w-[6.5rem]"
+              className="group relative px-3 py-2 rounded-md bg-secondary-1000/30 border border-secondary-1000/20 hover:border-secondary-700/30 transition-colors min-w-[6.5rem]"
             >
-              <div className="text-[11px] uppercase tracking-wide text-slate-400 group-hover:text-slate-300 transition-colors">{k}</div>
-              <div className="text-base font-semibold text-slate-100 flex items-baseline gap-1">
+              <div className="text-[11px] uppercase tracking-wide text-secondary-400/80 group-hover:text-secondary-300 transition-colors">{k}</div>
+              <div className="text-base font-semibold text-secondary-100 flex items-baseline gap-1">
                 {v.value ?? '-'}
-                {v.unit && <span className="text-[11px] font-normal text-slate-400">{v.unit}</span>}
+                {v.unit && <span className="text-[11px] font-normal text-secondary-400/80">{v.unit}</span>}
               </div>
             </div>
           ))}
@@ -107,7 +107,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
       {/* Chart Section */}
       <section className="flex flex-col gap-3 flex-1 min-h-0">
         <div className="flex items-center gap-2">
-          <h4 className="text-sm font-semibold text-slate-100 tracking-wide">추이 차트</h4>
+          <h4 className="text-sm font-semibold text-secondary-100 tracking-wide">추이 차트</h4>
           <div className="ml-auto flex gap-1 text-xs">
             {(['day','week','month'] as const).map(periodOption => (
               <button
@@ -116,8 +116,8 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
                 className={
                   'px-2 py-1 rounded border transition shadow-sm ' +
                   (selectedPeriod === periodOption
-                    ? 'bg-indigo-500/30 border-indigo-400/40 text-indigo-200 ring-1 ring-indigo-400/30'
-                    : 'bg-slate-700/40 border-slate-600/40 text-slate-300 hover:bg-slate-600/50 hover:text-slate-200')
+                    ? 'bg-primary-700/20 border border-primary-400/30 text-primary-300'
+                    : 'bg-secondary-900/30 border border-secondary-900/40 text-secondary-400/80 hover:border-secondary-700/30 hover:text-secondary-300')
                 }
               >
                 {periodOption === 'day' ? '일별' : periodOption === 'week' ? '주별' : '월별'}
@@ -125,12 +125,12 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
             ))}
           </div>
         </div>
-    <div className="rounded-lg border border-slate-600/60 p-3 flex-1 overflow-hidden text-white bg-slate-800/40 backdrop-blur-sm min-h-0 flex flex-col">
+    <div className="rounded-lg border border-secondary-1000/20 p-3 flex-1 overflow-hidden text-secondary-100 bg-secondary-900/30 min-h-0 flex flex-col">
       {isLoading && !effectiveSeries && (
-            <div className="text-slate-400 text-sm">불러오는 중...</div>
+            <div className="text-secondary-400 text-sm">불러오는 중...</div>
           )}
       {!isLoading && !effectiveSeries && (
-            <div className="text-slate-500 text-sm">데이터가 없습니다.</div>
+            <div className="text-secondary-500 text-sm">데이터가 없습니다.</div>
           )}
       {effectiveSeries && (
             <DeviceMetricCharts
@@ -151,7 +151,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
       title={device.name || '장치 정보'}
       onClose={onClose}
       badges={badges}
-      titleClassName="text-2xl font-semibold tracking-tight text-white"
+      titleClassName="text-2xl font-semibold tracking-tight text-secondary-100"
       bodyClassName="flex-1 overflow-hidden"
       // hole={hole === undefined ? { ...DEFAULT_DEVICE_HOLE, w: '40rem', h: '30rem' } : (hole === false ? false : { ...DEFAULT_DEVICE_HOLE, ...hole })}
       hole={hole}

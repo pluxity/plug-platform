@@ -290,211 +290,106 @@
  * 6) 글래스모피즘 유틸리티 클래스
  * =======================================================*/
  @layer utilities {
+    /* ===== 기본 Liquid Glass 컴포넌트 ===== */
     .liquid-glass {
         position: relative;
-        
-        /* CSS 변수 정의 - 프로그래밍적 접근 */
-        --glass-opacity-center: 0.02;
-        --glass-opacity-edge: 0.08;
-        --glass-blur: 3px;
-        --glass-saturation: 110%;
-        --glass-brightness: 1.05;
-        --glass-border-opacity: 0.15;
-        --glass-shadow-opacity: 0.08;
-        
-        /* 물방울 표면 장력 효과 - 여러 겹의 radial-gradient */
-        background: 
-            /* 주요 물방울 그라디언트 */
-            radial-gradient(
-                ellipse at center,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 0.5)) 0%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 0.8)) 15%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 1.2)) 35%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 1.8)) 55%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 2.5)) 75%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 3.2)) 90%,
-                rgba(255, 255, 255, var(--glass-opacity-edge)) 100%
-            ),
-            /* 음영 - 아래쪽 3D 효과 */
-            radial-gradient(
-                ellipse 50% 25% at 50% 85%, 
-                rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 1.2)) 0%, 
-                transparent 70%
-            ),
-            linear-gradient(
-                135deg,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 1.5)) 0%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 0.8)) 50%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 2)) 100%
-            );
-        
-        /* 프로그래밍적 테두리 */
+       
+        --glass-opacity: 0.05;           /* 0.08 → 0.05 (중간 투명도) */
+        --glass-border-opacity: 0.12;    /* 0.18 → 0.12 (중간 테두리) */
+        --glass-blur: 14px;              /* 12px → 14px (중간 블러) */
+        --glass-saturation: 165%;        /* 180% → 165% (중간 채도) */
+        --glass-brightness: 1.05;        /* 1.1 → 1.05 (중간 밝기) */
+        --glass-contrast: 1.05;          /* 1.1 → 1.05 (중간 대비) */
+
+        background: rgba(255, 255, 255, var(--glass-opacity));
         border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
-        background-clip: padding-box;
-        
-        /* 계산된 그림자 시스템 */
         box-shadow:
-            0 calc(var(--glass-blur) * 15) calc(var(--glass-blur) * 30) rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 1.5)),
-            0 calc(var(--glass-blur) * 11) calc(var(--glass-blur) * 22) rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 1.2)),
-            0 calc(var(--glass-blur) * 6) calc(var(--glass-blur) * 12) rgba(0, 0, 0, var(--glass-shadow-opacity)),
-            0 calc(var(--glass-blur) * 4) calc(var(--glass-blur) * 8) rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 0.8)),
-            0 calc(var(--glass-blur) * 2) calc(var(--glass-blur) * 4) rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 0.6)),
-            /* 내부 하이라이트 */
-            inset 0 0 0 1px rgba(255, 255, 255, calc(var(--glass-border-opacity) * 1.3)),
-            inset 0 calc(var(--glass-blur) * 1) calc(var(--glass-blur) * 3) rgba(255, 255, 255, calc(var(--glass-border-opacity) * 2)),
-            inset 0 calc(var(--glass-blur) * -0.8) calc(var(--glass-blur) * 1.5) rgba(255, 255, 255, calc(var(--glass-border-opacity) * 0.7));
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
         
-        /* 굴절 효과 - contrast 조정으로 배경 굴절 시뮬레이션 */
+        /* 핵심 - backdrop-filter로 실제 유리 효과 */
         backdrop-filter: 
             blur(var(--glass-blur)) 
-            saturate(var(--glass-saturation)) 
-            brightness(var(--glass-brightness)) 
-            contrast(1.2);
+            saturate(var(--glass-saturation));
         -webkit-backdrop-filter: 
             blur(var(--glass-blur)) 
-            saturate(var(--glass-saturation)) 
-            brightness(var(--glass-brightness)) 
-            contrast(1.2);
+            saturate(var(--glass-saturation));
         
-        /* 물방울 모양 */
-        border-radius: 1rem;
-        transition: transform 0.1s ease-out;
-        transform-style: preserve-3d;
-        transform: translateZ(10px);
+        border-radius: 16px;
+        transition: all 0.2s ease;
     }
 
-    /* 다크모드 - 변수 오버라이드 */
     .dark .liquid-glass {
-        --glass-opacity-center: 0.03;
-        --glass-opacity-edge: 0.12;
-        --glass-blur: 5px;
-        --glass-saturation: 120%;
-        --glass-brightness: 1.08;
-        --glass-border-opacity: 0.18;
-        --glass-shadow-opacity: 0.4;
+        --glass-opacity: 0.08;           /* 0.12 → 0.08 (중간 투명도) */
+        --glass-border-opacity: 0.18;    /* 0.25 → 0.18 (중간 테두리) */
+        --glass-blur: 14px;              /* 16px → 14px (중간 블러) */
         
-        background: 
-            radial-gradient(
-                ellipse at center,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 0.6)) 0%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 1)) 15%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 1.5)) 35%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 2.2)) 55%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 3)) 75%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 3.8)) 90%,
-                rgba(255, 255, 255, var(--glass-opacity-edge)) 100%
-            ),
-            /* 다크모드 하이라이트 */
-            radial-gradient(
-                ellipse 70% 30% at 50% 20%, 
-                rgba(255, 255, 255, calc(var(--glass-border-opacity) * 1.8)) 0%, 
-                transparent 60%
-            ),
-            /* 다크모드 음영 */
-            radial-gradient(
-                ellipse 50% 25% at 50% 85%, 
-                rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 1)) 0%, 
-                transparent 70%
-            ),
-            linear-gradient(
-                135deg,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 2)) 0%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 1)) 50%,
-                rgba(255, 255, 255, calc(var(--glass-opacity-center) * 2.5)) 100%
-            );
+        background: rgba(255, 255, 255, var(--glass-opacity));
+        border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
+        
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 2px 8px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
 
-    /* 호버 애니메이션 - 물방울이 진동하며 형태가 약간 변함 */
     .liquid-glass:hover {
-        --glass-opacity-center: 0.025;
-        --glass-opacity-edge: 0.095;
-        --glass-blur: 3px;
-        --glass-brightness: 1.08;
-        --glass-border-opacity: 0.2;
+        --glass-opacity: 0.08;           /* 0.12 → 0.08 (중간 투명도) */
+        --glass-blur: 10px;              /* 8px → 10px (중간 블러) */
         
-        transform: scale(1.02) translateY(-2px) translateZ(15px);
-        border-radius: 1.1rem;
-        transition: transform 0s; 
+        transform: translateY(-2px);
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.15),
+            0 4px 12px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
 
     .dark .liquid-glass:hover {
-        --glass-opacity-center: 0.035;
-        --glass-opacity-edge: 0.14;
-        --glass-brightness: 1.12;
+        --glass-opacity: 0.12;           /* 0.18 → 0.12 (중간 투명도) */
+        --glass-blur: 12px;              /* 12px 유지 */
+        
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            0 4px 12px rgba(0, 0, 0, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
-    /* 아이콘 애니메이션 */
-    .liquid-glass:hover svg {
-        transform: scale(1.05) translateZ(2px);
-        transition: transform 0.2s ease-out;
-    }
-
-    .liquid-glass:active svg {
-        transform: scale(0.95) translateZ(-1px);
-        transition: transform 0.1s ease-in;
-    }
-
-    /* 클릭 효과  */
     .liquid-glass:active {
-        --glass-blur: 2px;
-        --glass-brightness: 1.1;
-        transition: all 0.1s ease-in;
+        --glass-opacity: 0.10;           /* 0.15 → 0.10 (중간 투명도) */
+        --glass-blur: 8px;               /* 6px → 8px (중간 블러) */
+        transform: translateY(0px) scale(0.98);
+        transition: all 0.1s ease;
+    }
+    
+    /* ===== 색상 변형들 ===== */
+    
+    .liquid-glass-primary {
+        background: rgba(82, 141, 232, 0.25);  /* 0.15 → 0.25 (더 진하게) */
+        border-color: rgba(82, 141, 232, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    }
+    
+    /* Secondary - Gray (더 진한 회색 사용) */
+    .liquid-glass-secondary {
+        background: rgba(31, 41, 55, 0.3);  /* secondary-1000 색상 사용 */
+        border-color: rgba(31, 41, 55, 0.5);  /* 더 진한 회색 테두리 */
+    }
+    
+    /* Accent - Green (기본 600) */
+    .liquid-glass-accent {
+        background: rgba(34, 197, 94, 0.25);    /* 0.15 → 0.25 (더 진하게) */
+        border-color: rgba(34, 197, 94, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    }
+    
+    /* Danger - Red (기본 600) */
+    .liquid-glass-danger {
+        background: rgba(239, 68, 68, 0.25);    /* 0.15 → 0.25 (더 진하게) */
+        border-color: rgba(239, 68, 68, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    }
+    
+    /* Warning - Yellow/Amber (기본 600) */
+    .liquid-glass-warning {
+        background: rgba(245, 158, 11, 0.25);   /* 0.15 → 0.25 (더 진하게) */
+        border-color: rgba(245, 158, 11, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
     }
 }
-
- /* test */
-/* @layer utilities {
-    .liquid-glass {
-        position: relative;
-        
-        --c-glass: #bbbbbc;
-        --c-light: #fff;
-        --c-dark: #000;
-        --glass-reflex-dark: 1;
-        --glass-reflex-light: 1;
-        --saturation: 150%;
-        
-        background-color: color-mix(in srgb, var(--c-glass) 12%, transparent);
-        
-        backdrop-filter: blur(8px) saturate(var(--saturation));
-        -webkit-backdrop-filter: blur(8px) saturate(var(--saturation));
-        
-        box-shadow: 
-            inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
-            inset 1.8px 3px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 90%), transparent),
-            inset -2px -2px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
-            inset -3px -8px 1px -6px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
-            inset -0.3px -1px 4px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 12%), transparent),
-            inset -1.5px 2.5px 0px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
-            inset 0px 3px 4px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
-            inset 2px -6.5px 1px -4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
-            0px 1px 5px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
-            0px 6px 16px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
-        
-        border-radius: 1rem;
-        transition: background-color 400ms cubic-bezier(1, 0, 0.4, 1),
-                    box-shadow 400ms cubic-bezier(1, 0, 0.4, 1);
-    }
-
-    .dark .liquid-glass {
-        --c-glass: #bbbbbc;
-        --c-light: #fff;
-        --c-dark: #000;
-        --c-content: #e1e1e1;
-        --glass-reflex-dark: 2;
-        --glass-reflex-light: 0.3;
-        --saturation: 150%;
-    }
-
-    .liquid-glass:hover {
-        background-color: color-mix(in srgb, var(--c-glass) 16%, transparent);
-        transform: scale(1.02) translateY(-2px);
-        transition: transform 200ms cubic-bezier(0.5, 0, 0, 1),
-                    background-color 400ms cubic-bezier(1, 0, 0.4, 1);
-    }
-
-    .liquid-glass:active {
-        transform: scale(0.98);
-        transition: transform 100ms ease-in;
-    }
-} */

@@ -22,7 +22,7 @@ type Story = StoryObj<typeof Avatar>
 export const Default: Story = {
     render: (args) => (
         <Avatar {...args}>
-            <AvatarImage />
+            <AvatarImage className="bg-muted-blue-gray" />
             <AvatarFallback>프로필 이미지를 불러올 수 없을 경우 보여줄 텍스트가 들어갑니다.</AvatarFallback>
         </Avatar>
     )

@@ -31,7 +31,7 @@ function AvatarImage({
     return (
       <div
         data-slot="avatar-image"
-        className={cn("aspect-square size-full bg-muted-blue-gray flex items-center justify-center", className)}
+        className={cn("aspect-square size-full flex items-center justify-center", className)}
       >
         <ProfileSvg />
       </div>
@@ -41,7 +41,7 @@ function AvatarImage({
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn("aspect-square size-full bg-muted-blue-gray", className)}
+      className={cn("aspect-square size-full", className)}
       src={src}
       {...props}
     />

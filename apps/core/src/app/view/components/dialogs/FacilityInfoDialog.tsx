@@ -37,8 +37,8 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
 
   // 위치 블록 (맨 위)
   const locationBlock = (facility.lat && facility.lon) ? (
-    <div className="flex flex-wrap gap-x-6 gap-y-2 text-[0.8125rem] bg-secondary-100/10 px-4 py-3 rounded-xl border border-secondary-100/10">
-      <div className="font-semibold tracking-wide text-[11px] text-secondary-500">위치</div>
+    <div className="flex items-center flex-wrap gap-x-6 text-[0.8125rem] bg-secondary-100/10 px-4 py-3 rounded-xl border border-secondary-100/10">
+      <div className="font-semibold tracking-wide text-[11px] text-secondary-400">위치</div>
       <div className="font-mono">Lat: {facility.lat.toFixed(6)}</div>
       <div className="font-mono">Lon: {facility.lon.toFixed(6)}</div>
     </div>
@@ -47,8 +47,8 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
   // 상세 설명 블록 (헤더 포함)
   const descriptionBlock = facility.description ? (
     <div className="flex flex-col gap-2">
-      <h5 className="text-xs font-semibold tracking-wide text-secondary-500">상세 설명</h5>
-      <p className="text-sm leading-relaxed text-secondary-100/90 whitespace-pre-wrap break-words">{facility.description}</p>
+      <h5 className="text-xs font-semibold tracking-wide text-secondary-400">상세 설명</h5>
+      <p className="text-sm leading-relaxed text-secondary-200 whitespace-pre-wrap break-words">{facility.description}</p>
     </div>
   ) : null
 
@@ -57,13 +57,13 @@ const FacilityInfoDialog = ({ facility, onClose, onEnterIndoor, hole }: Facility
     <div className="flex flex-wrap gap-4 text-[10px] text-secondary-300/70 leading-tight">
       {facility.createdAt && (
         <div className="flex flex-col min-w-[6rem]">
-          <span className="uppercase tracking-wide text-secondary-500 mb-0.5">생성일</span>
+          <span className="uppercase tracking-wide text-secondary-400 mb-0.5">생성일</span>
           <span className="text-[11px]">{new Date(facility.createdAt).toLocaleDateString()}</span>
         </div>
       )}
       {facility.updatedAt && (
         <div className="flex flex-col min-w-[6rem]">
-          <span className="uppercase tracking-wide text-secondary-500 mb-0.5">수정일</span>
+          <span className="uppercase tracking-wide text-secondary-400 mb-0.5">수정일</span>
           <span className="text-[11px]">{new Date(facility.updatedAt).toLocaleDateString()}</span>
         </div>
       )}
