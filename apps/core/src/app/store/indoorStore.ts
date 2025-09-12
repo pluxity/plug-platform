@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { getCctvsByFacility, getFeaturesByFacility, getDevices } from '@plug/common-services';
 import type { FeatureResponse, DeviceResponse, CctvResponse } from '@plug/common-services';
+import { useAuthStore } from '@/global/store/authStore';
 export interface IndoorState {
   facilityId: number | null;
   features: FeatureResponse[];
@@ -37,6 +38,14 @@ export type IndoorStore = IndoorState & IndoorActions;
 let loadingPromise: Promise<void> | null = null;
 let devicesLoadingPromise: Promise<void> | null = null;
 let cctvsLoadingPromise: Promise<void> | null = null;
+
+// CCTV 권한 확인 헬퍼 함수
+const checkCctvPermission = (): boolean => {
+  const authState = useAuthStore.getState();
+  const permissions = authState.getUserPermissions();
+  const cctvPermission = permissions.find(p => p.resourceType === 'CCTV');
+  return cctvPermission?.resourceIds.includes('ALL') || false;
+};
 
 export const useIndoorStore = create<IndoorStore>()((set, get) => ({
   facilityId: null,
@@ -104,6 +113,12 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
     return devicesLoadingPromise;
   },
   async loadCctvs(facilityId: number, options?: { force?: boolean }) {
+    // CCTV 권한이 없으면 로드하지 않음
+    if (!checkCctvPermission()) {
+      set({ cctvs: [] });
+      return;
+    }
+    
     const { force } = options || {};
     const state = get();
     if (cctvsLoadingPromise) return cctvsLoadingPromise;
@@ -137,7 +152,10 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
     }
     return undefined;
   },
-  findCctvByFeatureId: (featureId) => get().cctvs.find((c) => c.feature?.id === featureId),
+  findCctvByFeatureId: (featureId) => {
+    if (!checkCctvPermission()) return undefined;
+    return get().cctvs.find((c) => c.feature?.id === featureId);
+  },
   searchDevices: (query: string) => {
     const normalizeText = (value: unknown) => (value ?? '')
       .toString()
@@ -146,19 +164,24 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
       .normalize('NFC');
     const q = normalizeText(query);
     if (q.length < 1) return [];
+    
     const deviceList = get().devices;
     const cctvList = get().cctvs;
+    const hasCctvPermission = checkCctvPermission();
+    
     const filteredDevices = deviceList.filter((device) => {
       const name = normalizeText(device.name);
       const id = normalizeText(device.id);
       const category = normalizeText(device.deviceCategory?.name);
       return name.includes(q) || id.includes(q) || category.includes(q);
     });
-    const filteredCctvs = cctvList.filter((cctv) => {
+    
+    // CCTV 권한이 있을 때만 CCTV 검색
+    const filteredCctvs = hasCctvPermission ? cctvList.filter((cctv) => {
       const name = normalizeText(cctv.name);
       const id = normalizeText(cctv.id);
       return name.includes(q) || id.includes(q);
-    });
+    }) : [];
 
     const grouped = new Map<string, IndoorSearchItem[]>();
     for (const device of filteredDevices) {
@@ -180,6 +203,8 @@ export const useIndoorStore = create<IndoorStore>()((set, get) => ({
   findByCategoryId: (categoryId: number | null) => {
     if (categoryId == null) return [];
     if (categoryId === -1) {
+      // CCTV 카테고리인 경우 권한 확인
+      if (!checkCctvPermission()) return [];
       return get().cctvs.map((c) => ({ ...c, __kind: 'cctv' as const }));
     }
     return get().devices
