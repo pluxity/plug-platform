@@ -78,16 +78,16 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
             </CardTitle>
           </div>
           <CardAction className="self-center">
-            <code className="px-2 py-1 text-xs font-mono bg-gray-200 text-gray-700 rounded border">
+            <code className="px-2 py-1 text-xs font-mono bg-secondary-500/70 text-gray-700 rounded">
               {facility.code}
             </code>
           </CardAction>
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className=" pt-1 pb-3">
         <div>
-          <div className="relative group my-4">
+          <div className="relative group">
             {facility.thumbnail?.url ? (
               <div className="relative overflow-hidden rounded-md border">
                 <img

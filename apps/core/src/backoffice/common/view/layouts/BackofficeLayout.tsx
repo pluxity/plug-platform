@@ -8,7 +8,7 @@ const BackofficeLayout: React.FC = () => {
   return (
     <div className="h-screen flex flex-col">
       <BackofficeHeader />
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-white">
         <Outlet />
       </main>
       <Toast />

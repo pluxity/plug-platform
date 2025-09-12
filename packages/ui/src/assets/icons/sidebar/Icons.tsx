@@ -27,22 +27,3 @@ export const SecondDepthIcon = ({ className }: { className?: string }) => (
     <path d="M22.0008 17.3992C22.0008 19.2648 20.4619 20.7777 18.5619 20.7777C16.663 20.7777 15.123 19.2648 15.123 17.3992C15.123 15.5325 16.663 14.0195 18.5619 14.0195C20.4619 14.0195 22.0008 15.5325 22.0008 17.3992" />
   </svg>
 );
-
-export const FoldIcon = ({ className, isExpanded }: { className?: string, isExpanded: boolean }) => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    className={className}
-    style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
-  >
-    <path
-      d="M6 9l6 6 6-6"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);

@@ -43,27 +43,30 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   })
 
   return (
-    <div className={`max-w-md w-full space-y-8 ${className}`}>
+    <div className={`max-w-md w-full space-y-8 ${className} bg-white px-11 py-6 rounded-lg`}>
       <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
           로그인
         </h2>
       </div>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
-          <div className="space-y-4">
+          <div className="space-y-6">
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>아이디</FormLabel>
+                  <FormLabel className="block font-medium text-gray-700 mb-2">
+                    아이디
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       autoComplete="username"
-                      placeholder="아이디를 입력하세요"
+                      placeholder="아이디를 입력해주세요"
+                      className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -71,18 +74,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>비밀번호</FormLabel>
+                  <FormLabel className="block font-medium text-gray-600 mb-2">
+                    비밀번호
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       autoComplete="current-password"
-                      placeholder="비밀번호를 입력하세요"
+                      placeholder="비밀번호를 입력해주세요"
+                      className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -93,24 +99,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm text-center">
+            <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-200">
               {error}
             </div>
           )}
 
-          <div>
+          <div className="pt-2">
             <Button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   로그인 중...
                 </>
               ) : (
-                '로그인'
+                '로그인 하기'
               )}
             </Button>
           </div>

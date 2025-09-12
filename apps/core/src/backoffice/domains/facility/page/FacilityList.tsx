@@ -120,13 +120,6 @@ const FacilityList: React.FC = () => {
   return (
     <PageContainer title="시설 관리">
       <div className="space-y-6">
-        <div className="mb-6">
-          <FacilityTypeFilter 
-            selectedTypes={selectedTypes}
-            onTypeToggle={handleTypeToggle}
-          />
-        </div>
-        
         <div className="flex flex-col sm:flex-row gap-4 mb-6 items-start sm:items-center justify-between">
           <div className="relative flex-1 max-w-md">
             <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,6 +138,12 @@ const FacilityList: React.FC = () => {
           </AdminButton>
         </div>
 
+        <div className="mb-6">
+          <FacilityTypeFilter
+            selectedTypes={selectedTypes}
+            onTypeToggle={handleTypeToggle}
+          />
+        </div>
         {paginatedFacilities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">표시할 시설이 없습니다.</p>

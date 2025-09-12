@@ -1,10 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { cn } from "../../../utils/utils";
 import { SidebarItem, SidebarProps } from "./Sidebar.types";
-import {
-  FirstDepthIcon,
-  SecondDepthIcon,
-} from "../../../assets/icons/sidebar/Icons";
+import {SecondDepthIcon,} from "../../../assets/icons/sidebar/Icons";
 
 const Sidebar = ({
                    items,
@@ -46,7 +43,7 @@ const Sidebar = ({
                 item.depth === 1 ? "h-10" : "h-7",
                 item.depth === 2 && "ml-8",
                 isActive
-                  ? "bg-primary-50 text-primary-900"
+                  ? "bg-primary-50 text-primary-600"
                   : "text-[#6B7482] hover:bg-primary-50/50",
                 "rounded-[3px]",
                 "transform transition-transform duration-200 hover:scale-[1.01]",
@@ -69,13 +66,7 @@ const Sidebar = ({
                 isActive && "translate-x-1"
               )}>
                 {item.depth === 1 ? (
-                  <FirstDepthIcon
-                    className={cn(
-                      "w-5 h-5",
-                      "transition-all duration-300",
-                      isActive ? "text-primary-600 scale-110" : "text-secondary-600",
-                    )}
-                  />
+                    item.icon
                 ) : (
                   <SecondDepthIcon
                     className={cn(

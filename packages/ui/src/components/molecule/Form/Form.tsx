@@ -74,7 +74,7 @@ function FormItem({ className, ...props }: FormItemProps) {
     <FormItemContext.Provider value={{ id }}>
       <div
         data-slot="form-item"
-        className={cn("grid gap-2", className)}
+        className={cn("grid", className)}
         {...props}
       />
     </FormItemContext.Provider>
@@ -91,7 +91,7 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={cn("data-[error=true]:text-danger-700", className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -138,15 +138,23 @@ function FormMessage({ className, ...props }: FormMessageProps) {
   }
 
   return (
-    <p
+    <div
       data-slot="form-message"
       id={formMessageId}
-      className={cn("text-destructive text-sm", className)}
+      className={cn(
+        "flex items-center gap-1 text-danger-700 text-xs bg-destructive-100 p-1 rounded-sm mt-1",
+        className,
+      )}
       {...props}
     >
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="6" r="5" stroke="#DC2626" stroke-width="1" fill="none"/>
+        <line x1="6" y1="4" x2="6" y2="6" stroke="#DC2626" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="6" cy="8" r="0.5" fill="#DC2626"/>
+      </svg>
       {body}
-    </p>
-  )
+    </div>
+  );
 }
 
 export {
