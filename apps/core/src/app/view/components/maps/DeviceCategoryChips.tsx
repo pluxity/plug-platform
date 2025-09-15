@@ -16,6 +16,7 @@ const DeviceCategoryChips = ({
 }: DeviceCategoryChipsProps) => {
   const { categories, isLoading } = useDeviceCategoryTree();
   const getUserPermissions = useAuthStore(s => s.getUserPermissions);
+  const hasRole = useAuthStore(s => s.hasRole);
   const [internalSelected, setInternalSelected] = useState<number | null>(selectedId);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -28,12 +29,29 @@ const DeviceCategoryChips = ({
   // 권한에 따라 필터링된 카테고리 생성
   const topLevel = useMemo(() => {
     const baseCategories = (categories || []).filter((c) => !c.parentId);
+    const isAdmin = hasRole('ADMIN');
+
+    // ADMIN 은 모든 카테고리 노출
+    if (isAdmin) {
+      // ADMIN 은 CCTV 도 항상 노출
+      const cctvCategory = {
+        id: -1,
+        name: 'CCTV',
+        depth: 0,
+        thumbnailFile: {
+          id: -1,
+          url: '/images/icons/cctv.png',
+        },
+      };
+      return [cctvCategory, ...baseCategories];
+    }
+
     const permissions = getUserPermissions();
-    
+
     // DEVICE-CATEGORY 권한 확인
     const deviceCategoryPermission = permissions.find(p => p.resourceType === 'DEVICE_CATEGORY');
     let filteredCategories = baseCategories;
-    
+
     if (deviceCategoryPermission) {
       // ALL이 아니면 특정 카테고리만 필터링
       if (!deviceCategoryPermission.resourceIds.includes('ALL')) {
@@ -46,13 +64,13 @@ const DeviceCategoryChips = ({
       // DEVICE-CATEGORY 권한이 없으면 빈 배열
       filteredCategories = [];
     }
-    
+
     // CCTV 권한 확인
     const cctvPermission = permissions.find(p => p.resourceType === 'CCTV');
     const hasCctvPermission = cctvPermission?.resourceIds.includes('ALL') || false;
-    
+
     if (!hasCctvPermission) return filteredCategories;
-    
+
     const cctvCategory = {
       id: -1,
       name: 'CCTV',
@@ -62,9 +80,9 @@ const DeviceCategoryChips = ({
         url: '/images/icons/cctv.png',
       },
     };
-    
+
     return [cctvCategory, ...filteredCategories];
-  }, [categories, getUserPermissions]);
+  }, [categories, getUserPermissions, hasRole]);
 
   const selectCategory = useCallback((clickedId: number) => {
     setInternalSelected((prev) => {

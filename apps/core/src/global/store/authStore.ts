@@ -15,6 +15,7 @@ interface AuthStore {
   getUsername: () => string | undefined;
   getUserRoles: () => string[];
   hasRole: (roleName: string) => boolean;
+  isAdmin: () => boolean;
   updateLocalUserInfo: (updates: Partial<UserProfile>) => void;
   getUserPermissions: () => Array<{ resourceType: string; resourceIds: string[] }>;
   hasPermission: (resourceType: string, resourceId?: string) => boolean;
@@ -38,6 +39,7 @@ export const useAuthStore = create<AuthStore>()(
         const roles = get().getUserRoles();
         return roles.includes(roleName);
       },
+      isAdmin: () => get().hasRole('ADMIN'),
       updateLocalUserInfo: (updates: Partial<UserProfile>) => {
         const currentUser = get().user;
         if (currentUser) {
@@ -58,17 +60,13 @@ export const useAuthStore = create<AuthStore>()(
               }
               const ids = merged.get(p.resourceType)!;
 
-              if (ids.has('ALL')) {
-                continue;
-              }
+              if (ids.has('ALL')) continue;
 
               if (p.resourceIds.includes('ALL')) {
                 ids.clear();
                 ids.add('ALL');
               } else {
-                for (const id of p.resourceIds) {
-                  ids.add(id);
-                }
+                for (const id of p.resourceIds) ids.add(id);
               }
             }
           }
@@ -80,6 +78,10 @@ export const useAuthStore = create<AuthStore>()(
         }));
       },
       hasPermission: (resourceType: string, resourceId?: string) => {
+        const user = get().user;
+        if (user?.roles && Array.from(user.roles).some(r => r.name === 'ADMIN')) {
+          return true; // ADMIN 은 모든 권한 보유
+        }
         const permissions = get().getUserPermissions();
         const permission = permissions.find(p => p.resourceType === resourceType);
         if (!permission) return false;
