@@ -133,6 +133,9 @@ importers:
       '@types/node':
         specifier: ^22.15.2
         version: 22.15.3
+      '@types/react-plotly.js':
+        specifier: ^2.6.3
+        version: 2.6.3
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
@@ -2277,6 +2280,9 @@ packages:
   '@types/pbf@3.0.5':
     resolution: {integrity: sha512-j3pOPiEcWZ34R6a6mN07mUkM4o4Lwf6hPNt8eilOeZhTFbxFXmKhvXl9Y28jotFPaI1bpPDJsbCprUoNke6OrA==}
 
+  '@types/plotly.js@3.0.5':
+    resolution: {integrity: sha512-tIgCee+P9qBQ9uddiHNj++LgJxkhjPM2gWp8gaXbdLSx4RtZDZlR8eleEDtDSKiRpSBO/9McyZhMsFyXZH7iZA==}
+
   '@types/react-color@3.0.13':
     resolution: {integrity: sha512-2c/9FZ4ixC5T3JzN0LP5Cke2Mf0MKOP2Eh0NPDPWmuVH3NjPyhEjqNMQpN1Phr5m74egAy+p2lYNAFrX1z9Yrg==}
     peerDependencies:
@@ -2286,6 +2292,9 @@ packages:
     resolution: {integrity: sha512-XGJkWF41Qq305SKWEILa1O8vzhb3aOo3ogBlSmiqNko/WmRb6QIaweuZCXjKygVDXpzXb5wyxKTSOsmkuqj+Qw==}
     peerDependencies:
       '@types/react': ^19.0.0
+
+  '@types/react-plotly.js@2.6.3':
+    resolution: {integrity: sha512-HBQwyGuu/dGXDsWhnQrhH+xcJSsHvjkwfSRjP+YpOsCCWryIuXF78ZCBjpfgO3sCc0Jo8sYp4NOGtqT7Cn3epQ==}
 
   '@types/react-router-dom@5.3.3':
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
@@ -7185,6 +7194,8 @@ snapshots:
 
   '@types/pbf@3.0.5': {}
 
+  '@types/plotly.js@3.0.5': {}
+
   '@types/react-color@3.0.13(@types/react@19.1.2)':
     dependencies:
       '@types/react': 19.1.2
@@ -7192,6 +7203,11 @@ snapshots:
 
   '@types/react-dom@19.1.2(@types/react@19.1.2)':
     dependencies:
+      '@types/react': 19.1.2
+
+  '@types/react-plotly.js@2.6.3':
+    dependencies:
+      '@types/plotly.js': 3.0.5
       '@types/react': 19.1.2
 
   '@types/react-router-dom@5.3.3':

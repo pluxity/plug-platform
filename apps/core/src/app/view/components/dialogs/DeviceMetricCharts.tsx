@@ -99,11 +99,12 @@ export const DeviceMetricCharts = ({
                       ]}
                       layout={{
                         ...buildTimeSeriesLayout(`${metricName}${unitSuffix}`),
+                        title: undefined,
+                        legend: undefined,
                         autosize: true,
                         dragmode: 'pan',
                         margin: { t: 12, r: 8, b: 24, l: 44 },
                         xaxis: {
-                          title: 'Time',
                           tickfont: {
                             color: 'rgba(156, 163, 175, 0.9)' ,
                             size: 10 
@@ -117,7 +118,6 @@ export const DeviceMetricCharts = ({
                           linecolor: 'rgba(255, 255, 255, 0.1)',
                         },
                         yaxis: { 
-                          title: metricName, 
                           tickfont: {
                             color: 'rgba(156, 163, 175, 0.9)',
                             size: 10
