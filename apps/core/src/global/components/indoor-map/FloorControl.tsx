@@ -148,8 +148,8 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
                         onClick={() => toggleFloor(floor.floorId)}
                         className={`w-full px-3 py-2 rounded-md text-xs font-medium border transition-all duration-200 cursor-pointer select-none text-left hover:scale-105 ${
                           isOn
-                            ? 'liquid-glass liquid-glass-primary text-secondary-100 shadow-lg'
-                            : 'liquid-glass text-secondary-100 hover:bg-white/5'
+                            ? 'liquid-glass liquid-glass-primary clickable text-secondary-100 shadow-lg'
+                            : 'liquid-glass clickable text-secondary-100 hover:bg-white/5'
                         }`}
                         title={isOn ? '층 숨기기' : '층 보이기'}
                       >

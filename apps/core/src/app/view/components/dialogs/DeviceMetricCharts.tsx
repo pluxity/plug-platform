@@ -73,7 +73,7 @@ export const DeviceMetricCharts = ({
                           },
                           marker: {
                             color: '#A9CBF6', 
-                            size: 9,
+                            size: 8,
                             symbol: 'circle',
                             line: {
                               color: '#2E61E6',
@@ -101,24 +101,26 @@ export const DeviceMetricCharts = ({
                         ...buildTimeSeriesLayout(`${metricName}${unitSuffix}`),
                         autosize: true,
                         dragmode: 'pan',
-                        margin: { t: 12, r: 8, b: 32, l: 44 },
+                        margin: { t: 12, r: 8, b: 24, l: 44 },
                         xaxis: {
                           title: 'Time',
                           tickfont: {
-                            color: 'rgba(156, 163, 175, 0.9)' 
+                            color: 'rgba(156, 163, 175, 0.9)' ,
+                            size: 10 
                           },
                           tickangle: 0,
                           tickmode: 'array',
                           tickvals,
                           ticktext: tickvals,
-                          ticklen: 5,
+                          ticklen: 6,
                           gridcolor: 'rgba(255, 255, 255, 0.1)',
-                          linecolor: 'rgba(255, 255, 255, 0.1)'
+                          linecolor: 'rgba(255, 255, 255, 0.1)',
                         },
                         yaxis: { 
                           title: metricName, 
                           tickfont: {
-                            color: 'rgba(156, 163, 175, 0.9)' 
+                            color: 'rgba(156, 163, 175, 0.9)',
+                            size: 10
                           },
                           ticklen: 5,
                           automargin: true,
@@ -126,7 +128,7 @@ export const DeviceMetricCharts = ({
                           linecolor: 'rgba(255, 255, 255, 0.1)'
                         },
                         plot_bgcolor: 'transparent',
-                        paper_bgcolor: 'transparent'
+                        paper_bgcolor: 'transparent',
                       }}
                       style={{ 
                         width: '100%', 

@@ -93,7 +93,7 @@ const GroupSearchFormInner = <T,>(
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="liquid-glass w-full px-4 py-2 pr-10 text-secondary-100 placeholder-secondary-100/60 focus:outline-none focus:ring-2 focus:ring-secondary-100/30 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="liquid-glass clickable w-full px-4 py-2 pr-10 text-secondary-100 placeholder-secondary-100/60 focus:outline-none focus:ring-2 focus:ring-secondary-100/30 disabled:opacity-60 disabled:cursor-not-allowed"
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
           {value ? (

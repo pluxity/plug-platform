@@ -29,7 +29,7 @@ const MapControls: React.FC = () => {
         <button
           onClick={() => handleZoom(1)}
           title="확대"
-          className="liquid-glass w-11 h-11 rounded-lg flex items-center justify-center"
+          className="liquid-glass clickable w-11 h-11 rounded-lg flex items-center justify-center"
         >
           <PlusIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
         </button>
@@ -38,7 +38,7 @@ const MapControls: React.FC = () => {
         <button
           onClick={() => handleZoom(-1)}
           title="축소"
-          className="liquid-glass w-11 h-11 rounded-lg flex items-center justify-center"
+          className="liquid-glass clickable w-11 h-11 rounded-lg flex items-center justify-center"
         >
           <MinusIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
         </button>
@@ -50,7 +50,7 @@ const MapControls: React.FC = () => {
         <button
           onClick={handleHome}
           title="홈으로 이동"
-          className="liquid-glass w-11 h-11 rounded-lg flex items-center justify-center"
+          className="liquid-glass clickable w-11 h-11 rounded-lg flex items-center justify-center"
         >
           <HomeIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
         </button>
