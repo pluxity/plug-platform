@@ -1,7 +1,7 @@
-import { UserProfile } from '@plug/common-services/types';
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { UserProfile } from '@plug/common-services/types';
 interface AuthStore {
   user: UserProfile | null;
   isAuthenticated: boolean;
@@ -15,8 +15,9 @@ interface AuthStore {
   getUsername: () => string | undefined;
   getUserRoles: () => string[];
   hasRole: (roleName: string) => boolean;
-  // 간단한 사용자 정보 업데이트 (로컬 상태만)
   updateLocalUserInfo: (updates: Partial<UserProfile>) => void;
+  getUserPermissions: () => Array<{ resourceType: string; resourceIds: string[] }>;
+  hasPermission: (resourceType: string, resourceId?: string) => boolean;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -37,12 +38,53 @@ export const useAuthStore = create<AuthStore>()(
         const roles = get().getUserRoles();
         return roles.includes(roleName);
       },
-      // 로컬 상태 업데이트 (서버 동기화는 별도 처리)
       updateLocalUserInfo: (updates: Partial<UserProfile>) => {
         const currentUser = get().user;
         if (currentUser) {
           set({ user: { ...currentUser, ...updates } });
         }
+      },
+      getUserPermissions: () => {
+        const user = get().user;
+        if (!user?.roles) return [];
+
+        const merged = new Map<string, Set<string>>();
+
+        for (const role of user.roles) {
+          for (const permission of role.permissions) {
+            for (const p of permission.permissions) {
+              if (!merged.has(p.resourceType)) {
+                merged.set(p.resourceType, new Set<string>());
+              }
+              const ids = merged.get(p.resourceType)!;
+
+              if (ids.has('ALL')) {
+                continue;
+              }
+
+              if (p.resourceIds.includes('ALL')) {
+                ids.clear();
+                ids.add('ALL');
+              } else {
+                for (const id of p.resourceIds) {
+                  ids.add(id);
+                }
+              }
+            }
+          }
+        }
+
+        return Array.from(merged.entries()).map(([resourceType, resourceIds]) => ({
+          resourceType,
+          resourceIds: Array.from(resourceIds),
+        }));
+      },
+      hasPermission: (resourceType: string, resourceId?: string) => {
+        const permissions = get().getUserPermissions();
+        const permission = permissions.find(p => p.resourceType === resourceType);
+        if (!permission) return false;
+        if (!resourceId) return true;
+        return permission.resourceIds.includes('ALL') || permission.resourceIds.includes(resourceId);
       },
     }),
     {
