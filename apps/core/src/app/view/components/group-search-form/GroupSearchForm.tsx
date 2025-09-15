@@ -9,7 +9,7 @@ function flattenCount<T>(groups: GroupSearchGroup<T>[]) {
   return groups.reduce((total, group) => total + (group.items?.length ?? 0), 0);
 }
 
-function DefaultEmpty({ text }: { text: string }) { return (<div className="px-4 py-3 text-gray-500 text-center">{text}</div>); }
+function DefaultEmpty({ text }: { text: string }) { return (<div className="px-4 py-3 text-secondary-100 text-center">{text}</div>); }
 
 function useControlledOpen({ isOpen, defaultOpen, onOpenChange }: { isOpen?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void }) {
   const [internalOpenState, setInternalOpenState] = useState<boolean>(!!defaultOpen);
@@ -93,20 +93,20 @@ const GroupSearchFormInner = <T,>(
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="liquid-glass clickable w-full px-4 py-2 pr-10 text-secondary-100 placeholder-secondary-100/60 focus:outline-none focus:ring-2 focus:ring-secondary-100/30 disabled:opacity-60 disabled:cursor-not-allowed"
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
           {value ? (
             <button
               onClick={() => onValueChange('')}
-              className="text-gray-400 hover:text-gray-600 focus:outline-none"
+              className="text-secondary-100 focus:outline-none transition-colors duration-200"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-secondary-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           ) : (
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-secondary-100/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           )}
@@ -114,23 +114,25 @@ const GroupSearchFormInner = <T,>(
       </div>
 
       {open && (
-        <div className={clsx('absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto', dropdownClassName)}>
+        <div className={clsx('absolute z-50 w-full mt-2 liquid-glass rounded-2xl border-secondary-100/10', dropdownClassName)}>
           {showCount && totalCount > 0 && (
-            <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs text-gray-600">
+            <div className="px-4 py-3 border-b border-white/10 text-xs text-secondary-100 font-medium">
               {totalCount}개의 결과가 있습니다
             </div>
           )}
 
           {groups.map((group, groupIndex) => (
-            <div key={`${group.heading}-${groupIndex}`} className="py-1">
-              <div className="px-3 py-1 text-xs text-gray-500 uppercase tracking-wide">{group.heading}</div>
+            <div key={`${group.heading}-${groupIndex}`} className="pt-2 pb-3 px-2 max-h-70 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-600">
+              <div className="px-2 py-2 text-xs text-secondary-100 uppercase tracking-wide font-medium">
+                {group.heading}
+              </div>
               {group.items.map((item, itemIndex) => {
                 const itemKey = (getItemKey?.(item, groupIndex, itemIndex)) ?? `${group.heading}-${itemIndex}`;
                 return (
                   <button
                     key={itemKey}
                     onClick={() => onSelect?.(item, { group, groupIndex, itemIndex })}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                    className="w-full mt-2 px-4 py-3 text-left liquid-glass liquid-glass-secondary focus:outline-none rounded-md"
                   >
                     {renderItem(item, { group, groupIndex, itemIndex })}
                   </button>
@@ -138,6 +140,7 @@ const GroupSearchFormInner = <T,>(
               })}
             </div>
           ))}
+
 
           {totalCount === 0 && (
             <DefaultEmpty text={emptyText} />

@@ -153,7 +153,7 @@ const DeviceCategoryChips = ({
   }, [topLevel.length, isLoading]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
@@ -162,7 +162,7 @@ const DeviceCategoryChips = ({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onPointerLeave={endDrag}
-        className="flex items-center gap-2 px-1 py-1 overflow-x-auto overflow-y-hidden whitespace-nowrap cursor-grab active:cursor-grabbing select-none scroll-smooth no-scrollbar overscroll-contain"
+        className="flex items-center gap-2 px-4 py-1 overflow-x-auto overflow-y-hidden whitespace-nowrap cursor-grab active:cursor-grabbing select-none scroll-smooth no-scrollbar overscroll-contain"
         role="tablist"
         aria-label="장치 카테고리"
       >
@@ -180,8 +180,8 @@ const DeviceCategoryChips = ({
             data-chip="true"
             onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id); }}
             className={[
-              'inline-flex items-center px-3 py-1.5 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
-              internalSelected === category.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+              'liquid-glass liquid-glass-primary clickable inline-flex items-center px-3 py-1 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
+              internalSelected === category.id ? 'text-secondary-100' : 'text-secondary-600',
             ].join(' ')}
             title={category.name}
           >
@@ -205,11 +205,9 @@ const DeviceCategoryChips = ({
           type="button"
           aria-label="왼쪽으로 스크롤"
           onClick={() => scrollByAmount(-240)}
-          className="absolute left-1 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-7 w-7 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+          className="absolute left-1 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-7 w-7 rounded-full border border-secondary-500 bg-secondary-100/80 text-secondary-900/80 hover:bg-secondary-400"
         >
-          <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden="true">
-            <path fillRule="evenodd" d="M12.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L8.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
+          <span className="text-lg font-bold">&lt;</span>
         </button>
       )}
       {canScrollRight && (
@@ -217,11 +215,9 @@ const DeviceCategoryChips = ({
           type="button"
           aria-label="오른쪽으로 스크롤"
           onClick={() => scrollByAmount(240)}
-          className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-7 w-7 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+          className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-7 w-7 rounded-full border border-secondary-500 bg-secondary-100/80 text-secondary-900/80 hover:bg-secondary-400"
         >
-          <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden="true">
-            <path fillRule="evenodd" d="M7.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 11-1.414-1.414L11.586 10l-4.293 4.293a1 1 0 011.414-1.414z" clipRule="evenodd" />
-          </svg>
+          <span className="text-lg font-bold">&gt;</span>
         </button>
       )}
     </div>

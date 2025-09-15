@@ -18,23 +18,29 @@ function Profile({
     type = "list",
     profileItems = [],
     children,
-    className
- }: ProfileProps) {
+    className,
+    profileImageClassName,
+    profileTitleClassName,
+    profileDescriptionClassName,
+    dropdownContentClassName,
+}: ProfileProps) {
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <div className={cn("flex items-center space-x-2 cursor-pointer", className)}>
-                    <Avatar className="h-8 w-8">
-                        <AvatarImage src={profileImage} />
+                    <Avatar className="h-9 w-9">
+                        <AvatarImage src={profileImage} className={profileImageClassName} />
                     </Avatar>
                     <div className="flex flex-col items-start text-sm">
-                        <p className="text-gray-600">{profileDescription}</p>
-                        <p>{profileTitle}</p>
+                        <p className={cn("text-gray-600", profileDescriptionClassName)}>{profileDescription}</p>
+                        <p className={cn("text-gray-600", profileTitleClassName)}>{profileTitle}</p>
                     </div>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent 
+                className={cn(dropdownContentClassName)}
+            >
                 {type === "custom" ? (
                     children
                 ) : (
