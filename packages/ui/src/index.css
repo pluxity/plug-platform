@@ -312,9 +312,6 @@
         backdrop-filter: 
             blur(var(--glass-blur)) 
             saturate(var(--glass-saturation));
-        -webkit-backdrop-filter: 
-            blur(var(--glass-blur)) 
-            saturate(var(--glass-saturation));
         
         border-radius: 16px;
         transition: all 0.2s ease;
