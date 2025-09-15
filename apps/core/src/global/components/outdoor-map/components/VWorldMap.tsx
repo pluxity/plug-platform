@@ -13,6 +13,7 @@ interface VWorldMapProps {
   mapProvider?: MapProvider;
   preventCameraReset?: boolean;
   onMapInitialized?: () => void;
+  enableTerrain?: boolean;
 }
 
 const VWorldMap: React.FC<VWorldMapProps> = ({
@@ -21,14 +22,31 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   mapProvider = 'vworld',
   preventCameraReset = false,
   onMapInitialized,
+  enableTerrain = false,
 }) => {
   const imageryProvider = useMemo(
     () => createImageryProvider(mapProvider),
     [mapProvider],
   );
 
+  const viewerProps = useMemo(() => {
+    const props: { terrainProvider?: Cesium.TerrainProvider | Promise<Cesium.TerrainProvider> } = {};
+    if (enableTerrain) {
+      // WorldTerrain을 사용하도록 설정
+      props.terrainProvider = Cesium.createWorldTerrainAsync();
+    } else {
+      // 평면 지형 사용
+      props.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+    }
+    return props;
+  }, [enableTerrain]);
+
   return (
-    <BaseCesiumViewer className={className} sceneMode={Cesium.SceneMode.SCENE3D}>
+    <BaseCesiumViewer 
+      className={className} 
+      sceneMode={Cesium.SceneMode.SCENE3D}
+      {...viewerProps}
+    >
       <Scene />
       <InitialCameraSetup
         hasInitialized={preventCameraReset}

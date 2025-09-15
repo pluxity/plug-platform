@@ -10,7 +10,7 @@ const ThreeDViewer: React.FC = () => {
             console.log('WebGL 엔진 메모리 해제 완료.');
         } else if (evt.key === 'w') {
             Core.Initialize(containerRef.current as HTMLElement);
-            Loader.LoadGltf('Seomyeun_250611.glb', () => console.log('모델 로드 완료.'));
+            Loader.LoadGltf('yongsan.glb', () => console.log('모델 로드 완료.'));
             console.log('WebGL 재 초기화 호출.');
         }
     });
@@ -18,7 +18,7 @@ const ThreeDViewer: React.FC = () => {
     useEffect(() => {
         if (containerRef.current) {
             Core.Initialize(containerRef.current);
-            Loader.LoadGltf('Seomyeun_250611.glb', () => console.log('모델 로드 완료.'));
+            Loader.LoadGltf('yongsan.glb', () => console.log('모델 로드 완료.'));
         }
         console.log('WebGL 초기화 호출.');
     }, []);

@@ -65,39 +65,48 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
   if (floors.length === 0) return null;
 
   return (
-    <div className={`${className} relative bg-white/5 backdrop-blur-xxs border border-white/30 shadow-lg overflow-hidden`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-white/10 to-white/15 "></div>
-
-      {isExpanded && (
-        <div className="relative z-10 border-b border-white/20">
-          {/* Header row */}
+    <div className={`${className} liquid-glass relative overflow-hidden`}>
+      <div
+        className={`relative z-10 border-b border-white/20 transition-all duration-400 ease-out transform overflow-hidden ${
+          isExpanded 
+            ? 'max-h-screen opacity-100 translate-y-0' 
+            : 'max-h-0 opacity-0 -translate-y-4'
+        }`}
+      >
+        {/* Header row */}
+        <div className={`transition-all duration-500 delay-75 ${
+          isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
           <div className="flex items-center justify-between mb-3 pt-2 px-2">
             <div className="flex items-center space-x-2 select-none">
-              <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-              <h3 className="text-sm font-semibold text-gray-100">층별 보기</h3>
+              <h3 className="text-sm font-semibold text-secondary-100">층별 보기</h3>
             </div>
             <button
               onClick={toggleAllFloors}
-              className="text-xs px-3 py-1 bg-white/20 hover:bg-white/30 text-gray-100 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/20 cursor-pointer select-none"
+              className="liquid-glass liquid-glass-secondary text-xs px-3 py-1 text-secondary-500 cursor-pointer select-none"
             >
               {allVisible ? '모두 숨기기' : '모두 보기'}
             </button>
           </div>
+        </div>
 
-          {/* Tools row: search */}
+        {/* Tools row: search */}
+        <div className={`transition-all duration-500 delay-150 ${
+          isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
           <div className="flex items-center gap-2 px-2 pb-3">
             <div className="relative flex-1">
               <input
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
-                className="w-full bg-white/10 placeholder:text-gray-300/70 text-gray-100 text-xs px-3 py-2 rounded-md outline-none border border-white/20 focus:border-white/40"
+                className=" w-full bg-white/10 placeholder:text-secondary-500 text-secondary-100 text-xs px-3 py-2 rounded-md outline-none border border-secondary-100/20"
                 placeholder="층 검색 (예: 3, B1, 로비)"
                 aria-label="층 검색"
               />
               {filterText && (
                 <button
                   onClick={() => setFilterText('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-secondary-500 hover:text-secondary-100"
                   aria-label="검색 지우기"
                 >
                   ×
@@ -105,32 +114,42 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
               )}
             </div>
           </div>
-
-          {/* Content: grid for many floors, list for fewer */}
-          <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
-            {floors.length > 15 && (
-              <div className="sticky top-0 bg-blue-400/20 border border-blue-300/30 backdrop-blur-sm p-3 z-10">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-blue-100 font-medium">🏢 총 {floors.length}개 층</p>
-                  <div className="text-xs text-blue-200">{visibleFloors.size}개 표시 중</div>
-                </div>
+        </div>
+        <div className={`transition-all duration-500 delay-225 ${
+          isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
+          {floors.length > 15 && (
+            <div className="sticky top-0 bg-primary-1000/60 border border-primary-700/30 p-3 z-10">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-secondary-100 font-medium">총 {floors.length}개 층</p>
+                <div className="text-xs text-primary-400">{visibleFloors.size}개 표시 중</div>
               </div>
-            )}
-
+            </div>
+          )}
+          <div className="min-h-60 min-w-60 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
             {filteredFloors.length === 0 ? (
-              <div className="px-3 py-8 text-center text-xs text-gray-300">검색 결과가 없습니다</div>
+              <div className="h-60 flex items-center justify-center">
+                <div className="text-center text-xs text-secondary-100">검색 결과가 없습니다</div>
+              </div>
             ) : filteredFloors.length > 14 ? (
-              <div className="p-2 grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {filteredFloors.map((floor: Floor) => {
+              <div className="p-2 grid grid-cols-3 sm:grid-cols-3 gap-2">
+                {filteredFloors.map((floor: Floor, index: number) => {
                   const isOn = visibleFloors.has(floor.floorId);
                   return (
-                    <div key={floor.floorId} className="group relative">
+                    <div 
+                      key={floor.floorId} 
+                      className="group relative"
+                      style={{
+                        animationDelay: `${index * 20}ms`,
+                        animation: isExpanded ? 'fadeInUp 0.3s ease-out forwards' : 'none'
+                      }}
+                    >
                       <button
                         onClick={() => toggleFloor(floor.floorId)}
-                        className={`w-full px-3 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer select-none text-left ${
+                        className={`w-full px-3 py-2 rounded-md text-xs font-medium border transition-all duration-200 cursor-pointer select-none text-left hover:scale-105 ${
                           isOn
-                            ? 'bg-emerald-500/20 border-emerald-300/40 text-white hover:bg-emerald-500/30'
-                            : 'bg-white/10 border-white/20 text-gray-100 hover:bg-white/20'
+                            ? 'liquid-glass liquid-glass-primary clickable text-secondary-100 shadow-lg'
+                            : 'liquid-glass clickable text-secondary-100 hover:bg-white/5'
                         }`}
                         title={isOn ? '층 숨기기' : '층 보이기'}
                       >
@@ -143,33 +162,37 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
               </div>
             ) : (
               <div className="space-y-1 px-1 pb-2">
-                {filteredFloors.map((floor: Floor) => (
+                {filteredFloors.map((floor: Floor, index: number) => (
                   <div
                     key={floor.floorId}
-                    className="flex items-center justify-between p-2 hover:bg-white/10 transition-all duration-200 group rounded"
+                    className="flex items-center justify-between p-2 hover:bg-secondary-100/10 transition-all duration-200 group rounded hover:scale-[1.02]"
+                    style={{
+                      animationDelay: `${index * 15}ms`,
+                      animation: isExpanded ? 'fadeInUp 0.25s ease-out forwards' : 'none'
+                    }}
                   >
                     <div className="flex items-center space-x-3 select-none">
                       <div
                         className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
-                          visibleFloors.has(floor.floorId) ? 'bg-green-400 shadow-md' : 'bg-gray-400'
+                          visibleFloors.has(floor.floorId) ? 'bg-primary-500/70 shadow-md scale-110' : 'bg-secondary-100/20'
                         }`}
                       ></div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-100 group-hover:text-white select-none">
+                        <span className="text-sm font-medium text-secondary-100 group-hover:text-secondary-100 select-none">
                           {floor.name}
                         </span>
                         {floors.length > 10 && (
-                          <span className="text-[11px] text-gray-300 select-none">ID: {floor.floorId}</span>
+                          <span className="text-[11px] text-secondary-500 select-none">ID: {floor.floorId}</span>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => toggleFloor(floor.floorId)}
-                        className={`w-8 h-8 flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                        className={`w-8 h-8 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110 ${
                           visibleFloors.has(floor.floorId)
-                            ? 'text-green-400 hover:text-green-300'
-                            : 'text-gray-400 hover:text-gray-300'
+                            ? 'text-primary-500/70 hover:text-primary-600/70'
+                            : 'text-secondary-100/40 hover:text-secondary-100/60'
                         }`}
                         aria-pressed={visibleFloors.has(floor.floorId)}
                         aria-label={visibleFloors.has(floor.floorId) ? '층 숨기기' : '층 보이기'}
@@ -202,7 +225,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
             )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Footer / toggle */}
       <div className="relative z-10">
@@ -211,7 +234,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
           className="w-full flex items-center justify-between px-3 py-2 hover:bg-white/10 transition-all duration-200 group cursor-pointer"
         >
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200">
+          <div className="w-8 h-8 bg-gradient-to-br from-primary-500/60 to-primary-600/70 flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -222,8 +245,8 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
               </svg>
             </div>
             <div className="flex flex-col items-start select-none">
-              <span className="text-sm font-semibold text-gray-100 group-hover:text-white transition-colors">층 선택</span>
-              <span className="text-xs text-gray-300">
+              <span className="text-sm font-semibold text-secondary-100 group-hover:text-secondary-100 transition-colors">층 선택</span>
+              <span className="text-xs text-secondary-500">
                 {floors.length > 15
                   ? `${floors.length}층 건물 · ${visibleFloors.size}개 표시`
                   : `${visibleFloors.size}개 층 표시`}
@@ -232,7 +255,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
           </div>
           <div className="ml-2">
             <svg
-              className={`w-4 h-4 text-gray-300 group-hover:text-gray-100 transition-all duration-200 ${
+              className={`w-4 h-4 text-secondary-300 group-hover:text-secondary-100 transition-all duration-200 ${
                 isExpanded ? 'rotate-180' : 'rotate-0'
               }`}
               fill="none"

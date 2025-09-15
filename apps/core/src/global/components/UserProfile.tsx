@@ -1,18 +1,63 @@
 import { useNavigate } from 'react-router-dom';
-
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 import type { UserProfile as UserProfileType  } from '@plug/common-services';
 import { useSignOut, getUserProfile } from '@plug/common-services/services';
 import { Profile } from '@plug/ui';
 
 import { useAuthStore } from '@/global/store';
+
 interface UserProfileProps {
-  showAdminPortal?: boolean; // 관리자 페이지(백오피스) 진입 버튼 표시 여부
-  className?: string;        // 아바타 트리거 커스터마이징
-  panelWidthClass?: string;  // 내용물 width Tailwind 클래스 (기본 w-56)
-  alignInfoToRight?: boolean; // 내부 필드 값 오른쪽 정렬 여부
+  showAdminPortal?: boolean;
+  className?: string;
+  panelWidthClass?: string;
+  alignInfoToRight?: boolean;
 }
+
+// 커스텀 훅으로 스타일 분리
+const useUserProfileStyles = (isAdmin: boolean, showAdminPortal: boolean) => {
+  return useMemo(() => {
+    const isAdminUser = isAdmin && showAdminPortal;
+    
+    return {
+      trigger: isAdminUser 
+        ? 'rounded-sm shadow transition'
+        : 'space-x-3 min-w-30 px-3 py-1 rounded-sm shadow transition liquid-glass',
+      
+      dropdown: isAdminUser 
+        ? 'liquid-glass right-6 transform transition-all duration-400 ease-out'
+        : 'fixed right-0',
+      
+      infoSection: isAdminUser 
+        ? 'mb-3 border-b border-primary-200/30 pb-2'
+        : 'mb-3 border-b border-secondary-100/20 pb-2',
+      
+      title: isAdminUser 
+        ? 'text-sm py-2 font-semibold mb-2 text-secondary-100'
+        : 'text-sm font-semibold mb-1',
+      
+      fieldLabel: isAdminUser 
+        ? 'text-secondary-300 font-medium text-xs'
+        : 'text-secondary-400/80',
+      
+      fieldValue: isAdminUser 
+        ? 'text-secondary-300'
+        : 'font-medium',
+      
+      profileImage: isAdminUser 
+        ? 'brightness-0 saturate-1000 invert-90 bg-secondary-200/30 p-2 rounded-lg linear-gradient-to-br from-secondary-200/30 to-secondary-200/10'
+        : 'bg-gray-200 border border-gray-300 p-2', 
+      
+      adminButton: isAdminUser 
+        ? 'w-full text-left px-2 py-1.5 rounded bg-primary-500/40 text-secondary-100 hover:bg-primary-400/80 hover:text-primary-900/80 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary-300/70 font-medium'
+        : 'w-full text-left px-2 py-1.5 rounded hover:bg-secondary-200 text-sm text-secondary-600 hover:text-secondary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-secondary-300/70 font-medium',
+      
+      logoutButton: isAdminUser 
+        ? 'w-full text-left px-2 py-1.5 rounded bg-danger-500/40 text-secondary-100 hover:bg-danger-300/80 hover:text-danger-900/80 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary-300/70 font-medium'
+        : 'w-full text-left px-2 py-1.5 rounded hover:bg-danger-100 text-sm text-danger-600 disabled:opacity-60'
+    };
+  }, [isAdmin, showAdminPortal]);
+};
 
 const UserProfile: React.FC<UserProfileProps> = ({
   showAdminPortal = true,
@@ -28,6 +73,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const [userProfile, setUserProfile] = useState<UserProfileType | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 스타일 훅 사용
+  const styles = useUserProfileStyles(isAdmin, showAdminPortal);
+  const isAdminUser = isAdmin && showAdminPortal;
 
   useEffect(() => {
     let mounted = true;
@@ -62,14 +111,20 @@ const UserProfile: React.FC<UserProfileProps> = ({
   return (
     <Profile
       type="custom"
-      className={['space-x-0 p-1 bg-white/90 rounded-full shadow hover:bg-white transition [&>div:last-child]:hidden', className].filter(Boolean).join(' ')}
-      profileTitle={undefined}
-      profileDescription={undefined}
+      className={[styles.trigger, className].filter(Boolean).join(' ')}
+      profileTitle={isAdminUser ? undefined : userProfile?.name}
+      profileDescription={isAdminUser ? undefined : userProfile?.department}
       profileImage={undefined}
+      profileImageClassName={styles.profileImage}  
+      profileTitleClassName={styles.title}
+      profileDescriptionClassName={styles.fieldLabel}
+      dropdownContentClassName={[styles.dropdown].filter(Boolean).join(' ')}
     >
       <div className={`${panelWidthClass} p-2`}>
-        <div className="mb-3 border-b pb-2">
-          <p className="text-sm font-semibold mb-1">내 정보</p>
+        <div className={styles.infoSection}>
+          <p className={styles.title}>
+            {isAdminUser ? '관리자 정보' : '내 정보'}
+          </p>
           {loading ? (
             <div className="animate-pulse space-y-2">
               <div className="h-3 bg-gray-200 rounded" />
@@ -81,34 +136,44 @@ const UserProfile: React.FC<UserProfileProps> = ({
           ) : (
             <div className="text-xs space-y-1">
               <div className="flex justify-between">
-                <span className="text-gray-500">이름</span>
-                <span className={`font-medium truncate max-w-[60%] ${valueAlignCls}`}>{userProfile?.name || '-'}</span>
+                <span className={styles.fieldLabel}>이름</span>
+                <span className={`${styles.fieldValue} truncate max-w-[60%] ${valueAlignCls}`}>
+                  {userProfile?.name || '-'}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">부서</span>
-                <span className={`truncate max-w-[60%] ${valueAlignCls}`}>{userProfile?.department || '-'}</span>
+                <span className={styles.fieldLabel}>부서</span>
+                <span className={`${styles.fieldValue} truncate max-w-[60%] ${valueAlignCls}`}>
+                  {userProfile?.department || '-'}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">연락처</span>
-                <span className={`truncate max-w-[60%] ${valueAlignCls}`}>{userProfile?.phoneNumber || '-'}</span>
+                <span className={styles.fieldLabel}>연락처</span>
+                <span className={`${styles.fieldValue} truncate max-w-[60%] ${valueAlignCls}`}>
+                  {userProfile?.phoneNumber || '-'}
+                </span>
               </div>
             </div>
           )}
         </div>
         <div className="flex flex-col gap-1">
-          {isAdmin && showAdminPortal && (
+          {isAdminUser && (
             <button
               type="button"
               onClick={() => navigate('/admin')}
-              className="w-full text-left px-2 py-1.5 rounded hover:bg-gray-100 text-sm text-sky-600 hover:text-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-sky-300/70"
-            >관리자 페이지로 이동</button>
+              className={styles.adminButton}
+            >
+              관리자 페이지로 이동
+            </button>
           )}
           <button
             type="button"
             disabled={isSigningOut}
             onClick={handleLogout}
-            className="w-full text-left px-2 py-1.5 rounded hover:bg-red-50 text-sm text-red-600 disabled:opacity-60"
-          >{isSigningOut ? '로그아웃 중...' : '로그아웃'}</button>
+            className={styles.logoutButton}
+          >
+            {isSigningOut ? '로그아웃 중...' : '로그아웃'}
+          </button>
         </div>
       </div>
     </Profile>

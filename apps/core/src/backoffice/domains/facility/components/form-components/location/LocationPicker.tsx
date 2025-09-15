@@ -12,6 +12,7 @@ interface LocationPickerProps {
   };
   enabled: boolean;
   showMarker: boolean;
+  markerModelUrl?: string; // 마커 glb 파일 경로
 }
 
 const LocationPickerComponent: React.FC<LocationPickerProps> = ({
@@ -19,6 +20,7 @@ const LocationPickerComponent: React.FC<LocationPickerProps> = ({
   initialLocation,
   enabled,
   showMarker,
+  markerModelUrl = '/models/marker.glb', // public/models/marker.glb 파일
 }) => {
   const { viewer } = useCesium();
   const handlerRef = useRef<Cesium.ScreenSpaceEventHandler | null>(null);
@@ -36,10 +38,19 @@ const LocationPickerComponent: React.FC<LocationPickerProps> = ({
     (click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
       if (!viewer || !enabled) return;
 
-      const pickedPosition = viewer.camera.pickEllipsoid(
-        click.position,
-        viewer.scene.globe.ellipsoid
-      );
+      // 먼저 3D 타일 표면을 시도
+      let pickedPosition = viewer.scene.pickPosition(click.position);
+      
+      if (!pickedPosition) {
+        // 3D 타일이 없는 경우 기본 지구 표면 사용
+        const ellipsoidPosition = viewer.camera.pickEllipsoid(
+          click.position,
+          viewer.scene.globe.ellipsoid
+        );
+        if (ellipsoidPosition) {
+          pickedPosition = ellipsoidPosition;
+        }
+      }
 
       if (pickedPosition) {
         const cartographic = Cesium.Cartographic.fromCartesian(pickedPosition);
@@ -88,17 +99,15 @@ const LocationPickerComponent: React.FC<LocationPickerProps> = ({
   return (
     <Entity
       position={markerPosition}
-      billboard={{
-        image: 'data:image/svg+xml;base64,' + btoa(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-            <path fill="#ff0000" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-          </svg>
-        `),
-        scale: 1.0,
-        pixelOffset: new Cesium.Cartesian2(0, -16),
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+      orientation={Cesium.Transforms.headingPitchRollQuaternion(
+        markerPosition,
+        new Cesium.HeadingPitchRoll(0, 0, 0) // 방향 설정
+      )}
+      model={{
+        uri: markerModelUrl,
+        scale: 10.0,
         heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        color: Cesium.Color.WHITE, // 모델 색상 조정 가능
       }}
     />
   );

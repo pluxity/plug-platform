@@ -24,7 +24,7 @@ export const DeviceMetricCharts = ({
   if (!metricKeys.length) return <div className="text-slate-400 text-sm">메트릭이 없습니다.</div>;
 
   return (
-    <div className={['flex flex-col text-white', heightClass, className || ''].join(' ')}>
+    <div className={['flex flex-col text-secondary-100', heightClass, className || ''].join(' ')}>
       <Suspense fallback={<div className="text-slate-400 text-sm">차트 로딩...</div>}>
         <Tabs defaultValue={metricKeys[0]} className="flex flex-col flex-1 min-h-0">
           <TabsList
@@ -36,7 +36,7 @@ export const DeviceMetricCharts = ({
                 key={metricName}
                 value={metricName}
                 unstyled
-                className="flex-1 min-w-[6rem] px-3 py-1 text-xs font-medium rounded-md border border-slate-600/60 text-white/70 hover:text-white hover:border-slate-400/70 data-[state=active]:text-white data-[state=active]:border-slate-300 data-[state=active]:bg-slate-600/20 transition-colors"
+                className="flex-1 min-w-[6rem] px-3 py-1 text-xs font-medium rounded-md border border-secondary-100/10 text-secondary-400/80 hover:text-secondary-300 hover:border-secondary-300/30 data-[state=active]:text-secondary-300 data-[state=active]:border-secondary-100/10 data-[state=active]:bg-secondary-100/10 transition-colors"
               >
                 {metricName}
               </TabsTrigger>
@@ -53,7 +53,7 @@ export const DeviceMetricCharts = ({
             return (
               <TabsContent key={metricName} value={metricName} className="mt-1 flex-1 min-h-0">
                 <div className="flex flex-col w-full h-80 min-h-0">
-                  <div className="text-[11px] text-white/80 mb-0.5 select-none leading-none">단위: {rawUnit || '-'}</div>
+                  <div className="text-[11px] text-secondary-400/80 mb-0.5 select-none leading-none">단위: {rawUnit || '-'}</div>
                   <div className="relative flex-1 min-h-0">
                     <Plot
                       data={[
@@ -64,26 +64,76 @@ export const DeviceMetricCharts = ({
                           x: timestamps,
                           y: metricData.values,
                           connectgaps: true,
+                          line: {
+                            color: '#528DE8', 
+                            width: 1.5,
+                            shape: 'spline',
+                            smoothing: 0.8,
+                            dash: 'solid'
+                          },
+                          marker: {
+                            color: '#A9CBF6', 
+                            size: 8,
+                            symbol: 'circle',
+                            line: {
+                              color: '#2E61E6',
+                              width: 2
+                            },
+                            opacity: 0.8
+                          },
                           hovertemplate: rawUnit
                             ? '%{x}<br><b>%{y}</b> ' + rawUnit + '<extra></extra>'
-                            : '%{x}<br><b>%{y}</b><extra></extra>'
+                            : '%{x}<br><b>%{y}</b><extra></extra>',
+                            hoverlabel: {
+                              bgcolor: 'rgba(55, 65, 81, 0.8)',
+                              bordercolor: 'rgba(55, 65, 81, 0.4)', 
+                              font: {
+                                color: 'rgba(255, 255, 255, 0.8)', 
+                                size: 12,
+                                family: 'Arial, sans-serif'
+                              },
+                              namelength: -1,
+                              align: 'left'
+                            }
                         }
                       ]}
                       layout={{
                         ...buildTimeSeriesLayout(`${metricName}${unitSuffix}`),
                         autosize: true,
                         dragmode: 'pan',
-                        margin: { t: 12, r: 8, b: 32, l: 44 },
+                        margin: { t: 12, r: 8, b: 24, l: 44 },
                         xaxis: {
                           title: 'Time',
+                          tickfont: {
+                            color: 'rgba(156, 163, 175, 0.9)' ,
+                            size: 10 
+                          },
                           tickangle: 0,
                           tickmode: 'array',
                           tickvals,
-                          ticktext: tickvals
+                          ticktext: tickvals,
+                          ticklen: 6,
+                          gridcolor: 'rgba(255, 255, 255, 0.1)',
+                          linecolor: 'rgba(255, 255, 255, 0.1)',
                         },
-                        yaxis: { title: metricName, automargin: true }
+                        yaxis: { 
+                          title: metricName, 
+                          tickfont: {
+                            color: 'rgba(156, 163, 175, 0.9)',
+                            size: 10
+                          },
+                          ticklen: 5,
+                          automargin: true,
+                          gridcolor: 'rgba(255, 255, 255, 0.1)',
+                          linecolor: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        plot_bgcolor: 'transparent',
+                        paper_bgcolor: 'transparent',
                       }}
-                      style={{ width: '100%', height: '100%' }}
+                      style={{ 
+                        width: '100%', 
+                        height: '100%',
+                      }}
                       config={hideModeBar
                         ? {
                             displaylogo: false,

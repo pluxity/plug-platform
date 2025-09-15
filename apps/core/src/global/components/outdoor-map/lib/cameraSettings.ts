@@ -25,3 +25,38 @@ export function setHomeViewInstant(viewer: Cesium.Viewer) {
   );
   viewer.scene.camera.flyToBoundingSphere(new Cesium.BoundingSphere(target, 80), { offset, duration: 0 });
 }
+
+export function flyToLocation(
+  viewer: Cesium.Viewer, 
+  longitude: number, 
+  latitude: number, 
+  opts?: { 
+    duration?: number; 
+    height?: number; 
+    range?: number; 
+    headingDeg?: number; 
+    pitchDeg?: number; 
+  }
+) {
+  if (!viewer) return;
+  
+  const {
+    duration = 1.5,
+    height = 20,
+    range = 2000,
+    headingDeg = 0,
+    pitchDeg = -45
+  } = opts || {};
+  
+  const target = Cesium.Cartesian3.fromDegrees(longitude, latitude, height);
+  const offset = new Cesium.HeadingPitchRange(
+    Cesium.Math.toRadians(headingDeg),
+    Cesium.Math.toRadians(pitchDeg),
+    range
+  );
+  
+  viewer.scene.camera.flyToBoundingSphere(new Cesium.BoundingSphere(target, 80), { 
+    offset, 
+    duration 
+  });
+}

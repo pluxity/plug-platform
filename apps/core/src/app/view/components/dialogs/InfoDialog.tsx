@@ -74,9 +74,8 @@ export const InfoDialog = ({
   } 
   
   const containerBase = [
-    'relative flex text-slate-100 bg-gradient-to-br',
-    'from-slate-900/90 via-slate-800/80 to-slate-700/70 backdrop-blur-sm',
-    'border border-white/10 shadow-2xl rounded-2xl',
+    'relative flex text-secondary-100 rounded-2xl',
+    'liquid-glass liquid-glass-secondary',
     sizeClass
   ].join(' ');
 
@@ -89,11 +88,11 @@ export const InfoDialog = ({
   : undefined;
 
   const closeBtnClass = isCompact
-    ? 'absolute top-2 right-2 w-7 h-7 rounded-md flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition'
-  : 'absolute top-3 right-3 w-12 h-12 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-[0.95] transition';
+    ? 'absolute top-2 right-2 w-7 h-7 rounded-md flex items-center justify-center text-secondary-100 hover:text-secondary-100 hover:bg-secondary-100/10 active:scale-[0.95] transition'
+  : 'absolute top-3 right-3 w-12 h-12 rounded-xl flex items-center justify-center text-secondary-100 hover:text-secondary-100 hover:bg-secondary-100/10 active:scale-[0.95] transition';
 
   const titleClass = [
-    isCompact ? 'text-base font-semibold tracking-tight text-white' : 'text-[1.5rem] leading-snug font-semibold tracking-tight text-white drop-shadow',
+    isCompact ? 'text-base font-semibold tracking-tight text-secondary-100' : 'text-2xl font-semibold tracking-tight text-secondary-100',
     'break-words',
     titleClassName || ''
   ].join(' ');
@@ -133,7 +132,7 @@ export const InfoDialog = ({
           </div>
           {children}
           {footer && (
-            <div className={isCompact ? 'pt-2 border-t border-white/10 flex flex-wrap gap-2' : 'mt-auto pt-2 border-t border-white/10 flex flex-wrap gap-3'}>
+            <div className={isCompact ? 'pt-2 border-t border-secondary-100/10 flex flex-wrap gap-2' : 'mt-auto pt-2 border-t border-secondary-100/10 flex flex-wrap gap-3'}>
               {footer}
             </div>
           )}
