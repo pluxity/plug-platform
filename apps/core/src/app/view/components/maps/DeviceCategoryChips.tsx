@@ -162,7 +162,7 @@ const DeviceCategoryChips: React.FC<DeviceCategoryChipsProps> = ({ selectedId = 
             onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id); }}
             className={[
               'liquid-glass liquid-glass-primary clickable inline-flex items-center px-3 py-1 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
-              internalSelected === category.id ? 'text-secondary-100' : 'text-secondary-100',
+              internalSelected === category.id ? 'text-secondary-100' : 'text-secondary-600',
             ].join(' ')}
             title={category.name}
           >

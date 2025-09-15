@@ -70,7 +70,7 @@ const DeviceInfoDialog = ({ device, onClose, hole }: DeviceInfoDialogProps) => {
 
   const body = (
     <div className="flex flex-col gap-5 flex-1 overflow-hidden">
-      <section className="rounded-lg bg-secondary-100/10 px-4 py-3 rounded-xl border border-secondary-100/10 p-4">
+      <section className="bg-secondary-100/10 px-4 py-3 rounded-xl border border-secondary-100/10 p-4">
         <div className="flex items-start gap-3 mb-3">
           <h4 className="text-sm font-semibold text-secondary-100 tracking-wide">현재값</h4>
           <div className="ml-auto text-[11px] text-secondary-400 flex items-center gap-1">
