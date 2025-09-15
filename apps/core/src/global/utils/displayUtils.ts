@@ -8,7 +8,7 @@ export const TEXT_STYLE = {
 
 // 비디오 플레이어 스타일 클래스
 export const VIDEO_PLAYER_STYLE = {
-    CONTAINER: 'relative inline-block w-70 h-40 bg-black/80 rounded-lg shadow-lg',
+    CONTAINER: ' -translate-y-20 relative inline-block w-70 h-40 bg-black/80 rounded-lg shadow-lg',
     CLOSE_BUTTON: 'absolute -top-2 -right-2 w-6 h-6 bg-secondary-1000/80 text-white border-0 rounded-full cursor-pointer flex items-center justify-center text-base font-bold z-10 transition-colors duration-200 hover:bg-secondary-1000/60',
     VIDEO: 'w-full h-full object-cover bg-secondary-1000-80',
 } as const;

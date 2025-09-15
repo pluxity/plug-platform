@@ -23,7 +23,7 @@ export interface UsePoiEmbeddedWebRTCResult {
 interface PoiEventTarget { id?: string; property?: { deviceId?: string | number | null; deviceID?: string | number | null } }
 
 export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}): UsePoiEmbeddedWebRTCResult {
-  const { onError, width = 280, aspect = 16 / 9, muted = true, controls = true } = options;
+  const { onError, muted = true, controls = true } = options;
   const poiSessionsRef = useRef<Record<string, { pc: RTCPeerConnection; abort?: AbortController }>>({});
 
   const stopPoi = useCallback((poiId: string) => {
@@ -81,15 +81,15 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     const abort = new AbortController();
     poiSessionsRef.current[poiId] = { pc, abort };
     try {
-    const url = buildWhepUrl(host, port, path);
-    await performWhepNegotiation(pc, url, abort.signal);
+      const url = buildWhepUrl(host, port, path);
+      await performWhepNegotiation(pc, url, abort.signal);
     if (poiSessionsRef.current[poiId]?.pc !== pc) return;
     } catch (err) {
-    console.error('POI WebRTC failed', err);
-    stopPoi(poiId);
-    onError?.(poiId, err);
+      console.error('POI WebRTC failed', err);
+      stopPoi(poiId);
+      onError?.(poiId, err);
     }
-  }, [aspect, controls, muted, onError, stopPoi, width]);
+  }, [controls, muted, onError, stopPoi]);
 
   const onPoiPointerUp = useCallback((evt: unknown) => {
     const target = (evt as { target?: PoiEventTarget } | undefined)?.target;
