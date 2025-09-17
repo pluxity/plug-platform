@@ -206,7 +206,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
         ].join(" ")}
         style={{
           padding: "12px",
-          paddingLeft: "24x",
+          paddingLeft: "24px",
           paddingRight: "20px",
         }}
         draggable={enableDragDrop && !disabled}
