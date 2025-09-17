@@ -24,16 +24,13 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
   thumbnailSize = 'small',
   disabled = false,
   enableCodes = true,
-  allowRootAdd = true,
   enableThumbnail = false,
   emptyMessage = '등록된 카테고리가 없습니다.',
-  // title = '카테고리',
   ...operations
 }) => {
   const {
     rootAddValue,
     rootAddCode,
-    setIsAddingRoot,
     setRootAddValue,
     setRootAddCode,
     setRootThumbnailFileId,
@@ -52,11 +49,10 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
   }, [itemsWithCorrectDepths])
 
   const resetRootAddForm = useCallback(() => {
-    setIsAddingRoot(false)
     setRootAddValue('')
     setRootAddCode('')
     setRootThumbnailFileId(undefined)
-  }, [setIsAddingRoot, setRootAddValue, setRootAddCode, setRootThumbnailFileId])
+  }, [setRootAddValue, setRootAddCode, setRootThumbnailFileId])
 
   const handleCategoryMove = async (draggedId: string, targetId: string, position: 'before' | 'after' | 'inside') => {
     const draggedNode = findNodeById(itemsWithCorrectDepths, draggedId)

@@ -51,9 +51,6 @@ const DashboardLayout: React.FC = () => {
         activeItemId={activeItem}
         expandedItems={expandedItems}
         onItemClick={handleClick}
-        onToggleExpand={function (): void {
-          throw new Error("Function not implemented.");
-        }}
       />
 
       <main className="flex-1 p-10">

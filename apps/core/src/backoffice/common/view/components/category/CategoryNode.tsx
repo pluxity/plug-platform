@@ -43,7 +43,7 @@ export interface CategoryNodeProps {
   enableThumbnail?: boolean
   thumbnailSize?: 'small' | 'medium' | 'large'
   enableCodes?: boolean
-  classname?: string
+  className?: string
 }
 
 export const CategoryNode: React.FC<CategoryNodeProps> = ({
@@ -58,7 +58,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                                                             enableDragDrop = true,
                                                             enableThumbnail = false,
                                                             thumbnailSize = 'small',
-                                                            enableCodes = true, classname,
+                                                            enableCodes = true, className,
                                                           }) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -202,7 +202,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
           dragOver === "inside"
             ? "bg-blue-50/40 ring-2 ring-secondary-300"
             : "",
-          classname,
+          className,
         ].join(" ")}
         style={{
           padding: "12px",
@@ -504,7 +504,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                     thumbnailSize={thumbnailSize}
                     enableCodes={enableCodes}
                     enableThumbnail={enableThumbnail}
-                    classname="!bg-secondary-100/70 border-none"
+                    className="!bg-secondary-100/70 border-none"
                   />
                 ))}
               </div>
