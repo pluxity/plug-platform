@@ -79,8 +79,9 @@ const data = Px.Poi.ExportAll();
 console.log('Poi.ExportAll', data);
 ```
 
-## Px.Poi.Import(data: [PoiImportOption](./Interfaces.md#PoiImportOption) | [PoiImportOption](./Interfaces.md#PoiImportOption)[] | string);
+## Px.Poi.Import(data: [PoiImportOption](./Interfaces.md#PoiImportOption) | [PoiImportOption](./Interfaces.md#PoiImportOption)[] | string, onImportCompleted?: Function);
 - data: poi 임포트 옵션
+- onImportCompleted: 임포트 완료 후 호출될 콜백 함수
 - poi data로부터 poi를 생성한다.
 ```javascript
 fetch('poiSampleData.json').then(res => res.json()).then(data => {
@@ -114,6 +115,8 @@ Px.Poi.Import({
         "y": 1,
         "z": 1
     }
+}, () => {
+    console.log('임포트 작업 완료');
 });
 ```
 

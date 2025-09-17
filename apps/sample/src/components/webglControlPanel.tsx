@@ -510,11 +510,11 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
             case 'Poi.Import': {
                 fetch('poiSampleData.json').then(res => res.json()).then(data => {
                     console.log('Poi.Import', data);
-                    Poi.Import(data);
+                    Poi.Import(data, () => console.log('Poi.Import 완료.'));
                 });
             } break;
             case 'Poi.ImportSingle': {
-                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "htmlString": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }');
+                Poi.Import('{ "id": "ff8419ab-0b64-40a4-bfc2-0f3b317e0b2e", "iconUrl": "SamplePoiIcon.png", "modelUrl": "monkeyhead.glb", "htmlString": "ff8419ab", "property": { "testText": "테스트 속성", "testInt": 11, "testFloat": 2.2 }, "floorId": "4", "position": { "x": -11.168609758648447, "y": 0.19880974292755127, "z": -2.6205250759845735 }, "rotation": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }', () => console.log('Poi.Import 완료.') );
             } break;
             case 'Poi.ExportAll(LocalStorage)': {
                 const data = Poi.ExportAll();
@@ -526,7 +526,7 @@ class WebGLControlPanel extends React.Component<WebGLControlPanelProps, WebGLCon
                 if (data === undefined || data === null) {
                     console.warn('no such data of PoiData.');
                 } else {
-                    Poi.Import(JSON.parse(data));
+                    Poi.Import(JSON.parse(data), () => console.log('Poi.Import 완료.'));
                 }
             } break;
             case 'Poi.Clear': {

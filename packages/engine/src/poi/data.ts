@@ -457,7 +457,7 @@ function ExportAll() {
  * poi 데이터 임포트
  * @param data - 임포트 데이터
  */
-function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] | string) {
+function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] | string, onImportCompleted?: Function) {
 
     // 비주얼 리소스 업데이트 없이 이전의 생성 요소 제거
     Clear(false);
@@ -509,6 +509,12 @@ function Import(data: Interfaces.PoiImportOption | Interfaces.PoiImportOption[] 
 
     // 업데이트
     bNeedsUpdate = true;
+
+    // 엔진 렌더링 함수 강제 호출
+    engine.onRender();
+
+    // Import 완료 콜백 호출
+    onImportCompleted?.();
 }
 
 /**

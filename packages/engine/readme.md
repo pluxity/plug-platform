@@ -13,6 +13,9 @@
 
 업데이트 내역
 ============
+# 2025-09-17
+- [Poi](./docs/Poi.md#pxpoiimportdata-poiimportoption--poiimportoption--string-onimportcompleted-function) Poi Import 함수 콜백 추가
+
 # 2025-09-08
 - [Poi](./docs/Poi.md) SetHtmlObjectVisibilityCheck 기본값 false로 설정
 - [Poi](./docs/Poi.md) Poi Html객체 가시성 체크 광선 레이어 설정
