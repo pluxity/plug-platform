@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom'
 import React from 'react'
 const AppLayout: React.FC = () => {
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className="flex flex-col bg-gray-100">
       <main className="flex-1 relative overflow-hidden">
         <Outlet />
       </main>

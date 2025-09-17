@@ -109,7 +109,7 @@ const Sidebar = ({
 
   return (
     <nav
-      className="w-56 h-screen py-5 bg-secondary-200/50 border-r border-slate-200 overflow-hidden shadow-[1px_0_2px_rgba(0,0,0,0.05)]"
+      className="w-56 py-5 bg-secondary-200/50 border-r border-slate-200 overflow-hidden shadow-[1px_0_2px_rgba(0,0,0,0.05)]"
       aria-label="사이드바 네비게이션"
     >
       <div className="w-full flex flex-col gap-1.5">

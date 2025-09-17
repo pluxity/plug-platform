@@ -1,22 +1,22 @@
 import { cn } from "../../../utils/utils";
-import { TableProps, TableHeaderProps, TableBodyProps, TableRowProps, TableHeadProps, TableCellProps, TableFooterProps, TableCaptionProps } from "./Table.types";
+import {
+  TableProps, TableHeaderProps, TableBodyProps, TableRowProps,
+  TableHeadProps, TableCellProps, TableFooterProps, TableCaptionProps
+} from "./Table.types";
 
-const tableStyles = "w-full caption-bottom text-sm";
-const headerStyles = "bg-content";
-const rowStyles = "flex justify-between items-center";
-const headStyles = "h-9 text-gray-500 font-medium text-center justify-start flex flex-1 justify-center items-center border border-gray-point-light";
-const cellStyles = "h-9 text-zinc-700 text-sm font-medium text-center justify-start border border-gray-point-light flex flex-1 items-center justify-center";
+const tableWrapperStyles = "relative w-full rounded-lg overflow-hidden";
+const tableStyles = "w-full text-sm !border-separate border-spacing-2";
+const headerStyles = "bg-secondary-200 text-secondary-900 rounded-lg overflow-hidden";
+const rowStyles = " flex justify-between items-center";
+const headStyles = "h-12 text-secondary-900 font-bold text-center px-3 justify-start flex flex-1 justify-center items-center";
+const cellStyles = "h-12 text-secondary-800 px-3 text-center border-b justify-start flex flex-1 justify-center items-center";
 
-function Table({
-  className,
-  unstyled,
-  ...props
-}: TableProps) {
+function Table({ className, unstyled, ...props }: TableProps) {
   return (
-    <div data-slot="table-container" className="relative w-full">
+    <div data-slot="table-container" className={cn(!unstyled && tableWrapperStyles, className)}>
       <table
         data-slot="table"
-        className={cn(!unstyled && tableStyles, className)}
+        className={cn(!unstyled && tableStyles)}
         {...props}
       />
     </div>
@@ -25,11 +25,7 @@ function Table({
 
 Table.displayName = "Table";
 
-function TableHeader({
-  className,
-  unstyled,
-  ...props
-}: TableHeaderProps) {
+function TableHeader({ className, unstyled, ...props }: TableHeaderProps) {
   return (
     <thead
       data-slot="table-header"
@@ -41,11 +37,7 @@ function TableHeader({
 
 TableHeader.displayName = "TableHeader";
 
-function TableBody({
-  className,
-  unstyled,
-  ...props
-}: TableBodyProps) {
+function TableBody({ className, unstyled, ...props }: TableBodyProps) {
   return (
     <tbody
       data-slot="table-body"
@@ -57,11 +49,7 @@ function TableBody({
 
 TableBody.displayName = "TableBody";
 
-function TableRow({
-  className,
-  unstyled,
-  ...props
-}: TableRowProps) {
+function TableRow({ className, unstyled, ...props }: TableRowProps) {
   return (
     <tr
       data-slot="table-row"
@@ -73,11 +61,7 @@ function TableRow({
 
 TableRow.displayName = "TableRow";
 
-function TableHead({
-  className,
-  unstyled,
-  ...props
-}: TableHeadProps) {
+function TableHead({ className, unstyled, ...props }: TableHeadProps) {
   return (
     <th
       data-slot="table-head"
@@ -89,11 +73,7 @@ function TableHead({
 
 TableHead.displayName = "TableHead";
 
-function TableCell({
-  className,
-  unstyled,
-  ...props
-}: TableCellProps) {
+function TableCell({ className, unstyled, ...props }: TableCellProps) {
   return (
     <td
       data-slot="table-cell"
@@ -117,10 +97,7 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 
 TableFooter.displayName = "TableFooter";
 
-function TableCaption({
-  className,
-  ...props
-}: TableCaptionProps) {
+function TableCaption({ className, ...props }: TableCaptionProps) {
   return (
     <caption
       data-slot="table-caption"

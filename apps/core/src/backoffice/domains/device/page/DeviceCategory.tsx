@@ -198,7 +198,7 @@ const DeviceCategory: React.FC = () => {
               onThumbnailUpload={handleThumbnailUpload}
               enableDragDrop={true}
               disabled={createDeviceCategory.isLoading}
-              thumbnailSize="large"
+              thumbnailSize="medium"
               enableThumbnail={true}
               enableCodes={false}
           />

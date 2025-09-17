@@ -4,7 +4,19 @@ import { toast } from 'sonner';
 import React, { useState } from 'react';
 
 import { useAssetsSWR, deleteAsset } from '@plug/common-services/services';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from '@plug/ui';
+import {
+  DataTable,
+  Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+  Badge
+} from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { AssetCreateModal } from '@/backoffice/domains/asset/components/AssetCreateModal';
@@ -90,54 +102,58 @@ const AssetList: React.FC = () => {
     },
   ];
 
-  // 에셋 컬럼 정의
   const columns = [
     {
-      accessorKey: 'categoryName',
-      header: '에셋 카테고리',
-    },
-    {
-      accessorKey: 'code',
-      header: '에셋 코드',
-    },
-    {
-      accessorKey: 'name',
-      header: '에셋 이름',
-    },
-    {
-      accessorKey: 'file',
-      header: '3D 파일',
-    },
-    {
-      accessorKey: 'thumbnailFile',
-      header: '썸네일 파일',
+      accessorKey: "name",
+      header: "에셋 이름",
       cell: ({ row }: { row: { original: AssetData } }) => (
-        <img 
-          src={row.original.thumbnailFile} 
-          alt="썸네일" 
-          className="w-8 h-8 rounded-sm object-contain" 
+        <div className="font-semibold text-primary-foreground">{row.original.name}</div>
+      ),
+    },
+    {
+      accessorKey: "categoryName",
+      header: "에셋 카테고리",
+    },
+    {
+      accessorKey: "code",
+      header: "에셋 코드",
+      cell: ({ row }: { row: { original: AssetData } }) => (
+        <div className="inline-flex items-center px-3 py-1 bg-primary-100 border border-primary-300 rounded-xl text-xs font-medium text-primary-700/80">
+          {row.original.code}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "file",
+      header: "3D 파일",
+    },
+    {
+      accessorKey: "thumbnailFile",
+      header: "썸네일 파일",
+      cell: ({ row }: { row: { original: AssetData } }) => (
+        <img
+          src={row.original.thumbnailFile}
+          alt="썸네일"
+          className="w-8 h-8 rounded-sm object-contain"
         />
       ),
     },
     {
-      id: 'actions',
-      header: '관리',
+      id: "actions",
+      header: "관리",
       cell: ({ row }: { row: { original: AssetData } }) => (
         <div className="flex space-x-2">
-          <Button
-            variant="secondary"
-            size="sm"
+          <Badge
             onClick={() => handleEdit(Number(row.original.id))}
           >
             수정
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+          </Badge>
+          <Badge
+            variant="secondary"
             onClick={() => handleDelete(row.original)}
-          > 
+          >
             삭제
-          </Button>
+          </Badge>
         </div>
       ),
     },
@@ -145,8 +161,8 @@ const AssetList: React.FC = () => {
 
   return (
     <PageContainer title="에셋 관리">
-      <Card>
-        <CardContent>
+      <div>
+        <div>
           <DataTable
             columns={columns}
             data={filteredAssetData}
@@ -157,8 +173,8 @@ const AssetList: React.FC = () => {
             selects={selects}
             buttons={<Button onClick={handleCreate}>등록</Button>}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <AssetCreateModal
         isOpen={createModalOpen}

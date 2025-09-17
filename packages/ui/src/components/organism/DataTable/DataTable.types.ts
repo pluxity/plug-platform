@@ -11,4 +11,5 @@ export interface DataTableProps<TData> {
   selects?: FilterSelect[];
   buttons?: React.ReactNode;
   rowSelection?: boolean;
+  pageDescription?: string;
 }

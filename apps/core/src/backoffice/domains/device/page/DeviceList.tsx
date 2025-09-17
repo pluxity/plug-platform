@@ -5,7 +5,19 @@ import React, {useState} from 'react';
 import { deleteDevice, useDeviceCategoryTree } from '@plug/common-services';
 import { useDevicesSWR } from '@plug/common-services/services';
 import { DeviceCategoryResponse } from '@plug/common-services/types';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+import {
+  DataTable,
+  Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Badge
+} from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { DeviceCreateModal } from '@/backoffice/domains/device/components/DeviceCreateModal';
@@ -89,11 +101,18 @@ const DeviceList: React.FC = () => {
         }
     ]
 
-    const headerClassName = "h-10 px-3 flex flex-1 justify-center items-center font-medium";
+    const headerClassName = "h-10 px-3 flex flex-1 justify-center items-center font-bold";
     const cellClassName = "h-10 px-3 flex flex-1 items-center justify-center text-sm truncate";
 
     const columns = [
-        {
+      {
+        accessorKey: 'name',
+        header: () => <div className={`w-36 ${headerClassName}`}>디바이스 이름</div>,
+        cell: ({ row }: { row: { original: DeviceData } }) => (
+          <div className={`w-36 ${cellClassName} font-semibold text-primary-foreground`} title={row.original.name}>{row.original.name}</div>
+        )
+      },
+      {
             accessorKey: 'companyType',
             header: () => <div className={`w-36 ${headerClassName}`}>회사 타입</div>,
             cell: ({ row }: { row: { original: DeviceData } }) => (
@@ -104,7 +123,11 @@ const DeviceList: React.FC = () => {
             accessorKey: 'deviceType',
             header: () => <div className={`w-36 ${headerClassName}`}>디바이스 타입</div>,
             cell: ({ row }: { row: { original: DeviceData } }) => (
-                <div className={`w-36 ${cellClassName}`} title={row.original.deviceType}>{row.original.deviceType}</div>
+                <div className={`w-36 ${cellClassName}`} title={row.original.deviceType}>
+                  <div className="inline-flex items-center px-3 py-1 bg-primary-100 border border-primary-300 rounded-xl text-xs font-medium text-primary-700/80">
+                    {row.original.deviceType}
+                  </div>
+                </div>
             )
         },
         {
@@ -122,19 +145,12 @@ const DeviceList: React.FC = () => {
             )
         },
         {
-            accessorKey: 'name',
-            header: () => <div className={`w-36 ${headerClassName}`}>디바이스 이름</div>,
-            cell: ({ row }: { row: { original: DeviceData } }) => (
-                <div className={`w-36 ${cellClassName}`} title={row.original.name}>{row.original.name}</div>
-            )
-        },
-        {
             id: 'actions',
             header: () => <div className={`w-10 ${headerClassName}`}>관리</div>,
             cell: ({ row }: { row: { original: DeviceData } }) => (
                 <div className={`w-10 ${cellClassName} gap-1`}>
-                    <Button variant="secondary" size="sm" onClick={() => row.original.id && handleEdit(row.original.id)}>수정</Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDelete(row.original)}>삭제</Button>
+                    <Badge onClick={() => row.original.id && handleEdit(row.original.id)}>수정</Badge>
+                    <Badge variant="secondary" onClick={() => handleDelete(row.original)}>삭제</Badge>
                 </div>
             ),
         },
@@ -142,8 +158,8 @@ const DeviceList: React.FC = () => {
 
     return (
         <PageContainer title="디바이스 관리">
-            <Card>
-                <CardContent>
+            <div>
+                <div>
                     <div className="overflow-x-auto">
                         <DataTable
                             columns={columns}
@@ -156,8 +172,8 @@ const DeviceList: React.FC = () => {
                             buttons={<Button onClick={handleCreate}>등록</Button>}
                         />
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             <DeviceCreateModal
                 isOpen={isCreateModalOpen}

@@ -4,7 +4,19 @@ import React, { useState } from 'react'
 import { toast } from 'sonner';
 
 import { useUsersSWR, deleteUser, initUserPassword } from '@plug/common-services/services'
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
+import {
+  DataTable,
+  Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Badge
+} from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts'
 import { UserMapper } from '@/backoffice/domains/users/mapper/userMapper'
@@ -12,6 +24,7 @@ import { UserData } from '@/backoffice/domains/users/types/user'
 
 import { UserCreateModal } from '../components/UserCreateModal'
 import { UserEditModal } from '../components/UserEditModal'
+
 const User: React.FC = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -23,7 +36,7 @@ const User: React.FC = () => {
     const { data, mutate } = useUsersSWR();
     const userData = data ? data.map(UserMapper) : [];
     const { data: roleData } = useRolesSWR();
-
+    
     const handleCreate = () => {
         setCreateModalOpen(true);
     }
@@ -88,13 +101,16 @@ const User: React.FC = () => {
     }
 
     const columns = [
-        {
+      {
+        header: '이름',
+        accessorKey: 'name',
+        cell: ({ row }: { row: { original: UserData } }) => (
+          <div className="font-semibold text-primary-foreground">{row.original.name}</div>
+        ),
+      },
+      {
             header: '아이디',
             accessorKey: 'username',
-        },
-        {
-            header: '이름',
-            accessorKey: 'name',
         },
         {
             header: '전화번호',
@@ -122,27 +138,23 @@ const User: React.FC = () => {
             header: '관리',
             cell: ({row}: {row: { original: UserData }}) => (
               <div className="flex space-x-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
+                <Badge
+                  variant="outline"
                   onClick={() => handlePasswordInit(row.original.id)}
                 >
                   비밀번호 초기화
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
+                </Badge>
+                <Badge
                   onClick={() => handleEdit(row.original.id)}
                 >
                   수정
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                </Badge>
+                <Badge
+                  variant="secondary"
                   onClick={() => handleDelete(row.original)}
                 > 
                   삭제
-                </Button>
+                </Badge>
               </div>
             ),
         },
@@ -150,16 +162,16 @@ const User: React.FC = () => {
    
     return (
         <PageContainer title="사용자 관리">
-            <Card>
-                <CardContent>
-                    <DataTable 
-                        columns={columns} 
-                        data={userData} 
-                        pageSize={12}
-                        buttons={<Button onClick={handleCreate}>등록</Button>} 
-                    />
-                </CardContent>
-            </Card>
+            <div>
+              <DataTable
+                columns={columns}
+                data={userData}
+                pageSize={12}
+                filterPlaceholder={'이름을 입력해주세요.'}
+                filterColumnKey='name'
+                buttons={<Button onClick={handleCreate}>등록</Button>}
+              />
+            </div>
 
             <UserCreateModal
                 isOpen={createModalOpen}

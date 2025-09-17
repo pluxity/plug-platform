@@ -56,7 +56,7 @@ const DashboardLayout: React.FC = () => {
         }}
       />
 
-      <main className="flex-1 p-10 overflow-auto">
+      <main className="flex-1 p-10">
         <Outlet />
       </main>
     </div>

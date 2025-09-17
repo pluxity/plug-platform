@@ -16,6 +16,7 @@ import { FilterBar } from "../../molecule/FilterBar/FilterBar";
 import { Checkbox } from "../../atom/Checkbox/Checkbox";
 import { DataTableProps } from "./DataTable.types";
 import { useState } from "react";
+import { Info } from "lucide-react";
 
 function DataTable<TData>({
   columns,
@@ -27,6 +28,7 @@ function DataTable<TData>({
   selects,
   buttons,
   rowSelection,
+  pageDescription,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -84,13 +86,19 @@ function DataTable<TData>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center pb-4">
         {showFilter && (
           <FilterBar
             selects={selects || []}
             showSearchInput={!!filterColumnKey}
-            searchValue={filterColumnKey ? String(table.getColumn(filterColumnKey)?.getFilterValue() ?? "") : ""}
-            onSearch={value => {
+            searchValue={
+              filterColumnKey
+                ? String(
+                    table.getColumn(filterColumnKey)?.getFilterValue() ?? "",
+                  )
+                : ""
+            }
+            onSearch={(value) => {
               if (filterColumnKey) {
                 table.getColumn(filterColumnKey)?.setFilterValue(String(value));
               }
@@ -98,9 +106,17 @@ function DataTable<TData>({
             searchPlaceholder={filterPlaceholder}
           />
         )}
-        {buttons && <div className="ml-auto flex gap-2">{buttons}</div>}
+        {pageDescription && (
+          <div className="flex gap-2 font-medium text-secondary-800 bg-secondary-100 rounded-md px-3 py-3 text-sm items-center">
+            <Info className="w-4 h-4 text-secondary-700"/>
+            <div>{pageDescription}</div>
+          </div>
+        )}
+        {buttons && (
+          <div className="ml-auto flex gap-2 font-semibold">{buttons}</div>
+        )}
       </div>
-      <div className="rounded-md border">
+      <div>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -109,7 +125,10 @@ function DataTable<TData>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -118,18 +137,28 @@ function DataTable<TData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-secondary-100 text-primary-900"
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  데이터가 없습니다.
                 </TableCell>
               </TableRow>
             )}
@@ -142,7 +171,11 @@ function DataTable<TData>({
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => table.previousPage()}
-                className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={
+                  !table.getCanPreviousPage()
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
               />
             </PaginationItem>
             {Array.from({ length: table.getPageCount() }, (_, i) => (
@@ -159,7 +192,11 @@ function DataTable<TData>({
             <PaginationItem>
               <PaginationNext
                 onClick={() => table.nextPage()}
-                className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={
+                  !table.getCanNextPage()
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
               />
             </PaginationItem>
           </PaginationContent>

@@ -43,8 +43,8 @@ function SelectTrigger({ className, size = "default", children, ...props }: Sele
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "w-full h-9 min-w-16 px-2.5 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-between items-center group rounded-[2px]",
-        "focus:outline-slate-400 focus:text-zinc-700",
+        "w-full h-9 min-w-16 px-2.5 bg-white inline-flex justify-between items-center group rounded-sm border",
+        "focus:outline-none focus:ring-1 focus:ring-primary-500",
         "data-[state=open]:outline-slate-400",
         "data-[invalid=true]:outline-red-700 data-[invalid=true]:text-red-700",
         "disabled:bg-gray-200 disabled:outline-neutral-300 disabled:text-neutral-300",
@@ -56,7 +56,7 @@ function SelectTrigger({ className, size = "default", children, ...props }: Sele
       <SelectPrimitive.Icon asChild>
         <ChevronDownArrow className={cn(
           "text-neutral-300",
-          "group-focus:text-zinc-700",
+          "group-focus:text-secondary-700",
           "group-data-[invalid=true]:text-red-700", 
           "group-disabled:text-neutral-300"
         )} />
@@ -73,7 +73,7 @@ function SelectContent({ className, children, position = "popper", ...props }: S
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "min-w-[var(--radix-select-trigger-width)] p-2.5 bg-white rounded-[2px] !outline !outline-1 !outline-offset-[-1px] !outline-slate-400 inline-flex flex-col justify-center items-start gap-3",
+          "min-w-[var(--radix-select-trigger-width)] p-2.5 bg-white rounded-sm border focus:outline-none focus:ring-1 focus:ring-primary-500 inline-flex flex-col justify-center items-start gap-3",
           "z-50 overflow-hidden",
           position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
@@ -111,8 +111,8 @@ function SelectItem({ className, children, ...props }: SelectItemProps){
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "justify-start text-gray-500 text-sm font-medium w-full py-1 cursor-default select-none outline-none",
-        "data-[highlighted]:text-zinc-700",
+        "justify-start text-gray-500 text-sm font-medium w-full py-1 cursor-default select-none outline-none hover:bg-primary-100 hover:text-secondary-700",
+        "data-[highlighted]:text-secondary-700",
         "data-[state=checked]:text-blue-600",
         "data-[disabled]:opacity-50 data-[disabled]:pointer-events-none",
         className
