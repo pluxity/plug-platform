@@ -11,13 +11,13 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary-250 text-primary-900 hover:bg-blue-300 disabled:bg-point-blue-disable",
+          "bg-primary-250 text-primary-900 hover:bg-primary-300 disabled:bg-point-blue-disable",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 disabled:bg-gray2 disabled:text-white",
+          "bg-destructive text-white hover:bg-destructive-300 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 disabled:bg-destructive-100 disabled:text-white",
         outline:
           "border bg-white border border-secondary-600 text-gray hover:border-secondary-800 hover:text-black disabled:border-gray2 disabled:text-gray2",
         secondary:
-          "bg-muted-light-blue1 border border-point-blue text-point-blue hover:bg-muted-light-blue2 disabled:border-gray2 disabled:bg-point-blue-disable",
+          "bg-secondary-400 hover:bg-secondary-500 disabled:bg-point-blue-disable",
         ghost:
           "hover:bg-secondary-300 hover:text-point-blue dark:hover:bg-muted-light-blue2/50",
         link: "text-primary underline-offset-4 hover:text-point-blue underline active:text-black disabled:text-gray2",

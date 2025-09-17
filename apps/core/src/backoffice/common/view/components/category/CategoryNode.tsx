@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 
-import { 
-  Button, 
-  Input, 
-  Badge, 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle, 
-  AlertDialogTrigger 
+import {
+  Button,
+  Input,
+  Badge,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
 } from '@plug/ui'
 
 import { CategoryItem, DragState } from '@/backoffice/common/services/types/category'
@@ -43,22 +43,23 @@ export interface CategoryNodeProps {
   enableThumbnail?: boolean
   thumbnailSize?: 'small' | 'medium' | 'large'
   enableCodes?: boolean
+  classname?: string
 }
 
 export const CategoryNode: React.FC<CategoryNodeProps> = ({
-  item,
-  maxDepth,
-  onAdd,
-  onUpdate,
-  onDelete,
-  onMove,
-  onThumbnailUpload,
-  disabled = false,
-  enableDragDrop = true,
-  enableThumbnail = false,
-  thumbnailSize = 'small',
-  enableCodes = true
-}) => {
+                                                            item,
+                                                            maxDepth,
+                                                            onAdd,
+                                                            onUpdate,
+                                                            onDelete,
+                                                            onMove,
+                                                            onThumbnailUpload,
+                                                            disabled = false,
+                                                            enableDragDrop = true,
+                                                            enableThumbnail = false,
+                                                            thumbnailSize = 'small',
+                                                            enableCodes = true, classname,
+                                                          }) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
@@ -73,7 +74,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
 
   const sizeClasses = {
     small: 'w-6 h-6',
-    medium: 'w-8 h-8', 
+    medium: 'w-8 h-8',
     large: 'w-16 h-16'
   }
 
@@ -145,11 +146,11 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
     if (!enableDragDrop || !onMove) return
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
-    
+
     const rect = e.currentTarget.getBoundingClientRect()
     const y = e.clientY - rect.top
     const height = rect.height
-    
+
     if (y < height * 0.25) {
       setDragOver('top')
     } else if (y > height * 0.75) {
@@ -166,10 +167,10 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
   const handleDrop = (e: React.DragEvent) => {
     if (!enableDragDrop || !onMove) return
     e.preventDefault()
-    
+
     const draggedId = e.dataTransfer.getData('text/plain')
     if (draggedId === item.id) return
-    
+
     if (dragOver === 'top') {
       onMove(draggedId, item.id, 'before')
     } else if (dragOver === 'bottom') {
@@ -177,13 +178,12 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
     } else if (dragOver === 'inside') {
       onMove(draggedId, item.id, 'inside')
     }
-    
+
     setDragOver('none')
   }
 
   const hasChildren = item.children && item.children.length > 0
   const canAddChildren = item.depth <= maxDepth
-
 
   return (
     <div className="relative">
@@ -196,17 +196,18 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
 
       <div
         className={[
-          "group relative flex items-center gap-3 rounded-lg bg-secondary-200",
-          "transition-colors duration-200 hover:bg-secondary-300",
+          "group relative flex items-center gap-3 rounded-lg bg-secondary-400/70",
+          "transition-colors duration-200 hover:bg-secondary-400",
           isDragging ? "opacity-60 ring-2 ring-secondary-300" : "",
           dragOver === "inside"
             ? "bg-blue-50/40 ring-2 ring-secondary-300"
             : "",
+          classname,
         ].join(" ")}
         style={{
           padding: "12px",
-          paddingLeft: "20px",
-          marginLeft: `${item.depth * 50 - 50}px`,
+          paddingLeft: "24x",
+          paddingRight: "20px",
         }}
         draggable={enableDragDrop && !disabled}
         onDragStart={handleDragStart}
@@ -353,10 +354,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
               </div>
 
               {getChildrenCount(item) > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="bg-white"
-                >
+                <Badge variant="secondary" className="bg-white mr-5">
                   {getChildrenCount(item)}개 하위 카테고리
                 </Badge>
               )}
@@ -365,12 +363,12 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
         </div>
 
         {!isEditing && !disabled && (
-          <div className="flex flex-shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="flex flex-shrink-0 items-center gap-2">
             {canAddChildren && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 p-0 text-blue-600 bg-primary-200 hover:bg-primary-300 hover:text-blue-700"
+                className="h-8 w-8 p-0 text-blue-600 bg-primary-300 hover:bg-primary-400 hover:text-blue-700"
                 onClick={() => setIsAdding(true)}
                 disabled={item.depth >= maxDepth}
                 title="하위 카테고리 추가"
@@ -395,13 +393,13 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                   size="icon"
                   className={[
                     "h-8 w-8 p-0",
-                    hasChildren
+                    item.children && item.children.length > 0
                       ? "cursor-not-allowed text-gray-400"
                       : "text-red-600 bg-destructive-200 hover:bg-destructive-400 hover:text-red-700",
                   ].join(" ")}
-                  disabled={hasChildren}
+                  disabled={!!(item.children && item.children.length > 0)}
                   title={
-                    hasChildren
+                    item.children && item.children.length > 0
                       ? `하위 카테고리 ${item.children!.length}개가 있어 삭제할 수 없습니다`
                       : "카테고리 삭제"
                   }
@@ -430,11 +428,12 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
       </div>
 
       {isAdding && (
-        <div className="flex gap-2.5" style={{ marginLeft: `${item.depth * 24 + 12}px` }}>
+        <div
+          className="flex gap-2.5"
+          style={{ marginLeft: `${item.depth * 24 + 12}px` }}
+        >
           <CornerDownRight className="mt-3 text-secondary-700" />
-          <div
-            className="mt-2 rounded-lg bg-secondary-200 p-4 flex flex-col gap-3 w-full"
-          >
+          <div className="mt-2 rounded-lg bg-secondary-200 p-4 flex flex-col gap-3 w-full">
             <div className="flex flex-col gap-3">
               <Input
                 value={addValue}
@@ -468,49 +467,49 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
               )}
               <div className="flex-1" />
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full p-0 text-green-600 hover:bg-green-50 hover:text-green-700"
                 onClick={handleAddSubmit}
                 disabled={disabled}
-                title="확인"
               >
-                <Check />
+                수정
               </Button>
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                variant="secondary"
                 onClick={handleAddCancel}
                 disabled={disabled}
-                title="취소"
               >
-                <X />
+                취소
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {hasChildren && isExpanded && (
-        <div className="mt-1">
-          {item.children!.map((child) => (
-            <CategoryNode
-              key={child.id}
-              item={child}
-              maxDepth={maxDepth}
-              onAdd={onAdd}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
-              onMove={onMove}
-              onThumbnailUpload={onThumbnailUpload}
-              disabled={disabled}
-              enableDragDrop={enableDragDrop}
-              thumbnailSize={thumbnailSize}
-              enableCodes={enableCodes}
-              enableThumbnail={enableThumbnail}
-            />
-          ))}
+      {hasChildren && (
+        <div className={isExpanded ? "mx-1.5" : "hidden"}>
+          <div>
+            <div className="rounded-b-lg bg-secondary-100/70 overflow-hidden">
+              <div className="p-2 pr-0">
+                {item.children!.map((child) => (
+                  <CategoryNode
+                    key={child.id}
+                    item={child}
+                    maxDepth={maxDepth}
+                    onAdd={onAdd}
+                    onUpdate={onUpdate}
+                    onDelete={onDelete}
+                    onMove={onMove}
+                    onThumbnailUpload={onThumbnailUpload}
+                    disabled={disabled}
+                    enableDragDrop={enableDragDrop}
+                    thumbnailSize={thumbnailSize}
+                    enableCodes={enableCodes}
+                    enableThumbnail={enableThumbnail}
+                    classname="!bg-secondary-100/70 border-none"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

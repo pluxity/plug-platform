@@ -166,33 +166,14 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
                 )}
                 <div className="flex-1" />
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full text-green-600 hover:text-green-700 hover:bg-green-50"
                   onClick={handleRootAdd}
                   disabled={disabled}
-                  title="확인"
                 >
-                  ✓
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                  onClick={resetRootAddForm}
-                  disabled={disabled}
-                  title="취소"
-                >
-                  ✕
+                  추가 하기
                 </Button>
               </div>
             </div>
           </div>
-          {itemsWithCorrectDepths.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500 flex justify-end">
-              총 {totalCategoryCount}개의 카테고리가 등록되어 있습니다.
-            </div>
-          )}
         </div>
 
         <div className="space-y-1 w-full h-full">
@@ -200,7 +181,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
             <div className="bg-primary-500 w-1 h-5 ml-1 rounded-sm" />
             <div>카테고리 목록</div>
           </div>
-          <div className="border rounded-lg p-5 overflow-y-auto h-full flex flex-col gap-2.5">
+          <div className="border rounded-lg p-7 overflow-y-auto h-full flex flex-col gap-2.5">
             {itemsWithCorrectDepths.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <div className="text-4xl mb-2">
@@ -235,6 +216,11 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
           </div>
         </div>
       </div>
+      {itemsWithCorrectDepths.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500 flex justify-end">
+          총 {totalCategoryCount}개의 카테고리가 등록되어 있습니다.
+        </div>
+      )}
     </div>
   );
 }
