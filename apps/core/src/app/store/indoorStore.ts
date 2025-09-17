@@ -39,11 +39,13 @@ let loadingPromise: Promise<void> | null = null;
 let devicesLoadingPromise: Promise<void> | null = null;
 let cctvsLoadingPromise: Promise<void> | null = null;
 
-// CCTV 권한 확인 헬퍼 함수
 const checkCctvPermission = (): boolean => {
   const authState = useAuthStore.getState();
-  const permissions = authState.getUserPermissions();
-  const cctvPermission = permissions.find(p => p.resourceType === 'CCTV');
+  try {
+    if (typeof authState.isAdmin === 'function' && authState.isAdmin()) return true;
+  } catch { /* ignore */ }
+    const permissions = authState.getUserPermissions();
+    const cctvPermission = permissions.find(p => p.resourceType === 'CCTV');
   return cctvPermission?.resourceIds.includes('ALL') || false;
 };
 

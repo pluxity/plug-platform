@@ -103,17 +103,25 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('translate') ? handleFinishEdit() : handleStartEdit('translate')}
         className={`
-          h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
           ${isActiveMode('translate') 
-            ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 text-white shadow-xl shadow-blue-500/40 scale-110 ring-2 ring-blue-300/50' 
-            : 'bg-gradient-to-br from-cyan-100 to-blue-100 hover:from-cyan-200 hover:to-blue-200 text-cyan-700 hover:text-blue-700 hover:scale-105 shadow-md hover:shadow-lg'
+            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('translate') ? '위치 편집 종료' : '위치 편집 시작'}
       >
-        <Move size={18} className={`transition-transform duration-200 ${isActiveMode('translate') ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-110'}`} />
+        <div className={`
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          ${isActiveMode('translate') 
+            ? 'bg-transparent' 
+            : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
+          }
+        `}>
+          <Move size={18} className={`transition-transform duration-200 ${isActiveMode('translate') ? 'scale-110 drop-shadow-sm text-secondary-100' : 'group-hover:scale-110'}`} />
+        </div>
         {isActiveMode('translate') && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/70 to-primary-500/30 rounded-xl animate-pulse" />
         )}
       </Button>
       
@@ -122,17 +130,25 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('rotate') ? handleFinishEdit() : handleStartEdit('rotate')}
         className={`
-          h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
           ${isActiveMode('rotate') 
-            ? 'bg-gradient-to-br from-emerald-400 via-green-500 to-emerald-600 text-white shadow-xl shadow-emerald-500/40 scale-110 ring-2 ring-emerald-300/50' 
-            : 'bg-gradient-to-br from-emerald-100 to-green-100 hover:from-emerald-200 hover:to-green-200 text-emerald-700 hover:text-green-700 hover:scale-105 shadow-md hover:shadow-lg'
+            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('rotate') ? '회전 편집 종료' : '회전 편집 시작'}
       >
-        <RotateCcw size={18} className={`transition-transform duration-200 ${isActiveMode('rotate') ? 'scale-110 animate-spin drop-shadow-sm' : 'group-hover:scale-110 group-hover:rotate-12'}`} />
+        <div className={`
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          ${isActiveMode('rotate') 
+            ? 'bg-transparent' 
+            : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
+          }
+        `}>
+          <RotateCcw size={18} className={`transition-transform duration-200 ${isActiveMode('rotate') ? 'scale-110 animate-spin drop-shadow-sm text-secondary-100' : 'group-hover:scale-110 group-hover:rotate-12'}`} />
+        </div>
         {isActiveMode('rotate') && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/70 to-primary-500/30 rounded-xl animate-pulse" />
         )}
       </Button>
       
@@ -141,17 +157,25 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('scale') ? handleFinishEdit() : handleStartEdit('scale')}
         className={`
-          h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
           ${isActiveMode('scale') 
-            ? 'bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-600 text-white shadow-xl shadow-purple-500/40 scale-110 ring-2 ring-purple-300/50' 
-            : 'bg-gradient-to-br from-violet-100 to-purple-100 hover:from-violet-200 hover:to-purple-200 text-violet-700 hover:text-purple-700 hover:scale-105 shadow-md hover:shadow-lg'
+            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('scale') ? '크기 편집 종료' : '크기 편집 시작'}
       >
-        <Scale size={18} className={`transition-transform duration-200 ${isActiveMode('scale') ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-110'}`} />
-        {isDeleteMode && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl animate-pulse" />
+        <div className={`
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          ${isActiveMode('scale') 
+            ? 'bg-transparent' 
+            : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
+          }
+        `}>
+          <Scale size={18} className={`transition-transform duration-200 ${isActiveMode('scale') ? 'scale-110 drop-shadow-sm text-secondary-100' : 'group-hover:scale-110'}`} />
+        </div>
+        {isActiveMode('scale') && (
+           <div className="absolute inset-0 bg-gradient-to-br from-primary-600/70 to-primary-500/30 rounded-xl animate-pulse" />
         )}
       </Button>
 
@@ -160,22 +184,30 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={handleDeleteMode}
         className={`
-          h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
           ${isDeleteMode 
-            ? 'bg-gradient-to-br from-red-400 via-pink-500 to-red-600 text-white shadow-xl shadow-red-500/40 scale-110 ring-2 ring-red-300/50' 
-            : 'bg-gradient-to-br from-red-100 to-pink-100 hover:from-red-200 hover:to-pink-200 text-red-700 hover:text-red-700 hover:scale-105 shadow-md hover:shadow-lg'
+            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isDeleteMode ? '삭제 모드 종료' : '삭제 모드 시작'}
       >
-        <Trash size={18} className={`transition-transform duration-200 ${isDeleteMode ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-110'}`} />
+        <div className={`
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          ${isDeleteMode 
+            ? 'bg-transparent' 
+            : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
+          }
+        `}>
+          <Trash size={18} className={`transition-transform duration-200 ${isDeleteMode ? 'scale-110 drop-shadow-sm text-secondary-100' : 'group-hover:scale-110'}`} />
+        </div>
         {isDeleteMode && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl animate-pulse" />
+           <div className="absolute inset-0 bg-gradient-to-br from-primary-600/70 to-primary-500/30 rounded-xl animate-pulse" />
         )}
       </Button>
-      
+
       {(isEditing || isDeleteMode) && (
-        <div className="w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent mx-1 self-stretch" />
+        <div className="w-px bg-gradient-to-b from-transparent via-border to-transparent mx-1 self-stretch" />
       )}
       
       {(isEditing || isDeleteMode) && (
@@ -184,8 +216,8 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
           size="sm"
           onClick={handleFinishEdit}
           className="
-            h-11 w-11 p-0 rounded-xl transition-all duration-200 ease-out group relative overflow-hidden
-            bg-gradient-to-br from-rose-500 via-red-600 to-pink-700 text-white shadow-xl shadow-rose-500/50 hover:from-rose-600 hover:via-red-700 hover:to-pink-800 hover:scale-105 ring-2 ring-rose-300/60
+            h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent hover:text-secondary-100
+            liquid-glass bg-danger-600 text-danger-foreground hover:bg-danger-700 ring-2 ring-danger-300/60
           "
           title="편집 종료 (ESC)"
         >

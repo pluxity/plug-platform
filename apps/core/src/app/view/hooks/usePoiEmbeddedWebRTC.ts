@@ -1,4 +1,5 @@
 import { buildWhepUrl, performWhepNegotiation, prepareReceiverPeerConnection } from '@/global/webrtc/whep';
+import { createVideoPlayerHtml } from '@/global/utils/displayUtils';
 
 import { useCallback, useEffect, useRef } from 'react';
 
@@ -22,7 +23,7 @@ export interface UsePoiEmbeddedWebRTCResult {
 interface PoiEventTarget { id?: string; property?: { deviceId?: string | number | null; deviceID?: string | number | null } }
 
 export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}): UsePoiEmbeddedWebRTCResult {
-  const { onError, width = 280, aspect = 16 / 9, muted = true, controls = true } = options;
+  const { onError, muted = true, controls = true } = options;
   const poiSessionsRef = useRef<Record<string, { pc: RTCPeerConnection; abort?: AbortController }>>({});
 
   const stopPoi = useCallback((poiId: string) => {
@@ -47,41 +48,24 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     if (!poiId) return;
     const path = (streamKey ?? poiId)?.toString();
     stopPoi(poiId);
+
     const videoId = `poi-video-${poiId}`;
     const closeBtnId = `poi-video-close-${poiId}`;
-    const height = Math.round(width / aspect);
-    const containerStyle = {
-      position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-    };
-    const closeBtnStyle = {
-      position: 'absolute', top: '-10px', right: '-10px', width: '28px', height: '28px', border: 'none', borderRadius: '999px',
-      background: 'rgba(15,23,42,0.85)', color: '#e2e8f0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: '14px', lineHeight: '1', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.4)', backdropFilter: 'blur(6px)', zIndex: 100,
-    };
-    const videoStyle = {
-      width: `${width}px`, height: `${height}px`, background: '#000', border: '1px solid #475569', borderRadius: '6px', objectFit: 'contain',
-    };
-    const styleToString = (styleObj: Record<string, string | number>) => Object.entries(styleObj)
-      .map(([k, v]) => `${k.replace(/([A-Z])/g, '-$1').toLowerCase()}:${v}`).join(';');
-    const html = `
-      <div style="${styleToString(containerStyle)}">
-        <button id="${closeBtnId}" title="닫기" aria-label="닫기"
-          style="${styleToString(closeBtnStyle)}"
-          onmouseenter="this.style.background='rgba(30,41,59,0.9)'" onmouseleave="this.style.background='rgba(15,23,42,0.85)'"
-        >×</button>
-        <video id="${videoId}" ${muted ? 'muted' : ''} ${controls ? 'controls' : ''} autoplay playsinline style="${styleToString(videoStyle)}"></video>
-      </div>`
+
+    const html = createVideoPlayerHtml(videoId, closeBtnId, muted, controls);
     Poi.SetTextInnerHtml(poiId, html);
 
-  await new Promise((r) => setTimeout(r, 0));
-  const videoEl = document.getElementById(videoId) as HTMLVideoElement | null;
-  const closeBtn = document.getElementById(closeBtnId) as HTMLButtonElement | null;
+    await new Promise((r) => setTimeout(r, 0));
+    const videoEl = document.getElementById(videoId) as HTMLVideoElement | null;
+    const closeBtn = document.getElementById(closeBtnId) as HTMLButtonElement | null;
+    
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
         stopPoi(poiId);
         try { Poi.SetTextInnerHtml(poiId, ''); } catch { /* ignore */ }
       }, { once: true });
     }
+    
     if (!videoEl) return;
 
   const metaEnv = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
@@ -97,15 +81,15 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     const abort = new AbortController();
     poiSessionsRef.current[poiId] = { pc, abort };
     try {
-    const url = buildWhepUrl(host, port, path);
-    await performWhepNegotiation(pc, url, abort.signal);
+      const url = buildWhepUrl(host, port, path);
+      await performWhepNegotiation(pc, url, abort.signal);
     if (poiSessionsRef.current[poiId]?.pc !== pc) return;
     } catch (err) {
-    console.error('POI WebRTC failed', err);
-    stopPoi(poiId);
-    onError?.(poiId, err);
+      console.error('POI WebRTC failed', err);
+      stopPoi(poiId);
+      onError?.(poiId, err);
     }
-  }, [aspect, controls, muted, onError, stopPoi, width]);
+  }, [controls, muted, onError, stopPoi]);
 
   const onPoiPointerUp = useCallback((evt: unknown) => {
     const target = (evt as { target?: PoiEventTarget } | undefined)?.target;

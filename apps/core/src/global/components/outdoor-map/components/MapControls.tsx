@@ -3,93 +3,58 @@ import { flyToHome } from '../lib/cameraSettings';
 import React from 'react';
 import { useCesium } from 'resium';
 
-import { Button } from '@plug/ui';
-const btnCls = [
-  'hover:bg-transparent',
-  'text-gray-100 hover:text-gray-800',
-  'cursor-pointer w-9 h-9',
-  'hover:scale-150 transition-transform duration-200',
-  'rounded-full flex items-center justify-center',
-].join(' ');
+import { MinusIcon, PlusIcon, HomeIcon } from 'lucide-react';
 
 const MapControls: React.FC = () => {
   const { viewer } = useCesium();
 
-  const zoom = (dir: 1 | -1) => {
+  const handleZoom = (dir: 1 | -1) => {
     if (!viewer) return;
     const cam = viewer.scene.camera;
     const h = cam.positionCartographic.height;
     cam.move(cam.direction, h * 0.1 * dir);
   };
 
+  const handleHome = () => {
+    if (viewer) {
+      flyToHome(viewer, { duration: 1.5 });
+    }
+  };
+
   return (
-    <div
-      className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-1.5 z-10 p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 shadow-xl"
-    >
-      <Button
-        onClick={() => zoom(1)}
-        variant="ghost"
-        size="icon"
-        title="확대"
-        className={btnCls}
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <div className="absolute top-1/2 right-4 -translate-y-1/2 z-10">
+      {/* 범용 liquid-glass 컨테이너 */}
+      <div className="liquid-glass flex flex-col gap-3 p-3">
+        {/* 확대 버튼 */}
+        <button
+          onClick={() => handleZoom(1)}
+          title="확대"
+          className="liquid-glass clickable w-11 h-11 rounded-lg flex items-center justify-center"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-          />
-        </svg>
-      </Button>
-      <Button
-        onClick={() => zoom(-1)}
-        variant="ghost"
-        size="icon"
-        title="축소"
-        className={btnCls}
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+          <PlusIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
+        </button>
+
+        {/* 축소 버튼 */}
+        <button
+          onClick={() => handleZoom(-1)}
+          title="축소"
+          className="liquid-glass clickable w-11 h-11 rounded-lg flex items-center justify-center"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M20 12H4"
-          />
-        </svg>
-      </Button>
-      <Button
-        onClick={() => viewer && flyToHome(viewer, { duration: 1.5 })}
-        variant="ghost"
-        size="icon"
-        title="홈"
-        className={btnCls}
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+          <MinusIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
+        </button>
+
+        {/* 구분선 */}
+        <div className="h-px bg-white/15 mx-2" />
+
+        {/* 홈 버튼 */}
+        <button
+          onClick={handleHome}
+          title="홈으로 이동"
+          className="liquid-glass clickable w-11 h-11 rounded-lg flex items-center justify-center"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-          />
-          <polyline points="9,22 9,12 15,12 15,22" />
-        </svg>
-      </Button>
+          <HomeIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
+        </button>
+      </div>
     </div>
   );
 };
