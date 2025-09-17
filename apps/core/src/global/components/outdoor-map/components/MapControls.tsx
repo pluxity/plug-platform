@@ -24,12 +24,12 @@ const MapControls: React.FC = () => {
   return (
     <div className="absolute top-1/2 right-4 -translate-y-1/2 z-10">
       {/* 범용 liquid-glass 컨테이너 */}
-      <div className="liquid-glass bg-secondary-600/60 flex flex-col gap-3 p-3 rounded-xl shadow-2xl">
+      <div className="liquid-glass bg-secondary-600/40 flex flex-col gap-3 p-3 rounded-xl shadow-2xl">
         {/* 확대 버튼 */}
         <button
           onClick={() => handleZoom(1)}
           title="확대"
-          className="liquid-glass clickable bg-secondary-800/40 hover:bg-secondary-800/50 w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
+          className="liquid-glass clickable bg-secondary-600/60 hover:bg-secondary-600/70 w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <PlusIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
         </button>
@@ -38,7 +38,7 @@ const MapControls: React.FC = () => {
         <button
           onClick={() => handleZoom(-1)}
           title="축소"
-          className="liquid-glass clickable bg-secondary-800/40 hover:bg-secondary-800/50 w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
+          className="liquid-glass clickable bg-secondary-600/60 hover:bg-secondary-600/70 w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <MinusIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
         </button>
@@ -50,7 +50,7 @@ const MapControls: React.FC = () => {
         <button
           onClick={handleHome}
           title="홈으로 이동"
-          className="liquid-glass clickable bg-secondary-800/40 hover:bg-secondary-800/50 w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
+          className="liquid-glass clickable bg-secondary-600/60 hover:bg-secondary-600/70 w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <HomeIcon className="w-5 h-5 text-white/90 hover:text-white transition-colors" />
         </button>

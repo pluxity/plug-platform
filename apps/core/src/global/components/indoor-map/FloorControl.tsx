@@ -65,7 +65,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
   if (floors.length === 0) return null;
 
   return (
-    <div className={`${className} liquid-glass relative overflow-hidden bg-secondary-600/60`}>
+    <div className={`${className} liquid-glass relative overflow-hidden bg-secondary-600/40`}>
       <div
         className={`relative z-10 border-b border-white/20 transition-all duration-400 ease-out transform overflow-hidden ${
           isExpanded 

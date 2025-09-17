@@ -103,7 +103,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('translate') ? handleFinishEdit() : handleStartEdit('translate')}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isActiveMode('translate') 
             ? 'liquid-glass bg-primary-700 bg-secondary-800/70 text-primary-foreground  scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
@@ -123,14 +123,14 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         {isActiveMode('translate') && (
           <div className="absolute inset-0 bg-gradient-to-br from-primary-600/70 to-primary-500/30 rounded-xl animate-pulse" />
         )}
-      </Button>
+      </Button> 
       
       <Button
         variant="ghost"
         size="sm"
         onClick={() => isActiveMode('rotate') ? handleFinishEdit() : handleStartEdit('rotate')}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isActiveMode('rotate') 
             ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
@@ -157,7 +157,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('scale') ? handleFinishEdit() : handleStartEdit('scale')}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isActiveMode('scale') 
             ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
@@ -184,7 +184,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={handleDeleteMode}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isDeleteMode 
             ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
