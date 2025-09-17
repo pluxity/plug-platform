@@ -104,17 +104,17 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         onClick={() => isActiveMode('translate') ? handleFinishEdit() : handleStartEdit('translate')}
         className={`
           h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
-          ${isActiveMode('translate') 
-            ? 'liquid-glass bg-primary-700 bg-secondary-800/70 text-primary-foreground  scale-110' 
+          ${isActiveMode('translate')
+            ? 'liquid-glass text-primary-foreground scale-110'
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('translate') ? '위치 편집 종료' : '위치 편집 시작'}
       >
         <div className={`
-          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md  
-          ${isActiveMode('translate') 
-            ? 'bg-transparent' 
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md
+          ${isActiveMode('translate')
+            ? 'bg-transparent'
             : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
           }
         `}>
@@ -132,14 +132,14 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isActiveMode('rotate') 
-            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            ? 'liquid-glass text-primary-foreground scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('rotate') ? '회전 편집 종료' : '회전 편집 시작'}
       >
         <div className={`
-          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md
           ${isActiveMode('rotate') 
             ? 'bg-transparent' 
             : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
@@ -159,14 +159,14 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isActiveMode('scale') 
-            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            ? 'liquid-glass text-primary-foreground scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('scale') ? '크기 편집 종료' : '크기 편집 시작'}
       >
         <div className={`
-          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md
           ${isActiveMode('scale') 
             ? 'bg-transparent' 
             : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
@@ -186,14 +186,14 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         className={`
           h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/40
           ${isDeleteMode 
-            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            ? 'liquid-glass text-primary-foreground scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isDeleteMode ? '삭제 모드 종료' : '삭제 모드 시작'}
       >
         <div className={`
-          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md
           ${isDeleteMode 
             ? 'bg-transparent' 
             : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
@@ -217,7 +217,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
           onClick={handleFinishEdit}
           className="
             h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent hover:text-secondary-100
-            liquid-glass bg-danger-600 text-danger-foreground hover:bg-danger-700 ring-2 ring-danger-300/60
+            liquid-glass liquid-glass-danger bg-danger-600 text-danger-foreground hover:bg-danger-700 ring-2 ring-danger-300/60
           "
           title="편집 종료 (ESC)"
         >
