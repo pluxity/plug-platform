@@ -65,7 +65,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
   if (floors.length === 0) return null;
 
   return (
-    <div className={`${className} liquid-glass relative overflow-hidden`}>
+    <div className={`${className} liquid-glass relative overflow-hidden bg-secondary-600/60`}>
       <div
         className={`relative z-10 border-b border-white/20 transition-all duration-400 ease-out transform overflow-hidden ${
           isExpanded 
@@ -83,7 +83,7 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
             </div>
             <button
               onClick={toggleAllFloors}
-              className="liquid-glass liquid-glass-secondary text-xs px-3 py-1 text-secondary-500 cursor-pointer select-none"
+              className="liquid-glass liquid-glass-secondary text-xs px-3 py-1 text-secondary-500 cursor-pointer select-none bg-secondary-800/70"
             >
               {allVisible ? '모두 숨기기' : '모두 보기'}
             </button>
@@ -146,10 +146,10 @@ export const FloorControl: React.FC<FloorControlProps> = ({ floors = [], classNa
                     >
                       <button
                         onClick={() => toggleFloor(floor.floorId)}
-                        className={`w-full px-3 py-2 rounded-md text-xs font-medium border transition-all duration-200 cursor-pointer select-none text-left hover:scale-105 ${
+                        className={`w-full px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 cursor-pointer select-none text-left liquid-glass clickable ${
                           isOn
-                            ? 'liquid-glass liquid-glass-primary clickable text-secondary-100 shadow-lg'
-                            : 'liquid-glass clickable text-secondary-100 hover:bg-white/5'
+                            ? 'liquid-glass-primary text-secondary-100 shadow-lg bg-primary-600/50 hover:bg-primary-600/40'
+                            : 'text-secondary-100 hover:bg-white/5 bg-secondary-800/70'
                         }`}
                         title={isOn ? '층 숨기기' : '층 보이기'}
                       >

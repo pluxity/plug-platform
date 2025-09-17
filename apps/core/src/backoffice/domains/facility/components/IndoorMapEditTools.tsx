@@ -103,16 +103,16 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('translate') ? handleFinishEdit() : handleStartEdit('translate')}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
           ${isActiveMode('translate') 
-            ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
+            ? 'liquid-glass bg-primary-700 bg-secondary-800/70 text-primary-foreground  scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
           }
         `}
         title={isActiveMode('translate') ? '위치 편집 종료' : '위치 편집 시작'}
       >
         <div className={`
-          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md 
+          w-full h-full flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 rounded-md  
           ${isActiveMode('translate') 
             ? 'bg-transparent' 
             : 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70 text-secondary-100'
@@ -130,7 +130,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('rotate') ? handleFinishEdit() : handleStartEdit('rotate')}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
           ${isActiveMode('rotate') 
             ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
@@ -157,7 +157,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={() => isActiveMode('scale') ? handleFinishEdit() : handleStartEdit('scale')}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
           ${isActiveMode('scale') 
             ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
@@ -184,7 +184,7 @@ export const IndoorMapEditTools: React.FC<IndoorMapEditToolsProps> = ({
         size="sm"
         onClick={handleDeleteMode}
         className={`
-          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent
+          h-11 w-11 p-0 transition-all duration-200 ease-out group relative overflow-hidden hover:bg-transparent bg-secondary-600/60
           ${isDeleteMode 
             ? 'liquid-glass bg-primary-700 text-primary-foreground bg-primary-300/50 scale-110' 
             : 'liquid-glass group-hover:bg-gradient-to-br group-hover:from-primary-500/60 group-hover:to-primary-600/70'
