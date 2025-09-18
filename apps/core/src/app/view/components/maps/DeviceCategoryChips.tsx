@@ -198,7 +198,7 @@ const DeviceCategoryChips = ({
             data-chip="true"
             onClick={() => { if (dragDistanceRef.current > 10) return; selectCategory(category.id); }}
             className={[
-              'liquid-glass liquid-glass-primary clickable inline-flex items-center px-3 py-1 rounded-full border text-sm whitespace-nowrap shrink-0 cursor-pointer',
+              'liquid-glass liquid-glass-primary clickable bg-primary-500/40 hover:bg-primary-600/50 border border-primary-500/40 inline-flex items-center px-3 py-1 rounded-full text-sm whitespace-nowrap shrink-0 cursor-pointer',
               internalSelected === category.id ? 'text-secondary-100' : 'text-secondary-600',
             ].join(' ')}
             title={category.name}

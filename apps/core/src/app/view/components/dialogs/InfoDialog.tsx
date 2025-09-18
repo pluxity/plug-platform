@@ -75,7 +75,7 @@ export const InfoDialog = ({
   
   const containerBase = [
     'relative flex text-secondary-100 rounded-2xl',
-    'liquid-glass liquid-glass-secondary',
+    'liquid-glass liquid-glass-secondary bg-secondary-900/60',
     sizeClass
   ].join(' ');
 
