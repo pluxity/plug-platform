@@ -29,6 +29,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import {cn} from "@plug/ui";
 
 export interface CategoryNodeProps {
   item: CategoryItem
