@@ -1,7 +1,7 @@
-import { UserProfile } from '@/global/components';
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import AdminProfile from "@/backoffice/common/view/components/AdminProfile";
+
 const BackofficeHeader: React.FC = () => {
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const BackofficeHeader: React.FC = () => {
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            <UserProfile showAdminPortal={false} />
+            <AdminProfile showAdminPortal={false} />
           </div>
         </div>
       </div>

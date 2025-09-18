@@ -54,6 +54,7 @@ export * from "./components/molecule/LabeledInput/LabeledInput";
 export * from "./components/molecule/ModalForm/ModalForm";
 export * from "./components/molecule/SearchForm/SearchForm";
 export * from "./components/molecule/ToggleGroup/ToggleGroup";
+export * from "./components/molecule/Profile/AdminProfile";
 export * from "./components/molecule/Profile/Profile";
 //Organism
 export * from "./components/organism/DataTable/DataTable";
