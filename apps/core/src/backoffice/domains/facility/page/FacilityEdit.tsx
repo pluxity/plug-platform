@@ -3,10 +3,10 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button} from '@plug/ui';
+import { Button, Separator } from "@plug/ui";
 import { 
   FacilityService, 
   domainUtils,
@@ -379,33 +379,13 @@ const FacilityEdit: React.FC = () => {
     );
   }
 
-  const domainConfig = domainUtils.getConfig(facilityType);
+  const domainConfig = domainUtils.getConfig(facilityType) as unknown as Record<string, string>;
 
   return (
     <PageContainer title={`${facility.facility?.name || '시설'} 수정`} >
-      <div className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-primary-800">
-            시설 유형:
-          </span>
-          <span className="text-sm bg-primary-200 text-primary-800 px-2 py-1 rounded">
-            {domainConfig.displayName}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            onClick={handleGoBack}
-            className="text-secondary-800 hover:text-gray-800 rounded-md border"
-          >
-            <ArrowLeft size={18} />
-            목록으로
-          </Button>
-        </div>
-      </div>
+      <div className="space-y-10">
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 border-t p-10">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <FacilityForm
           register={register}
           errors={errors}
@@ -414,18 +394,24 @@ const FacilityEdit: React.FC = () => {
           watch={watch}
           currentThumbnailFile={facility.facility?.thumbnail}
           isEditMode={true}
+          domainConfig={domainConfig}
         />
 
-        <DrawingFileHistory
-          facilityId={facilityId!}
-          history={drawingHistory}
-          onHistoryUpdate={handleHistoryUpdate}
-          onFloorsExtracted={handleFloorsExtracted}
-        />
+        <Separator orientation="horizontal" />
 
-        {renderDynamicComponents()}
+        <div className="grid grid-cols-2 gap-10">
+          <DrawingFileHistory
+            facilityId={facilityId!}
+            history={drawingHistory}
+            onHistoryUpdate={handleHistoryUpdate}
+            onFloorsExtracted={handleFloorsExtracted}
+          />
 
-        <div className="flex items-center justify-end gap-3 pt-6 mt-8 border-t">
+          {renderDynamicComponents()}
+        </div>
+
+
+        <div className="flex items-center justify-end gap-3 py-10 my-8 border-t">
           <Button
             type="button"
             variant="outline"

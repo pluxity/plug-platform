@@ -10,7 +10,8 @@ import {
   Textarea,
   Input,
   Badge,
-} from '@plug/ui';
+  Separator,
+} from "@plug/ui";
 import { FacilityHistoryResponse, facilityService, useFileUploadWithInfo } from '@plug/common-services';
 import { Model, Interfaces } from '@plug/engine';
 
@@ -114,141 +115,175 @@ export const DrawingFileHistory: React.FC<DrawingFileHistoryProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="text-2xl font-bold text-gray-700" data-testid="facility-form-title">
+      <div
+        className="text-2xl font-bold text-gray-700"
+        data-testid="facility-form-title"
+      >
         도면 정보
       </div>
-      <div className="space-y-4 border rounded-lg p-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2" >
-            <div className="w-0.5 h-6 rounded-full bg-primary-600 inline-block mr-3"/>
-            <label className="block font-bold">
-              <span>도면 파일 수정 이력</span>
-            </label>
-          </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">새 도면 업로드</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>새 도면 파일 업로드</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    도면 파일 <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="file"
-                    accept=".glb,.gltf"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileUploaded(file);
-                      }
-                    }}
-                    disabled={isUploading}
-                  />
-                  {isUploading && (
-                    <p className="text-sm text-gray-500 mt-1">파일 업로드 중...</p>
-                  )}
-                  {fileUpload.fileInfo && (
-                    <p className="text-sm text-green-600 mt-1">
-                      업로드 완료: {fileUpload.fileInfo.originalFileName}
-                    </p>
-                  )}
-                  {isProcessingDrawing && (
-                    <p className="text-sm text-blue-600 mt-1">도면에서 층 정보 추출 중...</p>
-                  )}
-                  {extractedFloors.length > 0 && (
-                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                      <p className="text-sm font-medium text-blue-800 mb-2">
-                        추출된 층 정보 ({extractedFloors.length}개):
-                      </p>
-                      <div className="space-y-1">
-                        {extractedFloors.slice(0, 5).map((floor, index) => (
-                          <div key={index} className="text-xs text-blue-700">
-                            • {floor.name} (ID: {floor.floorId})
-                          </div>
-                        ))}
-                        {extractedFloors.length > 5 && (
-                          <div className="text-xs text-blue-600">
-                            ... 외 {extractedFloors.length - 5}개
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    변경 사유 <span className="text-red-500">*</span>
-                  </label>
-                  <Textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="도면 파일 변경 사유를 입력하세요"
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={handleDialogClose}>
-                    취소
-                  </Button>
-                  <Button 
-                    onClick={handleDrawingUpdate}
-                    disabled={!uploadedFileId || !comment.trim() || isUploading}
-                  >
-                    업로드
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+      <div className="space-y-4 border rounded-lg p-6 h-80 overflow-y-auto scrollbar-thin">
         <div>
           {history.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">도면 파일 이력이 없습니다.</p>
+            <p className="text-secondary-500 text-center py-4">
+              도면 파일 이력이 없습니다.
+            </p>
           ) : (
             <div className="space-y-3">
               {history.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="border rounded-lg p-3 bg-gray-50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        {index === 0 && (
-                          <Badge variant="secondary" className="text-xs">
-                            현재
-                          </Badge>
-                        )}
-                        <span className="font-medium text-sm">
-                        {item.file.originalFileName}
-                      </span>
+                <>
+                  {index === 0 && (
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <div className="flex items-center mb-3">
+                          <div className="w-0.5 h-5 rounded-full bg-primary-600 inline-block mr-3"/>
+                          <label className="block font-bold">
+                            현재 도면
+                          </label>
+                        </div>
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm">새 도면 업로드</Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>새 도면 파일 업로드</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium mb-2">
+                                  도면 파일 <span className="text-red-500">*</span>
+                                </label>
+                                <Input
+                                  type="file"
+                                  accept=".glb,.gltf"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      handleFileUploaded(file);
+                                    }
+                                  }}
+                                  disabled={isUploading}
+                                />
+                                {isUploading && (
+                                  <p className="text-sm text-secondary-500 mt-1">
+                                    파일 업로드 중...
+                                  </p>
+                                )}
+                                {fileUpload.fileInfo && (
+                                  <p className="text-sm text-green-600 mt-1">
+                                    업로드 완료: {fileUpload.fileInfo.originalFileName}
+                                  </p>
+                                )}
+                                {isProcessingDrawing && (
+                                  <p className="text-sm text-blue-600 mt-1">
+                                    도면에서 층 정보 추출 중...
+                                  </p>
+                                )}
+                                {extractedFloors.length > 0 && (
+                                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                                    <p className="text-sm font-medium text-blue-800 mb-2">
+                                      추출된 층 정보 ({extractedFloors.length}개):
+                                    </p>
+                                    <div className="space-y-1">
+                                      {extractedFloors.slice(0, 5).map((floor, index) => (
+                                        <div key={index} className="text-xs text-blue-700">
+                                          • {floor.name} (ID: {floor.floorId})
+                                        </div>
+                                      ))}
+                                      {extractedFloors.length > 5 && (
+                                        <div className="text-xs text-blue-600">
+                                          ... 외 {extractedFloors.length - 5}개
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium mb-2">
+                                  변경 사유 <span className="text-red-500">*</span>
+                                </label>
+                                <Textarea
+                                  value={comment}
+                                  onChange={(e) => setComment(e.target.value)}
+                                  placeholder="도면 파일 변경 사유를 입력하세요"
+                                  rows={3}
+                                />
+                              </div>
+
+                              <div className="flex justify-end space-x-2">
+                                <Button variant="outline" onClick={handleDialogClose}>
+                                  취소
+                                </Button>
+                                <Button
+                                  onClick={handleDrawingUpdate}
+                                  disabled={!uploadedFileId || !comment.trim() || isUploading}
+                                >
+                                  업로드
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{item.comment}</p>
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>
-                        {new Date(item.createdAt).toLocaleString("ko-KR")}
-                      </span>
-                        <span>작성자: {item.createdBy}</span>
-                      </div>
+                      <Separator orientation="horizontal"/>
                     </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(item.file.url, "_blank")}
-                      >
-                        다운로드
-                      </Button>
+                  )}
+                  <div
+                    key={item.id}
+                    className="rounded-lg p-3 bg-secondary-200"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex flex-col w-full space-y-2">
+                        <div className="flex justify-between">
+                          <div className="flex items-center space-x-2 mb-1">
+                            {index === 0 && (
+                              <Badge className="text-xs">현재</Badge>
+                            )}
+                            <span className="font-medium text-sm">
+                              {item.file.originalFileName}
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() =>
+                                window.open(item.file.url, "_blank")
+                              }
+                            >
+                              다운로드
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <p className="text-sm text-secondary-900 mb-2">
+                            {item.comment}
+                          </p>
+                          <div className="flex items-center space-x-4 text-xs text-secondary-800">
+                            <span>
+                              {new Date(item.createdAt).toLocaleString("ko-KR")}
+                            </span>
+                            <span>작성자: {item.createdBy}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                  {index === 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center mt-5 mb-3">
+                        <div className="w-0.5 h-5 rounded-full bg-primary-600 inline-block mr-3"/>
+                        <label className="block font-bold">
+                          이전 도면 수정 이력
+                        </label>
+                      </div>
+                      <Separator orientation="horizontal"/>
+                    </div>
+                  )}
+                </>
               ))}
             </div>
           )}

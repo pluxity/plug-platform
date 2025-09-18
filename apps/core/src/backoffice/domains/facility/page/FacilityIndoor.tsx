@@ -1,25 +1,18 @@
-import { toast } from "sonner"
-
-import { Poi, Interfaces, Camera } from '@plug/engine'
-
-import { PageContainer } from '@/backoffice/common/view/layouts'
-
-import { usePoiEvents, PoiData } from '../hooks/usePoiEvents'
-
-import { ArrowLeft } from "lucide-react"
 import React, { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
-
+import { toast } from "sonner"
+import { Poi, Interfaces, Camera } from '@plug/engine'
+import { PageContainer } from '@/backoffice/common/view/layouts'
+import { usePoiEvents, PoiData } from '../hooks/usePoiEvents'
 import { FacilityService, FacilityType, deleteFeature, FeatureResponse, getFeaturesByFacility, updateFeatureTransform } from '@plug/common-services'
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter } from "@plug/ui"
-
 import { IndoorMapViewer, FloorControl } from '@/global/components'
 import { useAssets } from '@/global/store'
 import type { Floor } from '@/global/types'
 import { convertFloors, poiUnassignedText, poiAssignedText } from '@/global/utils'
-
 import { IndoorMapEditTools, FeatureAssignModal } from '../components'
 import { useCctvData, useDeviceData } from '../hooks'
+
 type FacilityData = {
   facility?: {
     id: number
@@ -35,17 +28,11 @@ type FacilityData = {
   boundary?: string
 }
 
-// 이벤트 타입은 usePoiEvents 훅 내부 정의 사용
-
-
-// 클릭 이벤트 타입도 훅 내부 정의 사용
-
 const FacilityIndoor: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const location = useLocation()
-  
-  // Router state에서 데이터 추출
+
   const facilityTypeFromState = location.state?.facilityType as FacilityType | null
   
   const facilityId = id ? parseInt(id, 10) : null
@@ -123,7 +110,6 @@ const FacilityIndoor: React.FC = () => {
     }
   }, []);
 
-  // 공통 엔진 이벤트 등록 훅
   usePoiEvents({
     isDeleteMode,
     onPointerDelete: handlePointerDelete,
@@ -132,7 +118,6 @@ const FacilityIndoor: React.FC = () => {
   });
  
 
-  // Features 로드를 위한 함수
   const loadFeaturesByFacility = useCallback(async (facilityId: number): Promise<FeatureResponse[]> => {
     try {
       const features = await getFeaturesByFacility(facilityId)  
@@ -266,7 +251,6 @@ const FacilityIndoor: React.FC = () => {
             const hasDrawing = response.data.facility?.drawing?.url ? true : false
             setHas3DDrawing(hasDrawing)
             
-            // 층 정보 변환
             if (response.data && 'floors' in response.data && response.data.floors) {
               const convertedFloors = convertFloors(response.data.floors);
               setFloors(convertedFloors);
@@ -289,7 +273,6 @@ const FacilityIndoor: React.FC = () => {
     loadFacility()
   }, [facilityId, facilityTypeFromState, navigate])
 
-  // Features 로드
   useEffect(() => {
     const loadFeatures = async () => {
       if (!facilityId) return;
@@ -319,24 +302,8 @@ const FacilityIndoor: React.FC = () => {
     )
   }
 
-  const handleGoBack = () => {
-    navigate('/admin/facility')
-  }
-
   return (
     <PageContainer title={`실내지도 편집 - ${facilityData?.facility?.name || id}`}>
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-3 mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleGoBack}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft size={18} />
-            목록으로
-          </Button>
-        </div>        
         <div className="bg-white flex-1 border rounded-lg overflow-hidden">          
           {has3DDrawing === null && (
             <div className="h-full flex items-center justify-center bg-gray-100">
@@ -347,7 +314,6 @@ const FacilityIndoor: React.FC = () => {
             </div>
           )}
           
-          {/* 3D 도면이 없는 경우 */}
           {has3DDrawing === false && (
             <div className="h-full flex items-center justify-center bg-gray-100">
               <div className="text-center">
@@ -390,21 +356,18 @@ const FacilityIndoor: React.FC = () => {
                 onLoadComplete={handleLoadComplete}
               />
          
-              {/* Floor Control - 우측 하단 */}
               {floors.length > 0 && (
                 <div className="absolute bottom-6 right-6 z-20 max-w-xs">
                   <FloorControl floors={floors} />
                 </div>
               )}
               
-              {/* POI 편집 툴 - 우측 상단 */}
               <div className="absolute top-4 right-4 z-30">
                 <IndoorMapEditTools onDeleteMode={handleDeleteModeChange} />
               </div>
             </div>
           )}
         </div>
-      </div>
 
       {showDeleteDialog && selectedFeature && (
         <Dialog open={showDeleteDialog} onOpenChange={handleDeleteCancel}>

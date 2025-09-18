@@ -191,9 +191,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   const getFileIcon = () => {
     if (fileType === 'image') {
-      return <Image size={20} className="text-blue-500" />;
+      return <Image size={20} className="text-primary-500" />;
     }
-    return <FileText size={20} className="text-blue-500" />;
+    return <FileText size={20} className="text-primary-500" />;
   };
 
   const displayFileName = fileInfo?.originalFileName || 
@@ -213,13 +213,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
       <div className="flex flex-col gap-4">
         {(fileInfo || currentFileInfo || currentFileId) && (
-          <div className="w-full">
+          <div className="w-full bg-secondary-500 rounded-md">
             {fileType === 'image' && (currentImageUrl || fileInfo?.url) ? (
-              <div className="relative bg-white rounded-sm border border-gray-200">
+              <div className="relative ">
                 <img
                   src={fileInfo?.url || currentImageUrl || ''}
                   alt="미리보기"
-                  className="w-full h-52 object-contain rounded-lg p-2 bg-secondary-200"
+                  className="w-full h-60 object-contain"
                   onError={() => setCurrentImageUrl(null)}
                 />
                 {!isEditMode && (
@@ -262,14 +262,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
         <div
           className={`
-        relative w-full rounded-xl border-2 border-dashed transition-all duration-200
+        relative w-full rounded-md transition-all duration-200
         ${(fileInfo || currentFileInfo || currentFileId) ? 'p-4' : 'p-8'}
         ${isDragOver
             ? (dragValidFileType
-                ? 'border-blue-500 bg-blue-50/50'
+                ? 'border-primary-500 bg-primary-50/50'
                 : 'border-red-500 bg-red-50/50'
             )
-            : 'border-gray-200 hover:border-gray-300 bg-gray-50/50 hover:bg-gray-50'
+            : 'bg-primary-200 hover:bg-primary-300'
           }
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
       `}
@@ -278,13 +278,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           onDragLeave={handleDragLeave}
           onClick={!disabled ? handleButtonClick : undefined}
         >
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <Upload
               className={`
-            ${(fileInfo || currentFileInfo || currentFileId) ? 'h-8 w-8' : 'h-12 w-12'} 
+            'h-8 w-8' 
             ${isDragOver
-                ? (dragValidFileType ? 'text-blue-500' : 'text-red-500')
-                : 'text-gray-400'
+                ? (dragValidFileType ? 'text-primary-500' : 'text-red-500')
+                : 'text-primary-700'
               }
             transition-colors duration-200
           `}
@@ -294,8 +294,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             font-medium
             ${(fileInfo || currentFileInfo || currentFileId) ? 'text-sm' : 'text-base'} 
             ${isDragOver
-                ? (dragValidFileType ? 'text-blue-700' : 'text-red-700')
-                : 'text-gray-700'
+                ? (dragValidFileType ? 'text-primary-700' : 'text-red-700')
+                : 'text-primary-700'
               }
           `}>
                 {isDragOver
@@ -318,11 +318,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </div>
         </div>
 
-        {/* 로딩 상태 */}
         {isLoading && (
-          <div className="flex items-center justify-center p-3 bg-blue-50 rounded-lg">
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
-            <span className="ml-3 text-sm font-medium text-blue-700">업로드 중...</span>
+          <div className="flex items-center justify-center p-3 bg-primary-50 rounded-lg">
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-600 border-t-transparent"></div>
+            <span className="ml-3 text-sm font-medium text-primary-700">업로드 중...</span>
           </div>
         )}
       </div>

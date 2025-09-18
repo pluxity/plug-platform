@@ -7,7 +7,8 @@ export const FacilityIcon = ({ className }: { className?: string }) => (
     <rect x="5" y="3" width="14" height="18" rx="2" opacity="0.35" />
     <rect x="9" y="7" width="2" height="2" rx="1" />
     <rect x="13" y="7" width="2" height="2" rx="1" />
-    <rect x="11" y="11" width="2" height="2" rx="1" />
+    <rect x="9" y="11" width="2" height="2" rx="1" />
+    <rect x="13" y="11" width="2" height="2" rx="1" />
     <rect x="10" y="15" width="4" height="6" rx="1" />
   </svg>
 );

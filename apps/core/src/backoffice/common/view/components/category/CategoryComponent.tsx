@@ -121,13 +121,10 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
       <div className="flex gap-4">
         <div>
           <div className="font-bold text-secondary-900 mb-5 flex items-center gap-2">
-            <div className="bg-primary-500 w-1 h-5 ml-1 rounded-sm" />
+            <div className="bg-primary-600 w-0.5 h-5 mr-2" />
             <div>카테고리 추가하기</div>
           </div>
           <div className="flex flex-col justify-between mb-3 border rounded-lg p-5">
-            <div className="flex items-center justify-between w-full mb-2.5">
-              <Badge className="h-6 rounded-md">최대 {maxDepth}단계</Badge>
-            </div>
             <div className="mb-4 rounded-md bg-secondary-100 p-4 w-80">
               <div className="flex flex-col gap-2.5">
                 <Input
@@ -174,9 +171,11 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
 
         <div className="space-y-1 w-full h-full">
           <div className="font-bold text-secondary-900 mb-5 flex items-center gap-2">
-            <div className="bg-primary-500 w-1 h-5 ml-1 rounded-sm" />
+            <div className="bg-primary-600 w-0.5 h-5 mr-2" />
             <div>카테고리 목록</div>
+            <Badge className="h-6 rounded-md ml-2.5">최대 {maxDepth}단계</Badge>
           </div>
+
           <div className="border rounded-lg p-7 overflow-y-auto h-full flex flex-col gap-2.5">
             {itemsWithCorrectDepths.length === 0 ? (
               <div className="text-center py-8 text-gray-500">

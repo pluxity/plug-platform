@@ -53,7 +53,7 @@ const DashboardLayout: React.FC = () => {
         onItemClick={handleClick}
       />
 
-      <main className="flex-1 p-10">
+      <main className="flex-1 p-10 overflow-auto">
         <Outlet />
       </main>
     </div>

@@ -27,7 +27,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
       border text-xs font-medium
       ${
           isAllSelected
-            ? "bg-white text-primary-800 font-semibold border-2 border-primary-500"
+            ? "bg-white text-primary-800 font-semibold border-2 border-primary-700"
             : "bg-white text-secondary-700 border-secondary-500 hover:border-primary-400 hover:bg-primary-100"
         }
     `}
@@ -41,7 +41,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
         inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-semibold
         ${
             isAllSelected
-              ? "bg-primary-500 text-white"
+              ? "bg-primary-700 text-white"
               : "bg-secondary-300 text-secondary-600"
           }
       `}
@@ -63,7 +63,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
           border text-xs font-medium
           ${
               isSelected
-                ? "bg-white text-primary-800 font-semibold border-2 border-primary-500"
+                ? "bg-white text-primary-800 font-semibold border-2 border-primary-700"
                 : "bg-white text-secondary-700 border-secondary-500 hover:border-primary-300 hover:bg-primary-50"
             }
         `}
@@ -76,7 +76,7 @@ const FacilityTypeFilter: React.FC<FacilityTypeFilterProps> = ({
               inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-semibold
               ${
                   isSelected
-                    ? "bg-primary-500 text-white"
+                    ? "bg-primary-700 text-white"
                     : "bg-secondary-300 text-secondary-600"
                 }
             `}

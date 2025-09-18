@@ -67,6 +67,7 @@ export interface ExtendedFacilityFormProps extends FacilityFormProps {
   currentThumbnailFile?: FileResponse | null;
   currentDrawingFile?: FileResponse | null;
   isEditMode?: boolean;
+  domainConfig: Record<string, string>;
 }
 
 export interface FloorsFormProps extends FacilityFormProps {

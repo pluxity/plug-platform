@@ -18,16 +18,16 @@ const ChevronDownArrow = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const DeleteIcon = ({ onClick }: { onClick?: (e: React.MouseEvent) => void }) => (
+export const DeleteIcon = ({ onClick }: { onClick?: (e: React.MouseEvent) => void }) => (
   <div 
     data-property-1="delete" 
     className="w-3.5 h-3.5 relative cursor-pointer"
     onClick={onClick}
   >
     <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="7" cy="7.5" r="5" fill="#C7DDFD"/>
-      <path d="M8.74264 5L9.44975 5.70711L5.20711 9.94975L4.5 9.24264L8.74264 5Z" fill="#9CA8BA"/>
-      <path d="M9.44975 9.24264L8.74264 9.94975L4.5 5.70711L5.20711 5L9.44975 9.24264Z" fill="#9CA8BA"/>
+      <circle cx="7" cy="7.5" r="5" fill="#A9CBF6"/>
+      <path d="M8.74264 5L9.44975 5.70711L5.20711 9.94975L4.5 9.24264L8.74264 5Z" fill="#6B7280"/>
+      <path d="M9.44975 9.24264L8.74264 9.94975L4.5 5.70711L5.20711 5L9.44975 9.24264Z" fill="#6B7280"/>
     </svg>
   </div>
 );
@@ -56,11 +56,11 @@ function MultiSelect ({
       <Popover.Trigger asChild disabled={disabled}>
         <button
           className={cn(
-            "w-full h-auto min-h-9 min-w-16 px-2.5 py-2 bg-white rounded-sm outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex justify-between items-center group rounded-[2px]",
+            "w-full h-auto min-h-9 min-w-16 px-2.5 py-2 bg-white rounded-sm inline-flex justify-between items-center group border",
             "focus:outline-slate-400 focus:text-zinc-700",
-            "data-[state=open]:outline-slate-400",
-            invalid && "outline-red-700 text-red-700",
-            disabled && "bg-gray-200 outline-neutral-300 text-neutral-300 cursor-not-allowed",
+            "data-[state=open]:border-slate-400",
+            invalid && "border-red-700 text-red-700",
+            disabled && "bg-gray-200 border-neutral-300 text-neutral-300 cursor-not-allowed",
             className
           )}
           aria-label="Select multiple"
@@ -79,7 +79,7 @@ function MultiSelect ({
                 {selectedOptions.map((o) => (
                   <div 
                     key={o.value} 
-                    className="px-[5px] py-1 bg-blue-50 inline-flex justify-center items-center gap-[3px]"
+                    className="px-1.5 py-1 bg-primary-200 inline-flex justify-center items-center gap-1 rounded-sm"
                   >
                     <div className="justify-start text-zinc-700 text-xs font-medium font-['SUIT']">
                       {o.label}
@@ -109,7 +109,7 @@ function MultiSelect ({
       <Popover.Portal>
         <Popover.Content 
           className={cn(
-            "min-w-[var(--radix-popover-trigger-width)] p-2.5 bg-white rounded-[2px] outline outline-1 outline-offset-[-1px] outline-slate-400 inline-flex flex-col justify-center items-start gap-3",
+            "min-w-[var(--radix-popover-trigger-width)] p-2.5 bg-white rounded-sm border inline-flex flex-col justify-center items-start gap-3",
             "z-50 max-h-60 overflow-y-auto"
           )} 
           align="start"

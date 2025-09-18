@@ -37,74 +37,68 @@ const LocationSelectorField: React.FC<LocationSelectorFieldProps> = ({
     <div className="space-y-4">
       <div className="space-y-4" data-testid="location-selector-input">
         <div className="flex items-center space-x-2">
-          <div className="w-0.5 h-6 rounded-sm bg-primary-600 inline-block mr-3"/>
+          <div className="w-0.5 h-5 rounded-sm bg-primary-600 inline-block mr-3"/>
           <label className="block font-bold">
             위치 정보
           </label>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm text-gray-500 mb-2">위도 (Latitude)</label>
-            <Controller
-              name="facility.lat"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="number"
-                  step="any"
-                  placeholder="위도"
-                  value={field.value || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    field.onChange(value ? Number(value) : undefined);
-                  }}
-                />
-              )}
-            />
-          </div>
+        <div className="flex gap-4 justify-between">
+          <div className="flex space-x-4">
+            <div className="flex space-x-2 items-center justify-center">
+              <label className="block text-gray-500 w-50">*  위도 (Latitude)</label>
+              <Controller
+                name="facility.lat"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="number"
+                    step="any"
+                    placeholder="위도"
+                    readOnly
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value ? Number(value) : undefined);
+                    }}
+                  />
+                )}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm text-gray-500 mb-2">경도 (Longitude)</label>
-            <Controller
-              name="facility.lon"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="number"
-                  step="any"
-                  placeholder="경도"
-                  value={field.value || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    field.onChange(value ? Number(value) : undefined);
-                  }}
-                />
-              )}
-            />
+            <div className="flex space-x-2 items-center justify-center">
+              <label className="block text-gray-500 w-50">*  경도 (Longitude)</label>
+              <Controller
+                name="facility.lon"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="number"
+                    step="any"
+                    placeholder="경도"
+                    readOnly
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value ? Number(value) : undefined);
+                    }}
+                  />
+                )}
+              />
+            </div>
           </div>
-
           <div className="flex flex-col justify-end gap-2">
             <Button
               type="button"
-              variant="outline"
               onClick={() => setIsMapOpen(true)}
-              className="w-full"
+              className="w-48"
             >
-              지도에서 선택
+              위치 정보 수정
             </Button>
           </div>
         </div>
-
-        {watchedLat && watchedLon && (
-          <div className="mt-3 p-3 bg-secondary-300 rounded-md">
-            <p className="text-sm text-secondary-900">
-              선택된 위치: 위도 {watchedLat.toFixed(6)}, 경도 {watchedLon.toFixed(6)}
-            </p>
-          </div>
-        )}
 
         {errors.facility?.lat && (
           <p className="text-red-500 text-sm mt-1">{errors.facility.lat.message}</p>

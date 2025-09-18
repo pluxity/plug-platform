@@ -43,7 +43,7 @@ const Sidebar = ({
                 item.depth === 1 ? "h-10" : "h-7",
                 item.depth === 2 && "ml-8",
                 isActive
-                  ? "bg-primary-50 text-primary-600"
+                  ? "bg-primary-50 text-primary-700"
                   : "text-[#6B7482] hover:bg-primary-50/50",
                 "rounded-[3px]",
                 "transform transition-transform duration-200 hover:scale-[1.01]",
@@ -53,7 +53,7 @@ const Sidebar = ({
               {isActive && (
                 <div
                   className={cn(
-                    "w-1 h-full bg-primary-600 rounded-r-sm mr-3",
+                    "w-1 h-full bg-primary-700 rounded-r-sm mr-3",
                     "transform transition-all duration-300",
                     "animate-fadeIn"
                   )}
@@ -72,7 +72,7 @@ const Sidebar = ({
                     className={cn(
                       "w-4 h-4",
                       "transition-all duration-300",
-                      isActive ? "text-primary-600 scale-110" : "text-secondary-600",
+                      isActive ? "text-primary-700 scale-110" : "text-secondary-600",
                     )}
                   />
                 )}
