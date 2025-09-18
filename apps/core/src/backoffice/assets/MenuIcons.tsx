@@ -57,13 +57,13 @@ export const CCTVIcon = ({ className }: { className?: string }) => (
 );
 
 export const UserIcon = ({ className }: { className?: string }) => (
-    <svg
-        width="24" height="24" viewBox="0 0 24 24"
-        fill="currentColor" xmlns="http://www.w3.org/2000/svg"
-        className={className}
-    >
-        <circle opacity="0.35" cx="12" cy="8" r="4" />
-        <path d="M12 13c-3.3 0-6 2.2-6 5v1h12v-1c0-2.8-2.7-5-6-5z" />
-    </svg>
+  <svg
+    width="24" height="24" viewBox="0 0 24 24"
+    fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+    className={className} aria-hidden
+  >
+    <circle opacity="0.35" cx="12" cy="8" r="4" />
+    <path d="M12 13c-3.3 0-6 2.2-6 5v1h12v-1c0-2.8-2.7-5-6-5z" />
+  </svg>
 );
 

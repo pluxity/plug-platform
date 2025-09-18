@@ -31,7 +31,7 @@ const ThumbnailHoverButtons: React.FC<ThumbnailHoverButtonsProps> = ({
   facilityName = '시설'
 }) => {
   return (
-    <div className="absolute inset-0 bg-black/60 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+    <div className="absolute inset-0 bg-transparent group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
       {onView && (
         <button
           type="button"

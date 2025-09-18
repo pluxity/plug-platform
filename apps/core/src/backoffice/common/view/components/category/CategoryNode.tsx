@@ -195,7 +195,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
       )}
 
       <div
-        className={[
+        className={cn(
           "group relative flex items-center gap-3 rounded-lg bg-secondary-400/70",
           "transition-colors duration-200 hover:bg-secondary-400",
           isDragging ? "opacity-60 ring-2 ring-secondary-300" : "",
@@ -203,7 +203,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
             ? "bg-blue-50/40 ring-2 ring-secondary-300"
             : "",
           className,
-        ].join(" ")}
+        )}
         style={{
           padding: "12px",
           paddingLeft: "24px",

@@ -379,7 +379,7 @@ const FacilityEdit: React.FC = () => {
     );
   }
 
-  const domainConfig = domainUtils.getConfig(facilityType) as unknown as Record<string, string>;
+  const domainConfig = domainUtils.getConfig(facilityType);
 
   return (
     <PageContainer title={`${facility.facility?.name || '시설'} 수정`} >
