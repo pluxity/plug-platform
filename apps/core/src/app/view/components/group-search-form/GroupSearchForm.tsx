@@ -93,7 +93,7 @@ const GroupSearchFormInner = <T,>(
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="liquid-glass clickable w-full px-4 py-2 pr-10 text-secondary-100 placeholder-secondary-100/60 focus:outline-none focus:ring-2 focus:ring-secondary-100/30 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="liquid-glass clickable bg-secondary-600/40 w-full px-4 py-2 pr-10 text-secondary-100 placeholder-secondary-100/60 focus:outline-none focus:ring-2 focus:ring-secondary-100/30 disabled:opacity-60 disabled:cursor-not-allowed"
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
           {value ? (
@@ -114,7 +114,7 @@ const GroupSearchFormInner = <T,>(
       </div>
 
       {open && (
-        <div className={clsx('absolute z-50 w-full mt-2 liquid-glass rounded-2xl border-secondary-100/10', dropdownClassName)}>
+        <div className={clsx('absolute z-50 w-full mt-2 liquid-glass rounded-2xl border-secondary-100/10 bg-secondary-600/40', dropdownClassName)}>
           {showCount && totalCount > 0 && (
             <div className="px-4 py-3 border-b border-white/10 text-xs text-secondary-100 font-medium">
               {totalCount}개의 결과가 있습니다
@@ -132,7 +132,7 @@ const GroupSearchFormInner = <T,>(
                   <button
                     key={itemKey}
                     onClick={() => onSelect?.(item, { group, groupIndex, itemIndex })}
-                    className="w-full mt-2 px-4 py-3 text-left liquid-glass liquid-glass-secondary focus:outline-none rounded-md"
+                    className="w-full mt-2 px-4 py-3 text-left liquid-glass liquid-glass-secondary bg-secondary-800/80 hover:bg-secondary-800/70 focus:outline-none rounded-md"
                   >
                     {renderItem(item, { group, groupIndex, itemIndex })}
                   </button>

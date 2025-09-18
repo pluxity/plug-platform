@@ -25,7 +25,7 @@ const useUserProfileStyles = (isAdmin: boolean, showAdminPortal: boolean) => {
         : 'space-x-3 min-w-30 px-3 py-1 rounded-sm shadow transition liquid-glass',
       
       dropdown: isAdminUser 
-        ? 'liquid-glass right-6 transform transition-all duration-400 ease-out'
+        ? 'liquid-glass bg-secondary-600/40 border border-secondary-100/20 right-6 transform transition-all duration-400 ease-out'
         : 'fixed right-0',
       
       infoSection: isAdminUser 

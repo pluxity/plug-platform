@@ -289,17 +289,23 @@
 /* =========================================================
  * 6) 글래스모피즘 유틸리티 클래스
  * =======================================================*/
- @layer utilities {
-    /* ===== 기본 Liquid Glass 컴포넌트 ===== */
+ @layer utilities { 
+    /* 기본 상태 - liquid glass 없음 */
     .liquid-glass {
         position: relative;
-       
-        --glass-opacity: 0.05;           /* 0.08 → 0.05 (중간 투명도) */
-        --glass-border-opacity: 0.12;    /* 0.18 → 0.12 (중간 테두리) */
-        --glass-blur: 14px;              /* 12px → 14px (중간 블러) */
-        --glass-saturation: 125%;        /* 180% → 125% (중간 채도) */
-        --glass-brightness: 1.05;        /* 1.1 → 1.05 (중간 밝기) */
-        --glass-contrast: 1.05;          /* 1.1 → 1.05 (중간 대비) */
+        backdrop-filter: none;
+        border-radius: 16px;
+        transition: all 0.2s ease;
+    }
+
+    /* Liquid 모드 활성화 */
+    .liquid .liquid-glass {
+        --glass-opacity: 0.05;
+        --glass-border-opacity: 0.12;
+        --glass-blur: 14px;
+        --glass-saturation: 125%;
+        --glass-brightness: 1.05;
+        --glass-contrast: 1.05;
 
         background: rgba(255, 255, 255, var(--glass-opacity));
         border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
@@ -308,19 +314,16 @@
             0 2px 8px rgba(0, 0, 0, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
         
-        /* 핵심 - backdrop-filter로 실제 유리 효과 */
         backdrop-filter: 
             blur(var(--glass-blur)) 
             saturate(var(--glass-saturation));
-        
-        border-radius: 16px;
-        transition: all 0.2s ease;
     }
 
-    .dark .liquid-glass {
-        --glass-opacity: 0.08;           /* 0.12 → 0.08 (중간 투명도) */
-        --glass-border-opacity: 0.18;    /* 0.25 → 0.18 (중간 테두리) */
-        --glass-blur: 14px;              /* 16px → 14px (중간 블러) */
+    /* Dark 모드에서 Liquid 모드 */
+    .dark.liquid .liquid-glass {
+        --glass-opacity: 0.08;
+        --glass-border-opacity: 0.18;
+        --glass-blur: 14px;
         
         background: rgba(255, 255, 255, var(--glass-opacity));
         border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
@@ -331,9 +334,10 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
 
-    .liquid-glass:hover {
-        --glass-opacity: 0.08;           /* 0.12 → 0.08 (중간 투명도) */
-        --glass-blur: 16px;              /* 8px → 16px (중간 블러) */
+    /* Hover 효과 */
+    .liquid .liquid-glass:hover {
+        --glass-opacity: 0.08;
+        --glass-blur: 16px;
         
         box-shadow:
             0 12px 40px rgba(0, 0, 0, 0.15),
@@ -341,9 +345,9 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
 
-    .dark .liquid-glass:hover {
-        --glass-opacity: 0.12;           /* 0.18 → 0.12 (중간 투명도) */
-        --glass-blur: 12px;              /* 12px 유지 */
+    .dark.liquid .liquid-glass:hover {
+        --glass-opacity: 0.12;
+        --glass-blur: 12px;
         
         box-shadow:
             0 12px 40px rgba(0, 0, 0, 0.4),
@@ -351,41 +355,38 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
-    .liquid-glass.clickable:active {
-        --glass-opacity: 0.10;           /* 0.15 → 0.10 (중간 투명도) */
-        --glass-blur: 8px;               /* 6px → 8px (중간 블러) */
+    /* Clickable 효과 */
+    .liquid .liquid-glass.clickable:active {
+        --glass-opacity: 0.10;
+        --glass-blur: 8px;
         transform: translateY(0px) scale(0.98);
         transition: all 0.1s ease;
     }
-    
+
     /* ===== 색상 변형들 ===== */
     
-    .liquid-glass-primary {
-        background: rgba(82, 141, 232, 0.25);  /* 0.15 → 0.25 (더 진하게) */
-        border-color: rgba(82, 141, 232, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    .liquid .liquid-glass-primary {
+        background: rgba(82, 141, 232, 0.25);
+        border-color: rgba(82, 141, 232, 0.4);
     }
     
-    /* Secondary - Gray (더 진한 회색 사용) */
-    .liquid-glass-secondary {
-        background: rgba(31, 41, 55, 0.3);  /* secondary-1000 색상 사용 */
-        border-color: rgba(31, 41, 55, 0.5);  /* 더 진한 회색 테두리 */
+    .liquid .liquid-glass-secondary {
+        background: rgba(31, 41, 55, 0.3);
+        border-color: rgba(31, 41, 55, 0.5);
     }
     
-    /* Accent - Green (기본 600) */
-    .liquid-glass-accent {
-        background: rgba(34, 197, 94, 0.25);    /* 0.15 → 0.25 (더 진하게) */
-        border-color: rgba(34, 197, 94, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    .liquid .liquid-glass-accent {
+        background: rgba(34, 197, 94, 0.25);
+        border-color: rgba(34, 197, 94, 0.4);
     }
     
-    /* Danger - Red (기본 600) */
-    .liquid-glass-danger {
-        background: rgba(239, 68, 68, 0.25);    /* 0.15 → 0.25 (더 진하게) */
-        border-color: rgba(239, 68, 68, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    .liquid .liquid-glass-danger {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: rgba(239, 68, 68, 0.4);
     }
     
-    /* Warning - Yellow/Amber (기본 600) */
-    .liquid-glass-warning {
-        background: rgba(245, 158, 11, 0.25);   /* 0.15 → 0.25 (더 진하게) */
-        border-color: rgba(245, 158, 11, 0.4);  /* 0.25 → 0.4 (더 진한 테두리) */
+    .liquid .liquid-glass-warning {
+        background: rgba(245, 158, 11, 0.25);
+        border-color: rgba(245, 158, 11, 0.4);
     }
 }
