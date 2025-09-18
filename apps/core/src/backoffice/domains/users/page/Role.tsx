@@ -14,7 +14,6 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-  Badge
 } from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts'
@@ -94,17 +93,20 @@ const Role: React.FC = () => {
       header: '관리',
       cell: ({row}: {row: { original: RoleData }}) => (
         <div className="flex space-x-2">
-          <Badge
-            onClick={() => handleEdit(row.original.id)}
+          <Button
+            color="primary"
+            size="sm"
+            onClick={() => handleEdit(Number(row.original.id))}
           >
             수정
-          </Badge>
-          <Badge
+          </Button>
+          <Button
             variant="secondary"
+            size="sm"
             onClick={() => handleDelete(row.original)}
-          > 
+          >
             삭제
-          </Badge>
+          </Button>
         </div>
       ),
     },

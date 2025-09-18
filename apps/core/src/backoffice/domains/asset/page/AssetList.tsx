@@ -15,7 +15,6 @@ import {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-  Badge
 } from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
@@ -24,24 +23,18 @@ import { AssetEditModal } from '@/backoffice/domains/asset/components/AssetEditM
 import { AssetMapper } from '@/backoffice/domains/asset/mapper/assetMapper';
 import { AssetData } from '@/backoffice/domains/asset/types/asset';
 const AssetList: React.FC = () => { 
-  // 모달 상태 관리
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<number | null>(null);
   const [deleteAssetData, setDeleteAssetData] = useState<AssetData | null>(null);
   const [category, setCategory] = useState("all");
   
-  // 에셋 목록 조회
   const { data, mutate } = useAssetsSWR();
   const { categories } = useAssetCategoryTree();
 
-  // 에셋 목록 매핑
   const assetData = data ? data.map(AssetMapper) : [];
-  
-  // 에셋 카테고리 필터링
   const filteredAssetData = category === "all" ? assetData : assetData.filter(asset => asset.categoryId?.toString() === category);
 
-  // 이벤트 핸들러 함수
   const handleCreate = () => {
     setCreateModalOpen(true);
   };
@@ -83,7 +76,6 @@ const AssetList: React.FC = () => {
     setDeleteAssetData(null);
   };
 
-  // 에셋 카테고리 옵션
   const categoryOptions = [
       { label: '전체', value: 'all' },
     ...categories.map((category: AssetCategoryResponse) => ({
@@ -143,17 +135,20 @@ const AssetList: React.FC = () => {
       header: "관리",
       cell: ({ row }: { row: { original: AssetData } }) => (
         <div className="flex space-x-2">
-          <Badge
+          <Button
+            color="primary"
+            size="sm"
             onClick={() => handleEdit(Number(row.original.id))}
           >
             수정
-          </Badge>
-          <Badge
+          </Button>
+          <Button
             variant="secondary"
+            size="sm"
             onClick={() => handleDelete(row.original)}
           >
             삭제
-          </Badge>
+          </Button>
         </div>
       ),
     },
