@@ -1,8 +1,9 @@
 import { AsideMenuItemProps } from '@/backoffice/common/services/types/layout'
-import React, { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import React, { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from '@plug/ui'
 import { AssetIcon, CCTVIcon, DeviceIcon, FacilityIcon, UserIcon } from "@/backoffice/assets/MenuIcons";
+import { useSidebarStore } from "../../services/store/useSidebarStore";
 
 const AsideMenuItems: AsideMenuItemProps[] = [
   { id: 'Facility', label: '시설물', to: '/admin/facility', icon: <FacilityIcon/>, depth: 1, showToggle: true},
@@ -25,13 +26,55 @@ const AsideMenuItems: AsideMenuItemProps[] = [
 
 ]
 
+function findActiveMenu(pathname: string, items: AsideMenuItemProps[]) {
+  return items.find((it) => it.to === pathname);
+}
+
+function getAncestorIds(
+  item: AsideMenuItemProps | undefined,
+  items: AsideMenuItemProps[]
+): string[] {
+  const chain: string[] = [];
+  let cur = item;
+  const byId = new Map(items.map((i) => [i.id, i]));
+  while (cur?.parentId) {
+    chain.push(cur.parentId);
+    cur = byId.get(cur.parentId);
+  }
+  return chain;
+}
+
 const DashboardLayout: React.FC = () => {
-  const [activeItem, setActiveItem] = useState<string | null>(null);
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const location = useLocation();
 
-  const handleClick = (id: string) => {setActiveItem(id);};
+  const { activeItem, expandedItems, setActiveItem, toggleExpandedItem, setExpandedItems } = useSidebarStore();
 
-  const handleToggle = (id: string) => setExpandedItems((prev) => (prev.includes(id) ? [] : [id]));
+  useEffect(() => {
+    const activeMenu = findActiveMenu(location.pathname, AsideMenuItems);
+
+    setActiveItem(activeMenu?.id ?? null);
+
+    if (activeMenu) {
+      const ancestors = getAncestorIds(activeMenu, AsideMenuItems);
+      if (ancestors.length) {
+        setExpandedItems((prev) => {
+          const set = new Set(prev);
+          ancestors.forEach((id) => set.add(id));
+          return Array.from(set);
+        });
+      }
+    } else {
+      setExpandedItems(() => []);
+    }
+  }, [location.pathname, setActiveItem, setExpandedItems]);
+
+  const handleClick = (id: string) => {
+    setActiveItem(id);
+  };
+
+  const handleToggle = (id: string) => {
+    toggleExpandedItem(id);
+  };
 
   return (
     <div className="flex h-full overflow-hidden">

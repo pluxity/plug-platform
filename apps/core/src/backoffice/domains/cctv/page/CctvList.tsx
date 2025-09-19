@@ -15,7 +15,6 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-  Badge,
 } from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
@@ -124,8 +123,8 @@ const CctvList: React.FC = () => {
             ),
             cell: ({row}: {row: {original: CctvData}}) => (
                 <div className={`w-10 ${cellClassName} gap-1`}>
-                    <Badge onClick={() => handleEdit(row.original.id)}>수정</Badge>
-                    <Badge variant="secondary" onClick={() => handleDelete(row.original)}>삭제</Badge>
+                    <Button size="sm" onClick={() => handleEdit(row.original.id)}>수정</Button>
+                    <Button size="sm" variant="secondary" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
             ), 
         }

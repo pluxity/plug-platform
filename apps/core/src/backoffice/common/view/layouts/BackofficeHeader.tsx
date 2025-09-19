@@ -13,7 +13,7 @@ const BackofficeHeader: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/admin')}
                 className="flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 aria-label="홈으로 이동"
               >
