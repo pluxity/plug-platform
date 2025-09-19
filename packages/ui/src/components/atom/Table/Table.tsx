@@ -6,7 +6,7 @@ import {
 
 const tableWrapperStyles = "relative w-full rounded-lg overflow-hidden";
 const tableStyles = "w-full text-sm !border-separate border-spacing-2";
-const headerStyles = "bg-secondary-200 text-secondary-900 rounded-lg overflow-hidden";
+const headerStyles = "bg-secondary-300 text-secondary-900 rounded-lg overflow-hidden";
 const rowStyles = " flex justify-between items-center";
 const headStyles = "h-12 text-secondary-900 font-bold text-center px-3 justify-start flex flex-1 justify-center items-center";
 const cellStyles = "h-12 text-secondary-800 px-3 text-center border-b justify-start flex flex-1 justify-center items-center";

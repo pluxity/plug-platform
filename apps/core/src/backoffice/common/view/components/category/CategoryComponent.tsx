@@ -125,7 +125,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
             <div>카테고리 추가하기</div>
           </div>
           <div className="flex flex-col justify-between mb-3 border rounded-lg p-5">
-            <div className="mb-4 rounded-md bg-secondary-100 p-4 w-80">
+            <div className="mb-4 rounded-md bg-secondary-300 p-4 w-80">
               <div className="flex flex-col gap-2.5">
                 <Input
                   value={rootAddValue}

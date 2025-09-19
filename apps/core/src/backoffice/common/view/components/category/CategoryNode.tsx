@@ -228,7 +228,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 p-0 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="h-6 w-6 p-0 text-gray-500 hover:bg-gray-300 hover:text-gray-700"
               onClick={handleToggleExpand}
               disabled={disabled}
               title={isExpanded ? "접기" : "펼치기"}
@@ -434,7 +434,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
           style={{ marginLeft: `${item.depth * 24 + 12}px` }}
         >
           <CornerDownRight className="mt-3 text-secondary-700" />
-          <div className="mt-2 rounded-lg bg-secondary-200 p-4 flex flex-col gap-3 w-full">
+          <div className="mt-2 rounded-lg bg-secondary-300 p-4 flex flex-col gap-3 w-full">
             <div className="flex flex-col gap-3">
               <Input
                 value={addValue}
@@ -488,7 +488,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
       {hasChildren && (
         <div className={isExpanded ? "mx-1.5" : "hidden"}>
           <div>
-            <div className="rounded-b-lg bg-secondary-100/70 overflow-hidden">
+            <div className="rounded-b-lg bg-secondary-200 overflow-hidden">
               <div className="p-2 pr-0">
                 {item.children!.map((child) => (
                   <CategoryNode
@@ -505,7 +505,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                     thumbnailSize={thumbnailSize}
                     enableCodes={enableCodes}
                     enableThumbnail={enableThumbnail}
-                    className="!bg-secondary-100/70 border-none"
+                    className="!bg-secondary-200 border-none"
                   />
                 ))}
               </div>

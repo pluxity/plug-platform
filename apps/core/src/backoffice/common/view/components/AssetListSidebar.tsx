@@ -121,10 +121,10 @@ function AssetItem({ asset, onClick }: AssetItemProps) {
         <Badge className="absolute bottom-0 right-0 rounded-none rounded-tl-lg bg-[#696969] text-secondary-400">배치 가능</Badge>
       </div>
       
-      <div className="flex px-3 py-2 items-center justify-between">
-        <h4 className="font-medium text-base text-white truncate">
+      <div className="flex flex-col px-3 py-2 gap-2">
+        <div className="font-medium text-sm text-white truncate">
           {asset.name}
-        </h4>
+        </div>
         <div className="flex items-center justify-between">
           {asset.categoryName && (
             <div className="text-xs text-secondary-700 bg-secondary-400 px-2 py-1 rounded-full inline-block flex-shrink-0">
@@ -153,7 +153,7 @@ function AssetCategoryBreadcrumb({
           variant="ghost"
           size="sm"
           onClick={goToRootCategory}
-          className="text-secondary-900 hover:bg-white hover:text-secondary-700 p-0 h-auto cursor-pointer text-base font-medium min-w-10"
+          className="text-primary-700 hover:bg-white hover:text-primary-700 p-0 h-auto cursor-pointer text-base font-medium min-w-10"
         >
           전체
         </Button>
@@ -209,7 +209,7 @@ export function AssetListSideBar({
   isCollapsed = false,
   // onToggleCollapse
 }: AssetListSideBarProps) {
-  const navigate = useNavigate()
+
   const { id: facilityId } = useParams<{ id: string }>();
   const {
     isLoading,
@@ -357,10 +357,6 @@ export function AssetListSideBar({
     );
   }
 
-  const handleGoBack = () => {
-    navigate('/admin/facility')
-  }
-
   return (
     <div className={`${isCollapsed ? 'w-16' : 'w-80'} bg-secondary-200 border-r  flex flex-col transition-all duration-300 ${className}`}>
       <div className="px-4 py-3 flex items-center justify-between bg-secondary-800 border-b shadow-xs">
@@ -372,13 +368,6 @@ export function AssetListSideBar({
             </label>
           </div>
         )}
-          <Button
-            variant="ghost"
-            onClick={handleGoBack}
-            className="text-secondary-200 !w-16 min-w-16 hover:text-secondary-1000"
-          >
-            목록으로
-          </Button>
         {/* 접기/펼치기 버튼 */}
         {/* {onToggleCollapse && (
           <Button
