@@ -12,7 +12,7 @@ const PageContainer: React.FC<PageContainerProps> = ({ title, children }) => {
   }
 
   return (
-    <div className="space-y-6 h-full">
+    <div className="space-y-6 h-full flex flex-col">
       <div className="border-b pb-6 mb-6 flex items-center justify-between">
         <h2 className="text-3xl font-bold text-secondary-foreground ">
           {title}
@@ -23,7 +23,7 @@ const PageContainer: React.FC<PageContainerProps> = ({ title, children }) => {
           </Button>
         )}
       </div>
-      <div className="space-y-6">{children}</div>
+      <div className="space-y-6 w-full h-full">{children}</div>
     </div>
   );
 }

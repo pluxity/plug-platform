@@ -178,7 +178,7 @@ const AssetCategory: React.FC = () => {
 
   return (
     <PageContainer title="에셋 카테고리 관리">
-      <div className="space-y-6">
+      <div className="space-y-6 h-full">
         {!isLoading && !hasError && (
           <CategoryComponent
             items={categories}

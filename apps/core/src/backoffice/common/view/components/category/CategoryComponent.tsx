@@ -118,7 +118,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
 
   return (
     <div className="flex flex-col gap-5 h-full justify-between">
-      <div className="flex gap-4">
+      <div className="flex gap-4 h-full">
         <div>
           <div className="font-bold text-secondary-900 mb-5 flex items-center gap-2">
             <div className="bg-primary-600 w-0.5 h-5 mr-2" />
@@ -169,7 +169,7 @@ export const CategoryComponent: React.FC<CategoryComponentProps> = ({
           </div>
         </div>
 
-        <div className="space-y-1 w-full h-full">
+        <div className="space-y-1 w-full h-full flex flex-col">
           <div className="font-bold text-secondary-900 mb-5 flex items-center gap-2">
             <div className="bg-primary-600 w-0.5 h-5 mr-2" />
             <div>카테고리 목록</div>

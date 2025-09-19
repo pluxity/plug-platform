@@ -197,7 +197,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
 
       <div
         className={cn(
-          "group relative flex items-center gap-3 rounded-lg bg-secondary-400/70",
+          "relative flex items-center gap-3 rounded-lg bg-secondary-400/70",
           "transition-colors duration-200 hover:bg-secondary-400",
           isDragging ? "opacity-60 ring-2 ring-secondary-300" : "",
           dragOver === "inside"

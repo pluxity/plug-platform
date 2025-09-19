@@ -183,8 +183,7 @@ const DeviceCategory: React.FC = () => {
 
   return (  
     <PageContainer title="디바이스 카테고리 관리">
-      <div className="space-y-6">
-        {/* 카테고리 관리 컴포넌트 */}
+      <div className="space-y-6 h-full">
         {!isLoading && !hasError && (
           <CategoryComponent
               items={categories}

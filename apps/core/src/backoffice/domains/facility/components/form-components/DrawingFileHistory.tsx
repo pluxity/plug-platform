@@ -121,7 +121,7 @@ export const DrawingFileHistory: React.FC<DrawingFileHistoryProps> = ({
       >
         도면 정보
       </div>
-      <div className="space-y-4 border rounded-lg p-6 h-80 overflow-y-auto scrollbar-thin">
+      <div className="space-y-4 border rounded-lg p-6 h-80 overflow-y-auto">
         <div>
           {history.length === 0 ? (
             <p className="text-secondary-500 text-center py-4">
