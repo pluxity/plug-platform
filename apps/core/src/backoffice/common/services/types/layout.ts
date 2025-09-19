@@ -1,7 +1,7 @@
 export interface AsideMenuItemProps {
     id: string;
     label: string;
-    icon?: string;
+    icon?: React.ReactNode;
     to?: string;
     depth: 1 | 2;
     parentId?: string;

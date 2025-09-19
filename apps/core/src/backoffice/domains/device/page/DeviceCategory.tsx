@@ -183,8 +183,7 @@ const DeviceCategory: React.FC = () => {
 
   return (  
     <PageContainer title="디바이스 카테고리 관리">
-      <div className="space-y-6">
-        {/* 카테고리 관리 컴포넌트 */}
+      <div className="space-y-6 h-full">
         {!isLoading && !hasError && (
           <CategoryComponent
               items={categories}
@@ -198,7 +197,7 @@ const DeviceCategory: React.FC = () => {
               onThumbnailUpload={handleThumbnailUpload}
               enableDragDrop={true}
               disabled={createDeviceCategory.isLoading}
-              thumbnailSize="large"
+              thumbnailSize="medium"
               enableThumbnail={true}
               enableCodes={false}
           />

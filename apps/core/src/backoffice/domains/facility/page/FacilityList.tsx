@@ -6,9 +6,9 @@ import { PageContainer } from '@/backoffice/common/view/layouts';
 
 import { useFacilityData } from '../hooks/useFacilityData';
 
-import { Button } from '@plug/ui';
+import { AdminButton } from '@plug/ui';
 
-import { CreateFacilityModal } from '../components/CreateFacilityModal';
+import { CreateFacilityModal } from "@/backoffice/domains/facility";
 import FacilityCard from '../components/FacilityCard';
 import FacilityTypeFilter from '../components/FacilityTypeFilter';
 import Pagination from '../components/Pagination';
@@ -94,7 +94,7 @@ const FacilityList: React.FC = () => {
       <PageContainer title="시설 관리">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700 mx-auto"></div>
             <p className="mt-4 text-gray-600">시설 목록을 불러오는 중...</p>
           </div>
         </div>
@@ -107,10 +107,10 @@ const FacilityList: React.FC = () => {
       <PageContainer title="시설 관리">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <p className="text-red-600 mb-4">시설 데이터를 불러오는 중 오류가 발생했습니다.</p>
-            <Button onClick={() => window.location.reload()}>
+            <p className="text-danger-600 mb-4">시설 데이터를 불러오는 중 오류가 발생했습니다.</p>
+            <AdminButton onClick={() => window.location.reload()}>
               다시 시도
-            </Button>
+            </AdminButton>
           </div>
         </div>
       </PageContainer>
@@ -120,16 +120,9 @@ const FacilityList: React.FC = () => {
   return (
     <PageContainer title="시설 관리">
       <div className="space-y-6">
-        <div className="mb-6">
-          <FacilityTypeFilter 
-            selectedTypes={selectedTypes}
-            onTypeToggle={handleTypeToggle}
-          />
-        </div>
-        
         <div className="flex flex-col sm:flex-row gap-4 mb-6 items-start sm:items-center justify-between">
           <div className="relative flex-1 max-w-md">
-            <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -137,19 +130,25 @@ const FacilityList: React.FC = () => {
               placeholder="시설명, 코드 또는 설명으로 검색..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border  rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>
+          <AdminButton onClick={() => setIsCreateModalOpen(true)}>
             새 시설 등록
-          </Button>
+          </AdminButton>
         </div>
 
+        <div className="mb-6">
+          <FacilityTypeFilter
+            selectedTypes={selectedTypes}
+            onTypeToggle={handleTypeToggle}
+          />
+        </div>
         {paginatedFacilities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">표시할 시설이 없습니다.</p>
             {(searchTerm || selectedTypes.length > 0) && (
-              <Button 
+              <AdminButton
                 variant="outline" 
                 className="mt-4"
                 onClick={() => {
@@ -159,7 +158,7 @@ const FacilityList: React.FC = () => {
                 }}
               >
                 필터 초기화
-              </Button>
+              </AdminButton>
             )}
           </div>
         ) : (

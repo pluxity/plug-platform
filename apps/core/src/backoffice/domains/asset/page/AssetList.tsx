@@ -4,7 +4,18 @@ import { toast } from 'sonner';
 import React, { useState } from 'react';
 
 import { useAssetsSWR, deleteAsset } from '@plug/common-services/services';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from '@plug/ui';
+import {
+  DataTable,
+  Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { AssetCreateModal } from '@/backoffice/domains/asset/components/AssetCreateModal';
@@ -12,24 +23,18 @@ import { AssetEditModal } from '@/backoffice/domains/asset/components/AssetEditM
 import { AssetMapper } from '@/backoffice/domains/asset/mapper/assetMapper';
 import { AssetData } from '@/backoffice/domains/asset/types/asset';
 const AssetList: React.FC = () => { 
-  // 모달 상태 관리
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<number | null>(null);
   const [deleteAssetData, setDeleteAssetData] = useState<AssetData | null>(null);
   const [category, setCategory] = useState("all");
   
-  // 에셋 목록 조회
   const { data, mutate } = useAssetsSWR();
   const { categories } = useAssetCategoryTree();
 
-  // 에셋 목록 매핑
   const assetData = data ? data.map(AssetMapper) : [];
-  
-  // 에셋 카테고리 필터링
   const filteredAssetData = category === "all" ? assetData : assetData.filter(asset => asset.categoryId?.toString() === category);
 
-  // 이벤트 핸들러 함수
   const handleCreate = () => {
     setCreateModalOpen(true);
   };
@@ -71,7 +76,6 @@ const AssetList: React.FC = () => {
     setDeleteAssetData(null);
   };
 
-  // 에셋 카테고리 옵션
   const categoryOptions = [
       { label: '전체', value: 'all' },
     ...categories.map((category: AssetCategoryResponse) => ({
@@ -90,52 +94,59 @@ const AssetList: React.FC = () => {
     },
   ];
 
-  // 에셋 컬럼 정의
   const columns = [
     {
-      accessorKey: 'categoryName',
-      header: '에셋 카테고리',
-    },
-    {
-      accessorKey: 'code',
-      header: '에셋 코드',
-    },
-    {
-      accessorKey: 'name',
-      header: '에셋 이름',
-    },
-    {
-      accessorKey: 'file',
-      header: '3D 파일',
-    },
-    {
-      accessorKey: 'thumbnailFile',
-      header: '썸네일 파일',
+      accessorKey: "name",
+      header: "에셋 이름",
       cell: ({ row }: { row: { original: AssetData } }) => (
-        <img 
-          src={row.original.thumbnailFile} 
-          alt="썸네일" 
-          className="w-8 h-8 rounded-sm object-contain" 
+        <div className="font-semibold text-primary-foreground">{row.original.name}</div>
+      ),
+    },
+    {
+      accessorKey: "categoryName",
+      header: "에셋 카테고리",
+    },
+    {
+      accessorKey: "code",
+      header: "에셋 코드",
+      cell: ({ row }: { row: { original: AssetData } }) => (
+        <div className="inline-flex items-center px-3 py-1 bg-primary-100 border border-primary-300 rounded-xl text-xs font-medium text-primary-700/80">
+          {row.original.code}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "file",
+      header: "3D 파일",
+    },
+    {
+      accessorKey: "thumbnailFile",
+      header: "썸네일 파일",
+      cell: ({ row }: { row: { original: AssetData } }) => (
+        <img
+          src={row.original.thumbnailFile}
+          alt="썸네일"
+          className="w-8 h-8 rounded-sm object-contain"
         />
       ),
     },
     {
-      id: 'actions',
-      header: '관리',
+      id: "actions",
+      header: "관리",
       cell: ({ row }: { row: { original: AssetData } }) => (
         <div className="flex space-x-2">
           <Button
-            variant="secondary"
+            color="primary"
             size="sm"
             onClick={() => handleEdit(Number(row.original.id))}
           >
             수정
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => handleDelete(row.original)}
-          > 
+          >
             삭제
           </Button>
         </div>
@@ -145,8 +156,8 @@ const AssetList: React.FC = () => {
 
   return (
     <PageContainer title="에셋 관리">
-      <Card>
-        <CardContent>
+      <div>
+        <div>
           <DataTable
             columns={columns}
             data={filteredAssetData}
@@ -157,8 +168,8 @@ const AssetList: React.FC = () => {
             selects={selects}
             buttons={<Button onClick={handleCreate}>등록</Button>}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <AssetCreateModal
         isOpen={createModalOpen}

@@ -6,9 +6,9 @@ import { Outlet } from 'react-router-dom';
 import { Toast } from '@plug/ui';
 const BackofficeLayout: React.FC = () => {
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="flex flex-col h-full">
       <BackofficeHeader />
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-white">
         <Outlet />
       </main>
       <Toast />

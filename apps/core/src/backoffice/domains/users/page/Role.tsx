@@ -3,13 +3,25 @@ import { toast } from 'sonner';
 import React, { useState } from 'react'
 
 import { useRolesSWR, deleteRole } from '@plug/common-services/services'
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui'
+import {
+  DataTable,
+  Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts'
 import { RoleCreateModal } from '@/backoffice/domains/users/components/RoleCreateModal';
 import { RoleEditModal } from '@/backoffice/domains/users/components/RoleEditModal';
 import { RoleMapper } from '@/backoffice/domains/users/mapper/roleMapper';
 import { RoleData } from '@/backoffice/domains/users/types/role';
+
 const Role: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -64,6 +76,9 @@ const Role: React.FC = () => {
     {
       header: '이름',
       accessorKey: 'name',
+      cell: ({ row }: { row: { original: RoleData } }) => (
+        <div className="font-semibold text-primary-foreground">{row.original.name}</div>
+      ),
     },
     {
       header: '설명',
@@ -79,17 +94,17 @@ const Role: React.FC = () => {
       cell: ({row}: {row: { original: RoleData }}) => (
         <div className="flex space-x-2">
           <Button
-            variant="secondary"
+            color="primary"
             size="sm"
-            onClick={() => handleEdit(row.original.id)}
+            onClick={() => handleEdit(Number(row.original.id))}
           >
             수정
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => handleDelete(row.original)}
-          > 
+          >
             삭제
           </Button>
         </div>
@@ -99,16 +114,12 @@ const Role: React.FC = () => {
 
   return (
     <PageContainer title="역할 관리"> 
-      <Card>
-        <CardContent>
-          <DataTable 
-            columns={columns} 
-            data={roleData} 
-            buttons={<Button onClick={handleCreate}>등록</Button>}
-          />
-        </CardContent>
-      </Card>
-
+      <DataTable
+        columns={columns}
+        data={roleData}
+        buttons={<Button onClick={handleCreate}>등록</Button>}
+        pageDescription="역할에 따른 권한 관리가 가능합니다."
+      />
 
       <RoleCreateModal
         isOpen={createModalOpen}

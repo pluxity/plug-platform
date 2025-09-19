@@ -7,6 +7,7 @@ export * from "./components/atom/Avatar/Avatar";
 export * from "./components/atom/Badge/Badge";
 export * from "./components/atom/Breadcrumb/Breadcrumb";
 export * from "./components/atom/Button/Button";
+export * from "./components/atom/Button/AdminButton"
 export * from "./components/atom/Calendar/Calendar";
 export * from "./components/atom/Card/Card";
 export * from "./components/atom/Carousel/Carousel";
@@ -53,6 +54,7 @@ export * from "./components/molecule/LabeledInput/LabeledInput";
 export * from "./components/molecule/ModalForm/ModalForm";
 export * from "./components/molecule/SearchForm/SearchForm";
 export * from "./components/molecule/ToggleGroup/ToggleGroup";
+export * from "./components/molecule/Profile/AdminProfile";
 export * from "./components/molecule/Profile/Profile";
 //Organism
 export * from "./components/organism/DataTable/DataTable";

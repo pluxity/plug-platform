@@ -1,17 +1,13 @@
-import { toast } from 'sonner';
-
-// SWR 기반 훅 사용 (데이터 + 네비게이션). 3D 영역 리렌더 최소화를 위해 zustand 전역 데이터 의존 제거.
-import { poiUnassignedText } from '@/global/utils/displayUtils';
-
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-
+import { toast } from 'sonner';
+import { poiUnassignedText } from '@/global/utils/displayUtils';
+import { useParams } from "react-router-dom";
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services';
 import { createFeature } from '@plug/common-services';
 import { Poi } from '@plug/engine';
-import { Button } from '@plug/ui';
-
+import { Badge, Button, Separator } from "@plug/ui";
 import { useAssetDataWithNavigation } from '@/global/store/assetSWRHooks';
+
 interface AssetListSideBarProps {
   onAssetClick?: (assetId: number) => void;
   className?: string;
@@ -34,47 +30,57 @@ function AssetCategoryItem({ category, onClick }: AssetCategoryItemProps) {
   
   return (
     <div
-  onClick={() => onClick(category.id)}
-      className="cursor-pointer hover:bg-gray-50 p-2 rounded-lg border border-gray-200 transition-colors"
+      onClick={() => onClick(category.id)}
+      className="cursor-pointer hover:bg-secondary-700 hover:shadow-md  bg-[#696969] transition-colors rounded-sm shadow-xs"
     >
-      {/* 작은 썸네일 (2줄 그리드에 맞게) */}
-      <div className="w-full h-16 rounded-lg overflow-hidden mb-2 bg-gray-100">
+      <div className="w-full overflow-hidden h-28  relative">
         {category.thumbnail?.url ? (
-          <img
-            src={category.thumbnail.url}
-            alt={category.name}
-            className="w-full h-full object-cover"
-          />
+          <>
+            <img
+              src={category.thumbnail.url}
+              alt={category.name}
+              className="w-full h-full object-cover rounded-t-sm bg-white/70"
+            />
+            {/*<Badge className="absolute bottom-0 right-0 rounded-none rounded-tl-lg bg-secondary-800 text-white">{category.code}</Badge>*/}
+          </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-blue-500 text-white font-bold text-lg">
+          <div className="w-full h-full flex items-center justify-center bg-primary-500 text-white font-bold text-lg">
             {thumbnailChar}
           </div>
         )}
       </div>
-      
-      {/* 카테고리 정보 */}
-      <div>
-        <h4 className="font-medium text-xs text-gray-900 truncate mb-1">
-          {category.name}
-        </h4>
-        <p className="text-xs text-gray-500 truncate mb-1">
-          {category.code}
-        </p>
+
+      <div className="flex w-full justify-between p-2">
         <div className="flex items-center justify-between">
-          <div className="text-xs text-gray-400">
+          <h4 className="font-medium text-white text-sm truncate mb-1">
+            {category.name}
+          </h4>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="text-xs text-secondary-700 bg-secondary-300 px-2 py-0.5 rounded-full inline-block flex-shrink-0">
             {category.children && category.children.length > 0 ? (
               <span>{category.children.length}개</span>
             ) : (
               <span>{category.assetIds?.length || 0}개</span>
             )}
           </div>
-          
-          {/* 화살표 아이콘 */}
-          <div className="text-gray-400">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
+
+          {/*<div className="text-secondary-600 p-1 rounded-full inline-block bg-secondary-300">*/}
+          {/*  <svg*/}
+          {/*    className="w-3 h-3"*/}
+          {/*    fill="none"*/}
+          {/*    stroke="currentColor"*/}
+          {/*    viewBox="0 0 24 24"*/}
+          {/*  >*/}
+          {/*    <path*/}
+          {/*      strokeLinecap="round"*/}
+          {/*      strokeLinejoin="round"*/}
+          {/*      strokeWidth={2}*/}
+          {/*      d="M9 5l7 7-7 7"*/}
+          {/*    />*/}
+          {/*  </svg>*/}
+          {/*</div>*/}
         </div>
       </div>
     </div>
@@ -91,11 +97,10 @@ function AssetItem({ asset, onClick }: AssetItemProps) {
   return (
     <div
       onClick={handleClick}
-      className="cursor-pointer hover:bg-blue-50 hover:shadow-md p-2 rounded-lg border border-gray-200 transition-all duration-200 active:scale-95 group"
+      className="cursor-pointer hover:bg-secondary-700 hover:shadow-md bg-[#696969] rounded-lg transition-all duration-200 active:scale-95 group"
       title={`${asset.name} - 클릭하여 3D 지도에 배치`}
     >
-      {/* 작은 썸네일 (2줄 그리드에 맞게) */}
-      <div className="w-full h-16 rounded-lg overflow-hidden mb-2 bg-gray-100 relative">
+      <div className="w-full h-28 rounded-t-lg overflow-hidden bg-white/70 relative">
         {asset.thumbnailFile?.url ? (
           <img
             src={asset.thumbnailFile.url}
@@ -108,33 +113,25 @@ function AssetItem({ asset, onClick }: AssetItemProps) {
           </div>
         )}
         
-        {/* 3D 모델 아이콘 오버레이 */}
-        <div className="absolute top-1 right-1 bg-blue-500 text-white rounded-full p-1 opacity-80 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 bg-white text-secondary-700 rounded-full p-1 ">
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
         </div>
+        <Badge className="absolute bottom-0 right-0 rounded-none rounded-tl-lg bg-[#696969] text-secondary-400">배치 가능</Badge>
       </div>
       
-      {/* 에셋 정보 */}
-      <div>
-        <h4 className="font-medium text-xs text-gray-900 truncate mb-1 group-hover:text-blue-600 transition-colors">
+      <div className="flex flex-col px-3 py-2 gap-2">
+        <div className="font-medium text-sm text-white truncate">
           {asset.name}
-        </h4>
-        <p className="text-xs text-gray-500 truncate mb-1">
-          {asset.code}
-        </p>
+        </div>
         <div className="flex items-center justify-between">
           {asset.categoryName && (
-            <div className="text-xs text-blue-600 bg-blue-50 px-1 py-0.5 rounded inline-block flex-shrink-0">
+            <div className="text-xs text-secondary-700 bg-secondary-400 px-2 py-1 rounded-full inline-block flex-shrink-0">
               {asset.categoryName}
             </div>
           )}
-          
-          {/* 배치 가능 표시 */}
-          <div className="text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-opacity ml-1">
-            배치 가능
-          </div>
+
         </div>
       </div>
     </div>
@@ -151,31 +148,29 @@ function AssetCategoryBreadcrumb({
   goToRootCategory: () => void;
 }) {
   return (
-    <div className="px-2">
       <div className="flex items-center space-x-1 text-xs">
         <Button
           variant="ghost"
           size="sm"
           onClick={goToRootCategory}
-          className="text-blue-600 hover:text-blue-800 p-1 h-auto cursor-pointer"
+          className="text-primary-700 hover:bg-white hover:text-primary-700 p-0 h-auto cursor-pointer text-base font-medium min-w-10"
         >
           전체
         </Button>
         {currentCategoryPath.map((category: AssetCategoryResponse) => (
           <React.Fragment key={category.id}>
-            <span className="text-gray-400">/</span>
+            <span className="text-secondary-900 text-base">/</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateToCategory(category.id)}
-              className="text-blue-600 hover:text-blue-800 p-1 h-auto text-xs cursor-pointer"
+              className="text-secondary-900 hover:bg-white hover:text-secondary-800 p-0 h-auto text-base cursor-pointer font-medium min-w-10"
             >
               {category.name}
             </Button>
           </React.Fragment>
         ))}
       </div>
-    </div>
   );
 }
 
@@ -214,9 +209,8 @@ export function AssetListSideBar({
   isCollapsed = false,
   // onToggleCollapse
 }: AssetListSideBarProps) {
-  // facilityId 가져오기
+
   const { id: facilityId } = useParams<{ id: string }>();
-  // Asset Store hooks
   const {
     isLoading,
     error,
@@ -231,12 +225,9 @@ export function AssetListSideBar({
   goToRootCategory,
   } = useAssetDataWithNavigation();
 
-  // 루트 카테고리로 초기화 
   useEffect(() => {
     navigateToCategory(null);
   }, [navigateToCategory]);
-
-  // 기존 store.getAssetsByCategory 대체: 훅에서 필터된 currentAssets 제공
 
   const handleCategoryClick = (categoryId: number) => {
     navigateToCategory(categoryId);
@@ -305,42 +296,39 @@ export function AssetListSideBar({
       return (
         <div className="flex items-center justify-center h-64">
           <div className="text-red-500 text-sm text-center">
-            오류가 발생했습니다<br />
-      {error instanceof Error ? error.message : '알 수 없는 오류'}
+            오류가 발생했습니다
+            <br />
+            {error.message}
           </div>
         </div>
   );
     }
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 px-5 py-4 h-full">
 
         <div className="flex items-center gap-2">
-          {/* 브레드크럼 네비게이션 */}
-          <div className="flex-1">
             <AssetCategoryBreadcrumb
               currentCategoryPath={currentCategoryPath}
               navigateToCategory={navigateToCategory}
               goToRootCategory={goToRootCategory}
             />
-          </div>
 
-          {/* 현재 상태 표시 */}
           {!isRootLevel && (
-            <span className="text-xs text-gray-500 text-center ml-auto mr-4">
+            <Badge
+              className="ml-auto bg-white text-secondary-900"
+              variant="secondary"
+            >
                 {hasChildCategories
                   ? `하위 카테고리 ${childCategories.length}개`
                   : `에셋 ${currentAssets.length}개`}
-            </span>
+            </Badge>
           )}
         </div>
 
+        <Separator className="my-4" orientation="horizontal" />
 
-        {/* 컨텐츠 영역 */}
-        <div className="px-2">
-          {/* 2줄 그리드로 카드 배치 */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* 하위 카테고리들 표시 */}
+          <div className="grid grid-cols-2 gap-5">
             {hasChildCategories && childCategories.map((category) => (
               <AssetCategoryItem
                 key={category.id}
@@ -349,7 +337,6 @@ export function AssetListSideBar({
               />
             ))}
 
-            {/* 에셋들 표시 */}
             {!hasChildCategories && currentAssets.map((asset) => (
               <AssetItem
                 key={asset.id}
@@ -358,14 +345,11 @@ export function AssetListSideBar({
               />
             ))}
           </div>
-        </div>
 
-        {/* 빈 상태 */}
         {!hasChildCategories && currentAssets.length === 0 && selectedCategoryId && (
           <AssetCategoryEmptyState selectedCategoryId={selectedCategoryId} />
         )}
 
-        {/* 루트 레벨에서 카테고리가 없는 경우 */}
         {isRootLevel && childCategories.length === 0 && (
           <AssetCategoryEmptyState isRootLevel />
         )}
@@ -374,12 +358,16 @@ export function AssetListSideBar({
   }
 
   return (
-    <div className={`${isCollapsed ? 'w-16' : 'w-80'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${className}`}>
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+    <div className={`${isCollapsed ? 'w-16' : 'w-80'} bg-secondary-200 border-r  flex flex-col transition-all duration-300 ${className}`}>
+      <div className="px-4 py-3 flex items-center justify-between bg-secondary-800 border-b shadow-xs">
         {!isCollapsed && (
-          <h2 className="text-lg font-semibold text-gray-900">Asset Category</h2>
+          <div className="flex items-center">
+            <div className="w-[3px] h-6 rounded-full bg-primary-600 inline-block mr-3"/>
+            <label className="block text-white text-lg font-bold">
+              Asset 분류
+            </label>
+          </div>
         )}
-        
         {/* 접기/펼치기 버튼 */}
         {/* {onToggleCollapse && (
           <Button
@@ -402,7 +390,7 @@ export function AssetListSideBar({
       </div>
       
       {!isCollapsed && (
-        <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex-1 overflow-y-auto">
           {renderContent()}
         </div>
       )}
@@ -419,6 +407,6 @@ export function AssetListSideBar({
       )} */}
     </div>
   );
-};
+}
 
 export default AssetListSideBar;

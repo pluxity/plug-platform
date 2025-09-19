@@ -1,79 +1,98 @@
 import { useNavigate } from "react-router-dom";
 import { cn } from "../../../utils/utils";
-import FoldIcon from "../../../assets/icons/sidebar/fold.svg";
-import UnfoldIcon from "../../../assets/icons/sidebar/unfold.svg";
-import DepthIcon from "../../../assets/icons/sidebar/2depth.svg";
-import { SidebarItem, SidebarProps } from "./Sidebar.types";
+import { SidebarProps } from "./Sidebar.types";
+import { SecondDepthIcon } from "../../../assets/icons/sidebar/Icons";
 
-const activeColor = 'invert(23%) sepia(98%) saturate(6209%) hue-rotate(212deg) brightness(97%) contrast(101%)';
-const inactiveColor = 'invert(47%) sepia(16%) saturate(268%) hue-rotate(174deg) brightness(94%) contrast(87%)';
-
-function Sidebar({ items, activeItemId, expandedItemIds, onItemClick, onToggleExpand }: SidebarProps) {
+const Sidebar = ({
+                   items,
+                   activeItemId,
+                   expandedItemIds,
+                   onToggleExpand,
+                 }: SidebarProps) => {
   const navigate = useNavigate();
 
-  const getItemById = (id: string) => items.find(item => item.id === id);
-  const isItemExpanded = (id: string) => expandedItemIds.includes(id);
+  const renderItems = (parentId?: string) =>
+    items
+      .filter((item) => (parentId ? item.parentId === parentId : item.depth === 1))
+      .map((item) => {
+        const isActive = item.id === activeItemId;
+        const isExpanded = expandedItemIds.includes(item.id);
+        const hasChildren = items.some((i) => i.parentId === item.id);
 
-  const renderItem = (item: SidebarItem) => {
-    const { id, label, icon, to, depth, showToggle } = item;
-    const isActive = id === activeItemId;
-    const isExpanded = isItemExpanded(id);
+        const handleRowClick = () => {
+          if (hasChildren) {
+            onToggleExpand?.(item.id);
+          } else if (item.to) {
+            navigate(item.to);
+          }
+        };
 
-    if (depth === 2 && item.parentId) {
-      const parent = getItemById(item.parentId);
-      if (!parent || !isItemExpanded(parent.id)) return null;
-    }
+        return (
+          <div key={item.id}>
+            <button
+              type="button"
+              onClick={handleRowClick}
+              aria-expanded={hasChildren ? isExpanded : undefined}
+              className={cn(
+                "w-full text-left flex items-center transition-all duration-300 ease-in-out rounded-[3px]",
+                item.depth === 1 ? "h-10" : "h-7",
+                item.depth === 2 && "ml-8",
+                hasChildren
+                  ? "text-[#6B7482] hover:bg-primary-50/50"
+                  : isActive
+                    ? "bg-primary-50 text-primary-700"
+                    : "text-[#6B7482] hover:bg-primary-50/50",
+              )}
+            >
+              {!hasChildren && isActive && (
+                <div className="w-1 h-full bg-primary-700 rounded-r-sm mr-3 transition-all duration-300 animate-fadeIn" />
+              )}
 
-    return (
-      <div
-        key={id}
-        className={cn(
-          "self-stretch inline-flex justify-start items-center gap-1.5 cursor-pointer",
-          depth === 1 ? "pl-1.5 py-1.5" : "pl-2.5 py-1.5 h-7",
-          isActive ? "bg-blue-50" : "bg-white",
-          "rounded-[3px] hover:bg-blue-50"
-        )}
-          onClick={() => {
-            onItemClick(id);
-            if (showToggle) onToggleExpand(id); 
-            if (to) navigate(to);
-          }}
-      >
-        <div className="rounded-sm flex justify-center items-center gap-2.5">
-          {showToggle ? (
-            <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
-              {isExpanded ? <UnfoldIcon /> : <FoldIcon />}
-            </div>
-          ) : depth === 2 ? (
-            <div className="w-[12px] h-[12px]" style={{ filter: isActive ? activeColor : inactiveColor }}>
-              <DepthIcon />
-            </div>
-          ) : (
-            <img
-              src={icon}
-              alt="icon"
-              width={12}
-              height={12}
-              style={{ filter: isActive ? activeColor : inactiveColor }}
-            />
-          )}
-          <div className={`text-center justify-start text-sm ${depth === 1 ? 'font-bold' : ''} ${isActive ? 'text-[#0066FF]' : 'text-[#6B7482]'} hover:text-[#0066FF]`}>
-            {label}
+              <div
+                className={cn(
+                  "flex items-center gap-2.5 px-4 transition-all duration-200",
+                  !hasChildren && isActive && "translate-x-1"
+                )}
+              >
+                {item.depth === 1 ? item.icon : (
+                  <SecondDepthIcon className={cn(
+                    "transition-all duration-300",
+                    !hasChildren && isActive ? "text-primary-700" : "text-secondary-600"
+                  )} />
+                )}
+
+                <span
+                  className={cn(
+                    "text-sm transition-all duration-300",
+                    item.depth === 1 && "font-bold",
+                    !hasChildren && isActive ? "text-primary-900" : "text-[#6B7482]"
+                  )}
+                >
+                  {item.label}
+                </span>
+              </div>
+            </button>
+
+            {hasChildren && (
+              <div
+                className={cn(
+                  "overflow-hidden transition-all duration-300 ease-in-out",
+                  isExpanded ? "max-h-[500px] opacity-100 translate-y-0" : "max-h-0 opacity-0 -translate-y-2"
+                )}
+              >
+                {renderItems(item.id)}
+              </div>
+            )}
           </div>
-        </div>
-      </div>
-    );
-  };
+        );
+      });
 
   return (
-    <div className="w-64 h-screen p-5 bg-white border-r border-slate-200 overflow-hidden">
-      <div className="w-full flex flex-col justify-start items-start gap-1.5">
-        {items.map(renderItem)}
-      </div>
-    </div>
+    <nav className="w-56 py-5 bg-secondary-200/50 border-r border-slate-200 overflow-hidden shadow-[1px_0_2px_rgba(0,0,0,0.05)]" aria-label="사이드바 네비게이션">
+      <div className="w-full flex flex-col gap-1.5">{renderItems()}</div>
+    </nav>
   );
-}
+};
 
 Sidebar.displayName = "Sidebar";
-
 export { Sidebar };

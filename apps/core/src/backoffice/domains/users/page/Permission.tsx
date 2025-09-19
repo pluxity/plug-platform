@@ -5,7 +5,18 @@ import { toast } from 'sonner';
 
 import { usePermissions } from '@plug/common-services/services';
 import { deletePermission } from '@plug/common-services/services';
-import { Card, CardContent, DataTable, Button, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@plug/ui';
+import {
+  DataTable,
+  Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
 import { PermissionEditModal } from '@/backoffice/domains/users/components/PermissionEditModal';
@@ -75,6 +86,9 @@ const Permission: React.FC = () => {
         {
             header: '권한 명',
             accessorKey: 'name',
+            cell: ({ row }: { row: { original: PermissionData } }) => (
+              <div className="font-semibold text-primary-foreground">{row.original.name}</div>
+            )
         },
         {
             header: '권한 목록',
@@ -85,8 +99,8 @@ const Permission: React.FC = () => {
             header: '관리',
             cell: ({row}: {row: { original: PermissionData }}) => (
                 <div className="flex space-x-2">
-                    <Button variant="secondary" size="sm" onClick={() => handleEdit(row.original.id)}>수정</Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDelete(row.original)}>삭제</Button>
+                    <Button size="sm" onClick={() => handleEdit(row.original.id)}>수정</Button>
+                    <Button size="sm" variant="secondary" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
             )
         } 
@@ -94,15 +108,12 @@ const Permission: React.FC = () => {
 
     return (
         <PageContainer title="권한 관리">
-            <Card>
-                <CardContent>
-                    <DataTable 
-                        columns={columns} 
-                        data={permissionData} 
-                        buttons={<Button onClick={handleCreate}>등록</Button>}
-                    />
-                </CardContent>
-            </Card>
+          <DataTable
+            columns={columns}
+            data={permissionData}
+            buttons={<Button onClick={handleCreate}>등록</Button>}
+            pageDescription="권한에 따른 접근 여부 관리가 가능합니다."
+          />
 
             <PermissionCreateModal 
                 isOpen={createModalOpen}    

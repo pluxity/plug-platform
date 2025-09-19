@@ -16,6 +16,7 @@
     /* Primary – Blue (Coolors 톤, 로고 계열) */
     --color-primary-100: #F5F9FF;
     --color-primary-200: #E8F1FC;
+    --color-primary-250: #deebfb;
     --color-primary-300: #D1E3FA;
     --color-primary-400: #A9CBF6;
     --color-primary-500: #7EACF0;
@@ -198,8 +199,8 @@
     --accent-foreground: var(--color-accent-foreground);
 
     --destructive: var(--color-danger-600);             /* #EF4444 */
-    --border: var(--color-secondary-400);               /* #E5E7EB */
-    --input: var(--color-secondary-400);
+    --border: var(--color-secondary-500);               /* #E5E7EB */
+    --input: var(--color-secondary-500);
     --ring: var(--color-primary-600);                   /* #528DE8 */
 
     /* Charts (임의 예시) */
@@ -289,7 +290,7 @@
 /* =========================================================
  * 6) 글래스모피즘 유틸리티 클래스
  * =======================================================*/
- @layer utilities { 
+ @layer utilities {
     /* 기본 상태 - liquid glass 없음 */
     .liquid-glass {
         position: relative;
@@ -313,7 +314,7 @@
             0 8px 32px rgba(0, 0, 0, 0.12),
             0 2px 8px rgba(0, 0, 0, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        
+
         backdrop-filter: 
             blur(var(--glass-blur)) 
             saturate(var(--glass-saturation));
@@ -389,4 +390,19 @@
         background: rgba(245, 158, 11, 0.25);
         border-color: rgba(245, 158, 11, 0.4);
     }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
 }

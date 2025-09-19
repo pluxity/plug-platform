@@ -6,7 +6,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useFileUploadWithInfo, FileResponse } from '@plug/common-services';
 import { Button, Input } from '@plug/ui';
 interface FileUploadProps {
-  label: string;
   accept?: string;
   onFileChange: (fileId: number | null) => void;
   onFileUploaded?: (fileInfo: FileResponse) => void;
@@ -21,7 +20,6 @@ interface FileUploadProps {
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
-  label,
   accept,
   onFileChange,
   onFileUploaded,
@@ -193,9 +191,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   const getFileIcon = () => {
     if (fileType === 'image') {
-      return <Image size={20} className="text-blue-500" />;
+      return <Image size={20} className="text-primary-500" />;
     }
-    return <FileText size={20} className="text-blue-500" />;
+    return <FileText size={20} className="text-primary-500" />;
   };
 
   const displayFileName = fileInfo?.originalFileName || 
@@ -203,12 +201,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     (currentFileId ? `파일 ID: ${currentFileId}` : '');
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium mb-2">
-        {label}
-      </label>
-      
-      {/* 숨겨진 파일 입력 */}
+    <div className="w-full">
       <Input
         ref={fileInputRef}
         type="file"
@@ -217,21 +210,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         className="hidden"
         disabled={disabled}
       />
-      
-      {/* 업로드된 파일 표시 */}
-      {(fileInfo || currentFileInfo || currentFileId) && (
-        <div className="space-y-3">
-          {/* 이미지 미리보기 */}
-          {fileType === 'image' && (currentImageUrl || fileInfo?.url) && (
-            <div className="flex justify-center">
-              <div className="relative w-full max-w-md">
+
+      <div className="flex flex-col gap-4">
+        {(fileInfo || currentFileInfo || currentFileId) && (
+          <div className="w-full bg-secondary-500 rounded-md">
+            {fileType === 'image' && (currentImageUrl || fileInfo?.url) ? (
+              <div className="relative ">
                 <img
                   src={fileInfo?.url || currentImageUrl || ''}
                   alt="미리보기"
-                  className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                  className="w-full h-60 object-contain"
                   onError={() => setCurrentImageUrl(null)}
                 />
-                {/* Edit 모드가 아닐 때만 X 버튼 표시 */}
                 {!isEditMode && (
                   <Button
                     type="button"
@@ -239,95 +229,102 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     size="sm"
                     onClick={handleRemoveFile}
                     disabled={disabled || isLoading}
-                    className="absolute top-2 right-2 bg-red-500 text-white hover:bg-red-600 rounded-full p-1"
+                    className="absolute top-3 right-3 bg-white/90 hover:bg-white shadow-sm rounded-full p-2 transition-all"
+                  >
+                    <X size={16} className="text-gray-600" />
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  {getFileIcon()}
+                  <span className="text-sm font-medium text-gray-700 truncate max-w-[240px]">
+                {displayFileName}
+              </span>
+                </div>
+                {!isEditMode && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveFile}
+                    disabled={disabled || isLoading}
+                    className="text-gray-500 hover:text-red-600 transition-colors"
                   >
                     <X size={16} />
                   </Button>
                 )}
               </div>
-            </div>
-          )}
-          
-          {(fileType !== 'image' || (!currentImageUrl && !fileInfo?.url)) && (
-            <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
-              <div className="flex items-center space-x-2">
-                {getFileIcon()}
-                <span className="text-sm text-gray-700 truncate">
-                  {displayFileName}
-                </span>
-              </div>
-              {!isEditMode && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRemoveFile}
-                  disabled={disabled || isLoading}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <X size={16} />
-                </Button>
+            )}
+          </div>
+        )}
+
+        <div
+          className={`
+        relative w-full rounded-md transition-all duration-200
+        ${(fileInfo || currentFileInfo || currentFileId) ? 'p-4' : 'p-8'}
+        ${isDragOver
+            ? (dragValidFileType
+                ? 'border-primary-500 bg-primary-50/50'
+                : 'border-red-500 bg-red-50/50'
+            )
+            : 'bg-primary-200 hover:bg-primary-300'
+          }
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+      `}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={!disabled ? handleButtonClick : undefined}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Upload
+              className={`
+            'h-8 w-8' 
+            ${isDragOver
+                ? (dragValidFileType ? 'text-primary-500' : 'text-red-500')
+                : 'text-primary-700'
+              }
+            transition-colors duration-200
+          `}
+            />
+            <div className="text-center">
+              <p className={`
+            font-medium
+            ${(fileInfo || currentFileInfo || currentFileId) ? 'text-sm' : 'text-base'} 
+            ${isDragOver
+                ? (dragValidFileType ? 'text-primary-700' : 'text-red-700')
+                : 'text-primary-700'
+              }
+          `}>
+                {isDragOver
+                  ? (dragValidFileType
+                      ? `${fileType === 'image' ? '이미지' : '파일'}를 놓아주세요`
+                      : `올바른 ${fileType === 'image' ? '이미지' : '파일'} 형식이 아닙니다`
+                  )
+                  : ((fileInfo || currentFileInfo || currentFileId)
+                      ? (fileType === 'image' ? '새 이미지 업로드' : '새 파일 업로드')
+                      : (placeholder || '파일을 드래그하거나 클릭하여 업로드')
+                  )
+                }
+              </p>
+              {accept && !(fileInfo || currentFileInfo || currentFileId) && !isDragOver && (
+                <p className="mt-1 text-xs text-gray-500">
+                  지원 형식: {accept}
+                </p>
               )}
             </div>
-          )}
-
+          </div>
         </div>
-      )}
-      
-      <div
-        className={`
-          border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors
-          ${(fileInfo || currentFileInfo || currentFileId) ? 'p-3' : 'p-6'}
-          ${isDragOver 
-            ? (dragValidFileType 
-              ? 'border-blue-500 bg-blue-50' 
-              : 'border-red-500 bg-red-50'
-            ) 
-            : 'border-gray-300 hover:border-gray-400'
-          }
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={!disabled ? handleButtonClick : undefined}
-      >
-        <Upload className={`mx-auto ${(fileInfo || currentFileInfo || currentFileId) ? 'h-6 w-6' : 'h-12 w-12'} 
-          ${isDragOver 
-            ? (dragValidFileType ? 'text-blue-500' : 'text-red-500') 
-            : 'text-gray-400'
-          }`} 
-        />
-        <p className={`mt-2 text-sm ${(fileInfo || currentFileInfo || currentFileId) ? 'text-xs' : ''} 
-          ${isDragOver 
-            ? (dragValidFileType ? 'text-blue-600' : 'text-red-600') 
-            : 'text-gray-600'
-          }`}
-        >
-          {isDragOver 
-            ? (dragValidFileType 
-              ? `${fileType === 'image' ? '이미지' : '파일'}를 놓아주세요` 
-              : `올바른 ${fileType === 'image' ? '이미지' : '파일'} 형식이 아닙니다`
-            )
-            : ((fileInfo || currentFileInfo || currentFileId) 
-              ? (fileType === 'image' ? '새 이미지 업로드' : '새 파일 업로드')
-              : (placeholder || '파일을 드래그하거나 클릭하여 업로드')
-            )
-          }
-        </p>
-        {accept && !(fileInfo || currentFileInfo || currentFileId) && !isDragOver && (
-          <p className="text-xs text-gray-500">
-            지원 형식: {accept}
-          </p>
+
+        {isLoading && (
+          <div className="flex items-center justify-center p-3 bg-primary-50 rounded-lg">
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-600 border-t-transparent"></div>
+            <span className="ml-3 text-sm font-medium text-primary-700">업로드 중...</span>
+          </div>
         )}
       </div>
-      
-      {isLoading && (
-        <div className="flex items-center justify-center p-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-sm text-gray-600">업로드 중...</span>
-        </div>
-      )}
     </div>
   );
 };

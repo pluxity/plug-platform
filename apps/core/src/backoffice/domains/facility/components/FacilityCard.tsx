@@ -63,7 +63,7 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 pt-4">
+    <Card className="duration-200 pt-4">
       <CardHeader 
         className="cursor-pointer" 
         onClick={handleCardClick}
@@ -72,22 +72,22 @@ const FacilityCard: React.FC<FacilityCardProps> = ({
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg font-semibold text-gray-900 truncate flex">
               {facility.name}
-              <Badge variant="outline" className="ml-2">
+              <Badge className="ml-2 rounded-full bg-primary-300 text-primary-900 border ">
                 {typeConfig?.displayName || '알 수 없음'}
               </Badge>
             </CardTitle>
           </div>
           <CardAction className="self-center">
-            <code className="px-2 py-1 text-xs font-mono bg-gray-100 text-gray-700 rounded border">
+            <code className="px-2 py-1 text-xs font-mono bg-secondary-500/70 text-gray-700 rounded">
               {facility.code}
             </code>
           </CardAction>
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className=" pt-1 pb-3">
         <div>
-          <div className="relative group my-4">
+          <div className="relative group">
             {facility.thumbnail?.url ? (
               <div className="relative overflow-hidden rounded-md border">
                 <img

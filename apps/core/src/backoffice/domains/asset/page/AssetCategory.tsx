@@ -178,8 +178,7 @@ const AssetCategory: React.FC = () => {
 
   return (
     <PageContainer title="에셋 카테고리 관리">
-      <div className="space-y-6">
-        {/* 카테고리 관리 컴포넌트 */}
+      <div className="space-y-6 h-full">
         {!isLoading && !hasError && (
           <CategoryComponent
             items={categories}
@@ -193,7 +192,7 @@ const AssetCategory: React.FC = () => {
             onThumbnailUpload={handleThumbnailUpload}
             enableDragDrop={true}
             disabled={createAssetCategory.isLoading}
-            thumbnailSize="large"
+            thumbnailSize="medium"
             enableThumbnail={true}
           />
         )}
