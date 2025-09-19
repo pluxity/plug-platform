@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { toast } from 'sonner';
 import { poiUnassignedText } from '@/global/utils/displayUtils';
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import type { AssetResponse, AssetCategoryResponse } from '@plug/common-services';
 import { createFeature } from '@plug/common-services';
 import { Poi } from '@plug/engine';
