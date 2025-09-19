@@ -10,6 +10,7 @@ function Avatar({
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
+
       className={cn(
         "relative flex",
         className

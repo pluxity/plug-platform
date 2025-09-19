@@ -208,7 +208,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
         style={{
           padding: "12px",
           paddingLeft: "24px",
-          paddingRight: "20px",
+          paddingRight: item.depth === 1 ? "24px" : "20px",
         }}
         draggable={enableDragDrop && !disabled}
         onDragStart={handleDragStart}
@@ -467,10 +467,7 @@ export const CategoryNode: React.FC<CategoryNodeProps> = ({
                 />
               )}
               <div className="flex-1" />
-              <Button
-                onClick={handleAddSubmit}
-                disabled={disabled}
-              >
+              <Button onClick={handleAddSubmit} disabled={disabled}>
                 수정
               </Button>
               <Button

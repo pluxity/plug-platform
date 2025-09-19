@@ -16,7 +16,6 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-  Badge
 } from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts';
