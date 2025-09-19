@@ -100,8 +100,8 @@ const Permission: React.FC = () => {
             header: '관리',
             cell: ({row}: {row: { original: PermissionData }}) => (
                 <div className="flex space-x-2">
-                    <Badge onClick={() => handleEdit(row.original.id)}>수정</Badge>
-                    <Badge variant="secondary" onClick={() => handleDelete(row.original)}>삭제</Badge>
+                    <Button size="sm" onClick={() => handleEdit(row.original.id)}>수정</Button>
+                    <Button size="sm" variant="secondary" onClick={() => handleDelete(row.original)}>삭제</Button>
                 </div>
             )
         } 

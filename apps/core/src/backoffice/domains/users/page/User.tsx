@@ -15,7 +15,6 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-  Badge
 } from "@plug/ui";
 
 import { PageContainer } from '@/backoffice/common/view/layouts'
@@ -138,23 +137,27 @@ const User: React.FC = () => {
             header: '관리',
             cell: ({row}: {row: { original: UserData }}) => (
               <div className="flex space-x-2">
-                <Badge
-                  variant="outline"
-                  onClick={() => handlePasswordInit(row.original.id)}
+                <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-secondary-800"
+                    onClick={() => handlePasswordInit(row.original.id)}
                 >
                   비밀번호 초기화
-                </Badge>
-                <Badge
-                  onClick={() => handleEdit(row.original.id)}
+                </Button>
+                <Button
+                    size="sm"
+                    onClick={() => handleEdit(row.original.id)}
                 >
                   수정
-                </Badge>
-                <Badge
-                  variant="secondary"
-                  onClick={() => handleDelete(row.original)}
+                </Button>
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleDelete(row.original)}
                 > 
                   삭제
-                </Badge>
+                </Button>
               </div>
             ),
         },
