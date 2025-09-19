@@ -51,7 +51,6 @@ const DashboardLayout: React.FC = () => {
 
   useEffect(() => {
     const activeMenu = findActiveMenu(location.pathname, AsideMenuItems);
-
     setActiveItem(activeMenu?.id ?? null);
 
     if (activeMenu) {
@@ -68,13 +67,7 @@ const DashboardLayout: React.FC = () => {
     }
   }, [location.pathname, setActiveItem, setExpandedItems]);
 
-  const handleClick = (id: string) => {
-    setActiveItem(id);
-  };
-
-  const handleToggle = (id: string) => {
-    toggleExpandedItem(id);
-  };
+  const handleToggle = (id: string) => toggleExpandedItem(id);
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -82,10 +75,8 @@ const DashboardLayout: React.FC = () => {
         items={AsideMenuItems}
         activeItemId={activeItem}
         expandedItemIds={expandedItems}
-        onItemClick={handleClick}
         onToggleExpand={handleToggle}
       />
-
       <main className="flex-1 p-10 overflow-auto flex flex-col">
         <Outlet />
       </main>

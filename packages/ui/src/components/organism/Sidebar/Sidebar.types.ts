@@ -12,6 +12,6 @@ export interface SidebarProps {
   items: SidebarItem[];
   activeItemId: string | null;
   expandedItemIds: string[];
-  onItemClick: (id: string) => void;
+  // onItemClick: (id: string) => void;
   onToggleExpand: (id: string) => void;
 }
