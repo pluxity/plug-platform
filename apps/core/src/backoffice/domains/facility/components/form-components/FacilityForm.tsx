@@ -67,7 +67,7 @@ export const FacilityForm: React.FC<ExtendedFacilityFormProps> = ({
             시설 기본 정보
           </div>
           <span className="text-sm bg-primary-200 text-primary-800 px-2 py-1 rounded">
-            {domainConfig.displayName}
+            {domainConfig?.displayName}
           </span>
         </div>
 
