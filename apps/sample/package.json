@@ -10,22 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@plug/ui": "workspace:*",
-    "@plug/engine": "workspace:*",
     "@plug/api-hooks": "workspace:*",
-    "react-router-dom": "^7.3.0",
-    "zustand": "^5.0.3",
-    "tailwindcss": "^4.0.6"
+    "@plug/engine": "workspace:*",
+    "@plug/ui": "workspace:*",
+    "react-router-dom": "^7.9.5",
+    "tailwindcss": "^4.1.17",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@eslint/js": "^9.19.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.19.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.18",
-    "globals": "^15.14.0",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "^8.22.0",
-    "vite": "^6.1.2"
+    "@eslint/js": "^9.39.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^15.15.0",
+    "typescript": "~5.7.3",
+    "typescript-eslint": "^8.46.3",
+    "vite": "^6.4.1"
   }
 }

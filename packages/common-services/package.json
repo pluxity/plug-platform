@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@plug/api-hooks": "workspace:*",
-    "swr": "^2.2.5"
+    "swr": "^2.3.6"
   }
-} 
+}
