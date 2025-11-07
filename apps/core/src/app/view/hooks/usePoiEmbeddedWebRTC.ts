@@ -69,7 +69,7 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     if (!videoEl) return;
 
   const metaEnv = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
-  const host = metaEnv.VITE_WEBRTC_HOST || metaEnv.VITE_CCTV_HOST || '192.168.4.8';
+  const host = metaEnv.VITE_WEBRTC_HOST || metaEnv.VITE_CCTV_HOST || '192.168.10.181';
   const port = metaEnv.VITE_WEBRTC_PORT || metaEnv.VITE_CCTV_PORT || '8889';
 
     const pc = prepareReceiverPeerConnection((stream) => {

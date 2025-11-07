@@ -22,15 +22,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* Alias - IDE 및 일부 번들러를 위해 src를 가리키도록 설정 */
-    /* 빌드 시에는 프로젝트 레퍼런스를 통해 dist 폴더의 결과물을 사용합니다. */
-    "baseUrl": ".",
-    "paths": {
-      "@plug/ui": ["packages/ui"],
-      "@plug/engine": ["packages/engine/src"],
-      "@plug/api-hooks": ["packages/api-hooks/src"],
-      "@plug/common-services": ["packages/common-services/src"],
-    }
   }
 }

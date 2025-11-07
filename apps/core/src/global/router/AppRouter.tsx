@@ -13,8 +13,11 @@ import React from 'react';
 import AppLayout from '@/app/view/layouts/AppLayout';
 import LoginPage from '@/global/pages/LoginPage';
 const AppRouter: React.FC = () => {
+
+  const basename = import.meta.env.VITE_CONTEXT_PATH || '/'
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route

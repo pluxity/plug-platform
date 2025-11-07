@@ -4,7 +4,7 @@ import { createErrorFromResponse } from "../util/apiUtils";
 
 export const baseKy = ky.create({
   credentials: 'include',
-  prefixUrl: '/api',
+  prefixUrl: import.meta.env.VITE_API_BASE_URL || '/api',
   headers: {
     'Content-Type': 'application/json'
   },

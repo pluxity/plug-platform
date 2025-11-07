@@ -40,7 +40,7 @@ const DeviceCategoryChips = ({
         depth: 0,
         thumbnailFile: {
           id: -1,
-          url: '/images/icons/cctv.png',
+          url: './images/icons/cctv.png',
         },
       };
       return [cctvCategory, ...baseCategories];
@@ -77,7 +77,7 @@ const DeviceCategoryChips = ({
       depth: 0,
       thumbnailFile: {
         id: -1,
-        url: '/images/icons/cctv.png',
+        url: './images/icons/cctv.png',
       },
     };
 

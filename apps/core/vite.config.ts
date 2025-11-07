@@ -5,36 +5,40 @@ import tailwindcss from '@tailwindcss/vite';
 import svgr from 'vite-plugin-svgr'
 import cesium from 'vite-plugin-cesium'
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    react(), 
-    tailwindcss(),
-    svgr({
-      include: "**/*.svg",
-    }),
-    cesium(),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@plug/core': path.resolve(__dirname, './src')
-    }
-  },
-  server: {
-    host: true,
-    port: 4000,
-    proxy: {
-        '/api': {
-            target: 'http://192.168.4.8:8080',
-            changeOrigin: true,
-            secure: false,
-            rewrite: (path) => path.replace(/^\/api/, '')
-        }
-    }
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: true
+export default defineConfig(({ mode }) => {
+  const base = mode === 'development' ? '/' : './'
+
+  return {
+    base,
+    plugins: [
+      react(), 
+      tailwindcss(),
+      svgr({
+        include: "**/*.svg",
+      }),
+      cesium(),
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+        '@plug/core': path.resolve(__dirname, './src')
+      }
+    },
+    server: {
+      host: true,
+      port: 4000,
+      proxy: {
+          '/api': {
+              target: 'http://192.168.10.181:8209',
+              changeOrigin: true,
+              secure: false,
+              rewrite: (path) => path.replace(/^\/api/, '')
+          }
+      }
+    },
+    build: {
+      outDir: 'dist',
+      sourcemap: true
+      },
   }
 })

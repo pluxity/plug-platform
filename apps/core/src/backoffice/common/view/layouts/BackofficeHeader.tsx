@@ -18,7 +18,7 @@ const BackofficeHeader: React.FC = () => {
                 aria-label="홈으로 이동"
               >
                 <img
-                  src="/logo.svg"
+                  src="logo.svg"
                   alt="Plug Platform"
                   className="h-8 w-auto select-none"
                   draggable={false}

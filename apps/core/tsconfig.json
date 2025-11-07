@@ -22,7 +22,6 @@
     "rootDir": "src",
     "jsx": "react-jsx",
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@plug/core/*": ["./src/*"],
