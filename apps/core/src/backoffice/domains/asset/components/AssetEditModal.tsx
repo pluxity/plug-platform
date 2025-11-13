@@ -91,7 +91,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
         setThumbnailPreview(null);
       }
     }
-  }, [isOpen, assetId, data, modalForm, clearModelInfo, clearThumbnailInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, assetId, data]);
 
   const handleModelChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,7 +158,8 @@ export const AssetEditModal: React.FC<AssetEditModalProps> = ({
     clearThumbnailInfo();
     onClose();
     mutate();
-  }, [data, onClose, mutate, modalForm, clearModelInfo, clearThumbnailInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, onClose]);
 
   const handleSubmit = useCallback(async (data: AssetFormData) => {
       try {
