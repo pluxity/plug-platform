@@ -1,5 +1,5 @@
 import { buildWhepUrl, performWhepNegotiation, prepareReceiverPeerConnection } from '@/global/webrtc/whep';
-import { createVideoPlayerHtml } from '@/global/utils/displayUtils';
+import { createVideoWithTextHtml } from '@/global/utils/displayUtils';
 
 import { useCallback, useEffect, useRef } from 'react';
 
@@ -25,6 +25,7 @@ interface PoiEventTarget { id?: string; property?: { deviceId?: string | number 
 export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}): UsePoiEmbeddedWebRTCResult {
   const { onError, muted = true, controls = true } = options;
   const poiSessionsRef = useRef<Record<string, { pc: RTCPeerConnection; abort?: AbortController }>>({});
+  const poiOriginalHtmlRef = useRef<Record<string, string>>({});
 
   const stopPoi = useCallback((poiId: string) => {
     const session = poiSessionsRef.current[poiId];
@@ -38,6 +39,15 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     } finally {
       delete poiSessionsRef.current[poiId];
     }
+    // 원래 HTML로 복원
+    const originalHtml = poiOriginalHtmlRef.current[poiId];
+    if (originalHtml) {
+      try {
+        Poi.SetTextInnerHtml(poiId, originalHtml);
+      } catch (e) {
+        console.error('[usePoiEmbeddedWebRTC] restore HTML error', poiId, e);
+      }
+    }
   }, []);
 
   const stopAll = useCallback(() => {
@@ -47,12 +57,25 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
   const startPoiVideo = useCallback(async (poiId: string, streamKey?: string | number | null) => {
     if (!poiId) return;
     const path = (streamKey ?? poiId)?.toString();
+
+    // 원래 HTML 저장 (처음 한 번만)
+    if (!poiOriginalHtmlRef.current[poiId]) {
+      try {
+        const poiData = Poi.Export(poiId);
+        poiOriginalHtmlRef.current[poiId] = poiData?.htmlString || '';
+      } catch (e) {
+        console.warn('[usePoiEmbeddedWebRTC] Failed to export POI HTML', poiId, e);
+        poiOriginalHtmlRef.current[poiId] = '';
+      }
+    }
+
     stopPoi(poiId);
 
     const videoId = `poi-video-${poiId}`;
     const closeBtnId = `poi-video-close-${poiId}`;
+    const originalHtml = poiOriginalHtmlRef.current[poiId] || '';
 
-    const html = createVideoPlayerHtml(videoId, closeBtnId, muted, controls);
+    const html = createVideoWithTextHtml(videoId, closeBtnId, originalHtml, muted, controls);
     Poi.SetTextInnerHtml(poiId, html);
 
     await new Promise((r) => setTimeout(r, 0));
@@ -62,7 +85,6 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
         stopPoi(poiId);
-        try { Poi.SetTextInnerHtml(poiId, ''); } catch { /* ignore */ }
       }, { once: true });
     }
     
@@ -70,7 +92,7 @@ export function usePoiEmbeddedWebRTC(options: UsePoiEmbeddedWebRTCOptions = {}):
 
   const metaEnv = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
   const host = metaEnv.VITE_WEBRTC_HOST || metaEnv.VITE_CCTV_HOST || '192.168.10.181';
-  const port = metaEnv.VITE_WEBRTC_PORT || metaEnv.VITE_CCTV_PORT || '8889';
+  const port = metaEnv.VITE_WEBRTC_PORT || metaEnv.VITE_CCTV_PORT || '8206';
 
     const pc = prepareReceiverPeerConnection((stream) => {
       if (videoEl && !videoEl.srcObject) {

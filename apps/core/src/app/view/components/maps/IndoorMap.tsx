@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState, useRef } from 'react'
 
 import type { DeviceResponse, FacilityType } from '@plug/common-services'
-import { Poi } from '@plug/engine'
+import { Poi, Camera } from '@plug/engine'
 
 import { MapScene } from '@/global/components/indoor-map'
 import { useAssets } from '@/global/store/assetStore'
@@ -59,6 +59,16 @@ const IndoorMap = ({ facilityId, facilityType, onGoOutdoor }: IndoorMapProps) =>
 
   useEffect(() => () => { handleOutdoor() }, [handleOutdoor])
 
+  // 전역 함수 등록: HTML에서 POI 클릭 시 카메라 이동
+  useEffect(() => {
+    window.__moveToPoiCamera = (poiId: string) => {
+      Camera.MoveToPoi(poiId, 1.0, { x: 0, y: 0, z: 0 }); // 1초간 카메라 이동
+    };
+    return () => {
+      delete window.__moveToPoiCamera;
+    };
+  }, []);
+
   const [selectedDevice, setSelectedDevice] = useState<DeviceResponse | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const findByCategoryId = useIndoorStore(s => s.findByCategoryId)
@@ -70,9 +80,10 @@ const IndoorMap = ({ facilityId, facilityType, onGoOutdoor }: IndoorMapProps) =>
   const buildDeviceLabelHtml = useCallback((device: DeviceLike) => {
     const cache = device.id ? latestCacheRef.current[device.id] : undefined
     const metrics = cache?.metrics && Object.keys(cache.metrics).length ? cache.metrics : null
+    const featureId = device.feature?.id;
     if (!metrics) {
       const fallback = (device.name || '—').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      return getPoiHtmlString(fallback, 'UNASSIGNED')
+      return getPoiHtmlString(fallback, 'UNASSIGNED', featureId)
     }
     const entries = Object.entries(metrics)
     const picked = entries.slice(0, 3)
@@ -82,7 +93,7 @@ const IndoorMap = ({ facilityId, facilityType, onGoOutdoor }: IndoorMapProps) =>
       return (val + unit).replace(/</g, '&lt;').replace(/>/g, '&gt;')
     })
     const label = parts.join(' / ') || (device.name || '—')
-    return getPoiHtmlString(label, 'ASSIGNED')
+    return getPoiHtmlString(label, 'ASSIGNED', featureId)
   }, [])
 
   const clearHighlights = useCallback(() => {
