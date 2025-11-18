@@ -1,0 +1,446 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
+
+<Meta title="Getting Started" />
+
+# Plug Platform UI
+
+**실내외 통합 관제 시스템을 위한 현대적이고 접근성 높은 UI 컴포넌트 라이브러리**
+
+React 19, TypeScript, Tailwind CSS v4로 구축된 전문 관제 시스템 UI 라이브러리입니다.
+
+## 디자인 시스템
+
+이 라이브러리는 **Atomic Design** 원칙을 따르며, 복잡도에 따라 컴포넌트를 구성합니다:
+
+- **Atoms** (원자): 기본 빌딩 블록 (Button, Input, Badge 등)
+- **Molecules** (분자): Atom의 간단한 조합
+- **Organisms** (유기체): 복잡하고 기능이 완전한 컴포넌트
+
+## 기술 스택
+
+- ⚛️ **React 19** - 최신 React 기능 활용
+- 🔷 **TypeScript** - 완전한 타입 안정성
+- 🎨 **Tailwind CSS v4** - 유틸리티 기반 스타일링
+- ♿ **Radix UI** - 접근성 우선 프리미티브
+- 📚 **Storybook 8.6** - 인터랙티브 문서화
+- 📊 **TanStack Table** - 강력한 테이블 기능
+- 📈 **Chart.js & Recharts** - 데이터 시각화
+
+---
+
+## 색상 팔레트
+
+우리의 디자인 시스템은 브랜드 색상과 시맨틱 변형을 포함한 포괄적인 색상 팔레트를 사용합니다. 각 색상은 최대한의 유연성을 위해 100-1000 단계의 음영을 제공합니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Primary (주요)"
+    subtitle="주요 브랜드 색상 - Blue"
+    colors={{
+      100: '#F5F9FF',
+      200: '#E8F1FC',
+      250: '#deebfb',
+      300: '#D1E3FA',
+      400: '#A9CBF6',
+      500: '#7EACF0',
+      600: '#528DE8',
+      700: '#2E61E6',
+      800: '#1E4FC2',
+      900: '#153A91',
+      1000: '#0F275F',
+    }}
+  />
+  <ColorItem
+    title="Secondary (중립)"
+    subtitle="UI 배경 및 본문 - Neutral Gray"
+    colors={{
+      100: '#FFFFFF',
+      200: '#F9FAFB',
+      300: '#F3F4F6',
+      400: '#E5E7EB',
+      500: '#D1D5DB',
+      600: '#9CA3AF',
+      700: '#6B7280',
+      800: '#4B5563',
+      900: '#374151',
+      1000: '#1F2937',
+    }}
+  />
+  <ColorItem
+    title="Accent (강조)"
+    subtitle="성공 및 긍정적 액션 - Green"
+    colors={{
+      100: '#F0FDF4',
+      200: '#DCFCE7',
+      300: '#BBF7D0',
+      400: '#86EFAC',
+      500: '#4ADE80',
+      600: '#22C55E',
+      700: '#16A34A',
+      800: '#15803D',
+      900: '#166534',
+      1000: '#14532D',
+    }}
+  />
+  <ColorItem
+    title="Danger (위험)"
+    subtitle="에러 및 삭제 - Red"
+    colors={{
+      100: '#FFF5F5',
+      200: '#FEE2E2',
+      300: '#FECACA',
+      400: '#FCA5A5',
+      500: '#F87171',
+      600: '#EF4444',
+      700: '#DC2626',
+      800: '#B91C1C',
+      900: '#991B1B',
+      1000: '#7F1D1D',
+    }}
+  />
+  <ColorItem
+    title="Warning (경고)"
+    subtitle="주의 메시지 및 알림 - Yellow/Amber"
+    colors={{
+      100: '#FFFBEB',
+      200: '#FEF3C7',
+      300: '#FDE68A',
+      400: '#FCD34D',
+      500: '#FBBF24',
+      600: '#F59E0B',
+      700: '#D97706',
+      800: '#B45309',
+      900: '#92400E',
+      1000: '#78350F',
+    }}
+  />
+</ColorPalette>
+
+### 색상 사용하기
+
+모든 색상은 Tailwind CSS 클래스를 통해 사용할 수 있습니다:
+
+```tsx
+// Primary (Blue)
+<div className="bg-primary-700 text-white">주요 버튼</div>
+
+// Secondary (Gray)
+<div className="bg-secondary-200 text-secondary-1000">회색 배경</div>
+
+// Accent (Green)
+<div className="bg-accent-600 text-white">성공 메시지</div>
+
+// Danger (Red)
+<div className="bg-danger-600 text-white">오류 메시지</div>
+
+// Warning (Amber)
+<div className="bg-warning-600 text-white">경고 알림</div>
+
+// 텍스트 색상
+<p className="text-primary-700">주요 텍스트</p>
+<p className="text-accent-700">성공 텍스트</p>
+<p className="text-danger-600">오류 텍스트</p>
+
+// 테두리 색상
+<div className="border border-secondary-400">회색 테두리</div>
+<div className="border-2 border-primary-600">주요 테두리</div>
+```
+
+### 시맨틱 색상 사용법
+
+- **Primary**: 주요 브랜드 액션, 링크, 포커스 상태
+- **Accent**: 확인, 성공적인 작업, 긍정적 피드백
+- **Warning**: 주의 메시지, 잠재적 문제, 주의 필요
+- **Danger**: 파괴적 액션, 오류 상태, 중요 알림
+- **Secondary**: 텍스트, 배경, 테두리, 비활성 상태
+
+---
+
+## 디자인 토큰
+
+### Border Radius (모서리 둥글기)
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginTop: '1rem', marginBottom: '2rem' }}>
+  <div>
+    <div style={{ width: '100px', height: '100px', backgroundColor: '#A9CBF6', borderRadius: '0.375rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>sm</strong> - 0.375rem (6px)</p>
+    <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>작은 요소</p>
+  </div>
+  <div>
+    <div style={{ width: '100px', height: '100px', backgroundColor: '#A9CBF6', borderRadius: '0.625rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>default</strong> - 0.625rem (10px)</p>
+    <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>일반 컴포넌트</p>
+  </div>
+  <div>
+    <div style={{ width: '100px', height: '100px', backgroundColor: '#A9CBF6', borderRadius: '0.75rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>md</strong> - 0.75rem (12px)</p>
+    <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>중간 크기</p>
+  </div>
+  <div>
+    <div style={{ width: '100px', height: '100px', backgroundColor: '#A9CBF6', borderRadius: '0.875rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>lg</strong> - 0.875rem (14px)</p>
+    <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>카드, 패널</p>
+  </div>
+</div>
+
+### Typography (타이포그래피)
+
+<div style={{ marginTop: '1rem', marginBottom: '2rem' }}>
+  <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#F9FAFB', borderRadius: '0.625rem' }}>
+    <p style={{ fontFamily: 'SUIT, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', fontSize: '1rem', margin: 0 }}>
+      <strong>SUIT</strong> - 기본 본문 폰트
+    </p>
+    <p style={{ fontFamily: 'SUIT, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', fontSize: '0.875rem', color: '#6B7280', margin: '0.5rem 0 0 0' }}>
+      한글 최적화 산세리프 서체
+    </p>
+  </div>
+  <div style={{ padding: '1rem', backgroundColor: '#F9FAFB', borderRadius: '0.625rem' }}>
+    <p style={{ fontFamily: 'ui-monospace, "Cascadia Code", monospace', fontSize: '1rem', margin: 0 }}>
+      <strong>Monospace</strong> - 코드 표시용 폰트
+    </p>
+    <p style={{ fontFamily: 'ui-monospace, "Cascadia Code", monospace', fontSize: '0.875rem', color: '#6B7280', margin: '0.5rem 0 0 0' }}>
+      코드 블록 및 고정폭 텍스트
+    </p>
+  </div>
+</div>
+
+### Shadow (그림자)
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginTop: '1rem', marginBottom: '2rem' }}>
+  <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.625rem', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold' }}>Soft</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#6B7280' }}>가벼운 그림자</p>
+  </div>
+  <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.625rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold' }}>Medium</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#6B7280' }}>중간 그림자</p>
+  </div>
+  <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.625rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold' }}>Large</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#6B7280' }}>큰 그림자</p>
+  </div>
+  <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.625rem', boxShadow: '0 0 24px rgba(46, 97, 230, 0.2)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold' }}>Glow</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#6B7280' }}>발광 효과</p>
+  </div>
+</div>
+
+### Gradient (그라데이션)
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem', marginBottom: '2rem' }}>
+  <div>
+    <div style={{ height: '80px', background: 'linear-gradient(135deg, #2E61E6 0%, #528DE8 100%)', borderRadius: '0.625rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>Primary</strong></p>
+  </div>
+  <div>
+    <div style={{ height: '80px', background: 'linear-gradient(135deg, #16A34A 0%, #22C55E 100%)', borderRadius: '0.625rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>Accent</strong></p>
+  </div>
+  <div>
+    <div style={{ height: '80px', background: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)', borderRadius: '0.625rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>Warning</strong></p>
+  </div>
+  <div>
+    <div style={{ height: '80px', background: 'linear-gradient(135deg, #DC2626 0%, #EF4444 100%)', borderRadius: '0.625rem' }}></div>
+    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}><strong>Danger</strong></p>
+  </div>
+</div>
+
+---
+
+## 특별 기능: Glassmorphism (글래스모피즘)
+
+다크 모드에서 사용 가능한 유리질감 효과를 지원합니다.
+
+### Liquid Glass 모드
+
+`.liquid` 클래스를 body에 추가하면 글래스모피즘 효과가 활성화됩니다:
+
+```tsx
+// 기본 사용
+<div className="liquid-glass">
+  유리질감 컨테이너
+</div>
+
+// 색상 변형
+<div className="liquid-glass liquid-glass-primary">
+  Primary 글래스
+</div>
+
+<div className="liquid-glass liquid-glass-accent">
+  Accent 글래스
+</div>
+
+// 클릭 가능한 요소
+<button className="liquid-glass clickable">
+  클릭 가능한 글래스 버튼
+</button>
+```
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginTop: '1rem', marginBottom: '2rem', backgroundColor: '#0A0F1C', padding: '2rem', borderRadius: '0.625rem' }}>
+  <div style={{ padding: '1.5rem', background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.18)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(14px)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold', color: '#EAF2FF' }}>기본</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#9CB3D1' }}>Glass Effect</p>
+  </div>
+  <div style={{ padding: '1.5rem', background: 'rgba(82, 141, 232, 0.25)', border: '1px solid rgba(82, 141, 232, 0.4)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(14px)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold', color: '#EAF2FF' }}>Primary</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#9CB3D1' }}>Blue Glass</p>
+  </div>
+  <div style={{ padding: '1.5rem', background: 'rgba(34, 197, 94, 0.25)', border: '1px solid rgba(34, 197, 94, 0.4)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(14px)' }}>
+    <p style={{ margin: 0, fontWeight: 'bold', color: '#EAF2FF' }}>Accent</p>
+    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#9CB3D1' }}>Green Glass</p>
+  </div>
+</div>
+
+---
+
+## 📐 Component Categories
+
+### Atoms (원자) - 44개
+기본 빌딩 블록
+- Button, Input, Label, Badge, Select, MultiSelect
+- Checkbox, Switch, Toggle, Radio Group
+- Avatar, Progress, Skeleton, Slider
+- Separator, Aspect Ratio, Textarea
+- SearchInput, ColorPicker, Card, Carousel
+- Calendar, Chart, Tooltip, Toast
+- Accordion, Alert, AlertDialog, Breadcrumb
+- Collapsible, Command, ContextMenu, Dialog
+- DialogPopover, Drawer, DropdownMenu, HoverCard
+- Menubar, NavigationMenu, Pagination, Popover
+- Resizable, Sheet, Table, Tabs
+
+### Molecules (분자) - 9개
+2-3개의 Atoms 조합
+- Combobox, DatePicker, FilterBar
+- Form, LabeledInput, ModalForm
+- Profile, SearchForm, ToggleGroup
+
+### Organisms (유기체) - 3개
+복잡한 UI 패턴
+- DataTable, LoginForm, Sidebar
+
+---
+
+## 시작하기
+
+### 설치
+
+```bash
+pnpm add @plug/ui
+```
+
+### 사용법
+
+앱에 전역 스타일을 import합니다:
+
+```tsx
+import '@plug/ui/styles';
+```
+
+컴포넌트를 import합니다:
+
+```tsx
+// 메인 엔트리에서 import
+import { Button, Input, Badge } from '@plug/ui';
+
+function App() {
+  return (
+    <div>
+      <Button variant="default" size="lg">
+        클릭하세요
+      </Button>
+      <Input placeholder="입력하세요" />
+      <Badge variant="default">뱃지</Badge>
+    </div>
+  );
+}
+```
+
+### Form 사용 (React Hook Form + Zod)
+
+```tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, Input, Button } from '@plug/ui';
+
+const schema = z.object({
+  username: z.string().min(2, '최소 2글자 이상'),
+  email: z.string().email('올바른 이메일 형식'),
+});
+
+function MyForm() {
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { username: '', email: '' },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(console.log)}>
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>사용자 이름</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">제출</Button>
+      </form>
+    </Form>
+  );
+}
+```
+
+### 유틸리티
+
+조건부 클래스명을 위한 `cn` 유틸리티를 사용합니다:
+
+```tsx
+import { cn } from '@plug/ui';
+
+const buttonClass = cn(
+  'base-class',
+  isActive && 'active-class',
+  isDisabled && 'disabled-class'
+);
+```
+
+---
+
+## 컴포넌트 탐색
+
+Atomic Design 레벨에 따라 구성된 컴포넌트를 탐색하세요:
+
+- **Atoms** → 기본 UI 요소 (44개)
+- **Molecules** → 컴포넌트 조합 (9개)
+- **Organisms** → 복잡한 기능 (3개)
+
+각 컴포넌트는 인터랙티브 예제, Props 문서, 사용법 가이드를 제공합니다.
+
+---
+
+## 다크 모드
+
+다크 모드는 `data-mode` 속성을 통해 제어됩니다:
+
+```tsx
+// Light mode
+<html data-mode="light">
+
+// Dark mode
+<html data-mode="dark">
+```
+
+다크 모드에서는 글래스모피즘 효과와 함께 최적화된 색상 대비를 제공합니다.
+
+---
+
+**Questions?** 문의사항은 팀 채널에서 공유해주세요.
